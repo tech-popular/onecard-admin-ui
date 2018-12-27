@@ -78,7 +78,11 @@ class EditableTable extends React.Component {
       key: 'name',
       editable: true,
       render: (name, record) => {
-        return (<span><Circle style={{ 'marginRight': 5 }} enabled={record.enable === 'ENABLED'} />{name}</span>);
+        if(this.editable){
+          return (<span><Circle style={{ 'marginRight': 5 }} enabled={record.enable === 'ENABLED'} />{name}</span>)
+        }else{
+          return name;
+        }
       },
     }, {
       align: 'center',
@@ -101,17 +105,6 @@ class EditableTable extends React.Component {
     }];
 
     if (this.editable) {
-      this.columns.push({
-        width: 100,
-        align: 'center',
-        title: '角色',
-        key: 'roles',
-        dataIndex: 'roles',
-        render: roles => {
-          const names = _.uniq(_.map(roles, role => role.role.name));
-          return _.join(names, ",");
-        }
-      });
       this.columns.push({
         align: 'center',
         title: '操作',
@@ -143,18 +136,6 @@ class EditableTable extends React.Component {
             <a onClick={() => this.cancel(id)}>取消</a>
           </span>);
           }
-        },
-      });
-    } else {
-      this.columns.push({
-        width: 100,
-        align: 'center',
-        title: '角色',
-        key: 'roleList',
-        dataIndex: 'roleList',
-        render: roles => {
-          const names = _.map(roles, r => r.name);
-          return _.join(names, ', ');
         },
       });
     }
@@ -223,6 +204,7 @@ class EditableTable extends React.Component {
           components={components}
           rowKey="id"
           bordered
+          pagination={this.editable}
           title={() => toolbar || '用户列表'}
           size="small"
           columns={columns}

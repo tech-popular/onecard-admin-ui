@@ -23,9 +23,9 @@ const makeSelectUsers = () => createSelector(selectUserDomain, (state) => state.
 const makeSelectFilter = () => createSelector(selectUserDomain, (state) => state.get('filter'));
 const makeSelectDrawerUser = () => createSelector(selectUserDomain, state => state.getIn(['drawer', 'user']));
 const makeSelectDrawerVisible = () => createSelector(selectUserDomain, state => state.getIn(['drawer', 'visible']));
-const makeSelectAlarmThreshold = () => createSelector(selectAlarmDomain, state => state.get('thresholds'));
-const makeSelectLevelMappings = () => createSelector(selectAlarmDomain, state => state.getIn(['level', 'mapping']));
-const makeSelectProjectData = () => createSelector(selectProjectDomain, state => state.get('data').toJS());
+const makeSelectAlarmTask = () => createSelector(selectAlarmDomain, state => state.get('tasks'));
+const makeSelectAlarmLevels = () => createSelector(selectAlarmDomain, state => state.get('levels'));
+const makeSelectProjectData = () => createSelector(selectProjectDomain, state => state.get('projects'));
 const makeSelectLocation = state => createSelector(routerDomain, state => state.get('location').toJS());
 const makeSelectRoles = () => createSelector(selectUserDomain, (state) => state.get('roles'));
 
@@ -40,7 +40,7 @@ export {
   makeSelectDrawerVisible,
   makeSelectRoles,
   makeNotifyMessage,
-  makeSelectAlarmThreshold,
-  makeSelectLevelMappings,
-  makeSelectProjectData
+  makeSelectAlarmTask,
+  makeSelectProjectData,
+  makeSelectAlarmLevels
 };

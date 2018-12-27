@@ -50,6 +50,7 @@ class UserList extends React.PureComponent {
       this.props.addUser(user);
     }
   };
+
   filter = (key) => {
     this.props.load(key);
   };
@@ -57,8 +58,9 @@ class UserList extends React.PureComponent {
   render() {
     return (
       <section>
-        <UserEditorTable {...this.props} toolbar={<UserToolBar search={(key) => this.filter(key)}
-                                                               addUser={() => this.showFormDrawer(true)} />} />
+        <UserEditorTable
+          {...this.props}
+          toolbar={<UserToolBar search={(key) => this.filter(key)} addUser={() => this.showFormDrawer(true)} />} />
         <Drawer
           title="创建用户"
           width={720}

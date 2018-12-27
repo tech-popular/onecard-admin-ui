@@ -7,37 +7,20 @@ export const types = {
 
 
 export const initialState = fromJS({
-  data: {
-    projects: false,
-    groups: false,
-    services: false,
-  },
+  projects: false
 });
 
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case types.UPDATE:
-      const projectData = action.projects;
-      const _projects = new Set();
-      const _groups = new Set();
-      const _services = new Set();
-      projectData.forEach(item => {
-        _groups.add(item.group);
-        _projects.add(item.project);
-        _services.add(item.serviceName);
-      });
-
-      // const { projects, groups, services } = action.data;
-      return state.setIn(['data', 'projects'], [..._projects])
-        .setIn(['data', 'groups'], [..._groups])
-        .setIn(['data', 'services'], [..._services]);
+      return state.set('projects', action.data);
     default:
       return state;
   }
 }
 
 export const actions = {
-  update: projects => ({ type: types.UPDATE, projects }),
+  update: data => ({ type: types.UPDATE, data }),
   loadProjects: () => ({ type: types.LOAD_PROJECTS }),
 };

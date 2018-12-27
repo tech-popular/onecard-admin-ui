@@ -5,24 +5,24 @@ import { createStructuredSelector } from 'reselect';
 import { Row, Col } from 'antd';
 
 import UserList from './userList';
-import RoleList from './roleList';
+import RoleList from '../AlarmPage/projectList';
 
 export class User extends React.PureComponent {
   render() {
     return (
       <section>
         <Row gutter={8}>
-          <Col span={18}>
+          <Col span={24}>
             <UserList />
           </Col>
-          <Col span={6}>
-            <Row style={{height: 800}}>
-              <RoleList />
-            </Row>
-            <Row>
+          {/*<Col span={6}>*/}
+            {/*<Row style={{height: 800}}>*/}
+              {/*<RoleList />*/}
+            {/*</Row>*/}
+            {/*<Row>*/}
 
-            </Row>
-          </Col>
+            {/*</Row>*/}
+          {/*</Col>*/}
         </Row>
       </section>
     );

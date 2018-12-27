@@ -1,13 +1,13 @@
-import React from 'react';
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
+import React from "react";
+import styled from "styled-components";
+import PropTypes from "prop-types";
 
-import { Table, Button } from 'antd';
-import { connect } from 'react-redux';
+import { Table, Button, Popover } from "antd";
+import { connect } from "react-redux";
 
-import { actions } from 'reducers/user';
-import { compose } from 'redux';
-import DeleteBtn from 'components/button/delete';
+import { actions } from "reducers/user";
+import { compose } from "redux";
+import DeleteBtn from "components/button/delete";
 
 const Wrapper = styled.section`
   padding: 5px;
@@ -16,41 +16,45 @@ const Wrapper = styled.section`
 `;
 
 
-
 class UserItemDetail extends React.PureComponent {
   constructor(props) {
     super(props);
     this.userItemColumns = [{
-      align: 'center',
+      align: "center",
       width: 100,
-      title: '组名',
-      dataIndex: 'group',
-      key: 'group',
+      title: "组名",
+      dataIndex: "project.group"
     }, {
       width: 200,
-      align: 'center',
-      title: '项目名',
-      dataIndex: 'project',
-      key: 'project',
+      align: "center",
+      title: "项目名",
+      dataIndex: "project.project"
     }, {
       width: 200,
-      align: 'center',
-      title: '服务名',
-      dataIndex: 'service',
-      key: 'service',
+      align: "center",
+      title: "服务名",
+      dataIndex: "project.serviceName"
     }, {
-      width: 150,
-      align: 'center',
-      title: '角色',
-      dataIndex: 'role',
-      key: 'role',
-      render: role => role.name,
+      width: 80,
+      align: "center",
+      title: "告警级别",
+      dataIndex: "threshold.level",
+      key: "threshold.id"
     }, {
-      align: 'center',
-      title: '操作',
-      dataIndex: 'id',
-      key: 'id',
-      render: (id) => <DeleteBtn tip="删除用户角色" action={() => this.deleteRole(id)} message={'确认删除角色？'} />,
+      width: 80,
+      align: "center",
+      title: "表达式",
+      dataIndex: "threshold.expression",
+      render: expression =>
+        <Popover content={expression} title="表达式" trigger="click">
+            <a>显示</a>
+        </Popover>
+    }, {
+      align: "center",
+      title: "操作",
+      dataIndex: "id",
+      key: "id",
+      render: (id) => <DeleteBtn tip="删除用户角色" action={() => this.deleteRole(id)} message={"确认删除角色？"} />
     }];
   }
 
@@ -62,21 +66,25 @@ class UserItemDetail extends React.PureComponent {
     this.props.showUserDrawer(this.props.user);
   };
 
+  showExpression = () => {
+
+  };
+
   render() {
     const user = this.props.user || [];
 
     return (
       <Wrapper>
-        <Button onClick={() => this.viewDrawer()} style={{ position: 'absolute', left: -50}}
-                size={'small'} icon={'plus'} type={'primary'}/>
+        {/*<Button onClick={() => this.viewDrawer()} style={{ position: "absolute", left: -50 }}*/}
+                {/*size={"small"} icon={"plus"} type={"primary"} />*/}
         <Table
           rowKey="id"
           pagination={false}
           scroll={{ y: 300 }}
           size="small"
-          locale={{ emptyText: '暂无数据' }}
+          locale={{ emptyText: "暂无数据" }}
           columns={this.userItemColumns}
-          dataSource={user.roles}
+          dataSource={user.projects}
         />
       </Wrapper>
     );
@@ -86,20 +94,20 @@ class UserItemDetail extends React.PureComponent {
 UserItemDetail.propTypes = {
   user: PropTypes.object.isRequired,
   deleteUserRole: PropTypes.func.isRequired,
-  showUserDrawer: PropTypes.func.isRequired,
+  showUserDrawer: PropTypes.func.isRequired
 };
 
 
 const withConnect = connect(
   null,
-  mapDispatchToProps,
+  mapDispatchToProps
 );
 
 
 function mapDispatchToProps(dispatch) {
   return {
     deleteUserRole: id => dispatch(actions.deleteUserRole(id)),
-    showUserDrawer: user => dispatch(actions.changeDrawerVisible(true, user)),
+    showUserDrawer: user => dispatch(actions.changeDrawerVisible(true, user))
   };
 }
 

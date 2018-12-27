@@ -24,11 +24,18 @@ const AddItemLabel = ({ ...props }) => {
 class _AddForm extends React.PureComponent {
   constructor(props) {
     super(props);
-    const { groups, services, projects } = this.props.projectData;
+    const _projects = new Set();
+    const _groups = new Set();
+    const _services = new Set();
+    this.props.projectData.forEach(item => {
+      _groups.add(item.group);
+      _projects.add(item.project);
+      _services.add(item.serviceName);
+    });
     this.state = {
-      groups: groups,
-      services: services,
-      projects: projects,
+      groups: [..._groups],
+      services: [..._services],
+      projects: [..._projects],
     };
   }
 
@@ -106,58 +113,58 @@ class _AddForm extends React.PureComponent {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="组名">
-                {getFieldDecorator('group', {
-                  rules: [{ required: true, message: '请输入组名' }],
-                })(
-                  <Select showSearch={true} placeholder="请输入组名">
-                    {this.state.groups.map(group => <Option key={group} value={group}>{group}</Option>)}
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="角色">
-                {getFieldDecorator('role', {
-                  rules: [{ required: true, message: '请选择角色' }],
-                })(
-                  <Select showSearch={true} placeholder="请选择角色">
-                    {roles.map(role => <Option key={role.id} value={role.id}>{role.name}</Option>)}
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label={<AddItemLabel inputTitle='输入项目名...' title={'创建项目'}
-                                     submit={text => this.insert('projects', text)} />}>
-                {getFieldDecorator('project', {
-                  rules: [{ required: true, message: '输入项目名' }],
-                })(
-                  <Select placeholder="请选择项目名">
-                    {this.state.projects.map(project => <Option key={project} value={project}>{project}</Option>)}
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label={<AddItemLabel inputTitle='输入服务名...' title={'创建服务'}
-                                              submit={text => this.insert('services', text)} />}>
-                {getFieldDecorator('service', {
-                  rules: [{ required: true, message: '输入服务名' }],
-                })(
-                  <Select placeholder="请选择服务名" showSearch
-                          filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
-                    {this.state.services.map(item => <Option key={item} value={item}>{item}</Option>)}
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
+          {/*<Row gutter={16}>*/}
+            {/*<Col span={12}>*/}
+              {/*<Form.Item label="组名">*/}
+                {/*{getFieldDecorator('group', {*/}
+                  {/*rules: [{ required: true, message: '请输入组名' }],*/}
+                {/*})(*/}
+                  {/*<Select showSearch={true} placeholder="请输入组名">*/}
+                    {/*{this.state.groups.map(group => <Option key={group} value={group}>{group}</Option>)}*/}
+                  {/*</Select>,*/}
+                {/*)}*/}
+              {/*</Form.Item>*/}
+            {/*</Col>*/}
+            {/*<Col span={12}>*/}
+              {/*<Form.Item label="角色">*/}
+                {/*{getFieldDecorator('role', {*/}
+                  {/*rules: [{ required: true, message: '请选择角色' }],*/}
+                {/*})(*/}
+                  {/*<Select showSearch={true} placeholder="请选择角色">*/}
+                    {/*{roles.map(role => <Option key={role.id} value={role.id}>{role.name}</Option>)}*/}
+                  {/*</Select>,*/}
+                {/*)}*/}
+              {/*</Form.Item>*/}
+            {/*</Col>*/}
+          {/*</Row>*/}
+          {/*<Row gutter={16}>*/}
+            {/*<Col span={12}>*/}
+              {/*<Form.Item*/}
+                {/*label={<AddItemLabel inputTitle='输入项目名...' title={'创建项目'}*/}
+                                     {/*submit={text => this.insert('projects', text)} />}>*/}
+                {/*{getFieldDecorator('project', {*/}
+                  {/*rules: [{ required: true, message: '输入项目名' }],*/}
+                {/*})(*/}
+                  {/*<Select placeholder="请选择项目名">*/}
+                    {/*{this.state.projects.map(project => <Option key={project} value={project}>{project}</Option>)}*/}
+                  {/*</Select>,*/}
+                {/*)}*/}
+              {/*</Form.Item>*/}
+            {/*</Col>*/}
+            {/*<Col span={12}>*/}
+              {/*<Form.Item label={<AddItemLabel inputTitle='输入服务名...' title={'创建服务'}*/}
+                                              {/*submit={text => this.insert('services', text)} />}>*/}
+                {/*{getFieldDecorator('service', {*/}
+                  {/*rules: [{ required: true, message: '输入服务名' }],*/}
+                {/*})(*/}
+                  {/*<Select placeholder="请选择服务名" showSearch*/}
+                          {/*filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>*/}
+                    {/*{this.state.services.map(item => <Option key={item} value={item}>{item}</Option>)}*/}
+                  {/*</Select>,*/}
+                {/*)}*/}
+              {/*</Form.Item>*/}
+            {/*</Col>*/}
+          {/*</Row>*/}
         </Form>
         <div
           style={{

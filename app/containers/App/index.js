@@ -11,7 +11,7 @@ import AlarmPage from '../AlarmPage';
 import NotFoundPage from '../NotFoundPage';
 
 import injectSaga from 'utils/injectSaga';
-import 'antd/dist/antd.css';
+// import 'antd/dist/antd.css';
 
 import GlobalStyle from 'global-styles';
 import kafkaSaga from 'sagas/kafka';
@@ -26,9 +26,9 @@ const { Header, Content, Footer } = Layout;
 
 import Global from './global';
 import { createStructuredSelector } from 'reselect';
-import { actions as userActions } from 'reducers/user';
+import { actions as alarmActions } from 'reducers/alarm';
 import { actions as projectActions } from 'reducers/project';
-import { makeSelectRoles } from 'reducers/selector';
+import { makeSelectProjectData, makeSelectAlarmLevels } from 'reducers/selector';
 
 
 class MainPage extends Component {
@@ -37,13 +37,14 @@ class MainPage extends Component {
   }
 
   componentDidMount() {
-    this.props.loadRoles();
     this.props.loadProjects();
+    this.props.loadAlarmLevel();
   }
 
   render() {
-    if (!this.props.roles) {
-      return <h1>加载中...</h1>;
+    const {projects, levels} = this.props;
+    if(projects === false || levels === false){
+      return <h1>加载中...</h1>
     }
     return (
       <div>
@@ -75,13 +76,14 @@ class MainPage extends Component {
 
 
 const mapStateToProps = createStructuredSelector({
-  roles: makeSelectRoles(),
+  levels: makeSelectAlarmLevels(),
+  projects: makeSelectProjectData(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    loadRoles: () => dispatch(userActions.loadRoles()),
     loadProjects: () => dispatch(projectActions.loadProjects()),
+    loadAlarmLevel: () => dispatch(alarmActions.loadLevel()),
   };
 }
 

@@ -8,15 +8,16 @@ module.exports = {
     ],
     '@babel/preset-react',
   ],
-  plugins: [
+  "plugins": [
     ["import", {
       "libraryName": "antd",
       "libraryDirectory": "es",
-      "style": "css",
-    }],
+      "style": "css"
+    },
+    ],
     'styled-components',
     '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-syntax-dynamic-import',
+    '@babel/plugin-syntax-dynamic-import'
   ],
   env: {
     production: {

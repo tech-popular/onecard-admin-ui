@@ -2,46 +2,32 @@ import { fromJS } from 'immutable';
 import _ from 'lodash';
 
 export const types = {
-  LOAD_THRESHOLD: 'app/AlarmPage/LOAD_THRESHOLD',
-  ADD_THRESHOLD: 'app/AlarmPage/ADD_THRESHOLD',
-  DELETE_THRESHOLD: 'app/AlarmPage/DELETE_THRESHOLD',
-  DELETE_THRESHOLD_SUCCESS: 'app/AlarmPage/DELETE_THRESHOLD_SUCCESS',
-  ADD_THRESHOLD_SUCCESS: 'app/AlarmPage/ADD_THRESHOLD_SUCCESS',
-  UPDATE_THRESHOLD: 'app/AlarmPage/UPDATE_THRESHOLD',
-  LOAD_LEVEL_MAPPING: 'app/AlarmPage/LOAD_LEVEL_MAPPING',
-  UPDATE_LEVEL_MAPPING: 'app/AlarmPage/UPDATE_LEVEL_MAPPING',
+  LOAD_TASK: 'app/AlarmPage/LOAD_TASK',
+  LOAD_LEVEL: 'app/AlarmPage/LOAD_LEVEL',
+  UPDATE_TASK: 'app/AlarmPage/UPDATE_TASK',
+  UPDATE_LEVEL: 'app/AlarmPage/UPDATE_LEVEL',
 };
 
 export const initialState = fromJS({
-  thresholds: false,
-  level: {
-    mapping: false,
-  },
+  tasks: false,
+  levels: false,
 });
 
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case types.UPDATE_THRESHOLD:
-      return state.set('thresholds', action.data);
-    case types.ADD_THRESHOLD_SUCCESS:
-      return state.set('thresholds', [...[action.data], ...state.get('thresholds')]);
-    case types.UPDATE_LEVEL_MAPPING:
-      return state.setIn(['level', 'mapping'], action.data);
-    case types.DELETE_THRESHOLD_SUCCESS:
-      return state.set('thresholds', _.reject(state.get('thresholds'), { 'id': action.id }));
+    case types.UPDATE_TASK:
+      return state.set('tasks', action.data);
+    case types.UPDATE_LEVEL:
+      return state.set('levels', action.data);
     default:
       return state;
   }
 }
 
 export const actions = {
-  loadThreshold: (text = "") => ({ type: types.LOAD_THRESHOLD, text }),
-  deleteThreshold: id => ({ type: types.DELETE_THRESHOLD, id }),
-  deleteThresholdSuccess: id => ({ type: types.DELETE_THRESHOLD_SUCCESS, id }),
-  addThreshold: data => ({ type: types.ADD_THRESHOLD, data }),
-  addThresholdSuccess: (data) => ({ type: types.ADD_THRESHOLD_SUCCESS, data }),
-  updateThreshold: (data) => ({ type: types.UPDATE_THRESHOLD, data }),
-  loadLevelMapping: () => ({ type: types.LOAD_LEVEL_MAPPING }),
-  updateLevelMapping: (data) => ({ type: types.UPDATE_LEVEL_MAPPING, data }),
+  loadTask: () => ({ type: types.LOAD_TASK }),
+  loadLevel: () => ({ type: types.LOAD_LEVEL }),
+  updateTaskList: (data) => ({ type: types.UPDATE_TASK, data }),
+  updateTaskLevel: (data) => ({ type: types.UPDATE_LEVEL, data }),
 };
