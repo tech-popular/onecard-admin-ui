@@ -328,10 +328,19 @@ export default {
       }, {
         value: 2,
         label: '复杂MIX'
+      },{
+        value: 3,
+        label: 'MYSQL'
       }],
       datasourceoptions: [{
         value: 1,
         label: 'kafka'
+      },{
+        value: 2,
+        label: '常规数据源'
+      },{
+        value: 3,
+        label: 'MYSQL'
       }],
       datatypeoptions: [{
         value: 1,

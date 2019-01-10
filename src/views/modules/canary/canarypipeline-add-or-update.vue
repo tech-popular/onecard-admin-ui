@@ -62,12 +62,6 @@
           name: [
             { required: true, message: '名称不能为空', trigger: 'blur' }
           ],
-          value: [
-            { required: true, message: 'pipe值不能为空', trigger: 'blur' }
-          ],
-          templateId: [
-            { required: true, message: '模板Id不能为空', trigger: 'blur' }
-          ],
           enable: [
             { required: true, message: '是否启用不能为空', trigger: 'blur' }
           ]
