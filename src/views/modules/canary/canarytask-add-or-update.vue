@@ -39,7 +39,7 @@
       <el-form-item label="sql" prop="sql">
         <el-input type="textarea" v-model="dataForm.sql" placeholder="sql"></el-input>
       </el-form-item>
-      <el-form-item label="频率（秒）" prop="howOften">
+      <el-form-item label="频率(秒)" prop="howOften">
         <el-input v-model="dataForm.howOften" placeholder="频率"></el-input>
       </el-form-item>
       <el-form-item label="标签" prop="tags">
@@ -173,7 +173,7 @@
   <span slot="footer" class="dialog-footer">
     <el-button style="margin-top: 12px;" v-show="nextButton" @click="nextPage()">下一步</el-button>
     <el-button @click="closeUpdateBox">取消</el-button>
-    <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+    <el-button v-show="dataForm.id" type="primary" @click="dataFormSubmit()">确定</el-button>
   </span>
 </el-dialog>
 </template>
@@ -270,15 +270,15 @@ export default {
         //   message: 'sql不能为空',
         //   trigger: 'blur'
         // }],
-        howOften: [{
-          required: true,
-          message: '频率不能为空',
-          trigger: 'blur'
-        },
-        {
-          type: 'number',
-          message: '请输入数字类型'
-        }],
+        // howOften: [{
+        //   required: true,
+        //   message: '频率不能为空',
+        //   trigger: 'blur'
+        // },
+        // {
+        //   type: 'number',
+        //   message: '请输入数字类型'
+        // }],
         projectId: [{
           required: true,
           message: '项目Id不能为空',
