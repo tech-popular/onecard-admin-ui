@@ -55,7 +55,7 @@
         prop="templateName"
         header-align="center"
         align="center"
-        label="模板Id">
+        label="模板">
       </el-table-column>
       <el-table-column
         prop="enable"

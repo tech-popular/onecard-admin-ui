@@ -17,7 +17,7 @@
     <el-form-item label="pipe值" prop="value">
       <el-input v-model="dataForm.value" placeholder="pipe值"></el-input>
     </el-form-item>
-    <el-form-item label="模板Id" prop="templateId">
+    <el-form-item label="模板" prop="templateId">
       <!--<el-input v-model="dataForm.templateId" placeholder="模板Id"></el-input>-->
       <el-select v-model="dataForm.templateId" placeholder="请选择">
     <el-option
