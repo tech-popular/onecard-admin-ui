@@ -229,7 +229,7 @@ export default {
         topic: '',
         cacheSql: '',
         sql: '',
-        howOften: '',
+        howOften: '60',
         tags: '',
         projectId: '',
         enable: 1
@@ -260,16 +260,16 @@ export default {
           message: '主题不能为空',
           trigger: 'blur'
         }],
-        cacheSql: [{
-          required: true,
-          message: 'cache_sql不能为空',
-          trigger: 'blur'
-        }],
-        sql: [{
-          required: true,
-          message: 'sql不能为空',
-          trigger: 'blur'
-        }],
+        // cacheSql: [{
+        //   required: true,
+        //   message: 'cache_sql不能为空',
+        //   trigger: 'blur'
+        // }],
+        // sql: [{
+        //   required: true,
+        //   message: 'sql不能为空',
+        //   trigger: 'blur'
+        // }],
         howOften: [{
           required: true,
           message: '频率不能为空',
@@ -278,11 +278,6 @@ export default {
         {
           type: 'number',
           message: '请输入数字类型'
-        }],
-        tags: [{
-          required: true,
-          message: '标签不能为空',
-          trigger: 'blur'
         }],
         projectId: [{
           required: true,
@@ -328,9 +323,6 @@ export default {
       }, {
         value: 2,
         label: '复杂MIX'
-      }, {
-        value: 3,
-        label: 'MYSQL'
       }],
       datasourceoptions: [{
         value: 1,
@@ -348,6 +340,9 @@ export default {
       }, {
         value: 2,
         label: 'ZIPKIN'
+      }, {
+        value: 3,
+        label: 'MYSQL'
       }],
       projects: [],
       activeName: '1',

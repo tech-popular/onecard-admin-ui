@@ -91,10 +91,10 @@
         label="频率">
       </el-table-column>
       <el-table-column
-        prop="tags"
+        prop="projectName"
         header-align="center"
         align="center"
-        label="标签">
+        label="项目名称">
       </el-table-column>
       <!--<el-table-column
         prop="projectId"
