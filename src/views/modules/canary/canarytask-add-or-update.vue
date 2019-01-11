@@ -39,7 +39,7 @@
       <el-form-item label="sql" prop="sql">
         <el-input type="textarea" v-model="dataForm.sql" placeholder="sql"></el-input>
       </el-form-item>
-      <el-form-item label="频率" prop="howOften">
+      <el-form-item label="频率（秒）" prop="howOften">
         <el-input v-model="dataForm.howOften" placeholder="频率"></el-input>
       </el-form-item>
       <el-form-item label="标签" prop="tags">
