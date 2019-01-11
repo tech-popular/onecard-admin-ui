@@ -10,7 +10,6 @@
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">首页</span>
         </el-menu-item>
-        <!--
         <el-submenu index="demo">
           <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
@@ -24,7 +23,7 @@
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">ueditor</span>
           </el-menu-item>
-        </el-submenu>-->
+        </el-submenu>
         <sub-menu
           v-for="menu in menuList"
           :key="menu.menuId"
