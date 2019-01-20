@@ -4,14 +4,14 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="横坐标是否显示" prop="xaxisShow">
-      <el-input v-model="dataForm.xaxisShow" placeholder="横坐标是否显示"></el-input>
+    <el-form-item label="创建者" prop="userId">
+      <el-input v-model="dataForm.userId" placeholder="创建者"></el-input>
     </el-form-item>
-    <el-form-item label="坐标类型" prop="xaxisType">
-      <el-input v-model="dataForm.xaxisType" placeholder="坐标类型"></el-input>
+    <el-form-item label="模板类型" prop="chartType">
+      <el-input v-model="dataForm.chartType" placeholder="模板类型"></el-input>
     </el-form-item>
-    <el-form-item label="两侧是否留白" prop="boundaryGap">
-      <el-input v-model="dataForm.boundaryGap" placeholder="两侧是否留白"></el-input>
+    <el-form-item label="模板内容" prop="chartContent">
+      <el-input v-model="dataForm.chartContent" placeholder="模板内容"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -28,19 +28,19 @@
         visible: false,
         dataForm: {
           id: 0,
-          xaxisShow: '',
-          xaxisType: '',
-          boundaryGap: ''
+          userId: '',
+          chartType: '',
+          chartContent: ''
         },
         dataRule: {
-          xaxisShow: [
-            { required: true, message: '横坐标是否显示不能为空', trigger: 'blur' }
+          userId: [
+            { required: true, message: '创建者不能为空', trigger: 'blur' }
           ],
-          xaxisType: [
-            { required: true, message: '坐标类型不能为空', trigger: 'blur' }
+          chartType: [
+            { required: true, message: '模板类型不能为空', trigger: 'blur' }
           ],
-          boundaryGap: [
-            { required: true, message: '两侧是否留白不能为空', trigger: 'blur' }
+          chartContent: [
+            { required: true, message: '模板内容不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -53,14 +53,14 @@
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/report/chartxaxis/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/report/chartuser/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.xaxisShow = data.chartxaxis.xaxisShow
-                this.dataForm.xaxisType = data.chartxaxis.xaxisType
-                this.dataForm.boundaryGap = data.chartxaxis.boundaryGap
+                this.dataForm.userId = data.chartuser.userId
+                this.dataForm.chartType = data.chartuser.chartType
+                this.dataForm.chartContent = data.chartuser.chartContent
               }
             })
           }
@@ -71,13 +71,13 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/report/chartxaxis/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/report/chartuser/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                'xaxisShow': this.dataForm.xaxisShow,
-                'xaxisType': this.dataForm.xaxisType,
-                'boundaryGap': this.dataForm.boundaryGap
+                'userId': this.dataForm.userId,
+                'chartType': this.dataForm.chartType,
+                'chartContent': this.dataForm.chartContent
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

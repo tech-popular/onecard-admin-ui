@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('report:chartlegend:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('report:chartlegend:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('report:chartuser:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('report:chartuser:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -29,64 +29,22 @@
         label="主键">
       </el-table-column>
       <el-table-column
-        prop="legendType"
+        prop="userId"
         header-align="center"
         align="center"
-        label="类型">
+        label="创建者">
       </el-table-column>
       <el-table-column
-        prop="legendShow"
+        prop="chartType"
         header-align="center"
         align="center"
-        label="是否显示">
+        label="模板类型">
       </el-table-column>
       <el-table-column
-        prop="legendLeft"
+        prop="chartContent"
         header-align="center"
         align="center"
-        label="左间距">
-      </el-table-column>
-      <el-table-column
-        prop="legendTop"
-        header-align="center"
-        align="center"
-        label="上间距">
-      </el-table-column>
-      <el-table-column
-        prop="legendRight"
-        header-align="center"
-        align="center"
-        label="右间距">
-      </el-table-column>
-      <el-table-column
-        prop="legendBottom"
-        header-align="center"
-        align="center"
-        label="底部间距">
-      </el-table-column>
-      <el-table-column
-        prop="orient"
-        header-align="center"
-        align="center"
-        label="布局朝向">
-      </el-table-column>
-      <el-table-column
-        prop="align"
-        header-align="center"
-        align="center"
-        label="对齐方式">
-      </el-table-column>
-      <el-table-column
-        prop="itemGap"
-        header-align="center"
-        align="center"
-        label="间距">
-      </el-table-column>
-      <el-table-column
-        prop="textStyle"
-        header-align="center"
-        align="center"
-        label="文本样式">
+        label="模板内容">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -115,7 +73,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './chartlegend-add-or-update'
+  import AddOrUpdate from './chartuser-add-or-update'
   export default {
     data () {
       return {
@@ -142,7 +100,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/report/chartlegend/list'),
+          url: this.$http.adornUrl('/report/chartuser/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -193,7 +151,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/report/chartlegend/delete'),
+            url: this.$http.adornUrl('/report/chartuser/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
