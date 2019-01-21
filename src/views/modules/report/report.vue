@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('report:chartuser:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('report:chartuser:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('report:report:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('report:report:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -29,22 +29,28 @@
         label="主键">
       </el-table-column>
       <el-table-column
+        prop="reportTitle"
+        header-align="center"
+        align="center"
+        label="报表标题">
+      </el-table-column>
+      <el-table-column
         prop="userId"
         header-align="center"
         align="center"
-        label="创建者">
+        label="报表用户">
       </el-table-column>
       <el-table-column
-        prop="chartType"
+        prop="defaultTime"
         header-align="center"
         align="center"
-        label="模板类型">
+        label="时间">
       </el-table-column>
       <el-table-column
-        prop="chartContent"
+        prop="imgurl"
         header-align="center"
         align="center"
-        label="模板内容">
+        label="图片地址">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -73,7 +79,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './chartuser-add-or-update'
+  import AddOrUpdate from './report-add-or-update'
   export default {
     data () {
       return {
@@ -100,7 +106,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/report/chartuser/list'),
+          url: this.$http.adornUrl('/report/report/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -151,7 +157,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/report/chartuser/delete'),
+            url: this.$http.adornUrl('/report/report/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
