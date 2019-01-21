@@ -58,9 +58,9 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.userId = data.chartuser.userId
-                this.dataForm.chartType = data.chartuser.chartType
-                this.dataForm.chartContent = data.chartuser.chartContent
+                this.dataForm.userId = data.chartUser.userId
+                this.dataForm.chartType = data.chartUser.chartType
+                this.dataForm.chartContent = data.chartUser.chartContent
               }
             })
           }
