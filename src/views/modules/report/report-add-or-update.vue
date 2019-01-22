@@ -40,12 +40,6 @@
           reportTitle: [
             { required: true, message: '报表标题不能为空', trigger: 'blur' }
           ],
-          userId: [
-            { required: true, message: '报表用户不能为空', trigger: 'blur' }
-          ],
-          defaultTime: [
-            { required: true, message: '时间不能为空', trigger: 'blur' }
-          ],
           imgurl: [
             { required: true, message: '图片地址不能为空', trigger: 'blur' }
           ]

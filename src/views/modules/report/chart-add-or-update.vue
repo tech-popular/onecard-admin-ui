@@ -4,9 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="创建者" prop="userId">
-      <el-input v-model="dataForm.userId" placeholder="创建者"></el-input>
-    </el-form-item>
+    <!--<el-form-item label="创建者" prop="userId">-->
+      <!--<el-input v-model="dataForm.userId" placeholder="创建者"></el-input>-->
+    <!--</el-form-item>-->
     <el-form-item label="模板类型" prop="chartType">
       <el-input v-model="dataForm.chartType" placeholder="模板类型"></el-input>
     </el-form-item>
@@ -53,9 +53,9 @@
           belongReport: ''
         },
         dataRule: {
-          userId: [
-            { required: true, message: '创建者不能为空', trigger: 'blur' }
-          ],
+          // userId: [
+          //   { required: true, message: '创建者不能为空', trigger: 'blur' }
+          // ],
           chartType: [
             { required: true, message: '模板类型不能为空', trigger: 'blur' }
           ],
