@@ -23,7 +23,7 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
+        prop="chartId"
         header-align="center"
         align="center"
         label="主键">
@@ -71,7 +71,7 @@
         label="上边距">
       </el-table-column>
       <el-table-column
-        prop="belongReport"
+        prop="reportId"
         header-align="center"
         align="center"
         label="属于哪个报表">
@@ -83,8 +83,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.chartId)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.chartId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -173,7 +173,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
+          return item.chartId
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',

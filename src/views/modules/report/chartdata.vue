@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('report:report:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('report:report:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('report:chartdata:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('report:chartdata:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -23,34 +23,46 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="reportId"
+        prop="targetId"
         header-align="center"
         align="center"
         label="主键">
       </el-table-column>
       <el-table-column
-        prop="reportTitle"
+        prop="chartId"
         header-align="center"
         align="center"
-        label="报表标题">
+        label="图表Id">
       </el-table-column>
       <el-table-column
-        prop="userId"
+        prop="taskId"
         header-align="center"
         align="center"
-        label="报表用户">
+        label="任务ID">
       </el-table-column>
       <el-table-column
-        prop="defaultTime"
+        prop="tartgetName"
         header-align="center"
         align="center"
-        label="时间">
+        label="指标名称">
       </el-table-column>
       <el-table-column
-        prop="imgurl"
+        prop="targetValue"
         header-align="center"
         align="center"
-        label="图片地址">
+        label="指标值">
+      </el-table-column>
+      <el-table-column
+        prop="showType"
+        header-align="center"
+        align="center"
+        label="显示类型">
+      </el-table-column>
+      <el-table-column
+        prop="showStack"
+        header-align="center"
+        align="center"
+        label="显示堆">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -59,8 +71,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.reportId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.reportId)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.targetId)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.targetId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -79,7 +91,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './report-add-or-update'
+  import AddOrUpdate from './chartdata-add-or-update'
   export default {
     data () {
       return {
@@ -106,7 +118,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/report/report/list'),
+          url: this.$http.adornUrl('/report/chartdata/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -149,7 +161,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.reportId
+          return item.targetId
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -157,7 +169,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/report/report/delete'),
+            url: this.$http.adornUrl('/report/chartdata/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

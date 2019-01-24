@@ -30,7 +30,7 @@
       return {
         visible: false,
         dataForm: {
-          id: 0,
+          reportId: 0,
           reportTitle: '',
           userId: '',
           defaultTime: '',
@@ -40,6 +40,12 @@
           reportTitle: [
             { required: true, message: '报表标题不能为空', trigger: 'blur' }
           ],
+          userId: [
+            { required: true, message: '报表用户不能为空', trigger: 'blur' }
+          ],
+          defaultTime: [
+            { required: true, message: '时间不能为空', trigger: 'blur' }
+          ],
           imgurl: [
             { required: true, message: '图片地址不能为空', trigger: 'blur' }
           ]
@@ -48,13 +54,13 @@
     },
     methods: {
       init (id) {
-        this.dataForm.id = id || 0
+        this.dataForm.reportId = id || 0
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
+          if (this.dataForm.reportId) {
             this.$http({
-              url: this.$http.adornUrl(`/report/report/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/report/report/info/${this.dataForm.reportId}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
@@ -73,10 +79,10 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/report/report/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/report/report/${!this.dataForm.reportId ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
+                'reportId': this.dataForm.reportId || undefined,
                 'reportTitle': this.dataForm.reportTitle,
                 'userId': this.dataForm.userId,
                 'defaultTime': this.dataForm.defaultTime,

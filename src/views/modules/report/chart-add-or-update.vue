@@ -4,9 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <!--<el-form-item label="创建者" prop="userId">-->
-      <!--<el-input v-model="dataForm.userId" placeholder="创建者"></el-input>-->
-    <!--</el-form-item>-->
+    <el-form-item label="创建者" prop="userId">
+      <el-input v-model="dataForm.userId" placeholder="创建者"></el-input>
+    </el-form-item>
     <el-form-item label="模板类型" prop="chartType">
       <el-input v-model="dataForm.chartType" placeholder="模板类型"></el-input>
     </el-form-item>
@@ -25,8 +25,8 @@
     <el-form-item label="上边距" prop="posTop">
       <el-input v-model="dataForm.posTop" placeholder="上边距"></el-input>
     </el-form-item>
-    <el-form-item label="属于哪个报表" prop="belongReport">
-      <el-input v-model="dataForm.belongReport" placeholder="属于哪个报表"></el-input>
+    <el-form-item label="属于哪个报表" prop="reportId">
+      <el-input v-model="dataForm.reportId" placeholder="属于哪个报表"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -42,7 +42,7 @@
       return {
         visible: false,
         dataForm: {
-          id: 0,
+          chartId: 0,
           userId: '',
           chartType: '',
           chartContent: '',
@@ -50,12 +50,12 @@
           posHeight: '',
           posLeft: '',
           posTop: '',
-          belongReport: ''
+          reportId: ''
         },
         dataRule: {
-          // userId: [
-          //   { required: true, message: '创建者不能为空', trigger: 'blur' }
-          // ],
+          userId: [
+            { required: true, message: '创建者不能为空', trigger: 'blur' }
+          ],
           chartType: [
             { required: true, message: '模板类型不能为空', trigger: 'blur' }
           ],
@@ -74,7 +74,7 @@
           posTop: [
             { required: true, message: '上边距不能为空', trigger: 'blur' }
           ],
-          belongReport: [
+          reportId: [
             { required: true, message: '属于哪个报表不能为空', trigger: 'blur' }
           ]
         }
@@ -82,13 +82,13 @@
     },
     methods: {
       init (id) {
-        this.dataForm.id = id || 0
+        this.dataForm.chartId = id || 0
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
+          if (this.dataForm.chartId) {
             this.$http({
-              url: this.$http.adornUrl(`/report/chart/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/report/chart/info/${this.dataForm.chartId}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
@@ -100,7 +100,7 @@
                 this.dataForm.posHeight = data.chart.posHeight
                 this.dataForm.posLeft = data.chart.posLeft
                 this.dataForm.posTop = data.chart.posTop
-                this.dataForm.belongReport = data.chart.belongReport
+                this.dataForm.reportId = data.chart.reportId
               }
             })
           }
@@ -111,10 +111,10 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/report/chart/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/report/chart/${!this.dataForm.chartId ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
+                'chartId': this.dataForm.chartId || undefined,
                 'userId': this.dataForm.userId,
                 'chartType': this.dataForm.chartType,
                 'chartContent': this.dataForm.chartContent,
@@ -122,7 +122,7 @@
                 'posHeight': this.dataForm.posHeight,
                 'posLeft': this.dataForm.posLeft,
                 'posTop': this.dataForm.posTop,
-                'belongReport': this.dataForm.belongReport
+                'reportId': this.dataForm.reportId
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
