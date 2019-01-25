@@ -63,7 +63,7 @@
   </div>
   <div v-show="activeName == '2'">
     <el-tabs v-model="task_activeName" @tab-click="handleClick()">
-      <el-tab-pane label="一级" name="oneLevel">
+      <el-tab-pane label="轻" name="oneLevel">
         <el-form :model="parentData.oneLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
           <el-form-item label="阈值表达式" prop="thresholdExpression">
             <el-input type="textarea" v-model="parentData.oneLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
@@ -99,7 +99,7 @@
         </el-form>
       </el-tab-pane>
       <!-- 2级 -->
-      <el-tab-pane label="二级" name="twoLevel">
+      <el-tab-pane label="中" name="twoLevel">
         <el-form :model="parentData.twoLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
           <el-form-item label="阈值表达式" prop="thresholdExpression">
             <el-input type="textarea" v-model="parentData.twoLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
@@ -133,8 +133,8 @@
           </el-transfer>
         </el-form>
       </el-tab-pane>
-      <!-- 三级 -->
-      <el-tab-pane label="三级" name="threeLevel">
+      <!-- 重 -->
+      <el-tab-pane label="重" name="threeLevel">
         <el-form :model="parentData.threeLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
           <el-form-item label="阈值表达式" prop="thresholdExpression">
             <el-input type="textarea" v-model="parentData.threeLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
