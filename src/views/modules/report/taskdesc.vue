@@ -23,7 +23,7 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
+        prop="taskDescId"
         header-align="center"
         align="center"
         label="主键">
@@ -56,7 +56,19 @@
         prop="timeInterval"
         header-align="center"
         align="center"
-        label="支持时间分区">
+        label="支持时间分区 字典">
+      </el-table-column>
+      <el-table-column
+        prop="showStack"
+        header-align="center"
+        align="center"
+        label="显示堆">
+      </el-table-column>
+      <el-table-column
+        prop="showType"
+        header-align="center"
+        align="center"
+        label="显示类型">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -65,8 +77,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.taskDescId)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.taskDescId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -155,7 +167,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
+          return item.taskDescId
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',

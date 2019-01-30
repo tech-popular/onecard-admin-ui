@@ -35,6 +35,12 @@
         label="创建者">
       </el-table-column>
       <el-table-column
+        prop="chartTitle"
+        header-align="center"
+        align="center"
+        label="chart标题">
+      </el-table-column>
+      <el-table-column
         prop="chartType"
         header-align="center"
         align="center"
@@ -44,37 +50,8 @@
         prop="chartContent"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="模板内容">
-      </el-table-column>
-      <el-table-column
-        prop="posWidth"
-        header-align="center"
-        align="center"
-        label="宽度">
-      </el-table-column>
-      <el-table-column
-        prop="posHeight"
-        header-align="center"
-        align="center"
-        label="高度">
-      </el-table-column>
-      <el-table-column
-        prop="posLeft"
-        header-align="center"
-        align="center"
-        label="左边距">
-      </el-table-column>
-      <el-table-column
-        prop="posTop"
-        header-align="center"
-        align="center"
-        label="上边距">
-      </el-table-column>
-      <el-table-column
-        prop="reportId"
-        header-align="center"
-        align="center"
-        label="属于哪个报表">
       </el-table-column>
       <el-table-column
         fixed="right"

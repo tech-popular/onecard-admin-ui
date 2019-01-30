@@ -16,8 +16,14 @@
     <el-form-item label="指标dsl" prop="dsl">
       <el-input v-model="dataForm.dsl" placeholder="指标dsl"></el-input>
     </el-form-item>
-    <el-form-item label="支持时间分区" prop="timeInterval">
-      <el-input v-model="dataForm.timeInterval" placeholder="支持时间分区"></el-input>
+    <el-form-item label="支持时间分区 字典" prop="timeInterval">
+      <el-input v-model="dataForm.timeInterval" placeholder="支持时间分区 字典"></el-input>
+    </el-form-item>
+    <el-form-item label="显示堆" prop="showStack">
+      <el-input v-model="dataForm.showStack" placeholder="显示堆"></el-input>
+    </el-form-item>
+    <el-form-item label="显示类型" prop="showType">
+      <el-input v-model="dataForm.showType" placeholder="显示类型"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -33,12 +39,14 @@
       return {
         visible: false,
         dataForm: {
-          id: 0,
+          taskDescId: 0,
           taskId: '',
           tartgetName: '',
           targetValue: '',
           dsl: '',
-          timeInterval: ''
+          timeInterval: '',
+          showStack: '',
+          showType: ''
         },
         dataRule: {
           taskId: [
@@ -50,24 +58,21 @@
           targetValue: [
             { required: true, message: '指标值不能为空', trigger: 'blur' }
           ],
-          dsl: [
-            { required: true, message: '指标dsl不能为空', trigger: 'blur' }
-          ],
           timeInterval: [
-            { required: true, message: '支持时间分区不能为空', trigger: 'blur' }
+            { required: true, message: '支持时间分区 字典不能为空', trigger: 'blur' }
           ]
         }
       }
     },
     methods: {
       init (id) {
-        this.dataForm.id = id || 0
+        this.dataForm.taskDescId = id || 0
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
+          if (this.dataForm.taskDescId) {
             this.$http({
-              url: this.$http.adornUrl(`/report/taskdesc/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/report/taskdesc/info/${this.dataForm.taskDescId}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
@@ -77,6 +82,8 @@
                 this.dataForm.targetValue = data.taskDesc.targetValue
                 this.dataForm.dsl = data.taskDesc.dsl
                 this.dataForm.timeInterval = data.taskDesc.timeInterval
+                this.dataForm.showStack = data.taskDesc.showStack
+                this.dataForm.showType = data.taskDesc.showType
               }
             })
           }
@@ -87,15 +94,17 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/report/taskdesc/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/report/taskdesc/${!this.dataForm.taskDescId ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
+                'taskDescId': this.dataForm.taskDescId || undefined,
                 'taskId': this.dataForm.taskId,
                 'tartgetName': this.dataForm.tartgetName,
                 'targetValue': this.dataForm.targetValue,
                 'dsl': this.dataForm.dsl,
-                'timeInterval': this.dataForm.timeInterval
+                'timeInterval': this.dataForm.timeInterval,
+                'showStack': this.dataForm.showStack,
+                'showType': this.dataForm.showType
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
