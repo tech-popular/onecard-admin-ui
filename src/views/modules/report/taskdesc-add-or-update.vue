@@ -4,6 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form-item label="父节点" prop="parentId">
+      <el-input v-model="dataForm.parentId" placeholder="父节点"></el-input>
+    </el-form-item>
     <el-form-item label="任务ID" prop="taskId">
       <el-input v-model="dataForm.taskId" placeholder="任务ID"></el-input>
     </el-form-item>
@@ -40,6 +43,7 @@
         visible: false,
         dataForm: {
           taskDescId: 0,
+          parentId: '',
           taskId: '',
           tartgetName: '',
           targetValue: '',
@@ -49,6 +53,9 @@
           showType: ''
         },
         dataRule: {
+          parentId: [
+            { required: true, message: '父节点不能为空', trigger: 'blur' }
+          ],
           taskId: [
             { required: true, message: '任务ID不能为空', trigger: 'blur' }
           ],
@@ -60,6 +67,12 @@
           ],
           timeInterval: [
             { required: true, message: '支持时间分区 字典不能为空', trigger: 'blur' }
+          ],
+          showStack: [
+            { required: true, message: '显示堆不能为空', trigger: 'blur' }
+          ],
+          showType: [
+            { required: true, message: '显示类型不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -77,6 +90,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
+                this.dataForm.parentId = data.taskDesc.parentId
                 this.dataForm.taskId = data.taskDesc.taskId
                 this.dataForm.tartgetName = data.taskDesc.tartgetName
                 this.dataForm.targetValue = data.taskDesc.targetValue
@@ -98,6 +112,7 @@
               method: 'post',
               data: this.$http.adornData({
                 'taskDescId': this.dataForm.taskDescId || undefined,
+                'parentId': this.dataForm.parentId,
                 'taskId': this.dataForm.taskId,
                 'tartgetName': this.dataForm.tartgetName,
                 'targetValue': this.dataForm.targetValue,

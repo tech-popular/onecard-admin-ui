@@ -29,6 +29,12 @@
         label="主键">
       </el-table-column>
       <el-table-column
+        prop="parentId"
+        header-align="center"
+        align="center"
+        label="父节点">
+      </el-table-column>
+      <el-table-column
         prop="taskId"
         header-align="center"
         align="center"
