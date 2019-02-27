@@ -41,13 +41,13 @@
         label="任务ID">
       </el-table-column>
       <el-table-column
-        prop="tartgetName"
+        prop="label"
         header-align="center"
         align="center"
         label="指标名称">
       </el-table-column>
       <el-table-column
-        prop="targetValue"
+        prop="value"
         header-align="center"
         align="center"
         label="指标值">

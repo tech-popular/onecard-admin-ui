@@ -10,11 +10,11 @@
     <el-form-item label="任务ID" prop="taskId">
       <el-input v-model="dataForm.taskId" placeholder="任务ID"></el-input>
     </el-form-item>
-    <el-form-item label="指标名称" prop="tartgetName">
-      <el-input v-model="dataForm.tartgetName" placeholder="指标名称"></el-input>
+    <el-form-item label="指标名称" prop="label">
+      <el-input v-model="dataForm.label" placeholder="指标名称"></el-input>
     </el-form-item>
-    <el-form-item label="指标值" prop="targetValue">
-      <el-input v-model="dataForm.targetValue" placeholder="指标值"></el-input>
+    <el-form-item label="指标值" prop="value">
+      <el-input v-model="dataForm.value" placeholder="指标值"></el-input>
     </el-form-item>
     <el-form-item label="指标dsl" prop="dsl">
       <el-input v-model="dataForm.dsl" placeholder="指标dsl"></el-input>
@@ -45,7 +45,7 @@
           taskDescId: 0,
           parentId: '',
           taskId: '',
-          tartgetName: '',
+          label: '',
           targetValue: '',
           dsl: '',
           timeInterval: '',
@@ -59,10 +59,10 @@
           taskId: [
             { required: true, message: '任务ID不能为空', trigger: 'blur' }
           ],
-          tartgetName: [
+          label: [
             { required: true, message: '指标名称不能为空', trigger: 'blur' }
           ],
-          targetValue: [
+          value: [
             { required: true, message: '指标值不能为空', trigger: 'blur' }
           ],
           timeInterval: [
@@ -92,8 +92,8 @@
               if (data && data.code === 0) {
                 this.dataForm.parentId = data.taskDesc.parentId
                 this.dataForm.taskId = data.taskDesc.taskId
-                this.dataForm.tartgetName = data.taskDesc.tartgetName
-                this.dataForm.targetValue = data.taskDesc.targetValue
+                this.dataForm.label = data.taskDesc.label
+                this.dataForm.value = data.taskDesc.value
                 this.dataForm.dsl = data.taskDesc.dsl
                 this.dataForm.timeInterval = data.taskDesc.timeInterval
                 this.dataForm.showStack = data.taskDesc.showStack
@@ -114,8 +114,8 @@
                 'taskDescId': this.dataForm.taskDescId || undefined,
                 'parentId': this.dataForm.parentId,
                 'taskId': this.dataForm.taskId,
-                'tartgetName': this.dataForm.tartgetName,
-                'targetValue': this.dataForm.targetValue,
+                'label': this.dataForm.label,
+                'value': this.dataForm.value,
                 'dsl': this.dataForm.dsl,
                 'timeInterval': this.dataForm.timeInterval,
                 'showStack': this.dataForm.showStack,
