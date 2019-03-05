@@ -42,6 +42,9 @@
       <el-form-item label="频率(秒)" prop="howOften">
         <el-input v-model="dataForm.howOften" placeholder="频率"></el-input>
       </el-form-item>
+      <el-form-item label="周期" prop="period">
+        <el-input v-model="dataForm.period" placeholder="周期"></el-input>
+      </el-form-item>
       <el-form-item label="标签" prop="tags">
         <el-input v-model="dataForm.tags" placeholder="标签"></el-input>
       </el-form-item>
@@ -230,6 +233,7 @@ export default {
         cacheSql: '',
         sql: '',
         howOften: '60',
+        period: 0,
         tags: '',
         projectId: '',
         enable: 1
@@ -519,6 +523,7 @@ export default {
           'cacheSql': this.dataForm.cacheSql,
           'sql': this.dataForm.sql,
           'howOften': this.dataForm.howOften,
+          'period': this.dataForm.period,
           'tags': this.dataForm.tags,
           'projectId': this.dataForm.projectId,
           'enable': this.dataForm.enable

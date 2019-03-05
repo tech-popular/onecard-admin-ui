@@ -91,6 +91,12 @@
         label="频率">
       </el-table-column>
       <el-table-column
+        prop="period"
+        header-align="center"
+        align="center"
+        label="周期">
+      </el-table-column>
+      <el-table-column
         prop="projectName"
         header-align="center"
         align="center"
