@@ -36,7 +36,12 @@ const mainRoutes = {
     { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
     { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } },
     { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
-    { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } }
+    { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
+    { path: '/demo-eventChoose', component: _import('demo/eventChoose'), name: 'demo-eventChoose', meta: { title: 'demo-eventChoose', isTab: true } },
+    // { path: '/report-list', component: _import('pages/report-list/report-list'), name: 'report-list', meta: { title: '报表列表', isTab: true } },
+    // { path: '/chart-list', component: _import('pages/chart-list/chart-list'), name: 'chart-list', meta: { title: '图形列表', isTab: true } },
+    { path: '/create-report', component: _import('modules/pages/createreport'), name: 'create-report', meta: { title: '报表', isTab: true } },
+    { path: '/create-chart', component: _import('modules/pages/createchart'), name: 'create-chart', meta: { title: '图形', isTab: true } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

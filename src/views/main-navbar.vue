@@ -3,7 +3,7 @@
     <div class="site-navbar__header">
       <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
         <a class="site-navbar__brand-lg" href="javascript:;">金丝雀系统</a>
-        <a class="site-navbar__brand-mini" href="javascript:;">金丝雀</a>
+        <a class="site-navbar__brand-mini" href="javascript:;"><icon-svg style="transform: scale(1.4, 1.4)" name="bird"></icon-svg></a>
       </h1>
     </div>
     <div class="site-navbar__body clearfix">
@@ -24,7 +24,7 @@
             </el-badge>
           </template>
         </el-menu-item>
-      
+
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">

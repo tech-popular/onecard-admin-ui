@@ -5,7 +5,7 @@
   window.SITE_CONFIG = {}
 
   // api接口请求地址
-  window.SITE_CONFIG['baseUrl'] = '//localhost:8000/canary-admin'
+  window.SITE_CONFIG['baseUrl'] = 'https://tech.9fbank.com/canary-admin/'
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain'] = './' // 域名
