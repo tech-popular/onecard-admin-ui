@@ -48,13 +48,13 @@
       <el-form-item label="标签" prop="tags">
         <el-input v-model="dataForm.tags" placeholder="标签"></el-input>
       </el-form-item>
-      <el-form-item label="项目Id" prop="projectId">
-        <!--<el-input v-model="dataForm.projectId" placeholder="项目Id"></el-input>-->
-        <el-select v-model="dataForm.projectId" placeholder="请选择">
-          <el-option v-for="item in projects" :key="item.id" :label="item.project" :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
+      <!--<el-form-item label="项目Id" prop="projectId">-->
+        <!--&lt;!&ndash;<el-input v-model="dataForm.projectId" placeholder="项目Id"></el-input>&ndash;&gt;-->
+        <!--<el-select v-model="dataForm.projectId" placeholder="请选择">-->
+          <!--<el-option v-for="item in projects" :key="item.id" :label="item.project" :value="item.id">-->
+          <!--</el-option>-->
+        <!--</el-select>-->
+      <!--</el-form-item>-->
       <el-form-item label="是否启用" prop="enable">
         <el-radio-group v-model="dataForm.enable">
           <el-radio :label="0">禁用</el-radio>
@@ -65,6 +65,15 @@
 
   </div>
   <div v-show="activeName == '2'">
+
+    <el-form :model="parentData">
+      <el-form-item label="serviceId" prop="serviceId">
+        <el-select v-model="parentData.serviceId" placeholder="请选择">
+          <el-option v-for="item in projects" :key="item.id" :label="item.project" :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
     <el-tabs v-model="task_activeName" @tab-click="handleClick()">
       <el-tab-pane label="轻" name="oneLevel">
         <el-form :model="parentData.oneLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
@@ -192,6 +201,7 @@ export default {
       parentData: { // 返显数据
         all_usergroup: [],
         all_pipeline: [],
+        serviceId: '',
         oneLevel: {
           threshold: {
             thresholdExpression: '',
@@ -283,11 +293,11 @@ export default {
         //   type: 'number',
         //   message: '请输入数字类型'
         // }],
-        projectId: [{
-          required: true,
-          message: '项目Id不能为空',
-          trigger: 'blur'
-        }],
+        // projectId: [{
+        //   required: true,
+        //   message: '项目Id不能为空',
+        //   trigger: 'blur'
+        // }],
         enable: [{
           required: true,
           message: '是否启用不能为空',
