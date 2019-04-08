@@ -18,7 +18,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="数据源" prop="datasource">
+      <el-form-item label="数据源类型" prop="datasource">
         <el-select v-model="dataForm.datasource" placeholder="请选择">
           <el-option v-for="item in datasourceoptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
@@ -30,7 +30,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="主题" prop="topic">
+      <el-form-item label="数据源" prop="topic">
         <el-input type="textarea" v-model="dataForm.topic" placeholder="主题"></el-input>
       </el-form-item>
       <el-form-item label="cache_sql" prop="cacheSql">

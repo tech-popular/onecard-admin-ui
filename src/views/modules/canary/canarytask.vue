@@ -49,7 +49,7 @@
         prop="datasource"
         header-align="center"
         align="center"
-        label="数据源">
+        label="数据源类型">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.datasource === 1" size="small">KAFKA</el-tag>
           <el-tag v-else-if="scope.row.datasource === 2" size="small" >常规数据源</el-tag>
@@ -96,12 +96,12 @@
         align="center"
         label="周期">
       </el-table-column>
-      <el-table-column
-        prop="projectName"
-        header-align="center"
-        align="center"
-        label="项目名称">
-      </el-table-column>
+      <!--<el-table-column-->
+        <!--prop="projectName"-->
+        <!--header-align="center"-->
+        <!--align="center"-->
+        <!--label="项目名称">-->
+      <!--</el-table-column>-->
       <!--<el-table-column
         prop="projectId"
         header-align="center"
