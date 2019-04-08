@@ -33,7 +33,7 @@
       <el-form-item label="数据源" prop="topic">
         <el-input type="textarea" v-model="dataForm.topic" placeholder="主题"></el-input>
       </el-form-item>
-      <el-form-item label="cache_sql" prop="cacheSql">
+      <el-form-item label=" 历史数据生成sql" prop="cacheSql">
         <el-input type="textarea" v-model="dataForm.cacheSql" placeholder="cache_sql"></el-input>
       </el-form-item>
       <el-form-item label="sql" prop="sql">
@@ -48,13 +48,6 @@
       <el-form-item label="标签" prop="tags">
         <el-input v-model="dataForm.tags" placeholder="标签"></el-input>
       </el-form-item>
-      <!--<el-form-item label="项目Id" prop="projectId">-->
-        <!--&lt;!&ndash;<el-input v-model="dataForm.projectId" placeholder="项目Id"></el-input>&ndash;&gt;-->
-        <!--<el-select v-model="dataForm.projectId" placeholder="请选择">-->
-          <!--<el-option v-for="item in projects" :key="item.id" :label="item.project" :value="item.id">-->
-          <!--</el-option>-->
-        <!--</el-select>-->
-      <!--</el-form-item>-->
       <el-form-item label="是否启用" prop="enable">
         <el-radio-group v-model="dataForm.enable">
           <el-radio :label="0">禁用</el-radio>
