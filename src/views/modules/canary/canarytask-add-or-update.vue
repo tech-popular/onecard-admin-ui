@@ -66,11 +66,11 @@
           :key="item.index"
           v-for="(item, index) in parentData.editableTabs"
           :label="item.title"
-          :name="item.index"
+          :name="item.sort"
           >
           <!-- serviceId目标选取 -->
           <el-form-item label="serviceId" prop="serviceId">
-            <el-select v-model="item.serviceId" @blur= "blurOption(e)" placeholder="请选择">
+            <el-select v-model="item.serviceId" @change= "blurOption(item)" placeholder="请选择">
               <el-option v-for="item in projects"   :key="item.id" :label="item.project" :value="item.id">
               </el-option>
             </el-select>
@@ -350,8 +350,8 @@ export default {
     }
   },
   methods: {
-    blurOption (e) {
-      console.log(e)
+    blurOption (item) {
+      this.parentData.editableTabs[(+item.index) - 1].title = this.projects[item.serviceId]['project']
     },
     dataType (obj) {
       if (obj === null) return 'Null'
@@ -564,11 +564,26 @@ export default {
         }
       })
     },
+    unique () {
+      return this.filter((v, i) => this.indexOf(v) === i)
+    },
     removeTab (targetName) {
-      console.log(targetName)
+      let newArr = []
+      if (this.parentData.editableTabs.length <= 1 || this.parentData.editableTabs.length > targetName) {
+        return
+      }
       let tabs = this.parentData.editableTabs
       let activeName = this.parentData.editableTabsValue
-      // this.parentData.deltabs.push(this.parentData.editableTabs[(+activeName) + 1]['sort'])
+      console.log(targetName)
+      console.log(this.parentData.editableTabs.length)
+      this.parentData.deltabs.push(this.parentData.editableTabs[(+targetName) - 1]['sort'])
+      this.parentData.deltabs.forEach(function (e) {
+        if (!newArr.includes(e)) {
+          newArr.push(e)
+        }
+      })
+      this.parentData.deltabs = newArr
+      console.log(this.parentData.deltabs)
       if (activeName === targetName) {
         tabs.forEach((tab, _index) => {
           if (tab.index === targetName) {
