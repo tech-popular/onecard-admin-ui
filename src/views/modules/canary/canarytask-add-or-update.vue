@@ -31,7 +31,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="数据源" prop="topic">
-        <el-input type="textarea" v-model="dataForm.topic" placeholder="主题"></el-input>
+        <el-input type="textarea" v-model="dataForm.topic" placeholder="主题" :rows="10"></el-input>
       </el-form-item>
       <el-form-item label=" 历史数据生成sql" prop="cacheSql">
         <el-input type="textarea" v-model="dataForm.cacheSql" placeholder="cache_sql"></el-input>
