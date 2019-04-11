@@ -58,122 +58,138 @@
 
   </div>
   <div v-show="activeName == '2'">
-
     <el-form :model="parentData">
-      <el-form-item label="serviceId" prop="serviceId">
-        <el-select v-model="parentData.serviceId" placeholder="请选择">
-          <el-option v-for="item in projects" :key="item.id" :label="item.project" :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
+      <!-- 详参配置二级Tab栏 -->
+      <el-tabs v-model="parentData.editableTabsValue" type="card" editable @edit="handleTabsEdit" @tab-remove="removeTab">
+        <el-tab-pane
+          @click='changeEditableTab()'
+          :key="item.index"
+          v-for="(item, index) in parentData.editableTabs"
+          :label="item.title"
+          :name="item.index"
+          >
+          <!-- serviceId目标选取 -->
+          <el-form-item label="serviceId" prop="serviceId">
+            <el-select v-model="item.serviceId" @blur= "blurOption(e)" placeholder="请选择">
+              <el-option v-for="item in projects"   :key="item.id" :label="item.project" :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- serviceId_End -->
+
+          <!-- 轻中重等级栏目 -->
+          <el-tabs v-model="task_activeName" @tab-click="levelHandleClick()">
+            <el-tab-pane label="轻" name="oneLevel">
+              <el-form :model="item.oneLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
+                <el-form-item label="阈值表达式" prop="thresholdExpression">
+                  <el-input type="textarea" v-model="item.oneLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
+                </el-form-item>
+                <el-form-item label="连续错误次数" prop="mostConsecutiveLosses">
+                  <el-input-number v-model="item.oneLevel.threshold.mostConsecutiveLosses" :min="1" :max="10" label="错误连续次数"></el-input-number>
+                  <el-tooltip class="item" effect="dark" content="连续错误多少次触发报警" placement="top">
+                    <i class="el-icon-warning"></i>
+                  </el-tooltip>
+                </el-form-item>
+                <el-form-item label="非连续错误次数" prop="incontinuity">
+                  <el-input-number v-model="item.oneLevel.threshold.incontinuity" :min="1" :max="10" label="检查点内错误次数"></el-input-number>
+                  <el-tooltip class="item" effect="dark" content="10次检查中不通过的次数总和触发报警" placement="top">
+                    <i class="el-icon-warning"></i>
+                  </el-tooltip>
+                </el-form-item>
+                <hr>
+                <!-- 选择用户群组 -->
+                选择用户群组
+                <el-transfer v-model="item.oneLevel.userGroupStr" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="parentData.allUsergroup" :titles="['全部', '选中']">
+                </el-transfer>
+                <hr>
+                <!-- 通道 -->
+                选择报警渠道
+                <el-transfer v-model="item.oneLevel.pipelieStr" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="parentData.allPipeline" :titles="['全部', '选中']">
+                </el-transfer>
+              </el-form>
+            </el-tab-pane>
+            <!-- 2级 -->
+            <el-tab-pane label="中" name="twoLevel">
+              <el-form :model="item.twoLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
+                <el-form-item label="阈值表达式" prop="thresholdExpression">
+                  <el-input type="textarea" v-model="item.twoLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
+                </el-form-item>
+                <el-form-item label="连续错误次数" prop="mostConsecutiveLosses">
+                  <el-input-number v-model="item.twoLevel.threshold.mostConsecutiveLosses" :min="1" :max="10" label="错误连续次数"></el-input-number>
+                  <el-tooltip class="item" effect="dark" content="连续错误多少次触发报警" placement="top">
+                    <i class="el-icon-warning"></i>
+                  </el-tooltip>
+                </el-form-item>
+                <el-form-item label="非连续错误次数" prop="incontinuity">
+                  <el-input-number v-model="item.twoLevel.threshold.incontinuity" :min="1" :max="10" label="检查点内错误次数"></el-input-number>
+                   <el-tooltip class="item" effect="dark" content="10次检查中不通过的次数总和触发报警" placement="top">
+                    <i class="el-icon-warning"></i>
+                  </el-tooltip>
+                </el-form-item>
+                <hr>
+                选择用户群组
+                <el-transfer v-model="item.twoLevel.userGroupStr" :titles="['全部', '选中']" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="parentData.allUsergroup">
+                </el-transfer>
+                <hr>
+                <!-- 通道 -->
+                选择报警渠道
+                <el-transfer v-model="item.twoLevel.pipelieStr" :titles="['全部', '选中']" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="parentData.allPipeline">
+                </el-transfer>
+              </el-form>
+            </el-tab-pane>
+            <!-- 重 -->
+            <el-tab-pane label="重" name="threeLevel">
+              <el-form :model="item.threeLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
+                <el-form-item label="阈值表达式" prop="thresholdExpression">
+                  <el-input type="textarea" v-model="item.threeLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
+                </el-form-item>
+                <el-form-item label="连续错误次数" prop="mostConsecutiveLosses">
+                  <el-input-number v-model="item.threeLevel.threshold.mostConsecutiveLosses" :min="1" :max="10" label="错误连续次数"></el-input-number>
+                   <el-tooltip class="item" effect="dark" content="连续错误多少次触发报警" placement="top">
+                    <i class="el-icon-warning"></i>
+                  </el-tooltip>
+                </el-form-item>
+                <el-form-item label="非连续错误次数" prop="incontinuity">
+                  <el-input-number v-model="item.threeLevel.threshold.incontinuity" :min="1" :max="10" label="检查点内错误次数"></el-input-number>
+                  <el-tooltip class="item" effect="dark" content="10次检查中不通过的次数总和触发报警" placement="top">
+                    <i class="el-icon-warning"></i>
+                  </el-tooltip>
+                </el-form-item>
+                <hr>
+                选择用户群组
+                <el-transfer v-model="item.threeLevel.userGroupStr" :titles="['全部', '选中']" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="parentData.allUsergroup">
+                </el-transfer>
+                <hr>
+                <!-- 通道 -->
+                选择报警渠道
+                <el-transfer v-model="item.threeLevel.pipelieStr" :titles="['全部', '选中']" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="parentData.allPipeline">
+                </el-transfer>
+              </el-form>
+            </el-tab-pane>
+          </el-tabs>
+          <!-- end -->
+        </el-tab-pane>
+      </el-tabs>
     </el-form>
-    <el-tabs v-model="task_activeName" @tab-click="handleClick()">
-      <el-tab-pane label="轻" name="oneLevel">
-        <el-form :model="parentData.oneLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
-          <el-form-item label="阈值表达式" prop="thresholdExpression">
-            <el-input type="textarea" v-model="parentData.oneLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
-          </el-form-item>
-          <el-form-item label="连续错误次数" prop="mostConsecutiveLosses">
-            <el-input-number v-model="parentData.oneLevel.threshold.mostConsecutiveLosses" :min="1" :max="10" label="错误连续次数"></el-input-number>
-            <el-tooltip class="item" effect="dark" content="连续错误多少次触发报警" placement="top">
-              <i class="el-icon-warning"></i>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="非连续错误次数" prop="incontinuity">
-            <el-input-number v-model="parentData.oneLevel.threshold.incontinuity" :min="1" :max="10" label="检查点内错误次数"></el-input-number>
-            <el-tooltip class="item" effect="dark" content="10次检查中不通过的次数总和触发报警" placement="top">
-              <i class="el-icon-warning"></i>
-            </el-tooltip>
-          </el-form-item>
-          <hr>
-          <!-- 选择用户群组 -->
-          选择用户群组
-          <el-transfer v-model="parentData.oneLevel.userGroupStr" :props="{
-                  key: 'id',
-                  label: 'name'
-                }" :data="parentData.allUsergroup" :titles="['全部', '选中']">
-          </el-transfer>
-          <hr>
-          <!-- 通道 -->
-          选择报警渠道
-          <el-transfer v-model="parentData.oneLevel.pipelieStr" :props="{
-                  key: 'id',
-                  label: 'name'
-                }" :data="parentData.allPipeline" :titles="['全部', '选中']">
-          </el-transfer>
-        </el-form>
-      </el-tab-pane>
-      <!-- 2级 -->
-      <el-tab-pane label="中" name="twoLevel">
-        <el-form :model="parentData.twoLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
-          <el-form-item label="阈值表达式" prop="thresholdExpression">
-            <el-input type="textarea" v-model="parentData.twoLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
-          </el-form-item>
-          <el-form-item label="连续错误次数" prop="mostConsecutiveLosses">
-            <el-input-number v-model="parentData.twoLevel.threshold.mostConsecutiveLosses" :min="1" :max="10" label="错误连续次数"></el-input-number>
-            <el-tooltip class="item" effect="dark" content="连续错误多少次触发报警" placement="top">
-              <i class="el-icon-warning"></i>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="非连续错误次数" prop="incontinuity">
-            <el-input-number v-model="parentData.twoLevel.threshold.incontinuity" :min="1" :max="10" label="检查点内错误次数"></el-input-number>
-             <el-tooltip class="item" effect="dark" content="10次检查中不通过的次数总和触发报警" placement="top">
-              <i class="el-icon-warning"></i>
-            </el-tooltip>
-          </el-form-item>
-          <hr>
-          选择用户群组
-          <el-transfer v-model="parentData.twoLevel.userGroupStr" :titles="['全部', '选中']" :props="{
-                  key: 'id',
-                  label: 'name'
-                }" :data="parentData.allUsergroup">
-          </el-transfer>
-          <hr>
-          <!-- 通道 -->
-          选择报警渠道
-          <el-transfer v-model="parentData.twoLevel.pipelieStr" :titles="['全部', '选中']" :props="{
-                  key: 'id',
-                  label: 'name'
-                }" :data="parentData.allPipeline">
-          </el-transfer>
-        </el-form>
-      </el-tab-pane>
-      <!-- 重 -->
-      <el-tab-pane label="重" name="threeLevel">
-        <el-form :model="parentData.threeLevel" :rules="dataRule_threshold" ref="dataForm_threshold">
-          <el-form-item label="阈值表达式" prop="thresholdExpression">
-            <el-input type="textarea" v-model="parentData.threeLevel.threshold.thresholdExpression" placeholder="阈值表达式"></el-input>
-          </el-form-item>
-          <el-form-item label="连续错误次数" prop="mostConsecutiveLosses">
-            <el-input-number v-model="parentData.threeLevel.threshold.mostConsecutiveLosses" :min="1" :max="10" label="错误连续次数"></el-input-number>
-             <el-tooltip class="item" effect="dark" content="连续错误多少次触发报警" placement="top">
-              <i class="el-icon-warning"></i>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="非连续错误次数" prop="incontinuity">
-            <el-input-number v-model="parentData.threeLevel.threshold.incontinuity" :min="1" :max="10" label="检查点内错误次数"></el-input-number>
-            <el-tooltip class="item" effect="dark" content="10次检查中不通过的次数总和触发报警" placement="top">
-              <i class="el-icon-warning"></i>
-            </el-tooltip>
-          </el-form-item>
-          <hr>
-          选择用户群组
-          <el-transfer v-model="parentData.threeLevel.userGroupStr" :titles="['全部', '选中']" :props="{
-                  key: 'id',
-                  label: 'name'
-                }" :data="parentData.allUsergroup">
-          </el-transfer>
-          <hr>
-          <!-- 通道 -->
-          选择报警渠道
-          <el-transfer v-model="parentData.threeLevel.pipelieStr" :titles="['全部', '选中']" :props="{
-                  key: 'id',
-                  label: 'name'
-                }" :data="parentData.allPipeline">
-          </el-transfer>
-        </el-form>
-      </el-tab-pane>
-    </el-tabs>
+
   </div>
   <span slot="footer" class="dialog-footer">
     <el-button style="margin-top: 12px;" v-show="nextButton" @click="nextPage()">下一步</el-button>
@@ -188,43 +204,17 @@ export default {
   name: 'add_update',
   data () {
     return {
+
       disabledNum: '', // disableTab
       nextButton: true,
       visible: false,
       parentData: { // 返显数据
-        all_usergroup: [],
-        all_pipeline: [],
-        serviceId: '',
-        oneLevel: {
-          threshold: {
-            thresholdExpression: '',
-            mostConsecutiveLosses: 3,
-            incontinuity: 10
-          },
-          userGroupStr: [],
-          pipeline: null,
-          pipelieStr: []
-        },
-        twoLevel: {
-          threshold: {
-            thresholdExpression: '',
-            mostConsecutiveLosses: 3,
-            incontinuity: 10
-          },
-          userGroupStr: [],
-          pipeline: null,
-          pipelieStr: []
-        },
-        threeLevel: {
-          threshold: {
-            thresholdExpression: '',
-            mostConsecutiveLosses: 3,
-            incontinuity: 10
-          },
-          userGroupStr: [],
-          pipeline: null,
-          pipelieStr: []
-        }
+        addtabs: [],
+        deltabs: [],
+        editableTabsValue: '1',
+        editableTabs: [],
+        allUsergroup: [],
+        allPipeline: []
       },
       dataForm: {
         id: 0,
@@ -356,9 +346,13 @@ export default {
       value1: [],
       userdata: [],
       task_activeName: 'oneLevel'
+
     }
   },
   methods: {
+    blurOption (e) {
+      console.log(e)
+    },
     dataType (obj) {
       if (obj === null) return 'Null'
       if (obj === undefined) return 'Undefined'
@@ -452,6 +446,8 @@ export default {
               this.$emit('refreshDataList')
             }
           })
+        } else {
+          this.$message.error(data.msg)
         }
       })
     },
@@ -511,6 +507,10 @@ export default {
       }
       this.activeName = tab.name
     },
+    // levelHandleClick
+    levelHandleClick () {
+      console.log(123)
+    },
     // 提交步骤一
     submitActiveOne () {
       return this.$http({
@@ -563,6 +563,115 @@ export default {
           })
         }
       })
+    },
+    removeTab (targetName) {
+      console.log(targetName)
+      let tabs = this.parentData.editableTabs
+      let activeName = this.parentData.editableTabsValue
+      // this.parentData.deltabs.push(this.parentData.editableTabs[(+activeName) + 1]['sort'])
+      if (activeName === targetName) {
+        tabs.forEach((tab, _index) => {
+          if (tab.index === targetName) {
+            let nextTab = tabs[_index + 1] || tabs[_index - 1]
+            if (nextTab) {
+              activeName = nextTab.index
+            }
+          }
+        })
+      }
+
+      this.parentData.editableTabsValue = activeName
+      this.parentData.editableTabs = tabs.filter(tab => tab.index !== targetName)
+    },
+    //
+    handleTabsEdit (targetName, action) {
+      let initTabsData = {
+        'serviceId': 0,
+        'sort': '0',
+        'index': '',
+        'oneLevel': {
+          'threshold': {
+            'id': null,
+            'taskId': 1,
+            'level': 1,
+            'serviceId': 1,
+            'thresholdExpression': '',
+            'mostConsecutiveLosses': 0,
+            'incontinuity': 1,
+            'enable': 1,
+            'tenantId': null
+          },
+          'usergroup': [],
+          'userGroupStr': [],
+          'pipeline': [],
+          'pipelieStr': []
+        },
+        'twoLevel': {
+          'threshold': {
+            'id': null,
+            'level': 2,
+            'serviceId': 3,
+            'thresholdExpression': '',
+            'mostConsecutiveLosses': 1,
+            'incontinuity': 1,
+            'enable': 1,
+            'tenantId': null
+          },
+          'usergroup': [],
+          'userGroupStr': [],
+          'pipeline': [],
+          'pipelieStr': []
+        },
+        'threeLevel': {
+          'threshold': {
+            'id': 8,
+            'taskId': 1,
+            'level': 3,
+            'serviceId': 1,
+            'thresholdExpression': '',
+            'mostConsecutiveLosses': 3,
+            'incontinuity': 5,
+            'enable': 1,
+            'tenantId': null
+          },
+          'usergroup': [],
+          'userGroupStr': [],
+          'pipeline': [],
+          'pipelieStr': []
+        }
+      }
+      if (action === 'add') {
+        if (this.parentData.editableTabs.length === 0) {
+          initTabsData.sort = '1'
+        } else {
+          initTabsData.sort = (+this.parentData.editableTabs[this.parentData.editableTabs.length - 1]['sort']) + 1 + ''
+        }
+        initTabsData.index = this.parentData.editableTabs.length + 1 + ''
+        initTabsData.title = 'default'
+        let newTabName = this.parentData.editableTabs.length + 1 + ''
+        this.parentData.editableTabs.push(initTabsData)
+        this.parentData.editableTabsValue = newTabName
+        this.parentData.addtabs.push(initTabsData.sort)
+      }
+      // if (action === 'remove') {
+      //   let tabs = this.parentData.editableTabs
+      //   debugger
+      //   let activeName = this.parentData.editableTabsValue
+      //   this.parentData.deltabs.push(this.parentData.editableTabs[(+activeName) + 1]['sort'])
+      //   if (activeName === targetName) {
+      //     tabs.forEach((tab, _index) => {
+      //       if (tab.index === targetName) {
+      //         let nextTab = tabs[_index + 1] || tabs[_index - 1]
+      //         if (nextTab) {
+      //           activeName = nextTab.index
+      //         }
+      //       }
+      //     })
+      //   }
+      //
+      //   this.parentData.editableTabsValue = activeName
+      //   this.parentData.editableTabs = tabs.filter(tab => tab.index !== targetName)
+      // }
     }
   }
 }
