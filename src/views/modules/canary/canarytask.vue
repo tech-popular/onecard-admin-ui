@@ -43,6 +43,7 @@
           <el-tag v-if="scope.row.datatype === 1" size="small">METRIC</el-tag>
           <el-tag v-else-if="scope.row.datatype === 2" size="small" >ZIPKIN</el-tag>
           <el-tag v-else-if="scope.row.datatype === 3" size="small">MYSQL</el-tag>
+          <el-tag v-else-if="scope.row.datatype === 4" size="small">Healthcheck</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -54,6 +55,7 @@
           <el-tag v-if="scope.row.datasource === 1" size="small">KAFKA</el-tag>
           <el-tag v-else-if="scope.row.datasource === 2" size="small" >常规数据源</el-tag>
           <el-tag v-else-if="scope.row.datasource === 3" size="small" >MYSQL</el-tag>
+          <el-tag v-else-if="scope.row.datasource === 4" size="small" >Healthcheck</el-tag>
         </template>
       </el-table-column>
       <el-table-column
