@@ -8,7 +8,7 @@
       <el-input v-model="dataForm.name" placeholder="模板名称"></el-input>
     </el-form-item>
     <el-form-item label="模板内容" prop="template">
-      <el-input type="textarea" v-model="dataForm.template" placeholder="模板内容"></el-input>
+      <el-input type="textarea" v-model="dataForm.template" placeholder="模板内容" :rows="50"></el-input>
     </el-form-item>
     <el-form-item label="描述" prop="description">
       <el-input v-model="dataForm.description" placeholder="描述"></el-input>
@@ -17,7 +17,7 @@
        <el-radio-group v-model="dataForm.enable">
           <el-radio :label="0">禁用</el-radio>
           <el-radio :label="1">正常</el-radio>
-        </el-radio-group>    
+        </el-radio-group>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

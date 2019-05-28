@@ -34,10 +34,10 @@
         <el-input type="textarea" v-model="dataForm.topic" placeholder="数据源" :rows="10"></el-input>
       </el-form-item>
       <el-form-item label=" 历史数据生成sql" prop="cacheSql">
-        <el-input type="textarea" v-model="dataForm.cacheSql" placeholder="cache_sql"></el-input>
+        <el-input type="textarea" v-model="dataForm.cacheSql" placeholder="cache_sql" :rows="10"></el-input>
       </el-form-item>
       <el-form-item label="sql" prop="sql">
-        <el-input type="textarea" v-model="dataForm.sql" placeholder="sql"></el-input>
+        <el-input type="textarea" v-model="dataForm.sql" placeholder="sql" :rows="12"></el-input>
       </el-form-item>
       <el-form-item label="频率(秒)" prop="howOften">
         <el-input v-model="dataForm.howOften" placeholder="频率"></el-input>
@@ -102,7 +102,7 @@
                 <el-transfer v-model="item.oneLevel.userGroupStr" :props="{
                         key: 'id',
                         label: 'name'
-                      }" :data="parentData.allUsergroup" :titles="['全部', '选中']">
+                      }" :data="parentData.allUsergroup" :titles="['全部', '选中']" :filterable="true">
                 </el-transfer>
                 <hr>
                 <!-- 通道 -->
@@ -110,7 +110,7 @@
                 <el-transfer v-model="item.oneLevel.pipelieStr" :props="{
                         key: 'id',
                         label: 'name'
-                      }" :data="parentData.allPipeline" :titles="['全部', '选中']">
+                      }" :data="parentData.allPipeline" :titles="['全部', '选中']" :filterable="true">
                 </el-transfer>
               </el-form>
             </el-tab-pane>
@@ -137,7 +137,7 @@
                 <el-transfer v-model="item.twoLevel.userGroupStr" :titles="['全部', '选中']" :props="{
                         key: 'id',
                         label: 'name'
-                      }" :data="parentData.allUsergroup">
+                      }" :data="parentData.allUsergroup" :filterable="true">
                 </el-transfer>
                 <hr>
                 <!-- 通道 -->
@@ -145,7 +145,7 @@
                 <el-transfer v-model="item.twoLevel.pipelieStr" :titles="['全部', '选中']" :props="{
                         key: 'id',
                         label: 'name'
-                      }" :data="parentData.allPipeline">
+                      }" :data="parentData.allPipeline" :filterable="true">
                 </el-transfer>
               </el-form>
             </el-tab-pane>
@@ -172,7 +172,7 @@
                 <el-transfer v-model="item.threeLevel.userGroupStr" :titles="['全部', '选中']" :props="{
                         key: 'id',
                         label: 'name'
-                      }" :data="parentData.allUsergroup">
+                      }" :data="parentData.allUsergroup" :filterable="true">
                 </el-transfer>
                 <hr>
                 <!-- 通道 -->
@@ -180,7 +180,7 @@
                 <el-transfer v-model="item.threeLevel.pipelieStr" :titles="['全部', '选中']" :props="{
                         key: 'id',
                         label: 'name'
-                      }" :data="parentData.allPipeline">
+                      }" :data="parentData.allPipeline" :filterable="true">
                 </el-transfer>
               </el-form>
             </el-tab-pane>
@@ -697,3 +697,9 @@ export default {
   }
 }
 </script>
+<style>
+  .el-transfer-panel{
+    width: 330px;
+  }
+
+</style>
