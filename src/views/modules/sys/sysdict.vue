@@ -59,22 +59,14 @@
         label="备注信息">
       </el-table-column>
       <el-table-column
-        prop="system"
+        prop="enable"
         header-align="center"
         align="center"
-        label="0-否|1-是">
-      </el-table-column>
-      <el-table-column
-        prop="delFlag"
-        header-align="center"
-        align="center"
-        label="删除标记">
-      </el-table-column>
-      <el-table-column
-        prop="tenantId"
-        header-align="center"
-        align="center"
-        label="所属租户">
+        label="是否启用">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.enable === 1" size="small">正常</el-tag>
+          <el-tag v-else size="small"  type="danger">禁用</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -85,6 +77,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="SysDicItemsHandle(scope.row.id)">字典项</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -170,6 +163,11 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
+      // 字典项
+      SysDicItemsHandle (id) {
+        this.$router.push({name: 'sys-sysdictitem', query: {id: id}})
+      },
+
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {

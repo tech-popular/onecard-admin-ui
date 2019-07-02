@@ -19,11 +19,8 @@
     <el-form-item label="备注信息" prop="remarks">
       <el-input v-model="dataForm.remarks" placeholder="备注信息"></el-input>
     </el-form-item>
-    <el-form-item label="0-否|1-是" prop="system">
-      <el-input v-model="dataForm.system" placeholder="0-否|1-是"></el-input>
-    </el-form-item>
-    <el-form-item label="删除标记" prop="delFlag">
-      <el-input v-model="dataForm.delFlag" placeholder="删除标记"></el-input>
+    <el-form-item label="删除标记" prop="enable">
+      <el-input v-model="dataForm.enable" placeholder="删除标记"></el-input>
     </el-form-item>
     <el-form-item label="所属租户" prop="tenantId">
       <el-input v-model="dataForm.tenantId" placeholder="所属租户"></el-input>
@@ -48,8 +45,7 @@
           createTime: '',
           updateTime: '',
           remarks: '',
-          system: '',
-          delFlag: '',
+          enable: '',
           tenantId: ''
         },
         dataRule: {
@@ -68,10 +64,7 @@
           remarks: [
             { required: true, message: '备注信息不能为空', trigger: 'blur' }
           ],
-          system: [
-            { required: true, message: '0-否|1-是不能为空', trigger: 'blur' }
-          ],
-          delFlag: [
+          enable: [
             { required: true, message: '删除标记不能为空', trigger: 'blur' }
           ],
           tenantId: [

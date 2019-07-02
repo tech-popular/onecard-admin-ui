@@ -2,11 +2,11 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable aria-readonly="true"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('sys:sysdictitem:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('sys:sysdictitem:save')" type="primary" @click="addOrUpdateHandle(dataForm.key, 0)">新增</el-button>
         <el-button v-if="isAuth('sys:sysdictitem:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -47,12 +47,6 @@
         label="标签名">
       </el-table-column>
       <el-table-column
-        prop="type"
-        header-align="center"
-        align="center"
-        label="类型">
-      </el-table-column>
-      <el-table-column
         prop="description"
         header-align="center"
         align="center"
@@ -77,22 +71,14 @@
         label="更新时间">
       </el-table-column>
       <el-table-column
-        prop="remarks"
+        prop="enable"
         header-align="center"
         align="center"
-        label="备注信息">
-      </el-table-column>
-      <el-table-column
-        prop="delFlag"
-        header-align="center"
-        align="center"
-        label="删除标记">
-      </el-table-column>
-      <el-table-column
-        prop="tenantId"
-        header-align="center"
-        align="center"
-        label="所属租户">
+        label="是否启用">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.enable === 1" size="small">正常</el-tag>
+          <el-tag v-else size="small"  type="danger">禁用</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -101,7 +87,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.key, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -126,7 +112,7 @@
     data () {
       return {
         dataForm: {
-          key: ''
+          key: this.$route.query.id || 0
         },
         dataList: [],
         pageIndex: 1,
@@ -182,10 +168,11 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (key, id) {
         this.addOrUpdateVisible = true
+        console.log(this.dataForm.key + '    ' + id)
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(this.dataForm.key, id)
         })
       },
       // 删除

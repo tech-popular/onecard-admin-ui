@@ -55,7 +55,7 @@
           user: '',
           passwd: '',
           url: '',
-          version: '',
+          version: 1,
           createTime: '',
           updateTime: '',
           remark: ''
@@ -78,10 +78,10 @@
           ],
           url: [
             { required: true, message: '数据库url不能为空', trigger: 'blur' }
+          ],
+          version: [
+            { required: true, message: '版本号不能为空', trigger: 'blur' }
           ]
-          // version: [
-          //   { required: true, message: '版本号不能为空', trigger: 'blur' }
-          // ],
           // createTime: [
           //   { required: true, message: '创建时间不能为空', trigger: 'blur' }
           // ],
