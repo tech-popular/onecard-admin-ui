@@ -65,6 +65,9 @@
           label: [
             { required: true, message: '标签名不能为空', trigger: 'blur' }
           ],
+          description: [
+            { required: true, message: '描述不能为空', trigger: 'blur' }
+          ],
           sort: [
             { required: true, message: '排序（升序）不能为空', trigger: 'blur' }
           ]

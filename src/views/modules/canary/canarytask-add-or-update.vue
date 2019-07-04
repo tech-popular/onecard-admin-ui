@@ -12,7 +12,6 @@
         <el-input v-model="dataForm.name" placeholder="任务名称"></el-input>
       </el-form-item>
       <el-form-item label="数据类型" prop="datatype">
-        <!--<el-input v-model="dataForm.datatype" placeholder="数据类型"></el-input>-->
         <el-select v-model="dataForm.datatype" placeholder="请选择">
           <el-option v-for="item in datatypeoptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
@@ -20,7 +19,31 @@
       </el-form-item>
       <el-form-item label="数据源类型" prop="datasource">
         <el-select v-model="dataForm.datasource" placeholder="请选择">
-          <el-option v-for="item in datasourceoptions" :key="item.value" :label="item.label" :value="item.value">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="in数据源类型" prop="inDatasource">
+        <el-select v-model="dataForm.inDatasource" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="out数据源类型" prop="outDatasource">
+        <el-select v-model="dataForm.outDatasource" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
@@ -47,6 +70,24 @@
       </el-form-item>
       <el-form-item label="标签" prop="tags">
         <el-input v-model="dataForm.tags" placeholder="标签"></el-input>
+      </el-form-item>
+      <el-form-item label="cron" prop="cron">
+        <el-input v-model="dataForm.cron" placeholder="*/10 * * * * ?"></el-input>
+      </el-form-item>
+      <el-form-item label="dependTask" prop="dependTask">
+        <el-input v-model="dataForm.dependTask" placeholder="dependTask"></el-input>
+      </el-form-item>
+      <el-form-item label="outType" prop="outType">
+        <el-input v-model="dataForm.outType" placeholder="outType"></el-input>
+      </el-form-item>
+      <el-form-item label="table" prop="table">
+        <el-input v-model="dataForm.table" placeholder="table"></el-input>
+      </el-form-item>
+      <el-form-item label="transformerConfig" prop="transformerConfig">
+        <el-input v-model="dataForm.transformerConfig" placeholder="transformerConfig"></el-input>
+      </el-form-item>
+      <el-form-item label="version" prop="version">
+        <el-input v-model="dataForm.version" placeholder="version"></el-input>
       </el-form-item>
       <el-form-item label="是否启用" prop="enable">
         <el-radio-group v-model="dataForm.enable">
@@ -216,6 +257,8 @@ export default {
         allUsergroup: [],
         allPipeline: []
       },
+      options: [],
+      datasourceoptions: [],
       dataForm: {
         id: 0,
         name: '',
@@ -229,7 +272,15 @@ export default {
         period: 0,
         tags: '',
         projectId: '',
-        enable: 1
+        enable: 1,
+        cron: '',
+        dependTask: '',
+        inDatasource: '',
+        outDatasource: '',
+        outType: '',
+        table: '',
+        transformerConfig: '',
+        version: 1
       },
       dataRule: {
         name: [{
@@ -321,19 +372,19 @@ export default {
         value: 2,
         label: '复杂MIX'
       }],
-      datasourceoptions: [{
-        value: 1,
-        label: 'kafka'
-      }, {
-        value: 2,
-        label: '常规数据源'
-      }, {
-        value: 3,
-        label: 'MYSQL'
-      }, {
-        value: 4,
-        label: 'Healthcheck'
-      }],
+      // datasourceoptions: [{
+      //   value: 1,
+      //   label: 'kafka'
+      // }, {
+      //   value: 2,
+      //   label: '常规数据源'
+      // }, {
+      //   value: 3,
+      //   label: 'MYSQL'
+      // }, {
+      //   value: 4,
+      //   label: 'Healthcheck'
+      // }],
       datatypeoptions: [{
         value: 1,
         label: 'METRIC'
@@ -461,6 +512,25 @@ export default {
     init (id) {
       this.dataForm.id = id || 0
       this.visible = true
+      // 20190703 下拉框数组-》数据源
+      this.$http({
+        url: this.$http.adornUrl(`/sys/sysdictitem/selectalltaskpage`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.options = data.dicList
+        }
+      })
+      this.$http({
+        url: this.$http.adornUrl(`/canary/canarydatasourceconfig/select`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.datasourceoptions = data.canaryDatasourceConfigEntities
+        }
+      })
       // 步骤一渲染
       this.fetchProjectsData().then(() => {
         this.$nextTick(() => {

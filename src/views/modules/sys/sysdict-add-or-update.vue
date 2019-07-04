@@ -19,12 +19,12 @@
     <el-form-item label="备注信息" prop="remarks">
       <el-input v-model="dataForm.remarks" placeholder="备注信息"></el-input>
     </el-form-item>
-    <el-form-item label="删除标记" prop="enable">
-      <el-input v-model="dataForm.enable" placeholder="删除标记"></el-input>
+    <el-form-item label="是否启用" prop="enable">
+      <el-input v-model="dataForm.enable" placeholder="是否启用"></el-input>
     </el-form-item>
-    <el-form-item label="所属租户" prop="tenantId">
-      <el-input v-model="dataForm.tenantId" placeholder="所属租户"></el-input>
-    </el-form-item>
+    <!--<el-form-item label="所属租户" prop="tenantId">-->
+      <!--<el-input v-model="dataForm.tenantId" placeholder="所属租户"></el-input>-->
+    <!--</el-form-item>-->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -54,22 +54,22 @@
           ],
           description: [
             { required: true, message: '描述不能为空', trigger: 'blur' }
-          ],
-          createTime: [
-            { required: true, message: '创建时间不能为空', trigger: 'blur' }
-          ],
-          updateTime: [
-            { required: true, message: '更新时间不能为空', trigger: 'blur' }
-          ],
-          remarks: [
-            { required: true, message: '备注信息不能为空', trigger: 'blur' }
-          ],
-          enable: [
-            { required: true, message: '删除标记不能为空', trigger: 'blur' }
-          ],
-          tenantId: [
-            { required: true, message: '所属租户不能为空', trigger: 'blur' }
           ]
+          // createTime: [
+          //   { required: true, message: '创建时间不能为空', trigger: 'blur' }
+          // ],
+          // updateTime: [
+          //   { required: true, message: '更新时间不能为空', trigger: 'blur' }
+          // ],
+          // remarks: [
+          //   { required: true, message: '备注信息不能为空', trigger: 'blur' }
+          // ],
+          // enable: [
+          //   { required: true, message: '是否启用不能为空', trigger: 'blur' }
+          // ]
+          // tenantId: [
+          //   { required: true, message: '所属租户不能为空', trigger: 'blur' }
+          // ]
         }
       }
     },

@@ -65,7 +65,7 @@
             { required: true, message: '数据库名字不能为空', trigger: 'blur' }
           ],
           datasourceType: [
-            { required: true, message: '数据源类型不能为空', trigger: 'blur' }
+            { required: true, message: '数据源类型必须是\'mysql\',\'postgre\',\'maxCompute\',\'kafka\',\'ftp\'', trigger: 'blur' }
           ],
           driver: [
             { required: true, message: '数据库驱动不能为空', trigger: 'blur' }

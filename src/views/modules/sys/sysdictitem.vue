@@ -123,11 +123,16 @@
         addOrUpdateVisible: false
       }
     },
+    deactivated () {
+      this.getDataList()
+      console.log('ppppppppppppp--------')
+    },
     components: {
       AddOrUpdate
     },
     activated () {
       this.getDataList()
+      console.log('112121--------------')
     },
     methods: {
       // 获取数据列表
@@ -139,7 +144,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.$route.query.id
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
