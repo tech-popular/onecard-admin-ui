@@ -20,30 +20,30 @@
       <el-form-item label="数据源类型" prop="datasource">
         <el-select v-model="dataForm.datasource" placeholder="请选择">
           <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
+            v-for="item in datasourceoptions"
+            :key="item.id"
+            :label="item.datasourceName"
+            :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="in数据源类型" prop="inDatasource">
         <el-select v-model="dataForm.inDatasource" placeholder="请选择">
           <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
+            v-for="item in datasourceoptions"
+            :key="item.id"
+            :label="item.datasourceName"
+            :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="out数据源类型" prop="outDatasource">
         <el-select v-model="dataForm.outDatasource" placeholder="请选择">
           <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
+            v-for="item in datasourceoptions"
+            :key="item.id"
+            :label="item.datasourceName"
+            :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -365,13 +365,7 @@ export default {
           trigger: 'blur'
         }]
       },
-      computeTypeoptions: [{
-        value: 1,
-        label: '简单SIMPLE'
-      }, {
-        value: 2,
-        label: '复杂MIX'
-      }],
+      computeTypeoptions: [],
       // datasourceoptions: [{
       //   value: 1,
       //   label: 'kafka'
@@ -519,7 +513,7 @@ export default {
         params: this.$http.adornParams()
       }).then(({data}) => {
         if (data && data.code === 0) {
-          this.options = data.dicList
+          this.computeTypeoptions = data.taskDicts.task_compute_type
         }
       })
       this.$http({
@@ -605,7 +599,15 @@ export default {
           'period': this.dataForm.period,
           'tags': this.dataForm.tags,
           'projectId': this.dataForm.projectId,
-          'enable': this.dataForm.enable
+          'enable': this.dataForm.enable,
+          'cron': this.dataForm.cron,
+          'table': this.dataForm.table,
+          'dependTask': this.dataForm.dependTask,
+          'inDatasource': this.dataForm.inDatasource,
+          'outDatasource': this.dataForm.outDatasource,
+          'outType': this.dataForm.outType,
+          'transformerConfig': this.dataForm.transformerConfig,
+          'version': this.dataForm.version
         })
       }).then(({
         data
