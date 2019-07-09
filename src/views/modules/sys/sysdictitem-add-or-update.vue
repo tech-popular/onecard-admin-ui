@@ -4,7 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="" prop="dictId">
+    <el-form-item label="" prop="dictId" style="display: none">
       <el-input v-model="dataForm.dictId" placeholder="" ></el-input>
     </el-form-item>
     <el-form-item label="数据值" prop="value">
@@ -89,7 +89,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                // this.dataForm.dictId = data.sysDictItem.dictId
+                this.dataForm.dictId = data.sysDictItem.dictId
                 this.dataForm.value = data.sysDictItem.value
                 this.dataForm.label = data.sysDictItem.label
                 this.dataForm.description = data.sysDictItem.description

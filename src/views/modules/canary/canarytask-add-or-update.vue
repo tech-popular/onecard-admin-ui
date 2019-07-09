@@ -8,24 +8,8 @@
 
   <div v-show="activeName == '1'">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="任务名称" prop="name">
-        <el-input v-model="dataForm.name" placeholder="任务名称"></el-input>
-      </el-form-item>
-      <el-form-item label="数据类型" prop="datatype">
-        <el-select v-model="dataForm.datatype" placeholder="请选择">
-          <el-option v-for="item in datatypeoptions" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="数据源类型" prop="datasource">
-        <el-select v-model="dataForm.datasource" placeholder="请选择">
-          <el-option
-            v-for="item in datasourceoptions"
-            :key="item.id"
-            :label="item.datasourceName"
-            :value="item.id">
-          </el-option>
-        </el-select>
+      <el-form-item label="任务名称" prop="name" >
+         <el-input v-model="dataForm.name" placeholder="任务名称"></el-input>
       </el-form-item>
       <el-form-item label="in数据源类型" prop="inDatasource">
         <el-select v-model="dataForm.inDatasource" placeholder="请选择">
@@ -37,15 +21,49 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="out数据源类型" prop="outDatasource">
-        <el-select v-model="dataForm.outDatasource" placeholder="请选择">
-          <el-option
-            v-for="item in datasourceoptions"
-            :key="item.id"
-            :label="item.datasourceName"
-            :value="item.id">
-          </el-option>
-        </el-select>
+      <!--<el-form-item label="out数据源类型" prop="outDatasource" >-->
+        <!--<el-select v-model="dataForm.outDatasource" placeholder="请选择">-->
+          <!--<el-option-->
+            <!--v-for="item in datasourceoptions"-->
+            <!--:key="item.id"-->
+            <!--:label="item.datasourceName"-->
+            <!--:value="item.id">-->
+          <!--</el-option>-->
+        <!--</el-select>-->
+      <!--</el-form-item>-->
+      <el-form-item
+        v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
+        :label="'数据源'"
+        :key="outdata.key"
+        :prop="dataForm.honeycombOutDatasourceEntitys.outTableName"
+        :rules="{
+      required: true, message: '表名不能为空', trigger: 'blur'}">
+        <el-row :gutter="24">
+          <el-col :span="5"><div class="grid-content bg-purple">
+            <el-select v-model="outdata.outDatasource" placeholder="请选择">
+              <el-option
+                v-for="item in datasourceoptions"
+                :key="item.id"
+                :label="item.datasourceName"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </div></el-col>
+          <el-col :span="5"><div class="grid-content bg-purple">
+
+            <el-input v-model="outdata.outTableName"></el-input>
+          </div></el-col>
+          <el-col :span="8"><div class="grid-content bg-purple">
+
+            <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
+          </div></el-col>
+        </el-row>
+
+
+
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="addDomain">新增out数据源</el-button>
       </el-form-item>
       <el-form-item label="计算类型" prop="computeType">
         <el-select v-model="dataForm.computeType" placeholder="请选择">
@@ -53,17 +71,11 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="数据源" prop="topic">
-        <el-input type="textarea" v-model="dataForm.topic" placeholder="数据源" :rows="10"></el-input>
-      </el-form-item>
       <el-form-item label=" 历史数据生成sql" prop="cacheSql">
         <el-input type="textarea" v-model="dataForm.cacheSql" placeholder="cache_sql" :rows="10"></el-input>
       </el-form-item>
       <el-form-item label="sql" prop="sql">
         <el-input type="textarea" v-model="dataForm.sql" placeholder="sql" :rows="12"></el-input>
-      </el-form-item>
-      <el-form-item label="频率(秒)" prop="howOften">
-        <el-input v-model="dataForm.howOften" placeholder="频率"></el-input>
       </el-form-item>
       <el-form-item label="周期" prop="period">
         <el-input v-model="dataForm.period" placeholder="周期"></el-input>
@@ -77,14 +89,8 @@
       <el-form-item label="dependTask" prop="dependTask">
         <el-input v-model="dataForm.dependTask" placeholder="dependTask"></el-input>
       </el-form-item>
-      <el-form-item label="outType" prop="outType">
-        <el-input v-model="dataForm.outType" placeholder="outType"></el-input>
-      </el-form-item>
-      <el-form-item label="table" prop="table">
-        <el-input v-model="dataForm.table" placeholder="table"></el-input>
-      </el-form-item>
       <el-form-item label="transformerConfig" prop="transformerConfig">
-        <el-input v-model="dataForm.transformerConfig" placeholder="transformerConfig"></el-input>
+        <el-input v-model="dataForm.transformerConfig" placeholder="transformerConfig" type="textarea" ></el-input>
       </el-form-item>
       <el-form-item label="version" prop="version">
         <el-input v-model="dataForm.version" placeholder="version"></el-input>
@@ -262,13 +268,9 @@ export default {
       dataForm: {
         id: 0,
         name: '',
-        datatype: '',
-        datasource: '',
         computeType: '',
-        topic: '',
         cacheSql: '',
         sql: '',
-        howOften: '60',
         period: 0,
         tags: '',
         projectId: '',
@@ -276,26 +278,20 @@ export default {
         cron: '',
         dependTask: '',
         inDatasource: '',
-        outDatasource: '',
-        outType: '',
-        table: '',
         transformerConfig: '',
-        version: 1
+        version: 1,
+        honeycombOutDatasourceEntitys: [{
+          outTableName: '',
+          outDatasource: 1,
+          enable: 1,
+          taskId: 0
+        }]
       },
+
       dataRule: {
         name: [{
           required: true,
           message: '任务名称不能为空',
-          trigger: 'blur'
-        }],
-        datatype: [{
-          required: true,
-          message: '数据类型不能为空',
-          trigger: 'blur'
-        }],
-        datasource: [{
-          required: true,
-          message: '数据源不能为空',
           trigger: 'blur'
         }],
         computeType: [{
@@ -303,35 +299,6 @@ export default {
           message: '计算类型不能为空',
           trigger: 'blur'
         }],
-        topic: [{
-          required: true,
-          message: '主题不能为空',
-          trigger: 'blur'
-        }],
-        // cacheSql: [{
-        //   required: true,
-        //   message: 'cache_sql不能为空',
-        //   trigger: 'blur'
-        // }],
-        // sql: [{
-        //   required: true,
-        //   message: 'sql不能为空',
-        //   trigger: 'blur'
-        // }],
-        // howOften: [{
-        //   required: true,
-        //   message: '频率不能为空',
-        //   trigger: 'blur'
-        // },
-        // {
-        //   type: 'number',
-        //   message: '请输入数字类型'
-        // }],
-        // projectId: [{
-        //   required: true,
-        //   message: '项目Id不能为空',
-        //   trigger: 'blur'
-        // }],
         enable: [{
           required: true,
           message: '是否启用不能为空',
@@ -366,41 +333,27 @@ export default {
         }]
       },
       computeTypeoptions: [],
-      // datasourceoptions: [{
-      //   value: 1,
-      //   label: 'kafka'
-      // }, {
-      //   value: 2,
-      //   label: '常规数据源'
-      // }, {
-      //   value: 3,
-      //   label: 'MYSQL'
-      // }, {
-      //   value: 4,
-      //   label: 'Healthcheck'
-      // }],
-      datatypeoptions: [{
-        value: 1,
-        label: 'METRIC'
-      }, {
-        value: 2,
-        label: 'ZIPKIN'
-      }, {
-        value: 3,
-        label: 'MYSQL'
-      }, {
-        value: 4,
-        label: 'Healthcheck'
-      }],
       projects: [],
       activeName: '1',
       value1: [],
       userdata: [],
       task_activeName: 'oneLevel'
-
     }
   },
   methods: {
+    addDomain () {
+      this.dataForm.honeycombOutDatasourceEntitys.push({
+        outTableName: '',
+        key: Date.now()
+      })
+      console.log(this.dataForm)
+    },
+    removeDomain (item) {
+      var index = this.dataForm.honeycombOutDatasourceEntitys.indexOf(item)
+      if (index !== -1) {
+        this.dataForm.honeycombOutDatasourceEntitys.splice(index, 1)
+      }
+    },
     blurOption (item) {
       this.parentData.editableTabs[(+item.index) - 1].title = this.projects[item.serviceId]['project']
     },
@@ -470,6 +423,7 @@ export default {
       }) => {
         if (data && data.code === 0) {
           this.dataForm = data.canaryTask
+          console.log(this.dataForm)
         }
       })
     },
@@ -517,12 +471,12 @@ export default {
         }
       })
       this.$http({
-        url: this.$http.adornUrl(`/canary/canarydatasourceconfig/select`),
+        url: this.$http.adornUrl(`/honeycomb/honeycombdatasourceconfig/select`),
         method: 'get',
         params: this.$http.adornParams()
       }).then(({data}) => {
         if (data && data.code === 0) {
-          this.datasourceoptions = data.canaryDatasourceConfigEntities
+          this.datasourceoptions = data.honeycombDatasourceConfigEntities
         }
       })
       // 步骤一渲染
@@ -589,25 +543,21 @@ export default {
         data: this.$http.adornData({
           'id': this.dataForm.id || undefined,
           'name': this.dataForm.name,
-          'datatype': this.dataForm.datatype,
-          'datasource': this.dataForm.datasource,
           'computeType': this.dataForm.computeType,
-          'topic': this.dataForm.topic,
           'cacheSql': this.dataForm.cacheSql,
           'sql': this.dataForm.sql,
-          'howOften': this.dataForm.howOften,
           'period': this.dataForm.period,
           'tags': this.dataForm.tags,
           'projectId': this.dataForm.projectId,
           'enable': this.dataForm.enable,
           'cron': this.dataForm.cron,
-          'table': this.dataForm.table,
           'dependTask': this.dataForm.dependTask,
           'inDatasource': this.dataForm.inDatasource,
           'outDatasource': this.dataForm.outDatasource,
-          'outType': this.dataForm.outType,
           'transformerConfig': this.dataForm.transformerConfig,
-          'version': this.dataForm.version
+          'version': this.dataForm.version,
+          'honeycombOutDatasourceEntitys': this.dataForm.honeycombOutDatasourceEntitys
+
         })
       }).then(({
         data

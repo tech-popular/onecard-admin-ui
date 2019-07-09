@@ -2,12 +2,12 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="任务名称" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('canary:canarytask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('canary:canarytask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombtask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombtask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,7 +26,7 @@
         prop="id"
         header-align="center"
         align="center"
-        label="任务Id">
+        label="">
       </el-table-column>
       <el-table-column
         prop="name"
@@ -35,69 +35,82 @@
         label="任务名称">
       </el-table-column>
       <el-table-column
-        prop="inDatasourceName"
+        prop="inDatasource"
         header-align="center"
         align="center"
-        label="in数据源类型">
+        label="输入数据源">
       </el-table-column>
       <el-table-column
         prop="computeType"
         header-align="center"
         align="center"
-        label="计算类型">
-
-      </el-table-column>
-      <!--<el-table-column
-        prop="topic"
-        header-align="center"
-        align="center"
-        label="主题">
+        label="计算类型:1 简单 2 复杂">
       </el-table-column>
       <el-table-column
         prop="cacheSql"
         header-align="center"
         align="center"
-        label="cache_sql">
+        label="历史数据生成SQL">
       </el-table-column>
       <el-table-column
         prop="sql"
         header-align="center"
         align="center"
-        label="sql">
-      </el-table-column>-->
-      <!--<el-table-column-->
-        <!--prop="howOften"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--label="频率">-->
-      <!--</el-table-column>-->
+        label="SQL">
+      </el-table-column>
       <el-table-column
         prop="period"
         header-align="center"
         align="center"
-        label="周期">
+        label="周期(分钟)">
       </el-table-column>
-      <!--<el-table-column-->
-        <!--prop="projectName"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--label="项目名称">-->
-      <!--</el-table-column>-->
-      <!--<el-table-column
-        prop="projectId"
+      <el-table-column
+        prop="transformerConfig"
         header-align="center"
         align="center"
-        label="项目Id">
-      </el-table-column>-->
+        label="转换配置">
+      </el-table-column>
+      <el-table-column
+        prop="outDatasource"
+        header-align="center"
+        align="center"
+        label="输出数据源">
+      </el-table-column>
+      <el-table-column
+        prop="dependTask"
+        header-align="center"
+        align="center"
+        label="依赖于某个任务(暂不支持)">
+      </el-table-column>
+      <el-table-column
+        prop="cron"
+        header-align="center"
+        align="center"
+        label="cron表达式">
+      </el-table-column>
+      <el-table-column
+        prop="version"
+        header-align="center"
+        align="center"
+        label="版本号">
+      </el-table-column>
+      <el-table-column
+        prop="tenantId"
+        header-align="center"
+        align="center"
+        label="租户id">
+      </el-table-column>
+      <el-table-column
+        prop="tags"
+        header-align="center"
+        align="center"
+        label="标签">
+      </el-table-column>
       <el-table-column
         prop="enable"
         header-align="center"
         align="center"
         label="是否启用">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small">正常</el-tag>
-          <el-tag v-else size="small"  type="danger">禁用</el-tag>
-        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -121,12 +134,12 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @closeUpdateBox = "closeUpdateBox" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './canarytask-add-or-update'
+  import AddOrUpdate from './honeycombtask-add-or-update'
   export default {
     data () {
       return {
@@ -153,7 +166,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/canary/first/list'),
+          url: this.$http.adornUrl('/honeycomb/honeycombtask/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -193,9 +206,6 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      closeUpdateBox () {
-        this.addOrUpdateVisible = false
-      },
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -207,7 +217,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/canary/first/delete'),
+            url: this.$http.adornUrl('/honeycomb/honeycombtask/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
