@@ -16,9 +16,9 @@
     <el-form-item label="描述" prop="description">
       <el-input v-model="dataForm.description" placeholder="描述"></el-input>
     </el-form-item>
-    <el-form-item label="排序（升序）" prop="sort">
-      <el-input v-model="dataForm.sort" placeholder="排序（升序）"></el-input>
-    </el-form-item>
+    <!--<el-form-item label="排序（升序）" prop="sort">-->
+      <!--<el-input v-model="dataForm.sort" placeholder="排序（升序）"></el-input>-->
+    <!--</el-form-item>-->
     <el-form-item label="备注信息" prop="remarks">
       <el-input v-model="dataForm.remarks" placeholder="备注信息"></el-input>
     </el-form-item>
@@ -64,12 +64,6 @@
           ],
           label: [
             { required: true, message: '标签名不能为空', trigger: 'blur' }
-          ],
-          description: [
-            { required: true, message: '描述不能为空', trigger: 'blur' }
-          ],
-          sort: [
-            { required: true, message: '排序（升序）不能为空', trigger: 'blur' }
           ]
         }
       }

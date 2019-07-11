@@ -19,9 +19,12 @@
     <el-form-item label="备注信息" prop="remarks">
       <el-input v-model="dataForm.remarks" placeholder="备注信息"></el-input>
     </el-form-item>
-    <el-form-item label="是否启用" prop="enable">
-      <el-input v-model="dataForm.enable" placeholder="是否启用"></el-input>
-    </el-form-item>
+      <el-form-item label="是否启用" prop="enable">
+        <el-radio-group v-model="dataForm.enable">
+          <el-radio :label="0">禁用</el-radio>
+          <el-radio :label="1">正常</el-radio>
+        </el-radio-group>
+      </el-form-item>
     <!--<el-form-item label="所属租户" prop="tenantId">-->
       <!--<el-input v-model="dataForm.tenantId" placeholder="所属租户"></el-input>-->
     <!--</el-form-item>-->
@@ -45,7 +48,7 @@
           createTime: '',
           updateTime: '',
           remarks: '',
-          enable: '',
+          enable: 1,
           tenantId: ''
         },
         dataRule: {

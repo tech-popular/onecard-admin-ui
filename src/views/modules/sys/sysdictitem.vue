@@ -125,14 +125,12 @@
     },
     deactivated () {
       this.getDataList()
-      console.log('ppppppppppppp--------')
     },
     components: {
       AddOrUpdate
     },
     activated () {
       this.getDataList()
-      console.log('112121--------------')
     },
     methods: {
       // 获取数据列表

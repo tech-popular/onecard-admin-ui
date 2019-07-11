@@ -11,7 +11,7 @@
       <el-form-item label="任务名称" prop="name" >
          <el-input v-model="dataForm.name" placeholder="任务名称"></el-input>
       </el-form-item>
-      <el-form-item label="in数据源类型" prop="inDatasource">
+      <el-form-item label="输入数据源类型" prop="inDatasource">
         <el-select v-model="dataForm.inDatasource" placeholder="请选择">
           <el-option
             v-for="item in datasourceoptions"
@@ -21,16 +21,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <!--<el-form-item label="out数据源类型" prop="outDatasource" >-->
-        <!--<el-select v-model="dataForm.outDatasource" placeholder="请选择">-->
-          <!--<el-option-->
-            <!--v-for="item in datasourceoptions"-->
-            <!--:key="item.id"-->
-            <!--:label="item.datasourceName"-->
-            <!--:value="item.id">-->
-          <!--</el-option>-->
-        <!--</el-select>-->
-      <!--</el-form-item>-->
       <el-form-item
         v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
         :label="'数据源'"
@@ -59,11 +49,9 @@
           </div></el-col>
         </el-row>
 
-
-
       </el-form-item>
       <el-form-item>
-        <el-button @click="addDomain">新增out数据源</el-button>
+        <el-button @click="addDomain">新增输出数据源</el-button>
       </el-form-item>
       <el-form-item label="计算类型" prop="computeType">
         <el-select v-model="dataForm.computeType" placeholder="请选择">
@@ -83,17 +71,36 @@
       <el-form-item label="标签" prop="tags">
         <el-input v-model="dataForm.tags" placeholder="标签"></el-input>
       </el-form-item>
-      <el-form-item label="cron" prop="cron">
+      <el-form-item label="cron表达式" prop="cron">
         <el-input v-model="dataForm.cron" placeholder="*/10 * * * * ?"></el-input>
       </el-form-item>
-      <el-form-item label="dependTask" prop="dependTask">
+      <el-form-item label="依赖任务ID" prop="dependTask">
         <el-input v-model="dataForm.dependTask" placeholder="dependTask"></el-input>
       </el-form-item>
-      <el-form-item label="transformerConfig" prop="transformerConfig">
-        <el-input v-model="dataForm.transformerConfig" placeholder="transformerConfig" type="textarea" ></el-input>
+      <el-form-item label="id规则" prop="idRule">
+        <el-select v-model="dataForm.idRule" placeholder="请选择">
+          <el-option v-for="item in idRuleoptions" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="version" prop="version">
-        <el-input v-model="dataForm.version" placeholder="version"></el-input>
+      <el-form-item label="id是否可覆盖" prop="idOverride">
+        <el-select v-model="dataForm.idOverride" placeholder="请选择">
+          <el-option
+            v-for="item in tureOrFalseoptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="重写规则" prop="overwriteKey">
+        <el-input v-model="dataForm.overwriteKey" placeholder="overwriteKey"></el-input>
+      </el-form-item>
+      <!--<el-form-item label="transformerConfig" prop="transformerConfig" >-->
+        <!--<el-input v-model="dataForm.transformerConfig" placeholder="transformerConfig" type="textarea" disabled ></el-input>-->
+      <!--</el-form-item>-->
+      <el-form-item label="版本" prop="version">
+        <el-input v-model="dataForm.version" placeholder="version" disabled></el-input>
       </el-form-item>
       <el-form-item label="是否启用" prop="enable">
         <el-radio-group v-model="dataForm.enable">
@@ -239,6 +246,7 @@
 
   </div>
   <span slot="footer" class="dialog-footer">
+     <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="">启动任务</el-button>
     <el-button style="margin-top: 12px;" v-show="nextButton" @click="nextPage()">下一步</el-button>
     <el-button @click="closeUpdateBox">取消</el-button>
     <el-button v-show="dataForm.id" type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -280,6 +288,9 @@ export default {
         inDatasource: '',
         transformerConfig: '',
         version: 1,
+        idRule: 'none',
+        idOverride: 'false',
+        overwriteKey: '',
         honeycombOutDatasourceEntitys: [{
           outTableName: '',
           outDatasource: 1,
@@ -287,7 +298,13 @@ export default {
           taskId: 0
         }]
       },
-
+      tureOrFalseoptions: [{
+        value: true,
+        label: 'true'
+      }, {
+        value: false,
+        label: 'false'
+      }],
       dataRule: {
         name: [{
           required: true,
@@ -333,6 +350,7 @@ export default {
         }]
       },
       computeTypeoptions: [],
+      idRuleoptions: [],
       projects: [],
       activeName: '1',
       value1: [],
@@ -411,6 +429,33 @@ export default {
       })
     },
     /**
+     * 启动任务
+     */
+    startTask () {
+      return this.$http({
+        url: this.$http.adornUrl(`/canary/first/starttask/${this.dataForm.id}`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({
+                 data
+               }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false
+              this.$emit('closeUpdateBox')
+              this.$emit('refreshDataList')
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    /**
      * @function fetchTaskData 【获取步骤1】
      */
     fetchTaskData () {
@@ -468,6 +513,7 @@ export default {
       }).then(({data}) => {
         if (data && data.code === 0) {
           this.computeTypeoptions = data.taskDicts.task_compute_type
+          this.idRuleoptions = data.taskDicts.task_id_rule
         }
       })
       this.$http({
@@ -556,7 +602,10 @@ export default {
           'outDatasource': this.dataForm.outDatasource,
           'transformerConfig': this.dataForm.transformerConfig,
           'version': this.dataForm.version,
-          'honeycombOutDatasourceEntitys': this.dataForm.honeycombOutDatasourceEntitys
+          'honeycombOutDatasourceEntitys': this.dataForm.honeycombOutDatasourceEntitys,
+          'idRule': this.dataForm.idRule,
+          'idOverride': this.dataForm.idOverride,
+          'overwriteKey': this.dataForm.overwriteKey
 
         })
       }).then(({
