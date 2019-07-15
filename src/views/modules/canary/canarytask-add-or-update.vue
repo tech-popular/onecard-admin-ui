@@ -11,7 +11,7 @@
       <el-form-item label="任务名称" prop="name" >
          <el-input v-model="dataForm.name" placeholder="任务名称"></el-input>
       </el-form-item>
-      <el-form-item label="输入数据源类型" prop="inDatasource">
+      <el-form-item label="输入数据源" prop="inDatasource">
         <el-select v-model="dataForm.inDatasource" placeholder="请选择">
           <el-option
             v-for="item in datasourceoptions"
@@ -23,13 +23,13 @@
       </el-form-item>
       <el-form-item
         v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
-        :label="'数据源'"
+        :label="'输出数据源'+index"
         :key="outdata.key"
         :prop="dataForm.honeycombOutDatasourceEntitys.outTableName"
         :rules="{
       required: true, message: '表名不能为空', trigger: 'blur'}">
         <el-row :gutter="24">
-          <el-col :span="5"><div class="grid-content bg-purple">
+          <el-col :span="9"><div class="grid-content bg-purple">
             <el-select v-model="outdata.outDatasource" placeholder="请选择">
               <el-option
                 v-for="item in datasourceoptions"
@@ -39,11 +39,11 @@
               </el-option>
             </el-select>
           </div></el-col>
-          <el-col :span="5"><div class="grid-content bg-purple">
+          <el-col :span="9"><div class="grid-content bg-purple">
 
             <el-input v-model="outdata.outTableName"></el-input>
           </div></el-col>
-          <el-col :span="8"><div class="grid-content bg-purple">
+          <el-col :span="4"><div class="grid-content bg-purple">
 
             <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
           </div></el-col>
@@ -246,7 +246,7 @@
 
   </div>
   <span slot="footer" class="dialog-footer">
-     <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="">启动任务</el-button>
+     <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button>
     <el-button style="margin-top: 12px;" v-show="nextButton" @click="nextPage()">下一步</el-button>
     <el-button @click="closeUpdateBox">取消</el-button>
     <el-button v-show="dataForm.id" type="primary" @click="dataFormSubmit()">确定</el-button>
