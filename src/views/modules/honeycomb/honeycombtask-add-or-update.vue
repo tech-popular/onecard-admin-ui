@@ -135,20 +135,20 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.name = data.honeycombtask.name
-                this.dataForm.inDatasource = data.honeycombtask.inDatasource
-                this.dataForm.computeType = data.honeycombtask.computeType
-                this.dataForm.cacheSql = data.honeycombtask.cacheSql
-                this.dataForm.sql = data.honeycombtask.sql
-                this.dataForm.period = data.honeycombtask.period
-                this.dataForm.transformerConfig = data.honeycombtask.transformerConfig
-                this.dataForm.outDatasource = data.honeycombtask.outDatasource
-                this.dataForm.dependTask = data.honeycombtask.dependTask
-                this.dataForm.cron = data.honeycombtask.cron
-                this.dataForm.version = data.honeycombtask.version
-                this.dataForm.tenantId = data.honeycombtask.tenantId
-                this.dataForm.tags = data.honeycombtask.tags
-                this.dataForm.enable = data.honeycombtask.enable
+                this.dataForm.name = data.honeycombTask.name
+                this.dataForm.inDatasource = data.honeycombTask.inDatasource
+                this.dataForm.computeType = data.honeycombTask.computeType
+                this.dataForm.cacheSql = data.honeycombTask.cacheSql
+                this.dataForm.sql = data.honeycombTask.sql
+                this.dataForm.period = data.honeycombTask.period
+                this.dataForm.transformerConfig = data.honeycombTask.transformerConfig
+                this.dataForm.outDatasource = data.honeycombTask.outDatasource
+                this.dataForm.dependTask = data.honeycombTask.dependTask
+                this.dataForm.cron = data.honeycombTask.cron
+                this.dataForm.version = data.honeycombTask.version
+                this.dataForm.tenantId = data.honeycombTask.tenantId
+                this.dataForm.tags = data.honeycombTask.tags
+                this.dataForm.enable = data.honeycombTask.enable
               }
             })
           }

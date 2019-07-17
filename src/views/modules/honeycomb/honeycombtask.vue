@@ -50,12 +50,14 @@
         prop="cacheSql"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="历史数据生成SQL">
       </el-table-column>
       <el-table-column
         prop="sql"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="SQL">
       </el-table-column>
       <el-table-column
@@ -68,6 +70,7 @@
         prop="transformerConfig"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="转换配置">
       </el-table-column>
       <el-table-column
@@ -120,6 +123,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandleThreshold(scope.row.id)">配置阈值</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -140,6 +144,7 @@
 
 <script>
   import AddOrUpdate from './honeycombtask-add-or-update'
+  import AddOrUpdateThreshold from '../canary/canarythresholdusergroup-add-or-update'
   export default {
     data () {
       return {
@@ -152,11 +157,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        addOrUpdateThresholdVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AddOrUpdateThreshold
     },
     activated () {
       this.getDataList()
@@ -204,6 +211,12 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      addOrUpdateHandleThreshold (id) {
+        this.addOrUpdateThresholdVisible = true
+        this.$nextTick(() => {
+          this.$refs.AddOrUpdateThreshold.init(id)
         })
       },
       // 删除
