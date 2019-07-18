@@ -4,7 +4,7 @@
       <div class="site-content">
         <div class="brand-info">
           <h2 class="brand-info__text">蜂巢系统</h2>
-          <p class="brand-info__intro">提供平台的全方位的报警监控。</p>
+          <p class="brand-info__intro">liuhy提供平台的全方位的报警监控。</p>
         </div>
         <div class="login-main">
           <h3 class="login-title">管理员登录</h3>
