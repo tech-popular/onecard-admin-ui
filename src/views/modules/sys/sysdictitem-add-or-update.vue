@@ -51,8 +51,8 @@
           createTime: '',
           updateTime: '',
           remarks: '',
-          enable: '',
-          tenantId: '',
+          enable: 1,
+          tenantId: 1,
           key: ''
         },
         dataRule: {
