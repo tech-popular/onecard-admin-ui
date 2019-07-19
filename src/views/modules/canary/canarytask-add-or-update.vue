@@ -83,8 +83,18 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="id是否可覆盖" prop="idOverride">
-        <el-select v-model="dataForm.idOverride" placeholder="请选择">
+      <el-form-item label="增加task字段" prop="addFieldTask">
+      <el-select v-model="dataForm.addFieldTask" placeholder="请选择">
+        <el-option
+          v-for="item in tureOrFalseoptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      </el-form-item>
+      <el-form-item label="增加timestamp字段" prop="addFieldTimestamp">
+        <el-select v-model="dataForm.addFieldTimestamp" placeholder="请选择">
           <el-option
             v-for="item in tureOrFalseoptions"
             :key="item.value"
@@ -289,7 +299,8 @@ export default {
         transformerConfig: '',
         version: 1,
         idRule: 'none',
-        idOverride: 'false',
+        addFieldTask: 'false',
+        addFieldTimestamp: 'false',
         overwriteKey: '',
         honeycombOutDatasourceEntitys: [{
           outTableName: '',
@@ -604,7 +615,8 @@ export default {
           'version': this.dataForm.version,
           'honeycombOutDatasourceEntitys': this.dataForm.honeycombOutDatasourceEntitys,
           'idRule': this.dataForm.idRule,
-          'idOverride': this.dataForm.idOverride,
+          'addFieldTimestamp': this.dataForm.addFieldTimestamp,
+          'addFieldTask': this.dataForm.addFieldTask,
           'overwriteKey': this.dataForm.overwriteKey
 
         })
