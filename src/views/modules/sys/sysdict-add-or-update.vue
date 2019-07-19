@@ -49,7 +49,7 @@
           updateTime: '',
           remarks: '',
           enable: 1,
-          tenantId: ''
+          tenantId: 1
         },
         dataRule: {
           type: [
@@ -118,7 +118,8 @@
                 'remarks': this.dataForm.remarks,
                 'system': this.dataForm.system,
                 'delFlag': this.dataForm.delFlag,
-                'tenantId': this.dataForm.tenantId
+                'tenantId': this.dataForm.tenantId,
+                'enable': this.dataForm.enable
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
