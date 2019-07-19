@@ -1,5 +1,5 @@
 <template>
-<el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+<el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible" :gutter="1">
   <el-tabs v-model="activeName" @tab-click="topHandleClick">
     <el-tab-pane label="任务基本信息" name="1" :disabled="disabledNum == '1'"></el-tab-pane>
     <el-tab-pane label="任务参数详细配置" name="2" :disabled="disabledNum == '2'"></el-tab-pane>
@@ -7,7 +7,7 @@
   </el-tabs>
 
   <div v-show="activeName == '1'">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
       <el-form-item label="任务名称" prop="name" >
          <el-input v-model="dataForm.name" placeholder="任务名称"></el-input>
       </el-form-item>
