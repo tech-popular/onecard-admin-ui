@@ -52,12 +52,12 @@
         align="center"
         label="数据库用户名">
       </el-table-column>
-      <el-table-column
-        prop="passwd"
-        header-align="center"
-        align="center"
-        label="数据库密码">
-      </el-table-column>
+      <!--<el-table-column-->
+        <!--prop="passwd"-->
+        <!--header-align="center"-->
+        <!--align="center"-->
+        <!--label="数据库密码">-->
+      <!--</el-table-column>-->
       <el-table-column
         prop="url"
         header-align="center"

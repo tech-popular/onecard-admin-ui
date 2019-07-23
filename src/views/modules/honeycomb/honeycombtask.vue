@@ -139,12 +139,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update-threshold v-if="addOrUpdateThresholdVisible" ref="addOrUpdateThreshold" ></add-or-update-threshold>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './honeycombtask-add-or-update'
   import AddOrUpdateThreshold from '../canary/canarythresholdusergroup-add-or-update'
+  import AddOrUpdate from './honeycombtask-add-or-update'
   export default {
     data () {
       return {
@@ -215,8 +216,11 @@
       },
       addOrUpdateHandleThreshold (id) {
         this.addOrUpdateThresholdVisible = true
+        console.log('aa')
         this.$nextTick(() => {
-          this.$refs.AddOrUpdateThreshold.init(id)
+          console.log('bb')
+          this.$refs.addOrUpdateThreshold.init(id)
+          console.log('ccc')
         })
       },
       // 删除

@@ -24,7 +24,7 @@
       <el-input v-model="dataForm.user" placeholder="数据库用户名"></el-input>
     </el-form-item>
     <el-form-item label="数据库密码" prop="passwd">
-      <el-input v-model="dataForm.passwd" placeholder="数据库密码"></el-input>
+      <el-input v-model="dataForm.passwd" placeholder="数据库密码" show-password></el-input>
     </el-form-item>
     <el-form-item label="数据库url" prop="url">
       <el-input v-model="dataForm.url" placeholder="数据库url"></el-input>
