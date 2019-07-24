@@ -107,6 +107,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -122,11 +123,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @closeUpdateBox = "closeUpdateBox" @refreshDataList="getDataList"></add-or-update>
+    <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './canarytask-add-or-update'
+  import TaskProgress from './canarytaskprogress'
   export default {
     data () {
       return {
@@ -139,11 +142,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        taskProgressVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      TaskProgress
     },
     activated () {
       this.getDataList()
@@ -191,6 +196,12 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      taskProgress (id) {
+        this.taskProgressVisible = true
+        this.$nextTick(() => {
+          this.$refs.taskProgress.init(id)
         })
       },
       closeUpdateBox () {
