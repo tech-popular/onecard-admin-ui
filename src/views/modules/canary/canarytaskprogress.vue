@@ -70,6 +70,8 @@
               if (data && data.code === 0) {
                 this.dataList = data.list
                 console.log(this.dataList)
+              } else {
+                this.dataList = []
               }
             })
           }
