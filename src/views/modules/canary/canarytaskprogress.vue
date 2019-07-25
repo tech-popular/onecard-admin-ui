@@ -1,7 +1,12 @@
 <template>
   <el-dialog
-    :visible.sync="visible"
-    >
+    title="展示最新10条"
+    :visible.sync="visible">
+    <span data-align="right">
+    <el-button @click="refreshData()" type="danger" align="right" round>刷新</el-button>
+    <el-button @click="visible = false" type="primary" align="right" round>关闭</el-button>
+    </span>
+    <br>
   <div class="mod-config">
     <el-table
       :data="dataList"
@@ -12,7 +17,8 @@
         prop="taskId"
         header-align="center"
         align="center"
-        label="任务Id">
+        label="任务Id"
+        width="50">
       </el-table-column>
       <el-table-column
         prop="taskStatus"
@@ -30,16 +36,21 @@
         prop="createTime"
         header-align="center"
         align="center"
-        label="创建时间">
+        label="创建时间"
+        width="250">
       </el-table-column>
       <el-table-column
         prop="updateTime"
         header-align="center"
         align="center"
-        label="更新时间">
+        label="更新时间"
+        width="250">
       </el-table-column>
     </el-table>
   </div>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="visible = false">关闭</el-button>
+    </span>
   </el-dialog>
 </template>
 
@@ -47,6 +58,7 @@
   export default {
     data () {
       return {
+        param: 0,
         visible: false,
         dataList: [],
         taskId: 0,
@@ -56,12 +68,17 @@
       }
     },
     methods: {
+      refreshData () {
+        this.init(this.param)
+      },
       // 获取数据列表
       init (id) {
+        this.param = id | 0
+        console.log(this.param)
         this.visible = true
         this.dataListLoading = true
         this.$nextTick(() => {
-          if (id) {
+          if (id !== 0) {
             this.$http({
               url: this.$http.adornUrl(`/canary/first/es/` + id),
               method: 'get',
@@ -72,6 +89,7 @@
                 console.log(this.dataList)
               } else {
                 this.dataList = []
+                this.dataForm.id = 0
               }
             })
           }
