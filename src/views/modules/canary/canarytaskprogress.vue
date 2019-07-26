@@ -33,6 +33,12 @@
         label="任务描述">
       </el-table-column>
       <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="任务描述">
+      </el-table-column>
+      <el-table-column
         prop="createTime"
         header-align="center"
         align="center"

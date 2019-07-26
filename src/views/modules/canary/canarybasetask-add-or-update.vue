@@ -111,12 +111,11 @@
                 this.dataForm.tenantId = data.canaryBaseTask.tenantId
                 this.dataForm.createdTime = data.canaryBaseTask.createdTime
                 this.dataForm.updatedTime = data.canaryBaseTask.updatedTime
-                this.canaryBaseTaskDatasourceEntities = data.canaryBaseTask.canaryBaseTaskDatasourceEntities
+                this.dataForm.canaryBaseTaskDatasourceEntities = data.canaryBaseTask.canaryBaseTaskDatasourceEntities
               }
             })
           }
         })
-        console.log(this.dataForm)
         this.$http({
           url: this.$http.adornUrl(`/honeycomb/honeycombdatasourceconfig/select`),
           method: 'get',
