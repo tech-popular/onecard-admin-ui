@@ -28,6 +28,15 @@
           </el-option>
         </el-select>
       </el-form-item>
+    <el-form-item label="请求方式" prop="method">
+      <el-select v-model="dataForm.method" placeholder="请选择">
+        <el-option v-for="item in methodoptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="超时时间" prop="timeOut">
+      <el-input-number v-model="dataForm.timeOut"  :min="0" :max="10" label="请求超时时间"></el-input-number>
+    </el-form-item>
     <el-form-item label="用户" prop="user">
       <el-input v-model="dataForm.user" placeholder="用户"></el-input>
     </el-form-item>
@@ -62,11 +71,14 @@
           enable: 1,
           isAuth: 0,
           user: '',
-          password: ''
+          password: '',
+          method: '',
+          timeOut: 0
         },
         serviceTypeoptions: [],
         protocoloptions: [],
         zerooneoptions: [],
+        methodoptions: [],
         dataRule: {
           serviceName: [
             { required: true, message: '应用名称不能为空', trigger: 'blur' }
@@ -94,12 +106,13 @@
         this.$http({
           url: this.$http.adornUrl(`/sys/sysdictitem/selectbydictypes`),
           method: 'post',
-          data: this.$http.adornData(['healthcheck_servicetype', 'healthcheck_protocol', 'zero_one'], false)
+          data: this.$http.adornData(['healthcheck_servicetype', 'healthcheck_protocol', 'zero_one', 'health_method'], false)
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.serviceTypeoptions = data.dicMap.healthcheck_servicetype
             this.protocoloptions = data.dicMap.healthcheck_protocol
             this.zerooneoptions = data.dicMap.zero_one
+            this.methodoptions = data.dicMap.health_method
           }
         })
         this.$nextTick(() => {
@@ -121,6 +134,8 @@
                 this.dataForm.password = data.honeycombHealthcheck.password
                 this.dataForm.createdTime = data.honeycombHealthcheck.createdTime
                 this.dataForm.updatedTime = data.honeycombHealthcheck.updatedTime
+                this.dataForm.method = data.honeycombHealthcheck.method
+                this.dataForm.timeOut = data.honeycombHealthcheck.timeOut
               }
             })
           }
@@ -144,7 +159,9 @@
                 'user': this.dataForm.user,
                 'password': this.dataForm.password,
                 'createdTime': this.dataForm.createdTime,
-                'updatedTime': this.dataForm.updatedTime
+                'updatedTime': this.dataForm.updatedTime,
+                'method': this.dataForm.method,
+                'timeOut': this.dataForm.timeOut
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
