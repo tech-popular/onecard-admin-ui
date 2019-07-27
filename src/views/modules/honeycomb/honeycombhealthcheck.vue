@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('canary:canarybasetask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('canary:canarybasetask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombhealthcheck:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombhealthcheck:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -29,10 +29,28 @@
         label="主键">
       </el-table-column>
       <el-table-column
-        prop="cron"
+        prop="serviceName"
         header-align="center"
         align="center"
-        label="cron表达式">
+        label="应用名称">
+      </el-table-column>
+      <el-table-column
+        prop="protocol"
+        header-align="center"
+        align="center"
+        label="协议">
+      </el-table-column>
+      <el-table-column
+        prop="uri"
+        header-align="center"
+        align="center"
+        label="资源">
+      </el-table-column>
+      <el-table-column
+        prop="serviceType"
+        header-align="center"
+        align="center"
+        label="应用类型">
       </el-table-column>
       <el-table-column
         prop="enable"
@@ -44,11 +62,23 @@
           <el-tag v-else size="small" type="danger">禁用</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="tenantId"
+     <!-- <el-table-column
+        prop="isAuth"
         header-align="center"
         align="center"
-        label="租户">
+        label="是否登录">
+      </el-table-column>-->
+      <el-table-column
+        prop="user"
+        header-align="center"
+        align="center"
+        label="用户">
+      </el-table-column>
+      <el-table-column
+        prop="password"
+        header-align="center"
+        align="center"
+        label="密码">
       </el-table-column>
       <el-table-column
         prop="createdTime"
@@ -71,7 +101,6 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateServiceHandle(scope.row.id)">应用配置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,14 +115,11 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <task-service v-if="taskServiceVisible" ref="taskService"  @refreshDataList="getDataList"></task-service>
-
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './canarybasetask-add-or-update'
-  import TaskService from './canarybaseservice'
+  import AddOrUpdate from './honeycombhealthcheck-add-or-update'
   export default {
     data () {
       return {
@@ -106,13 +132,11 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false,
-        taskServiceVisible: false
+        addOrUpdateVisible: false
       }
     },
     components: {
-      AddOrUpdate,
-      TaskService
+      AddOrUpdate
     },
     activated () {
       this.getDataList()
@@ -122,7 +146,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/canary/canarybasetask/list'),
+          url: this.$http.adornUrl('/honeycomb/honeycombhealthcheck/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -162,15 +186,6 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 应用配置
-      addOrUpdateServiceHandle (id) {
-        this.taskServiceVisible = true
-        this.$nextTick(() => {
-          console.log('id', id)
-          this.$refs.taskService.init(id)
-          console.log('2222')
-        })
-      },
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -182,7 +197,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/canary/canarybasetask/delete'),
+            url: this.$http.adornUrl('/honeycomb/honeycombhealthcheck/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

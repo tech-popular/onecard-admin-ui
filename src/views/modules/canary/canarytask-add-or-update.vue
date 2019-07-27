@@ -106,6 +106,19 @@
       <el-form-item label="重写规则" prop="overwriteKey">
         <el-input v-model="dataForm.overwriteKey" placeholder="overwriteKey"></el-input>
       </el-form-item>
+      <el-form-item label="服务名称字段" prop="serviceNameFiled">
+        <el-input v-model="dataForm.serviceNameFiled" placeholder="serviceNameFiled"></el-input>
+      </el-form-item>
+      <el-form-item label="健康检查任务" prop="isHealthcheck">
+        <el-select v-model="dataForm.isHealthcheck" placeholder="请选择">
+          <el-option
+            v-for="item in tureOrFalseoptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <!--<el-form-item label="transformerConfig" prop="transformerConfig" >-->
         <!--<el-input v-model="dataForm.transformerConfig" placeholder="transformerConfig" type="textarea" disabled ></el-input>-->
       <!--</el-form-item>-->
@@ -302,6 +315,8 @@ export default {
         addFieldTask: 'false',
         addFieldTimestamp: 'false',
         overwriteKey: '',
+        serviceNameFiled: '',
+        isHealthcheck: 'false',
         honeycombOutDatasourceEntitys: [{
           outTableName: '',
           outDatasource: 1,
@@ -617,7 +632,9 @@ export default {
           'idRule': this.dataForm.idRule,
           'addFieldTimestamp': this.dataForm.addFieldTimestamp,
           'addFieldTask': this.dataForm.addFieldTask,
-          'overwriteKey': this.dataForm.overwriteKey
+          'overwriteKey': this.dataForm.overwriteKey,
+          'serviceNameFiled': this.dataForm.serviceNameFiled,
+          'isHealthcheck': this.dataForm.isHealthcheck
 
         })
       }).then(({

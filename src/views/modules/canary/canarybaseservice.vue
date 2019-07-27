@@ -1,13 +1,17 @@
 <template>
+  <el-dialog
+    title="应用配置"
+    :close-on-click-modal="false"
+    :visible.sync="visible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="init()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="项目名称或服务名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('canary:canarybasetask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('canary:canarybasetask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="init()">查询</el-button>
+        <el-button v-if="isAuth('canary:canaryproject:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('canary:canaryproject:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,13 +30,25 @@
         prop="id"
         header-align="center"
         align="center"
-        label="主键">
+        label="项目主键Id">
       </el-table-column>
       <el-table-column
-        prop="cron"
+        prop="project"
         header-align="center"
         align="center"
-        label="cron表达式">
+        label="项目">
+      </el-table-column>
+      <el-table-column
+        prop="servicename"
+        header-align="center"
+        align="center"
+        label="服务名称">
+      </el-table-column>
+      <el-table-column
+        prop="group"
+        header-align="center"
+        align="center"
+        label="组名">
       </el-table-column>
       <el-table-column
         prop="enable"
@@ -45,24 +61,6 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="tenantId"
-        header-align="center"
-        align="center"
-        label="租户">
-      </el-table-column>
-      <el-table-column
-        prop="createdTime"
-        header-align="center"
-        align="center"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column
-        prop="updatedTime"
-        header-align="center"
-        align="center"
-        label="更新时间">
-      </el-table-column>
-      <el-table-column
         fixed="right"
         header-align="center"
         align="center"
@@ -71,7 +69,6 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateServiceHandle(scope.row.id)">应用配置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -85,15 +82,13 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <task-service v-if="taskServiceVisible" ref="taskService"  @refreshDataList="getDataList"></task-service>
-
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"></add-or-update>
   </div>
+  </el-dialog>
 </template>
 
 <script>
-  import AddOrUpdate from './canarybasetask-add-or-update'
-  import TaskService from './canarybaseservice'
+  import AddOrUpdate from './canaryproject-add-or-update'
   export default {
     data () {
       return {
@@ -101,28 +96,26 @@
           key: ''
         },
         dataList: [],
+        visible: false,
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false,
-        taskServiceVisible: false
+        addOrUpdateVisible: false
       }
     },
     components: {
-      AddOrUpdate,
-      TaskService
-    },
-    activated () {
-      this.getDataList()
+      AddOrUpdate
     },
     methods: {
       // 获取数据列表
-      getDataList () {
+      init (id) {
+        console.log('service aaa ', id)
+        this.visible = true
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/canary/canarybasetask/list'),
+          url: this.$http.adornUrl('/canary/canaryproject/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -144,12 +137,12 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.init()
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.init()
       },
       // 多选
       selectionChangeHandle (val) {
@@ -160,15 +153,6 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
-        })
-      },
-      // 应用配置
-      addOrUpdateServiceHandle (id) {
-        this.taskServiceVisible = true
-        this.$nextTick(() => {
-          console.log('id', id)
-          this.$refs.taskService.init(id)
-          console.log('2222')
         })
       },
       // 删除
@@ -182,7 +166,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/canary/canarybasetask/delete'),
+            url: this.$http.adornUrl('/canary/canaryproject/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
@@ -192,7 +176,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.init()
                 }
               })
             } else {
