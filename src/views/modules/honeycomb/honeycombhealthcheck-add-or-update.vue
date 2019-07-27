@@ -24,7 +24,7 @@
     </el-form-item>
       <el-form-item label="是否登录" prop="isAuth">
         <el-select v-model="dataForm.isAuth" placeholder="请选择">
-          <el-option v-for="item in zerooneoptions" :key="item.value" :label="item.label" :value="item.value">
+          <el-option v-for="item in zerooneoptions" :key="Number(item.value)" :label="item.label" :value="Number(item.value)">
           </el-option>
         </el-select>
       </el-form-item>
@@ -60,7 +60,7 @@
           uri: '',
           serviceType: '',
           enable: 1,
-          isAuth: '',
+          isAuth: 0,
           user: '',
           password: ''
         },
