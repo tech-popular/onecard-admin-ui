@@ -2,16 +2,25 @@
   <el-dialog
     title="应用配置"
     :close-on-click-modal="false"
-    :visible.sync="visible">
+    :modal-append-to-body='false'
+    z-index="99"
+    :visible.sync="outerVisible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="init()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="searchData()">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="项目名称或服务名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="init()">查询</el-button>
-        <el-button v-if="isAuth('canary:canaryproject:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('canary:canaryproject:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="searchData()">查询</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="dataForm.newprojectid"  placeholder="请选择">
+          <el-option v-for="item in newprojectidoptions"   :key="item.id" :label="item.project" :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="isAuth('canary:canaryproject:save')" type="primary" @click="addProjectToTaskHandle()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -20,12 +29,6 @@
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>
       <el-table-column
         prop="id"
         header-align="center"
@@ -67,7 +70,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="setThresholdHandle(scope.row.id)">配置阈值</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -82,45 +85,64 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"></add-or-update>
+    <add-or-update v-if="addOrUpdateServiceVisible" ref="addOrUpdate" @refreshDataList="init"></add-or-update>
   </div>
   </el-dialog>
 </template>
 
 <script>
-  import AddOrUpdate from './canaryproject-add-or-update'
+  import AddOrUpdate from './canarybasetaskthreshold-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
-          key: ''
+          key: '',
+          taskId: 0,
+          newprojectid: 0
         },
         dataList: [],
-        visible: false,
+        outerVisible: false,
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        newprojectidoptions: [],
+        addOrUpdateServiceVisible: false
       }
     },
     components: {
       AddOrUpdate
     },
     methods: {
+      searchData () {
+        this.init(this.dataForm.taskId)
+      },
       // 获取数据列表
       init (id) {
-        console.log('service aaa ', id)
-        this.visible = true
+        // 返回下拉框
+        this.$http({
+          url: this.$http.adornUrl(`/canary/canaryproject/select`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({
+                   data
+                 }) => {
+          if (data && data.code === 0) {
+            this.newprojectidoptions = data.allProjects
+          }
+        })
+        this.dataForm.taskId = id || 0
+        this.outerVisible = true
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/canary/canaryproject/list'),
+          url: this.$http.adornUrl('/canary/canarybasetask/relservicetask'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'taskId': this.dataForm.taskId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -137,38 +159,38 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.init()
+        this.searchData()
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.init()
+        this.searchData()
       },
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
+      setThresholdHandle (id) {
+        this.addOrUpdateServiceVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 删除
-      deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+      // 添加该应用到项目中
+      addProjectToTaskHandle (projectid) {
+        this.$confirm(`确定做添加操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/canary/canaryproject/delete'),
+            url: this.$http.adornUrl('/canary/canarybasetask/addtoservicerel'),
             method: 'post',
-            data: this.$http.adornData(ids, false)
+            data: this.$http.adornData({
+              'serviceId': this.dataForm.newprojectid,
+              'taskId': this.dataForm.taskId
+            }, false)
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({
@@ -176,7 +198,38 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.init()
+                  this.searchData()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+            this.dataForm.newprojectid = 0
+          })
+        })
+      },
+      // 删除
+      deleteHandle (id) {
+        this.$confirm(`确定对[id=${id}]进行删除操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/canary/canarybasetask/deleteservicerel'),
+            method: 'post',
+            data: this.$http.adornData({
+              'serviceId': id,
+              'taskId': this.dataForm.taskId
+            }, false)
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.searchData()
                 }
               })
             } else {

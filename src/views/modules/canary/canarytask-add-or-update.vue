@@ -510,7 +510,6 @@ export default {
       }).then(({
         data
       }) => {
-        console.log(data)
         if (data && data.code === 0) {
           this.$message({
             message: '操作成功',

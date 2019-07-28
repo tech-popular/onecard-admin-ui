@@ -166,9 +166,7 @@
       addOrUpdateServiceHandle (id) {
         this.taskServiceVisible = true
         this.$nextTick(() => {
-          console.log('id', id)
           this.$refs.taskService.init(id)
-          console.log('2222')
         })
       },
       // 删除
