@@ -148,7 +148,7 @@
           <!-- serviceId目标选取 -->
           <el-form-item label="serviceId" prop="serviceId">
             <el-select v-model="item.serviceId" @change= "blurOption(item)" placeholder="请选择">
-              <el-option v-for="item in projects"   :key="item.id" :label="item.project" :value="item.id">
+              <el-option v-for="_item in projects"   :key="_item.id" :label="_item.project" :value="_item.id">
               </el-option>
             </el-select>
           </el-form-item>
@@ -399,7 +399,7 @@ export default {
       }
     },
     blurOption (item) {
-      this.parentData.editableTabs[(+item.index) - 1].title = this.projects[item.serviceId]['project']
+      this.parentData.editableTabs[(+item.index) - 1].title = this.projects[item.serviceId - 1]['project']
     },
     dataType (obj) {
       if (obj === null) return 'Null'
