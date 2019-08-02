@@ -11,7 +11,11 @@
       <el-input v-model="dataForm.tenantId" placeholder="租户Id"></el-input>
     </el-form-item>
     <el-form-item label="是否启用" prop="enable">
-      <el-input v-model="dataForm.enable" placeholder="是否启用"></el-input>
+      <!--<el-input v-model="dataForm.enable" placeholder="是否启用"></el-input>-->
+      <el-radio-group v-model="dataForm.enable">
+        <el-radio :label="0">禁用</el-radio>
+        <el-radio :label="1">正常</el-radio>
+      </el-radio-group>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

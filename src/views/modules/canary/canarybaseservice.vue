@@ -70,7 +70,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="setThresholdHandle(scope.row.id)">配置阈值</el-button>
+          <el-button type="text" size="small" @click="setThresholdHandle(scope.row.taskServiceId)">配置阈值</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -172,6 +172,7 @@
       },
       // 新增 / 修改
       setThresholdHandle (id) {
+        console.log(id + 'bbbbbb')
         this.addOrUpdateServiceVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
