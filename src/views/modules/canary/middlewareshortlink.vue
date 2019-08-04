@@ -6,7 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('canary:middlewareshortlink:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <!--<el-button v-if="isAuth('canary:middlewareshortlink:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+        <el-button  type="primary" @click="addOrUpdateHandleShortLink()">链接操作</el-button>
         <el-button v-if="isAuth('canary:middlewareshortlink:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -85,11 +86,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update-short-link v-if="addOrUpdateShortLinkVisible" ref="addOrUpdateShortLink" @close="" @refreshDataList="getDataList"></add-or-update-short-link>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './middlewareshortlink-add-or-update'
+  import AddOrUpdateShortLink from './shortlink-add-or-update'
   export default {
     data () {
       return {
@@ -102,11 +105,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        addOrUpdateShortLinkVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AddOrUpdateShortLink
     },
     activated () {
       this.getDataList()
@@ -154,6 +159,13 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      // 新增 / 修改
+      addOrUpdateHandleShortLink () {
+        this.addOrUpdateShortLinkVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdateShortLink.init()
         })
       },
       // 删除

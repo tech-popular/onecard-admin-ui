@@ -67,25 +67,7 @@
           updateTime: '',
           remark: ''
         },
-        datasourceTypeOptions: [{
-          value: 'mysql',
-          label: 'mysql'
-        }, {
-          value: 'postgre',
-          label: 'postgre'
-        }, {
-          value: 'maxCompute',
-          label: 'maxCompute'
-        }, {
-          value: 'kafka',
-          label: 'kafka'
-        }, {
-          value: 'ftp',
-          label: 'ftp'
-        }, {
-          value: 'es',
-          label: 'es'
-        }],
+        datasourceTypeOptions: [],
         dataRule: {
           datasourceName: [
             { required: true, message: '数据库名字不能为空', trigger: 'blur' }
@@ -115,6 +97,16 @@
       init (id) {
         this.dataForm.id = id || 0
         this.visible = true
+        // 下拉框选型
+        this.$http({
+          url: this.$http.adornUrl(`/sys/sysdictitem/selectbydictypes`),
+          method: 'post',
+          data: this.$http.adornData(['datasource_config_type'], false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.datasourceTypeOptions = data.dicMap.datasource_config_type
+          }
+        })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
