@@ -47,18 +47,24 @@
         dataForm: {
           key: '',
           url: '',
-          shorturl: ''
+          shortLinkCode: ''
         },
         secondForm: {
           key: '',
           url: '',
-          shorturl: ''
+          shortLinkCode: ''
         }
       }
     },
     methods: {
       init () {
         this.visible = true
+        this.dataForm.key = ''
+        this.dataForm.url = ''
+        this.dataForm.shortLinkCode = ''
+        this.secondForm.key = ''
+        this.secondForm.url = ''
+        this.secondForm.shortLinkCode = ''
       },
       handleClick (tab, event) {
         console.log(tab, event)
@@ -75,6 +81,7 @@
             if (data && data.code === 0) {
               this.dataForm.shortLinkCode = data.savemiddleware.data.shortLinkUrl
               this.dataForm.url = data.savemiddleware.data.url
+              this.$emit('refreshDataList')
             } else {
               this.$message.error(data.msg)
             }

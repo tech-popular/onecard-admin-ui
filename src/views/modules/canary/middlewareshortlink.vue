@@ -85,8 +85,8 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update-short-link v-if="addOrUpdateShortLinkVisible" ref="addOrUpdateShortLink"  @refreshDataList="getDataList"></add-or-update-short-link>
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <add-or-update-short-link v-if="addOrUpdateShortLinkVisible" ref="addOrUpdateShortLink" @close="" @refreshDataList="getDataList"></add-or-update-short-link>
   </div>
 </template>
 
