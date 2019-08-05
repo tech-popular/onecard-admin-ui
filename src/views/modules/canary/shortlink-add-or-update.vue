@@ -70,13 +70,16 @@
         console.log(tab, event)
       },
       saveShortLink () {
+        console.log(this.dataForm.key)
+        const url = this.dataForm.key
         if (this.dataForm.key) {
           this.$http({
             url: this.$http.adornUrl(`/canary/middlewareshortlink/shortLink/save`),
             method: 'post',
-            params: this.$http.adornParams({
-              'url': this.dataForm.key
-            })
+            data: this.$http.adornData(url, false)
+            // params: this.$http.adornParams({
+            //   'url': this.dataForm.key
+            // })
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.dataForm.shortLinkCode = data.savemiddleware.data.shortLinkUrl
