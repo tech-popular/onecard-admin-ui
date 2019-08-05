@@ -50,6 +50,7 @@
           prop="thresholdExpression"
           header-align="center"
           align="center"
+          show-overflow-tooltip
           label="阈值表达式">
         </el-table-column>
         <el-table-column
@@ -63,18 +64,6 @@
           header-align="center"
           align="center"
           label="检查点内错误次数">
-        </el-table-column>
-        <el-table-column
-          prop="tenantId"
-          header-align="center"
-          align="center"
-          label="租户Id">
-        </el-table-column>
-        <el-table-column
-          prop="enable"
-          header-align="center"
-          align="center"
-          label="是否启用">
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -105,31 +94,42 @@
     <hr>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="level级别" prop="level">
-        <el-select v-model="dataForm.level" placeholder="请选择level级别">
+        <el-select v-model="dataForm.thresholdEntity.level" placeholder="请选择level级别">
           <el-option v-for="item in leveloptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="阈值表达式" prop="thresholdExpression">
-        <el-input v-model="dataForm.thresholdExpression" placeholder="阈值表达式"></el-input>
+        <el-input v-model="dataForm.thresholdEntity.thresholdExpression" placeholder="阈值表达式"></el-input>
       </el-form-item>
       <el-form-item label="错误连续次数" prop="mostConsecutiveLosses">
-        <el-input v-model="dataForm.mostConsecutiveLosses" placeholder="错误连续次数"></el-input>
+        <el-input v-model="dataForm.thresholdEntity.mostConsecutiveLosses" placeholder="错误连续次数"></el-input>
       </el-form-item>
       <el-form-item label="检查点内错误次数" prop="incontinuity">
-        <el-input v-model="dataForm.incontinuity" placeholder="检查点内错误次数"></el-input>
+        <el-input v-model="dataForm.thresholdEntity.incontinuity" placeholder="检查点内错误次数"></el-input>
       </el-form-item>
-      <el-form-item label="租户Id" prop="tenantId">
-        <el-input v-model="dataForm.tenantId" placeholder="租户Id"></el-input>
-      </el-form-item>
-      <el-form-item label="是否启用" prop="enable">
-        <el-input v-model="dataForm.enable" placeholder="是否启用"></el-input>
-      </el-form-item>
+
+      <hr>
+      选择用户群组
+      <el-transfer v-model="dataForm.userGroupStr" :titles="['全部', '选中']" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="dataForm.allUsergroup" :filterable="true">
+      </el-transfer>
+      <hr>
+      <!-- 通道 -->
+      选择报警渠道
+      <el-transfer v-model="dataForm.pipelieStr" :titles="['全部', '选中']" :props="{
+                        key: 'id',
+                        label: 'name'
+                      }" :data="dataForm.allPipeline" :filterable="true">
+      </el-transfer>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="innerVisible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
+
   </el-dialog>
 </template>
 
@@ -139,14 +139,20 @@
       return {
         innerVisible: false,
         dataForm: {
-          id: 0,
-          level: '',
-          thresholdExpression: '',
-          mostConsecutiveLosses: '',
-          incontinuity: '',
-          tenantId: '',
-          enable: ''
+          thresholdEntity: {
+            id: 0,
+            level: '',
+            thresholdExpression: '',
+            mostConsecutiveLosses: '',
+            incontinuity: '',
+            tenantId: '',
+            enable: ''
+          },
+          userGroupStr: [],
+          pipelieStr: []
         },
+        allUsergroup: [],
+        allPipeline: [],
         leveloptions: [],
         projectServiceId: 0,
         dataList: [],
@@ -184,7 +190,7 @@
             this.leveloptions = data.dicMap.threshold_level
           }
         })
-
+        this.getAllUserAndPipe()
         this.projectServiceId = projectServiceId || 0
         this.innerVisible = true
         this.dataListLoading = true
@@ -206,31 +212,6 @@
             this.totalPage = 0
           }
           this.dataListLoading = false
-        })
-      },
-      init1 (id) {
-        console.log('id' + id)
-        this.dataForm.id = id || 0
-        this.innerVisible = true
-        this.$nextTick(() => {
-          // this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
-            this.$http({
-              url: this.$http.adornUrl(`/canary/canarybasetask/threshold/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.dataForm.serviceId = data.canarybaseservicethreshold.serviceId
-                this.dataForm.level = data.canarybaseservicethreshold.level
-                this.dataForm.thresholdExpression = data.canarybaseservicethreshold.thresholdExpression
-                this.dataForm.mostConsecutiveLosses = data.canarybaseservicethreshold.mostConsecutiveLosses
-                this.dataForm.incontinuity = data.canarybaseservicethreshold.incontinuity
-                this.dataForm.tenantId = data.canarybaseservicethreshold.tenantId
-                this.dataForm.enable = data.canarybaseservicethreshold.enable
-              }
-            })
-          }
         })
       },
       // 表单提交
@@ -265,6 +246,18 @@
                 this.$message.error(data.msg)
               }
             })
+          }
+        })
+      },
+      getAllUserAndPipe () {
+        // 穿梭框左侧使用
+        this.$http({
+          url: this.$http.adornUrl(`/canary/canarybasetask/threshold/alluserandpipe`),
+          method: 'post',
+          data: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log(data)
           }
         })
       },

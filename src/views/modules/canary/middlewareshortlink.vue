@@ -36,12 +36,6 @@
         label="url">
       </el-table-column>
       <el-table-column
-        prop="shortLinkCode"
-        header-align="center"
-        align="center"
-        label="短链code">
-      </el-table-column>
-      <el-table-column
         prop="shortLinkUrl"
         header-align="center"
         align="center"

@@ -6,7 +6,7 @@
     <el-tab-pane label="缩短网址" name="first">
       <el-form :model="dataForm" :inline="true" ref="dataForm"  label-width="80px">
         <el-form-item  prop="url">
-          <el-input v-model="dataForm.key" placeholder="原始链接"></el-input>
+          <el-input v-model="dataForm.key" placeholder="原始链接" style="width: 550px"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="saveShortLink()" >缩短网址</el-button>
@@ -22,7 +22,7 @@
     <el-tab-pane label="网址还原" name="second">
       <el-form :model="secondForm" :inline="true" ref="secondForm"  label-width="80px">
         <el-form-item  >
-          <el-input v-model="secondForm.key" placeholder="短链接"></el-input>
+          <el-input v-model="secondForm.key" placeholder="短链接" style="width: 550px"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="getShortLink()" >还原网址</el-button>
