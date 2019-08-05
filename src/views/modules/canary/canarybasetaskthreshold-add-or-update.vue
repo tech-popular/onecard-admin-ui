@@ -100,13 +100,19 @@
         </el-select>
       </el-form-item>
       <el-form-item label="阈值表达式" prop="thresholdExpression">
-        <el-input v-model="dataForm.thresholdEntity.thresholdExpression" placeholder="阈值表达式"></el-input>
+        <el-input type="textarea" v-model="dataForm.thresholdEntity.thresholdExpression" placeholder="阈值表达式"></el-input>
       </el-form-item>
       <el-form-item label="错误连续次数" prop="mostConsecutiveLosses">
-        <el-input v-model="dataForm.thresholdEntity.mostConsecutiveLosses" placeholder="错误连续次数"></el-input>
+        <el-input-number v-model="dataForm.thresholdEntity.mostConsecutiveLosses" :min="1" :max="10" label="错误连续次数"></el-input-number>
+        <el-tooltip class="item" effect="dark" content="连续错误多少次触发报警" placement="top">
+          <i class="el-icon-warning"></i>
+        </el-tooltip>
       </el-form-item>
       <el-form-item label="检查点内错误次数" prop="incontinuity">
-        <el-input v-model="dataForm.thresholdEntity.incontinuity" placeholder="检查点内错误次数"></el-input>
+        <el-input-number v-model="dataForm.thresholdEntity.incontinuity" :min="1" :max="10" label="错误连续次数"></el-input-number>
+        <el-tooltip class="item" effect="dark" content="检查点内错误次数" placement="top">
+          <i class="el-icon-warning"></i>
+        </el-tooltip>
       </el-form-item>
 
       <hr>
