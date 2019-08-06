@@ -7,8 +7,8 @@
     <el-form-item label="项目" prop="project">
       <el-input v-model="dataForm.project" placeholder="项目"></el-input>
     </el-form-item>
-    <el-form-item label="服务名称" prop="servicename">
-      <el-input v-model="dataForm.servicename" placeholder="服务名称"></el-input>
+    <el-form-item label="服务名称" prop="serviceName">
+      <el-input v-model="dataForm.serviceName" placeholder="服务名称"></el-input>
     </el-form-item>
     <el-form-item label="组名" prop="group">
       <el-input v-model="dataForm.group" placeholder="组名"></el-input>
@@ -35,7 +35,7 @@
         dataForm: {
           id: 0,
           project: '',
-          servicename: '',
+          serviceName: '',
           group: '',
           enable: 1
         },
@@ -43,7 +43,7 @@
           project: [
             { required: true, message: '项目不能为空', trigger: 'blur' }
           ],
-          servicename: [
+          serviceName: [
             { required: true, message: '服务名称不能为空', trigger: 'blur' }
           ],
           group: [
@@ -69,7 +69,7 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dataForm.project = data.canaryProject.project
-                this.dataForm.servicename = data.canaryProject.servicename
+                this.dataForm.serviceName = data.canaryProject.serviceName
                 this.dataForm.group = data.canaryProject.group
                 this.dataForm.enable = data.canaryProject.enable
               }
@@ -87,7 +87,7 @@
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
                 'project': this.dataForm.project,
-                'servicename': this.dataForm.servicename,
+                'serviceName': this.dataForm.serviceName,
                 'group': this.dataForm.group,
                 'enable': this.dataForm.enable
               })

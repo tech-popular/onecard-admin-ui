@@ -98,7 +98,7 @@
         dataForm: {
           key: '',
           taskId: 0,
-          newprojectid: 0
+          newprojectid: ''
         },
         dataList: [],
         outerVisible: false,
@@ -172,7 +172,6 @@
       },
       // 新增 / 修改
       setThresholdHandle (id) {
-        console.log(id + 'bbbbbb')
         this.addOrUpdateServiceVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
@@ -205,7 +204,7 @@
             } else {
               this.$message.error(data.msg)
             }
-            this.dataForm.newprojectid = 0
+            this.dataForm.newprojectid = ''
           })
         })
       },

@@ -52,12 +52,6 @@
         label="pipe值">
       </el-table-column>
       <el-table-column
-        prop="templateName"
-        header-align="center"
-        align="center"
-        label="模板">
-      </el-table-column>
-      <el-table-column
         prop="enable"
         header-align="center"
         align="center"
@@ -121,7 +115,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/canary/canarypipeline/lishasname'),
+          url: this.$http.adornUrl('/canary/canarypipeline/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,

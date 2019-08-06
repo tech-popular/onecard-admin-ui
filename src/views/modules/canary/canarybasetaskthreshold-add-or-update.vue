@@ -94,7 +94,7 @@
     <hr>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="level级别" prop="level">
-        <el-select v-model="dataForm.thresholdEntity.level" placeholder="请选择level级别">
+        <el-select v-model="dataForm.thresholdEntity.levelId" placeholder="请选择level级别">
           <el-option v-for="item in leveloptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
@@ -120,16 +120,46 @@
       <el-transfer v-model="dataForm.userGroupStr" :titles="['全部', '选中']" :props="{
                         key: 'id',
                         label: 'name'
-                      }" :data="dataForm.allUsergroup" :filterable="true">
+                      }" :data="allUsergroupOptions" :filterable="true">
       </el-transfer>
       <hr>
       <!-- 通道 -->
-      选择报警渠道
-      <el-transfer v-model="dataForm.pipelieStr" :titles="['全部', '选中']" :props="{
-                        key: 'id',
-                        label: 'name'
-                      }" :data="dataForm.allPipeline" :filterable="true">
-      </el-transfer>
+      <el-form-item
+        v-for="(outdata, index) in dataForm.templateAndpipe"
+        :label="'模板'+index"
+        :key="outdata.key"
+        :rules="{
+      required: true, message: '不能为空', trigger: 'blur'}">
+        <el-row :gutter="24">
+          <el-col :span="9"><div class="grid-content bg-purple">
+            <el-select v-model="outdata.pipeLineId" placeholder="请选择">
+              <el-option
+                v-for="item in allPipelineOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </div></el-col>
+          <el-col :span="9"><div class="grid-content bg-purple">
+            <el-select v-model="outdata.templateId" placeholder="请选择">
+              <el-option
+                v-for="item in allTemplateOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </div></el-col>
+          <el-col :span="4"><div class="grid-content bg-purple">
+
+            <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
+          </div></el-col>
+        </el-row>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="addDomain">新增</el-button>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="innerVisible = false">取消</el-button>
@@ -147,18 +177,19 @@
         dataForm: {
           thresholdEntity: {
             id: 0,
-            level: '',
+            levelId: '',
             thresholdExpression: '',
             mostConsecutiveLosses: '',
             incontinuity: '',
-            tenantId: '',
-            enable: ''
+            tenantId: 1,
+            enable: 1
           },
           userGroupStr: [],
-          pipelieStr: []
+          templateAndpipe: []
         },
-        allUsergroup: [],
-        allPipeline: [],
+        allUsergroupOptions: [],
+        allPipelineOptions: [],
+        allTemplateOptions: [],
         leveloptions: [],
         projectServiceId: 0,
         dataList: [],
@@ -168,18 +199,20 @@
         dataListLoading: false,
         dataListSelections: [],
         dataRule: {
-          level: [
-            { required: true, message: 'level级别不能为空', trigger: 'blur' }
-          ],
-          thresholdExpression: [
-            { required: true, message: '阈值表达式不能为空', trigger: 'blur' }
-          ],
-          mostConsecutiveLosses: [
-            { required: true, message: '错误连续次数不能为空', trigger: 'blur' }
-          ],
-          incontinuity: [
-            { required: true, message: '检查点内错误次数不能为空', trigger: 'blur' }
-          ]
+          thresholdEntity: {
+            level: [
+              { required: true, message: 'level级别不能为空', trigger: 'blur' }
+            ],
+            thresholdExpression: [
+              { required: true, message: '阈值表达式不能为空', trigger: 'blur' }
+            ],
+            mostConsecutiveLosses: [
+              { required: true, message: '错误连续次数不能为空', trigger: 'blur' }
+            ],
+            incontinuity: [
+              { required: true, message: '检查点内错误次数不能为空', trigger: 'blur' }
+            ]
+          }
         }
       }
     },
@@ -196,7 +229,8 @@
             this.leveloptions = data.dicMap.threshold_level
           }
         })
-        this.getAllUserAndPipe()
+        this.getAllUserGroup()
+        this.getAllTemplateAndPip()
         this.projectServiceId = projectServiceId || 0
         this.innerVisible = true
         this.dataListLoading = true
@@ -220,33 +254,37 @@
           this.dataListLoading = false
         })
       },
+      addDomain () {
+        this.dataForm.templateAndpipe.push({
+          key: Date.now()
+        })
+      },
+      removeDomain (item) {
+        const index = this.dataForm.templateAndpipe.indexOf(item)
+        if (index !== -1) {
+          this.dataForm.templateAndpipe.splice(index, 1)
+        }
+      },
       // 表单提交
       dataFormSubmit () {
+        console.log(this.dataForm)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/canary/canarybaseservicethreshold/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/canary/canarybasetask/threshold/${!this.dataForm.thresholdEntity.id ? 'save' : 'update'}`),
               method: 'post',
-              data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'serviceId': this.dataForm.serviceId,
-                'level': this.dataForm.level,
-                'thresholdExpression': this.dataForm.thresholdExpression,
-                'mostConsecutiveLosses': this.dataForm.mostConsecutiveLosses,
-                'incontinuity': this.dataForm.incontinuity,
-                'tenantId': this.dataForm.tenantId,
-                'enable': this.dataForm.enable
-              })
+              data: this.$http.adornData(this.dataForm
+              )
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
                   type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.innerVisible = false
-                    this.$emit('refreshDataList')
-                  }
+                  duration: 1500
+                  // onClose: () => {
+                  //   this.innerVisible = false
+                  //   this.$emit('refreshDataList')
+                  // }
                 })
               } else {
                 this.$message.error(data.msg)
@@ -255,15 +293,27 @@
           }
         })
       },
-      getAllUserAndPipe () {
+      getAllUserGroup () {
         // 穿梭框左侧使用
         this.$http({
-          url: this.$http.adornUrl(`/canary/canarybasetask/threshold/alluserandpipe`),
+          url: this.$http.adornUrl(`/canary/canarybasetask/threshold/allusergroup`),
           method: 'post',
           data: this.$http.adornParams()
         }).then(({data}) => {
           if (data && data.code === 0) {
-            console.log(data)
+            this.allUsergroupOptions = data.allUserGroup
+          }
+        })
+      },
+      getAllTemplateAndPip () {
+        this.$http({
+          url: this.$http.adornUrl(`/canary/canarybasetask/threshold/alltemplateAndPipe`),
+          method: 'post',
+          data: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.allPipelineOptions = data.allPipelineEntities
+            this.allTemplateOptions = data.allTemplateEntities
           }
         })
       },

@@ -33,7 +33,7 @@ export default {
       dataForm: {
         id: 0,
         name: '',
-        tenantId: '',
+        tenantId: 1,
         enable: 1
       },
       dataRule: {
@@ -61,35 +61,10 @@ export default {
     init (id) {
       this.dataForm.id = id || 0
       this.visible = true
-      this.$http({
-        url: this.$http.adornUrl(`/canary/canaryusergroup/userconfig/${this.dataForm.id}`),
-        method: 'get',
-        params: this.$http.adornParams()
-      }).then(({
-        data
-      }) => {
-        if (data && data.code === 0) {
-          this.allUserEntities = data.allUserEntities
-          this.userGroupUserArray = data.userGroupUserArray
-        }
-      })
 
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(`/canary/canaryusergroup/userconfig/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({
-            data
-          }) => {
-            if (data && data.code === 0) {
-              this.allUserEntities = data.allUserEntities
-              this.userGroupUserArray = data.userGroupUserArray
-            }
-          })
-
           this.$http({
             url: this.$http.adornUrl(`/canary/canaryusergroup/info/${this.dataForm.id}`),
             method: 'get',
@@ -101,6 +76,20 @@ export default {
               this.dataForm.name = data.canaryUserGroup.name
               this.dataForm.tenantId = data.canaryUserGroup.tenantId
               this.dataForm.enable = data.canaryUserGroup.enable
+              this.allUserEntities = data.canaryUserGroup.allUserList
+              this.userGroupUserArray = data.canaryUserGroup.userGroupUserArray
+            }
+          })
+        } else {
+          this.$http({
+            url: this.$http.adornUrl(`/canary/canaryusergroup/getalluser`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({
+                     data
+                   }) => {
+            if (data && data.code === 0) {
+              this.allUserEntities = data.canaryUserEntities
             }
           })
         }

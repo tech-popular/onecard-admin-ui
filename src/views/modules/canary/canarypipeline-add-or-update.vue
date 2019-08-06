@@ -17,17 +17,6 @@
     <el-form-item label="pipe值" prop="value">
       <el-input v-model="dataForm.value" placeholder="pipe值"></el-input>
     </el-form-item>
-    <el-form-item label="模板" prop="templateId">
-      <!--<el-input v-model="dataForm.templateId" placeholder="模板Id"></el-input>-->
-      <el-select v-model="dataForm.templateId" placeholder="请选择">
-    <el-option
-      v-for="item in options"
-      :key="item.id"
-      :label="item.name"
-      :value="item.id">
-       </el-option>
-     </el-select>
-    </el-form-item>
     <el-form-item label="是否启用" prop="enable">
     <el-radio-group v-model="dataForm.enable">
           <el-radio :label="0">禁用</el-radio>
@@ -87,15 +76,6 @@
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-          this.$http({
-            url: this.$http.adornUrl(`/canary/canarytemplate/select`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.options = data.canaryTemplateEntities
-            }
-          })
           if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/canary/canarypipeline/info/${this.dataForm.id}`),

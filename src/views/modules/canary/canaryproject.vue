@@ -35,7 +35,7 @@
         label="项目">
       </el-table-column>
       <el-table-column
-        prop="servicename"
+        prop="serviceName"
         header-align="center"
         align="center"
         label="服务名称">
