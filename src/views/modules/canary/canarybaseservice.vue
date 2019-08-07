@@ -71,7 +71,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="setThresholdHandle(scope.row.taskServiceId)">配置阈值</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.taskServiceId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -178,7 +178,7 @@
         })
       },
       // 添加该应用到项目中
-      addProjectToTaskHandle (projectid) {
+      addProjectToTaskHandle () {
         this.$confirm(`确定做添加操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -209,19 +209,16 @@
         })
       },
       // 删除
-      deleteHandle (id) {
-        this.$confirm(`确定对[id=${id}]进行删除操作?`, '提示', {
+      deleteHandle (taskServiceId) {
+        this.$confirm(`确定对[id=${taskServiceId}]进行删除操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/canary/canarybasetask/deleteservicerel'),
+            url: this.$http.adornUrl('/canary/canarybasetask/deleteservicerel/' + taskServiceId),
             method: 'post',
-            data: this.$http.adornData({
-              'serviceId': id,
-              'taskId': this.dataForm.taskId
-            }, false)
+            params: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({

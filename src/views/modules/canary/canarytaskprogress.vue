@@ -86,7 +86,7 @@
         this.$nextTick(() => {
           if (id !== 0) {
             this.$http({
-              url: this.$http.adornUrl(`/canary/first/es/` + id),
+              url: this.$http.adornUrl(`/honeycomb/honeycombtask/es/` + id),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {

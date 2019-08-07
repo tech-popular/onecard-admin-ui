@@ -7,21 +7,13 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('canary:canarybasetask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('canary:canarybasetask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>
       <el-table-column
         prop="id"
         header-align="center"
@@ -29,10 +21,10 @@
         label="主键">
       </el-table-column>
       <el-table-column
-        prop="cron"
+        prop="name"
         header-align="center"
         align="center"
-        label="cron表达式">
+        label="name">
       </el-table-column>
       <el-table-column
         prop="enable"
@@ -43,12 +35,6 @@
           <el-tag v-if="scope.row.enable === 1" size="small" >正常</el-tag>
           <el-tag v-else size="small" type="danger">禁用</el-tag>
         </template>
-      </el-table-column>
-      <el-table-column
-        prop="tenantId"
-        header-align="center"
-        align="center"
-        label="租户">
       </el-table-column>
       <el-table-column
         prop="createdTime"
@@ -151,10 +137,6 @@
         this.pageIndex = val
         this.getDataList()
       },
-      // 多选
-      selectionChangeHandle (val) {
-        this.dataListSelections = val
-      },
       // 新增 / 修改
       addOrUpdateHandle (id) {
         this.addOrUpdateVisible = true
@@ -171,18 +153,15 @@
       },
       // 删除
       deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定对[${id} '删除']操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/canary/canarybasetask/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
+            url: this.$http.adornUrl('/canary/canarybasetask/delete/' + id),
+            method: 'get',
+            params: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({

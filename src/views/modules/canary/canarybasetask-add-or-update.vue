@@ -4,8 +4,8 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="cron表达式" prop="cron">
-      <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input>
+    <el-form-item label="name" prop="name">
+      <el-input v-model="dataForm.name" placeholder="name"></el-input>
     </el-form-item>
       <el-form-item
         v-for="(outdata, index) in dataForm.canaryBaseTaskDatasourceEntities"
@@ -61,7 +61,7 @@
         datasourceoptions: [],
         dataForm: {
           id: 0,
-          cron: '',
+          name: '',
           enable: 1,
           tenantId: 1,
           createdTime: '',
@@ -72,8 +72,8 @@
           }]
         },
         dataRule: {
-          cron: [
-            { required: true, message: 'cron表达式不能为空', trigger: 'blur' }
+          name: [
+            { required: true, message: 'name表达式不能为空', trigger: 'blur' }
           ],
           enable: [
             { required: true, message: '是否启用不能为空', trigger: 'blur' }
@@ -106,7 +106,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.cron = data.canaryBaseTask.cron
+                this.dataForm.name = data.canaryBaseTask.name
                 this.dataForm.enable = data.canaryBaseTask.enable
                 this.dataForm.tenantId = data.canaryBaseTask.tenantId
                 this.dataForm.createdTime = data.canaryBaseTask.createdTime
@@ -114,6 +114,8 @@
                 this.dataForm.canaryBaseTaskDatasourceEntities = data.canaryBaseTask.canaryBaseTaskDatasourceEntities
               }
             })
+          } else {
+            this.dataForm.canaryBaseTaskDatasourceEntities = []
           }
         })
         this.$http({
@@ -135,7 +137,7 @@
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                'cron': this.dataForm.cron,
+                'name': this.dataForm.name,
                 'enable': this.dataForm.enable,
                 'tenantId': this.dataForm.tenantId,
                 'createdTime': this.dataForm.createdTime,
