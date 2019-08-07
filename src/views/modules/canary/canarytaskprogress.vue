@@ -14,20 +14,20 @@
       v-loading="dataListLoading"
       style="width: 100%;">
       <el-table-column
-        prop="taskId"
+        prop="task_id"
         header-align="center"
         align="center"
         label="任务Id"
         width="50">
       </el-table-column>
       <el-table-column
-        prop="taskStatus"
+        prop="task_status"
         header-align="center"
         align="center"
         label="任务状态">
       </el-table-column>
       <el-table-column
-        prop="taskStatusDesc"
+        prop="task_status_desc"
         header-align="center"
         align="center"
         label="任务描述">
@@ -39,14 +39,14 @@
         label="任务描述">
       </el-table-column>
       <el-table-column
-        prop="createTime"
+        prop="create_time"
         header-align="center"
         align="center"
         label="创建时间"
         width="250">
       </el-table-column>
       <el-table-column
-        prop="updateTime"
+        prop="update_time"
         header-align="center"
         align="center"
         label="更新时间"
