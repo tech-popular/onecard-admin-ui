@@ -80,6 +80,7 @@
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
+          <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -95,12 +96,14 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
+    <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './honeycombtask-add-or-update'
   import TaskProgress from '../canary/canarytaskprogress'
+  import TaskDependent from './honeycombtask-dependent'
   export default {
     data () {
       return {
@@ -115,12 +118,14 @@
         dataListSelections: [],
         addOrUpdateVisible: false,
         addOrUpdateThresholdVisible: false,
-        taskProgressVisible: false
+        taskProgressVisible: false,
+        taskDependentVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      TaskProgress
+      TaskProgress,
+      TaskDependent
     },
     activated () {
       this.getDataList()
@@ -174,6 +179,13 @@
         this.taskProgressVisible = true
         this.$nextTick(() => {
           this.$refs.taskProgress.init(id)
+        })
+      },
+      taskDependent (id) {
+        console.log('sssss' + id)
+        this.taskDependentVisible = true
+        this.$nextTick(() => {
+          this.$refs.taskDependent.init(id)
         })
       },
       // 删除

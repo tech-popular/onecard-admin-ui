@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
+    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="name" prop="name">
       <el-input v-model="dataForm.name" placeholder="name"></el-input>
     </el-form-item>
@@ -15,23 +15,33 @@
         :rules="{
       required: true, message: '表名不能为空', trigger: 'blur'}">
         <el-row :gutter="24">
-          <el-col :span="6"><div class="grid-content bg-purple">
-            <el-select v-model="outdata.datasourceId" placeholder="请选择">
-              <el-option
-                v-for="item in datasourceoptions"
-                :key="item.id"
-                :label="item.datasourceName"
-                :value="item.id">
-              </el-option>
-            </el-select>
-          </div></el-col>
-          <el-col :span="12"><div class="grid-content bg-purple">
-            <el-input type="textarea" v-model="outdata.sql"></el-input>
-          </div></el-col>
-          <el-col :span="4"><div class="grid-content bg-purple">
-
-            <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
-          </div></el-col>
+          <el-col :span="5">
+            <div class="grid-content bg-purple">
+              <el-input  v-model="outdata.name"></el-input>
+            </div>
+          </el-col>
+          <el-col :span="5">
+            <div class="grid-content bg-purple">
+              <el-select v-model="outdata.datasourceId" placeholder="请选择">
+                <el-option
+                  v-for="item in datasourceoptions"
+                  :key="item.id"
+                  :label="item.datasourceName"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+          </div>
+          </el-col>
+          <el-col :span="10">
+            <div class="grid-content bg-purple">
+              <el-input type="textarea" v-model="outdata.sql"></el-input>
+            </div>
+          </el-col>
+          <el-col :span="2">
+            <div class="grid-content bg-purple">
+              <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
+            </div>
+          </el-col>
         </el-row>
       </el-form-item>
       <el-form-item>
@@ -65,6 +75,7 @@
           createdTime: '',
           updatedTime: '',
           canaryBaseTaskDatasourceEntities: [{
+            name: '',
             datasourceId: 0,
             sql: ''
           }]
