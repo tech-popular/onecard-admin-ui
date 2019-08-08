@@ -55,9 +55,6 @@
       <el-form-item>
         <el-button @click="addDomain">新增输出数据源</el-button>
       </el-form-item>
-    <el-form-item label="历史数据生成SQL" prop="cacheSql">
-      <el-input type="textarea" v-model="dataForm.cacheSql" placeholder="历史数据生成SQL" :rows="10"></el-input>
-    </el-form-item>
     <el-form-item label="SQL" prop="sql">
       <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
     </el-form-item>
@@ -69,9 +66,6 @@
     <!--</el-form-item>-->
     <el-form-item label="输出数据源" prop="outDatasource">
       <el-input v-model="dataForm.outDatasource" placeholder="输出数据源"></el-input>
-    </el-form-item>
-    <el-form-item label="依赖于Id" prop="dependTask">
-      <el-input v-model="dataForm.dependTask" placeholder="依赖于某个任务"></el-input>
     </el-form-item>
     <el-form-item label="cron表达式" prop="cron">
       <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input>
@@ -149,12 +143,10 @@
           name: '',
           inDatasource: '',
           computeType: '',
-          cacheSql: '',
           sql: '',
           period: '',
           transformerConfig: '',
           outDatasource: '',
-          dependTask: '',
           cron: '',
           version: 1,
           tenantId: 1,
@@ -245,12 +237,10 @@
                 this.dataForm.name = data.honeycombTask.name
                 this.dataForm.inDatasource = data.honeycombTask.inDatasource
                 this.dataForm.computeType = data.honeycombTask.computeType
-                this.dataForm.cacheSql = data.honeycombTask.cacheSql
                 this.dataForm.sql = data.honeycombTask.sql
                 this.dataForm.period = data.honeycombTask.period
                 this.dataForm.transformerConfig = data.honeycombTask.transformerConfig
                 this.dataForm.outDatasource = data.honeycombTask.outDatasource
-                this.dataForm.dependTask = data.honeycombTask.dependTask
                 this.dataForm.cron = data.honeycombTask.cron
                 this.dataForm.version = data.honeycombTask.version
                 this.dataForm.tenantId = data.honeycombTask.tenantId
@@ -307,12 +297,10 @@
                 'name': this.dataForm.name,
                 'inDatasource': this.dataForm.inDatasource,
                 'computeType': this.dataForm.computeType,
-                'cacheSql': this.dataForm.cacheSql,
                 'sql': this.dataForm.sql,
                 'period': this.dataForm.period,
                 'transformerConfig': this.dataForm.transformerConfig,
                 'outDatasource': this.dataForm.outDatasource,
-                'dependTask': this.dataForm.dependTask,
                 'cron': this.dataForm.cron,
                 'version': this.dataForm.version,
                 'tenantId': this.dataForm.tenantId,

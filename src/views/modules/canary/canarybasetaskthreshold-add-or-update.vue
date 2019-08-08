@@ -63,7 +63,7 @@
           width="150"
           label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="getThreshold(scope.row.id)">查看/修改</el-button>
+            <el-button type="text" size="small" @click="getThreshold(scope.row.id)">加载</el-button>
             <el-button type="text" size="small" @click="deleteThreshold(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -96,7 +96,7 @@
       </el-form-item>
 
       <hr>
-      选择用户群组
+      配置用户群组
       <el-transfer v-model="dataForm.userGroupStr" :titles="['全部', '选中']" :props="{
                         key: 'id',
                         label: 'name'
@@ -104,38 +104,54 @@
       </el-transfer>
       <hr>
       <!-- 通道 -->
-      <el-form-item label="模板和通道关系"></el-form-item>
+      <el-form-item label="配置模板和通道关系"></el-form-item>
       <el-form-item
         v-for="(outdata, index) in dataForm.templateAndpipe"
-        :label="'模板'+index"
+        :label="'通道和模板'+index"
         :key="outdata.key"
         :rules="{
       required: true, message: '不能为空', trigger: 'blur'}">
         <el-row :gutter="24">
-          <el-col :span="9"><div class="grid-content bg-purple">
-            <el-select v-model="outdata.pipeLineId" placeholder="请选择">
-              <el-option
-                v-for="item in allPipelineOptions"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-              </el-option>
-            </el-select>
-          </div></el-col>
-          <el-col :span="9"><div class="grid-content bg-purple">
-            <el-select v-model="outdata.templateId" placeholder="请选择">
-              <el-option
-                v-for="item in allTemplateOptions"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-              </el-option>
-            </el-select>
-          </div></el-col>
-          <el-col :span="4"><div class="grid-content bg-purple">
+          <el-col :span="2">
+            <div class="grid-content bg-purple">
+              模板
+            </div>
+          </el-col>
+          <el-col :span="7">
+            <div class="grid-content bg-purple">
+              <el-select v-model="outdata.templateId" placeholder="请选择">
+                <el-option
+                  v-for="item in allTemplateOptions"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+          </el-col>
+          <el-col :span="2">
+            <div class="grid-content bg-purple">
+              通道
+            </div>
+          </el-col>
+          <el-col :span="7" >
+            <div class="grid-content bg-purple">
+              <el-select v-model="outdata.pipeLineId" placeholder="请选择">
+                <el-option
+                  v-for="item in allPipelineOptions"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+          </el-col>
 
+          <el-col :span="4">
+            <div class="grid-content bg-purple">
             <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
-          </div></el-col>
+          </div>
+          </el-col>
         </el-row>
       </el-form-item>
       <el-form-item>
@@ -228,6 +244,7 @@
         })
       },
       getThreshold (id) {
+        this.clearDataForm()
         this.getAllUserGroup()
         this.getAllTemplateAndPip()
         this.$http({
@@ -276,15 +293,7 @@
               )
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500
-                  // onClose: () => {
-                  //   this.innerVisible = false
-                  //   this.$emit('refreshDataList')
-                  // }
-                })
+                this.$message('保存成功')
                 this.getListData()
                 this.clearDataForm()
               } else {

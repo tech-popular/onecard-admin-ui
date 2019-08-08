@@ -3,10 +3,11 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
     <el-form-item label="name" prop="name">
       <el-input v-model="dataForm.name" placeholder="name"></el-input>
     </el-form-item>
+      <el-form-item label="新增sql"></el-form-item>
       <el-form-item
         v-for="(outdata, index) in dataForm.canaryBaseTaskDatasourceEntities"
         :label="'sql数据源'+index"
@@ -14,7 +15,7 @@
         :rules="{
       required: true, message: '表名不能为空', trigger: 'blur'}">
         <el-row :gutter="24">
-          <el-col :span="9"><div class="grid-content bg-purple">
+          <el-col :span="6"><div class="grid-content bg-purple">
             <el-select v-model="outdata.datasourceId" placeholder="请选择">
               <el-option
                 v-for="item in datasourceoptions"
@@ -24,8 +25,8 @@
               </el-option>
             </el-select>
           </div></el-col>
-          <el-col :span="9"><div class="grid-content bg-purple">
-            <el-input v-model="outdata.sql"></el-input>
+          <el-col :span="12"><div class="grid-content bg-purple">
+            <el-input type="textarea" v-model="outdata.sql"></el-input>
           </div></el-col>
           <el-col :span="4"><div class="grid-content bg-purple">
 
@@ -41,9 +42,6 @@
         <el-radio :label="0">禁用</el-radio>
         <el-radio :label="1">正常</el-radio>
       </el-radio-group>
-    </el-form-item>
-    <el-form-item label="租户" prop="tenantId">
-      <el-input v-model="dataForm.tenantId" placeholder="租户"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

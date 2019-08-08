@@ -47,11 +47,11 @@
         label="计算类型">
       </el-table-column>
       <el-table-column
-        prop="cacheSql"
+        prop="cron"
         header-align="center"
         align="center"
         show-overflow-tooltip
-        label="历史数据生成SQL">
+        label="cron表达式">
       </el-table-column>
       <el-table-column
         prop="sql"

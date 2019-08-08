@@ -2,7 +2,6 @@
   <el-dialog
     title="应用配置"
     :close-on-click-modal="false"
-    :modal-append-to-body='false'
     z-index="99"
     :visible.sync="outerVisible">
   <div class="mod-config">
@@ -42,7 +41,7 @@
         label="项目">
       </el-table-column>
       <el-table-column
-        prop="servicename"
+        prop="serviceName"
         header-align="center"
         align="center"
         label="服务名称">
