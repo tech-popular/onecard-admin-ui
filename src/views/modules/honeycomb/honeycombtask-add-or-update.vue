@@ -144,7 +144,7 @@
           inDatasource: '',
           computeType: '',
           sql: '',
-          period: '',
+          period: 0,
           transformerConfig: '',
           outDatasource: '',
           cron: '',
@@ -184,6 +184,9 @@
           ],
           computeType: [
             { required: true, message: '计算类型:1 简单 2 复杂不能为空', trigger: 'blur' }
+          ],
+          period: [
+            { required: true, message: '周期不能为空', trigger: 'blur' }
           ]
         }
       }

@@ -182,7 +182,6 @@
         })
       },
       taskDependent (id) {
-        console.log('sssss' + id)
         this.taskDependentVisible = true
         this.$nextTick(() => {
           this.$refs.taskDependent.init(id)
