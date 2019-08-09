@@ -13,7 +13,7 @@
         <el-button @click="searchData()">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="dataForm.newprojectid"  placeholder="请选择">
+        <el-select v-model="dataForm.newprojectid" ref="newProjectid" placeholder="请选择">
           <el-option v-for="item in newprojectidoptions"   :key="item.id" :label="item.project" :value="item.id">
           </el-option>
         </el-select>
@@ -195,7 +195,7 @@
               this.$message({
                 message: '操作成功',
                 type: 'success',
-                duration: 1500,
+                duration: 300,
                 onClose: () => {
                   this.searchData()
                 }

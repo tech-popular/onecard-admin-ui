@@ -5,7 +5,10 @@
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="应用名称" prop="serviceName">
-      <el-input v-model="dataForm.serviceName" placeholder="应用名称"></el-input>
+      <el-select v-model="dataForm.serviceName" placeholder="请选择">
+        <el-option v-for="item in serviceNameoptions" :key="item.serviceName" :label="item.serviceName" :value="item.serviceName">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="协议" prop="protocol">
       <el-select v-model="dataForm.protocol" placeholder="请选择">
@@ -79,6 +82,7 @@
         protocoloptions: [],
         zerooneoptions: [],
         methodoptions: [],
+        serviceNameoptions: [],
         dataRule: {
           serviceName: [
             { required: true, message: '应用名称不能为空', trigger: 'blur' }
@@ -100,6 +104,15 @@
     },
     methods: {
       init (id) {
+        this.$http({
+          url: this.$http.adornUrl(`/canary/canaryproject/select`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.serviceNameoptions = data.allProjects
+          }
+        })
         this.dataForm.id = id || 0
         this.visible = true
         // 下拉框选型
