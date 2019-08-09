@@ -34,8 +34,8 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="超时时间" prop="timeOut">
-      <el-input-number v-model="dataForm.timeOut"  :min="0" :max="10" label="请求超时时间"></el-input-number>
+    <el-form-item label="超时时间(毫秒)" prop="timeOut">
+      <el-input v-model="dataForm.timeOut" type="number" size="100px" label="请求超时时间"></el-input>
     </el-form-item>
     <el-form-item label="用户" prop="user">
       <el-input v-model="dataForm.user" placeholder="用户"></el-input>
