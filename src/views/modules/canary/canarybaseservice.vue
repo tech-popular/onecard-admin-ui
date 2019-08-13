@@ -178,6 +178,10 @@
       },
       // 添加该应用到项目中
       addProjectToTaskHandle () {
+        if (!this.dataForm.newprojectid) {
+          alert('请选择要加入的应用')
+          return
+        }
         this.$confirm(`确定做添加操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -203,7 +207,7 @@
               alert('添加成功')
             } else {
               this.$message.error(data.msg)
-              alert('添加失败')
+              alert(data.msg)
             }
             this.dataForm.newprojectid = ''
           })
