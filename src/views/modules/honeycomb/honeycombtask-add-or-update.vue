@@ -64,12 +64,11 @@
     <!--<el-form-item label="转换配置" prop="transformerConfig">-->
       <!--<el-input v-model="dataForm.transformerConfig" placeholder="转换配置"></el-input>-->
     <!--</el-form-item>-->
-    <el-form-item label="输出数据源" prop="outDatasource">
-      <el-input v-model="dataForm.outDatasource" placeholder="输出数据源"></el-input>
-    </el-form-item>
     <el-form-item label="cron表达式" prop="cron">
       <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input>
     </el-form-item>
+      <el-collapse  v-model="activeNames">
+        <el-collapse-item title="高级选项" name="1" >
       <el-form-item label="id规则" prop="idRule">
         <el-select v-model="dataForm.idRule" placeholder="请选择">
           <el-option v-for="item in idRuleoptions" :key="item.value" :label="item.label" :value="item.value">
@@ -124,6 +123,8 @@
           <el-radio :label="1">正常</el-radio>
         </el-radio-group>
       </el-form-item>
+        </el-collapse-item>
+      </el-collapse>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button>
@@ -138,6 +139,7 @@
     data () {
       return {
         visible: false,
+        activeNames: '1',
         dataForm: {
           id: 0,
           name: '',
@@ -243,7 +245,6 @@
                 this.dataForm.sql = data.honeycombTask.sql
                 this.dataForm.period = data.honeycombTask.period
                 this.dataForm.transformerConfig = data.honeycombTask.transformerConfig
-                this.dataForm.outDatasource = data.honeycombTask.outDatasource
                 this.dataForm.cron = data.honeycombTask.cron
                 this.dataForm.version = data.honeycombTask.version
                 this.dataForm.tenantId = data.honeycombTask.tenantId
