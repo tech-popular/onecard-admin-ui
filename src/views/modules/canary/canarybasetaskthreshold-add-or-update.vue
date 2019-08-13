@@ -296,8 +296,10 @@
                 this.$message('保存成功')
                 this.getListData()
                 this.clearDataForm()
+                alert('保存成功')
               } else {
                 this.$message.error(data.msg)
+                alert('操作失败')
               }
             })
           }

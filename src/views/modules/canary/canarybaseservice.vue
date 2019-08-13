@@ -200,8 +200,10 @@
                   this.searchData()
                 }
               })
+              alert('添加成功')
             } else {
               this.$message.error(data.msg)
+              alert('添加失败')
             }
             this.dataForm.newprojectid = ''
           })
