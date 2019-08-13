@@ -8,7 +8,7 @@
       <el-input v-model="dataForm.name" placeholder="模板名称"></el-input>
     </el-form-item>
     <el-form-item label="模板内容" prop="template">
-      <el-input type="textarea" v-model="dataForm.template" placeholder="模板内容" :rows="20"></el-input>
+      <el-input type="textarea" v-model="dataForm.template" placeholder="模板内容" :rows="15"></el-input>
     </el-form-item>
     <el-form-item label="描述" prop="description">
       <el-input v-model="dataForm.description" placeholder="描述"></el-input>
@@ -45,9 +45,6 @@
           ],
           template: [
             { required: true, message: '模板内容不能为空', trigger: 'blur' }
-          ],
-          description: [
-            { required: true, message: '描述不能为空', trigger: 'blur' }
           ],
           enable: [
             { required: true, message: '是否启用不能为空', trigger: 'blur' }
