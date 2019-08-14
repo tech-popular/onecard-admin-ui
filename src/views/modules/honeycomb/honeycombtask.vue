@@ -200,13 +200,13 @@
               type: 'success',
               duration: 1500,
               onClose: () => {
-                  this.getDataList()
+                this.getDataList()
               }
             })
           } else {
             this.$message.error(data.msg)
           }
-      })
+        })
       },
       // 删除
       deleteHandle (id) {
