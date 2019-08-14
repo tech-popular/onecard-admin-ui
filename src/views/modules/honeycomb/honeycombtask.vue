@@ -80,6 +80,7 @@
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
+          <el-button type="text" size="small" @click="startTask(scope.row.id)">启动任务</el-button>
           <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
         </template>
       </el-table-column>
@@ -187,6 +188,26 @@
           this.$refs.taskDependent.init(id)
         })
       },
+      startTask (id) {
+        return this.$http({
+          url: this.$http.adornUrl(`/honeycomb/honeycombtask/starttask/` + id),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                  this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+      })
+      },
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -208,7 +229,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+
                 }
               })
             } else {
