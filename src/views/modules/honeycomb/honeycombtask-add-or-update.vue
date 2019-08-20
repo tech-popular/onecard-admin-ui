@@ -259,6 +259,8 @@
                 this.dataForm.honeycombOutDatasourceEntitys = data.honeycombTask.honeycombOutDatasourceEntitys
               }
             })
+          } else {
+            this.dataForm.honeycombOutDatasourceEntitys = []
           }
         })
       },
