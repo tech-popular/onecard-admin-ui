@@ -7,6 +7,7 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('canary:canarybasetask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" @click="syncEs()">同步ES</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -142,6 +143,27 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      // 同步到es
+      syncEs () {
+        return this.$http({
+          url: this.$http.adornUrl(`/canary/canarybasetask/all/syncEs`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
         })
       },
       // 应用配置

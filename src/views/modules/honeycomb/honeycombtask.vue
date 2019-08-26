@@ -1,13 +1,20 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <!--<el-input v-model="dataForm.key" placeholder="参数名" clearable  @keyup.enter.native="getDataList()"></el-input>-->
+        <el-autocomplete
+          v-model="dataForm.key"
+          :fetch-suggestions="querySearchAsync"
+          placeholder="请输入内容"
+          @select="handleSelect"
+        ></el-autocomplete>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('honeycomb:honeycombtask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('honeycomb:honeycombtask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button type="primary" @click="syncEs()">同步ES</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -111,6 +118,7 @@
         dataForm: {
           key: ''
         },
+        restaurants: [],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -131,7 +139,43 @@
     activated () {
       this.getDataList()
     },
+    mounted () {
+      this.loadAll()
+    },
     methods: {
+      loadAll () {
+        if (this.dataForm.key) {
+          this.$http({
+            url: this.$http.adornUrl('/honeycomb/honeycombtask/search/' + this.dataForm.key),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              console.log('data' + data.searchData)
+              this.restaurants = data.searchData
+              console.log('data1' + this.restaurants)
+            }
+          })
+        }
+      },
+      querySearchAsync (queryString, cb) {
+        this.loadAll()
+        var restaurants = this.restaurants
+        var results = queryString ? restaurants.filter(this.createStateFilter(queryString)) : restaurants
+        clearTimeout(this.timeout)
+        this.timeout = setTimeout(() => {
+          cb(results)
+        }, 3000 * Math.random())
+      },
+      createStateFilter (queryString) {
+        return (state) => {
+          console.log('2222' + state)
+          return (state.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+        }
+      },
+      handleSelect (item) {
+        console.log(item)
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -188,6 +232,27 @@
           this.$refs.taskDependent.init(id)
         })
       },
+      // 同步到es
+      syncEs () {
+        return this.$http({
+          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/syncEs`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      },
       startTask (id) {
         return this.$http({
           url: this.$http.adornUrl(`/honeycomb/honeycombtask/starttask/` + id),
@@ -229,7 +294,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-
+                  this.getDataList()
                 }
               })
             } else {
