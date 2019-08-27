@@ -8,6 +8,7 @@
           :fetch-suggestions="querySearchAsync"
           placeholder="请输入内容"
           @select="handleSelect"
+          class="input-with-select"
         ></el-autocomplete>
       </el-form-item>
       <el-form-item>
@@ -107,7 +108,11 @@
     <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
   </div>
 </template>
-
+<style>
+  .input-with-select  {
+    width: 380px;
+  }
+</style>
 <script>
   import AddOrUpdate from './honeycombtask-add-or-update'
   import TaskProgress from '../canary/canarytaskprogress'
@@ -151,30 +156,22 @@
             params: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 0) {
-              console.log('data' + data.searchData)
               this.restaurants = data.searchData
-              console.log('data1' + this.restaurants)
             }
           })
         }
       },
       querySearchAsync (queryString, cb) {
         this.loadAll()
-        var restaurants = this.restaurants
-        var results = queryString ? restaurants.filter(this.createStateFilter(queryString)) : restaurants
         clearTimeout(this.timeout)
         this.timeout = setTimeout(() => {
-          cb(results)
+          cb(this.restaurants)
         }, 3000 * Math.random())
       },
-      createStateFilter (queryString) {
-        return (state) => {
-          console.log('2222' + state)
-          return (state.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
-        }
-      },
       handleSelect (item) {
-        console.log(item)
+        console.log(' iiii' + item.name)
+        this.dataForm.key = item.name
+        this.getDataList()
       },
       // 获取数据列表
       getDataList () {
