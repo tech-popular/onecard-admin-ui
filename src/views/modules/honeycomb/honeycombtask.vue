@@ -9,6 +9,7 @@
           placeholder="请输入内容"
           @select="handleSelect"
           class="input-with-select"
+          @keyup.enter.native="getDataList()"
         ></el-autocomplete>
       </el-form-item>
       <el-form-item>

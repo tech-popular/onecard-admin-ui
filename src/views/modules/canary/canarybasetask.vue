@@ -1,8 +1,16 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" >
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <!--<el-input v-model="dataForm.key" placeholder="参数名" clearable @keyup.enter.native="getDataList()"></el-input>-->
+        <el-autocomplete
+          v-model="dataForm.key"
+          :fetch-suggestions="querySearchAsync"
+          placeholder="请输入内容"
+          @select="handleSelect"
+          class="input-with-select"
+          @keyup.enter.native="getDataList()"
+        ></el-autocomplete>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -77,7 +85,11 @@
 
   </div>
 </template>
-
+<style>
+  .input-with-select  {
+    width: 380px;
+  }
+</style>
 <script>
   import AddOrUpdate from './canarybasetask-add-or-update'
   import TaskService from './canarybaseservice'
@@ -87,6 +99,7 @@
         dataForm: {
           key: ''
         },
+        restaurants: [],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -105,6 +118,31 @@
       this.getDataList()
     },
     methods: {
+      loadAll () {
+        if (this.dataForm.key) {
+          this.$http({
+            url: this.$http.adornUrl('/canary/canarybasetask/search/' + this.dataForm.key),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.restaurants = data.searchData
+            }
+          })
+        }
+      },
+      querySearchAsync (queryString, cb) {
+        this.loadAll()
+        clearTimeout(this.timeout)
+        this.timeout = setTimeout(() => {
+          cb(this.restaurants)
+        }, 3000 * Math.random())
+      },
+      handleSelect (item) {
+        console.log(' iiii' + item.name)
+        this.dataForm.key = item.name
+        this.getDataList()
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
