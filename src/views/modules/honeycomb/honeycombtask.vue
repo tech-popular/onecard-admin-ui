@@ -50,7 +50,7 @@
         <!--label="输入数据源">-->
       <!--</el-table-column>-->
       <el-table-column
-        prop="computeType"
+        prop="inDatasourceName"
         header-align="center"
         align="center"
         label="计算类型">
