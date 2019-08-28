@@ -13,7 +13,7 @@
         <el-button @click="searchData()">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="dataForm.newprojectid" ref="newProjectid" placeholder="请选择">
+        <el-select v-model="dataForm.newprojectid" ref="newProjectid" filterable placeholder="请选择">
           <el-option v-for="item in newprojectidoptions"   :key="item.id" :label="item.project" :value="item.id">
           </el-option>
         </el-select>
