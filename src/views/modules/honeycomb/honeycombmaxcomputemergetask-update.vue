@@ -18,7 +18,7 @@
     </el-form-item>
     <el-form-item label="0是5分钟合并，1是t+1合并" prop="type">
       <el-select v-model="dataForm.type" placeholder="请选择">
-        <el-option v-for="item in typeoptions" :key="item.value" :label="item.label" :value="item.value">
+        <el-option v-for="item in typeoptions" :key="Number(item.value)" :label="item.label" :value="Number(item.value)">
         </el-option>
       </el-select>
     </el-form-item>
@@ -31,15 +31,6 @@
         <el-radio :label="1">正常</el-radio>
       </el-radio-group>
     </el-form-item>
-    <!--<el-form-item label="" prop="remark">-->
-      <!--<el-input v-model="dataForm.remark" placeholder=""></el-input>-->
-    <!--</el-form-item>-->
-    <!--<el-form-item label="" prop="createTime">-->
-      <!--<el-input v-model="dataForm.createTime" placeholder=""></el-input>-->
-    <!--</el-form-item>-->
-    <!--<el-form-item label="" prop="updateTime">-->
-      <!--<el-input v-model="dataForm.updateTime" placeholder=""></el-input>-->
-    <!--</el-form-item>-->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -109,7 +100,7 @@
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.tableName) {
             this.$http({
-              url: this.$http.adornUrl(`/honeycomb/honeycombmaxcomputemergetask/info/${this.dataForm.tableName}`),
+              url: this.$http.adornUrl(`/honeycomb/honeycombmaxcomputemergetask/info/` + this.dataForm.tableName),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
