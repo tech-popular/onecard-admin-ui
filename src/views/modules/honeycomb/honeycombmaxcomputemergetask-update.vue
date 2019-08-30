@@ -25,6 +25,9 @@
     <el-form-item label="版本号" prop="version">
       <el-input v-model="dataForm.version" placeholder="版本号" disabled></el-input>
     </el-form-item>
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="dataForm.remark" placeholder="备注" disabled></el-input>
+      </el-form-item>
     <el-form-item label="是否启用" prop="enable">
       <el-radio-group v-model="dataForm.enable">
         <el-radio :label="0">禁用</el-radio>

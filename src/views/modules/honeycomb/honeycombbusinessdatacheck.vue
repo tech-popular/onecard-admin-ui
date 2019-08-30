@@ -1,22 +1,13 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm">
+    <el-form :inline="true" :model="dataForm" >
       <el-form-item>
-        <!--<el-input v-model="dataForm.key" placeholder="参数名" clearable  @keyup.enter.native="getDataList()"></el-input>-->
-        <el-autocomplete
-          v-model="dataForm.key"
-          :fetch-suggestions="querySearchAsync"
-          placeholder="请输入内容"
-          @select="handleSelect"
-          class="input-with-select"
-          @keyup.enter.native="getDataList()"
-        ></el-autocomplete>
+        <el-input v-model="dataForm.key" placeholder="标题或应用名称" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('honeycomb:honeycombtask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('honeycomb:honeycombtask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button type="primary" @click="syncEs()">同步ES</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombbusinessdatacheck:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombbusinessdatacheck:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -35,39 +26,50 @@
         prop="id"
         header-align="center"
         align="center"
-        label="">
+        label="主键">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="serviceName"
         header-align="center"
         align="center"
-        label="任务名称">
+        label="应用名称">
       </el-table-column>
-      <!--<el-table-column-->
-        <!--prop="inDatasource"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--label="输入数据源">-->
-      <!--</el-table-column>-->
+      <el-table-column
+        prop="title"
+        header-align="center"
+        align="center"
+        label="标题">
+      </el-table-column>
       <el-table-column
         prop="inDatasourceName"
         header-align="center"
         align="center"
-        label="输入数据源">
-      </el-table-column>
+        label="输入数据源'">
+      </el-table-column>alarmRatio
       <el-table-column
-        prop="cron"
+        prop="alarmRatio"
         header-align="center"
         align="center"
-        show-overflow-tooltip
-        label="cron表达式">
+        label="报警比例">
       </el-table-column>
       <el-table-column
         prop="sql"
         header-align="center"
         align="center"
         show-overflow-tooltip
-        label="SQL">
+        label="执行sql">
+      </el-table-column>
+      <el-table-column
+        prop="period"
+        header-align="center"
+        align="center"
+        label="执行周期分钟，默认10分钟">
+      </el-table-column>
+      <el-table-column
+        prop="timeType"
+        header-align="center"
+        align="center"
+        label="时间类型">
       </el-table-column>
       <el-table-column
         prop="enable"
@@ -80,6 +82,18 @@
         </template>
       </el-table-column>
       <el-table-column
+        prop="createdTime"
+        header-align="center"
+        align="center"
+        label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="updatedTime"
+        header-align="center"
+        align="center"
+        label="更新时间">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"
@@ -88,9 +102,6 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
-          <el-button type="text" size="small" @click="startTask(scope.row.id)">启动任务</el-button>
-          <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -105,80 +116,38 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
-    <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
   </div>
 </template>
-<style>
-  .input-with-select  {
-    width: 380px;
-  }
-</style>
+
 <script>
-  import AddOrUpdate from './honeycombtask-add-or-update'
-  import TaskProgress from '../canary/canarytaskprogress'
-  import TaskDependent from './honeycombtask-dependent'
+  import AddOrUpdate from './honeycombbusinessdatacheck-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
           key: ''
         },
-        restaurants: [],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false,
-        addOrUpdateThresholdVisible: false,
-        taskProgressVisible: false,
-        taskDependentVisible: false
+        addOrUpdateVisible: false
       }
     },
     components: {
-      AddOrUpdate,
-      TaskProgress,
-      TaskDependent
+      AddOrUpdate
     },
     activated () {
       this.getDataList()
     },
-    mounted () {
-      this.loadAll()
-    },
     methods: {
-      loadAll () {
-        if (this.dataForm.key) {
-          this.$http({
-            url: this.$http.adornUrl('/honeycomb/honeycombtask/search/' + this.dataForm.key),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.restaurants = data.searchData
-            }
-          })
-        }
-      },
-      querySearchAsync (queryString, cb) {
-        this.loadAll()
-        clearTimeout(this.timeout)
-        this.timeout = setTimeout(() => {
-          cb(this.restaurants)
-        }, 3000 * Math.random())
-      },
-      handleSelect (item) {
-        console.log(' iiii' + item.name)
-        this.dataForm.key = item.name
-        this.getDataList()
-      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/honeycomb/honeycombtask/list'),
+          url: this.$http.adornUrl('/honeycomb/honeycombbusinessdatacheck/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -218,59 +187,6 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      taskProgress (id) {
-        this.taskProgressVisible = true
-        this.$nextTick(() => {
-          this.$refs.taskProgress.init(id)
-        })
-      },
-      taskDependent (id) {
-        this.taskDependentVisible = true
-        this.$nextTick(() => {
-          this.$refs.taskDependent.init(id)
-        })
-      },
-      // 同步到es
-      syncEs () {
-        return this.$http({
-          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/syncEs`),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      },
-      startTask (id) {
-        return this.$http({
-          url: this.$http.adornUrl(`/honeycomb/honeycombtask/starttask/` + id),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      },
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -282,7 +198,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/honeycomb/honeycombtask/delete'),
+            url: this.$http.adornUrl('/honeycomb/honeycombbusinessdatacheck/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
