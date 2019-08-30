@@ -44,7 +44,7 @@
           mergeSql: '',
           maxcomputeSpace: '',
           type: '',
-          version: '',
+          version: 1,
           enable: 1,
           remark: '',
           createTime: '',
@@ -91,16 +91,12 @@
               url: this.$http.adornUrl(`/honeycomb/honeycombmaxcomputemergetask/save`),
               method: 'post',
               data: this.$http.adornData({
-                'tableName': this.dataForm.tableName || undefined,
+                'tableName': this.dataForm.tableName,
                 'pk': this.dataForm.pk,
-                'mergeSql': this.dataForm.mergeSql,
                 'maxcomputeSpace': this.dataForm.maxcomputeSpace,
                 'type': this.dataForm.type,
                 'version': this.dataForm.version,
-                'enable': this.dataForm.enable,
-                'remark': this.dataForm.remark,
-                'createTime': this.dataForm.createTime,
-                'updateTime': this.dataForm.updateTime
+                'remark': this.dataForm.remark
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
