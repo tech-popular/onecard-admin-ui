@@ -8,7 +8,7 @@
         <el-input v-model="dataForm.userName" placeholder="登录帐号"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password" :class="{ 'is-required': !dataForm.id }">
-        <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
+        <el-input v-model="dataForm.password" type="password" placeholder="密码" @focus="cleanData()" @blur="midifyflag()"></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="comfirmPassword" :class="{ 'is-required': !dataForm.id }">
         <el-input v-model="dataForm.comfirmPassword" type="password" placeholder="确认密码"></el-input>
@@ -50,10 +50,14 @@
         }
       }
       var validateComfirmPassword = (rule, value, callback) => {
-        if (!this.dataForm.id && !/\S/.test(value)) {
-          callback(new Error('确认密码不能为空'))
-        } else if (this.dataForm.password !== value) {
-          callback(new Error('确认密码与密码输入不一致'))
+        if (this.dataForm.ismodifyPasswd === 'modify') {
+          if (!this.dataForm.id && !/\S/.test(value)) {
+            callback(new Error('确认密码不能为空'))
+          } else if (this.dataForm.password !== value) {
+            callback(new Error('确认密码与密码输入不一致'))
+          } else {
+            callback()
+          }
         } else {
           callback()
         }
@@ -80,6 +84,7 @@
           userName: '',
           password: '',
           comfirmPassword: '',
+          ismodifyPasswd: '',
           salt: '',
           email: '',
           mobile: '',
@@ -133,12 +138,19 @@
                 this.dataForm.salt = data.user.salt
                 this.dataForm.email = data.user.email
                 this.dataForm.mobile = data.user.mobile
+                this.dataForm.password = data.user.password
                 this.dataForm.roleIdList = data.user.roleIdList
                 this.dataForm.status = data.user.status
               }
             })
           }
         })
+      },
+      cleanData () {
+        this.dataForm.password = ''
+      },
+      midifyflag () {
+        this.dataForm.ismodifyPasswd = 'modify'
       },
       // 表单提交
       dataFormSubmit () {
@@ -155,7 +167,8 @@
                 'email': this.dataForm.email,
                 'mobile': this.dataForm.mobile,
                 'status': this.dataForm.status,
-                'roleIdList': this.dataForm.roleIdList
+                'roleIdList': this.dataForm.roleIdList,
+                'ismodifyPasswd': this.dataForm.ismodifyPasswd
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -172,6 +185,7 @@
                 this.$message.error(data.msg)
               }
             })
+            this.dataForm.ismodifyPasswd = ''
           }
         })
       }
