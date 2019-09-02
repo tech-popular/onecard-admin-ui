@@ -24,7 +24,7 @@
       </el-select>
     </el-form-item>
       <el-form-item label="报警比例" prop="alarmRatio">
-        <el-input  v-model="dataForm.alarmRatio" placeholder="报警比例"></el-input>
+        <el-input  v-model="dataForm.alarmRatio" type="number" placeholder="报警比例"></el-input>
       </el-form-item>
     <el-form-item label="执行sql" prop="sql">
       <el-input type="textarea" v-model="dataForm.sql" placeholder="执行sql"></el-input>
