@@ -111,6 +111,26 @@
           </el-option>
         </el-select>
       </el-form-item>
+          <el-form-item label="是否为业务监控任务" prop="isBusinessDataCheck">
+            <el-select v-model="dataForm.isBusinessDataCheck" placeholder="请选择">
+              <el-option
+                v-for="item in tureOrFalseoptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="是否是合并任务" prop="isMergeTask">
+            <el-select v-model="dataForm.isMergeTask" placeholder="请选择">
+              <el-option
+                v-for="item in tureOrFalseoptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
     <el-form-item label="版本号" prop="version">
       <el-input v-model="dataForm.version" placeholder="版本号" disabled></el-input>
     </el-form-item>
@@ -160,6 +180,8 @@
           overwriteKey: '',
           serviceNameFiled: '',
           isHealthcheck: 'false',
+          isBusinessDataCheck: 'false',
+          isMergeTask: 'false',
           honeycombOutDatasourceEntitys: [{
             outTableName: '',
             outDatasource: 1,
@@ -256,6 +278,8 @@
                 this.dataForm.overwriteKey = data.honeycombTask.overwriteKey
                 this.dataForm.serviceNameFiled = data.honeycombTask.serviceNameFiled
                 this.dataForm.isHealthcheck = data.honeycombTask.isHealthcheck
+                this.dataForm.isBusinessDataCheck = data.honeycombTask.isBusinessDataCheck
+                this.dataForm.isMergeTask = data.honeycombTask.isMergeTask
                 this.dataForm.honeycombOutDatasourceEntitys = data.honeycombTask.honeycombOutDatasourceEntitys
               }
             })
@@ -318,6 +342,8 @@
                 'overwriteKey': this.dataForm.overwriteKey,
                 'serviceNameFiled': this.dataForm.serviceNameFiled,
                 'isHealthcheck': this.dataForm.isHealthcheck,
+                'isBusinessDataCheck': this.dataForm.isBusinessDataCheck,
+                'isMergeTask': this.dataForm.isMergeTask,
                 'honeycombOutDatasourceEntitys': this.dataForm.honeycombOutDatasourceEntitys
               })
             }).then(({data}) => {
