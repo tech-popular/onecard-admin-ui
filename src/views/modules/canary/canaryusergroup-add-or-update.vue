@@ -7,10 +7,10 @@
     <el-transfer v-model="userGroupUserArray" :props="{
                   key: 'id',
                   label: 'name'
-                }" :data="allUserEntities"></el-transfer>
-    <el-form-item label="租户Id" prop="tenantId">
-      <el-input v-model="dataForm.tenantId" placeholder="租户Id"></el-input>
-    </el-form-item>
+                }" :data="allUserEntities" :filterable="true"></el-transfer>
+    <!--<el-form-item label="租户Id" prop="tenantId">-->
+      <!--<el-input v-model="dataForm.tenantId" placeholder="租户Id"></el-input>-->
+    <!--</el-form-item>-->
     <el-form-item label="是否启用" prop="enable">
       <el-radio-group v-model="dataForm.enable">
         <el-radio :label="0">禁用</el-radio>
@@ -40,11 +40,6 @@ export default {
         name: [{
           required: true,
           message: '用户组名称不能为空',
-          trigger: 'blur'
-        }],
-        tenantId: [{
-          required: true,
-          message: '租户Id不能为空',
           trigger: 'blur'
         }],
         enable: [{
