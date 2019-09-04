@@ -14,12 +14,12 @@
       :rules="{
     required: true, message: '表名不能为空', trigger: 'blur'}">
       <el-row :gutter="24">
-        <el-col :span="4">
-          <div class="grid-content bg-purple">任务选择</div>
+        <el-col :span="2">
+          <div class="grid-content bg-purple">任务</div>
         </el-col>
-        <el-col :span="5">
+        <el-col :span="11">
           <div class="grid-content bg-purple">
-            <el-select v-model="outdata.taskDependentId" filterable placeholder="请选择">
+            <el-select v-model="outdata.taskDependentId" filterable placeholder="请选择可搜索" style="width: 250px">
               <el-option
                 v-for="item in taskIdOptions"
                 :key="item.id"
@@ -29,10 +29,10 @@
             </el-select>
           </div>
         </el-col>
-        <el-col :span="4">
-          <div class="grid-content bg-purple">时间</div>
+        <el-col :span="3">
+          <div class="grid-content bg-purple">时间(秒)</div>
         </el-col>
-        <el-col :span="6" >
+        <el-col :span="4" >
           <div class="grid-content bg-purple">
             <el-input  v-model="outdata.validTime" type="number" size="5"></el-input>
           </div>

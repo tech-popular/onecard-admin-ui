@@ -171,6 +171,7 @@
           outDatasource: '',
           cron: '',
           version: 1,
+          dependTask: '',
           tenantId: 1,
           tags: '',
           enable: 1,
@@ -270,6 +271,7 @@
                 this.dataForm.cron = data.honeycombTask.cron
                 this.dataForm.version = data.honeycombTask.version
                 this.dataForm.tenantId = data.honeycombTask.tenantId
+                this.dataForm.dependTask = data.honeycombTask.dependTask
                 this.dataForm.tags = data.honeycombTask.tags
                 this.dataForm.enable = data.honeycombTask.enable
                 this.dataForm.idRule = data.honeycombTask.idRule
@@ -336,6 +338,7 @@
                 'tenantId': this.dataForm.tenantId,
                 'tags': this.dataForm.tags,
                 'enable': this.dataForm.enable,
+                'dependTask': this.dataForm.dependTask,
                 'idRule': this.dataForm.idRule,
                 'addFieldTimestamp': this.dataForm.addFieldTimestamp,
                 'addFieldTask': this.dataForm.addFieldTask,
