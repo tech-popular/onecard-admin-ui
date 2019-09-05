@@ -6,7 +6,7 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="应用名称" prop="serviceName">
       <el-select v-model="dataForm.serviceName" placeholder="请选择">
-        <el-option v-for="item in serviceNameoptions" :key="item.serviceName" :label="item.serviceName" :value="item.serviceName">
+        <el-option v-for="item in serviceNameoptions" :key="item.serviceName" :label="item.project +'--'+ item.serviceName" :value="item.serviceName">
         </el-option>
       </el-select>
     </el-form-item>

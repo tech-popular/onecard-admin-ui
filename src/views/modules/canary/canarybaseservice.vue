@@ -14,7 +14,7 @@
       </el-form-item>
       <el-form-item>
         <el-select v-model="dataForm.newprojectid" ref="newProjectid" filterable placeholder="请选择">
-          <el-option v-for="item in newprojectidoptions"   :key="item.id" :label="item.project" :value="item.id">
+          <el-option v-for="item in newprojectidoptions"   :key="item.id" :label="item.project +'--'+ item.serviceName" :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
