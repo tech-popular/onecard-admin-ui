@@ -47,6 +47,16 @@
       <el-form-item>
         <el-button @click="addDomain">新增sql数据源</el-button>
       </el-form-item>
+      <el-form-item label="数据权限" prop="tenantId">
+        <el-select v-model="dataForm.tenantId" placeholder="请选择,默认为所有人查看">
+          <el-option
+            v-for="item in tenantoptions"
+            :key="item.tenantId"
+            :label="item.name"
+            :value="item.tenantId">
+          </el-option>
+        </el-select>
+      </el-form-item>
     <el-form-item label="是否启用" prop="enable">
       <el-radio-group v-model="dataForm.enable">
         <el-radio :label="0">禁用</el-radio>
@@ -71,7 +81,7 @@
           id: 0,
           name: '',
           enable: 1,
-          tenantId: 1,
+          tenantId: '',
           createdTime: '',
           updatedTime: '',
           canaryBaseTaskDatasourceEntities: [{
@@ -80,6 +90,7 @@
             sql: ''
           }]
         },
+        tenantoptions: [],
         dataRule: {
           name: [
             { required: true, message: 'name表达式不能为空', trigger: 'blur' }
@@ -104,6 +115,16 @@
         }
       },
       init (id) {
+        // 数据源权限tenant
+        this.$http({
+          url: this.$http.adornUrl(`/sys/systenant/select`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.tenantoptions = data.sysTenantEntities
+          }
+        })
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
