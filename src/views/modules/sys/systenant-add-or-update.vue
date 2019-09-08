@@ -10,11 +10,14 @@
       <el-form-item label="租户Id设定" prop="tenantId">
         <el-input v-model="dataForm.tenantId" type="number" placeholder="租户Id"></el-input>
       </el-form-item>
-    <el-form-item label="租户秘钥" prop="secretKey">
-      <el-input v-model="dataForm.secretKey" placeholder="租户秘钥"></el-input>
-    </el-form-item>
+    <!--<el-form-item label="租户秘钥" prop="secretKey">-->
+      <!--<el-input v-model="dataForm.secretKey" placeholder="租户秘钥"></el-input>-->
+    <!--</el-form-item>-->
     <el-form-item label="是否启用" prop="enable">
-      <el-input v-model="dataForm.enable" placeholder="是否启用"></el-input>
+      <el-radio-group v-model="dataForm.enable">
+        <el-radio :label="0">禁用</el-radio>
+        <el-radio :label="1">正常</el-radio>
+      </el-radio-group>
     </el-form-item>
     <el-form-item label="创建时间" prop="createdTime"  v-show="this.dataForm.id">
       <el-input v-model="dataForm.createdTime"  placeholder="创建时间" disabled></el-input>
@@ -40,7 +43,7 @@
           name: '',
           secretKey: '',
           tenantId: '',
-          enable: '',
+          enable: 1,
           createdTime: '',
           updatedTime: ''
         },
@@ -50,9 +53,6 @@
           ],
           tenantId: [
             { required: true, message: '租户Id不能为空', trigger: 'blur' }
-          ],
-          secretKey: [
-            { required: true, message: '租户秘钥不能为空', trigger: 'blur' }
           ],
           enable: [
             { required: true, message: '是否启用不能为空', trigger: 'blur' }

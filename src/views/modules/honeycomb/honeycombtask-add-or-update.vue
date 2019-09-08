@@ -59,7 +59,7 @@
       <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
     </el-form-item>
     <el-form-item label="周期" prop="period">
-      <el-input v-model="dataForm.period" placeholder="周期"></el-input>
+      <el-input v-model="dataForm.period" placeholder="周期" type="number"></el-input>
     </el-form-item>
     <!--<el-form-item label="转换配置" prop="transformerConfig">-->
       <!--<el-input v-model="dataForm.transformerConfig" placeholder="转换配置"></el-input>-->
@@ -67,6 +67,17 @@
     <el-form-item label="cron表达式" prop="cron">
       <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input>
     </el-form-item>
+      <el-form-item label="数据权限" prop="tenantId">
+        <el-select v-model="dataForm.tenantId" placeholder="请选择,默认为所有人查看">
+          <el-option
+            v-for="item in tenantoptions"
+            :key="item.tenantId"
+            :label="item.name"
+            :value="item.tenantId">
+          </el-option>
+        </el-select>
+      </el-form-item>
+
       <el-collapse  v-model="activeNames">
         <el-collapse-item title="高级选项" name="1" >
       <el-form-item label="id规则" prop="idRule">
@@ -144,6 +155,7 @@
         </el-radio-group>
       </el-form-item>
         </el-collapse-item>
+        <el-collapse-item name="2" ></el-collapse-item>
       </el-collapse>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -159,7 +171,7 @@
     data () {
       return {
         visible: false,
-        activeNames: '1',
+        activeNames: 2,
         dataForm: {
           id: 0,
           name: '',
@@ -172,7 +184,7 @@
           cron: '',
           version: 1,
           dependTask: '',
-          tenantId: 1,
+          tenantId: '',
           tags: '',
           enable: 1,
           idRule: 'none',
@@ -191,6 +203,7 @@
           }]
         },
         datasourceoptions: [],
+        tenantoptions: [],
         computeTypeoptions: [],
         idRuleoptions: [],
         tureOrFalseoptions: [{
@@ -231,6 +244,16 @@
         }
       },
       init (id) {
+        // 数据源权限tenant
+        this.$http({
+          url: this.$http.adornUrl(`/sys/systenant/select`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.tenantoptions = data.sysTenantEntities
+          }
+        })
         // 数据源下拉框
         this.$http({
           url: this.$http.adornUrl(`/honeycomb/honeycombdatasourceconfig/select`),
