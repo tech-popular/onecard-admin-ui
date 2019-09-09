@@ -116,7 +116,7 @@
 </style>
 <script>
   import AddOrUpdate from './honeycombtask-add-or-update'
-  import TaskProgress from '../canary/canarytaskprogress'
+  import TaskProgress from './honeycombtaskprogress'
   import TaskDependent from './honeycombtask-dependent'
   export default {
     data () {

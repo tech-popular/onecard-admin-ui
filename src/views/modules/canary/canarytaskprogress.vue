@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="展示最新10条"
+    title="展示最新101条"
     :visible.sync="visible">
     <span data-align="right">
     <el-button @click="refreshData()" type="danger" align="right" round>刷新</el-button>

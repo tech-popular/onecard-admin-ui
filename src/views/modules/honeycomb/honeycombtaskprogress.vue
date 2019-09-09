@@ -1,12 +1,21 @@
 <template>
   <el-dialog
-    title="展示最新10条"
+    title="进度数据"
     :visible.sync="visible">
     <span data-align="right">
-    <el-button @click="refreshData()" type="danger" align="right" round>刷新</el-button>
-    <el-button @click="visible = false" type="primary" align="right" round>关闭</el-button>
+    <el-button @click="refreshData()" type="danger" v-show="false" align="right" round>刷新</el-button>
+    <el-button @click="visible = false" type="primary" v-show="false" align="right" round>关闭</el-button>
     </span>
-    <br>
+    <el-form :inline="true" :model="dataForm" >
+      <el-form-item>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombhealthcheck:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombhealthcheck:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+      </el-form-item>
+    </el-form>
   <div class="mod-config">
     <el-table
       :data="dataList"
@@ -53,6 +62,15 @@
         width="250">
       </el-table-column>
     </el-table>
+    <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageIndex"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper">
+    </el-pagination>
   </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">关闭</el-button>
@@ -64,6 +82,9 @@
   export default {
     data () {
       return {
+        dataForm: {
+          key: ''
+        },
         param: 0,
         visible: false,
         dataList: [],
@@ -85,21 +106,38 @@
         this.$nextTick(() => {
           if (id !== 0) {
             this.$http({
-              url: this.$http.adornUrl(`/honeycomb/honeycombtask/es/` + id),
+              url: this.$http.adornUrl(`/honeycomb/honeycombtask/es`),
               method: 'get',
-              params: this.$http.adornParams()
+              params: this.$http.adornParams({
+                'page': this.pageIndex,
+                'limit': this.pageSize,
+                'key': this.dataForm.key,
+                'taskId': id
+              })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataList = data.list
-                console.log(this.dataList)
+                this.dataList = data.page.list
+                this.totalPage = data.page.totalCount
               } else {
                 this.dataList = []
+                this.totalPage = 0
                 this.dataForm.id = 0
               }
             })
           }
         })
         this.dataListLoading = false
+      },
+      // 每页数
+      sizeChangeHandle (val) {
+        this.pageSize = val
+        this.pageIndex = 1
+        this.getDataList()
+      },
+      // 当前页
+      currentChangeHandle (val) {
+        this.pageIndex = val
+        this.getDataList()
       }
     }
   }
