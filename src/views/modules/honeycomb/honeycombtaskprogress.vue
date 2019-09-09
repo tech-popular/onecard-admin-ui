@@ -3,10 +3,10 @@
     title="进度数据"
     :visible.sync="visible">
     <span data-align="right">
-    <el-button @click="refreshData()" type="danger" v-show="false" align="right" round>刷新</el-button>
-    <el-button @click="visible = false" type="primary" v-show="false" align="right" round>关闭</el-button>
+    <el-button @click="refreshData()" type="danger"  align="right" round>刷新</el-button>
+    <el-button @click="visible = false" type="primary"  align="right" round>关闭</el-button>
     </span>
-    <el-form :inline="true" :model="dataForm" >
+    <!--<el-form :inline="true" :model="dataForm" >
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
@@ -15,7 +15,7 @@
         <el-button v-if="isAuth('honeycomb:honeycombhealthcheck:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('honeycomb:honeycombhealthcheck:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
-    </el-form>
+    </el-form>-->
   <div class="mod-config">
     <el-table
       :data="dataList"
@@ -116,7 +116,7 @@
                 'page': this.pageIndex,
                 'limit': this.pageSize,
                 'key': this.dataForm.key,
-                'taskId': id
+                'taskId': this.param
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -136,12 +136,12 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.init()
+        this.init(this.param)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.init()
+        this.init(this.param)
       }
     }
   }
