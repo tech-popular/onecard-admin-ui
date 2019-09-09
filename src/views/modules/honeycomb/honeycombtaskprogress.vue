@@ -85,6 +85,9 @@
         dataForm: {
           key: ''
         },
+        pageIndex: 1,
+        pageSize: 10,
+        totalPage: 0,
         param: 0,
         visible: false,
         dataList: [],
@@ -116,8 +119,8 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataList = data.page.list
-                this.totalPage = data.page.totalCount
+                this.dataList = data.page.records
+                this.totalPage = data.page.total
               } else {
                 this.dataList = []
                 this.totalPage = 0
@@ -132,12 +135,12 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.init()
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.init()
       }
     }
   }
