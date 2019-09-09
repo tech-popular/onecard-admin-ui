@@ -38,6 +38,7 @@
       <el-table-column
         prop="task_status_desc"
         header-align="center"
+        show-overflow-tooltip
         align="center"
         label="任务描述">
       </el-table-column>
