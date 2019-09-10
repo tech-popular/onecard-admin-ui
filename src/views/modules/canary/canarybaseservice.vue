@@ -21,12 +21,16 @@
       <el-form-item>
         <el-button v-if="isAuth('canary:canaryproject:save')" type="primary" @click="addProjectToTaskHandle()">新增</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button  type="primary" @click="addProjectToTaskHandle()">复制</el-button>
+      </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
+      highlight-current-row
+      @current-change="handleCurrentChange"
       style="width: 100%;">
       <el-table-column
         prop="id"
@@ -107,7 +111,8 @@
         dataListLoading: false,
         dataListSelections: [],
         newprojectidoptions: [],
-        addOrUpdateServiceVisible: false
+        addOrUpdateServiceVisible: false,
+        currentRow: null
       }
     },
     components: {
@@ -175,6 +180,10 @@
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
         })
+      },
+      handleCurrentChange (val) {
+        this.currentRow = val
+        console.log(this.currentRow)
       },
       // 添加该应用到项目中
       addProjectToTaskHandle () {
