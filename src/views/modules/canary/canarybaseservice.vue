@@ -22,7 +22,7 @@
         <el-button v-if="isAuth('canary:canaryproject:save')" type="primary" @click="addProjectToTaskHandle()">新增</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button  type="primary" @click="addProjectToTaskHandle()">复制</el-button>
+        <el-button  type="primary" @click="copyProjectToTaskHandle()">复制</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -183,7 +183,6 @@
       },
       handleCurrentChange (val) {
         this.currentRow = val
-        console.log(this.currentRow)
       },
       // 添加该应用到项目中
       addProjectToTaskHandle () {
@@ -203,6 +202,50 @@
               'serviceId': this.dataForm.newprojectid,
               'taskId': this.dataForm.taskId
             }, false)
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 300,
+                onClose: () => {
+                  this.searchData()
+                }
+              })
+              alert('添加成功')
+            } else {
+              this.$message.error(data.msg)
+              alert(data.msg)
+            }
+            this.dataForm.newprojectid = ''
+          })
+        })
+      },
+      // 拷贝应用
+      copyProjectToTaskHandle () {
+        if (!this.dataForm.newprojectid) {
+          alert('请选择要加入的应用')
+          return
+        }
+        if (this.currentRow === null) {
+          alert('请选择要复制的应用，点击行即选择该目标')
+          return
+        }
+        console.log(this.currentRow)
+        console.log(this.dataForm.taskId)
+        this.$confirm(`确定做添加操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/canary/canarybasetask/copy'),
+            method: 'post',
+            data: this.$http.adornParams({
+              'destServiceId': this.dataForm.newprojectid,
+              'sourceServiceId': this.currentRow.id,
+              'taskId': this.dataForm.taskId
+            }, false, 'from')
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({
