@@ -9,6 +9,20 @@
         <el-button v-if="isAuth('honeycomb:honeycombmaxcomputemergetask:save')" type="primary" @click="addHandle()">新增</el-button>
         <el-button v-if="isAuth('honeycomb:honeycombmaxcomputemergetask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-upload
+          class="upload-demo"
+          :action="UploadUrl()"
+          :on-success="uploadSuccess"
+          :on-error="uploadError"
+          :on-exceed="handleExceed"
+          :file-list="fileList">
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item>
+        <a href="/static/plugins/模板.xlsx"> 模板文件下载</a>
+      </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
@@ -75,24 +89,6 @@
           <el-tag v-else size="small" type="danger">禁用</el-tag>
         </template>
       </el-table-column>
-      <!--<el-table-column-->
-        <!--prop="remark"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--label="备注">-->
-      <!--</el-table-column>-->
-      <!--<el-table-column-->
-        <!--prop="createTime"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--label="">-->
-      <!--</el-table-column>-->
-      <!--<el-table-column-->
-        <!--prop="updateTime"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--label="">-->
-      <!--</el-table-column>-->
       <el-table-column
         fixed="right"
         header-align="center"
@@ -129,6 +125,8 @@
         dataForm: {
           key: ''
         },
+        uploadurl: '',
+        fileList: [],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -168,6 +166,31 @@
           }
           this.dataListLoading = false
         })
+      },
+      handleRemove (file, fileList) {
+        console.log(file, fileList)
+      },
+      handlePreview (file) {
+        console.log(file)
+      },
+      uploadSuccess () {
+        console.log('成功')
+        this.$message({
+          message: '操作成功',
+          type: 'success',
+          duration: 1500
+        })
+        this.getDataList()
+      },
+      uploadError () {
+        console.log('失败')
+        this.$message.error('操作失败')
+      },
+      handleExceed (files, fileList) {
+        console.log('22222')
+      },
+      UploadUrl () {
+        return this.$http.adornUrl(`/honeycomb/honeycombmaxcomputemergetask/upload?token=${this.$cookie.get('token')}`)
       },
       // 每页数
       sizeChangeHandle (val) {
