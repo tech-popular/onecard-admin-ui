@@ -18,7 +18,8 @@
       // 业务
       window.SITE_CONFIG.cdnUrl + '/static/js/manifest.js',
       window.SITE_CONFIG.cdnUrl + '/static/js/vendor.js',
-      window.SITE_CONFIG.cdnUrl + '/static/js/app.js'
+      window.SITE_CONFIG.cdnUrl + '/static/js/app.js',
+      window.SITE_CONFIG.cdnUrl + '/static/plugins/模板.xlsx'
     ]
   };
 

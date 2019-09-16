@@ -21,7 +21,7 @@
         </el-upload>
       </el-form-item>
       <el-form-item>
-        <a href="/static/plugins/模板.xlsx"> 模板文件下载</a>
+        <a href="./static/plugins/模板.xlsx"> 模板文件下载</a>
       </el-form-item>
     </el-form>
     <el-table
