@@ -44,13 +44,6 @@ gulp.task('replace:version', ['create:versionCatalog'], function () {
     .pipe(gulp.dest(`${versionPath}/static/config/`))
 });
 
-// 替换附件xlsx
-gulp.task('replace:version', ['create:versionCatalog'], function () {
-  return gulp.src(`${versionPath}/static/config/index-${env}.xlsx`)
-    .pipe($.replace(/window.SITE_CONFIG\['version'\] = '.*'/g, `window.SITE_CONFIG['version'] = '${version}'`))
-    .pipe(gulp.dest(`${versionPath}/static/config/`))
-});
-
 // 合并${versionPath}/static/config/[index-${env}, init].js 至 ${distPath}/config/index.js
 gulp.task('concat:config', ['replace:version'], function () {
   return gulp.src([`${versionPath}/static/config/index-${env}.js`, `${versionPath}/static/config/init.js`])
