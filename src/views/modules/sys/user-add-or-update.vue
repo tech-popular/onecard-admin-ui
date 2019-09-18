@@ -24,6 +24,11 @@
           <el-checkbox v-for="role in roleList" :key="role.roleId" :label="role.roleId">{{ role.roleName }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
+      <el-form-item label="数据权限" size="mini" prop="systenandIdList">
+        <el-checkbox-group v-model="dataForm.systenandIdList">
+          <el-checkbox v-for="tenant in systenantList" :key="tenant.tenantId" :label="tenant.tenantId">{{ tenant.name }}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
       <el-form-item label="状态" size="mini" prop="status">
         <el-radio-group v-model="dataForm.status">
           <el-radio :label="0">禁用</el-radio>
@@ -89,8 +94,10 @@
           email: '',
           mobile: '',
           roleIdList: [],
+          systenandIdList: [],
           status: 1
         },
+        systenantList: [],
         dataRule: {
           userName: [
             { required: true, message: '用户名不能为空', trigger: 'blur' }
@@ -114,6 +121,16 @@
     },
     methods: {
       init (id) {
+        // 数据权限列表
+        this.$http({
+          url: this.$http.adornUrl(`/sys/systenant/nonullselect`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.systenantList = data.sysTenantEntities
+          }
+        })
         this.dataForm.id = id || 0
         this.$http({
           url: this.$http.adornUrl('/sys/role/select'),
@@ -141,6 +158,7 @@
                 this.dataForm.password = data.user.password
                 this.dataForm.roleIdList = data.user.roleIdList
                 this.dataForm.status = data.user.status
+                this.dataForm.systenandIdList = data.user.systenandIdList
               }
             })
           }
@@ -168,7 +186,8 @@
                 'mobile': this.dataForm.mobile,
                 'status': this.dataForm.status,
                 'roleIdList': this.dataForm.roleIdList,
-                'ismodifyPasswd': this.dataForm.ismodifyPasswd
+                'ismodifyPasswd': this.dataForm.ismodifyPasswd,
+                'systenandIdList': this.dataForm.systenandIdList
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
