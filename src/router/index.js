@@ -41,7 +41,9 @@ const mainRoutes = {
     // { path: '/report-list', component: _import('pages/report-list/report-list'), name: 'report-list', meta: { title: '报表列表', isTab: true } },
     // { path: '/chart-list', component: _import('pages/chart-list/chart-list'), name: 'chart-list', meta: { title: '图形列表', isTab: true } },
     { path: '/create-report', component: _import('modules/pages/createreport'), name: 'create-report', meta: { title: '报表', isTab: true } },
-    { path: '/create-chart', component: _import('modules/pages/createchart'), name: 'create-chart', meta: { title: '图形', isTab: true } }
+    { path: '/create-chart', component: _import('modules/pages/createchart'), name: 'create-chart', meta: { title: '图形', isTab: true } },
+    { path: '/phoenix-visual', component: _import('modules/phoenix/visual'), name: 'phoenix-visual', meta: { title: '可视化工具', isTab: true } },
+    { path: '/phoenix-spectaculars', component: _import('modules/phoenix/spectaculars'), name: 'phoenix-spectaculars', meta: { title: '看板', isTab: true } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
