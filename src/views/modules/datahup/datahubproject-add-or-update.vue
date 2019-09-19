@@ -11,7 +11,7 @@
       <el-input v-model="dataForm.odpsTableName" placeholder="maxcompute表名"></el-input>
     </el-form-item>
     <el-form-item label="datahub工程名" prop="datahubProjectName">
-      <el-input v-model="dataForm.datahubProjectName" placeholder="datahub工程名"></el-input>
+      <el-input v-model="dataForm.datahubProjectName" placeholder="datahub工程名" disabled></el-input>
     </el-form-item>
     <el-form-item label="datahub表名" prop="datahubTableName">
       <el-input v-model="dataForm.datahubTableName" placeholder="datahub表名"></el-input>
@@ -74,8 +74,9 @@
       }
     },
     methods: {
-      init (id) {
+      init (id, name) {
         this.dataForm.id = id || 0
+        this.dataForm.datahubProjectName = name
         this.visible = true
       },
       // 表单提交

@@ -4,39 +4,38 @@
     :visible.sync="visible">
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
+      <!--<el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList(this.dataForm.projectId)">查询</el-button>
         <el-button v-if="isAuth('datahup:datahubtopic:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('datahup:datahubtopic:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-      </el-form-item>
+      </el-form-item>-->
     </el-form>
     <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
+      <!--<el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50">
-      </el-table-column>
-      <el-table-column
+      </el-table-column>-->
+     <!-- <el-table-column
         prop="id"
         header-align="center"
         align="center"
         label="主键Id">
-      </el-table-column>
-      <el-table-column
+      </el-table-column>-->
+     <!-- <el-table-column
         prop="projectId"
         header-align="center"
         align="center"
         label="工程id">
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         prop="projectName"
         header-align="center"
@@ -54,14 +53,19 @@
         header-align="center"
         align="center"
         label="maxcompute连接状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.odpsConnectorStatus === 'CONNECTOR_CREATED'" type="primary" size="small" >CREATED</el-tag>
+          <el-tag v-else-if="scope.row.odpsConnectorStatus === 'CONNECTOR_PAUSED'"  size="small" type="danger">STOPPED</el-tag>
+          <el-tag v-else-if="scope.row.odpsConnectorStatus === 'CONNECTOR_RUNNING'"  size="small" type="success">RUNNING</el-tag>
+        </template>
       </el-table-column>
-      <el-table-column
+      <!--<el-table-column
         prop="version"
         header-align="center"
         align="center"
         label="版本号">
-      </el-table-column>
-      <el-table-column
+      </el-table-column>-->
+      <!--<el-table-column
         prop="enable"
         header-align="center"
         align="center"
@@ -72,20 +76,20 @@
         header-align="center"
         align="center"
         label="">
-      </el-table-column>
-      <el-table-column
+      </el-table-column>-->
+      <!--<el-table-column
         prop="createTime"
         header-align="center"
         align="center"
-        label="">
-      </el-table-column>
+        label="创建时间">
+      </el-table-column>-->
       <el-table-column
         prop="updateTime"
         header-align="center"
         align="center"
-        label="">
+        label="更新时间">
       </el-table-column>
-      <el-table-column
+      <!--<el-table-column
         fixed="right"
         header-align="center"
         align="center"
@@ -95,7 +99,7 @@
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
