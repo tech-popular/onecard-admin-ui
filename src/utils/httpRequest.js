@@ -4,7 +4,6 @@ import router from '@/router'
 import qs from 'qs'
 import merge from 'lodash/merge'
 import { clearLoginInfo } from '@/utils'
-
 const http = axios.create({
   timeout: 1000 * 30,
   withCredentials: true,
@@ -41,8 +40,14 @@ http.interceptors.response.use(response => {
  * @param {*} actionName action方法名称
  */
 http.adornUrl = (actionName) => {
-  console.log('进来', process.env.NODE_ENV, process.env.OPEN_PROXY)
   // 非生产环境 && 开启代理, 接口前缀统一使用[/proxyApi/]前缀做代理拦截!
+  // if (process.env.PHOENIX) {
+  //   console.log('1111')
+  //   return actionName
+  // } else {
+  //   console.log('2222')
+  //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
+  // }
   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
 }
 
