@@ -55,7 +55,7 @@
         arr: [], // 有几个图表
         legend: { // 设置标签样式
           type: 'scroll',
-          top:"12%",
+          top: '12%',
           backgroundColor: '#fff',
           padding: 0,
           itemGap: 0
@@ -65,7 +65,7 @@
           right: '0',
           bottom: '0',
           left: '0',
-          containLabel: true,
+          containLabel: true
         },
         textStyle: { // 设置标签名字样式
           rich: {
@@ -97,10 +97,10 @@
           }
         },
         title: {
-          top:"top",
-          left:"left"
+          top: 'top',
+          left: 'left'
         },
-        color: ['#FF4040','#634cff','#febe76','#31c5d3','#f1675d','#f6e58d','#686ee0','#99ce7e','#b466f0', '#f7b500','#48a37a'],
+        color: ['#FF4040', '#634cff', '#febe76', '#31c5d3', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a'],
         visibleChange: false,
         apiItems: [{name: '', value: ''}]
       }
@@ -207,7 +207,7 @@
                     tem.legend.data[i].textStyle = this.textStyle
                   }
                   if (tem.series[0].type == 'pie') {
-                    var center = ['50%', '62%'] //设置饼图大小
+                    var center = ['50%', '62%'] // 设置饼图大小
                     tem.series[0]['center'] = center
                   }
                 }
