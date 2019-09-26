@@ -16,6 +16,7 @@
     "build_uat": "cross-env npm_config_uat=1 gulp"
   },
   "dependencies": {
+    "@antv/g6": "^3.0.7-beta.1",
     "axios": "0.17.1",
     "babel-plugin-component": "0.10.1",
     "babel-polyfill": "6.26.0",
@@ -33,6 +34,7 @@
     "svg-sprite-loader": "3.7.3",
     "vue": "2.6.10",
     "vue-clipboard2": "^0.3.1",
+    "vue-codemirror": "^4.0.6",
     "vue-cookie": "1.1.4",
     "vue-router": "3.0.1",
     "vuex": "3.0.1"

@@ -11,8 +11,13 @@ import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/a
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import VueClipboard from 'vue-clipboard2'
+import VueCodemirror from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+import G6 from '@antv/g6'
+Vue.use(VueCodemirror)
 Vue.use(VueClipboard)
 Vue.use(VueCookie)
+Vue.use(G6)
 Vue.config.productionTip = false
 
 // 非生产环境, 适配mockjs模拟数据                 // api: https://github.com/nuysoft/Mock

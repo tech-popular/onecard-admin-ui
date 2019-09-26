@@ -35,7 +35,7 @@
         prop="id"
         header-align="center"
         align="center"
-        label="">
+        label="任务Id">
       </el-table-column>
       <el-table-column
         prop="name"
