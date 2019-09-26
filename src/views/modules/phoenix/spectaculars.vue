@@ -39,7 +39,7 @@
 
 <script>
   import echarts from 'echarts'
-  import api from '@/fetch/api'
+  // import api from '@/fetch/api'
   export default {
     data () {
       return {
@@ -130,7 +130,7 @@
       // 获取列表
       queryList () {
         this.$http({
-          url: api.screenList,
+          url: this.$http.adornUrl('phoenix/dashboard'),
           method: 'post',
           data: {
             data: {
