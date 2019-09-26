@@ -15,7 +15,7 @@
     </el-alert>
 
     <el-row :gutter="20">
-      <el-col  v-for="(outdata, index) in arr" :key="index" :span="12">
+      <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
           <el-select v-model="value1" class='selectList' multiple placeholder="通知策略" v-show="outdata" @visible-change="changeValue1()">
             <el-option
@@ -54,16 +54,53 @@
         visualizes: [],
         arr: [], // 有几个图表
         legend: { // 设置标签样式
-          textStyle: {
-            color: '#333'
-          },
           type: 'scroll',
-          x: 'left', // 'center' | 'left' | {number},
-          y: '40', // 'center' | 'bottom' | {number}
+          top:"12%",
           backgroundColor: '#fff',
           padding: 0,
-          itemGap: 20
+          itemGap: 0
         },
+        grid: { // 设置柱状样式
+          top: '90',
+          right: '0',
+          bottom: '0',
+          left: '0',
+          containLabel: true,
+        },
+        textStyle: { // 设置标签名字样式
+          rich: {
+            a: {
+              color: 'green',
+              fontWeight: 600,
+              fontSize: 16,
+              lineHeight: 10
+            },
+            b: {
+              color: 'red',
+              fontWeight: 600,
+              fontSize: 16,
+              lineHeight: 10
+            }
+          }
+        },
+        xAxis: {
+          axisLabel: {
+            show: true,
+            interval: 0, // {number} 0为全部显示
+            rotate: 60
+          },
+          axisTick: {
+            alignWithLabel: true,
+            interval: 0,
+            rotate: -30,
+            margin: -15
+          }
+        },
+        title: {
+          top:"top",
+          left:"left"
+        },
+        color: ['#FF4040','#634cff','#febe76','#31c5d3','#f1675d','#f6e58d','#686ee0','#99ce7e','#b466f0', '#f7b500','#48a37a'],
         visibleChange: false,
         apiItems: [{name: '', value: ''}]
       }
@@ -88,15 +125,6 @@
       if (this.chartPie) {
         this.chartPie.resize()
       }
-      // if (this.chartBar) {
-      //   this.chartBar.resize()
-      // }
-      // if (this.chartPie) {
-      //   this.chartPie.resize()
-      // }
-      // if (this.chartScatter) {
-      //   this.chartScatter.resize()
-      // }
     },
     methods: {
       // 获取列表
@@ -133,51 +161,22 @@
           }
         }).then(response => {
           let res = response.data
-          var textStyle = {
-            rich: {
-              a: {
-                color: 'green',
-                fontWeight: 600,
-                fontSize: 16,
-                lineHeight: 10
-              },
-              b: {
-                color: 'red',
-                fontWeight: 600,
-                fontSize: 16,
-                lineHeight: 10
-              }
-            }
-          }
-          var xAxis = {
-            axisLabel: {
-              show: true,
-              interval: 0, // {number} 0为全部显示
-              rotate: 60
-            },
-            axisTick: {
-              alignWithLabel: true,
-              interval: 0,
-              rotate: -30,
-              margin: -15
-            }
-          }
-          var title = {
-            textAlign: 'center'
-          }
           if (res.status == 1) {
             this.list = res.data.selection[0].items
             if (res.data.visualizes) {
               res.data.visualizes.forEach((tem, index) => {
                 this.arr.push(tem.selection[0])
+                tem['grid'] = this.grid
+                tem['color'] = this.color
+                console.log('tem.title', tem)
                 let label = 'J_chartLineBox' + index
                 if (tem.selection[0]) {
                   this.selection = tem.selection[0].items
                 }
-                Object.assign(tem.title, title)
+                Object.assign(tem.title, this.title)
                 Object.assign(tem.legend, this.legend)
                 if (tem.xAxis) {
-                  Object.assign(tem.xAxis, xAxis)
+                  Object.assign(tem.xAxis, this.xAxis)
                 }
                 // Object.assign(tem.xAxis, xAxis)
                 if (tem.series.length > 1) {
@@ -194,7 +193,7 @@
                     if (tem.legend.data[i].metric) {
                       var legendNameElse = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                       tem.legend.data[i].name = legendNameElse
-                      tem.legend.data[i].textStyle = textStyle
+                      tem.legend.data[i].textStyle = this.textStyle
                     }
                   }
                 } else {
@@ -205,7 +204,11 @@
                   for (let i = 0; i < tem.legend.data.length; i++) {
                     var legendName = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                     tem.legend.data[i].name = legendName
-                    tem.legend.data[i].textStyle = textStyle
+                    tem.legend.data[i].textStyle = this.textStyle
+                  }
+                  if (tem.series[0].type == 'pie') {
+                    var center = ['50%', '62%'] //设置饼图大小
+                    tem.series[0]['center'] = center
                   }
                 }
                 setTimeout(() => {
@@ -256,24 +259,30 @@
 <style lang="scss">
   .mod-demo-echarts {
     > .el-alert {
-      margin-bottom: 10px;
+      // margin-bottom: 10px;
     }
     > .el-row {
-      margin-top: -10px;
-      margin-bottom: -10px;
+      // margin-top: -10px;
+      // margin-bottom: -10px;
       .el-col {
-        padding-top: 10px;
-        padding-bottom: 10px;
+        // padding-top: 10px;
+        // padding-bottom: 10px;
       }
+    }
+    .el-card__body{
+      padding: 10px;
     }
     .chart-box {
       min-height: 400px;
     }
-    .selectList{
+    .echartList{
       position: relative;
-      width: 50%;
-      top: 0px;
-      left: 160px;
+    }
+    .selectList{
+      position: absolute;
+      width: 25%;
+      top: 20px;
+      left: 70%;
       z-index: 9;
     }
   }
