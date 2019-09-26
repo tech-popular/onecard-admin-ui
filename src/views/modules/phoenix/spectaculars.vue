@@ -4,7 +4,7 @@
       title=""
       type="warning"
       :closable="false">
-      <el-select v-model="value" placeholder="/a/b/0" @change="selectGet()">
+      <el-select v-model="value" placeholder="请选择授信流程" @change="selectGet()">
         <el-option
           v-for="item in list"
           :key="item.name"
@@ -17,7 +17,7 @@
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12">
         <el-card>
-          <!-- <el-select v-model="value1" class='selectList' multiple placeholder="通知策略" v-show="outdata" @visible-change="changeValue1()"> -->
+          <el-select v-model="value1" class='selectList' multiple placeholder="通知策略" v-show="outdata" @visible-change="changeValue1()">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -65,7 +65,7 @@
           itemGap: 20
         },
         visibleChange: false,
-        apiItems: [{name: ''}, {value: ''}]
+        apiItems: [{name: '', value: ''}]
       }
     },
     computed: {
@@ -110,7 +110,7 @@
               dashboardSelection: [{
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
-                placeholder: '${creditPath}',
+                placeholder: '\\{creditCondition\\}',
                 items: this.value ? [{
                   name: this.value,
                   value: this.value
@@ -120,7 +120,7 @@
               visualizeSelection: [{
                 name: 'visualize过滤策略',
                 type: 'visualize',
-                placeholder: '${strategy}',
+                placeholder: '\\{notifyCondition\\}',
                 items: this.value1 ? this.apiItems : []
               }]
             },
@@ -162,9 +162,11 @@
               margin: -15
             }
           }
+          var title = {
+            textAlign: 'center'
+          }
           if (res.status == 1) {
             this.list = res.data.selection[0].items
-            console.log('this.list', this.list)
             if (res.data.visualizes) {
               res.data.visualizes.forEach((tem, index) => {
                 this.arr.push(tem.selection[0])
@@ -172,23 +174,28 @@
                 if (tem.selection[0]) {
                   this.selection = tem.selection[0].items
                 }
+                Object.assign(tem.title, title)
                 Object.assign(tem.legend, this.legend)
                 if (tem.xAxis) {
                   Object.assign(tem.xAxis, xAxis)
                 }
                 // Object.assign(tem.xAxis, xAxis)
                 if (tem.series.length > 1) {
-                  for (let i = 1; i < tem.series.length; i++) {
-                    var seriesNameElse = tem.series[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                    tem.series[i].name = seriesNameElse
-                    if (!tem.series[i].data) {
-                      tem.legend.data[i]['icon'] = 'image://'
+                  for (let i = 0; i < tem.series.length; i++) {
+                    if (tem.legend.data[i].metric) {
+                      var seriesNameElse = tem.series[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                      tem.series[i].name = seriesNameElse
+                      if (!tem.series[i].data) {
+                        tem.legend.data[i]['icon'] = 'image://'
+                      }
                     }
                   }
-                  for (let i = 1; i < tem.legend.data.length; i++) {
-                    var legendNameElse = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                    tem.legend.data[i].name = legendNameElse
-                    tem.legend.data[i].textStyle = textStyle
+                  for (let i = 0; i < tem.legend.data.length; i++) {
+                    if (tem.legend.data[i].metric) {
+                      var legendNameElse = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                      tem.legend.data[i].name = legendNameElse
+                      tem.legend.data[i].textStyle = textStyle
+                    }
                   }
                 } else {
                   for (let i = 0; i < tem.series[0].data.length; i++) {
@@ -221,16 +228,26 @@
       },
       changeValue1 () {
         if (this.visibleChange && this.value1.length >= 1) {
+          // if (this.value1.length > 1) {
+          //   this.value1.forEach((tem, index) => {
+          //     this.apiItems[index]['name'] = tem
+          //     this.apiItems[index]['value'] = tem
+          //   })
+          // } else {
+          //   this.apiItems['name'] = this.value1
+          //   this.apiItems['value'] = this.value1
+          // }
+          this.value1.forEach((tem, index) => {
+            this.apiItems[index]['name'] = tem
+            this.apiItems[index]['value'] = tem
+          })
+          console.log('this.value1', this.value1, this.apiItems)
           this.arr = []
           this.queryList()
           this.visibleChange = false
         } else {
           this.visibleChange = true
         }
-        this.value1.forEach((tem, index) => {
-          this.apiItems[index]['name'] = tem
-          this.apiItems[index]['value'] = tem
-        })
       }
     }
   }
@@ -254,8 +271,8 @@
     }
     .selectList{
       position: relative;
-      width: 22%;
-      top: 60px;
+      width: 50%;
+      top: 0px;
       left: 160px;
       z-index: 9;
     }
