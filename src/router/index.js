@@ -18,8 +18,7 @@ const _import = require('./import-' + process.env.NODE_ENV)
 // 全局路由(无需嵌套上左右整体布局)
 const globalRoutes = [
   { path: '/404', component: _import('common/404'), name: '404', meta: { title: '404未找到' } },
-  { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } },
-  { path: '/phoenix-spectaculars', component: _import('modules/phoenix/spectaculars'), name: 'phoenix-spectaculars', meta: { title: '看板', isTab: true } }
+  { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -43,7 +42,8 @@ const mainRoutes = {
     // { path: '/chart-list', component: _import('pages/chart-list/chart-list'), name: 'chart-list', meta: { title: '图形列表', isTab: true } },
     { path: '/create-report', component: _import('modules/pages/createreport'), name: 'create-report', meta: { title: '报表', isTab: true } },
     { path: '/create-chart', component: _import('modules/pages/createchart'), name: 'create-chart', meta: { title: '图形', isTab: true } },
-    { path: '/phoenix-visual', component: _import('modules/phoenix/visual'), name: 'phoenix-visual', meta: { title: '可视化工具', isTab: true } }
+    { path: '/phoenix-visual', component: _import('modules/phoenix/visual'), name: 'phoenix-visual', meta: { title: '可视化工具', isTab: true } },
+    { path: '/phoenix-spectaculars', component: _import('modules/phoenix/spectaculars'), name: 'phoenix-spectaculars', meta: { title: '看板', isTab: true } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
