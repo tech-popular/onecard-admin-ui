@@ -24,20 +24,20 @@
             <span slot="title">ueditor</span>
           </el-menu-item>
         </el-submenu>
-        <!-- <el-submenu index="report">
+        <el-submenu index="report">
           <template slot="title">
             <icon-svg name="shoucangfill" class="site-sidebar__menu-icon"></icon-svg>
-            <span>报表和图形</span>
+            <span>凤凰系统</span>
           </template>
-          <el-menu-item index="report-list" @click="$router.push({ name: 'report-list' })">
+          <el-menu-item index="report-list" @click="$router.push({ name: 'phoenix-spectaculars' })">
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">报表列表</span>
+            <span slot="title">看板</span>
           </el-menu-item>
-          <el-menu-item index="chart-list" @click="$router.push({ name: 'chart-list' })">
+          <el-menu-item index="chart-list" @click="$router.push({ name: 'phoenix-visual' })">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">图形列表</span>
+            <span slot="title">新建可视化</span>
           </el-menu-item>
-        </el-submenu> -->
+        </el-submenu>
         <sub-menu
           v-for="menu in menuList"
           :key="menu.menuId"
