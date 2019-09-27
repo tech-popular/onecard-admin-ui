@@ -130,7 +130,7 @@
       // 获取列表
       queryList () {
         this.$http({
-          url: this.$http.adornUrl('phoenix/dashboard'),
+          url: this.$http.adornUrl('/phoenix/dashboard'),
           method: 'post',
           data: {
             data: {
@@ -159,10 +159,13 @@
               traceId: '59235c9c-0dcb-49ee-8c07-acf45b61d913'
             }
           }
-        }).then(response => {
-          let res = response.data
-          if (res.status == 1) {
+        }).then(({data}) => {
+          let res = JSON.parse(data.response)
+          console.log(res)
+          console.log(res.message)
+          if (res.status == '1') {
             this.list = res.data.selection[0].items
+            console.log(this.list)
             if (res.data.visualizes) {
               res.data.visualizes.forEach((tem, index) => {
                 this.arr.push(tem.selection[0])
