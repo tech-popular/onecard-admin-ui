@@ -201,7 +201,7 @@
                   }
                 } else {
                   for (let i = 0; i < tem.series[0].data.length; i++) {
-                    var seriesName = tem.series[0].data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                    var seriesName = tem.series[0].data[i].name + '\n\n ' + tem.legend.data[i].metric ? tem.legend.data[i].metric : '' + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                     tem.series[0].data[i].name = seriesName
                   }
                   for (let i = 0; i < tem.legend.data.length; i++) {
