@@ -160,9 +160,8 @@
             }
           }
         }).then(({data}) => {
-          let res = JSON.parse(data.response)
+          let res = data.response
           console.log(res)
-          console.log(res.message)
           if (res.status == '1') {
             this.list = res.data.selection[0].items
             console.log(this.list)
