@@ -127,6 +127,23 @@
       }
     },
     methods: {
+      // // 获取默认选项
+      // selection () {
+      //   this.$http({
+      //     url: this.$http.adornUrl('/phoenix/dashboard/selection'),
+      //     method: 'post',
+      //     data: {
+      //       data: {
+      //         dashboardId: 1
+      //       }
+      //     }
+      //   }).then(resp => {
+      //     let res = resp.data
+      //     if (res.status == '1') {
+      //       this.queryList(res.data)
+      //     }
+      //   })
+      // },
       // 获取列表
       queryList () {
         this.$http({
@@ -164,13 +181,11 @@
           console.log(res)
           if (res.status == '1') {
             this.list = res.data.selection[0].items
-            console.log(this.list)
             if (res.data.visualizes) {
               res.data.visualizes.forEach((tem, index) => {
                 this.arr.push(tem.selection[0])
                 tem['grid'] = this.grid
                 tem['color'] = this.color
-                console.log('tem.title', tem)
                 let label = 'J_chartLineBox' + index
                 if (tem.selection[0]) {
                   this.selection = tem.selection[0].items
@@ -180,9 +195,9 @@
                 if (tem.xAxis) {
                   Object.assign(tem.xAxis, this.xAxis)
                 }
-                // Object.assign(tem.xAxis, xAxis)
                 if (tem.series.length > 1) {
                   for (let i = 0; i < tem.series.length; i++) {
+                    // debugger
                     if (tem.legend.data[i].metric) {
                       var seriesNameElse = tem.series[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                       tem.series[i].name = seriesNameElse
@@ -199,10 +214,6 @@
                     }
                   }
                 } else {
-                  for (let i = 0; i < tem.series[0].data.length; i++) {
-                    var seriesName = tem.series[0].data[i].name + '\n\n ' + tem.legend.data[i].metric ? tem.legend.data[i].metric : '' + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                    tem.series[0].data[i].name = seriesName
-                  }
                   for (let i = 0; i < tem.legend.data.length; i++) {
                     var legendName = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                     tem.legend.data[i].name = legendName
@@ -211,6 +222,12 @@
                   if (tem.series[0].type == 'pie') {
                     var center = ['50%', '62%'] // 设置饼图大小
                     tem.series[0]['center'] = center
+                  }
+                  for (let i = 0; i < tem.series[0].data.length; i++) {
+                    var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                    console.log(seriesName)
+                    // debugger
+                    tem.series[0].data[i].name = seriesName
                   }
                 }
                 setTimeout(() => {
