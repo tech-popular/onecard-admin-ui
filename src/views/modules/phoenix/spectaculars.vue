@@ -17,7 +17,7 @@
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="通知策略" v-show="outdata" @visible-change="changeValue1()">
+          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata" @visible-change="changeValue1()">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -219,15 +219,17 @@
                     tem.legend.data[i].name = legendName
                     tem.legend.data[i].textStyle = this.textStyle
                   }
-                  if (tem.series[0].type == 'pie') {
-                    var center = ['50%', '62%'] // 设置饼图大小
-                    tem.series[0]['center'] = center
-                  }
-                  for (let i = 0; i < tem.series[0].data.length; i++) {
-                    var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                    console.log(seriesName)
-                    // debugger
-                    tem.series[0].data[i].name = seriesName
+                  if (tem.series[0]) {
+                    if (tem.series[0].type == 'pie') {
+                      var center = ['50%', '62%'] // 设置饼图大小
+                      tem.series[0]['center'] = center
+                    }
+                    for (let i = 0; i < tem.series[0].data.length; i++) {
+                      var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                      console.log(seriesName)
+                      // debugger
+                      tem.series[0].data[i].name = seriesName
+                    }
                   }
                 }
                 setTimeout(() => {
