@@ -17,7 +17,7 @@
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata" @visible-change="changeValue1()">
+          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata" @visible-change="changeValue1()" @remove-tag="changeTag()">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -102,7 +102,7 @@
         },
         color: ['#FF4040', '#634cff', '#febe76', '#31c5d3', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a'],
         visibleChange: false,
-        apiItems: [{name: '', value: ''}],
+        apiItems: [],
         visualizeId: 1 // 图表筛选框
       }
     },
@@ -128,6 +128,25 @@
       }
     },
     methods: {
+      getChinese (name) {
+        let names = name.split('\n')[0]
+        names = names.trim()
+        return names
+      },
+      fprice (s, n) {
+        s = parseFloat((s + '').replace(/[^\d.-]/g, '')).toFixed(n) + ''
+        let l = s.split('.')[0].split('').reverse()
+        let r = s.split('.')[1]
+        let t = ''
+        for (let i = 0; i < l.length; i++) {
+          t += l[i] + ((i + 1) % 3 === 0 && (i + 1) !== l.length ? ',' : '')
+        }
+        if (n === 0) {
+          return t.split('').reverse().join('')
+        } else {
+          return t.split('').reverse().join('') + '.' + r
+        }
+      },
       // 获取列表
       queryList () {
         this.$http({
@@ -179,6 +198,7 @@
                 if (tem.xAxis) {
                   Object.assign(tem.xAxis, this.xAxis)
                 }
+                // 饼状图长度为1
                 if (tem.series.length > 1) {
                   for (let i = 0; i < tem.series.length; i++) {
                     // debugger
@@ -197,6 +217,24 @@
                       tem.legend.data[i].textStyle = this.textStyle
                     }
                   }
+                  var tooltip = { // 工具框
+                    trigger: 'axis',
+                    axisPointer: {
+                      type: 'cross',
+                      label: {
+                        backgroundColor: '#283b56'
+                      }
+                    },
+                    formatter: (params) => {
+                      var result = params[0].axisValue
+                      params.map((item, i) => {
+                        result += '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background:' + item.color + '"></span><span style="color:#fff;">' + this.getChinese(
+                          item.seriesName) + '</span> : ' + this.fprice(item.value, 0) + '人</span>'
+                      })
+                      return result
+                    }
+                  }
+                  tem['tooltip'] = tooltip
                 } else {
                   for (let i = 0; i < tem.legend.data.length; i++) {
                     var legendName = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
@@ -204,13 +242,15 @@
                     tem.legend.data[i].textStyle = this.textStyle
                   }
                   if (tem.series[0]) {
-                    if (tem.series[0].type == 'pie') {
-                      var center = ['50%', '62%'] // 设置饼图大小
-                      tem.series[0]['center'] = center
-                    }
                     for (let i = 0; i < tem.series[0].data.length; i++) {
                       var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                       tem.series[0].data[i].name = seriesName
+                    }
+                    if (tem.series[0].type == 'pie') {
+                      var center = ['50%', '65%'] // 设置饼图大小
+                      var radius = '60%'
+                      tem.series[0]['center'] = center
+                      tem.series[0]['radius'] = radius
                     }
                   }
                 }
@@ -228,22 +268,33 @@
       },
       selectGet () {
         this.arr = []
-        this.apiItems = [{name: ''}, {value: ''}]
+        this.apiItems = []
         this.value1 = ''
         this.queryList()
       },
       changeValue1 () {
         if (this.visibleChange && this.value1.length >= 1) {
           this.value1.forEach((tem, index) => {
-            this.apiItems[index]['name'] = tem
-            this.apiItems[index]['value'] = tem
+            // this.apiItems[index]['name'] = tem
+            // this.apiItems[index]['value'] = tem
+            var obj = {}
+            obj.name = tem
+            obj.value = tem
+            this.apiItems.push(obj)
           })
+          console.log('value1', this.value1, this.apiItems)
           this.arr = []
           this.queryList()
           this.visibleChange = false
         } else {
           this.visibleChange = true
         }
+      },
+      changeTag () {
+        console.log('changeTag', this.value1, this.visibleChange)
+        this.apiItems = []
+        this.visibleChange = true
+        this.changeValue1()
       }
     }
   }
@@ -251,10 +302,10 @@
 
 <style lang="scss">
   .mod-demo-echarts {
-    > .el-alert {
+    .el-alert {
       // margin-bottom: 10px;
     }
-    > .el-row {
+    .el-row {
       // margin-top: -10px;
       // margin-bottom: -10px;
       .el-col {
