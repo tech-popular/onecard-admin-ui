@@ -242,7 +242,7 @@
                     tem.legend.data[i].textStyle = this.textStyle
                   }
                   if (tem.series[0]) {
-                    for (let i = 0; i < tem.series[0].data.length; i++) {
+                    for (let i = 0; i < tem.legend.data.length; i++) {
                       var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                       tem.series[0].data[i].name = seriesName
                     }
@@ -273,16 +273,13 @@
         this.queryList()
       },
       changeValue1 () {
-        if (this.visibleChange && this.value1.length >= 1) {
+        if (this.visibleChange) {
           this.value1.forEach((tem, index) => {
-            // this.apiItems[index]['name'] = tem
-            // this.apiItems[index]['value'] = tem
             var obj = {}
             obj.name = tem
             obj.value = tem
             this.apiItems.push(obj)
           })
-          console.log('value1', this.value1, this.apiItems)
           this.arr = []
           this.queryList()
           this.visibleChange = false
@@ -291,9 +288,8 @@
         }
       },
       changeTag () {
-        console.log('changeTag', this.value1, this.visibleChange)
-        this.apiItems = []
         this.visibleChange = true
+        this.apiItems = []
         this.changeValue1()
       }
     }
