@@ -23,7 +23,7 @@
       border
       v-loading="dataListLoading"
       lazy
-      :load="load"
+      :load="load1"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       style="width: 100%;">
       <el-table-column
@@ -31,27 +31,13 @@
         header-align="center"
         align="center"
         label="任务Id"
-        width="50">
+        width="200">
       </el-table-column>
-      <el-table-column
-        prop="task_status"
-        header-align="center"
-        align="center"
-        label="任务状态">
-      </el-table-column>
-
-     <!-- <el-table-column
-        prop="task_status_desc"
-        header-align="center"
-        show-tooltip-when-overflow
-        align="center"
-        label="任务描述">
-      </el-table-column>-->
       <el-table-column
         prop="timestamp"
         header-align="center"
         align="center"
-        label="批次时间"
+        label="批次号"
         width="250">
       </el-table-column>
       <el-table-column
@@ -114,22 +100,47 @@
         })
         this.dataListLoading = false
       },
-      load (row, treeNode, resolve) {
-        console.log('task_id', row.task_id)
-        console.log('timestamp', row.timestamp)
-        this.$http({
+      load1 (row, treeNode, resolve) {
+        console.log('row_id', row.id)
+        console.log('row_timestamp', row.timestamp)
+        console.log('row_taskid', row.task_id)
+        console.log('create_time', row.create_time)
+        resolve([
+          {
+            task_id: 185,
+            timestamp: '157067820000'
+          },
+          {
+            task_id: 185,
+            timestamp: '157067820000'
+          }
+        ])
+      },
+      load (tree, treeNode, resolve) {
+       /* this.$http({
           url: this.$http.adornUrl(`/honeycomb/honeycombtask/es/detail`),
           method: 'get',
           params: this.$http.adornParams({
-            'taskId': row.task_id,
-            'timestamp': row.timestamp
+            'taskId': tree.task_id,
+            'timestamp': tree.timestamp
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
-            console.log('data', data.detailData)
-            resolve(data.detailData)
+             resolve(data.detailData)
           }
-        })
+        }) */
+        resolve([
+          {
+            task_id: 185,
+            timestamp: 1570678200000,
+            update_time: 1570678293404
+          },
+          {
+            task_id: 185,
+            timestamp: 1570678200000,
+            update_time: 1570678293403
+          }
+        ])
       }
     }
   }
