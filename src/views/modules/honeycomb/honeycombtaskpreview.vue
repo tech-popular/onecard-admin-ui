@@ -1,6 +1,16 @@
 <template>
   <el-form :model="dataForm" :rules="dataRule" ref="dataForm"  label-width="150px">
-    <el-form-item prop="datasourceId">
+    <el-form-item label="任务列表">
+      <el-select v-model="taskId" filterable placeholder="请选择可搜索" style="width: 250px">
+        <el-option
+          v-for="item in taskIdOptions"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
+        </el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item prop="datasourceId" label="数据源">
       <el-select v-model="dataForm.datasourceId" placeholder="请选择">
         <el-option
           v-for="item in datasourceoptions"
@@ -11,16 +21,23 @@
       </el-select>
     </el-form-item>
     <el-form-item prop="sql">
-      <textarea ref="mycode" class="codesql" v-model="dataForm.sql" style="height:200px;width:600px;"></textarea>
+      <el-input type="textarea" ref="mycode" v-model="dataForm.sql" :rows="10"></el-input>
+      <!--<textarea ref="mycode" class="codesql" v-model="dataForm.sql" style="height:200px;width:600px;"></textarea>-->
+
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">执行</el-button>
+      <el-button type="primary" @click="stopMaxcomputepreview()">停止</el-button>
+    </el-form-item>
+    <el-form-item>
+      <el-input type="textarea" ref="returnData" v-model="returnData" :rows="10"></el-input>
     </el-form-item>
   </el-form>
+
 </template>
 
 <script>
-  import 'codemirror/theme/ambiance.css'
+  /** import 'codemirror/theme/ambiance.css'
   import 'codemirror/lib/codemirror.css'
   import 'codemirror/addon/hint/show-hint.css'
 
@@ -29,16 +46,20 @@
   require('codemirror/addon/selection/active-line')
   require('codemirror/mode/sql/sql')
   require('codemirror/addon/hint/show-hint')
-  require('codemirror/addon/hint/sql-hint')
+  require('codemirror/addon/hint/sql-hint')**/
   export default {
     name: 'codeMirror',
     data () {
       return {
         dataForm: {
-          sql: '//按Ctrl键进行代码提示',
-          datasourceId: ''
+          datasourceId: this.$route.query.datasourceId || '',
+          sql: this.$route.query.sql || ''
         },
+        taskId: this.$route.query.taskId || '',
+        taskIdOptions: [],
         datasourceoptions: [],
+        instanceId: '',
+        returnData: '',
         dataRule: {
           datasourceId: [
             { required: true, message: '输入数据源不能为空', trigger: 'blur' }
@@ -53,7 +74,7 @@
       this.selectOption()
     },
     mounted () {
-      let mime = 'text/x-mariadb'
+      /** let mime = 'text/x-mariadb'
       // let theme = 'ambiance'//设置主题，不设置的会使用默认主题
       let editor = CodeMirror.fromTextArea(this.$refs.mycode, {
         mode: mime, // 选择对应代码编辑器的语言，我这边选的是数据库，根据个人情况自行设置即可
@@ -66,18 +87,29 @@
         extraKeys: {'Ctrl': 'autocomplete'}, // 自定义快捷键
         hintOptions: { // 自定义提示选项
           tables: {
-            users: ['name', 'score', 'birthDate'],
-            countries: ['name', 'population', 'size']
+            // users: ['name', 'score', 'birthDate'],
+            // countries: ['name', 'population', 'size']
           }
         }
       })
+      editor.setValue(this.dataForm.sql)
       // 代码自动提示功能，记住使用cursorActivity事件不要使用change事件，这是一个坑，那样页面直接会卡死
       editor.on('cursorActivity', function () {
         editor.showHint()
-      })
+      })**/
     },
     methods: {
       selectOption () {
+        // 下拉框
+        this.$http({
+          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/select`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.taskIdOptions = data.allTask
+          }
+        })
         // 数据源下拉框
         this.$http({
           url: this.$http.adornUrl(`/honeycomb/honeycombdatasourceconfig/select`),
@@ -86,6 +118,90 @@
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.datasourceoptions = data.honeycombDatasourceConfigEntities
+          }
+        })
+      },
+      // 表单提交
+      dataFormSubmit () {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/honeycomb/honeycombtaskpreview/preview/sql`),
+              method: 'post',
+              data: this.$http.adornData(this.dataForm
+              )
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                console.log(data.resultBean)
+                this.returnData += JSON.stringify(data.resultBean)
+                if (data.resultBean.status === '2') {
+                  this.instanceId = data.resultBean.traceId
+                  this.returnData += '\n继续执行\n'
+                  this.continueMaxcomputepreview()
+                } else {
+                  clearInterval(window.clearnum)
+                  this.instanceId = ''
+                }
+              } else {
+                this.$message.error(data.msg)
+                alert('操作失败')
+              }
+            })
+          }
+        })
+      },
+      continueMaxcomputepreview () {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/honeycomb/honeycombtaskpreview/preview/maxcompute`),
+              method: 'post',
+              data: this.$http.adornData({
+                'instanceId': this.instanceId || undefined,
+                'datasourceId': this.dataForm.datasourceId
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                console.log(data.resultBean)
+                this.returnData += JSON.stringify(data.resultBean)
+                if (data.resultBean.status === '2') {
+                  this.returnData += '\n继续执行\n'
+                  clearInterval(window.clearnum)
+                  window.clearnum = setTimeout(() => {
+                    this.continueMaxcomputepreview()
+                  }, 1000)
+                } else {
+                  this.instanceId = ''
+                  clearInterval(window.clearnum)
+                }
+              } else {
+                this.$message.error(data.msg)
+                alert('操作失败')
+              }
+            })
+          }
+        })
+      },
+      stopMaxcomputepreview () {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/honeycomb/honeycombtaskpreview/preview/stopmaxcompute`),
+              method: 'post',
+              data: this.$http.adornData({
+                'instanceId': this.instanceId || undefined,
+                'datasourceId': this.dataForm.datasourceId
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                console.log(data.resultBean)
+                clearInterval(window.clearnum)
+                this.returnData += '\n停止执行\n'
+              } else {
+                this.$message.error(data.msg)
+                alert('操作失败')
+              }
+            })
           }
         })
       }
