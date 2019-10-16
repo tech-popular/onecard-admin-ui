@@ -23,7 +23,7 @@
       border
       v-loading="dataListLoading"
       lazy
-      :load="load1"
+      :load="load"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       style="width: 100%;">
       <el-table-column
@@ -100,24 +100,8 @@
         })
         this.dataListLoading = false
       },
-      load1 (row, treeNode, resolve) {
-        console.log('row_id', row.id)
-        console.log('row_timestamp', row.timestamp)
-        console.log('row_taskid', row.task_id)
-        console.log('create_time', row.create_time)
-        resolve([
-          {
-            task_id: 185,
-            timestamp: '157067820000'
-          },
-          {
-            task_id: 185,
-            timestamp: '157067820000'
-          }
-        ])
-      },
       load (tree, treeNode, resolve) {
-       /* this.$http({
+        this.$http({
           url: this.$http.adornUrl(`/honeycomb/honeycombtask/es/detail`),
           method: 'get',
           params: this.$http.adornParams({
@@ -126,21 +110,9 @@
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
-             resolve(data.detailData)
+            resolve(data.detailData)
           }
-        }) */
-        resolve([
-          {
-            task_id: 185,
-            timestamp: 1570678200000,
-            update_time: 1570678293404
-          },
-          {
-            task_id: 185,
-            timestamp: 1570678200000,
-            update_time: 1570678293403
-          }
-        ])
+        })
       }
     }
   }
