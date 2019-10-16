@@ -165,6 +165,11 @@
 
   </el-dialog>
 </template>
+<style>
+  .el-transfer-panel {
+    width: 300px;
+  }
+</style>
 
 <script>
   export default {
