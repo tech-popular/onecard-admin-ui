@@ -47,6 +47,20 @@
         label="更新时间"
         width="250">
       </el-table-column>
+      <el-table-column
+        prop="task_status"
+        header-align="center"
+        align="center"
+        label="状态码"
+        width="250">
+      </el-table-column>
+      <el-table-column
+        prop="task_status_desc"
+        header-align="center"
+        align="center"
+        label="状态描述"
+        width="250">
+      </el-table-column>
     </el-table>
   </div>
     <span slot="footer" class="dialog-footer">
