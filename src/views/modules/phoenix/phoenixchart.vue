@@ -49,6 +49,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateDegreeHandle(scope.row.id)">刻度配置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -63,11 +64,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <chart-degree v-if="chartDegreeVisible" ref="ChartDegree"  ></chart-degree>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './phoenixchart-add-or-update'
+  import ChartDegree from './phoenixchartdegree-add-or-update'
   export default {
     data () {
       return {
@@ -80,11 +83,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        chartDegreeVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      ChartDegree
     },
     activated () {
       this.getDataList()
@@ -132,6 +137,13 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      // 刻度配置
+      addOrUpdateDegreeHandle (id) {
+        this.chartDegreeVisible = true
+        this.$nextTick(() => {
+          this.$refs.ChartDegree.init(id)
         })
       },
       // 删除
