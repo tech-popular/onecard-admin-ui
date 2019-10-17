@@ -30,36 +30,31 @@
         prop="task_id"
         header-align="center"
         align="center"
-        label="任务Id"
-        width="200">
+        label="任务Id">
       </el-table-column>
       <el-table-column
         prop="timestamp"
         header-align="center"
         align="center"
-        label="批次号"
-        width="250">
+        label="批次号">
       </el-table-column>
       <el-table-column
         prop="update_time"
         header-align="center"
         align="center"
-        label="更新时间"
-        width="250">
+        label="更新时间">
       </el-table-column>
       <el-table-column
         prop="task_status"
         header-align="center"
         align="center"
-        label="状态码"
-        width="250">
+        label="状态码">
       </el-table-column>
       <el-table-column
         prop="task_status_desc"
         header-align="center"
         align="center"
-        label="状态描述"
-        width="250">
+        label="状态描述">
       </el-table-column>
     </el-table>
   </div>
