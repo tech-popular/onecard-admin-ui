@@ -54,14 +54,11 @@
     },
     methods: {
       init (chartId) {
-        console.log(chartId)
         this.dataForm.chartId = chartId
-        console.log(this.dataForm.chartId)
         this.visible = true
         this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
+          // this.$refs['dataForm'].resetFields()
           if (this.dataForm.chartId) {
-            console.log(this.dataForm.chartId)
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartdegree/chartdegreeinfo/${this.dataForm.chartId}`),
               method: 'get',
