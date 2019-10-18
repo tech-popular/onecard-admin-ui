@@ -58,9 +58,9 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.chartId = data.phoenixchartlegend.chartId
-                this.dataForm.name = data.phoenixchartlegend.name
-                this.dataForm.type = data.phoenixchartlegend.type
+                this.dataForm.chartId = data.phoenixChartLegend.chartId
+                this.dataForm.name = data.phoenixChartLegend.name
+                this.dataForm.type = data.phoenixChartLegend.type
               }
             })
           }
