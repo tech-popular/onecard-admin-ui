@@ -36,7 +36,7 @@
           sql: '',
           type: ''
         },
-        chartoptions: [],
+        // chartoptions: [],
         dataRule: {
 /*          chartId: [
             { required: true, message: 'chart_id号不能为空', trigger: 'blur' }
@@ -52,7 +52,7 @@
     },
     methods: {
       init (id) {
-        this.$http({
+       /* this.$http({
           url: this.$http.adornUrl(`/phoenix/phoenixchart/select`),
           method: 'get',
           params: this.$http.adornParams()
@@ -60,7 +60,7 @@
           if (data && data.code === 0) {
             this.chartoptions = data.phoenixChartEntities
           }
-        })
+        }) */
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
