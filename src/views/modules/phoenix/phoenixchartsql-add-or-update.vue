@@ -11,7 +11,7 @@
       <el-input v-model="dataForm.sql" placeholder="sql语句"></el-input>
     </el-form-item>
     <el-form-item label="标识sql对应的chart组件类型 legend、series" prop="type">
-      <el-input v-model="dataForm.type" placeholder="标识sql对应的chart组件类型 legend、series"></el-input>
+      <el-input v-model="dataForm.type" placeholder="组件类型"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -58,9 +58,9 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.chartId = data.phoenixchartsql.chartId
-                this.dataForm.sql = data.phoenixchartsql.sql
-                this.dataForm.type = data.phoenixchartsql.type
+                this.dataForm.chartId = data.phoenixChartSql.chartId
+                this.dataForm.sql = data.phoenixChartSql.sql
+                this.dataForm.type = data.phoenixChartSql.type
               }
             })
           }
