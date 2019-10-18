@@ -4,9 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="chart_id关联" prop="chartId">
+<!--    <el-form-item label="chart_id关联" prop="chartId">
       <el-input v-model="dataForm.chartId" placeholder="chart_id关联"></el-input>
-    </el-form-item>
+    </el-form-item>-->
     <el-form-item label="类型" prop="type">
       <el-input v-model="dataForm.type" placeholder="类型"></el-input>
     </el-form-item>
@@ -37,9 +37,9 @@
           number: ''
         },
         dataRule: {
-          chartId: [
+          /* chartId: [
             { required: true, message: 'chart_id关联不能为空', trigger: 'blur' }
-          ],
+          ], */
           type: [
             { required: true, message: '类型不能为空', trigger: 'blur' }
           ],

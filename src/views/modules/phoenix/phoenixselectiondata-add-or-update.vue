@@ -4,9 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="选择项id号" prop="selectionId">
+   <!-- <el-form-item label="选择项id号" prop="selectionId">
       <el-input v-model="dataForm.selectionId" placeholder="选择项id号"></el-input>
-    </el-form-item>
+    </el-form-item>-->
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
@@ -33,9 +33,9 @@
           value: ''
         },
         dataRule: {
-          selectionId: [
+         /* selectionId: [
             { required: true, message: '选择项id号不能为空', trigger: 'blur' }
-          ],
+          ], */
           name: [
             { required: true, message: '名称不能为空', trigger: 'blur' }
           ],

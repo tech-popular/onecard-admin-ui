@@ -4,11 +4,15 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="chart_id号" prop="chartId">
-      <el-input v-model="dataForm.chartId" placeholder="chart_id号"></el-input>
-    </el-form-item>
-    <el-form-item label="sql语句" prop="sql">
-      <el-input v-model="dataForm.sql" placeholder="sql语句"></el-input>
+  <!--  <el-form-item label="chart_id号" prop="chartId">
+      &lt;!&ndash;<el-input v-model="dataForm.chartId" disabled placeholder="chart_id号"></el-input>&ndash;&gt;
+      <el-select v-model="dataForm.chartId" placeholder="请选择">
+        <el-option v-for="item in chartoptions" :key="item.id" :label="item.text" :value="item.id">
+        </el-option>
+      </el-select>
+    </el-form-item>-->
+    <el-form-item label="sql语句"   prop="sql">
+      <el-input v-model="dataForm.sql" type="textarea"  :rows="5" placeholder="sql语句"></el-input>
     </el-form-item>
     <el-form-item label="标识sql对应的chart组件类型 legend、series" prop="type">
       <el-input v-model="dataForm.type" placeholder="组件类型"></el-input>
@@ -32,10 +36,11 @@
           sql: '',
           type: ''
         },
+        chartoptions: [],
         dataRule: {
-          chartId: [
+/*          chartId: [
             { required: true, message: 'chart_id号不能为空', trigger: 'blur' }
-          ],
+          ], */
           sql: [
             { required: true, message: 'sql语句不能为空', trigger: 'blur' }
           ],
@@ -47,6 +52,15 @@
     },
     methods: {
       init (id) {
+        this.$http({
+          url: this.$http.adornUrl(`/phoenix/phoenixchart/select`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.chartoptions = data.phoenixChartEntities
+          }
+        })
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
