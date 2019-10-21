@@ -50,6 +50,8 @@
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button type="text" size="small" @click="addOrUpdateDegreeHandle(scope.row.id)">刻度配置</el-button>
+          <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
+          <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -65,12 +67,14 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <chart-degree v-if="chartDegreeVisible" ref="ChartDegree"  ></chart-degree>
+    <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './phoenixchart-add-or-update'
   import ChartDegree from './phoenixchartdegree-add-or-update'
+  import ChartSql from './phoenixchartsql'
   export default {
     data () {
       return {
@@ -84,12 +88,14 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        chartDegreeVisible: false
+        chartDegreeVisible: false,
+        chartSqlVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      ChartDegree
+      ChartDegree,
+      ChartSql
     },
     activated () {
       this.getDataList()
@@ -146,6 +152,19 @@
           this.$refs.ChartDegree.init(id)
         })
       },
+     // 大屏图表sql集合
+      chartSqlHandle (id) {
+        console.log(id + '==>id')
+        this.chartSqlVisible = true
+        this.$nextTick(() => {
+          this.$refs.chartSql.getDataList(id)
+        })
+      },
+/*      pushHandle () {
+        this.$router.push(
+          {name: 'phoenix-phoenixselection', params: {'queryId': '1223434'}}
+        )
+      }, */
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {

@@ -2,15 +2,16 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
-    :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-  <!--  <el-form-item label="chart_id号" prop="chartId">
-      &lt;!&ndash;<el-input v-model="dataForm.chartId" disabled placeholder="chart_id号"></el-input>&ndash;&gt;
+    :visible.sync="visible"
+    append-to-body>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
+    <el-form-item label="chart_id号" prop="chartId">
+      <!--<el-input v-model="dataForm.chartId" disabled placeholder="chart_id号"></el-input>-->
       <el-select v-model="dataForm.chartId" placeholder="请选择">
         <el-option v-for="item in chartoptions" :key="item.id" :label="item.text" :value="item.id">
         </el-option>
       </el-select>
-    </el-form-item>-->
+    </el-form-item>
     <el-form-item label="sql语句"   prop="sql">
       <el-input v-model="dataForm.sql" type="textarea"  :rows="5" placeholder="sql语句"></el-input>
     </el-form-item>
@@ -64,7 +65,7 @@
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
+          // this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartsql/info/${this.dataForm.id}`),

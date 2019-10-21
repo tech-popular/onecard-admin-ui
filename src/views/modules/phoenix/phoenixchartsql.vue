@@ -1,15 +1,22 @@
 <template>
+  <el-dialog
+    title="大屏图表sql"
+    :visible.sync="visible">
+    <span data-align="right">
+    <el-button @click="refreshData()" type="danger"  align="right" round>刷新</el-button>
+    <el-button @click="visible = false" type="primary"  align="right" round>关闭</el-button>
+    </span>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchartsql:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchartsql:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-      </el-form-item>
-    </el-form>
+    <el-form-item>
+      <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button @click="getDataList()">查询</el-button>
+      <el-button v-if="isAuth('phoenix:phoenixchartsql:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+      <el-button v-if="isAuth('phoenix:phoenixchartsql:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+    </el-form-item>
+  </el-form>
     <el-table
       :data="dataList"
       border
@@ -22,12 +29,12 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
+<!--      <el-table-column
         prop="id"
         header-align="center"
         align="center"
         label="主键">
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         prop="chartId"
         header-align="center"
@@ -70,6 +77,7 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -77,6 +85,7 @@
   export default {
     data () {
       return {
+        visible: false,
         dataForm: {
           key: ''
         },
@@ -96,8 +105,15 @@
       this.getDataList()
     },
     methods: {
+      refreshData () {
+        console.log(this.dataForm.chartId + '====>chartId')
+        this.getDataList(this.dataForm.chartId)
+      },
       // 获取数据列表
-      getDataList () {
+      getDataList (chartId) {
+        console.log(this.dataForm.key + 'ppppp')
+        this.dataForm.chartId = chartId
+        this.visible = true
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/phoenix/phoenixchartsql/list'),
@@ -105,7 +121,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'chartId': this.dataForm.chartId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
