@@ -4,14 +4,17 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
-    <el-form-item label="chart_id号" prop="chartId">
-      <!--<el-input v-model="dataForm.chartId" disabled placeholder="chart_id号"></el-input>-->
-      <el-select v-model="dataForm.chartId" placeholder="请选择">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(this.dataForm.chartId)" label-width="100px">
+<!--    <el-form-item label="chart_id号" prop="chartId">
+      <el-input v-model="dataForm.chartId" disabled placeholder="chart_id号"></el-input>
+     &lt;!&ndash; <el-select v-model="dataForm.chartId" placeholder="请选择">
         <el-option v-for="item in chartoptions" :key="item.id" :label="item.text" :value="item.id">
         </el-option>
-      </el-select>
-    </el-form-item>
+      </el-select>&ndash;&gt;
+    </el-form-item>-->
+      <el-form-item label="" prop="chartId" style="display: none">
+        <el-input v-model="dataForm.chartId" placeholder="" ></el-input>
+      </el-form-item>
     <el-form-item label="sql语句"   prop="sql">
       <el-input v-model="dataForm.sql" type="textarea"  :rows="5" placeholder="sql语句"></el-input>
     </el-form-item>
@@ -21,7 +24,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit(dataForm.chartId)">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -35,7 +38,8 @@
           id: 0,
           chartId: '',
           sql: '',
-          type: ''
+          type: '',
+          key: ''
         },
         // chartoptions: [],
         dataRule: {
@@ -52,7 +56,7 @@
       }
     },
     methods: {
-      init (id) {
+      init (key, id) {
        /* this.$http({
           url: this.$http.adornUrl(`/phoenix/phoenixchart/select`),
           method: 'get',
@@ -63,6 +67,8 @@
           }
         }) */
         this.dataForm.id = id || 0
+        this.dataForm.key = key || 0
+        this.dataForm.chartId = key
         this.visible = true
         this.$nextTick(() => {
           // this.$refs['dataForm'].resetFields()
@@ -82,8 +88,9 @@
         })
       },
       // 表单提交
-      dataFormSubmit () {
+      dataFormSubmit (chartId) {
         this.$refs['dataForm'].validate((valid) => {
+          this.dataForm.chartId = chartId
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartsql/${!this.dataForm.id ? 'save' : 'update'}`),
