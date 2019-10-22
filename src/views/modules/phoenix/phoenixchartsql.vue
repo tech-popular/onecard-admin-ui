@@ -58,6 +58,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="chartSqlColumnHandle(scope.row.id)">大屏图表sql列</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -72,12 +73,15 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList1="getDataList(this.dataForm.chartId)"></add-or-update>
+    <!-- 大屏图表sql列 -->
+    <chart-sql-column v-if="chartSqlColumnVisible" ref="chartSqlColumn"></chart-sql-column>
   </div>
   </el-dialog>
 </template>
 
 <script>
   import AddOrUpdate from './phoenixchartsql-add-or-update'
+  import ChartSqlColumn from './phoenixchartsqlcolumn'
   export default {
     data () {
       return {
@@ -92,23 +96,23 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        chartSqlColumnVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      ChartSqlColumn
     },
     activated () {
       this.getDataList(this.dataForm.chartId)
     },
     methods: {
       refreshData () {
-        console.log(this.dataForm.chartId + '====>chartId')
         this.getDataList(this.dataForm.chartId)
       },
       // 获取数据列表
       getDataList (chartId) {
-        console.log(this.dataForm.key + 'ppppp')
         this.dataForm.chartId = chartId
         this.visible = true
         this.dataListLoading = true
@@ -152,6 +156,12 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(chartId, id)
+        })
+      },
+      chartSqlColumnHandle (id) {
+        this.chartSqlColumnVisible = true
+        this.$nextTick(() => {
+          this.$refs.chartSqlColumn.getDataList(id)
         })
       },
       // 删除

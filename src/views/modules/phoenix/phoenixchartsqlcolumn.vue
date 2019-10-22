@@ -1,6 +1,10 @@
 <template>
+  <el-dialog
+    title="大屏图表sql列"
+    :visible.sync="visible"
+    append-to-body>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList((this.dataForm.chartSqlId))">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
@@ -68,8 +72,9 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartSqlId)"></add-or-update>
   </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -78,7 +83,9 @@
     data () {
       return {
         dataForm: {
-          key: ''
+          visible: false,
+          key: '',
+          chartSqlId: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -93,19 +100,22 @@
       AddOrUpdate
     },
     activated () {
-      this.getDataList()
+      this.getDataList(this.dataForm.chartSqlId)
     },
     methods: {
       // 获取数据列表
-      getDataList () {
+      getDataList (chartSqlId) {
         this.dataListLoading = true
+        this.dataForm.chartSqlId = chartSqlId
+        this.visible = true
         this.$http({
           url: this.$http.adornUrl('/phoenix/phoenixchartsqlcolumn/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'chartSqlId': this.dataForm.chartSqlId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -122,12 +132,12 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getDataList(this.dataForm.chartSqlId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getDataList(this.dataForm.chartSqlId)
       },
       // 多选
       selectionChangeHandle (val) {
@@ -161,7 +171,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.getDataList(this.dataForm.chartSqlId)
                 }
               })
             } else {
