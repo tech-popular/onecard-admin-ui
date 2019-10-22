@@ -1,4 +1,11 @@
 <template>
+  <el-dialog
+    title="图例"
+    :visible.sync="visible">
+     <span data-align="right">
+    <el-button @click="refreshData()" type="danger"  align="right" round>刷新</el-button>
+    <el-button @click="visible = false" type="primary"  align="right" round>关闭</el-button>
+    </span>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
@@ -6,7 +13,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchartlegend:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixchartlegend:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId,0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixchartlegend:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -53,7 +60,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -68,8 +75,10 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId)"></add-or-update>
   </div>
+
+  </el-dialog>
 </template>
 
 <script>
@@ -77,6 +86,7 @@
   export default {
     data () {
       return {
+        visible: false,
         dataForm: {
           key: ''
         },
@@ -93,11 +103,17 @@
       AddOrUpdate
     },
     activated () {
-      this.getDataList()
+      this.getDataList(this.dataForm.chartId)
     },
     methods: {
+      refreshData () {
+        console.log(this.dataForm.chartId + '====>chartId')
+        this.getDataList(this.dataForm.chartId)
+      },
       // 获取数据列表
-      getDataList () {
+      getDataList (chartId) {
+        this.dataForm.chartId = chartId
+        this.visible = true
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/phoenix/phoenixchartlegend/list'),
@@ -105,6 +121,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
+            'chartId': this.dataForm.chartId,
             'key': this.dataForm.key
           })
         }).then(({data}) => {
@@ -134,10 +151,10 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (chartId, id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(chartId, id)
         })
       },
       // 删除

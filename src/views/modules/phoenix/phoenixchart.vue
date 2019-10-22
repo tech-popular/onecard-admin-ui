@@ -51,6 +51,7 @@
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button type="text" size="small" @click="addOrUpdateDegreeHandle(scope.row.id)">刻度配置</el-button>
           <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
+          <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
           <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
         </template>
       </el-table-column>
@@ -68,12 +69,14 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <chart-degree v-if="chartDegreeVisible" ref="ChartDegree"  ></chart-degree>
     <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
+    <chart-legend v-if="chartLegendVisible" ref="chartLegend"   ></chart-legend>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './phoenixchart-add-or-update'
   import ChartDegree from './phoenixchartdegree-add-or-update'
+  import ChartLegend from './phoenixchartlegend'
   import ChartSql from './phoenixchartsql'
   export default {
     data () {
@@ -89,12 +92,14 @@
         dataListSelections: [],
         addOrUpdateVisible: false,
         chartDegreeVisible: false,
+        chartLegendVisible: false,
         chartSqlVisible: false
       }
     },
     components: {
       AddOrUpdate,
       ChartDegree,
+      ChartLegend,
       ChartSql
     },
     activated () {
@@ -150,6 +155,13 @@
         this.chartDegreeVisible = true
         this.$nextTick(() => {
           this.$refs.ChartDegree.init(id)
+        })
+      },
+        // 图例
+      chartLegendHandle (id) {
+        this.chartLegendVisible = true
+        this.$nextTick(() => {
+          this.$refs.chartLegend.getDataList(id)
         })
       },
      // 大屏图表sql集合
