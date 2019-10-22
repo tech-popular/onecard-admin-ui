@@ -242,11 +242,12 @@
         console.log(this.dataForm)
       },
       testSQL () {
-        console.log(this.dataForm)
+        console.log(this.dataForm.sql)
         this.visible = false
         this.$router.push({
           path: 'honeycomb-honeycombtaskpreview',
-          query: {
+          name: 'honeycomb-honeycombtaskpreview',
+          params: {
             sql: this.dataForm.sql,
             datasourceId: this.dataForm.inDatasource,
             taskId: this.dataForm.id
