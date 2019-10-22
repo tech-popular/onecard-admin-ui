@@ -52,6 +52,7 @@
           <el-button type="text" size="small" @click="addOrUpdateDegreeHandle(scope.row.id)">刻度配置</el-button>
           <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
           <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
+          <el-button type="text" size="small" @click="selectionHandle(scope.row.id)">大屏选择项</el-button>
           <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
         </template>
       </el-table-column>
@@ -70,6 +71,7 @@
     <chart-degree v-if="chartDegreeVisible" ref="ChartDegree"  ></chart-degree>
     <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
     <chart-legend v-if="chartLegendVisible" ref="chartLegend"   ></chart-legend>
+    <selection v-if="selectionVisible" ref="selection"   ></selection>
   </div>
 </template>
 
@@ -78,6 +80,7 @@
   import ChartDegree from './phoenixchartdegree'
   import ChartLegend from './phoenixchartlegend'
   import ChartSql from './phoenixchartsql'
+  import Selection from './phoenixselection'
   export default {
     data () {
       return {
@@ -93,14 +96,16 @@
         addOrUpdateVisible: false,
         chartDegreeVisible: false,
         chartLegendVisible: false,
-        chartSqlVisible: false
+        chartSqlVisible: false,
+        selectionVisible: false
       }
     },
     components: {
       AddOrUpdate,
       ChartDegree,
       ChartLegend,
-      ChartSql
+      ChartSql,
+      Selection
     },
     activated () {
       this.getDataList()
@@ -162,6 +167,13 @@
         this.chartLegendVisible = true
         this.$nextTick(() => {
           this.$refs.chartLegend.getDataList(id)
+        })
+      },
+        // 大屏选择项
+      selectionHandle (id) {
+        this.selectionVisible = true
+        this.$nextTick(() => {
+          this.$refs.selection.getDataList(id)
         })
       },
      // 大屏图表sql集合

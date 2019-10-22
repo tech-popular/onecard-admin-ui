@@ -2,14 +2,18 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
-    :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-<!--    <el-form-item label="chart_id号" prop="chartId">
-      <el-input v-model="dataForm.chartId" placeholder="chart_id号"></el-input>
+    :visible.sync="visible"
+    append-to-body>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(this.dataForm.chartId)" label-width="80px">
+      <el-form-item label="" prop="chartId">
+        <el-input v-model="dataForm.chartId" style="display: none;" placeholder=""></el-input>
+      </el-form-item>
+    <el-form-item label="" prop="chartId">
+      <el-input v-model="dataForm.chartId" placeholder="chart_id号"  style="display: none"></el-input>
     </el-form-item>
-    <el-form-item label="大屏号" prop="screenId">
-      <el-input-number v-model="dataForm.screenId" placeholder="大屏号"></el-input-number>
-    </el-form-item>-->
+   <el-form-item label="" prop="screenId">
+      <el-input-number v-model="dataForm.screenId" placeholder="大屏号"  style="display: none"></el-input-number>
+    </el-form-item>
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
@@ -60,11 +64,13 @@
       }
     },
     methods: {
-      init (id) {
+      init (key, id) {
         this.dataForm.id = id || 0
+        this.dataForm.key = key || 0
+        this.dataForm.chartId = key
         this.visible = true
         this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
+          // this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixselection/info/${this.dataForm.id}`),
@@ -83,9 +89,10 @@
         })
       },
       // 表单提交
-      dataFormSubmit () {
+      dataFormSubmit (chartId) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.dataForm.chartId = chartId
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixselection/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',

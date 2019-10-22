@@ -2,10 +2,6 @@
   <el-dialog
     title="刻度表"
     :visible.sync="visible">
-     <span data-align="right">
-    <el-button @click="refreshData()" type="danger"  align="right" round>刷新</el-button>
-    <el-button @click="visible = false" type="primary"  align="right" round>关闭</el-button>
-    </span>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
@@ -33,13 +29,14 @@
         prop="id"
         header-align="center"
         align="center"
-        label="主键">
+        label="编号">
       </el-table-column>
       <el-table-column
-        prop="chartId"
+        prop=""
         header-align="center"
         align="center"
-        label="chart_id关联">
+        label="chart_id号"
+        style="display: none">
       </el-table-column>
       <el-table-column
         prop="type"
@@ -63,7 +60,6 @@
         fixed="right"
         header-align="center"
         align="center"
-        width="150"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, scope.row.id)">修改</el-button>
