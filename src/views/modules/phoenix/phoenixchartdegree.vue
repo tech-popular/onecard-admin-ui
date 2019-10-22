@@ -1,4 +1,11 @@
 <template>
+  <el-dialog
+    title="刻度表"
+    :visible.sync="visible">
+     <span data-align="right">
+    <el-button @click="refreshData()" type="danger"  align="right" round>刷新</el-button>
+    <el-button @click="visible = false" type="primary"  align="right" round>关闭</el-button>
+    </span>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
@@ -6,8 +13,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchart:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchart:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixchartdegree:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId,0)">新增</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixchartdegree:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,19 +33,31 @@
         prop="id"
         header-align="center"
         align="center"
-        label="编号">
+        label="主键">
       </el-table-column>
       <el-table-column
-        prop="text"
+        prop="chartId"
         header-align="center"
         align="center"
-        label="图表标题">
+        label="chart_id关联">
       </el-table-column>
       <el-table-column
-        prop="subtext"
+        prop="type"
         header-align="center"
         align="center"
-        label="chart副标题">
+        label="类型">
+      </el-table-column>
+      <el-table-column
+        prop="step"
+        header-align="center"
+        align="center"
+        label="步长">
+      </el-table-column>
+      <el-table-column
+        prop="number"
+        header-align="center"
+        align="center"
+        label="刻度">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -47,12 +66,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateDegreeHandle(scope.row.id)">刻度配置</el-button>
-          <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
-          <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
-          <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -66,21 +81,17 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <chart-degree v-if="chartDegreeVisible" ref="ChartDegree"  ></chart-degree>
-    <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
-    <chart-legend v-if="chartLegendVisible" ref="chartLegend"   ></chart-legend>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId)"></add-or-update>
   </div>
+  </el-dialog>
 </template>
 
 <script>
-  import AddOrUpdate from './phoenixchart-add-or-update'
-  import ChartDegree from './phoenixchartdegree'
-  import ChartLegend from './phoenixchartlegend'
-  import ChartSql from './phoenixchartsql'
+  import AddOrUpdate from './phoenixchartdegree-add-or-update'
   export default {
     data () {
       return {
+        visible: false,
         dataForm: {
           key: ''
         },
@@ -90,27 +101,27 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false,
-        chartDegreeVisible: false,
-        chartLegendVisible: false,
-        chartSqlVisible: false
+        addOrUpdateVisible: false
       }
     },
     components: {
-      AddOrUpdate,
-      ChartDegree,
-      ChartLegend,
-      ChartSql
+      AddOrUpdate
     },
     activated () {
-      this.getDataList()
+      this.getDataList(this.dataForm.chartId)
     },
     methods: {
+      refreshData () {
+        console.log(this.dataForm.chartId + '====>chartId')
+        this.getDataList(this.dataForm.chartId)
+      },
       // 获取数据列表
-      getDataList () {
+      getDataList (chartId) {
+        this.dataForm.chartId = chartId
+        this.visible = true
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/phoenix/phoenixchart/list'),
+          url: this.$http.adornUrl('/phoenix/phoenixchartdegree/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -144,39 +155,12 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (chartId, id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(chartId, id)
         })
       },
-      // 刻度配置
-      addOrUpdateDegreeHandle (id) {
-        this.chartDegreeVisible = true
-        this.$nextTick(() => {
-          this.$refs.ChartDegree.getDataList(id)
-        })
-      },
-        // 图例
-      chartLegendHandle (id) {
-        this.chartLegendVisible = true
-        this.$nextTick(() => {
-          this.$refs.chartLegend.getDataList(id)
-        })
-      },
-     // 大屏图表sql集合
-      chartSqlHandle (id) {
-        console.log(id + '==>id')
-        this.chartSqlVisible = true
-        this.$nextTick(() => {
-          this.$refs.chartSql.getDataList(id)
-        })
-      },
-/*      pushHandle () {
-        this.$router.push(
-          {name: 'phoenix-phoenixselection', params: {'queryId': '1223434'}}
-        )
-      }, */
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -188,7 +172,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/phoenix/phoenixchart/delete'),
+            url: this.$http.adornUrl('/phoenix/phoenixchartdegree/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
