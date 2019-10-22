@@ -26,7 +26,7 @@
         prop="id"
         header-align="center"
         align="center"
-        label="主键">
+        label="编号">
       </el-table-column>
       <el-table-column
         prop="selectionId"

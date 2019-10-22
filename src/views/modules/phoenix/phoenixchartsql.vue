@@ -29,12 +29,12 @@
         align="center"
         width="50">
       </el-table-column>
-<!--      <el-table-column
+      <el-table-column
         prop="id"
         header-align="center"
         align="center"
-        label="主键">
-      </el-table-column>-->
+        label="编号">
+      </el-table-column>
       <el-table-column
         prop="chartId"
         header-align="center"
@@ -75,7 +75,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId)"></add-or-update>
   </div>
   </el-dialog>
 </template>
@@ -102,7 +102,7 @@
       AddOrUpdate
     },
     activated () {
-      this.getDataList()
+      this.getDataList(this.dataForm.chartId)
     },
     methods: {
       refreshData () {
@@ -139,12 +139,12 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getDataList(this.dataList.chartId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getDataList(this.dataList.chartId)
       },
       // 多选
       selectionChangeHandle (val) {
@@ -178,7 +178,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.getDataList(this.dataList.chartId)
                 }
               })
             } else {
