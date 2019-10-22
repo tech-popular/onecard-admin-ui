@@ -3,12 +3,12 @@
     title="刻度表"
     :visible.sync="visible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(this.dataForm.chartId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="getDataList(this.dataForm.chartId)">查询</el-button>
         <el-button v-if="isAuth('phoenix:phoenixchartdegree:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId,0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixchartdegree:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -89,7 +89,8 @@
       return {
         visible: false,
         dataForm: {
-          key: ''
+          key: '',
+          chartId: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -122,7 +123,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'chartId': this.dataForm.chartId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
