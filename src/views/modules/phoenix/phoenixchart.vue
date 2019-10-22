@@ -75,7 +75,7 @@
 
 <script>
   import AddOrUpdate from './phoenixchart-add-or-update'
-  import ChartDegree from './phoenixchartdegree-add-or-update'
+  import ChartDegree from './phoenixchartdegree'
   import ChartLegend from './phoenixchartlegend'
   import ChartSql from './phoenixchartsql'
   export default {
@@ -154,7 +154,7 @@
       addOrUpdateDegreeHandle (id) {
         this.chartDegreeVisible = true
         this.$nextTick(() => {
-          this.$refs.ChartDegree.init(id)
+          this.$refs.ChartDegree.getDataList(id)
         })
       },
         // 图例

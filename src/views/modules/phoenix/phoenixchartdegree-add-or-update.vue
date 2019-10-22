@@ -2,8 +2,9 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
-    :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    :visible.sync="visible"
+    append-to-body>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(this.dataForm.chartId)" label-width="80px">
 <!--    <el-form-item label="chart_id关联" prop="chartId">
       <el-input v-model="dataForm.chartId" placeholder="chart_id关联"></el-input>
     </el-form-item>-->
