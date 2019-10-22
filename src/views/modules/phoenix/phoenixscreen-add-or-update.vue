@@ -10,14 +10,17 @@
     <el-form-item label="租户id" prop="tenantId">
       <el-input v-model="dataForm.tenantId" placeholder="租户id"></el-input>
     </el-form-item>
-    <el-form-item label="创建时间" prop="createTime">
+    <!--<el-form-item label="创建时间" prop="createTime">
       <el-input v-model="dataForm.createTime" placeholder="创建时间"></el-input>
     </el-form-item>
     <el-form-item label="更新时间" prop="updateTime">
       <el-input v-model="dataForm.updateTime" placeholder="更新时间"></el-input>
-    </el-form-item>
+    </el-form-item>-->
     <el-form-item label="是否启用" prop="enable">
-      <el-input v-model="dataForm.enable" placeholder="是否启用"></el-input>
+      <el-radio-group v-model="dataForm.enable">
+        <el-radio :label="0">禁用</el-radio>
+        <el-radio :label="1">正常</el-radio>
+      </el-radio-group>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -35,10 +38,10 @@
         dataForm: {
           id: 0,
           name: '',
-          tenantId: '',
+          tenantId: 1,
           createTime: '',
           updateTime: '',
-          enable: ''
+          enable: 1
         },
         dataRule: {
           name: [

@@ -18,7 +18,7 @@
     <el-form-item label="sql语句"   prop="sql">
       <el-input v-model="dataForm.sql" type="textarea"  :rows="5" placeholder="sql语句"></el-input>
     </el-form-item>
-    <el-form-item label="标识sql对应的chart组件类型 legend、series" prop="type">
+    <el-form-item label="组件类型" prop="type">
       <el-input v-model="dataForm.type" placeholder="组件类型"></el-input>
     </el-form-item>
     </el-form>
@@ -109,7 +109,7 @@
                   duration: 1500,
                   onClose: () => {
                     this.visible = false
-                    this.$emit('refreshDataList')
+                    this.$emit('refreshDataList1')
                   }
                 })
               } else {
