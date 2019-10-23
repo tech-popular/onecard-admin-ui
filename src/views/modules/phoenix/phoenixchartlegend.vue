@@ -2,17 +2,13 @@
   <el-dialog
     title="图例"
     :visible.sync="visible">
-     <span data-align="right">
-    <el-button @click="refreshData()" type="danger"  align="right" round>刷新</el-button>
-    <el-button @click="visible = false" type="primary"  align="right" round>关闭</el-button>
-    </span>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="getDataList(dataForm.chartId)">查询</el-button>
         <el-button v-if="isAuth('phoenix:phoenixchartlegend:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId,0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixchartlegend:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -75,7 +71,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId)"></add-or-update>
   </div>
 
   </el-dialog>
@@ -106,10 +102,6 @@
       this.getDataList(this.dataForm.chartId)
     },
     methods: {
-      refreshData () {
-        console.log(this.dataForm.chartId + '====>chartId')
-        this.getDataList(this.dataForm.chartId)
-      },
       // 获取数据列表
       getDataList (chartId) {
         this.dataForm.chartId = chartId
@@ -139,12 +131,12 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getDataList(this.dataForm.chartId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getDataList(this.dataForm.chartId)
       },
       // 多选
       selectionChangeHandle (val) {
@@ -178,7 +170,8 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.visible = false
+                  this.getDataList(this.dataForm.chartId)
                 }
               })
             } else {
