@@ -168,7 +168,7 @@
                   clearInterval(window.clearnum)
                   window.clearnum = setTimeout(() => {
                     this.continueMaxcomputepreview()
-                  }, 1000)
+                  }, 3000)
                 } else {
                   this.instanceId = ''
                   clearInterval(window.clearnum)
