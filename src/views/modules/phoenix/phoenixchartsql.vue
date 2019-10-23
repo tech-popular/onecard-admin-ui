@@ -3,7 +3,7 @@
     title="大屏图表sql"
     :visible.sync="visible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(this.dataForm.chartId)">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartId)">
     <el-form-item>
       <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
     </el-form-item>
@@ -72,7 +72,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList1="getDataList(this.dataForm.chartId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList1="getDataList(dataForm.chartId)"></add-or-update>
     <!-- 大屏图表sql列 -->
     <chart-sql-column v-if="chartSqlColumnVisible" ref="chartSqlColumn"></chart-sql-column>
   </div>
@@ -185,6 +185,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  this.visible = false
                   this.getDataList(this.dataList.chartId)
                 }
               })

@@ -1,12 +1,11 @@
 <template>
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
-    :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="大屏图表sql号" prop="chartSqlId">
-      <el-input v-model="dataForm.chartSqlId" placeholder="大屏图表sql号"></el-input>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.chartSqlId)" label-width="80px">
+    <el-form-item label="" prop="chartSqlId">
+      <el-input v-model="dataForm.chartSqlId" placeholder="" style="display: none"></el-input>
     </el-form-item>
     <el-form-item label="字段名称" prop="columnName">
       <el-input v-model="dataForm.columnName" placeholder="字段名称"></el-input>
@@ -17,7 +16,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit(dataForm.chartSqlId)">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -31,12 +30,13 @@
           id: 0,
           chartSqlId: '',
           columnName: '',
-          columnUnit: ''
+          columnUnit: '',
+          key: ''
         },
         dataRule: {
-          chartSqlId: [
+         /* chartSqlId: [
             { required: true, message: '大屏图表sql号不能为空', trigger: 'blur' }
-          ],
+          ], */
           columnName: [
             { required: true, message: '字段名称不能为空', trigger: 'blur' }
           ],
@@ -47,11 +47,15 @@
       }
     },
     methods: {
-      init (id) {
+      init (key, id) {
         this.dataForm.id = id || 0
+        this.dataForm.key = key || 0
+        this.dataForm.chartSqlId = key
         this.visible = true
         this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.id <= 0) {
+            this.$refs['dataForm'].resetFields()
+          }
           if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartsqlcolumn/info/${this.dataForm.id}`),
@@ -68,8 +72,9 @@
         })
       },
       // 表单提交
-      dataFormSubmit () {
+      dataFormSubmit (chartSqlId) {
         this.$refs['dataForm'].validate((valid) => {
+          this.dataForm.chartSqlId = chartSqlId
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartsqlcolumn/${!this.dataForm.id ? 'save' : 'update'}`),
