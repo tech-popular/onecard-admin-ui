@@ -45,6 +45,12 @@
         label="更新时间">
       </el-table-column>
       <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="备注">
+      </el-table-column>
+      <el-table-column
         prop="task_status"
         header-align="center"
         align="center"
@@ -55,6 +61,11 @@
         header-align="center"
         align="center"
         label="状态描述">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.task_status > 70 || scope.row.task_status_desc ==='' " type="danger" >异常</el-tag>
+          <el-tag v-else-if="scope.row.task_status === 70"   >正常</el-tag>
+          <el-tag v-else size="small" >{{scope.row.task_status_desc}}</el-tag>
+        </template>
       </el-table-column>
     </el-table>
   </div>

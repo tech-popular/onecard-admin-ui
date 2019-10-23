@@ -28,7 +28,6 @@
     <el-form-item>
       <el-button type="primary" @click="dataFormSubmit()">执行</el-button>
       <el-button type="primary" @click="stopMaxcomputepreview()">停止</el-button>
-      <el-button type="primary" @click="test()">测试</el-button>
     </el-form-item>
     <el-form-item>
       <el-input type="textarea" ref="returnData" v-model="returnData" :rows="10"></el-input>
@@ -134,7 +133,7 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 console.log(data.resultBean)
-                this.returnData += JSON.stringify(data.resultBean)
+                this.returnData += JSON.stringify(data)
                 if (data.resultBean.status === '2') {
                   this.instanceId = data.resultBean.traceId
                   this.returnData += '\n继续执行\n'
@@ -144,25 +143,11 @@
                   this.instanceId = ''
                 }
               } else {
-                this.$message.error(data.msg)
-                this.returnData += data.msg
+                this.returnData += JSON.stringify(data, null, 1)
               }
             })
           }
         })
-      },
-      test () {
-        let json1 = '{"msg":"success","code":0,"page":{"totalCount":148,"pageSize":10,"totalPage":15,"currPage":1,"list":[{"id":1,"name":"韩要翔","dingding":"18610245602","mobile":"18610245602","email":"hanyaoxiang@9fbank.com.cn","enable":1,"tenantId":null},{"id":2,"name":"成天华","dingding":"18911130732","mobile":"18911130732","email":"chengtianhua@9fbank.cc","enable":1,"tenantId":null},{"id":3,"name":"刘慧勇","dingding":"13683546933","mobile":"13683546933","email":"liuhuiyong@9fbank.cc","enable":1,"tenantId":null},{"id":8,"name":"李国鹏","dingding":"15011170289","mobile":"15011170289","email":"liguopeng1@9fbank.cc","enable":1,"tenantId":null},{"id":9,"name":"吴传鹏","dingding":"18070147019","mobile":"18070147019","email":"wuchuanpeng@9fbank.com.cn","enable":1,"tenantId":null},{"id":11,"name":"杨志","dingding":"18500153676","mobile":"18500153676","email":"yangzhi@9fbank.cc","enable":1,"tenantId":null},{"id":12,"name":"赵卫国","dingding":"18635066165","mobile":"18635066165","email":"zhaoweiguo@9fbank.com.cn","enable":1,"tenantId":null},{"id":13,"name":"陈炎龙","dingding":"18500683126","mobile":"18500683126","email":"jigoudaihou@9fbank.com.cn","enable":1,"tenantId":null},{"id":14,"name":"王勇刚","dingding":"18010476582","mobile":"18010476582","email":"wangyonggang@ithro.com.cn","enable":1,"tenantId":null},{"id":15,"name":"李宁宁","dingding":"18911213535","mobile":"18911213535","email":"liningning@9fbank.com.cn","enable":1,"tenantId":null}]}}'
-        var person = JSON.parse(json1)
-        var keys = Object.keys(person)
-        console.log('==================' + keys)
-        var value = []
-        for (var i = 0, len = keys.length; i < len; i++) {
-          var key = keys[i]
-          value[i] = person[key]
-          console.log(typeof value[i])
-          console.log('-----person==== ', key, ': ', value[i])
-        }
       },
       continueMaxcomputepreview () {
         this.$refs['dataForm'].validate((valid) => {
@@ -177,7 +162,7 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 console.log(data.resultBean)
-                this.returnData += JSON.stringify(data.resultBean)
+                this.returnData += JSON.stringify(data)
                 if (data.resultBean.status === '2') {
                   this.returnData += '\n继续执行\n'
                   clearInterval(window.clearnum)
@@ -189,7 +174,7 @@
                   clearInterval(window.clearnum)
                 }
               } else {
-                this.returnData += '\ndata.msg\n'
+                this.returnData += JSON.stringify(data)
               }
             })
           }
