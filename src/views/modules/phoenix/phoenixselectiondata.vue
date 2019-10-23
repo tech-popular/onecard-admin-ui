@@ -1,12 +1,16 @@
 <template>
+  <el-dialog
+    title="大屏选择项数据"
+    :visible.sync="visible"
+    append-to-body>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.selectionId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixselectiondata:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button @click="getDataList(dataForm.selectionId)">查询</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixselectiondata:save')" type="primary" @click="addOrUpdateHandle(dataForm.selectionId, 0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixselectiondata:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -53,7 +57,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.selectionId , scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -68,8 +72,9 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.selectionId)"></add-or-update>
   </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -77,6 +82,7 @@
   export default {
     data () {
       return {
+        visible: false,
         dataForm: {
           key: ''
         },
@@ -93,19 +99,22 @@
       AddOrUpdate
     },
     activated () {
-      this.getDataList()
+      this.getDataList(this.dataForm.selectionId)
     },
     methods: {
       // 获取数据列表
-      getDataList () {
+      getDataList (selectionId) {
         this.dataListLoading = true
+        this.visible = true
+        this.dataForm.selectionId = selectionId
         this.$http({
           url: this.$http.adornUrl('/phoenix/phoenixselectiondata/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'selectionId': this.dataForm.selectionId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -122,22 +131,22 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getDataList(this.dataForm.selectionId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getDataList(this.dataForm.selectionId)
       },
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (selectionId, id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(selectionId, id)
         })
       },
       // 删除
@@ -161,7 +170,8 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.visible = false
+                  this.getDataList(this.dataForm.selectionId)
                 }
               })
             } else {

@@ -3,12 +3,12 @@
     title="大屏选择项"
     :visible.sync="visible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.selectionId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="getDataList(dataForm.selectionId)">查询</el-button>
         <el-button v-if="isAuth('phoenix:phoenixselection:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId, dataForm.screenId, 0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixselection:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -70,6 +70,8 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.screenId, dataForm.chartId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">大屏选择项数据</el-button>
+
         </template>
       </el-table-column>
     </el-table>
@@ -83,13 +85,16 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId, this.dataForm.screenId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId, dataForm.screenId)"></add-or-update>
+    <!-- 大屏选择项数据 -->
+    <selection-data v-if="selectionDataVisible" ref="selectionData"></selection-data>
   </div>
   </el-dialog>
 </template>
 
 <script>
   import AddOrUpdate from './phoenixselection-add-or-update'
+  import SelectionData from './phoenixselectiondata'
   export default {
     data () {
       return {
@@ -103,11 +108,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        selectionDataVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      SelectionData
     },
     activated () {
       this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
@@ -163,6 +170,13 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(chartId, id, screenId)
+        })
+      },
+        // 大屏选择项数据
+      selectionDataHandle (id) {
+        this.selectionDataVisible = true
+        this.$nextTick(() => {
+          this.$refs.selectionData.getDataList(id)
         })
       },
       // 删除
