@@ -35,8 +35,7 @@
         prop="chartId"
         header-align="center"
         align="center"
-        label="chart_id号"
-        style="display: none">
+        label="chart_id号">
       </el-table-column>
       <el-table-column
         prop="type"
@@ -180,7 +179,7 @@
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.getDataList()
+                  this.getDataList(this.dataForm.chartId)
                 }
               })
             } else {

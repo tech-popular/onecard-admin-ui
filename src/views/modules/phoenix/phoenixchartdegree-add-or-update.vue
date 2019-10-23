@@ -4,7 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(this.dataForm.chartId)" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.chartId)" label-width="80px">
       <el-form-item label="" prop="chartId">
         <el-input v-model="dataForm.chartId" style="display: none" placeholder=""></el-input>
       </el-form-item>
@@ -35,7 +35,8 @@
           chartId: '',
           type: '',
           step: '',
-          number: ''
+          number: '',
+          key: ''
         },
         dataRule: {
           /* chartId: [
