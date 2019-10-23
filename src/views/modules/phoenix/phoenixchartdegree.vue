@@ -3,13 +3,13 @@
     title="刻度表"
     :visible.sync="visible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchartdegree:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId,0)">新增</el-button>
+        <el-button @click="getDataList(dataForm.chartId)">查询</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixchartdegree:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId, 0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixchartdegree:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -32,10 +32,10 @@
         label="编号">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="chartId"
         header-align="center"
         align="center"
-        label="chart_id号"
+        label=""
         style="display: none">
       </el-table-column>
       <el-table-column
@@ -77,7 +77,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId)"></add-or-update>
   </div>
   </el-dialog>
 </template>
@@ -89,7 +89,8 @@
       return {
         visible: false,
         dataForm: {
-          key: ''
+          key: '',
+          chartId: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -108,7 +109,6 @@
     },
     methods: {
       refreshData () {
-        console.log(this.dataForm.chartId + '====>chartId')
         this.getDataList(this.dataForm.chartId)
       },
       // 获取数据列表
@@ -122,7 +122,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'chartId': this.dataForm.chartId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -139,12 +140,12 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getDataList(this.dataForm.chartId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getDataList(this.dataForm.chartId)
       },
       // 多选
       selectionChangeHandle (val) {
@@ -178,6 +179,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  this.visible = false
                   this.getDataList()
                 }
               })

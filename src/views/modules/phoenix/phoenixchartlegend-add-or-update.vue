@@ -8,9 +8,6 @@
       <el-form-item label="" prop="chartId">
         <el-input v-model="dataForm.chartId" style="display: none;" placeholder=""></el-input>
       </el-form-item>
-    <!--<el-form-item label="chart_id号" prop="chartId">
-      <el-input v-model="dataForm.chartId" placeholder="chart_id号"></el-input>
-    </el-form-item>-->
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
@@ -37,9 +34,6 @@
           type: ''
         },
         dataRule: {
-          /* chartId: [
-            { required: true, message: 'chart_id号不能为空', trigger: 'blur' }
-          ], */
           name: [
             { required: true, message: '名称不能为空', trigger: 'blur' }
           ],
@@ -56,7 +50,9 @@
         this.dataForm.chartId = key
         this.visible = true
         this.$nextTick(() => {
-          // this.$refs['dataForm'].resetFields()
+          if (this.dataForm.id <= 0) {
+            this.$refs['dataForm'].resetFields()
+          }
           if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartlegend/info/${this.dataForm.id}`),
@@ -75,8 +71,8 @@
       // 表单提交！
       dataFormSubmit (chartId) {
         this.$refs['dataForm'].validate((valid) => {
+          this.dataForm.chartId = chartId
           if (valid) {
-            this.dataForm.chartId = chartId
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartlegend/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',

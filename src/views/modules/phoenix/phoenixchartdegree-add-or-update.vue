@@ -6,7 +6,7 @@
     append-to-body>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(this.dataForm.chartId)" label-width="80px">
       <el-form-item label="" prop="chartId">
-        <el-input v-model="dataForm.chartId" style="display: none;" placeholder=""></el-input>
+        <el-input v-model="dataForm.chartId" style="display: none" placeholder=""></el-input>
       </el-form-item>
     <el-form-item label="类型" prop="type">
       <el-input v-model="dataForm.type" placeholder="类型"></el-input>
@@ -60,15 +60,16 @@
         this.dataForm.chartId = key
         this.visible = true
         this.$nextTick(() => {
-          // this.$refs['dataForm'].resetFields()
-          if (this.dataForm.chartId) {
+          if (this.dataForm.id <= 0) {
+            this.$refs['dataForm'].resetFields()
+          }
+          if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/phoenix/phoenixchartdegree/chartdegreeinfo/${this.dataForm.chartId}`),
+              url: this.$http.adornUrl(`/phoenix/phoenixchartdegree/chartdegreeinfo/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.id = data.phoenixChartDegree.id
                 this.dataForm.chartId = data.phoenixChartDegree.chartId
                 this.dataForm.type = data.phoenixChartDegree.type
                 this.dataForm.step = data.phoenixChartDegree.step
@@ -81,8 +82,8 @@
       // 表单提交
       dataFormSubmit (chartId) {
         this.$refs['dataForm'].validate((valid) => {
+          this.dataForm.chartId = chartId
           if (valid) {
-            this.dataForm.chartId = chartId
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartdegree/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',

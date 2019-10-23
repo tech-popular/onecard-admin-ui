@@ -49,7 +49,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateDegreeHandle(scope.row.id)">刻度配置</el-button>
+          <el-button type="text" size="small" @click="chartDegreeHandle(scope.row.id)">刻度配置</el-button>
           <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
           <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
           <el-button type="text" size="small" @click="selectionHandle(scope.row.id)">大屏选择项</el-button>
@@ -68,7 +68,7 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <chart-degree v-if="chartDegreeVisible" ref="ChartDegree"  ></chart-degree>
+    <chart-degree v-if="chartDegreeVisible" ref="chartDegree"  ></chart-degree>
     <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
     <chart-legend v-if="chartLegendVisible" ref="chartLegend"   ></chart-legend>
     <selection v-if="selectionVisible" ref="selection"   ></selection>
@@ -156,10 +156,10 @@
         })
       },
       // 刻度配置
-      addOrUpdateDegreeHandle (id) {
+      chartDegreeHandle (id) {
         this.chartDegreeVisible = true
         this.$nextTick(() => {
-          this.$refs.ChartDegree.getDataList(id)
+          this.$refs.chartDegree.getDataList(id)
         })
       },
         // 图例

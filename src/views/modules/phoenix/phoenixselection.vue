@@ -9,7 +9,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixselection:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId, 0)">新增</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixselection:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId, dataForm.screenId, 0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixselection:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -68,7 +68,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.screenId, dataForm.chartId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -83,7 +83,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartId, this.dataForm.screenId)"></add-or-update>
   </div>
   </el-dialog>
 </template>
@@ -110,15 +110,16 @@
       AddOrUpdate
     },
     activated () {
-      this.getDataList(this.dataForm.chartId)
+      this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
     },
     methods: {
       refreshData () {
-        this.getDataList(this.dataForm.chartId)
+        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
       },
       // 获取数据列表
-      getDataList (chartId) {
+      getDataList (chartId, screenId) {
         this.dataForm.chartId = chartId
+        this.dataForm.screenId = screenId
         this.visible = true
         this.dataListLoading = true
         this.$http({
@@ -128,7 +129,8 @@
             'page': this.pageIndex,
             'limit': this.pageSize,
             'key': this.dataForm.key,
-            'chartId': this.dataForm.chartId
+            'chartId': this.dataForm.chartId,
+            'screenId': this.dataForm.screenId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -145,22 +147,22 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
       },
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (chartId, id) {
+      addOrUpdateHandle (chartId, id, screenId) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(chartId, id)
+          this.$refs.addOrUpdate.init(chartId, id, screenId)
         })
       },
       // 删除
@@ -184,7 +186,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList(this.dataList.chartId)
+                  this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
                 }
               })
             } else {
