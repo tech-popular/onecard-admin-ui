@@ -4,13 +4,13 @@
     :visible.sync="visible"
     append-to-body>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList((this.dataForm.chartSqlId))">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartSqlId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchartsqlcolumn:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button @click="getDataList(dataForm.chartSqlId)">查询</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixchartsqlcolumn:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartSqlId, 0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixchartsqlcolumn:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -57,7 +57,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartSqlId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -72,7 +72,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(this.dataForm.chartSqlId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartSqlId)"></add-or-update>
   </div>
   </el-dialog>
 </template>
@@ -82,8 +82,8 @@
   export default {
     data () {
       return {
+        visible: false,
         dataForm: {
-          visible: false,
           key: '',
           chartSqlId: ''
         },
@@ -144,10 +144,10 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (chartSqlId, id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(chartSqlId, id)
         })
       },
       // 删除
@@ -171,6 +171,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  this.visible = false
                   this.getDataList(this.dataForm.chartSqlId)
                 }
               })

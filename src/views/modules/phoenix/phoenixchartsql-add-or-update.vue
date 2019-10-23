@@ -71,7 +71,9 @@
         this.dataForm.chartId = key
         this.visible = true
         this.$nextTick(() => {
-          // this.$refs['dataForm'].resetFields()
+          if (this.dataForm.id <= 0) {
+            this.$refs['dataForm'].resetFields()
+          }
           if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartsql/info/${this.dataForm.id}`),
