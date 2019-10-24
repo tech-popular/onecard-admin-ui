@@ -182,8 +182,8 @@
         }).then(({data}) => {
           let res = data.response
           if (res.status == '1') {
-            this.list = res.data.selection[0].items
-            if (res.data.visualizes) {
+            this.list = res.data.selection[0].items // 下拉列表选项
+            if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
                 this.arr.push(tem.selection[0])
                 tem['grid'] = this.grid
@@ -198,15 +198,17 @@
                 if (tem.xAxis) {
                   Object.assign(tem.xAxis, this.xAxis)
                 }
-                // 饼状图长度为1
-                if (tem.series.length > 1) {
+                if (tem.type == 'bar') { // 折现柱状
                   for (let i = 0; i < tem.series.length; i++) {
-                    // debugger
-                    if (tem.legend.data[i].metric) {
-                      var seriesNameElse = tem.series[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                      tem.series[i].name = seriesNameElse
-                      if (!tem.series[i].data) {
-                        tem.legend.data[i]['icon'] = 'image://'
+                    if (tem.legend.data) {
+                      if (tem.legend.data[i].metric) {
+                        if (tem.series) {
+                          var seriesNameElse = tem.series[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                          tem.series[i].name = seriesNameElse
+                          if (!tem.series[i].data) {
+                            tem.legend.data[i]['icon'] = 'image://'
+                          }
+                        }
                       }
                     }
                   }
@@ -235,7 +237,7 @@
                     }
                   }
                   tem['tooltip'] = tooltip
-                } else {
+                } else if (tem.type == 'pie') { // 饼图
                   for (let i = 0; i < tem.legend.data.length; i++) {
                     var legendName = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                     tem.legend.data[i].name = legendName
@@ -243,8 +245,10 @@
                   }
                   if (tem.series[0]) {
                     for (let i = 0; i < tem.legend.data.length; i++) {
-                      var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                      tem.series[0].data[i].name = seriesName
+                      if (tem.series[0].data) {
+                        var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                        tem.series[0].data[i].name = seriesName
+                      }
                     }
                     if (tem.series[0].type == 'pie') {
                       var center = ['50%', '65%'] // 设置饼图大小
@@ -253,6 +257,21 @@
                       tem.series[0]['radius'] = radius
                     }
                   }
+                } else if (tem.type == 'funnel') { // 漏斗
+                  // const label = {
+                  //     show: true,
+                  //     position: 'inside'
+                  // }
+                  // Object.assign(tem, label)
+                  // console.log(tem)
+                  // // label: {
+                  // //     show: true,
+                  // //     position: 'inside'
+                  // // }
+                } else if (tem.type == 'radar') { // 雷达
+                } else if (tem.type == 'pies') { // 饼图嵌套
+                  tem.series[0].radius = ['40%', '55%']
+                  tem.series[1].radius = ['0%', '30%']
                 }
                 setTimeout(() => {
                   this.chartPie = echarts.init(document.getElementById(label))
