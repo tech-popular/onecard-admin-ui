@@ -4,10 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(this.dataForm.chartId)" label-width="80px">
-      <el-form-item label="" prop="chartId">
-        <el-input v-model="dataForm.chartId" style="display: none;" placeholder=""></el-input>
-      </el-form-item>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.chartId)" label-width="80px">
     <el-form-item label="" prop="chartId">
       <el-input v-model="dataForm.chartId" placeholder="chart_id号"  style="display: none"></el-input>
     </el-form-item>
@@ -26,7 +23,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit(dataForm.chartId)">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -70,7 +67,9 @@
         this.dataForm.chartId = key
         this.visible = true
         this.$nextTick(() => {
-          // this.$refs['dataForm'].resetFields()
+          if (this.dataForm.id <= 0) {
+            this.$refs['dataForm'].resetFields()
+          }
           if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixselection/info/${this.dataForm.id}`),
@@ -91,8 +90,8 @@
       // 表单提交
       dataFormSubmit (chartId) {
         this.$refs['dataForm'].validate((valid) => {
+          this.dataForm.chartId = chartId
           if (valid) {
-            this.dataForm.chartId = chartId
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixselection/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',

@@ -22,8 +22,7 @@
       <el-table-column
         type="selection"
         header-align="center"
-        align="center"
-        width="50">
+        align="center">
       </el-table-column>
       <el-table-column
         prop="id"
@@ -65,7 +64,6 @@
         fixed="right"
         header-align="center"
         align="center"
-        width="150"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.screenId, dataForm.chartId, scope.row.id)">修改</el-button>
