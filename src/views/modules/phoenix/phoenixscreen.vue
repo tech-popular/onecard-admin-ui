@@ -71,6 +71,8 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="phoenixChartsHandle(scope.row.id)">大屏上的charts</el-button>
+          <el-button type="text" size="small" @click="selectionHandle(0, scope.row.id)">大屏选择项</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -85,11 +87,16 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <!-- 大屏选择项 -->
+    <selection v-if="selectionVisible" ref="selection"></selection>
+    <phoenix-charts v-if="phoenixChartsVisible" ref="phoenixCharts"/>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './phoenixscreen-add-or-update'
+  import Selection from './phoenixselection'
+  import PhoenixCharts from './phoenixscreen-charts-add-or-update'
   export default {
     data () {
       return {
@@ -102,11 +109,15 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        selectionVisible: false,
+        phoenixChartsVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      Selection,
+      PhoenixCharts
     },
     activated () {
       this.getDataList()
@@ -154,6 +165,21 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      //  大屏上的charts
+      phoenixChartsHandle (id) {
+        this.phoenixChartsVisible = true
+        this.$nextTick(() => {
+          this.$refs.phoenixCharts.init(id)
+        })
+      },
+      // 大屏选择项
+      selectionHandle (id, screenId) {
+        console.log('id' + id, 'screenId' + screenId)
+        this.selectionVisible = true
+        this.$nextTick(() => {
+          this.$refs.selection.getDataList(id, screenId)
         })
       },
       // 删除

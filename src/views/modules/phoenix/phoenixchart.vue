@@ -52,7 +52,7 @@
           <el-button type="text" size="small" @click="chartDegreeHandle(scope.row.id)">刻度配置</el-button>
           <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
           <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
-          <el-button type="text" size="small" @click="selectionHandle(scope.row.id)">大屏选择项</el-button>
+          <el-button type="text" size="small" @click="selectionHandle(scope.row.id, 0 )">大屏选择项</el-button>
           <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
         </template>
       </el-table-column>
@@ -170,10 +170,10 @@
         })
       },
         // 大屏选择项
-      selectionHandle (chartId) {
+      selectionHandle (chartId, id) {
         this.selectionVisible = true
         this.$nextTick(() => {
-          this.$refs.selection.getDataList(chartId)
+          this.$refs.selection.getDataList(chartId, id)
         })
       },
      // 大屏图表sql集合

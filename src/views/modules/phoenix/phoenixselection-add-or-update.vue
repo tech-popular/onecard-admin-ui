@@ -4,7 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.chartId)" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.chartId ,dataForm.screenId)" label-width="80px">
     <el-form-item label="" prop="chartId">
       <el-input v-model="dataForm.chartId" placeholder="chart_id号"  style="display: none"></el-input>
     </el-form-item>
@@ -23,7 +23,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit(dataForm.chartId)">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit(dataForm.chartId, dataForm.screenId)">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -39,7 +39,8 @@
           screenId: '',
           name: '',
           type: '',
-          placeholder: ''
+          placeholder: '',
+          key: ''
         },
         dataRule: {
          /* chartId: [
@@ -61,10 +62,11 @@
       }
     },
     methods: {
-      init (key, id) {
+      init (key, screenId, id) {
         this.dataForm.id = id || 0
         this.dataForm.key = key || 0
         this.dataForm.chartId = key
+        this.dataForm.screentId = screenId || 0
         this.visible = true
         this.$nextTick(() => {
           if (this.dataForm.id <= 0) {
@@ -88,9 +90,10 @@
         })
       },
       // 表单提交
-      dataFormSubmit (chartId) {
+      dataFormSubmit (chartId, screenId) {
         this.$refs['dataForm'].validate((valid) => {
           this.dataForm.chartId = chartId
+          this.dataForm.screenId = screenId
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixselection/${!this.dataForm.id ? 'save' : 'update'}`),
