@@ -53,6 +53,7 @@
           <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
           <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
           <el-button type="text" size="small" @click="selectionHandle(scope.row.id, 0 )">大屏选择项</el-button>
+          <el-button type="text" size="small" @click="chartRadarHandle(scope.row.id)">雷达</el-button>
           <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
         </template>
       </el-table-column>
@@ -72,6 +73,7 @@
     <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
     <chart-legend v-if="chartLegendVisible" ref="chartLegend"   ></chart-legend>
     <selection v-if="selectionVisible" ref="selection"   ></selection>
+    <chart-radar v-if="chartRadarVisible" ref="chartRadar"></chart-radar>
   </div>
 </template>
 
