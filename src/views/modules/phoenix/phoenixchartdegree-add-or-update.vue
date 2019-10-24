@@ -66,15 +66,15 @@
           }
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/phoenix/phoenixchartdegree/chartdegreeinfo/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/phoenix/phoenixchartdegree/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.chartId = data.phoenixChartDegree.chartId
-                this.dataForm.type = data.phoenixChartDegree.type
-                this.dataForm.step = data.phoenixChartDegree.step
-                this.dataForm.number = data.phoenixChartDegree.number
+                this.dataForm.chartId = data.phoenixChartDegreeEntity.chartId
+                this.dataForm.type = data.phoenixChartDegreeEntity.type
+                this.dataForm.step = data.phoenixChartDegreeEntity.step
+                this.dataForm.number = data.phoenixChartDegreeEntity.number
               }
             })
           }
