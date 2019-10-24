@@ -1,16 +1,16 @@
 <template>
   <el-dialog
-    title="大屏选择项"
+    title="雷达"
     :visible.sync="visible">
-  <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartId ,dataForm.screenId)">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+    <div class="mod-config">
+      <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartId)">
+        <el-form-item>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList(dataForm.selectionId)">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixselection:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId, dataForm.screenId, 0)">新增</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixselection:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="getDataList(dataForm.chartId)">查询</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixchartradar:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId, 0)">新增</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixchartradar:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -22,7 +22,8 @@
       <el-table-column
         type="selection"
         header-align="center"
-        align="center">
+        align="center"
+        width="50">
       </el-table-column>
       <el-table-column
         prop="id"
@@ -34,13 +35,7 @@
         prop="chartId"
         header-align="center"
         align="center"
-        label="chart_id号">
-      </el-table-column>
-      <el-table-column
-        prop="screenId"
-        header-align="center"
-        align="center"
-        label="大屏号">
+        label="chartId号">
       </el-table-column>
       <el-table-column
         prop="name"
@@ -49,26 +44,26 @@
         label="名称">
       </el-table-column>
       <el-table-column
-        prop="type"
+        prop="max"
         header-align="center"
         align="center"
-        label="选择项值">
+        label="最大值">
       </el-table-column>
       <el-table-column
-        prop="placeholder"
+        prop="sort"
         header-align="center"
         align="center"
-        label="占位符">
+        label="排序">
       </el-table-column>
       <el-table-column
         fixed="right"
         header-align="center"
         align="center"
+        width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, dataForm.screenId, scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">大屏选择项数据</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,21 +77,20 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId, dataForm.screenId)"></add-or-update>
-    <!-- 大屏选择项数据 -->
-    <selection-data v-if="selectionDataVisible" ref="selectionData"></selection-data>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId)"></add-or-update>
   </div>
   </el-dialog>
 </template>
+
 <script>
-  import AddOrUpdate from './phoenixselection-add-or-update'
-  import SelectionData from './phoenixselectiondata'
+  import AddOrUpdate from './phoenixchartradar-add-or-update'
   export default {
     data () {
       return {
         visible: false,
         dataForm: {
-          key: ''
+          key: '',
+          chartId: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -104,37 +98,32 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false,
-        selectionDataVisible: false
+        addOrUpdateVisible: false
       }
     },
     components: {
-      AddOrUpdate,
-      SelectionData
+      AddOrUpdate
     },
     activated () {
-      this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+      this.getDataList(this.dataForm.chartId)
     },
     methods: {
       refreshData () {
-        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+        this.getDataList(this.dataForm.chartId)
       },
       // 获取数据列表
-      getDataList (chartId, screenId) {
+      getDataList (chartId) {
         this.dataForm.chartId = chartId
-        this.dataForm.screenId = screenId
-        console.log('chartId' + chartId, 'screenId' + screenId)
         this.visible = true
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/phoenix/phoenixselection/list'),
+          url: this.$http.adornUrl('/phoenix/phoenixchartradar/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
             'key': this.dataForm.key,
-            'chartId': this.dataForm.chartId,
-            'screenId': this.dataForm.screenId
+            'chartId': this.dataForm.chartId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -151,30 +140,22 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+        this.getDataList(this.dataForm.chartId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+        this.getDataList(this.dataForm.chartId)
       },
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (chartId, screenId, id) {
-        console.log('id' + id, 'screenId' + screenId, 'chartId' + chartId)
+      addOrUpdateHandle (chartId, id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(chartId, screenId, id)
-        })
-      },
-        // 大屏选择项数据
-      selectionDataHandle (id) {
-        this.selectionDataVisible = true
-        this.$nextTick(() => {
-          this.$refs.selectionData.getDataList(id)
+          this.$refs.addOrUpdate.init(chartId, id)
         })
       },
       // 删除
@@ -188,7 +169,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/phoenix/phoenixselection/delete'),
+            url: this.$http.adornUrl('/phoenix/phoenixchartradar/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
@@ -198,7 +179,8 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+                  this.visible = false
+                  this.getDataList(this.dataForm.chartId)
                 }
               })
             } else {

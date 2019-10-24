@@ -81,6 +81,7 @@
   import ChartLegend from './phoenixchartlegend'
   import ChartSql from './phoenixchartsql'
   import Selection from './phoenixselection'
+  import ChartRadar from './phoenixchartradar'
   export default {
     data () {
       return {
@@ -97,7 +98,8 @@
         chartDegreeVisible: false,
         chartLegendVisible: false,
         chartSqlVisible: false,
-        selectionVisible: false
+        selectionVisible: false,
+        chartRadarVisible: false
       }
     },
     components: {
@@ -105,7 +107,8 @@
       ChartDegree,
       ChartLegend,
       ChartSql,
-      Selection
+      Selection,
+      ChartRadar
     },
     activated () {
       this.getDataList()
@@ -174,6 +177,13 @@
         this.selectionVisible = true
         this.$nextTick(() => {
           this.$refs.selection.getDataList(chartId, id)
+        })
+      },
+        // 雷达
+      chartRadarHandle (id) {
+        this.chartRadarVisible = true
+        this.$nextTick(() => {
+          this.$refs.chartRadar.getDataList(id)
         })
       },
      // 大屏图表sql集合
