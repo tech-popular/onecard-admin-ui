@@ -37,7 +37,7 @@
         label="chart_id号">
       </el-table-column>
       <el-table-column
-        prop="screenId"
+        prop=""
         header-align="center"
         align="center"
         label="大屏号">
@@ -66,7 +66,7 @@
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.screenId, dataForm.chartId, scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">大屏选择项数据</el-button>
 
@@ -83,7 +83,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId, dataForm.screenId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId)"></add-or-update>
     <!-- 大屏选择项数据 -->
     <selection-data v-if="selectionDataVisible" ref="selectionData"></selection-data>
   </div>

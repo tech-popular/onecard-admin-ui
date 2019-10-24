@@ -170,10 +170,10 @@
         })
       },
         // 大屏选择项
-      selectionHandle (chartId, screenId) {
+      selectionHandle (chartId) {
         this.selectionVisible = true
         this.$nextTick(() => {
-          this.$refs.selection.getDataList(chartId, screenId)
+          this.$refs.selection.getDataList(chartId)
         })
       },
      // 大屏图表sql集合
