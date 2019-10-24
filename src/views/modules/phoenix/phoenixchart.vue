@@ -53,6 +53,7 @@
           <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
           <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
           <el-button type="text" size="small" @click="selectionHandle(scope.row.id)">大屏选择项</el-button>
+          <el-button type="text" size="small" @click="chartRadarHandle(scope.row.id)">雷达</el-button>
           <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
         </template>
       </el-table-column>
@@ -72,6 +73,7 @@
     <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
     <chart-legend v-if="chartLegendVisible" ref="chartLegend"   ></chart-legend>
     <selection v-if="selectionVisible" ref="selection"   ></selection>
+    <chart-radar v-if="chartRadarVisible" ref="chartRadar"></chart-radar>
   </div>
 </template>
 
@@ -81,6 +83,7 @@
   import ChartLegend from './phoenixchartlegend'
   import ChartSql from './phoenixchartsql'
   import Selection from './phoenixselection'
+  import ChartRadar from './phoenixchartradar'
   export default {
     data () {
       return {
@@ -97,7 +100,8 @@
         chartDegreeVisible: false,
         chartLegendVisible: false,
         chartSqlVisible: false,
-        selectionVisible: false
+        selectionVisible: false,
+        chartRadarVisible: false
       }
     },
     components: {
@@ -105,7 +109,8 @@
       ChartDegree,
       ChartLegend,
       ChartSql,
-      Selection
+      Selection,
+      ChartRadar
     },
     activated () {
       this.getDataList()
@@ -170,10 +175,17 @@
         })
       },
         // 大屏选择项
-      selectionHandle (chartId) {
+      selectionHandle (id) {
         this.selectionVisible = true
         this.$nextTick(() => {
-          this.$refs.selection.getDataList(chartId)
+          this.$refs.selection.getDataList(id)
+        })
+      },
+        // 雷达
+      chartRadarHandle (id) {
+        this.chartRadarVisible = true
+        this.$nextTick(() => {
+          this.$refs.chartRadar.getDataList(id)
         })
       },
      // 大屏图表sql集合
