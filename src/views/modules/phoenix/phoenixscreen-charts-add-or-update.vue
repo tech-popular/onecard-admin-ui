@@ -109,20 +109,20 @@
         },
             // 表单提交
         dataFormSubmit (screenId) {
-          console.log(this.dataForm.id + 'id')
           this.$refs['dataForm'].validate((valid) => {
             this.dataForm.screenId = screenId
             console.log(screenId + 'screenId')
+            console.log(this.dataForm.charts + 'charts')
             if (valid) {
               this.$http({
                 url: this.$http.adornUrl(`/phoenix/phoenixscreen/screenrelcharts/${!this.dataForm.id ? 'save' : 'update'}`),
                 method: 'post',
                 data: this.$http.adornData({
                   'id': this.dataForm.id || undefined,
-                  'screenId': this.dataForm.screenId,
+               /*   'screenId': this.dataForm.screenId,
                   'chartId': this.dataForm.chartId,
-                  'order': this.dataForm.order
-                  // 'charts': this.dataForm.charts
+                  'order': this.dataForm.order */
+                  'charts': this.dataForm.charts
                 })
               }).then(({data}) => {
                 if (data && data.code === 0) {

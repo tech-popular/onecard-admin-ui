@@ -3,13 +3,13 @@
     title="大屏选择项"
     :visible.sync="visible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartId ,dataForm.screenId)">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.chartId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList(dataForm.selectionId)">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixselection:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId, dataForm.screenId, 0)">新增</el-button>
+        <el-button @click="getDataList(dataForm.chartId)">查询</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixselection:save')" type="primary" @click="addOrUpdateHandle(dataForm.chartId,  0)">新增</el-button>
         <el-button v-if="isAuth('phoenix:phoenixselection:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -66,7 +66,7 @@
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId, dataForm.screenId, scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId,scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">大屏选择项数据</el-button>
         </template>
@@ -82,7 +82,7 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId, dataForm.screenId)"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.chartId)"></add-or-update>
     <!-- 大屏选择项数据 -->
     <selection-data v-if="selectionDataVisible" ref="selectionData"></selection-data>
   </div>
@@ -113,17 +113,15 @@
       SelectionData
     },
     activated () {
-      this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+      this.getDataList(this.dataForm.chartId)
     },
     methods: {
       refreshData () {
-        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+        this.getDataList(this.dataForm.chartId)
       },
       // 获取数据列表
-      getDataList (chartId, screenId) {
+      getDataList (chartId) {
         this.dataForm.chartId = chartId
-        this.dataForm.screenId = screenId
-        console.log('chartId' + chartId, 'screenId' + screenId)
         this.visible = true
         this.dataListLoading = true
         this.$http({
@@ -133,8 +131,8 @@
             'page': this.pageIndex,
             'limit': this.pageSize,
             'key': this.dataForm.key,
-            'chartId': this.dataForm.chartId,
-            'screenId': this.dataForm.screenId
+            'chartId': this.dataForm.chartId
+            // 'screenId': this.dataForm.screenId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -151,23 +149,22 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+        this.getDataList(this.dataForm.chartId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+        this.getDataList(this.dataForm.chartId)
       },
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (chartId, screenId, id) {
-        console.log('id' + id, 'screenId' + screenId, 'chartId' + chartId)
+      addOrUpdateHandle (chartId, id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(chartId, screenId, id)
+          this.$refs.addOrUpdate.init(chartId, id)
         })
       },
         // 大屏选择项数据
@@ -198,7 +195,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList(this.dataForm.chartId, this.dataForm.screenId)
+                  this.getDataList(this.dataForm.chartId)
                 }
               })
             } else {

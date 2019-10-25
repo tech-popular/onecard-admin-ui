@@ -1,13 +1,16 @@
 <template>
+  <el-dialog
+    title="大屏选择项"
+    :visible.sync="visible">
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList(dataForm.screenId)">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixscreen:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixscreen:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="getDataList(dataForm.screenId)">查询</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixselection:save')" type="primary" @click="addOrUpdateHandle(dataForm.screenId, 0)">新增</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixselection:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -19,8 +22,7 @@
       <el-table-column
         type="selection"
         header-align="center"
-        align="center"
-        width="50">
+        align="center">
       </el-table-column>
       <el-table-column
         prop="id"
@@ -29,50 +31,44 @@
         label="编号">
       </el-table-column>
       <el-table-column
+        prop="chartId"
+        header-align="center"
+        align="center"
+        label="chart_id号">
+      </el-table-column>
+      <el-table-column
+        prop="screenId"
+        header-align="center"
+        align="center"
+        label="大屏号">
+      </el-table-column>
+      <el-table-column
         prop="name"
         header-align="center"
         align="center"
         label="名称">
       </el-table-column>
       <el-table-column
-        prop="tenantId"
+        prop="type"
         header-align="center"
         align="center"
-        label="租户id">
+        label="选择项值">
       </el-table-column>
       <el-table-column
-        prop="createTime"
+        prop="placeholder"
         header-align="center"
         align="center"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column
-        prop="updateTime"
-        header-align="center"
-        align="center"
-        label="更新时间">
-      </el-table-column>
-      <el-table-column
-        prop="enable"
-        header-align="center"
-        align="center"
-        label="是否启用">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small" >正常</el-tag>
-          <el-tag v-else size="small" type="danger">禁用</el-tag>
-        </template>
+        label="占位符">
       </el-table-column>
       <el-table-column
         fixed="right"
         header-align="center"
         align="center"
-        width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.screenId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="phoenixChartsHandle(scope.row.id)">大屏上的charts</el-button>
-          <el-button type="text" size="small" @click="screenSelectionHandle(scope.row.id)">大屏选择项</el-button>
+          <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">大屏选择项数据</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,20 +82,19 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <!-- 大屏选择项 -->
-    <screen-selection v-if="screenSelectionVisible" ref="screenSelection"></screen-selection>
-    <phoenix-charts v-if="phoenixChartsVisible" ref="phoenixCharts"/>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.screenId)"></add-or-update>
+    <!-- 大屏选择项数据 -->
+    <selection-data v-if="selectionDataVisible" ref="selectionData"></selection-data>
   </div>
+  </el-dialog>
 </template>
-
 <script>
-  import AddOrUpdate from './phoenixscreen-add-or-update'
-  import ScreenSelection from './phoenixscreen-selection'
-  import PhoenixCharts from './phoenixscreen-charts-add-or-update'
+  import AddOrUpdate from './phoenixscreenselection-add-or-update'
+  import SelectionData from './phoenixselectiondata'
   export default {
     data () {
       return {
+        visible: false,
         dataForm: {
           key: ''
         },
@@ -110,29 +105,35 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        screenSelectionVisible: false,
-        phoenixChartsVisible: false
+        selectionDataVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      ScreenSelection,
-      PhoenixCharts
+      SelectionData
     },
     activated () {
-      this.getDataList()
+      this.getDataList(this.dataForm.screenId)
     },
     methods: {
+      refreshData () {
+        this.getDataList(this.dataForm.screenId)
+      },
       // 获取数据列表
-      getDataList () {
+      getDataList (screenId) {
+        this.dataForm.screenId = screenId
+        console.log('screenId' + screenId)
+        this.visible = true
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/phoenix/phoenixscreen/list'),
+          url: this.$http.adornUrl('/phoenix/phoenixselection/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            // 'chartId': this.dataForm.chartId,
+            'screenId': this.dataForm.screenId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -149,36 +150,30 @@
       sizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getDataList(this.dataForm.screenId)
       },
       // 当前页
       currentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getDataList(this.dataForm.screenId)
       },
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (screenId, id) {
+        console.log('id' + id, 'screenId' + screenId)
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(screenId, id)
         })
       },
-      //  大屏上的charts
-      phoenixChartsHandle (id) {
-        this.phoenixChartsVisible = true
+        // 大屏选择项数据
+      selectionDataHandle (id) {
+        this.selectionDataVisible = true
         this.$nextTick(() => {
-          this.$refs.phoenixCharts.init(id)
-        })
-      },
-      // 大屏选择项
-      screenSelectionHandle (id) {
-        this.screenSelectionVisible = true
-        this.$nextTick(() => {
-          this.$refs.screenSelection.getDataList(id)
+          this.$refs.selectionData.getDataList(id)
         })
       },
       // 删除
@@ -192,7 +187,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/phoenix/phoenixscreen/delete'),
+            url: this.$http.adornUrl('/phoenix/phoenixselection/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
@@ -202,7 +197,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.getDataList(this.dataForm.screenId)
                 }
               })
             } else {
