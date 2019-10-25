@@ -99,7 +99,13 @@
         visibleChange: false,
         apiItems: [],
         visualizeId: 1, // 图表筛选框
-        selection: []
+        selection: [],
+        label: {
+          normal: {
+            show: true,
+            position: 'inside'
+          }
+        }
       }
     },
     computed: {
@@ -254,11 +260,8 @@
                     }
                   }
                 } else if (tem.type == 'funnel') { // 漏斗
-                  let obj = {
-                    show: true,
-                    position: 'inside'
-                  }
-                  tem.series[0].label = obj
+                  tem.series[0]['label'] = this.label
+                  console.log('tem.series', tem)
                 } else if (tem.type == 'radar') { // 雷达
                 } else if (tem.type == 'pies') { // 饼图嵌套
                   tem.series[0].radius = ['40%', '55%']
@@ -269,6 +272,11 @@
                   this.visualizeId = tem.id
                 }
                 let label = 'J_chartLineBox' + index
+                // this.chartPie = echarts.init(document.getElementById(label))
+                // this.chartPie.setOption(tem, true)
+                // window.addEventListener('resize', () => {
+                //   this.chartPie.resize()
+                // })
                 setTimeout(() => {
                   this.chartPie = echarts.init(document.getElementById(label))
                   this.chartPie.setOption(tem, true)
