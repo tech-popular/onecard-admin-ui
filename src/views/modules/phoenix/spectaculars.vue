@@ -28,6 +28,11 @@
           <div :id="'J_chartLineBox' + index" class="chart-box"></div>
         </el-card>
       </el-col>
+      <div class="funnelList">
+        <ul>
+          <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}{{item.percentRise ? '↑' : '↓'}}{{item.percent}}{{item.percent_unit}}</li>
+        </ul>
+      </div>
     </el-row>
   </div>
 </template>
@@ -99,7 +104,8 @@
         visibleChange: false,
         apiItems: [],
         visualizeId: 1, // 图表筛选框
-        selection: []
+        selection: [],
+        funnelList: []
       }
     },
     computed: {
@@ -254,20 +260,24 @@
                     }
                   }
                 } else if (tem.type == 'funnel') { // 漏斗
-                  tem.series[0].left = '25%'
-                  tem.series[0].width = '50%'
+                  tem.series[0].left = '15%'
+                  tem.series[0].width = '70%'
+
+                  tem.series[0]['label'] = {
+                    normal: {
+                      show: true,
+                      position: 'inside'
+                    }
+                  }
 
                   tem.series[0].data.forEach((item, index) => {
                     item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '↑' : '↓'}  ${item.percent}%`
                   })
 
-                  tem.tooltip.formatter = '{a}<br/>{b}'
-
-                  tem.legend.data.forEach((item, index) => {
-                    tem.legend.data[index] = `${item.name}</br>`
-                  })
-                  console.log(tem.legend.data)
+                  tem.tooltip.formatter = '{a}<br/><br/>{b}'
+                  this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
+                  tem.tooltip = {}
                 } else if (tem.type == 'pies') { // 饼图嵌套
                   tem.series[0].radius = ['40%', '55%']
                   tem.series[1].radius = ['0%', '30%']
@@ -320,6 +330,7 @@
 </script>
 
 <style lang="scss">
+
   .mod-demo-echarts {
     .el-alert {
       // margin-bottom: 10px;
@@ -347,6 +358,28 @@
       top: 20px;
       left: 70%;
       z-index: 9;
+    }
+  }
+  li{
+    list-style: none;
+  }
+  .funnelList{
+    ul{
+      li{
+        position: absolute;
+      }
+      li:nth-child(1){
+        top: 20px;
+        left: calc(25% - 94px);
+      }
+      li:nth-child(2){
+        top: 150px;
+        left: 20px;
+      }
+      li:nth-child(3){
+        top: 260px;
+        left: 34px;
+      }
     }
   }
 </style>
