@@ -59,6 +59,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.selectionId , scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="phoenixChartsHandle(scope.row.id)">选择项值上的charts</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -73,12 +74,15 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList(dataForm.selectionId)"></add-or-update>
+    <!-- 选择项值上的charts -->
+    <phoenix-charts v-if="phoenixChartsVisible" ref="phoenixCharts"/>
   </div>
   </el-dialog>
 </template>
 
 <script>
   import AddOrUpdate from './phoenixselectiondata-add-or-update'
+  import PhoenixCharts from './phoenixselection-charts-add-or-update'
   export default {
     data () {
       return {
@@ -92,11 +96,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        phoenixChartsVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      PhoenixCharts
     },
     activated () {
       this.getDataList(this.dataForm.selectionId)
@@ -147,6 +153,13 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(selectionId, id)
+        })
+      },
+        //  大屏上的charts
+      phoenixChartsHandle (id) {
+        this.phoenixChartsVisible = true
+        this.$nextTick(() => {
+          this.$refs.phoenixCharts.init(id)
         })
       },
       // 删除
