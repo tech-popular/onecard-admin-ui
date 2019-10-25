@@ -28,11 +28,6 @@
           <div :id="'J_chartLineBox' + index" class="chart-box"></div>
         </el-card>
       </el-col>
-      <!-- <el-col :span="12">
-        <el-card>
-          <div id="J_chartLineBox01" class="chart-box"></div>
-        </el-card>
-      </el-col> -->
     </el-row>
   </div>
 </template>
@@ -103,7 +98,8 @@
         color: ['#FF4040', '#634cff', '#febe76', '#31c5d3', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a'],
         visibleChange: false,
         apiItems: [],
-        visualizeId: 1 // 图表筛选框
+        visualizeId: 1, // 图表筛选框
+        selection: []
       }
     },
     computed: {
@@ -112,14 +108,19 @@
         set (val) { this.$store.commit('common/updateSidebarFold', val) }
       }
     },
+    watch: {
+      arr (oldValue, newValue) {
+        console.log(newValue)
+      }
+    },
     created () {
-      this.queryList()
     },
     mounted () {
       if (!this.sidebarFold) {
         // set (true) { this.$store.commit('common/updateSidebarFold', val) }
         this.sidebarFold = !this.sidebarFold
       }
+      this.queryList()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -188,11 +189,6 @@
                 this.arr.push(tem.selection[0])
                 tem['grid'] = this.grid
                 tem['color'] = this.color
-                let label = 'J_chartLineBox' + index
-                if (tem.selection[0]) {
-                  this.selection = tem.selection[0].items
-                  this.visualizeId = tem.id
-                }
                 Object.assign(tem.title, this.title)
                 Object.assign(tem.legend, this.legend)
                 if (tem.xAxis) {
@@ -258,24 +254,24 @@
                     }
                   }
                 } else if (tem.type == 'funnel') { // 漏斗
-                  // const label = {
-                  //     show: true,
-                  //     position: 'inside'
-                  // }
-                  // Object.assign(tem, label)
-                  // console.log(tem)
-                  // // label: {
-                  // //     show: true,
-                  // //     position: 'inside'
-                  // // }
+                  let obj = {
+                    show: true,
+                    position: 'inside'
+                  }
+                  tem.series[0].label = obj
                 } else if (tem.type == 'radar') { // 雷达
                 } else if (tem.type == 'pies') { // 饼图嵌套
                   tem.series[0].radius = ['40%', '55%']
                   tem.series[1].radius = ['0%', '30%']
                 }
+                if (tem.selection[0]) {
+                  this.selection = tem.selection[0].items
+                  this.visualizeId = tem.id
+                }
+                let label = 'J_chartLineBox' + index
                 setTimeout(() => {
                   this.chartPie = echarts.init(document.getElementById(label))
-                  this.chartPie.setOption(tem)
+                  this.chartPie.setOption(tem, true)
                   window.addEventListener('resize', () => {
                     this.chartPie.resize()
                   })
