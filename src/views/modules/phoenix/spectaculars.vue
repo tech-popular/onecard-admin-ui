@@ -254,11 +254,19 @@
                     }
                   }
                 } else if (tem.type == 'funnel') { // 漏斗
-                  let obj = {
-                    show: true,
-                    position: 'inside'
-                  }
-                  tem.series[0].label = obj
+                  tem.series[0].left = '25%'
+                  tem.series[0].width = '50%'
+
+                  tem.series[0].data.forEach((item, index) => {
+                    item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '↑' : '↓'}  ${item.percent}%`
+                  })
+
+                  tem.tooltip.formatter = '{a}<br/>{b}'
+
+                  tem.legend.data.forEach((item, index) => {
+                    tem.legend.data[index] = `${item.name}</br>`
+                  })
+                  console.log(tem.legend.data)
                 } else if (tem.type == 'radar') { // 雷达
                 } else if (tem.type == 'pies') { // 饼图嵌套
                   tem.series[0].radius = ['40%', '55%']
