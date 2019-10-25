@@ -16,6 +16,11 @@
 
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
+        <div class="funnelList" v-show="boxList[index].type == 'funnel'">
+          <ul>
+            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}{{item.percentRise ? '↑' : '↓'}}{{item.percent}}{{item.percent_unit}}</li>
+          </ul>
+        </div>
         <el-card>
           <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata" @visible-change="changeValue1()" @remove-tag="changeTag()">
             <el-option
@@ -28,11 +33,6 @@
           <div :id="'J_chartLineBox' + index" class="chart-box"></div>
         </el-card>
       </el-col>
-      <div class="funnelList">
-        <ul>
-          <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}{{item.percentRise ? '↑' : '↓'}}{{item.percent}}{{item.percent_unit}}</li>
-        </ul>
-      </div>
     </el-row>
   </div>
 </template>
@@ -105,7 +105,8 @@
         apiItems: [],
         visualizeId: 1, // 图表筛选框
         selection: [],
-        funnelList: []
+        funnelList: [],
+        boxList: []
       }
     },
     computed: {
@@ -191,6 +192,7 @@
           if (res.status == '1') {
             this.list = res.data.selection[0].items // 下拉列表选项
             if (res.data.visualizes) { // 图标列表
+              this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
                 this.arr.push(tem.selection[0])
                 tem['grid'] = this.grid
@@ -274,7 +276,7 @@
                     item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '↑' : '↓'}  ${item.percent}%`
                   })
 
-                  tem.tooltip.formatter = '{a}<br/><br/>{b}'
+                  tem.tooltip.formatter = '{a}<br/>{b}'
                   this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
                   tem.tooltip = {}
@@ -364,13 +366,16 @@
     list-style: none;
   }
   .funnelList{
+    margin: 0;
+    padding: 0;
     ul{
       li{
         position: absolute;
+        z-index: 9999;
       }
       li:nth-child(1){
-        top: 20px;
-        left: calc(25% - 94px);
+        top: 50px;
+        left: calc(50% - 100px);
       }
       li:nth-child(2){
         top: 150px;
