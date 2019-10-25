@@ -53,6 +53,7 @@
         return {
           visible: false,
           screenId: '',
+          id: 0,
           dataForm: {
             charts: [{
               chartId: '',
@@ -110,17 +111,15 @@
             // 表单提交
         dataFormSubmit (screenId) {
           this.$refs['dataForm'].validate((valid) => {
+            console.log(this.screenId + 'screenId')
             this.dataForm.screenId = screenId
-            console.log(screenId + 'screenId')
             if (valid) {
               this.$http({
                 url: this.$http.adornUrl(`/phoenix/phoenixscreen/screenrelcharts/${!this.dataForm.id ? 'save' : 'update'}`),
                 method: 'post',
                 data: this.$http.adornData({
                   'id': this.dataForm.id || undefined,
-               /*   'screenId': this.dataForm.screenId,
-                  'chartId': this.dataForm.chartId,
-                  'order': this.dataForm.order */
+                  'screenId': this.dataForm.screenId,
                   'charts': this.dataForm.charts
                 })
               }).then(({data}) => {

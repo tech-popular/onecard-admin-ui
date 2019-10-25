@@ -54,6 +54,7 @@
         return {
           visible: false,
           selectionDataId: '',
+          id: 0,
           dataForm: {
             charts: [{
               chartId: '',
@@ -113,17 +114,15 @@
             // 表单提交
         dataFormSubmit (selectionDataId) {
           this.$refs['dataForm'].validate((valid) => {
-            this.dataForm.selectionDataId = selectionDataId
-            console.log(selectionDataId + 'selectionDataId')
+            console.log(this.selectionDataId + 'selectionDataId')
+              this.dataForm.selectionDataId = selectionDataId
             if (valid) {
               this.$http({
-                url: this.$http.adornUrl(`/phoenix/phoenixselectiondata/selectonrelcharts/${!this.dataForm.id ? 'save' : 'update'}`),
+                url: this.$http.adornUrl(`/phoenix/phoenixselectiondata/screenrelcharts/${!this.dataForm.id ? 'save' : 'update'}`),
                 method: 'post',
                 data: this.$http.adornData({
                   'id': this.dataForm.id || undefined,
-               /*   'selectionDataId': this.dataForm.selectionDataId,
-                  'chartId': this.dataForm.chartId,
-                  'order': this.dataForm.order */
+                  'selectionDataId': this.dataForm.selectionDataId,
                   'charts': this.dataForm.charts
                 })
               }).then(({data}) => {
