@@ -16,11 +16,6 @@
 
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
-        <div class="funnelList" v-show="boxList[index].type == 'funnel'">
-          <ul>
-            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}{{item.percentRise ? '↑' : '↓'}}{{item.percent}}{{item.percent_unit}}</li>
-          </ul>
-        </div>
         <el-card>
           <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata" @visible-change="changeValue1()" @remove-tag="changeTag()">
             <el-option
@@ -32,6 +27,13 @@
           </el-select>
           <div :id="'J_chartLineBox' + index" class="chart-box"></div>
         </el-card>
+        <div class="funnelList">
+          <ul v-show="boxList[index].type == 'funnel'">
+            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}{{item.percentRise ? '↑' : '↓'}}{{item.percent}}{{item.percent_unit}}</li>
+          </ul>
+          <ul>
+          </ul>
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -268,12 +270,16 @@
                   tem.series[0]['label'] = {
                     normal: {
                       show: true,
-                      position: 'inside'
-                    }
+                      position: 'inside',
+                      color: '#666',
+                      fontWeight: '100'
+                    },
+                    color: '#666',
+                    fontWeight: '100'
                   }
 
                   tem.series[0].data.forEach((item, index) => {
-                    item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '↑' : '↓'}  ${item.percent}%`
+                    item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '↑' : '{↓'}  ${item.percent}%`
                   })
 
                   tem.tooltip.formatter = '{a}<br/>{b}'
@@ -366,12 +372,10 @@
     list-style: none;
   }
   .funnelList{
-    margin: 0;
-    padding: 0;
     ul{
       li{
-        position: absolute;
         z-index: 9999;
+        position: absolute;
       }
       li:nth-child(1){
         top: 50px;
