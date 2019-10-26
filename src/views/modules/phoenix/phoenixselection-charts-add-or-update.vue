@@ -1,10 +1,10 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    title="配置"
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.selectionDataId)" label-width="80px">
+    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="新增大屏配置"></el-form-item>
       <el-form-item
         v-for="(outdata, index) in dataForm.charts"
@@ -43,7 +43,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit(dataForm.selectionDataId)">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -54,11 +54,11 @@
         return {
           visible: false,
           selectionDataId: '',
-          id: 0,
           dataForm: {
             charts: [{
               chartId: '',
-              order: 0
+              order: 0,
+              id: 0
             }]
           },
           chartsoptions: [],
@@ -79,7 +79,7 @@
             this.dataForm.charts.splice(index, 1)
           }
         },
-        init (id) {
+        init (selectionDataId) {
                 // 所有charts
           this.$http({
             url: this.$http.adornUrl(`/phoenix/phoenixchart/select`),
@@ -90,7 +90,7 @@
               this.chartsoptions = data.phoenixChartEntities
             }
           })
-          this.dataForm.selectionDataId = id || 0
+          this.dataForm.selectionDataId = selectionDataId || 0
           this.visible = true
           this.$nextTick(() => {
             if (this.dataForm.selectionDataId <= 0) {
@@ -112,16 +112,14 @@
           })
         },
             // 表单提交
-        dataFormSubmit (selectionDataId) {
+        dataFormSubmit () {
           this.$refs['dataForm'].validate((valid) => {
             console.log(this.selectionDataId + 'selectionDataId')
-              this.dataForm.selectionDataId = selectionDataId
             if (valid) {
               this.$http({
-                url: this.$http.adornUrl(`/phoenix/phoenixselectiondata/screenrelcharts/${!this.dataForm.id ? 'save' : 'update'}`),
+                url: this.$http.adornUrl(`/phoenix/phoenixselectiondata/screenrelcharts/save`),
                 method: 'post',
                 data: this.$http.adornData({
-                  'id': this.dataForm.id || undefined,
                   'selectionDataId': this.dataForm.selectionDataId,
                   'charts': this.dataForm.charts
                 })

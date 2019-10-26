@@ -1,9 +1,9 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    title="配置"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.screenId)" label-width="80px">
       <el-form-item label="新增大屏配置"></el-form-item>
       <el-form-item
         v-for="(outdata, index) in dataForm.charts"
@@ -42,7 +42,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit(dataForm.screenId)">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -53,11 +53,11 @@
         return {
           visible: false,
           screenId: '',
-          id: 0,
           dataForm: {
             charts: [{
               chartId: '',
-              order: 0
+              order: 0,
+              id: 0
             }]
           },
           chartsoptions: [],
@@ -78,7 +78,7 @@
             this.dataForm.charts.splice(index, 1)
           }
         },
-        init (id) {
+        init (screenId) {
                 // 所有charts
           this.$http({
             url: this.$http.adornUrl(`/phoenix/phoenixchart/select`),
@@ -89,10 +89,12 @@
               this.chartsoptions = data.phoenixChartEntities
             }
           })
-          this.dataForm.screenId = id || 0
+          this.dataForm.screenId = screenId || 0
           this.visible = true
           this.$nextTick(() => {
-            this.$refs['dataForm'].resetFields()
+            if (this.dataForm.screenId <= 0) {
+              this.$refs['dataForm'].resetFields()
+            }
             if (this.dataForm.screenId) {
               this.$http({
                 url: this.$http.adornUrl(`/phoenix/phoenixscreen/screenrelcharts/${this.dataForm.screenId}`),
@@ -112,13 +114,11 @@
         dataFormSubmit () {
           this.$refs['dataForm'].validate((valid) => {
             // console.log(this.screenId + 'screenId')
-            // this.dataForm.screenId = screenId
             if (valid) {
               this.$http({
-                url: this.$http.adornUrl(`/phoenix/phoenixscreen/screenrelcharts/${!this.dataForm.id ? 'save' : 'update'}`),
+                url: this.$http.adornUrl(`/phoenix/phoenixscreen/screenrelcharts/save`),
                 method: 'post',
                 data: this.$http.adornData({
-                  'id': this.dataForm.id || undefined,
                   'screenId': this.dataForm.screenId,
                   'charts': this.dataForm.charts
                 })
