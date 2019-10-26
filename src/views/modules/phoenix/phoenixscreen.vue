@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchart:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('phoenix:phoenixchart:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixscreen:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixscreen:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -29,16 +29,38 @@
         label="编号">
       </el-table-column>
       <el-table-column
-        prop="text"
+        prop="name"
         header-align="center"
         align="center"
-        label="图表标题">
+        label="名称">
       </el-table-column>
       <el-table-column
-        prop="subtext"
+        prop="tenantId"
         header-align="center"
         align="center"
-        label="chart副标题">
+        label="租户id">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        header-align="center"
+        align="center"
+        label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="updateTime"
+        header-align="center"
+        align="center"
+        label="更新时间">
+      </el-table-column>
+      <el-table-column
+        prop="enable"
+        header-align="center"
+        align="center"
+        label="是否启用">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.enable === 1" size="small" >正常</el-tag>
+          <el-tag v-else size="small" type="danger">禁用</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -49,12 +71,8 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="chartDegreeHandle(scope.row.id)">刻度配置</el-button>
-          <el-button type="text" size="small" @click="chartSqlHandle(scope.row.id)">大屏图表sql</el-button>
-          <el-button type="text" size="small" @click="chartLegendHandle(scope.row.id)">图例</el-button>
-          <el-button type="text" size="small" @click="selectionHandle(scope.row.id)">大屏选择项</el-button>
-          <el-button type="text" size="small" @click="chartRadarHandle(scope.row.id)">雷达</el-button>
-          <!--<el-button type="text" size="small" @click="pushHandle(scope.row.id)">pushTest</el-button>-->
+          <el-button type="text" size="small" @click="phoenixChartsHandle(scope.row.id)">大屏上的charts</el-button>
+          <el-button type="text" size="small" @click="screenSelectionHandle(scope.row.id)">大屏选择项</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -69,21 +87,16 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <chart-degree v-if="chartDegreeVisible" ref="chartDegree"  ></chart-degree>
-    <chart-sql v-if="chartSqlVisible" ref="chartSql"  ></chart-sql>
-    <chart-legend v-if="chartLegendVisible" ref="chartLegend"   ></chart-legend>
-    <selection v-if="selectionVisible" ref="selection"   ></selection>
-    <chart-radar v-if="chartRadarVisible" ref="chartRadar"></chart-radar>
+    <!-- 大屏选择项 -->
+    <screen-selection v-if="screenSelectionVisible" ref="screenSelection"></screen-selection>
+    <phoenix-charts v-if="phoenixChartsVisible" ref="phoenixCharts"/>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './phoenixchart-add-or-update'
-  import ChartDegree from './phoenixchartdegree'
-  import ChartLegend from './phoenixchartlegend'
-  import ChartSql from './phoenixchartsql'
-  import Selection from './phoenixselection'
-  import ChartRadar from './phoenixchartradar'
+  import AddOrUpdate from './phoenixscreen-add-or-update'
+  import ScreenSelection from './phoenixscreen-selection'
+  import PhoenixCharts from './phoenixscreen-charts-add-or-update'
   export default {
     data () {
       return {
@@ -97,20 +110,14 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        chartDegreeVisible: false,
-        chartLegendVisible: false,
-        chartSqlVisible: false,
-        selectionVisible: false,
-        chartRadarVisible: false
+        screenSelectionVisible: false,
+        phoenixChartsVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      ChartDegree,
-      ChartLegend,
-      ChartSql,
-      Selection,
-      ChartRadar
+      ScreenSelection,
+      PhoenixCharts
     },
     activated () {
       this.getDataList()
@@ -120,7 +127,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/phoenix/phoenixchart/list'),
+          url: this.$http.adornUrl('/phoenix/phoenixscreen/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -160,47 +167,20 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 刻度配置
-      chartDegreeHandle (id) {
-        this.chartDegreeVisible = true
+      //  大屏上的charts
+      phoenixChartsHandle (id) {
+        this.phoenixChartsVisible = true
         this.$nextTick(() => {
-          this.$refs.chartDegree.getDataList(id)
+          this.$refs.phoenixCharts.init(id)
         })
       },
-        // 图例
-      chartLegendHandle (id) {
-        this.chartLegendVisible = true
+      // 大屏选择项
+      screenSelectionHandle (id) {
+        this.screenSelectionVisible = true
         this.$nextTick(() => {
-          this.$refs.chartLegend.getDataList(id)
+          this.$refs.screenSelection.getDataList(id)
         })
       },
-        // 大屏选择项
-      selectionHandle (id) {
-        this.selectionVisible = true
-        this.$nextTick(() => {
-          this.$refs.selection.getDataList(id)
-        })
-      },
-        // 雷达
-      chartRadarHandle (id) {
-        this.chartRadarVisible = true
-        this.$nextTick(() => {
-          this.$refs.chartRadar.getDataList(id)
-        })
-      },
-     // 大屏图表sql集合
-      chartSqlHandle (id) {
-        console.log(id + '==>id')
-        this.chartSqlVisible = true
-        this.$nextTick(() => {
-          this.$refs.chartSql.getDataList(id)
-        })
-      },
-/*      pushHandle () {
-        this.$router.push(
-          {name: 'phoenix-phoenixselection', params: {'queryId': '1223434'}}
-        )
-      }, */
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -212,7 +192,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/phoenix/phoenixchart/delete'),
+            url: this.$http.adornUrl('/phoenix/phoenixscreen/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
