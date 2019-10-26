@@ -1,19 +1,18 @@
 <template>
   <div class="mod-demo-echarts">
     <el-alert
-      title=""
-      type="warning"
-      :closable="false">
-      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
-        <el-option
-          v-for="item in list"
-          :key="item.name"
-          :label="item.value"
-          :value="item.name">
-        </el-option>
-      </el-select>
-    </el-alert>
-
+        title=""
+        type="warning"
+        :closable="false">
+        <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
+          <el-option
+            v-for="item in list"
+            :key="item.name"
+            :label="item.value"
+            :value="item.name">
+          </el-option>
+        </el-select>
+      </el-alert>
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
@@ -29,13 +28,46 @@
         </el-card>
         <div class="funnelList">
           <ul v-show="boxList[index].type == 'funnel'">
-            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}{{item.percentRise ? '↑' : '↓'}}{{item.percent}}{{item.percent_unit}}</li>
+            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
           </ul>
           <ul>
           </ul>
         </div>
       </el-col>
     </el-row>
+    <div class="quadrant">
+      <h3>四象限&&小X卡</h3>
+      <div class="mainText">
+        <div class="quadrantLeft">
+          <div class="quadrantLeftLeft">
+            <div :key="index" v-for="(value, key, index) in quadrantList.quadrantDetails">
+              <p>{{key}}</p>
+              <ul>
+                <li></li>
+              </ul>
+            </div>
+          </div>
+          <div class="quadrantLeftRight">
+            <div :key="index" v-for="(value, key, index) in quadrantList.quadrant">
+              <p>{{key}}</p>
+              <ul :key="indexList" v-for="(valueList, keyList, indexList) in value">
+                <li>{{valueList.metric}}{{valueList.metric_unit}}{{valueList.percentRise ? '↑' : '↓'}}{{valueList.percent}}{{valueList.percent_unit}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="quadrantRight">
+          <div :key='index' class="quadrantRightList" v-for="(value, key, index) in quadrantList.quadrantCards">
+            <div class="quadrantRightListContent">
+              <p>{{key}}</p>
+              <ul :key="indexValue" v-for="(valueList, keyList, indexValue) in value">
+                <li>{{valueList.metric}}{{valueList.metric_unit}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -108,7 +140,8 @@
         visualizeId: 1, // 图表筛选框
         selection: [],
         funnelList: [],
-        boxList: []
+        boxList: [],
+        quadrantList: ''
       }
     },
     computed: {
@@ -268,27 +301,36 @@
                   tem.series[0].width = '70%'
 
                   tem.series[0]['label'] = {
-                    normal: {
-                      show: true,
-                      position: 'inside',
-                      color: '#666',
-                      fontWeight: '100'
-                    },
-                    color: '#666',
-                    fontWeight: '100'
+                    show: true,
+                    position: 'inside',
+                    color: '#333'
                   }
+                  tem.series[0]['label'].rich = this.textStyle.rich
 
                   tem.series[0].data.forEach((item, index) => {
-                    item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '↑' : '{↓'}  ${item.percent}%`
+                    item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '{a|↑}' : '{b|↓}'}  ${item.percent}%`
                   })
-
                   tem.tooltip.formatter = '{a}<br/>{b}'
                   this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
                   tem.tooltip = {}
+                  tem.series[1].itemStyle = {
+                    normal: {
+                      color: 'blue'
+                    }
+                  }
+                  tem.legend.orient = 'vertical'
+                  tem.legend.left = 'right'
+                  tem.legend.itemGap = 20
                 } else if (tem.type == 'pies') { // 饼图嵌套
-                  tem.series[0].radius = ['40%', '55%']
+                  tem.series[0].radius = ['55%', '75%']
                   tem.series[1].radius = ['0%', '30%']
+                  tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
+                  tem.legend.orient = 'vertical'
+                  tem.legend.left = 'right'
+                  tem.legend.itemGap = 20
+                } else if (tem.type == 'quadrant') { // 四象限
+                  this.quadrantList = tem.legend.extend
                 }
                 if (tem.selection[0]) {
                   this.selection = tem.selection[0].items
@@ -340,17 +382,6 @@
 <style lang="scss">
 
   .mod-demo-echarts {
-    .el-alert {
-      // margin-bottom: 10px;
-    }
-    .el-row {
-      // margin-top: -10px;
-      // margin-bottom: -10px;
-      .el-col {
-        // padding-top: 10px;
-        // padding-bottom: 10px;
-      }
-    }
     .el-card__body{
       padding: 10px;
     }
@@ -373,21 +404,54 @@
   }
   .funnelList{
     ul{
+      position: absolute;
+      width: 170px;
+      height: 200px;
+      top: 90px;
+      left: 20px;
+      padding: 0;
       li{
-        z-index: 9999;
-        position: absolute;
+        color: #555;
+        margin-top: 41px;
       }
       li:nth-child(1){
-        top: 50px;
-        left: calc(50% - 100px);
+        margin-top: -71px;
+        left: 260px;
+        width: 100px;
+        position: absolute;
+        text-align: center;
       }
-      li:nth-child(2){
-        top: 150px;
-        left: 20px;
+    }
+  }
+  .colorRed{
+    color: red;
+  }
+  .percentRise{
+    color: green;
+  }
+  .quadrant{
+    width: 100%;
+    height: 400px;
+    background: red;
+    h3{
+      padding-top: 10px;
+      text-align: center;
+    }
+    .mainText{
+      width: 100%;
+      display: flex;
+      .quadrantLeft{
+        flex: 3;
+        .quadrantLeftLeft{
+          flex: 1;
+        }
+        .quadrantLeftRight{
+          flex: 1;
+        }
       }
-      li:nth-child(3){
-        top: 260px;
-        left: 34px;
+      .quadrantRight{
+        flex: 1;
+        background: blue;
       }
     }
   }
