@@ -38,7 +38,7 @@
         prop="tenantId"
         header-align="center"
         align="center"
-        label="租户id">
+        label="租户号">
       </el-table-column>
       <el-table-column
         prop="createTime"

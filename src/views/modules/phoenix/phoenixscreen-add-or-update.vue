@@ -7,8 +7,8 @@
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
-    <el-form-item label="租户id" prop="tenantId">
-      <el-input v-model="dataForm.tenantId" placeholder="租户id"></el-input>
+    <el-form-item label="租户号" prop="tenantId">
+      <el-input v-model="dataForm.tenantId" placeholder="租户号"></el-input>
     </el-form-item>
     <!--<el-form-item label="创建时间" prop="createTime">
       <el-input v-model="dataForm.createTime" placeholder="创建时间"></el-input>

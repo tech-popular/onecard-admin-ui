@@ -6,7 +6,7 @@
     append-to-body>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.chartId)" label-width="80px">
     <el-form-item label="" prop="chartId">
-      <el-input v-model="dataForm.chartId" placeholder="chart_id号"  style="display: none"></el-input>
+      <el-input v-model="dataForm.chartId" placeholder="chart号"  style="display: none"></el-input>
     </el-form-item>
 <!--   <el-form-item label="" prop="screenId">
       <el-input-number v-model="dataForm.screenId" placeholder="大屏号"  style="display: none"></el-input-number>

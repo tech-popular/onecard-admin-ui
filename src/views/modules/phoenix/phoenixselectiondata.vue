@@ -40,7 +40,7 @@
           prop="selectionId"
           header-align="center"
           align="center"
-          label="选择项id号">
+          label="选择项号">
         </el-table-column>
         <el-table-column
           prop="name"

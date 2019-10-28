@@ -35,7 +35,7 @@
         prop="chartId"
         header-align="center"
         align="center"
-        label="chart_id号">
+        label="chart号">
       </el-table-column>
       <el-table-column
         prop="name"

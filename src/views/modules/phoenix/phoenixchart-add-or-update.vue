@@ -7,8 +7,8 @@
     <el-form-item label="图表标题" prop="text">
       <el-input v-model="dataForm.text" placeholder="图表标题"></el-input>
     </el-form-item>
-    <el-form-item label="chart副标题" prop="subtext">
-      <el-input v-model="dataForm.subtext" placeholder="chart副标题"></el-input>
+    <el-form-item label="副标题" prop="subtext">
+      <el-input v-model="dataForm.subtext" placeholder="副标题"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
