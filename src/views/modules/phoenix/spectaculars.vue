@@ -16,7 +16,7 @@
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata" @visible-change="changeValue1()" @remove-tag="changeTag()">
+          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1()" @remove-tag="changeTag()">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -24,7 +24,7 @@
               :value="item.name">
             </el-option>
           </el-select>
-          <div :id="'J_chartLineBox' + index" class="chart-box"></div>
+          <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
         <div class="funnelList">
           <ul v-show="boxList[index].type == 'funnel'">
@@ -35,15 +35,19 @@
         </div>
       </el-col>
     </el-row>
-    <div class="quadrant">
+    <div v-if='quadrantList' class="quadrant">
       <h3>四象限&&小X卡</h3>
+      <div class="titleName">
+        <p>四象限</p>
+        <p>小X卡</p>
+      </div>
       <div class="mainText">
         <div class="quadrantLeft">
           <div class="quadrantLeftLeft">
             <div :key="index" v-for="(value, key, index) in quadrantList.quadrantDetails">
               <p>{{key}}</p>
-              <ul>
-                <li></li>
+              <ul :key="indexList" v-for="(valueList, keyList, indexList) in value">
+                <li>{{keyList}} {{valueList[0].metric}}{{valueList[0].metric_unit}} {{valueList[1].metric}}{{valueList[1].metric_unit}} <span class="colorRed" :class="{'percentRise' : valueList[1].percentRise}">{{valueList[1].percentRise ? '↑' : '↓'}} {{valueList[1].percent}}{{valueList[1].percent_unit}}</span></li>
               </ul>
             </div>
           </div>
@@ -51,7 +55,7 @@
             <div :key="index" v-for="(value, key, index) in quadrantList.quadrant">
               <p>{{key}}</p>
               <ul :key="indexList" v-for="(valueList, keyList, indexList) in value">
-                <li>{{valueList.metric}}{{valueList.metric_unit}}{{valueList.percentRise ? '↑' : '↓'}}{{valueList.percent}}{{valueList.percent_unit}}</li>
+                <li>{{valueList.metric}}{{valueList.metric_unit}}<span class="colorRed" :class="{'percentRise' : valueList.percentRise}">{{valueList.percentRise ? '↑' : '↓'}} {{valueList.percent}}{{valueList.percent_unit}}</span></li>
               </ul>
             </div>
           </div>
@@ -150,11 +154,6 @@
         set (val) { this.$store.commit('common/updateSidebarFold', val) }
       }
     },
-    watch: {
-      arr (oldValue, newValue) {
-        console.log(newValue)
-      }
-    },
     created () {
     },
     mounted () {
@@ -229,7 +228,9 @@
             if (res.data.visualizes) { // 图标列表
               this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
-                this.arr.push(tem.selection[0])
+                if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                  this.arr.push(tem)
+                }
                 tem['grid'] = this.grid
                 tem['color'] = this.color
                 Object.assign(tem.title, this.title)
@@ -296,6 +297,7 @@
                       tem.series[0]['radius'] = radius
                     }
                   }
+                  // tem.legend.data.unshift('全选', '全不选')
                 } else if (tem.type == 'funnel') { // 漏斗
                   tem.series[0].left = '15%'
                   tem.series[0].width = '70%'
@@ -336,13 +338,15 @@
                   this.selection = tem.selection[0].items
                   this.visualizeId = tem.id
                 }
-                let label = 'J_chartLineBox' + index
                 setTimeout(() => {
-                  this.chartPie = echarts.init(document.getElementById(label))
-                  this.chartPie.setOption(tem, true)
-                  window.addEventListener('resize', () => {
-                    this.chartPie.resize()
-                  })
+                  if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                    let label = 'J_chartLineBox' + tem.id
+                    this.chartPie = echarts.init(document.getElementById(label))
+                    this.chartPie.setOption(tem, true)
+                    window.addEventListener('resize', () => {
+                      this.chartPie.resize()
+                    })
+                  }
                 }, 500)
               })
             }
@@ -431,27 +435,107 @@
   }
   .quadrant{
     width: 100%;
-    height: 400px;
-    background: red;
+    background: #f0f4f8;
+    padding-bottom: 20px;
     h3{
       padding-top: 10px;
       text-align: center;
     }
+    .titleName{
+      width: 100%;
+      height: 40px;
+      display: flex;
+      p{
+        text-align: center;
+      }
+      p:nth-child(1){
+        flex:3;
+      }
+      p:nth-child(2){
+        flex:1;
+      }
+    }
     .mainText{
       width: 100%;
       display: flex;
+      font-size: 12px;
+      height: 400px;
+      p{
+        padding-top: 20px;
+      }
       .quadrantLeft{
         flex: 3;
+        display: flex;
         .quadrantLeftLeft{
           flex: 1;
+          &>div{
+            height: 50%;
+            margin-top: -12px;
+            ul{
+              padding: 0;
+            }
+          }
+          &>div:nth-child(1) {
+            background: #f2c9a1;
+            // background-image: linear-gradient(to right, #f1d8c3 , #f2c08d);
+          }
+          &>div:nth-child(2) {
+            background: #baa993;
+            // background-image: linear-gradient(to right, #baa993 , #825820);
+          }
         }
         .quadrantLeftRight{
-          flex: 1;
+          color: #fff;
+          flex: 2;
+          &>div{
+            width: 50%;
+            display: inline-block;
+            text-align: center;
+            vertical-align:middle;
+            height: 50%;
+            ul{
+              padding: 0;
+            }
+          }
+          &>div:nth-child(1) {
+            background: #f2c9a1;
+            // background-image: linear-gradient(to right, #f1d8c3 , #f2c08d);
+          }
+          &>div:nth-child(2) {
+            background: #eb9038;
+          }
+          &>div:nth-child(3) {
+            background: #baa993;
+            // background-image: linear-gradient(to right, #baa993 , #825820);
+          }
+          &>div:nth-child(4) {
+            background: #eba25b;
+          }
         }
       }
       .quadrantRight{
         flex: 1;
-        background: blue;
+        &>div{
+          height: 31.35%;
+          margin: 0 20px;
+          p{
+            text-align: center;
+          }
+          ul{
+            padding: 0;
+            text-align: center;
+          }
+        }
+        &>div:nth-child(1){
+          background: #f5e8d5;
+          margin-top: -12px;
+        }
+        &>div:nth-child(2){
+          background: #faf7d7;
+        }
+        &>div:nth-child(3){
+          background: #d3e6dd;
+        }
       }
     }
   }
