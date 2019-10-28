@@ -9,7 +9,10 @@
         <el-input v-model="dataForm.chartId" style="display: none" placeholder=""></el-input>
       </el-form-item>
     <el-form-item label="类型" prop="type">
-      <el-input v-model="dataForm.type" placeholder="类型"></el-input>
+      <el-select v-model="dataForm.type" placeholder="请选择">
+        <el-option v-for="item in degreeTypes" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="步长" prop="step">
       <el-input v-model="dataForm.step" placeholder="步长"></el-input>
@@ -38,6 +41,7 @@
           number: '',
           key: ''
         },
+        degreeTypes: [],
         dataRule: {
           /* chartId: [
             { required: true, message: 'chart_id关联不能为空', trigger: 'blur' }
@@ -60,6 +64,16 @@
         this.dataForm.key = key || 0
         this.dataForm.chartId = key
         this.visible = true
+          // 下拉框选型
+        this.$http({
+          url: this.$http.adornUrl(`/sys/sysdictitem/selectbydictypes`),
+          method: 'post',
+          data: this.$http.adornData(['degree_type'], false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.degreeTypes = data.dicMap.degree_type
+          }
+        })
         this.$nextTick(() => {
           if (this.dataForm.id <= 0) {
             this.$refs['dataForm'].resetFields()

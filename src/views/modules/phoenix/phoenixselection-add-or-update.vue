@@ -14,8 +14,11 @@
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
-    <el-form-item label="选择项值" prop="type">
-      <el-input v-model="dataForm.type" placeholder="选择项值"></el-input>
+    <el-form-item label="类型" prop="type">
+      <el-select v-model="dataForm.type" placeholder="请选择">
+        <el-option v-for="item in selectionTypes" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="占位符" prop="placeholder">
       <el-input v-model="dataForm.placeholder" placeholder="占位符"></el-input>
@@ -42,6 +45,7 @@
           placeholder: '',
           key: ''
         },
+        selectionTypes: [],
         dataRule: {
          /* chartId: [
             { required: true, message: 'chart_id号不能为空', trigger: 'blur' }
@@ -67,6 +71,16 @@
         this.dataForm.key = key || 0
         this.dataForm.chartId = key
         this.visible = true
+        // 下拉框选型
+        this.$http({
+          url: this.$http.adornUrl(`/sys/sysdictitem/selectbydictypes`),
+          method: 'post',
+          data: this.$http.adornData(['selection_type'], false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.selectionTypes = data.dicMap.selection_type
+          }
+        })
         this.$nextTick(() => {
           if (this.dataForm.id <= 0) {
             this.$refs['dataForm'].resetFields()

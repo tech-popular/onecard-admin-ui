@@ -10,7 +10,7 @@
      &lt;!&ndash; <el-select v-model="dataForm.chartId" placeholder="请选择">
         <el-option v-for="item in chartoptions" :key="item.id" :label="item.text" :value="item.id">
         </el-option>
-      </el-select>&ndash;&gt;
+      </el-select>
     </el-form-item>-->
       <el-form-item label="" prop="chartId" style="display: none">
         <el-input v-model="dataForm.chartId" placeholder="" ></el-input>
@@ -18,8 +18,11 @@
     <el-form-item label="sql语句"   prop="sql">
       <el-input v-model="dataForm.sql" type="textarea"  :rows="5" placeholder="sql语句"></el-input>
     </el-form-item>
-    <el-form-item label="组件类型" prop="type">
-      <el-input v-model="dataForm.type" placeholder="组件类型"></el-input>
+    <el-form-item label="类型" prop="type">
+      <el-select v-model="dataForm.type" placeholder="请选择">
+        <el-option v-for="item in sqlTypes" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -41,6 +44,7 @@
           type: '',
           key: ''
         },
+        sqlTypes: [],
         // chartoptions: [],
         dataRule: {
 /*          chartId: [
@@ -70,6 +74,16 @@
         this.dataForm.key = key || 0
         this.dataForm.chartId = key
         this.visible = true
+          // 下拉框选型
+        this.$http({
+          url: this.$http.adornUrl(`/sys/sysdictitem/selectbydictypes`),
+          method: 'post',
+          data: this.$http.adornData(['sql_type'], false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.sqlTypes = data.dicMap.sql_type
+          }
+        })
         this.$nextTick(() => {
           if (this.dataForm.id <= 0) {
             this.$refs['dataForm'].resetFields()
