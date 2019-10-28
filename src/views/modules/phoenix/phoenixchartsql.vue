@@ -41,6 +41,7 @@
         prop="sql"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="sql语句">
       </el-table-column>
       <el-table-column
