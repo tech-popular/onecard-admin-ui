@@ -14,6 +14,9 @@
     <el-form-item label="类型" prop="type">
       <el-input v-model="dataForm.type" placeholder="类型"></el-input>
     </el-form-item>
+    <el-form-item label="排序" prop="sort">
+      <el-input v-model="dataForm.sort" placeholder="排序"></el-input>
+    </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -31,7 +34,8 @@
           id: 0,
           chartId: '',
           name: '',
-          type: ''
+          type: '',
+          sort: ''
         },
         dataRule: {
           name: [
@@ -39,6 +43,9 @@
           ],
           type: [
             { required: true, message: '类型不能为空', trigger: 'blur' }
+          ],
+          sort: [
+              { required: true, message: '排序不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -63,6 +70,7 @@
                 this.dataForm.chartId = data.phoenixChartLegend.chartId
                 this.dataForm.name = data.phoenixChartLegend.name
                 this.dataForm.type = data.phoenixChartLegend.type
+                this.dataForm.sort = data.phoenixChartLegend.sort
               }
             })
           }
@@ -80,7 +88,8 @@
                 'id': this.dataForm.id || undefined,
                 'chartId': this.dataForm.chartId,
                 'name': this.dataForm.name,
-                'type': this.dataForm.type
+                'type': this.dataForm.type,
+                'sort': this.dataForm.sort
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

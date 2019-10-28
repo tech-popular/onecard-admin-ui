@@ -36,12 +36,12 @@
         align="center"
         label="chart_id号">
       </el-table-column>
-      <el-table-column
+      <!--<el-table-column
         prop="screenId"
         header-align="center"
         align="center"
         label="大屏号">
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         prop="name"
         header-align="center"

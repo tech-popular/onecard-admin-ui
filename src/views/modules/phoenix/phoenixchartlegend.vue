@@ -50,6 +50,12 @@
         label="类型">
       </el-table-column>
       <el-table-column
+        prop="sort"
+        header-align="center"
+        align="center"
+        label="排序">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"

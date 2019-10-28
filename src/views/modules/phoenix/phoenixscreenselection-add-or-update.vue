@@ -5,9 +5,9 @@
     :visible.sync="visible"
     append-to-body>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.screenId)" label-width="80px">
-    <el-form-item label="" prop="chartId">
+   <!-- <el-form-item label="" prop="chartId">
       <el-input v-model="dataForm.chartId" placeholder="chart_id号"  style="display: none"></el-input>
-    </el-form-item>
+    </el-form-item>-->
    <el-form-item label="" prop="screenId">
       <el-input-number v-model="dataForm.screenId" placeholder="大屏号"  style="display: none"></el-input-number>
     </el-form-item>
@@ -35,7 +35,7 @@
         visible: false,
         dataForm: {
           id: 0,
-          chartId: '',
+          // chartId: '',
           screenId: '',
           name: '',
           type: '',
@@ -78,7 +78,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.chartId = data.phoenixSelection.chartId
+                // this.dataForm.chartId = data.phoenixSelection.chartId
                 this.dataForm.screenId = data.phoenixSelection.screenId
                 this.dataForm.name = data.phoenixSelection.name
                 this.dataForm.type = data.phoenixSelection.type
