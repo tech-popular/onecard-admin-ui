@@ -1,23 +1,22 @@
 <template>
   <div class="mod-demo-echarts">
     <el-alert
-      title=""
-      type="warning"
-      :closable="false">
-      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
-        <el-option
-          v-for="item in list"
-          :key="item.name"
-          :label="item.value"
-          :value="item.name">
-        </el-option>
-      </el-select>
-    </el-alert>
-
+        title=""
+        type="warning"
+        :closable="false">
+        <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
+          <el-option
+            v-for="item in list"
+            :key="item.name"
+            :label="item.value"
+            :value="item.name">
+          </el-option>
+        </el-select>
+      </el-alert>
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata" @visible-change="changeValue1()" @remove-tag="changeTag()">
+          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1()" @remove-tag="changeTag()">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -25,15 +24,54 @@
               :value="item.name">
             </el-option>
           </el-select>
-          <div :id="'J_chartLineBox' + index" class="chart-box"></div>
+          <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
+        <div class="funnelList">
+          <ul v-show="boxList[index].type == 'funnel'">
+            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
+          </ul>
+          <ul>
+          </ul>
+        </div>
       </el-col>
-      <!-- <el-col :span="12">
-        <el-card>
-          <div id="J_chartLineBox01" class="chart-box"></div>
-        </el-card>
-      </el-col> -->
     </el-row>
+    <div v-if='quadrantList' class="quadrant">
+      <h3>四象限&&小X卡</h3>
+      <div class="titleName">
+        <p>四象限</p>
+        <p>小X卡</p>
+      </div>
+      <div class="mainText">
+        <div class="quadrantLeft">
+          <div class="quadrantLeftLeft">
+            <div :key="index" v-for="(value, key, index) in quadrantList.quadrantDetails">
+              <p>{{key}}</p>
+              <ul :key="indexList" v-for="(valueList, keyList, indexList) in value">
+                <li>{{keyList}} {{valueList[0].metric}}{{valueList[0].metric_unit}} {{valueList[1].metric}}{{valueList[1].metric_unit}} <span class="colorRed" :class="{'percentRise' : valueList[1].percentRise}">{{valueList[1].percentRise ? '↑' : '↓'}} {{valueList[1].percent}}{{valueList[1].percent_unit}}</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="quadrantLeftRight">
+            <div :key="index" v-for="(value, key, index) in quadrantList.quadrant">
+              <p>{{key}}</p>
+              <ul :key="indexList" v-for="(valueList, keyList, indexList) in value">
+                <li>{{valueList.metric}}{{valueList.metric_unit}}<span class="colorRed" :class="{'percentRise' : valueList.percentRise}">{{valueList.percentRise ? '↑' : '↓'}} {{valueList.percent}}{{valueList.percent_unit}}</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="quadrantRight">
+          <div :key='index' class="quadrantRightList" v-for="(value, key, index) in quadrantList.quadrantCards">
+            <div class="quadrantRightListContent">
+              <p>{{key}}</p>
+              <ul :key="indexValue" v-for="(valueList, keyList, indexValue) in value">
+                <li>{{valueList.metric}}{{valueList.metric_unit}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -103,7 +141,11 @@
         color: ['#FF4040', '#634cff', '#febe76', '#31c5d3', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a'],
         visibleChange: false,
         apiItems: [],
-        visualizeId: 1 // 图表筛选框
+        visualizeId: 1, // 图表筛选框
+        selection: [],
+        funnelList: [],
+        boxList: [],
+        quadrantList: ''
       }
     },
     computed: {
@@ -113,13 +155,13 @@
       }
     },
     created () {
-      this.queryList()
     },
     mounted () {
       if (!this.sidebarFold) {
         // set (true) { this.$store.commit('common/updateSidebarFold', val) }
         this.sidebarFold = !this.sidebarFold
       }
+      this.queryList()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -182,31 +224,31 @@
         }).then(({data}) => {
           let res = data.response
           if (res.status == '1') {
-            this.list = res.data.selection[0].items
-            if (res.data.visualizes) {
+            this.list = res.data.selection[0].items // 下拉列表选项
+            if (res.data.visualizes) { // 图标列表
+              this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
-                this.arr.push(tem.selection[0])
+                if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                  this.arr.push(tem)
+                }
                 tem['grid'] = this.grid
                 tem['color'] = this.color
-                let label = 'J_chartLineBox' + index
-                if (tem.selection[0]) {
-                  this.selection = tem.selection[0].items
-                  this.visualizeId = tem.id
-                }
                 Object.assign(tem.title, this.title)
                 Object.assign(tem.legend, this.legend)
                 if (tem.xAxis) {
                   Object.assign(tem.xAxis, this.xAxis)
                 }
-                // 饼状图长度为1
-                if (tem.series.length > 1) {
+                if (tem.type == 'bar') { // 折现柱状
                   for (let i = 0; i < tem.series.length; i++) {
-                    // debugger
-                    if (tem.legend.data[i].metric) {
-                      var seriesNameElse = tem.series[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                      tem.series[i].name = seriesNameElse
-                      if (!tem.series[i].data) {
-                        tem.legend.data[i]['icon'] = 'image://'
+                    if (tem.legend.data) {
+                      if (tem.legend.data[i].metric) {
+                        if (tem.series) {
+                          var seriesNameElse = tem.series[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                          tem.series[i].name = seriesNameElse
+                          if (!tem.series[i].data) {
+                            tem.legend.data[i]['icon'] = 'image://'
+                          }
+                        }
                       }
                     }
                   }
@@ -235,7 +277,7 @@
                     }
                   }
                   tem['tooltip'] = tooltip
-                } else {
+                } else if (tem.type == 'pie') { // 饼图
                   for (let i = 0; i < tem.legend.data.length; i++) {
                     var legendName = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
                     tem.legend.data[i].name = legendName
@@ -243,8 +285,10 @@
                   }
                   if (tem.series[0]) {
                     for (let i = 0; i < tem.legend.data.length; i++) {
-                      var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
-                      tem.series[0].data[i].name = seriesName
+                      if (tem.series[0].data) {
+                        var seriesName = tem.series[0].data[i].name + '\n\n ' + (tem.legend.data[i].metric ? tem.legend.data[i].metric : '') + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
+                        tem.series[0].data[i].name = seriesName
+                      }
                     }
                     if (tem.series[0].type == 'pie') {
                       var center = ['50%', '65%'] // 设置饼图大小
@@ -253,13 +297,56 @@
                       tem.series[0]['radius'] = radius
                     }
                   }
+                  // tem.legend.data.unshift('全选', '全不选')
+                } else if (tem.type == 'funnel') { // 漏斗
+                  tem.series[0].left = '15%'
+                  tem.series[0].width = '70%'
+
+                  tem.series[0]['label'] = {
+                    show: true,
+                    position: 'inside',
+                    color: '#333'
+                  }
+                  tem.series[0]['label'].rich = this.textStyle.rich
+
+                  tem.series[0].data.forEach((item, index) => {
+                    item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '{a|↑}' : '{b|↓}'}  ${item.percent}%`
+                  })
+                  tem.tooltip.formatter = '{a}<br/>{b}'
+                  this.funnelList = tem.legend.data
+                } else if (tem.type == 'radar') { // 雷达
+                  tem.tooltip = {}
+                  tem.series[1].itemStyle = {
+                    normal: {
+                      color: 'blue'
+                    }
+                  }
+                  tem.legend.orient = 'vertical'
+                  tem.legend.left = 'right'
+                  tem.legend.itemGap = 20
+                } else if (tem.type == 'pies') { // 饼图嵌套
+                  tem.series[0].radius = ['55%', '75%']
+                  tem.series[1].radius = ['0%', '30%']
+                  tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
+                  tem.legend.orient = 'vertical'
+                  tem.legend.left = 'right'
+                  tem.legend.itemGap = 20
+                } else if (tem.type == 'quadrant') { // 四象限
+                  this.quadrantList = tem.legend.extend
+                }
+                if (tem.selection[0]) {
+                  this.selection = tem.selection[0].items
+                  this.visualizeId = tem.id
                 }
                 setTimeout(() => {
-                  this.chartPie = echarts.init(document.getElementById(label))
-                  this.chartPie.setOption(tem)
-                  window.addEventListener('resize', () => {
-                    this.chartPie.resize()
-                  })
+                  if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                    let label = 'J_chartLineBox' + tem.id
+                    this.chartPie = echarts.init(document.getElementById(label))
+                    this.chartPie.setOption(tem, true)
+                    window.addEventListener('resize', () => {
+                      this.chartPie.resize()
+                    })
+                  }
                 }, 500)
               })
             }
@@ -297,18 +384,8 @@
 </script>
 
 <style lang="scss">
+
   .mod-demo-echarts {
-    .el-alert {
-      // margin-bottom: 10px;
-    }
-    .el-row {
-      // margin-top: -10px;
-      // margin-bottom: -10px;
-      .el-col {
-        // padding-top: 10px;
-        // padding-bottom: 10px;
-      }
-    }
     .el-card__body{
       padding: 10px;
     }
@@ -324,6 +401,142 @@
       top: 20px;
       left: 70%;
       z-index: 9;
+    }
+  }
+  li{
+    list-style: none;
+  }
+  .funnelList{
+    ul{
+      position: absolute;
+      width: 170px;
+      height: 200px;
+      top: 90px;
+      left: 20px;
+      padding: 0;
+      li{
+        color: #555;
+        margin-top: 41px;
+      }
+      li:nth-child(1){
+        margin-top: -71px;
+        left: 260px;
+        width: 100px;
+        position: absolute;
+        text-align: center;
+      }
+    }
+  }
+  .colorRed{
+    color: red;
+  }
+  .percentRise{
+    color: green;
+  }
+  .quadrant{
+    width: 100%;
+    background: #f0f4f8;
+    padding-bottom: 20px;
+    h3{
+      padding-top: 10px;
+      text-align: center;
+    }
+    .titleName{
+      width: 100%;
+      height: 40px;
+      display: flex;
+      p{
+        text-align: center;
+      }
+      p:nth-child(1){
+        flex:3;
+      }
+      p:nth-child(2){
+        flex:1;
+      }
+    }
+    .mainText{
+      width: 100%;
+      display: flex;
+      font-size: 12px;
+      height: 400px;
+      p{
+        padding-top: 20px;
+      }
+      .quadrantLeft{
+        flex: 3;
+        display: flex;
+        .quadrantLeftLeft{
+          flex: 1;
+          &>div{
+            height: 50%;
+            margin-top: -12px;
+            ul{
+              padding: 0;
+            }
+          }
+          &>div:nth-child(1) {
+            background: #f2c9a1;
+            // background-image: linear-gradient(to right, #f1d8c3 , #f2c08d);
+          }
+          &>div:nth-child(2) {
+            background: #baa993;
+            // background-image: linear-gradient(to right, #baa993 , #825820);
+          }
+        }
+        .quadrantLeftRight{
+          color: #fff;
+          flex: 2;
+          &>div{
+            width: 50%;
+            display: inline-block;
+            text-align: center;
+            vertical-align:middle;
+            height: 50%;
+            ul{
+              padding: 0;
+            }
+          }
+          &>div:nth-child(1) {
+            background: #f2c9a1;
+            // background-image: linear-gradient(to right, #f1d8c3 , #f2c08d);
+          }
+          &>div:nth-child(2) {
+            background: #eb9038;
+          }
+          &>div:nth-child(3) {
+            background: #baa993;
+            // background-image: linear-gradient(to right, #baa993 , #825820);
+          }
+          &>div:nth-child(4) {
+            background: #eba25b;
+          }
+        }
+      }
+      .quadrantRight{
+        flex: 1;
+        &>div{
+          height: 31.35%;
+          margin: 0 20px;
+          p{
+            text-align: center;
+          }
+          ul{
+            padding: 0;
+            text-align: center;
+          }
+        }
+        &>div:nth-child(1){
+          background: #f5e8d5;
+          margin-top: -12px;
+        }
+        &>div:nth-child(2){
+          background: #faf7d7;
+        }
+        &>div:nth-child(3){
+          background: #d3e6dd;
+        }
+      }
     }
   }
 </style>
