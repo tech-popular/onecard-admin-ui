@@ -35,6 +35,7 @@
         </div>
       </el-col>
     </el-row>
+    <!-- 四象限 -->
     <div v-if='quadrantList' class="quadrant">
       <h3>四象限&&小X卡</h3>
       <div class="titleName">
@@ -69,6 +70,16 @@
               </ul>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- 其他总体数据展示 -->
+    <div v-if='lineList' class="line">
+      <div :key="item.id" v-for="(item) in lineList">
+        <div>
+          <p>{{item.title.text}}</p>
+          <h3></h3>
+          <div :id="'lineCharts' + item.id" class="lineCharts"></div>
         </div>
       </div>
     </div>
@@ -145,7 +156,8 @@
         selection: [],
         funnelList: [],
         boxList: [],
-        quadrantList: ''
+        quadrantList: '', // 四象限数据
+        lineList: [] // 框框加折线图数据
       }
     },
     computed: {
@@ -333,6 +345,8 @@
                   tem.legend.itemGap = 20
                 } else if (tem.type == 'quadrant') { // 四象限
                   this.quadrantList = tem.legend.extend
+                } else if (tem.type == 'line') { // 框框嵌套折线图
+                  this.lineList = tem
                 }
                 if (tem.selection[0]) {
                   this.selection = tem.selection[0].items
@@ -341,6 +355,13 @@
                 setTimeout(() => {
                   if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
                     let label = 'J_chartLineBox' + tem.id
+                    this.chartPie = echarts.init(document.getElementById(label))
+                    this.chartPie.setOption(tem, true)
+                    window.addEventListener('resize', () => {
+                      this.chartPie.resize()
+                    })
+                  } else if (tem.type == 'line') {
+                    let label = 'lineCharts' + tem.id
                     this.chartPie = echarts.init(document.getElementById(label))
                     this.chartPie.setOption(tem, true)
                     window.addEventListener('resize', () => {
