@@ -78,7 +78,7 @@
 <script>
   import echarts from 'echarts'
   // import api from '@/fetch/api'
-  import 'echarts/lib/chart/funnel'
+  // import 'echarts/lib/chart/funnel'
   export default {
     data () {
       return {
