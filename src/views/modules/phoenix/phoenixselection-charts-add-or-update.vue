@@ -114,7 +114,6 @@
             // 表单提交
         dataFormSubmit () {
           this.$refs['dataForm'].validate((valid) => {
-            console.log(this.selectionDataId + 'selectionDataId')
             if (valid) {
               this.$http({
                 url: this.$http.adornUrl(`/phoenix/phoenixselectiondata/screenrelcharts/save`),

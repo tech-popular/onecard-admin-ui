@@ -4,13 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.screenId)" label-width="80px">
-   <!-- <el-form-item label="" prop="chartId">
-      <el-input v-model="dataForm.chartId" placeholder="chart_id号"  style="display: none"></el-input>
-    </el-form-item>-->
-   <el-form-item label="" prop="screenId">
-      <el-input-number v-model="dataForm.screenId" placeholder="大屏号"  style="display: none"></el-input-number>
-    </el-form-item>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
@@ -26,7 +20,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit(dataForm.screenId)">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -47,12 +41,6 @@
         },
         selectionTypes: [],
         dataRule: {
-         /* chartId: [
-            { required: true, message: 'chart_id号不能为空', trigger: 'blur' }
-          ],
-          screenId: [
-            { required: true, message: '大屏号不能为空', trigger: 'blur' }
-          ], */
           name: [
             { required: true, message: '名称不能为空', trigger: 'blur' }
           ],
@@ -103,9 +91,8 @@
         })
       },
       // 表单提交
-      dataFormSubmit (screenId) {
+      dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
-          this.dataForm.screenId = screenId
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixselection/${!this.dataForm.id ? 'save' : 'update'}`),
