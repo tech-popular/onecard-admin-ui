@@ -27,7 +27,7 @@
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
         <div class="funnelList">
-          <ul v-show="boxList[index].type == 'funnel'">
+          <ul v-show="arr[index].type == 'funnel'">
             <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
           </ul>
           <ul>
