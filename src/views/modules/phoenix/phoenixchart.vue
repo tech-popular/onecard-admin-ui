@@ -38,7 +38,7 @@
         prop="subtext"
         header-align="center"
         align="center"
-        label="chart副标题">
+        label="副标题">
       </el-table-column>
       <el-table-column
         fixed="right"

@@ -35,12 +35,13 @@
         prop="chartId"
         header-align="center"
         align="center"
-        label="chart_id号">
+        label="chart号">
       </el-table-column>
       <el-table-column
         prop="sql"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="sql语句">
       </el-table-column>
       <el-table-column

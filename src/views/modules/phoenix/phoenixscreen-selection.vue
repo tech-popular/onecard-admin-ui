@@ -30,12 +30,12 @@
         align="center"
         label="编号">
       </el-table-column>
-      <el-table-column
+  <!--    <el-table-column
         prop="chartId"
         header-align="center"
         align="center"
         label="chart_id号">
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         prop="screenId"
         header-align="center"
@@ -68,7 +68,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.screenId, scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">大屏选择项数据</el-button>
+          <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">选择项数据</el-button>
         </template>
       </el-table-column>
     </el-table>

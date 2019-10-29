@@ -4,18 +4,15 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.screenId)" label-width="80px">
-    <el-form-item label="" prop="chartId">
-      <el-input v-model="dataForm.chartId" placeholder="chart_id号"  style="display: none"></el-input>
-    </el-form-item>
-   <el-form-item label="" prop="screenId">
-      <el-input-number v-model="dataForm.screenId" placeholder="大屏号"  style="display: none"></el-input-number>
-    </el-form-item>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
-    <el-form-item label="选择项值" prop="type">
-      <el-input v-model="dataForm.type" placeholder="选择项值"></el-input>
+    <el-form-item label="类型" prop="type">
+      <el-select v-model="dataForm.type" placeholder="请选择">
+        <el-option v-for="item in selectionTypes" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="占位符" prop="placeholder">
       <el-input v-model="dataForm.placeholder" placeholder="占位符"></el-input>
@@ -23,7 +20,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit(dataForm.screenId)">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -35,20 +32,15 @@
         visible: false,
         dataForm: {
           id: 0,
-          chartId: '',
+          // chartId: '',
           screenId: '',
           name: '',
           type: '',
           placeholder: '',
           key: ''
         },
+        selectionTypes: [],
         dataRule: {
-         /* chartId: [
-            { required: true, message: 'chart_id号不能为空', trigger: 'blur' }
-          ],
-          screenId: [
-            { required: true, message: '大屏号不能为空', trigger: 'blur' }
-          ], */
           name: [
             { required: true, message: '名称不能为空', trigger: 'blur' }
           ],
@@ -67,6 +59,16 @@
         this.dataForm.key = key || 0
         this.dataForm.screenId = key
         this.visible = true
+          // 下拉框选型
+        this.$http({
+          url: this.$http.adornUrl(`/sys/sysdictitem/selectbydictypes`),
+          method: 'post',
+          data: this.$http.adornData(['selection_type'], false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.selectionTypes = data.dicMap.selection_type
+          }
+        })
         this.$nextTick(() => {
           if (this.dataForm.id <= 0) {
             this.$refs['dataForm'].resetFields()
@@ -78,7 +80,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.chartId = data.phoenixSelection.chartId
+                // this.dataForm.chartId = data.phoenixSelection.chartId
                 this.dataForm.screenId = data.phoenixSelection.screenId
                 this.dataForm.name = data.phoenixSelection.name
                 this.dataForm.type = data.phoenixSelection.type
@@ -89,9 +91,8 @@
         })
       },
       // 表单提交
-      dataFormSubmit (screenId) {
+      dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
-          this.dataForm.screenId = screenId
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixselection/${!this.dataForm.id ? 'save' : 'update'}`),

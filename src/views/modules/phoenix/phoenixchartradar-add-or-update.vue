@@ -4,10 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(dataForm.chartId)" label-width="80px">
-    <el-form-item label="" prop="chartId">
-      <el-input v-model="dataForm.chartId" placeholder="" style="display:none;"></el-input>
-    </el-form-item>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
@@ -35,8 +32,7 @@
           chartId: '',
           name: '',
           max: '',
-          sort: '',
-          key: ''
+          sort: ''
         },
         dataRule: {
           name: [
@@ -52,10 +48,9 @@
       }
     },
     methods: {
-      init (key, id) {
+      init (chartId, id) {
         this.dataForm.id = id || 0
-        this.dataForm.key = key || 0
-        this.dataForm.chartId = key
+        this.dataForm.chartId = chartId || 0
         this.visible = true
         this.$nextTick(() => {
           if (this.dataForm.id <= 0) {
@@ -78,9 +73,8 @@
         })
       },
       // 表单提交
-      dataFormSubmit (chartId) {
+      dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
-          this.dataForm.chartId = chartId
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartradar/${!this.dataForm.id ? 'save' : 'update'}`),

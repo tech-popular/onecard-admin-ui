@@ -12,8 +12,8 @@
         :key="outdata.key"
         :rules="{
       required: true, message: '表名不能为空', trigger: 'blur'}">
-        <el-row :gutter="24">
-          <el-col :span="5">
+        <el-row :gutter="25">
+          <el-col :span="10">
             <div class="grid-content bg-purple">
               <el-select v-model="outdata.chartId" placeholder="请选择">
                 <el-option
@@ -25,7 +25,7 @@
               </el-select>
             </div>
           </el-col>
-          <el-col :span="10">
+          <el-col :span="5">
             <div class="grid-content bg-purple">
               <el-input type="number" min="0" v-model="outdata.order"></el-input>
             </div>
@@ -114,7 +114,6 @@
             // 表单提交
         dataFormSubmit () {
           this.$refs['dataForm'].validate((valid) => {
-            console.log(this.selectionDataId + 'selectionDataId')
             if (valid) {
               this.$http({
                 url: this.$http.adornUrl(`/phoenix/phoenixselectiondata/screenrelcharts/save`),

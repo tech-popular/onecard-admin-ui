@@ -4,27 +4,20 @@
     :close-on-click-modal="false"
     :visible.sync="visible"
     append-to-body>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit(this.dataForm.chartId)" label-width="100px">
-<!--    <el-form-item label="chart_id号" prop="chartId">
-      <el-input v-model="dataForm.chartId" disabled placeholder="chart_id号"></el-input>
-     &lt;!&ndash; <el-select v-model="dataForm.chartId" placeholder="请选择">
-        <el-option v-for="item in chartoptions" :key="item.id" :label="item.text" :value="item.id">
-        </el-option>
-      </el-select>&ndash;&gt;
-    </el-form-item>-->
-      <el-form-item label="" prop="chartId" style="display: none">
-        <el-input v-model="dataForm.chartId" placeholder="" ></el-input>
-      </el-form-item>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
     <el-form-item label="sql语句"   prop="sql">
       <el-input v-model="dataForm.sql" type="textarea"  :rows="5" placeholder="sql语句"></el-input>
     </el-form-item>
-    <el-form-item label="组件类型" prop="type">
-      <el-input v-model="dataForm.type" placeholder="组件类型"></el-input>
+    <el-form-item label="类型" prop="type">
+      <el-select v-model="dataForm.type" placeholder="请选择">
+        <el-option v-for="item in sqlTypes" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit(dataForm.chartId)">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -38,14 +31,11 @@
           id: 0,
           chartId: '',
           sql: '',
-          type: '',
-          key: ''
+          type: ''
         },
+        sqlTypes: [],
         // chartoptions: [],
         dataRule: {
-/*          chartId: [
-            { required: true, message: 'chart_id号不能为空', trigger: 'blur' }
-          ], */
           sql: [
             { required: true, message: 'sql语句不能为空', trigger: 'blur' }
           ],
@@ -56,7 +46,7 @@
       }
     },
     methods: {
-      init (key, id) {
+      init (chartId, id) {
        /* this.$http({
           url: this.$http.adornUrl(`/phoenix/phoenixchart/select`),
           method: 'get',
@@ -67,9 +57,18 @@
           }
         }) */
         this.dataForm.id = id || 0
-        this.dataForm.key = key || 0
-        this.dataForm.chartId = key
+        this.dataForm.chartId = chartId || 0
         this.visible = true
+          // 下拉框选型
+        this.$http({
+          url: this.$http.adornUrl(`/sys/sysdictitem/selectbydictypes`),
+          method: 'post',
+          data: this.$http.adornData(['sql_type'], false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.sqlTypes = data.dicMap.sql_type
+          }
+        })
         this.$nextTick(() => {
           if (this.dataForm.id <= 0) {
             this.$refs['dataForm'].resetFields()
@@ -90,9 +89,8 @@
         })
       },
       // 表单提交
-      dataFormSubmit (chartId) {
+      dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
-          this.dataForm.chartId = chartId
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/phoenix/phoenixchartsql/${!this.dataForm.id ? 'save' : 'update'}`),

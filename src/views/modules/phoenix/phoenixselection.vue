@@ -34,14 +34,14 @@
         prop="chartId"
         header-align="center"
         align="center"
-        label="chart_id号">
+        label="chart号">
       </el-table-column>
-      <el-table-column
+      <!--<el-table-column
         prop="screenId"
         header-align="center"
         align="center"
         label="大屏号">
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         prop="name"
         header-align="center"
@@ -68,7 +68,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(dataForm.chartId,scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">大屏选择项数据</el-button>
+          <el-button type="text" size="small" @click="selectionDataHandle(scope.row.id)">选择项数据</el-button>
         </template>
       </el-table-column>
     </el-table>
