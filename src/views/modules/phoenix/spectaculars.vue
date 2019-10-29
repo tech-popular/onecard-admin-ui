@@ -74,15 +74,15 @@
       </div>
     </div>
     <!-- 其他总体数据展示 -->
-    <!-- <div v-if='lineList' class="line">
+    <div v-if='lineList' class="line">
       <div :key="item.id" v-for="(item) in lineList">
-        <div>
-          <p>{{item.title.text}}</p>
-          <h3></h3>
+        <div class="lineEvery">
+          <p>{{item.titleName}}</p>
+          <h3>{{item.series[0].data[item.series[0].data.length-1].percent}}</h3>
           <div :id="'lineCharts' + item.id" class="lineCharts"></div>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -93,9 +93,10 @@
     data () {
       return {
         props: { multiple: true },
-        chartLine: null,
-        chartBar: null,
+        // chartLine: null,
+        // chartBar: null,
         chartPie: null,
+        myCharts: null,
         chartScatter: null,
         list: [],
         value: '预授信（常规黑指）',
@@ -155,7 +156,6 @@
         visualizeId: 1, // 图表筛选框
         selection: [],
         funnelList: [],
-        boxList: [],
         quadrantList: '', // 四象限数据
         lineList: [] // 框框加折线图数据
       }
@@ -179,6 +179,9 @@
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
       if (this.chartPie) {
         this.chartPie.resize()
+      }
+      if (this.myCharts) {
+        this.myCharts.resize()
       }
     },
     methods: {
@@ -238,7 +241,6 @@
           if (res.status == '1') {
             this.list = res.data.selection[0].items // 下拉列表选项
             if (res.data.visualizes) { // 图标列表
-              this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
                 if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
                   this.arr.push(tem)
@@ -346,7 +348,12 @@
                 } else if (tem.type == 'quadrant') { // 四象限
                   this.quadrantList = tem.legend.extend
                 } else if (tem.type == 'line') { // 框框嵌套折线图
-                  this.lineList = tem
+                  tem.titleName = tem.title.text
+                  tem.title = {}
+                  tem.series[0].name = ''
+                  tem.grid.top = ''
+                  tem.series[0].areaStyle = {}
+                  this.lineList.push(tem)
                 }
                 if (tem.selection[0]) {
                   this.selection = tem.selection[0].items
@@ -361,12 +368,12 @@
                       this.chartPie.resize()
                     })
                   } else if (tem.type == 'line') {
-                    // let label = 'lineCharts' + tem.id
-                    // this.chartPie = echarts.init(document.getElementById(label))
-                    // this.chartPie.setOption(tem, true)
-                    // window.addEventListener('resize', () => {
-                    //   this.chartPie.resize()
-                    // })
+                    let label = 'lineCharts' + tem.id
+                    this.myCharts = echarts.init(document.getElementById(label))
+                    this.myCharts.setOption(tem, true)
+                    window.addEventListener('resize', () => {
+                      this.myCharts.resize()
+                    })
                   }
                 }, 500)
               })
@@ -378,6 +385,7 @@
         this.arr = []
         this.apiItems = []
         this.value1 = ''
+        this.quadrantList = ''
         this.queryList()
       },
       changeValue1 () {
@@ -412,6 +420,9 @@
     }
     .chart-box {
       min-height: 400px;
+    }
+    .lineCharts {
+      min-height: 300px;
     }
     .echartList{
       position: relative;
@@ -559,5 +570,24 @@
         }
       }
     }
+  }
+  .line{
+    width: 100%;
+    height: 400px;
+    background: #f0f4f8;
+    margin-top: 20px;
+    &>div{
+      .lineEvery{
+        text-align: center;
+        max-width: 400px;
+        p{
+          padding-top: 20px;
+        }
+      }
+    }
+    
+  }
+  .lineCharts{
+    width: 400px;
   }
 </style>
