@@ -2,6 +2,7 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
+    z-index="99"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
     <el-form-item label="任务名称" prop="name">
@@ -57,6 +58,9 @@
       </el-form-item>
     <el-form-item label="SQL" prop="sql">
       <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button @click="testSQL">测试一下SQL</el-button>
     </el-form-item>
     <el-form-item label="周期" prop="period">
       <el-input v-model="dataForm.period" placeholder="周期" type="number"></el-input>
@@ -236,6 +240,19 @@
           key: Date.now()
         })
         console.log(this.dataForm)
+      },
+      testSQL () {
+        console.log(this.dataForm.sql)
+        this.visible = false
+        this.$router.push({
+          path: 'honeycomb-honeycombtaskpreview',
+          name: 'honeycomb-honeycombtaskpreview',
+          params: {
+            sql: this.dataForm.sql,
+            datasourceId: this.dataForm.inDatasource,
+            taskId: this.dataForm.id
+          }
+        })
       },
       removeDomain (item) {
         var index = this.dataForm.honeycombOutDatasourceEntitys.indexOf(item)
