@@ -27,7 +27,7 @@
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
         <div class="funnelList">
-          <ul v-show="boxList[index].type == 'funnel'">
+          <ul v-show="arr[index].type == 'funnel'">
             <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
           </ul>
           <ul>
@@ -74,7 +74,7 @@
       </div>
     </div>
     <!-- 其他总体数据展示 -->
-    <div v-if='lineList' class="line">
+    <!-- <div v-if='lineList' class="line">
       <div :key="item.id" v-for="(item) in lineList">
         <div>
           <p>{{item.title.text}}</p>
@@ -82,7 +82,7 @@
           <div :id="'lineCharts' + item.id" class="lineCharts"></div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -361,12 +361,12 @@
                       this.chartPie.resize()
                     })
                   } else if (tem.type == 'line') {
-                    let label = 'lineCharts' + tem.id
-                    this.chartPie = echarts.init(document.getElementById(label))
-                    this.chartPie.setOption(tem, true)
-                    window.addEventListener('resize', () => {
-                      this.chartPie.resize()
-                    })
+                    // let label = 'lineCharts' + tem.id
+                    // this.chartPie = echarts.init(document.getElementById(label))
+                    // this.chartPie.setOption(tem, true)
+                    // window.addEventListener('resize', () => {
+                    //   this.chartPie.resize()
+                    // })
                   }
                 }, 500)
               })
