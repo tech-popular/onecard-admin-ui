@@ -221,10 +221,7 @@
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection.placeholder,
-                items: [{
-                  name: this.value,
-                  value: this.value
-                }],
+                items: [],
                 columnName: this.list.columnName || this.defaultSelection.columnName,
                 mark: this.list.mark || this.defaultSelection.mark
               }],
