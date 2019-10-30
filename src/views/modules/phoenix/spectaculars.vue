@@ -380,6 +380,7 @@
         this.arr = []
         this.apiItems = []
         this.value1 = ''
+        this.quadrantList = ''
         this.queryList()
       },
       changeValue1 (selectionIndex) {
