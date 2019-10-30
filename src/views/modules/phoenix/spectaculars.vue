@@ -77,6 +77,7 @@
 
 <script>
   import echarts from 'echarts'
+  import 'echarts/lib/chart/funnel'
   export default {
     data () {
       return {
