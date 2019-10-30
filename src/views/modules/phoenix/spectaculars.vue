@@ -6,7 +6,7 @@
         :closable="false">
         <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
           <el-option
-            v-for="item in list"
+            v-for="item in list.items"
             :key="item.name"
             :label="item.value"
             :value="item.name">
@@ -16,7 +16,7 @@
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1()" @remove-tag="changeTag()">
+          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata.selection[0])" @remove-tag="changeTag(selection[0])">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -77,8 +77,6 @@
 
 <script>
   import echarts from 'echarts'
-  // import api from '@/fetch/api'
-  // import 'echarts/lib/chart/funnel'
   export default {
     data () {
       return {
@@ -146,7 +144,8 @@
         selection: [],
         funnelList: [],
         boxList: [],
-        quadrantList: ''
+        quadrantList: '',
+        defaultSelection: []
       }
     },
     computed: {
@@ -162,7 +161,7 @@
         // set (true) { this.$store.commit('common/updateSidebarFold', val) }
         this.sidebarFold = !this.sidebarFold
       }
-      this.queryList()
+      this.getDefaultSelection()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -190,29 +189,51 @@
           return t.split('').reverse().join('') + '.' + r
         }
       },
+      // 获取默认选择项
+      getDefaultSelection () {
+        this.$http({
+          url: this.$http.adornUrl('/phoenix/dashboard/selection'),
+          method: 'post',
+          data: {
+            data: {
+              dashboardId: 1
+            }
+          }
+        }).then((resp) => {
+          let res = resp.data
+          this.defaultSelection = res.response.data[0]
+        }).then(() => {
+          this.queryList()
+        })
+      },
+
       // 获取列表
-      queryList () {
+      queryList (selectionIndex) {
         this.$http({
           url: this.$http.adornUrl('/phoenix/dashboard'),
           method: 'post',
           data: {
             data: {
               dashboardId: 1,
-              dashboardSelection: [{
+              dashboardSelection: [{ // 大屏
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
-                placeholder: '\\{creditCondition\\}',
+                placeholder: this.list.placeholder || this.defaultSelection.placeholder,
                 items: [{
                   name: this.value,
                   value: this.value
-                }]
+                }],
+                columnName: this.list.columnName || this.defaultSelection.columnName,
+                mark: this.list.mark || this.defaultSelection.mark
               }],
               visualizeId: this.visualizeId,
-              visualizeSelection: [{
+              visualizeSelection: [{ // 图表
                 name: 'visualize过滤策略',
                 type: 'visualize',
-                placeholder: '\\{notifyCondition\\}',
-                items: this.value1 ? this.apiItems : []
+                placeholder: selectionIndex ? (selectionIndex.placeholder) : this.defaultSelection.placeholder,
+                items: this.value1 ? this.apiItems : [],
+                columnName: selectionIndex ? (selectionIndex.columnName) : '',
+                mark: selectionIndex ? (selectionIndex.mark) : ''
               }]
             },
             header: {
@@ -225,7 +246,7 @@
         }).then(({data}) => {
           let res = data.response
           if (res.status == '1') {
-            this.list = res.data.selection[0].items // 下拉列表选项
+            this.list = res.data.selection[0] // 下拉列表选项
             if (res.data.visualizes) { // 图标列表
               this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
@@ -360,7 +381,7 @@
         this.value1 = ''
         this.queryList()
       },
-      changeValue1 () {
+      changeValue1 (selectionIndex) {
         if (this.visibleChange) {
           this.value1.forEach((tem, index) => {
             var obj = {}
@@ -369,16 +390,16 @@
             this.apiItems.push(obj)
           })
           this.arr = []
-          this.queryList()
+          this.queryList(selectionIndex)
           this.visibleChange = false
         } else {
           this.visibleChange = true
         }
       },
-      changeTag () {
+      changeTag (selectionIndex) {
         this.visibleChange = true
         this.apiItems = []
-        this.changeValue1()
+        this.changeValue1(selectionIndex)
       }
     }
   }
