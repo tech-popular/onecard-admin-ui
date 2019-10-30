@@ -198,7 +198,7 @@
           method: 'post',
           data: {
             data: {
-              dashboardId: 1
+              dashboardId: 2
             }
           }
         }).then((resp) => {
@@ -216,7 +216,7 @@
           method: 'post',
           data: {
             data: {
-              dashboardId: 1,
+              dashboardId: 2,
               dashboardSelection: [{ // 大屏
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
