@@ -355,7 +355,7 @@
                 } else if (tem.type == 'quadrant') { // 四象限
                   this.quadrantList = tem.legend.extend
                 }
-                if (tem.selection[0]) {
+                if (tem.selection.length > 0 && tem.selection[0]) {
                   this.selection = tem.selection[0].items
                   this.visualizeId = tem.id
                 }
