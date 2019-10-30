@@ -422,7 +422,7 @@
       min-height: 400px;
     }
     .lineCharts {
-      min-height: 300px;
+      min-height: 200px;
     }
     .echartList{
       position: relative;
