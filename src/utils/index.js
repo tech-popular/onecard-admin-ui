@@ -56,3 +56,14 @@ export function clearLoginInfo () {
   store.commit('resetStore')
   router.options.isAddDynamicMenuRoutes = false
 }
+
+// 截取url 里面token的值
+export const getQueryString = name => {
+  let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
+  let params = window.location.search.substr(1) || window.location.href.split('?')[1]
+  let r = params && params.match(reg)
+  if (r != null) {
+    return unescape(r[2])
+  }
+  return null
+}

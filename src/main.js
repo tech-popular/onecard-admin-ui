@@ -14,6 +14,9 @@ import VueClipboard from 'vue-clipboard2'
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import G6 from '@antv/g6'
+import echarts from 'echarts'
+import 'echarts/lib/chart/funnel'
+Vue.use(echarts)
 Vue.use(VueCodemirror)
 Vue.use(VueClipboard)
 Vue.use(VueCookie)

@@ -231,7 +231,7 @@
               visualizeSelection: [{ // 图表
                 name: 'visualize过滤策略',
                 type: 'visualize',
-                placeholder: selectionIndex ? (selectionIndex.placeholder) : this.defaultSelection.placeholder,
+                placeholder: selectionIndex ? (selectionIndex.placeholder) : '',
                 items: this.value1 ? this.apiItems : [],
                 columnName: selectionIndex ? (selectionIndex.columnName) : '',
                 mark: selectionIndex ? (selectionIndex.mark) : ''
