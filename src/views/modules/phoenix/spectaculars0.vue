@@ -163,7 +163,7 @@
         // set (true) { this.$store.commit('common/updateSidebarFold', val) }
         this.sidebarFold = !this.sidebarFold
       }
-      this.getDefaultSelection()
+      this.queryList()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
