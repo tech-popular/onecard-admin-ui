@@ -83,6 +83,47 @@
         </div>
       </div>
     </div>
+    <!-- 合计放款 -->
+    <div class="allPay">
+      <div class="allPayLeft">
+        <div>
+          <p>{{simpleList[0].title.text}}</p>
+          <h3>{{simpleList[0].legend.extend.simple[0].metric}}{{simpleList[0].legend.extend.simple[0].metric_unit}}</h3>
+        </div>
+        <div>
+          <div :key="index" v-for="(item, index) in simpleList[1].legend.extend.simple">
+            <p>{{item.name}}</p>
+            <p>{{item.metric}}{{item.metric_unit}} <span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}} {{item.percent}}{{item.percent_unit}}</span></p>
+          </div>
+        </div>
+        <div>
+          <div :key="index" v-for="(item, index) in simpleList[2].legend.extend.simple">
+            <p>{{item.name}}</p>
+            <p>{{item.metric}}{{item.metric_unit}} <span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}} {{item.percent}}{{item.percent_unit}}</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="allPayRight"></div>
+    </div>
+    <!-- 机构资金监控 -->
+    <div class="monitor">
+      <div class="monitorLeft">
+        <div>
+          <p>{{simpleList[3].legend.extend.simple[0].name}}</p>
+          <p>{{simpleList[3].legend.extend.simple[0].metric}}{{simpleList[3].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[3].legend.extend.simple[0].percentRise}">{{simpleList[3].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[3].legend.extend.simple[0].percent}}{{simpleList[3].legend.extend.simple[0].percent_unit}}</span></p>
+        </div>
+        <div>
+          <p>{{simpleList[4].legend.extend.simple[0].name}}</p>
+          <p>{{simpleList[4].legend.extend.simple[0].metric}}{{simpleList[4].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[4].legend.extend.simple[0].percentRise}">{{simpleList[4].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[4].legend.extend.simple[0].percent}}{{simpleList[4].legend.extend.simple[0].percent_unit}}</span></p>
+        </div>
+        <div>
+          <p>{{simpleList[5].legend.extend.simple[0].name}}</p>
+          <p>{{simpleList[5].legend.extend.simple[0].metric}}{{simpleList[5].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[5].legend.extend.simple[0].percentRise}">{{simpleList[5].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[5].legend.extend.simple[0].percent}}{{simpleList[5].legend.extend.simple[0].percent_unit}}</span></p>
+        </div>
+      </div>
+      <div class="monitorRight">
+      </div>
+    </div>
   </div>
 </template>
 
@@ -157,7 +198,8 @@
         selection: [],
         funnelList: [],
         quadrantList: '', // 四象限数据
-        lineList: [] // 框框加折线图数据
+        lineList: [], // 框框加折线图数据
+        simpleList: [] // 侧边数据
       }
     },
     computed: {
@@ -354,6 +396,8 @@
                   tem.grid.top = ''
                   tem.series[0].areaStyle = {}
                   this.lineList.push(tem)
+                } else if (tem.type == 'simple') {
+                  this.simpleList.push(tem)
                 }
                 if (tem.selection[0]) {
                   this.selection = tem.selection[0].items
@@ -573,7 +617,7 @@
   }
   .line{
     width: 100%;
-    height: 400px;
+    height: 300px;
     background: #f0f4f8;
     margin-top: 20px;
     &>div{
@@ -589,5 +633,53 @@
   }
   .lineCharts{
     width: 400px;
+  }
+  .allPay{
+    width: 100%;
+    background: #f0f4f8;
+    margin-top: 20px;
+    display: flex;
+    .allPayLeft{
+      flex: 1;
+      &>div{
+        border-radius: 10px;
+        margin: 20px;
+        background: #ccc;
+        text-align: center;
+        padding: 20px 7px;
+        div{
+          font-size: 12px;
+          line-height: 12px;
+          margin-bottom: 10px;
+        }
+      }
+    }
+    .allPayRight{
+      flex: 5;
+    }
+  }
+  .monitor{
+    width: 100%;
+    background: #f0f4f8;
+    margin-top: 20px;
+    display: flex;
+    .monitorLeft{
+      flex: 1;
+      &>div{
+        border-radius: 10px;
+        margin: 20px;
+        background: #ccc;
+        text-align: center;
+        padding: 20px 7px;
+        div{
+          font-size: 12px;
+          line-height: 12px;
+          margin-bottom: 10px;
+        }
+      }
+    }
+    .monitorRight{
+      flex: 5;
+    }
   }
 </style>
