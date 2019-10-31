@@ -32,12 +32,12 @@
         align="center"
         label="编号">
       </el-table-column>
-      <el-table-column
+     <!-- <el-table-column
         prop="chartSqlId"
         header-align="center"
         align="center"
         label="大屏图表sql号">
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         prop="columnName"
         header-align="center"

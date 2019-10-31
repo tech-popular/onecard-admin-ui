@@ -31,12 +31,12 @@
         align="center"
         label="编号">
       </el-table-column>
-      <el-table-column
+      <!--<el-table-column
         prop="chartId"
         header-align="center"
         align="center"
         label="chart号">
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         prop="sql"
         header-align="center"
