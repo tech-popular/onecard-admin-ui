@@ -170,7 +170,6 @@
         }, 3000 * Math.random())
       },
       handleSelect (item) {
-        console.log(' iiii' + item.name)
         this.dataForm.key = item.name
         this.getDataList()
       },
