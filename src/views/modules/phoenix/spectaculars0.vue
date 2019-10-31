@@ -3,7 +3,7 @@
     <el-alert
         title=""
         type="warning"
-        v-if="list.items.length>0"
+        v-if="list.items && list.items.length>0"
         :closable="false">
         <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
           <el-option
