@@ -440,6 +440,9 @@
         this.apiItems = []
         this.value1 = ''
         this.quadrantList = ''
+        this.lineList = ''
+        this.simpleList = ''
+        this.funnelList = ''
         this.queryList()
       },
       changeValue1 (selectionIndex) {
