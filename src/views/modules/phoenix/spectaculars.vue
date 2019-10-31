@@ -203,32 +203,39 @@
     methods: {
       // 全选功能
       clickALlCheck (index) {
-        let selectall = document.getElementById("selectall" + index)
+        let selectall = document.getElementById('selectall' + index)
         let flag = selectall.getAttribute('flag')
         let selectArr = this.arr[index].legend.data
-        if(flag == 1){
-          var val = false
+        var val = ''
+        if (flag == 1) {
+          val = false
           selectall.setAttribute('flag', 0)
           selectall.value = '全选中'
         } else {
-          var val = true
+          val = true
           selectall.setAttribute('flag', 1)
           selectall.value = '全不选'
         }
         let obj = {}
         let selectName = []
         selectArr.forEach((item, indx) => {
-         selectName.push(item.name)
+          selectName.push(item.name)
         })
         selectName.forEach((item, indx) => {
           obj[item] = val
         })
         this.arr[index].legend.selected = obj
-        console.log(this.arr[index])
+        let label = 'J_chartLineBox' + this.arr[index].id
+        this.chartPie = echarts.init(document.getElementById(label))
         this.chartPie.setOption(this.arr[index], true)
         window.addEventListener('resize', () => {
           this.chartPie.resize()
         })
+        console.log(this.arr[index])
+        // this.chartPie.setOption(this.arr[index], true)
+        // window.addEventListener('resize', () => {
+        //   this.chartPie.resize()
+        // })
       },
       // 获取默认选择项
       getDefaultSelection () {
