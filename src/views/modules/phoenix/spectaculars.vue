@@ -75,7 +75,7 @@
       </div>
     </div>
     <!-- 其他总体数据展示 -->
-    <div v-if='lineList' class="line">
+    <div v-if='lineList && lineList.length>0' class="line">
       <div :key="item.id" v-for="(item) in lineList">
         <div class="lineEvery">
           <p>{{item.titleName}}</p>
