@@ -17,7 +17,7 @@
     <el-row :gutter="20">
       <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata.selection[0])" @remove-tag="changeTag(selection[0])">
+          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata.selection[0], index)" @remove-tag="changeTag(selection[0])">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -34,6 +34,7 @@
           <ul>
           </ul>
         </div>
+        <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index)" type="button" value="全不选" flag="1"/>
       </el-col>
     </el-row>
     <!-- 四象限 -->
@@ -130,7 +131,7 @@
 
 <script>
   import echarts from 'echarts'
-  import { fprice, getChinese } from '@/utils'
+  import { fprice, getChinese, getQueryString } from '@/utils'
   import 'echarts/lib/chart/funnel'
   import 'echarts/lib/chart/radar'
   export default {
@@ -171,7 +172,8 @@
         simpleList: [], // 侧边数据
         funnelList: [], // 漏斗图数据
         quadrantList: '', // 四象限数据
-        defaultSelection: [] // 调用默认接口存的数据
+        defaultSelection: [], // 调用默认接口存的数据
+        mark: '' // 区分是哪个列表点过来的
       }
     },
     computed: {
@@ -181,13 +183,13 @@
       }
     },
     created () {
+      this.mark = getQueryString('mark')
     },
     mounted () {
       if (!this.sidebarFold) {
-        // set (true) { this.$store.commit('common/updateSidebarFold', val) }
         this.sidebarFold = !this.sidebarFold
       }
-      this.getDefaultSelection()
+      this.mark == 'a' ? this.getDefaultSelection() : this.queryList()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -199,6 +201,35 @@
       }
     },
     methods: {
+      // 全选功能
+      clickALlCheck (index) {
+        let selectall = document.getElementById("selectall" + index)
+        let flag = selectall.getAttribute('flag')
+        let selectArr = this.arr[index].legend.data
+        if(flag == 1){
+          var val = false
+          selectall.setAttribute('flag', 0)
+          selectall.value = '全选中'
+        } else {
+          var val = true
+          selectall.setAttribute('flag', 1)
+          selectall.value = '全不选'
+        }
+        let obj = {}
+        let selectName = []
+        selectArr.forEach((item, indx) => {
+         selectName.push(item.name)
+        })
+        selectName.forEach((item, indx) => {
+          obj[item] = val
+        })
+        this.arr[index].legend.selected = obj
+        console.log(this.arr[index])
+        this.chartPie.setOption(this.arr[index], true)
+        window.addEventListener('resize', () => {
+          this.chartPie.resize()
+        })
+      },
       // 获取默认选择项
       getDefaultSelection () {
         this.$http({
@@ -219,6 +250,7 @@
 
       // 获取列表
       queryList (selectionIndex) {
+        let { mark } = this.$data
         this.$http({
           url: this.$http.adornUrl('/phoenix/dashboard'),
           method: 'post',
@@ -229,10 +261,10 @@
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection.placeholder,
-                items: [{
+                items: mark == 'a' ? [{
                   name: this.value,
                   value: this.value
-                }],
+                }] : [],
                 columnName: this.list.columnName || this.defaultSelection.columnName,
                 mark: this.list.mark || this.defaultSelection.mark
               }],
@@ -440,12 +472,12 @@
         this.apiItems = []
         this.value1 = ''
         this.quadrantList = ''
-        this.lineList = ''
-        this.simpleList = ''
+        this.lineList = []
+        this.simpleList = []
         this.funnelList = ''
         this.queryList()
       },
-      changeValue1 (selectionIndex) {
+      changeValue1 (selectionIndex, index) {
         if (this.visibleChange) {
           this.value1.forEach((tem, index) => {
             var obj = {}
@@ -454,6 +486,7 @@
             this.apiItems.push(obj)
           })
           this.arr = []
+          this.lineList = []
           this.queryList(selectionIndex)
           this.visibleChange = false
         } else {
@@ -463,6 +496,7 @@
       changeTag (selectionIndex) {
         this.visibleChange = true
         this.apiItems = []
+        this.lineList = []
         this.changeValue1(selectionIndex)
       }
     }
@@ -694,5 +728,10 @@
     .monitorRight{
       flex: 5;
     }
+  }
+  .allChecked{
+    position: absolute;
+    top: 0;
+    left: 50%;
   }
 </style>

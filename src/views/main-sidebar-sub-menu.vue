@@ -50,7 +50,7 @@
           this.$router.push({
             path: route[0].name,
             query: {
-              id: menu.menuId
+              mark: menu.mark
             }
           })
         }
