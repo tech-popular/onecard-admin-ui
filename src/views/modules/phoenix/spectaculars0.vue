@@ -249,6 +249,7 @@
             if (res.data.selection.length > 0) {
               this.list = res.data.selection[0] // 下拉列表选项
             }
+            console.log(res.data.selection[0].items == true)
             if (res.data.visualizes) { // 图标列表
               this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
