@@ -56,3 +56,35 @@ export function clearLoginInfo () {
   store.commit('resetStore')
   router.options.isAddDynamicMenuRoutes = false
 }
+
+// 截取url 里面token的值
+export const getQueryString = name => {
+  let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
+  let params = window.location.search.substr(1) || window.location.href.split('?')[1]
+  let r = params && params.match(reg)
+  if (r != null) {
+    return unescape(r[2])
+  }
+  return null
+}
+
+export const fprice = (s, n) => {
+  s = parseFloat((s + '').replace(/[^\d.-]/g, '')).toFixed(n) + ''
+  let l = s.split('.')[0].split('').reverse()
+  let r = s.split('.')[1]
+  let t = ''
+  for (let i = 0; i < l.length; i++) {
+    t += l[i] + ((i + 1) % 3 === 0 && (i + 1) !== l.length ? ',' : '')
+  }
+  if (n === 0) {
+    return t.split('').reverse().join('')
+  } else {
+    return t.split('').reverse().join('') + '.' + r
+  }
+}
+
+export const getChinese = (name) => {
+  let names = name.split('\n')[0]
+  names = names.trim()
+  return names
+}

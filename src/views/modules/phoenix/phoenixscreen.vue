@@ -1,22 +1,13 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <!--<el-input v-model="dataForm.key" placeholder="参数名" clearable  @keyup.enter.native="getDataList()"></el-input>-->
-        <el-autocomplete
-          v-model="dataForm.key"
-          :fetch-suggestions="querySearchAsync"
-          placeholder="请输入内容"
-          @select="handleSelect"
-          class="input-with-select"
-          @keyup.enter.native="getDataList()"
-        ></el-autocomplete>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('honeycomb:honeycombtask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('honeycomb:honeycombtask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button type="primary" @click="syncEs()">同步ES</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixscreen:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('phoenix:phoenixscreen:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -35,39 +26,31 @@
         prop="id"
         header-align="center"
         align="center"
-        label="任务Id">
+        label="编号">
       </el-table-column>
       <el-table-column
         prop="name"
         header-align="center"
         align="center"
-        label="任务名称">
-      </el-table-column>
-      <!--<el-table-column-->
-        <!--prop="inDatasource"-->
-        <!--header-align="center"-->
-        <!--align="center"-->
-        <!--label="输入数据源">-->
-      <!--</el-table-column>-->
-      <el-table-column
-        prop="inDatasourceName"
-        header-align="center"
-        align="center"
-        label="输入数据源">
+        label="名称">
       </el-table-column>
       <el-table-column
-        prop="cron"
+        prop="tenantId"
         header-align="center"
         align="center"
-        show-overflow-tooltip
-        label="cron表达式">
+        label="租户号">
       </el-table-column>
       <el-table-column
-        prop="sql"
+        prop="createTime"
         header-align="center"
         align="center"
-        show-overflow-tooltip
-        label="SQL">
+        label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="updateTime"
+        header-align="center"
+        align="center"
+        label="更新时间">
       </el-table-column>
       <el-table-column
         prop="enable"
@@ -88,9 +71,8 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
-          <el-button type="text" size="small" @click="startTask(scope.row.id)">启动任务</el-button>
-          <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
+          <el-button type="text" size="small" @click="phoenixChartsHandle(scope.row.id)">大屏上的charts</el-button>
+          <el-button type="text" size="small" @click="screenSelectionHandle(scope.row.id)">大屏选择项</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -105,26 +87,22 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
-    <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
+    <!-- 大屏选择项 -->
+    <screen-selection v-if="screenSelectionVisible" ref="screenSelection"></screen-selection>
+    <phoenix-charts v-if="phoenixChartsVisible" ref="phoenixCharts"/>
   </div>
 </template>
-<style>
-  .input-with-select  {
-    width: 380px;
-  }
-</style>
+
 <script>
-  import AddOrUpdate from './honeycombtask-add-or-update'
-  import TaskProgress from './honeycombtaskprogress'
-  import TaskDependent from './honeycombtask-dependent'
+  import AddOrUpdate from './phoenixscreen-add-or-update'
+  import ScreenSelection from './phoenixscreen-selection'
+  import PhoenixCharts from './phoenixscreen-charts-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
           key: ''
         },
-        restaurants: [],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -132,52 +110,24 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        addOrUpdateThresholdVisible: false,
-        taskProgressVisible: false,
-        taskDependentVisible: false
+        screenSelectionVisible: false,
+        phoenixChartsVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      TaskProgress,
-      TaskDependent
+      ScreenSelection,
+      PhoenixCharts
     },
     activated () {
       this.getDataList()
     },
-    mounted () {
-      this.loadAll()
-    },
     methods: {
-      loadAll () {
-        if (this.dataForm.key) {
-          this.$http({
-            url: this.$http.adornUrl('/honeycomb/honeycombtask/search/' + this.dataForm.key),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.restaurants = data.searchData
-            }
-          })
-        }
-      },
-      querySearchAsync (queryString, cb) {
-        this.loadAll()
-        clearTimeout(this.timeout)
-        this.timeout = setTimeout(() => {
-          cb(this.restaurants)
-        }, 3000 * Math.random())
-      },
-      handleSelect (item) {
-        this.dataForm.key = item.name
-        this.getDataList()
-      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/honeycomb/honeycombtask/list'),
+          url: this.$http.adornUrl('/phoenix/phoenixscreen/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -217,57 +167,18 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      taskProgress (id) {
-        this.taskProgressVisible = true
+      //  大屏上的charts
+      phoenixChartsHandle (id) {
+        this.phoenixChartsVisible = true
         this.$nextTick(() => {
-          this.$refs.taskProgress.init(id)
+          this.$refs.phoenixCharts.init(id)
         })
       },
-      taskDependent (id) {
-        this.taskDependentVisible = true
+      // 大屏选择项
+      screenSelectionHandle (id) {
+        this.screenSelectionVisible = true
         this.$nextTick(() => {
-          this.$refs.taskDependent.init(id)
-        })
-      },
-      // 同步到es
-      syncEs () {
-        return this.$http({
-          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/syncEs`),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      },
-      startTask (id) {
-        return this.$http({
-          url: this.$http.adornUrl(`/honeycomb/honeycombtask/starttask/` + id),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
+          this.$refs.screenSelection.getDataList(id)
         })
       },
       // 删除
@@ -281,7 +192,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/honeycomb/honeycombtask/delete'),
+            url: this.$http.adornUrl('/phoenix/phoenixscreen/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
