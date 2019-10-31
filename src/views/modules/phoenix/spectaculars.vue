@@ -321,17 +321,18 @@
                       tem.series[0]['radius'] = radius
                     }
                   }
-                  // tem.legend.data.unshift('全选', '全不选')
                 } else if (tem.type == 'funnel') { // 漏斗
-                  tem.series[0].left = '15%'
-                  tem.series[0].width = '70%'
-
-                  tem.series[0]['label'] = {
-                    show: true,
-                    position: 'inside',
-                    color: '#333'
+                  let funnelStyle = {
+                    left: '15%',
+                    width: '70%',
+                    label: {
+                      show: true,
+                      position: 'inside',
+                      color: '#333',
+                      rich: this.textStyle.rich
+                    }
                   }
-                  tem.series[0]['label'].rich = this.textStyle.rich
+                  Object.assign(tem.series[0], funnelStyle)
 
                   tem.series[0].data.forEach((item, index) => {
                     item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '{a|↑}' : '{b|↓}'}  ${item.percent}%`
@@ -339,11 +340,8 @@
                   tem.tooltip.formatter = '{a}<br/>{b}'
                   this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
-                  tem.tooltip = {}
                   tem.series[1].itemStyle = {
-                    normal: {
-                      color: 'blue'
-                    }
+                    color: 'blue'
                   }
                   tem.legend.orient = 'vertical'
                   tem.legend.left = 'right'
