@@ -3,6 +3,7 @@
     <el-alert
         title=""
         type="warning"
+        v-if="list.items"
         :closable="false">
         <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
           <el-option
@@ -245,7 +246,9 @@
         }).then(({data}) => {
           let res = data.response
           if (res.status == '1') {
-            this.list = res.data.selection[0] // 下拉列表选项
+            if (res.data.selection.length > 0) {
+              this.list = res.data.selection[0] // 下拉列表选项
+            }
             if (res.data.visualizes) { // 图标列表
               this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
