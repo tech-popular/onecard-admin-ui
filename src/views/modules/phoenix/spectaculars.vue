@@ -1,9 +1,9 @@
 <template>
   <div class="mod-demo-echarts">
     <el-alert
-        v-if="list.items"
         title=""
         type="warning"
+        v-if="list.items && list.items.length>0"
         :closable="false">
         <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
           <el-option
@@ -78,6 +78,7 @@
 
 <script>
   import echarts from 'echarts'
+  import { fprice, getChinese } from '@/utils'
   import 'echarts/lib/chart/funnel'
   import 'echarts/lib/chart/radar'
   export default {
@@ -93,20 +94,6 @@
         value1: '',
         visualizes: [],
         arr: [], // 有几个图表
-        legend: { // 设置标签样式
-          type: 'scroll',
-          top: '12%',
-          backgroundColor: '#fff',
-          padding: 0,
-          itemGap: 0
-        },
-        grid: { // 设置柱状样式
-          top: '90',
-          right: '0',
-          bottom: '0',
-          left: '0',
-          containLabel: true
-        },
         textStyle: { // 设置标签名字样式
           rich: {
             a: {
@@ -123,32 +110,13 @@
             }
           }
         },
-        xAxis: {
-          axisLabel: {
-            show: true,
-            interval: 0, // {number} 0为全部显示
-            rotate: 60
-          },
-          axisTick: {
-            alignWithLabel: true,
-            interval: 0,
-            rotate: -30,
-            margin: -15
-          }
-        },
-        title: {
-          top: 'top',
-          left: 'left'
-        },
-        color: ['#FF4040', '#634cff', '#febe76', '#31c5d3', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a'],
         visibleChange: false,
         apiItems: [],
         visualizeId: 1, // 图表筛选框
         selection: [],
-        funnelList: [],
-        boxList: [],
-        quadrantList: '',
-        defaultSelection: []
+        funnelList: [], // 漏斗图数据
+        quadrantList: '', // 四象限数据
+        defaultSelection: [] // 调用默认接口存的数据
       }
     },
     computed: {
@@ -173,25 +141,6 @@
       }
     },
     methods: {
-      getChinese (name) {
-        let names = name.split('\n')[0]
-        names = names.trim()
-        return names
-      },
-      fprice (s, n) {
-        s = parseFloat((s + '').replace(/[^\d.-]/g, '')).toFixed(n) + ''
-        let l = s.split('.')[0].split('').reverse()
-        let r = s.split('.')[1]
-        let t = ''
-        for (let i = 0; i < l.length; i++) {
-          t += l[i] + ((i + 1) % 3 === 0 && (i + 1) !== l.length ? ',' : '')
-        }
-        if (n === 0) {
-          return t.split('').reverse().join('')
-        } else {
-          return t.split('').reverse().join('') + '.' + r
-        }
-      },
       // 获取默认选择项
       getDefaultSelection () {
         this.$http({
@@ -249,22 +198,55 @@
         }).then(({data}) => {
           let res = data.response
           if (res.status == '1') {
-            if (res.data.selection.length > 0) {
-              this.list = res.data.selection[0] // 下拉列表选项
-            }
+            (res.data.selection.length > 0) && (this.list = res.data.selection[0]) // 下拉列表选项
             if (res.data.visualizes) { // 图标列表
-              this.boxList = res.data.visualizes
               res.data.visualizes.forEach((tem, index) => {
                 if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
                   this.arr.push(tem)
                 }
-                tem['grid'] = this.grid
-                tem['color'] = this.color
-                Object.assign(tem.title, this.title)
-                Object.assign(tem.legend, this.legend)
-                if (tem.xAxis) {
-                  Object.assign(tem.xAxis, this.xAxis)
+                let grid = { // 设置柱状样式
+                  top: '90',
+                  right: '0',
+                  bottom: '0',
+                  left: '0',
+                  containLabel: true
                 }
+                let legend = { // 设置标签样式
+                  type: 'scroll',
+                  top: '12%',
+                  backgroundColor: '#fff',
+                  padding: 0,
+                  itemGap: 0
+                }
+                let color = ['#FF4040', '#634cff', '#febe76', '#31c5d3', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a']
+                let title = {
+                  top: 'top',
+                  left: 'left'
+                }
+                let xAxis = {
+                  axisLabel: {
+                    show: true,
+                    interval: 0, // {number} 0为全部显示
+                    rotate: 60
+                  },
+                  axisTick: {
+                    alignWithLabel: true,
+                    interval: 0,
+                    rotate: -30,
+                    margin: -15
+                  }
+                }
+
+                tem['grid'] = grid
+                tem['color'] = color
+
+                Object.assign(tem.title, title)
+                Object.assign(tem.legend, legend)
+
+                if (tem.xAxis) {
+                  Object.assign(tem.xAxis, xAxis)
+                }
+
                 if (tem.type == 'bar') { // 折现柱状
                   for (let i = 0; i < tem.series.length; i++) {
                     if (tem.legend.data) {
@@ -297,8 +279,8 @@
                     formatter: (params) => {
                       var result = params[0].axisValue
                       params.map((item, i) => {
-                        result += '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background:' + item.color + '"></span><span style="color:#fff;">' + this.getChinese(
-                          item.seriesName) + '</span> : ' + this.fprice(item.value, 0) + '人</span>'
+                        result += '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background:' + item.color + '"></span><span style="color:#fff;">' + getChinese(
+                          item.seriesName) + '</span> : ' + fprice(item.value, 0) + '人</span>'
                       })
                       return result
                     }
