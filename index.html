@@ -7,6 +7,7 @@
   <title>蜂巢系统</title>
   <% if (process.env.NODE_ENV === 'production') { %>
     <!-- 生产环境 -->
+    <script src="./static/plugins/echarts.js"></script>
     <script>document.write('<script src="./config/index.js?t=' + new Date().getTime() + '"><\/script>');</script>
   <% }else { %>
     <!-- 开发环境 -->
