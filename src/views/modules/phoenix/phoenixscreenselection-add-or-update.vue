@@ -17,6 +17,12 @@
     <el-form-item label="占位符" prop="placeholder">
       <el-input v-model="dataForm.placeholder" placeholder="占位符"></el-input>
     </el-form-item>
+      <el-form-item label="字段名" prop="columnName">
+        <el-input v-model="dataForm.columnName" placeholder="字段名"></el-input>
+      </el-form-item>
+      <el-form-item label="标记" prop="mark">
+        <el-input v-model="dataForm.mark" placeholder="标记"></el-input>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -37,7 +43,9 @@
           name: '',
           type: '',
           placeholder: '',
-          key: ''
+          mark: '',
+          columnName: ''
+
         },
         selectionTypes: [],
         dataRule: {
@@ -49,15 +57,20 @@
           ],
           placeholder: [
             { required: true, message: '占位符不能为空', trigger: 'blur' }
+          ],
+          columnName: [
+              { required: true, message: '字段名不能为空', trigger: 'blur' }
+          ],
+          mark: [
+              { required: true, message: '标记不能为空', trigger: 'blur' }
           ]
         }
       }
     },
     methods: {
-      init (key, id) {
+      init (screenId, id) {
         this.dataForm.id = id || 0
-        this.dataForm.key = key || 0
-        this.dataForm.screenId = key
+        this.dataForm.screenId = screenId || 0
         this.visible = true
           // 下拉框选型
         this.$http({
@@ -80,11 +93,12 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                // this.dataForm.chartId = data.phoenixSelection.chartId
                 this.dataForm.screenId = data.phoenixSelection.screenId
                 this.dataForm.name = data.phoenixSelection.name
                 this.dataForm.type = data.phoenixSelection.type
                 this.dataForm.placeholder = data.phoenixSelection.placeholder
+                this.dataForm.columnName = data.phoenixSelection.columnName
+                this.dataForm.mark = data.phoenixSelection.mark
               }
             })
           }
@@ -99,11 +113,12 @@
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                // 'chartId': this.dataForm.chartId,
                 'screenId': this.dataForm.screenId,
                 'name': this.dataForm.name,
                 'type': this.dataForm.type,
-                'placeholder': this.dataForm.placeholder
+                'placeholder': this.dataForm.placeholder,
+                'columnName': this.dataForm.columnName,
+                'mark': this.dataForm.mark
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
