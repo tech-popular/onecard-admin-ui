@@ -8,7 +8,7 @@
       <span>{{ menu.name }}</span>
     </template>
     <sub-menu
-      v-for="item in menu.list" 
+      v-for="(item) in menu.list"
       :key="item.menuId"
       :menu="item"
       :dynamicMenuRoutes="dynamicMenuRoutes">
@@ -47,7 +47,12 @@
       gotoRouteHandle (menu) {
         var route = this.dynamicMenuRoutes.filter(item => item.meta.menuId === menu.menuId)
         if (route.length >= 1) {
-          this.$router.push({ name: route[0].name })
+          this.$router.push({
+            path: route[0].name,
+            query: {
+              id: menu.menuId
+            }
+          })
         }
       }
     }

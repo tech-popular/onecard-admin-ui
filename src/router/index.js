@@ -8,10 +8,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
-import { clearLoginInfo } from '@/utils'
+import { clearLoginInfo, getQueryString } from '@/utils'
 
 Vue.use(Router)
-
+console.log(getQueryString('tag'))
 // 开发环境不使用懒加载, 因为懒加载页面太多的话会造成webpack热更新太慢, 所以只有生产环境使用懒加载
 const _import = require('./import-' + process.env.NODE_ENV)
 
@@ -43,7 +43,8 @@ const mainRoutes = {
     { path: '/create-report', component: _import('modules/pages/createreport'), name: 'create-report', meta: { title: '报表', isTab: true } },
     { path: '/create-chart', component: _import('modules/pages/createchart'), name: 'create-chart', meta: { title: '图形', isTab: true } },
     { path: '/phoenix-visual', component: _import('modules/phoenix/visual'), name: 'phoenix-visual', meta: { title: '可视化工具', isTab: true } },
-    { path: '/phoenix-spectaculars', component: _import('modules/phoenix/spectaculars'), name: 'phoenix-spectaculars', meta: { title: '看板', isTab: true } }
+    { path: '/phoenix-spectaculars', component: _import('modules/phoenix/spectaculars'), name: 'phoenix-spectaculars', meta: { title: '看板', isTab: true } },
+    { path: '/phoenix-spectaculars0', component: _import('modules/phoenix/spectaculars0'), name: 'phoenix-spectaculars0', meta: { title: '彩虹评级', isTab: true } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

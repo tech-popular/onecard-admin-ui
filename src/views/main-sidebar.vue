@@ -24,7 +24,7 @@
             <span slot="title">ueditor</span>
           </el-menu-item>
         </el-submenu>
-        <el-submenu index="report">
+        <!-- <el-submenu index="report">
           <template slot="title">
             <icon-svg name="shoucangfill" class="site-sidebar__menu-icon"></icon-svg>
             <span>凤凰系统</span>
@@ -37,7 +37,7 @@
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">新建可视化</span>
           </el-menu-item>
-        </el-submenu>
+        </el-submenu> -->
         <sub-menu
           v-for="menu in menuList"
           :key="menu.menuId"

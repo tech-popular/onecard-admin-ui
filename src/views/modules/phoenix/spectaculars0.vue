@@ -1,9 +1,9 @@
 <template>
   <div class="mod-demo-echarts">
     <el-alert
-        v-if="list.items"
         title=""
         type="warning"
+        v-if="list.items && list.items.length>0"
         :closable="false">
         <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
           <el-option
@@ -164,7 +164,7 @@
         // set (true) { this.$store.commit('common/updateSidebarFold', val) }
         this.sidebarFold = !this.sidebarFold
       }
-      this.getDefaultSelection()
+      this.queryList()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -199,7 +199,7 @@
           method: 'post',
           data: {
             data: {
-              dashboardId: 1
+              dashboardId: 2
             }
           }
         }).then((resp) => {
@@ -217,15 +217,12 @@
           method: 'post',
           data: {
             data: {
-              dashboardId: 1,
+              dashboardId: 2,
               dashboardSelection: [{ // 大屏
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection.placeholder,
-                items: [{
-                  name: this.value,
-                  value: this.value
-                }],
+                items: [],
                 columnName: this.list.columnName || this.defaultSelection.columnName,
                 mark: this.list.mark || this.defaultSelection.mark
               }],
@@ -324,18 +321,17 @@
                       tem.series[0]['radius'] = radius
                     }
                   }
+                  // tem.legend.data.unshift('全选', '全不选')
                 } else if (tem.type == 'funnel') { // 漏斗
-                  let funnelStyle = {
-                    left: '15%',
-                    width: '70%',
-                    label: {
-                      show: true,
-                      position: 'inside',
-                      color: '#333',
-                      rich: this.textStyle.rich
-                    }
+                  tem.series[0].left = '15%'
+                  tem.series[0].width = '70%'
+
+                  tem.series[0]['label'] = {
+                    show: true,
+                    position: 'inside',
+                    color: '#333'
                   }
-                  Object.assign(tem.series[0], funnelStyle)
+                  tem.series[0]['label'].rich = this.textStyle.rich
 
                   tem.series[0].data.forEach((item, index) => {
                     item.name = `${item.name}  ${item.value}人  ${item.percentRise ? '{a|↑}' : '{b|↓}'}  ${item.percent}%`
@@ -343,8 +339,11 @@
                   tem.tooltip.formatter = '{a}<br/>{b}'
                   this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
+                  tem.tooltip = {}
                   tem.series[1].itemStyle = {
-                    color: 'blue'
+                    normal: {
+                      color: 'blue'
+                    }
                   }
                   tem.legend.orient = 'vertical'
                   tem.legend.left = 'right'
@@ -359,7 +358,7 @@
                 } else if (tem.type == 'quadrant') { // 四象限
                   this.quadrantList = tem.legend.extend
                 }
-                if (tem.selection[0]) {
+                if (tem.selection.length > 0 && tem.selection[0]) {
                   this.selection = tem.selection[0].items
                   this.visualizeId = tem.id
                 }
