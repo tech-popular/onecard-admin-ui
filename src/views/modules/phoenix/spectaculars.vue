@@ -383,6 +383,7 @@
                   tem.tooltip.formatter = '{a}<br/>{b}'
                   this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
+                  tem.tooltip = {}
                   tem.series[1].itemStyle = {
                     color: 'blue'
                   }
