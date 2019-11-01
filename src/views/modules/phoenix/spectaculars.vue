@@ -182,8 +182,13 @@
         set (val) { this.$store.commit('common/updateSidebarFold', val) }
       }
     },
+    watch: {
+      '$route' () {
+        this.mark = getQueryString('mark')
+        this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+      }
+    },
     created () {
-      this.mark = getQueryString('mark')
     },
     mounted () {
       if (!this.sidebarFold) {
