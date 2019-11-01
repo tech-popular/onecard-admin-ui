@@ -184,10 +184,10 @@
     },
     watch: {
       $route (to) {
-        console.log(to)
         if (to.path.indexOf('phoenix-spectaculars') != -1) {
-          this.mark = getQueryString('mark')
-          this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+          window.reload()
+          // this.mark = getQueryString('mark')
+          // this.mark == '1' ? this.getDefaultSelection() : this.queryList()
         }
       }
     },
