@@ -183,9 +183,12 @@
       }
     },
     watch: {
-      '$route' () {
-        this.mark = getQueryString('mark')
-        this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+      $route (to) {
+        console.log(to)
+        if (to.path.indexOf('phoenix-spectaculars') != -1) {
+          this.mark = getQueryString('mark')
+          this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+        }
       }
     },
     created () {
