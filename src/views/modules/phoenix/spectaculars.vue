@@ -185,6 +185,8 @@
     watch: {
       $route (to) {
         if (to.path.indexOf('phoenix-spectaculars') != -1) {
+          this.visualizeId = 1
+          this.list = []
           this.mark = getQueryString('mark')
           this.mark == '1' ? this.getDefaultSelection() : this.queryList()
         }
