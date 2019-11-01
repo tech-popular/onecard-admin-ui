@@ -189,7 +189,7 @@
       if (!this.sidebarFold) {
         this.sidebarFold = !this.sidebarFold
       }
-      this.mark == 'a' ? this.getDefaultSelection() : this.queryList()
+      this.mark == '1' ? this.getDefaultSelection() : this.queryList()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -206,7 +206,7 @@
         let selectall = document.getElementById('selectall' + index)
         let flag = selectall.getAttribute('flag')
         let selectArr = this.arr[index].legend.data
-        var val = ''
+        let val = ''
         if (flag == 1) {
           val = false
           selectall.setAttribute('flag', 0)
@@ -231,11 +231,6 @@
         window.addEventListener('resize', () => {
           this.chartPie.resize()
         })
-        console.log(this.arr[index])
-        // this.chartPie.setOption(this.arr[index], true)
-        // window.addEventListener('resize', () => {
-        //   this.chartPie.resize()
-        // })
       },
       // 获取默认选择项
       getDefaultSelection () {
@@ -268,7 +263,7 @@
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection.placeholder,
-                items: mark == 'a' ? [{
+                items: mark == '1' ? [{
                   name: this.value,
                   value: this.value
                 }] : [],
