@@ -15,9 +15,9 @@
         </el-select>
       </el-alert>
     <el-row :gutter="20">
-      <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
+      <el-col v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata.selection[0], index)" @remove-tag="changeTag(selection[0])">
+          <el-select v-model="selectedList && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -145,7 +145,6 @@
         chartScatter: null,
         list: [],
         value: '预授信（常规黑指）',
-        value1: '',
         visualizes: [],
         arr: [], // 有几个图表
         textStyle: { // 设置标签名字样式
@@ -173,7 +172,8 @@
         funnelList: [], // 漏斗图数据
         quadrantList: '', // 四象限数据
         defaultSelection: [], // 调用默认接口存的数据
-        mark: '' // 区分是哪个列表点过来的
+        mark: '', // 区分是哪个列表点过来的
+        selectedList: {}
       }
     },
     computed: {
@@ -262,7 +262,7 @@
       },
 
       // 获取列表
-      queryList (selectionIndex) {
+      queryList (selectionIndex, selectionData) {
         let { mark } = this.$data
         this.$http({
           url: this.$http.adornUrl('/phoenix/dashboard'),
@@ -286,7 +286,7 @@
                 name: 'visualize过滤策略',
                 type: 'visualize',
                 placeholder: selectionIndex ? (selectionIndex.placeholder) : '',
-                items: this.value1 ? this.apiItems : [],
+                items: selectionData ? this.apiItems : [],
                 columnName: selectionIndex ? (selectionIndex.columnName) : '',
                 mark: selectionIndex ? (selectionIndex.mark) : ''
               }]
@@ -306,6 +306,7 @@
             if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
                 if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                  tem.selectListArr = []
                   this.arr.push(tem)
                 }
                 let grid = { // 设置柱状样式
@@ -484,34 +485,39 @@
       selectGet () {
         this.arr = []
         this.apiItems = []
-        this.value1 = ''
         this.quadrantList = ''
         this.lineList = []
         this.simpleList = []
         this.funnelList = ''
         this.queryList()
       },
-      changeValue1 (selectionIndex, index) {
+      changeValue1 (data, index) {
         if (this.visibleChange) {
-          this.value1.forEach((tem, index) => {
-            var obj = {}
-            obj.name = tem
-            obj.value = tem
+          this.apiItems = []
+          data.selectListArr.forEach((tem, index) => {
+            var obj = {
+              name: tem,
+              value: tem
+            }
             this.apiItems.push(obj)
           })
           this.arr = []
           this.lineList = []
-          this.queryList(selectionIndex)
+          this.selectedList = {
+            data: data.selectListArr,
+            id: data.id
+          }
+          this.queryList(data.selection[0], data.selectListArr)
           this.visibleChange = false
         } else {
           this.visibleChange = true
         }
       },
-      changeTag (selectionIndex) {
+      changeTag (data) {
         this.visibleChange = true
         this.apiItems = []
         this.lineList = []
-        this.changeValue1(selectionIndex)
+        this.changeValue1(data)
       }
     }
   }
