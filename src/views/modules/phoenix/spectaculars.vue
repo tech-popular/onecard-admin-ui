@@ -258,7 +258,7 @@
           method: 'post',
           data: {
             data: {
-              dashboardId: 1,
+              dashboardId: mark,
               dashboardSelection: [{ // 大屏
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
