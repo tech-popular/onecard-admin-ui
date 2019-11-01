@@ -189,6 +189,8 @@
       }
     },
     created () {
+      this.mark = getQueryString('mark')
+      this.mark == '1' ? this.getDefaultSelection() : this.queryList()
     },
     mounted () {
       if (!this.sidebarFold) {
