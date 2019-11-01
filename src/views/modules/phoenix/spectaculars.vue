@@ -185,9 +185,8 @@
     watch: {
       $route (to) {
         if (to.path.indexOf('phoenix-spectaculars') != -1) {
-          window.reload()
-          // this.mark = getQueryString('mark')
-          // this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+          this.mark = getQueryString('mark')
+          this.mark == '1' ? this.getDefaultSelection() : this.queryList()
         }
       }
     },
@@ -303,6 +302,7 @@
             (res.data.selection.length > 0) && (this.list = res.data.selection[0]) // 下拉列表选项
             if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
+                this.arr = []
                 if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
                   this.arr.push(tem)
                 }
@@ -428,15 +428,15 @@
                   this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
                   tem.tooltip = {}
-                  tem.series[1].itemStyle = {
+                  tem.series[1] && (tem.series[1].itemStyle = {
                     color: 'blue'
-                  }
+                  })
                   tem.legend.orient = 'vertical'
                   tem.legend.left = 'right'
                   tem.legend.itemGap = 20
                 } else if (tem.type == 'pies') { // 饼图嵌套
                   tem.series[0].radius = ['55%', '75%']
-                  tem.series[1].radius = ['0%', '30%']
+                  tem.series[1] && (tem.series[1].radius = ['0%', '30%'])
                   tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
                   tem.legend.orient = 'vertical'
                   tem.legend.left = 'right'
