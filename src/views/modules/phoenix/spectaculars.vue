@@ -300,9 +300,9 @@
           let res = data.response
           if (res.status == '1') {
             (res.data.selection.length > 0) && (this.list = res.data.selection[0]) // 下拉列表选项
+            this.arr = []
             if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
-                this.arr = []
                 if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
                   this.arr.push(tem)
                 }
