@@ -194,7 +194,6 @@
     },
     created () {
       this.mark = getQueryString('mark')
-      this.mark == '1' ? this.getDefaultSelection() : this.queryList()
     },
     mounted () {
       if (!this.sidebarFold) {
@@ -456,12 +455,11 @@
                   tem.grid.top = ''
                   tem.series[0].areaStyle = {}
                   this.lineList.push(tem)
-                  console.log(this.lineList)
                 } else if (tem.type == 'simple') {
                   this.simpleList.push(tem)
                 }
                 if (tem.selection[0]) {
-                  this.selection = tem.selection[0].selectList.length > 0 ? tem.selection[0].selectList : tem.selection[0].items
+                  this.selection = tem.selection[0].selectList && tem.selection[0].selectList.length > 0 ? tem.selection[0].selectList : tem.selection[0].items
                   this.visualizeId = tem.id
                 }
                 setTimeout(() => {
@@ -511,6 +509,7 @@
             }
             this.apiItems.push(obj)
           })
+          this.visibleChange = false
           this.queryList(data.selection[0], data.selectListArr)
           return false
         }
