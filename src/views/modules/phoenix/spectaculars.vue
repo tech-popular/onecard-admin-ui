@@ -439,12 +439,14 @@
                   tem.legend.left = 'right'
                   tem.legend.itemGap = 20
                 } else if (tem.type == 'pies') { // 饼图嵌套
-                  tem.series[0].radius = ['55%', '75%']
-                  tem.series[1] && (tem.series[1].radius = ['0%', '30%'])
-                  tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
-                  tem.legend.orient = 'vertical'
-                  tem.legend.left = 'right'
-                  tem.legend.itemGap = 20
+                  if(tem.series.length > 0) {
+                    tem.series[0].radius = ['55%', '75%']
+                    tem.series[1] && (tem.series[1].radius = ['0%', '30%'])
+                    tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
+                    tem.legend.orient = 'vertical'
+                    tem.legend.left = 'right'
+                    tem.legend.itemGap = 20
+                  }
                 } else if (tem.type == 'quadrant') { // 四象限
                   this.quadrantList = tem.legend.extend
                 } else if (tem.type == 'line') { // 框框嵌套折线图
