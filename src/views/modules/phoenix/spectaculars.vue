@@ -15,9 +15,9 @@
         </el-select>
       </el-alert>
     <el-row :gutter="20">
-      <el-col v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
+      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList'>
         <el-card>
-          <el-select v-model="selectedList && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
+          <el-select v-model="selectedList && selectedList.data && selectedList.data.length>0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -29,7 +29,7 @@
         </el-card>
         <div class="funnelList">
           <ul v-show="arr[index].type == 'funnel'">
-            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
+            <li :key='index' v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
           </ul>
           <ul>
           </ul>
@@ -303,6 +303,7 @@
           if (res.status == '1') {
             (res.data.selection.length > 0) && (this.list = res.data.selection[0]) // 下拉列表选项
             this.arr = []
+            this.lineList = []
             if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
                 if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
@@ -453,11 +454,12 @@
                   tem.grid.top = ''
                   tem.series[0].areaStyle = {}
                   this.lineList.push(tem)
+                  console.log(this.lineList)
                 } else if (tem.type == 'simple') {
                   this.simpleList.push(tem)
                 }
                 if (tem.selection[0]) {
-                  this.selection = tem.selection[0].items
+                  this.selection = tem.selection[0].selectList || tem.selection[0].items || []
                   this.visualizeId = tem.id
                 }
                 setTimeout(() => {
@@ -491,9 +493,29 @@
         this.funnelList = ''
         this.queryList()
       },
-      changeValue1 (data, index) {
+      changeValue1 (data, type) {
+        if (type == 'remove') {
+          this.apiItems = []
+          this.arr = []
+          this.lineList = []
+          this.selectedList = {
+            id: this.selectedList.id,
+            data: this.selectedList.data.selectListArr
+          }
+          this.selectedList.data.forEach((tem, index) => {
+            var obj = {
+              name: tem,
+              value: tem
+            }
+            this.apiItems.push(obj)
+          })
+          this.queryList(data.selection[0], data.selectListArr)
+          return false
+        }
         if (this.visibleChange) {
           this.apiItems = []
+          this.arr = []
+          this.lineList = []
           data.selectListArr.forEach((tem, index) => {
             var obj = {
               name: tem,
@@ -501,8 +523,6 @@
             }
             this.apiItems.push(obj)
           })
-          this.arr = []
-          this.lineList = []
           this.selectedList = {
             data: data.selectListArr,
             id: data.id
@@ -517,7 +537,7 @@
         this.visibleChange = true
         this.apiItems = []
         this.lineList = []
-        this.changeValue1(data)
+        this.changeValue1(data, 'remove')
       }
     }
   }
