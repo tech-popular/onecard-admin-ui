@@ -459,7 +459,7 @@
                   this.simpleList.push(tem)
                 }
                 if (tem.selection[0]) {
-                  this.selection = tem.selection[0].selectList || tem.selection[0].items || []
+                  this.selection = tem.selection[0].selectList.length > 0 ? tem.selection[0].selectList : tem.selection[0].items
                   this.visualizeId = tem.id
                 }
                 setTimeout(() => {
