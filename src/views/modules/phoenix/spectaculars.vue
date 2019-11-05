@@ -353,6 +353,8 @@
                 }
 
                 if (tem.type == 'bar') { // 折现柱状
+                  this.mark == '3' && (tem.legend.type = 'plain')
+                  console.log(tem)
                   for (let i = 0; i < tem.series.length; i++) {
                     if (tem.legend.data) {
                       if (tem.legend.data[i].metric) {
@@ -438,7 +440,7 @@
                   tem.legend.left = 'right'
                   tem.legend.itemGap = 20
                 } else if (tem.type == 'pies') { // 饼图嵌套
-                  if(tem.series.length > 0) {
+                  if (tem.series.length > 0) {
                     tem.series[0].radius = ['55%', '75%']
                     tem.series[1] && (tem.series[1].radius = ['0%', '30%'])
                     tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
