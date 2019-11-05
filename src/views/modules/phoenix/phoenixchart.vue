@@ -41,6 +41,12 @@
         label="副标题">
       </el-table-column>
       <el-table-column
+        prop="positi"
+        header-align="center"
+        align="center"
+        label="位置">
+       </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"

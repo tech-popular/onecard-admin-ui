@@ -10,6 +10,9 @@
     <el-form-item label="副标题" prop="subtext">
       <el-input v-model="dataForm.subtext" placeholder="副标题"></el-input>
     </el-form-item>
+    <el-form-item label="位置" prop="positi">
+      <el-input v-model="dataForm.positi" placeholder="位置"></el-input>
+    </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -26,7 +29,8 @@
         dataForm: {
           id: 0,
           text: '',
-          subtext: ''
+          subtext: '',
+          positi: ''
         },
         dataRule: {
           text: [
@@ -53,6 +57,7 @@
               if (data && data.code === 0) {
                 this.dataForm.text = data.phoenixChart.text
                 this.dataForm.subtext = data.phoenixChart.subtext
+                this.dataForm.positi = data.phoenixChart.positi
               }
             })
           }
@@ -68,7 +73,8 @@
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
                 'text': this.dataForm.text,
-                'subtext': this.dataForm.subtext
+                'subtext': this.dataForm.subtext,
+                'positi': this.dataForm.positi
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
