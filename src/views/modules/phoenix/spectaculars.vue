@@ -408,7 +408,7 @@
                   }
                   tem['tooltip'] = tooltip
                   if (this.mark == '3' && tem.positi && tem.positi == 'right') { // 机构资金右侧数据
-                    tem.legend.type = tem.legendType
+                    tem.legend.type = tem.legendType || 'scroll'
                     tem.title.textStyle = {
                       fontSize: '14'
                     }
