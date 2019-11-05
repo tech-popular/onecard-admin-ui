@@ -13,6 +13,9 @@
     <el-form-item label="位置" prop="positi">
       <el-input v-model="dataForm.positi" placeholder="位置"></el-input>
     </el-form-item>
+    <el-form-item label="图例类型" prop="legendType">
+      <el-input v-model="dataForm.legendType" placeholder="图例类型"></el-input>
+    </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -30,7 +33,8 @@
           id: 0,
           text: '',
           subtext: '',
-          positi: ''
+          positi: '',
+          legendType: ''
         },
         dataRule: {
           text: [
@@ -58,6 +62,7 @@
                 this.dataForm.text = data.phoenixChart.text
                 this.dataForm.subtext = data.phoenixChart.subtext
                 this.dataForm.positi = data.phoenixChart.positi
+                this.dataForm.legendType = data.phoenixChartLegend.legendType
               }
             })
           }
@@ -74,7 +79,8 @@
                 'id': this.dataForm.id || undefined,
                 'text': this.dataForm.text,
                 'subtext': this.dataForm.subtext,
-                'positi': this.dataForm.positi
+                'positi': this.dataForm.positi,
+                'legendType': this.dataForm.legendType
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
