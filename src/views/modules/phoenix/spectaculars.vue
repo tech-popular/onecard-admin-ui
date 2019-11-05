@@ -34,7 +34,7 @@
           <ul>
           </ul>
         </div>
-        <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index)" type="button" value="全不选" flag="1"/>
+        <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index, 'arr')" type="button" value="全不选" flag="1"/>
       </el-col>
     </el-row>
     <!-- 四象限 -->
@@ -86,7 +86,7 @@
       </div>
     </div>
     <!-- 合计放款 -->
-    <div class="allPay" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
+    <div class="allPay" v-if="mark == '4'">
       <div class="allPayLeft">
         <div>
           <p>{{simpleList[0].title.text}}</p>
@@ -108,22 +108,18 @@
       <div class="allPayRight"></div>
     </div>
     <!-- 机构资金监控 -->
-    <div class="monitor" v-if="simpleList[3] || simpleList[4] || simpleList[5]">
-      <div class="monitorLeft">
-        <div>
-          <p>{{simpleList[3].legend.extend.simple[0].name}}</p>
-          <p>{{simpleList[3].legend.extend.simple[0].metric}}{{simpleList[3].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[3].legend.extend.simple[0].percentRise}">{{simpleList[3].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[3].legend.extend.simple[0].percent}}{{simpleList[3].legend.extend.simple[0].percent_unit}}</span></p>
-        </div>
-        <div>
-          <p>{{simpleList[4].legend.extend.simple[0].name}}</p>
-          <p>{{simpleList[4].legend.extend.simple[0].metric}}{{simpleList[4].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[4].legend.extend.simple[0].percentRise}">{{simpleList[4].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[4].legend.extend.simple[0].percent}}{{simpleList[4].legend.extend.simple[0].percent_unit}}</span></p>
-        </div>
-        <div>
-          <p>{{simpleList[5].legend.extend.simple[0].name}}</p>
-          <p>{{simpleList[5].legend.extend.simple[0].metric}}{{simpleList[5].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[5].legend.extend.simple[0].percentRise}">{{simpleList[5].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[5].legend.extend.simple[0].percent}}{{simpleList[5].legend.extend.simple[0].percent_unit}}</span></p>
+    <div class="monitor" v-if="mark == '3'">
+      <div class="monitorLeft" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
+        <div :key='item.id' v-for="(item) in simpleList">
+          <p>{{item.legend.extend.simple[0].name}}</p>
+          <p>{{item.legend.extend.simple[0].metric}}{{item.legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : item.legend.extend.simple[0].percentRise}">{{item.legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{item.legend.extend.simple[0].percent}}{{item.legend.extend.simple[0].percent_unit}}</span></p>
         </div>
       </div>
       <div class="monitorRight">
+        <div class="monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
+          <div :id="'barCharts' + item.id" class="barCharts"></div>
+          <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index, 'barRightList')" type="button" value="全不选" flag="1"/>
+        </div>
       </div>
     </div>
   </div>
@@ -173,7 +169,8 @@
         quadrantList: '', // 四象限数据
         defaultSelection: [], // 调用默认接口存的数据
         mark: '', // 区分是哪个列表点过来的
-        selectedList: {}
+        selectedList: {},
+        barRightList: [] // 右侧柱状图数据
       }
     },
     computed: {
@@ -212,10 +209,15 @@
     },
     methods: {
       // 全选功能
-      clickALlCheck (index) {
+      clickALlCheck (index, arrValue) {
         let selectall = document.getElementById('selectall' + index)
         let flag = selectall.getAttribute('flag')
-        let selectArr = this.arr[index].legend.data
+        let selectArr = ''
+        if (arrValue == 'arr') {
+          selectArr = this.arr[index].legend.data
+        } else {
+          selectArr = this.barRightList[index].legend.data
+        }
         let val = ''
         if (flag == 1) {
           val = false
@@ -234,13 +236,26 @@
         selectName.forEach((item, indx) => {
           obj[item] = val
         })
-        this.arr[index].legend.selected = obj
-        let label = 'J_chartLineBox' + this.arr[index].id
-        this.chartPie = echarts.init(document.getElementById(label))
-        this.chartPie.setOption(this.arr[index], true)
-        window.addEventListener('resize', () => {
-          this.chartPie.resize()
-        })
+        if (arrValue == 'arr') {
+          this.arr[index].legend.selected = obj
+        } else {
+          this.barRightList[index].legend.selected = obj
+        }
+        if (arrValue == 'barRightList') {
+          let label = 'barCharts' + this.barRightList[index].id
+          this.chartPie = echarts.init(document.getElementById(label))
+          this.chartPie.setOption(this.barRightList[index], true)
+          window.addEventListener('resize', () => {
+            this.chartPie.resize()
+          })
+        } else {
+          let label = 'J_chartLineBox' + this.arr[index].id
+          this.chartPie = echarts.init(document.getElementById(label))
+          this.chartPie.setOption(this.arr[index], true)
+          window.addEventListener('resize', () => {
+            this.chartPie.resize()
+          })
+        }
       },
       // 获取默认选择项
       getDefaultSelection () {
@@ -303,10 +318,11 @@
             (res.data.selection.length > 0) && (this.list = res.data.selection[0]) // 下拉列表选项
             this.arr = []
             this.lineList = []
+            this.barRightList = []
             if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
-                if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
-                  tem.selectListArr = []
+                tem.selectListArr = []
+                if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
                   this.arr.push(tem)
                 }
                 let grid = { // 设置柱状样式
@@ -353,8 +369,6 @@
                 }
 
                 if (tem.type == 'bar') { // 折现柱状
-                  this.mark == '3' && (tem.legend.type = 'plain')
-                  console.log(tem)
                   for (let i = 0; i < tem.series.length; i++) {
                     if (tem.legend.data) {
                       if (tem.legend.data[i].metric) {
@@ -393,6 +407,13 @@
                     }
                   }
                   tem['tooltip'] = tooltip
+                  if (this.mark == '3' && tem.positi && tem.positi == 'right') { // 机构资金右侧数据
+                    // tem.legend.type = 'plain'
+                    tem.title.textStyle = {
+                      fontSize: '14'
+                    }
+                    this.barRightList.push(tem)
+                  }
                 } else if (tem.type == 'pie') { // 饼图
                   for (let i = 0; i < tem.legend.data.length; i++) {
                     var legendName = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
@@ -465,7 +486,16 @@
                   this.visualizeId = tem.id
                 }
                 setTimeout(() => {
-                  if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                  if (this.mark == '3' && tem.positi == 'right') {
+                    let label = 'barCharts' + tem.id
+                    this.myCharts = echarts.init(document.getElementById(label))
+                    this.myCharts.setOption(tem, true)
+                    window.addEventListener('resize', () => {
+                      this.myCharts.resize()
+                    })
+                    return false
+                  }
+                  if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
                     let label = 'J_chartLineBox' + tem.id
                     this.chartPie = echarts.init(document.getElementById(label))
                     this.chartPie.setOption(tem, true)
@@ -750,17 +780,17 @@
   }
   .monitor{
     width: 100%;
-    background: #f0f4f8;
+    // background: #f0f4f8;
     margin-top: 20px;
     display: flex;
     .monitorLeft{
       flex: 1;
       &>div{
         border-radius: 10px;
-        margin: 20px;
+        margin: 40px 20px;
         background: #ccc;
         text-align: center;
-        padding: 20px 7px;
+        padding: 40px 7px;
         div{
           font-size: 12px;
           line-height: 12px;
@@ -770,6 +800,16 @@
     }
     .monitorRight{
       flex: 5;
+      .monitorRightList{
+        // background: #ccc;
+        margin: 20px;
+        position: relative;
+        box-sizing: border-box;
+      }
+      .barCharts{
+        min-height: 200px;
+        max-height: 200px;
+      }
     }
   }
   .allChecked{
