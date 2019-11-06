@@ -15,7 +15,7 @@
         </el-select>
       </el-alert>
     <el-row :gutter="20">
-      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList'>
+      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList' :class="{'Rainbow' : mark == '2'}">
         <el-card>
           <el-select v-model="selectedList && selectedList.data && selectedList.data.length>0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
             <el-option
@@ -462,8 +462,8 @@
                   tem.legend.itemGap = 20
                 } else if (tem.type == 'pies') { // 饼图嵌套
                   if (tem.series.length > 0) {
-                    tem.series[0].radius = ['55%', '75%']
-                    tem.series[1] && (tem.series[1].radius = ['0%', '30%'])
+                    tem.series[0].radius = ['40%', '55%']
+                    tem.series[1] && (tem.series[1].radius = ['0%', '15%'])
                     tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
                     tem.legend.orient = 'vertical'
                     tem.legend.left = 'right'
@@ -590,6 +590,12 @@
     }
     .echartList{
       position: relative;
+    }
+    .Rainbow:nth-child(odd){
+      width: 33%;
+    }
+    .Rainbow:nth-child(even){
+      width: 66%;
     }
     .selectList{
       position: absolute;
@@ -790,7 +796,7 @@
         margin: 40px 20px;
         background: #ccc;
         text-align: center;
-        padding: 40px 7px;
+        padding: 100px 7px;
         div{
           font-size: 12px;
           line-height: 12px;
@@ -807,8 +813,8 @@
         box-sizing: border-box;
       }
       .barCharts{
-        min-height: 200px;
-        max-height: 200px;
+        min-height: 300px;
+        max-height: 300px;
       }
     }
   }
