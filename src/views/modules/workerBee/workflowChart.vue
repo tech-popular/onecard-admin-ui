@@ -147,7 +147,59 @@ export default{
             new go.Binding('visible', 'answer', function (a) { return (!!a) })
           )
         )
-      var nodeDataArray = this.dataAllList.nodeDataArray
+      var nodeDataArray = [
+        {
+          key: 1,
+          question: 'Greeting',
+          actions: [
+            { text: 'Sales', figure: 'ElectricalHazard', fill: 'blue' },
+            { text: 'Parts and Services', figure: 'FireHazard', fill: 'red' },
+            { text: 'Representative', figure: 'IrritationHazard', fill: 'yellow' }
+          ]
+        },
+        {
+          key: 2,
+          question: 'Sales',
+          actions: [
+            { text: 'Compact', figure: 'ElectricalHazard', fill: 'blue' },
+            { text: 'Mid-Size', figure: 'FireHazard', fill: 'red' },
+            { text: 'Large', figure: 'IrritationHazard', fill: 'yellow' }
+          ]
+        },
+        {
+          key: 3,
+          question: 'Parts and Services',
+          actions: [
+            { text: 'Maintenance', figure: 'ElectricalHazard', fill: 'blue' },
+            { text: 'Repairs', figure: 'FireHazard', fill: 'red' },
+            { text: 'State Inspection', figure: 'IrritationHazard', fill: 'yellow' }
+          ]
+        },
+        { key: 4, question: 'Representative' },
+        { key: 5, question: 'Compact' },
+        { key: 6, question: 'Mid-Size' },
+        {
+          key: 7,
+          question: 'Large',
+          actions: [
+            { text: 'SUV', figure: 'ElectricalHazard', fill: 'blue' },
+            { text: 'Van', figure: 'FireHazard', fill: 'red' }
+          ]
+        },
+        { key: 8, question: 'Maintenance' },
+        { key: 9, question: 'Repairs' },
+        { key: 10, question: 'State Inspection' },
+        { key: 11, question: 'SUV' },
+        { key: 12, question: 'Van' },
+        { key: 13, category: 'Terminal', text: 'Susan' },
+        { key: 14, category: 'Terminal', text: 'Eric' },
+        { key: 15, category: 'Terminal', text: 'Steven' },
+        { key: 16, category: 'Terminal', text: 'Tom' },
+        { key: 17, category: 'Terminal', text: 'Emily' },
+        { key: 18, category: 'Terminal', text: 'Tony' },
+        { key: 19, category: 'Terminal', text: 'Ken' },
+        { key: 20, category: 'Terminal', text: 'Rachel' }
+      ]
       var linkDataArray = this.dataAllList.linkDataArray
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
@@ -157,6 +209,7 @@ export default{
           linkDataArray: linkDataArray
         })
     },
+
     // 放大事件
     enlarge () {
       var mySelf = this
