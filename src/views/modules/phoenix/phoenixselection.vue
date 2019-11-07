@@ -30,12 +30,12 @@
         align="center"
         label="编号">
       </el-table-column>
-      <el-table-column
+      <!--<el-table-column
         prop="chartId"
         header-align="center"
         align="center"
         label="chart号">
-      </el-table-column>
+      </el-table-column>-->
       <!--<el-table-column
         prop="screenId"
         header-align="center"
@@ -59,6 +59,18 @@
         header-align="center"
         align="center"
         label="占位符">
+      </el-table-column>
+      <el-table-column
+        prop="columnName"
+        header-align="center"
+        align="center"
+        label="字段名">
+      </el-table-column>
+      <el-table-column
+        prop="mark"
+        header-align="center"
+        align="center"
+        label="标记">
       </el-table-column>
       <el-table-column
         fixed="right"

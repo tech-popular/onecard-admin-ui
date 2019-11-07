@@ -15,9 +15,9 @@
         </el-select>
       </el-alert>
     <el-row :gutter="20">
-      <el-col  v-for="(outdata, index) in arr" :key="index" :span="12"  class='echartList'>
+      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList' :class="{'Rainbow' : mark == '2'}">
         <el-card>
-          <el-select v-model="value1" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata.selection[0])" @remove-tag="changeTag(selection[0])">
+          <el-select v-model="selectedList && selectedList.data && selectedList.data.length>0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
             <el-option
               v-for="item in selection"
               :key="item.name"
@@ -29,11 +29,12 @@
         </el-card>
         <div class="funnelList">
           <ul v-show="arr[index].type == 'funnel'">
-            <li :key = index v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
+            <li :key='index' v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
           </ul>
           <ul>
           </ul>
         </div>
+        <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index, 'arr')" type="button" value="全不选" flag="1"/>
       </el-col>
     </el-row>
     <!-- 四象限 -->
@@ -85,7 +86,7 @@
       </div>
     </div>
     <!-- 合计放款 -->
-    <div class="allPay" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
+    <div class="allPay" v-if="mark == '4'">
       <div class="allPayLeft">
         <div>
           <p>{{simpleList[0].title.text}}</p>
@@ -107,22 +108,18 @@
       <div class="allPayRight"></div>
     </div>
     <!-- 机构资金监控 -->
-    <div class="monitor" v-if="simpleList[3] || simpleList[4] || simpleList[5]">
-      <div class="monitorLeft">
-        <div>
-          <p>{{simpleList[3].legend.extend.simple[0].name}}</p>
-          <p>{{simpleList[3].legend.extend.simple[0].metric}}{{simpleList[3].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[3].legend.extend.simple[0].percentRise}">{{simpleList[3].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[3].legend.extend.simple[0].percent}}{{simpleList[3].legend.extend.simple[0].percent_unit}}</span></p>
-        </div>
-        <div>
-          <p>{{simpleList[4].legend.extend.simple[0].name}}</p>
-          <p>{{simpleList[4].legend.extend.simple[0].metric}}{{simpleList[4].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[4].legend.extend.simple[0].percentRise}">{{simpleList[4].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[4].legend.extend.simple[0].percent}}{{simpleList[4].legend.extend.simple[0].percent_unit}}</span></p>
-        </div>
-        <div>
-          <p>{{simpleList[5].legend.extend.simple[0].name}}</p>
-          <p>{{simpleList[5].legend.extend.simple[0].metric}}{{simpleList[5].legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : simpleList[5].legend.extend.simple[0].percentRise}">{{simpleList[5].legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{simpleList[5].legend.extend.simple[0].percent}}{{simpleList[5].legend.extend.simple[0].percent_unit}}</span></p>
+    <div class="monitor" v-if="mark == '3'">
+      <div class="monitorLeft" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
+        <div :key='item.id' v-for="(item) in simpleList">
+          <p>{{item.legend.extend.simple[0].name}}</p>
+          <p>{{item.legend.extend.simple[0].metric}}{{item.legend.extend.simple[0].metric_unit}}<span class="colorRed" :class="{'percentRise' : item.legend.extend.simple[0].percentRise}">{{item.legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{item.legend.extend.simple[0].percent}}{{item.legend.extend.simple[0].percent_unit}}</span></p>
         </div>
       </div>
       <div class="monitorRight">
+        <div class="monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
+          <div :id="'barCharts' + item.id" class="barCharts"></div>
+          <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index, 'barRightList')" type="button" value="全不选" flag="1"/>
+        </div>
       </div>
     </div>
   </div>
@@ -130,7 +127,7 @@
 
 <script>
   import echarts from 'echarts'
-  import { fprice, getChinese } from '@/utils'
+  import { fprice, getChinese, getQueryString } from '@/utils'
   import 'echarts/lib/chart/funnel'
   import 'echarts/lib/chart/radar'
   export default {
@@ -144,7 +141,6 @@
         chartScatter: null,
         list: [],
         value: '预授信（常规黑指）',
-        value1: '',
         visualizes: [],
         arr: [], // 有几个图表
         textStyle: { // 设置标签名字样式
@@ -171,7 +167,10 @@
         simpleList: [], // 侧边数据
         funnelList: [], // 漏斗图数据
         quadrantList: '', // 四象限数据
-        defaultSelection: [] // 调用默认接口存的数据
+        defaultSelection: [], // 调用默认接口存的数据
+        mark: '', // 区分是哪个列表点过来的
+        selectedList: {},
+        barRightList: [] // 右侧柱状图数据
       }
     },
     computed: {
@@ -180,14 +179,24 @@
         set (val) { this.$store.commit('common/updateSidebarFold', val) }
       }
     },
+    watch: {
+      $route (to) {
+        if (to.path.indexOf('phoenix-spectaculars') != -1) {
+          this.visualizeId = 1
+          this.list = []
+          this.mark = getQueryString('mark')
+          this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+        }
+      }
+    },
     created () {
+      this.mark = getQueryString('mark')
     },
     mounted () {
       if (!this.sidebarFold) {
-        // set (true) { this.$store.commit('common/updateSidebarFold', val) }
         this.sidebarFold = !this.sidebarFold
       }
-      this.getDefaultSelection()
+      this.mark == '1' ? this.getDefaultSelection() : this.queryList()
     },
     activated () {
       // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -199,6 +208,55 @@
       }
     },
     methods: {
+      // 全选功能
+      clickALlCheck (index, arrValue) {
+        let selectall = document.getElementById('selectall' + index)
+        let flag = selectall.getAttribute('flag')
+        let selectArr = ''
+        if (arrValue == 'arr') {
+          selectArr = this.arr[index].legend.data
+        } else {
+          selectArr = this.barRightList[index].legend.data
+        }
+        let val = ''
+        if (flag == 1) {
+          val = false
+          selectall.setAttribute('flag', 0)
+          selectall.value = '全选中'
+        } else {
+          val = true
+          selectall.setAttribute('flag', 1)
+          selectall.value = '全不选'
+        }
+        let obj = {}
+        let selectName = []
+        selectArr.forEach((item, indx) => {
+          selectName.push(item.name)
+        })
+        selectName.forEach((item, indx) => {
+          obj[item] = val
+        })
+        if (arrValue == 'arr') {
+          this.arr[index].legend.selected = obj
+        } else {
+          this.barRightList[index].legend.selected = obj
+        }
+        if (arrValue == 'barRightList') {
+          let label = 'barCharts' + this.barRightList[index].id
+          this.chartPie = echarts.init(document.getElementById(label))
+          this.chartPie.setOption(this.barRightList[index], true)
+          window.addEventListener('resize', () => {
+            this.chartPie.resize()
+          })
+        } else {
+          let label = 'J_chartLineBox' + this.arr[index].id
+          this.chartPie = echarts.init(document.getElementById(label))
+          this.chartPie.setOption(this.arr[index], true)
+          window.addEventListener('resize', () => {
+            this.chartPie.resize()
+          })
+        }
+      },
       // 获取默认选择项
       getDefaultSelection () {
         this.$http({
@@ -218,21 +276,22 @@
       },
 
       // 获取列表
-      queryList (selectionIndex) {
+      queryList (selectionIndex, selectionData) {
+        let { mark } = this.$data
         this.$http({
           url: this.$http.adornUrl('/phoenix/dashboard'),
           method: 'post',
           data: {
             data: {
-              dashboardId: 1,
+              dashboardId: mark,
               dashboardSelection: [{ // 大屏
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection.placeholder,
-                items: [{
+                items: mark == '1' ? [{
                   name: this.value,
                   value: this.value
-                }],
+                }] : [],
                 columnName: this.list.columnName || this.defaultSelection.columnName,
                 mark: this.list.mark || this.defaultSelection.mark
               }],
@@ -241,7 +300,7 @@
                 name: 'visualize过滤策略',
                 type: 'visualize',
                 placeholder: selectionIndex ? (selectionIndex.placeholder) : '',
-                items: this.value1 ? this.apiItems : [],
+                items: selectionData ? this.apiItems : [],
                 columnName: selectionIndex ? (selectionIndex.columnName) : '',
                 mark: selectionIndex ? (selectionIndex.mark) : ''
               }]
@@ -257,9 +316,13 @@
           let res = data.response
           if (res.status == '1') {
             (res.data.selection.length > 0) && (this.list = res.data.selection[0]) // 下拉列表选项
+            this.arr = []
+            this.lineList = []
+            this.barRightList = []
             if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
-                if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                tem.selectListArr = []
+                if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
                   this.arr.push(tem)
                 }
                 let grid = { // 设置柱状样式
@@ -344,6 +407,13 @@
                     }
                   }
                   tem['tooltip'] = tooltip
+                  if (this.mark == '3' && tem.positi && tem.positi == 'right') { // 机构资金右侧数据
+                    tem.legend.type = tem.legendType || 'scroll'
+                    tem.title.textStyle = {
+                      fontSize: '14'
+                    }
+                    this.barRightList.push(tem)
+                  }
                 } else if (tem.type == 'pie') { // 饼图
                   for (let i = 0; i < tem.legend.data.length; i++) {
                     var legendName = tem.legend.data[i].name + '\n\n ' + tem.legend.data[i].metric + tem.legend.data[i].metric_unit + (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') + tem.legend.data[i].percent + tem.legend.data[i].percent_unit
@@ -383,19 +453,22 @@
                   tem.tooltip.formatter = '{a}<br/>{b}'
                   this.funnelList = tem.legend.data
                 } else if (tem.type == 'radar') { // 雷达
-                  tem.series[1].itemStyle = {
+                  tem.tooltip = {}
+                  tem.series[1] && (tem.series[1].itemStyle = {
                     color: 'blue'
-                  }
+                  })
                   tem.legend.orient = 'vertical'
                   tem.legend.left = 'right'
                   tem.legend.itemGap = 20
                 } else if (tem.type == 'pies') { // 饼图嵌套
-                  tem.series[0].radius = ['55%', '75%']
-                  tem.series[1].radius = ['0%', '30%']
-                  tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
-                  tem.legend.orient = 'vertical'
-                  tem.legend.left = 'right'
-                  tem.legend.itemGap = 20
+                  if (tem.series.length > 0) {
+                    tem.series[0].radius = ['40%', '55%']
+                    tem.series[1] && (tem.series[1].radius = ['0%', '15%'])
+                    tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
+                    tem.legend.orient = 'vertical'
+                    tem.legend.left = 'right'
+                    tem.legend.itemGap = 20
+                  }
                 } else if (tem.type == 'quadrant') { // 四象限
                   this.quadrantList = tem.legend.extend
                 } else if (tem.type == 'line') { // 框框嵌套折线图
@@ -409,11 +482,20 @@
                   this.simpleList.push(tem)
                 }
                 if (tem.selection[0]) {
-                  this.selection = tem.selection[0].items
+                  this.selection = tem.selection[0].selectList && tem.selection[0].selectList.length > 0 ? tem.selection[0].selectList : tem.selection[0].items
                   this.visualizeId = tem.id
                 }
                 setTimeout(() => {
-                  if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line') {
+                  if (this.mark == '3' && tem.positi == 'right') {
+                    let label = 'barCharts' + tem.id
+                    this.myCharts = echarts.init(document.getElementById(label))
+                    this.myCharts.setOption(tem, true)
+                    window.addEventListener('resize', () => {
+                      this.myCharts.resize()
+                    })
+                    return false
+                  }
+                  if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
                     let label = 'J_chartLineBox' + tem.id
                     this.chartPie = echarts.init(document.getElementById(label))
                     this.chartPie.setOption(tem, true)
@@ -437,29 +519,58 @@
       selectGet () {
         this.arr = []
         this.apiItems = []
-        this.value1 = ''
         this.quadrantList = ''
+        this.lineList = []
+        this.simpleList = []
+        this.funnelList = ''
         this.queryList()
       },
-      changeValue1 (selectionIndex) {
-        if (this.visibleChange) {
-          this.value1.forEach((tem, index) => {
-            var obj = {}
-            obj.name = tem
-            obj.value = tem
+      changeValue1 (data, type) {
+        if (type == 'remove') {
+          this.apiItems = []
+          this.arr = []
+          this.lineList = []
+          this.selectedList = {
+            id: this.selectedList.id,
+            data: this.selectedList.data.selectListArr
+          }
+          this.selectedList.data.forEach((tem, index) => {
+            var obj = {
+              name: tem,
+              value: tem
+            }
             this.apiItems.push(obj)
           })
+          this.visibleChange = false
+          this.queryList(data.selection[0], data.selectListArr)
+          return false
+        }
+        if (this.visibleChange) {
+          this.apiItems = []
           this.arr = []
-          this.queryList(selectionIndex)
+          this.lineList = []
+          data.selectListArr.forEach((tem, index) => {
+            var obj = {
+              name: tem,
+              value: tem
+            }
+            this.apiItems.push(obj)
+          })
+          this.selectedList = {
+            data: data.selectListArr,
+            id: data.id
+          }
+          this.queryList(data.selection[0], data.selectListArr)
           this.visibleChange = false
         } else {
           this.visibleChange = true
         }
       },
-      changeTag (selectionIndex) {
+      changeTag (data) {
         this.visibleChange = true
         this.apiItems = []
-        this.changeValue1(selectionIndex)
+        this.lineList = []
+        this.changeValue1(data, 'remove')
       }
     }
   }
@@ -479,6 +590,12 @@
     }
     .echartList{
       position: relative;
+    }
+    .Rainbow:nth-child(odd){
+      width: 33%;
+    }
+    .Rainbow:nth-child(even){
+      width: 66%;
     }
     .selectList{
       position: absolute;
@@ -669,17 +786,17 @@
   }
   .monitor{
     width: 100%;
-    background: #f0f4f8;
+    // background: #f0f4f8;
     margin-top: 20px;
     display: flex;
     .monitorLeft{
       flex: 1;
       &>div{
         border-radius: 10px;
-        margin: 20px;
+        margin: 40px 20px;
         background: #ccc;
         text-align: center;
-        padding: 20px 7px;
+        padding: 100px 7px;
         div{
           font-size: 12px;
           line-height: 12px;
@@ -689,6 +806,21 @@
     }
     .monitorRight{
       flex: 5;
+      .monitorRightList{
+        // background: #ccc;
+        margin: 20px;
+        position: relative;
+        box-sizing: border-box;
+      }
+      .barCharts{
+        min-height: 300px;
+        max-height: 300px;
+      }
     }
+  }
+  .allChecked{
+    position: absolute;
+    top: 0;
+    left: 50%;
   }
 </style>

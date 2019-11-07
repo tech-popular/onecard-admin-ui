@@ -72,6 +72,14 @@
         label="授权标识">
       </el-table-column>
       <el-table-column
+        prop="mark"
+        header-align="center"
+        align="center"
+        width="150"
+        :show-overflow-tooltip="true"
+        label="标记">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"

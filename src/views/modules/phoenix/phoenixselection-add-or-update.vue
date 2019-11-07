@@ -17,6 +17,12 @@
     <el-form-item label="占位符" prop="placeholder">
       <el-input v-model="dataForm.placeholder" placeholder="占位符"></el-input>
     </el-form-item>
+    <el-form-item label="字段名" prop="columnName">
+      <el-input v-model="dataForm.columnName" placeholder="字段名"></el-input>
+    </el-form-item>
+    <el-form-item label="标记" prop="mark">
+      <el-input v-model="dataForm.mark" placeholder="标记"></el-input>
+    </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -36,7 +42,9 @@
           // screenId: '',
           name: '',
           type: '',
-          placeholder: ''
+          placeholder: '',
+          columnName: '',
+          mark: ''
         },
         selectionTypes: [],
         dataRule: {
@@ -48,6 +56,12 @@
           ],
           placeholder: [
             { required: true, message: '占位符不能为空', trigger: 'blur' }
+          ],
+          columnName: [
+              { required: true, message: '字段名不能为空', trigger: 'blur' }
+          ],
+          mark: [
+              { required: true, message: '标记不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -83,6 +97,8 @@
                 this.dataForm.name = data.phoenixSelection.name
                 this.dataForm.type = data.phoenixSelection.type
                 this.dataForm.placeholder = data.phoenixSelection.placeholder
+                this.dataForm.columnName = data.phoenixSelection.columnName
+                this.dataForm.mark = data.phoenixSelection.mark
               }
             })
           }
@@ -101,7 +117,9 @@
                 // 'screenId': this.dataForm.screenId,
                 'name': this.dataForm.name,
                 'type': this.dataForm.type,
-                'placeholder': this.dataForm.placeholder
+                'placeholder': this.dataForm.placeholder,
+                'columnName': this.dataForm.columnName,
+                'mark': this.dataForm.mark
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
