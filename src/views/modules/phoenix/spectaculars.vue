@@ -15,7 +15,7 @@
         </el-select>
       </el-alert>
     <el-row :gutter="20">
-      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList' :class="{'Rainbow' : mark == '2'}">
+      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList' :class="`${mark == '2' ? 'Rainbow' : ''}${mark == '5' ? 'funnelStyle' : ''}`">
         <el-card>
           <el-select v-model="selectedList && selectedList.data && selectedList.data.length>0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
             <el-option
@@ -591,11 +591,14 @@
     .echartList{
       position: relative;
     }
+    .funnelStyle{
+      width: 33.33%;
+    }
     .Rainbow:nth-child(odd){
-      width: 33%;
+      width: 30%;
     }
     .Rainbow:nth-child(even){
-      width: 66%;
+      width: 70%;
     }
     .selectList{
       position: absolute;
@@ -622,7 +625,7 @@
       }
       li:nth-child(1){
         margin-top: -71px;
-        left: 260px;
+        left: 150px;
         width: 100px;
         position: absolute;
         text-align: center;
