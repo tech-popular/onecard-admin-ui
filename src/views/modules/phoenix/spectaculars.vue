@@ -15,7 +15,7 @@
         </el-select>
       </el-alert>
     <el-row :gutter="20">
-      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList' :class="{'Rainbow' : mark == '2'}">
+      <el-col v-for="(outdata, index) in arr" :key="outdata.id" :span="12"  class='echartList' :class="`${mark == '2' ? 'Rainbow' : ''}${mark == '5' ? 'funnelStyle' : ''}`">
         <el-card>
           <el-select v-model="selectedList && selectedList.data && selectedList.data.length>0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
             <el-option
@@ -29,7 +29,7 @@
         </el-card>
         <div class="funnelList">
           <ul v-show="arr[index].type == 'funnel'">
-            <li :key='index' v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
+            <li :key='index' v-for="(item, index) in outdata.legend.data">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
           </ul>
           <ul>
           </ul>
@@ -400,7 +400,7 @@
                     formatter: (params) => {
                       var result = params[0].axisValue
                       params.map((item, i) => {
-                        result += '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background:' + item.color + '"></span><span style="color:#fff;">' + getChinese(
+                        result += '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:  px;width:10px;height:10px;background:' + item.color + '"></span><span style="color:#fff;">' + getChinese(
                           item.seriesName) + '</span> : ' + fprice(item.value, 0) + '人</span>'
                       })
                       return result
@@ -591,11 +591,14 @@
     .echartList{
       position: relative;
     }
+    .funnelStyle{
+      width: 33.33%;
+    }
     .Rainbow:nth-child(odd){
-      width: 33%;
+      width: 30%;
     }
     .Rainbow:nth-child(even){
-      width: 66%;
+      width: 70%;
     }
     .selectList{
       position: absolute;
@@ -622,7 +625,7 @@
       }
       li:nth-child(1){
         margin-top: -71px;
-        left: 260px;
+        left: 150px;
         width: 100px;
         position: absolute;
         text-align: center;
