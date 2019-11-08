@@ -200,7 +200,27 @@ export default{
         { key: 19, category: 'Terminal', text: 'Ken' },
         { key: 20, category: 'Terminal', text: 'Rachel' }
       ]
-      var linkDataArray = this.dataAllList.linkDataArray
+      var linkDataArray = [
+        { from: 1, to: 2, answer: 1 },
+        { from: 1, to: 3, answer: 2 },
+        { from: 1, to: 4, answer: 3 },
+        { from: 2, to: 5, answer: 1 },
+        { from: 2, to: 6, answer: 2 },
+        { from: 2, to: 7, answer: 3 },
+        { from: 3, to: 8, answer: 1 },
+        { from: 3, to: 9, answer: 2 },
+        { from: 3, to: 10, answer: 3 },
+        { from: 7, to: 11, answer: 1 },
+        { from: 7, to: 12, answer: 2 },
+        { from: 5, to: 13 },
+        { from: 6, to: 14 },
+        { from: 11, to: 15 },
+        { from: 12, to: 16 },
+        { from: 8, to: 17 },
+        { from: 9, to: 18 },
+        { from: 10, to: 19 },
+        { from: 4, to: 20 }
+      ]
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
           copiesArrays: true,
