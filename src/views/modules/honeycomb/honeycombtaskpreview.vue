@@ -30,7 +30,8 @@
       <el-button type="primary" @click="stopMaxcomputepreview()">停止</el-button>
     </el-form-item>
     <el-form-item>
-      <el-input type="textarea" ref="returnData" v-model="returnData" :rows="10"></el-input>
+      <el-input type="textarea" ref="returnData" v-model="returnStatus" :autosize="{ minRows: 10, maxRows: 10}" style="width: 39%; display: inline-block;"></el-input>
+      <el-input type="textarea" ref="returnData" v-model="returnData" :autosize="{ minRows: 10, maxRows: 10}" style="width: 60%; display: inline-block;"></el-input>
     </el-form-item>
   </el-form>
 
@@ -60,6 +61,7 @@
         datasourceoptions: [],
         instanceId: '',
         returnData: '',
+        returnStatus: '',
         dataRule: {
           datasourceId: [
             { required: true, message: '输入数据源不能为空', trigger: 'blur' }
@@ -125,6 +127,8 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.returnData = ''
+            this.returnStatus = ''
             this.$http({
               url: this.$http.adornUrl(`/honeycomb/honeycombtaskpreview/preview/sql`),
               method: 'post',
@@ -132,11 +136,11 @@
               )
             }).then(({data}) => {
               if (data && data.code === 0) {
-                console.log(data.resultBean)
-                this.returnData += JSON.stringify(data)
+                this.returnStatus = JSON.stringify({status: data.resultBean.status})
+                this.returnData = JSON.stringify({data: data.resultBean.data, message: data.resultBean.message})
                 if (data.resultBean.status === '2') {
                   this.instanceId = data.resultBean.traceId
-                  this.returnData += '\n继续执行\n'
+                  this.returnData += '\n继续执行'
                   this.continueMaxcomputepreview()
                 } else {
                   clearInterval(window.clearnum)
@@ -161,10 +165,10 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                console.log(data.resultBean)
-                this.returnData += JSON.stringify(data)
+                this.returnStatus += `\n${JSON.stringify({status: data.resultBean.status})}`
+                this.returnData += JSON.stringify({data: data.resultBean.data, message: data.resultBean.message})
                 if (data.resultBean.status === '2') {
-                  this.returnData += '\n继续执行\n'
+                  this.returnData += '\n继续执行'
                   clearInterval(window.clearnum)
                   window.clearnum = setTimeout(() => {
                     this.continueMaxcomputepreview()
@@ -192,9 +196,9 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                console.log(data.resultBean)
                 clearInterval(window.clearnum)
-                this.returnData += '\n停止执行\n'
+                this.returnStatus += `\n${JSON.stringify({status: data.resultBean.status})}`
+                this.returnData += '\n停止执行'
               } else {
                 this.$message.error(data.msg)
                 alert('操作失败')

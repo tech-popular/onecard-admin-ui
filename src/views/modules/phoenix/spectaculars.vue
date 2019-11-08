@@ -29,7 +29,7 @@
         </el-card>
         <div class="funnelList">
           <ul v-show="arr[index].type == 'funnel'">
-            <li :key='index' v-for="(item, index) in funnelList">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
+            <li :key='index' v-for="(item, index) in outdata.legend.data">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
           </ul>
           <ul>
           </ul>
@@ -404,7 +404,7 @@
                     formatter: (params) => {
                       var result = params[0].axisValue
                       params.map((item, i) => {
-                        result += '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background:' + item.color + '"></span><span style="color:#fff;">' + getChinese(
+                        result += '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:  px;width:10px;height:10px;background:' + item.color + '"></span><span style="color:#fff;">' + getChinese(
                           item.seriesName) + '</span> : ' + fprice(item.value, 0) + '人</span>'
                       })
                       return result
