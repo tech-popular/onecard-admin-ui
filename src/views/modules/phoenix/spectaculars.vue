@@ -34,11 +34,11 @@
           <ul>
           </ul>
         </div>
-        <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index, 'arr')" type="button" value="全不选" flag="1"/>
+        <!-- <input class="allChecked" :id="'selectall' + index" @click="clickALlCheck(index, 'arr')" type="button" value="全不选" flag="1"/> -->
       </el-col>
     </el-row>
     <!-- 四象限 -->
-    <div v-if='quadrantList' class="quadrant">
+    <div v-if="quadrantList && mark == '4'" class="quadrant">
       <h3>四象限&&小X卡</h3>
       <div class="titleName">
         <p>四象限</p>
@@ -86,7 +86,7 @@
       </div>
     </div>
     <!-- 合计放款 -->
-    <div class="allPay" v-if="mark == '4'">
+    <!-- <div class="allPay">
       <div class="allPayLeft">
         <div>
           <p>{{simpleList[0].title.text}}</p>
@@ -106,7 +106,7 @@
         </div>
       </div>
       <div class="allPayRight"></div>
-    </div>
+    </div> -->
     <!-- 机构资金监控 -->
     <div class="monitor" v-if="mark == '3'">
       <div class="monitorLeft" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
@@ -319,6 +319,7 @@
             this.arr = []
             this.lineList = []
             this.barRightList = []
+            this.simpleList = []
             if (res.data.visualizes) { // 图标列表
               res.data.visualizes.forEach((tem, index) => {
                 tem.selectListArr = []
@@ -369,6 +370,9 @@
                 }
 
                 if (tem.type == 'bar') { // 折现柱状
+                  if (this.mark == '2' && tem.id == '16') {
+                    tem.color = ['#f1675d', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
+                  }
                   for (let i = 0; i < tem.series.length; i++) {
                     if (tem.legend.data) {
                       if (tem.legend.data[i].metric) {
@@ -462,13 +466,15 @@
                   tem.legend.itemGap = 20
                 } else if (tem.type == 'pies') { // 饼图嵌套
                   if (tem.series.length > 0) {
-                    tem.series[0].radius = ['40%', '55%']
-                    tem.series[1] && (tem.series[1].radius = ['0%', '15%'])
-                    tem.color = ['red', 'orange', 'yellow', 'green', '#006030', 'blue', 'purple', 'grey']
-                    tem.legend.orient = 'vertical'
-                    tem.legend.left = 'right'
+                    tem.series[0].radius = ['45%', '65%']
+                    tem.series[1] && (tem.series[1].radius = ['0%', '20%'])
+                    tem.color = ['#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
+                    // tem.legend.orient = 'vertical'
+                    // tem.legend.left = 'right'
+                    tem.legend.top = 'bottom'
                     tem.legend.itemGap = 20
                   }
+                  console.log(tem)
                 } else if (tem.type == 'quadrant') { // 四象限
                   this.quadrantList = tem.legend.extend
                 } else if (tem.type == 'line') { // 框框嵌套折线图
@@ -825,5 +831,9 @@
     position: absolute;
     top: 0;
     left: 50%;
+    background: #f1675d;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
   }
 </style>
