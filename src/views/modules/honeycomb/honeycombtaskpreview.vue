@@ -29,6 +29,7 @@
       <el-button type="primary" @click="dataFormSubmit()">执行</el-button>
       <el-button type="primary" @click="stopMaxcomputepreview()">停止</el-button>
     </el-form-item>
+    
     <el-form-item>
       <el-input type="textarea" ref="returnData" v-model="returnStatus" :autosize="{ minRows: 10, maxRows: 10}" style="width: 39%; display: inline-block;"></el-input>
       <el-input type="textarea" ref="returnData" v-model="returnData" :autosize="{ minRows: 10, maxRows: 10}" style="width: 60%; display: inline-block;"></el-input>
