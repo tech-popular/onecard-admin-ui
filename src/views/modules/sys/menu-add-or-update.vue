@@ -16,7 +16,8 @@
         <el-popover
           ref="menuListPopover"
           placement="bottom-start"
-          trigger="click">
+          trigger="click"
+          popper-class="menuSelect">
           <el-tree
             :data="menuList"
             :props="menuListTreeProps"
@@ -215,6 +216,10 @@
 </script>
 
 <style lang="scss">
+  .menuSelect{
+    height: 300px;
+    overflow: auto
+  }
   .mod-menu {
     .menu-list__input,
     .icon-list__input {
