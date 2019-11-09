@@ -2,7 +2,7 @@
   <div>
     <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
-    <div id="myDiagramDiv" style="width:100%; height:500px; background-color: #ccc;"></div>
+    <div id="myDiagramDiv" style="width:100%; height:100vh; background-color: #ccc;"></div>
   </div>
 </template>
 

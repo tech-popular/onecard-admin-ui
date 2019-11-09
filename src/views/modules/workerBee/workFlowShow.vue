@@ -32,7 +32,7 @@
       title="工作流预览"
       :close-on-click-modal="false"
       :before-close="handleClosede"
-      width="75%"
+      fullscreen
       :visible.sync="visible">
       <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
       <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/>
