@@ -32,12 +32,10 @@
       title="工作流预览"
       :close-on-click-modal="false"
       :before-close="handleClosede"
+      width="75%"
       :visible.sync="visible">
       <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
       <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/>
-      <span slot="footer">
-        <el-button @click="datano()">取消</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
