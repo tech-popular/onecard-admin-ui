@@ -2,7 +2,7 @@ import { httpGet, httpPost } from '@/api'
 
 // 元数据管理
 export const metadataList = (params) => httpGet('/canary/canaryproject/list', params) // 初始化列表
-export const allRuleTemplate = () => httpGet('/cash/riskrules/allRuleTemplate') // 任务类型
+export const allRuleTemplate = (params, flag) => httpPost('/sys/sysdictitem/selectbydictypes', params, flag) // 任务类型
 
 export const deleteArea = (params) => httpPost('/cash/area/delete', params) // 删除
 export const findAllCapitalList = () => httpGet('/cash/instmanage/findAllCapitalList') // findAllCapitalList

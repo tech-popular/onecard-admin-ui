@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-form :inline="true" :model="dataForm" >
-      <el-form-item label="任务类型" prop="ruleName">
+      <el-form-item label="任务类型" prop="templatename">
         <el-select filterable v-model="dataForm.templatename" clearable>
-          <el-option v-for="item in templateList" :value="item.ruleName" :key="item.ruleName" :label="item.ruleNameCn"/>
+          <el-option v-for="item in templateList" :value="item.value" :key="item.value" :label="item.label"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -117,9 +117,9 @@
           this.dataListLoading = false
         })
         // 任务类型
-        allRuleTemplate().then(({data}) => {
+        allRuleTemplate(['datasource_config_type'], false).then(({data}) => {
           if (data && data.code === 0) {
-            this.templateList = data.templateList
+            this.templateList = data.dicMap.datasource_config_type
           }
         })
       },
@@ -143,12 +143,12 @@
       },
       // 新增 / 修改
       addOrUpdateHandle (id) {
-        if (this.isNull(id) && this.isNull(this.dataForm.templatename)) {
-          alert('请选择模板')
-          return
-        }
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
+          if (this.isNull(id) && this.isNull(this.dataForm.templatename)) {
+            alert('请先选择任务类型')
+            return
+          }
           this.$refs.addOrUpdate.init(id)
         })
       },
