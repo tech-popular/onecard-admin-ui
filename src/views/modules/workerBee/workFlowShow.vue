@@ -16,6 +16,7 @@
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
           <el-button type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button>
+          <!-- <el-button type="text" @click="clickFlowEdit(scope.row)">编辑工作流</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -37,15 +38,27 @@
       <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
       <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/>
     </el-dialog>
+    <!-- 弹窗编辑示意图 -->
+    <el-dialog
+      title="工作流编辑"
+      :close-on-click-modal="false"
+      :before-close="handleClosede"
+      fullscreen
+      :visible.sync="visibleEdit">
+      <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
+      <showFlowEdit :dataAllList="dataAllList" @refreshDataList="getDataList"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import showFlow from './workflowChart'
+  import showFlowEdit from './workflowChartEdit'
   export default {
     data () {
       return {
         visible: false,
+        visibleEdit: false,
         dataForm: {
           workerBee: ''
         },
@@ -69,7 +82,8 @@
       }
     },
     components: {
-      showFlow
+      showFlow,
+      showFlowEdit
     },
     methods: {
       // 获取数据列表
@@ -126,6 +140,11 @@
       /** 查看示意图 */
       clickSketchMap (value) {
         this.visible = true
+        this.workerBee = value.workerBee
+        // this.getDataFlowList()
+      },
+      clickFlowEdit (value) {
+        this.visibleEdit = true
         this.workerBee = value.workerBee
         // this.getDataFlowList()
       },
