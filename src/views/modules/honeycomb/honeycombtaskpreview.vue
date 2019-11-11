@@ -1,58 +1,67 @@
 <template>
-  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" >
-    <el-form-item label="任务列表">
-      <el-select v-model="taskId" filterable placeholder="请选择可搜索" style="width: 250px">
-        <el-option
-          v-for="item in taskIdOptions"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id">
-        </el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item prop="datasourceId" label="数据源">
-      <el-select v-model="dataForm.datasourceId" placeholder="请选择">
-        <el-option
-          v-for="item in datasourceoptions"
-          :key="item.id"
-          :label="item.datasourceName"
-          :value="item.id">
-        </el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item prop="sql">
-      <el-input type="textarea" ref="mycode" v-model="dataForm.sql" :rows="10"></el-input>
-      <!--<textarea ref="mycode" class="codesql" v-model="dataForm.sql" style="height:200px;width:600px;"></textarea>-->
-
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="dataFormSubmit()">执行</el-button>
-      <el-button type="primary" @click="stopMaxcomputepreview()">停止</el-button>
-    </el-form-item>
-    
-    <el-form-item>
-      <el-input type="textarea" ref="returnData" v-model="returnStatus" :autosize="{ minRows: 10, maxRows: 10}" style="width: 39%; display: inline-block;"></el-input>
-      <el-input type="textarea" ref="returnData" v-model="returnData" :autosize="{ minRows: 10, maxRows: 10}" style="width: 60%; display: inline-block;"></el-input>
-    </el-form-item>
-  </el-form>
-
+  <div>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" >
+      <el-form-item label="任务列表">
+        <el-select v-model="taskId" filterable placeholder="请选择可搜索" style="width: 250px">
+          <el-option
+            v-for="item in taskIdOptions"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="datasourceId" label="数据源">
+        <el-select v-model="dataForm.datasourceId" placeholder="请选择">
+          <el-option
+            v-for="item in datasourceoptions"
+            :key="item.id"
+            :label="item.datasourceName"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="sql">
+        <!-- <el-input type="textarea" ref="mycode" v-model="dataForm.sql" :rows="10"></el-input> -->
+        <textarea ref="mycode" class="codesql" v-model="dataForm.sql" style="height:200px;width:600px;"></textarea>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="dataFormSubmit()">执行</el-button>
+        <el-button type="primary" @click="stopMaxcomputepreview()">停止</el-button>
+      </el-form-item>
+    </el-form>
+    <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+      <el-tab-pane label="执行状态" name="first">
+        <el-input type="textarea" ref="returnData" v-model="returnStatus" autosize></el-input>
+      </el-tab-pane>
+      <el-tab-pane label="执行结果" name="second">
+        <el-input type="textarea" ref="returnData" v-model="returnData" autosize></el-input>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
 </template>
 
 <script>
-  /** import 'codemirror/theme/ambiance.css'
+  import { codemirror } from 'vue-codemirror'
+  import 'codemirror/theme/ambiance.css'
   import 'codemirror/lib/codemirror.css'
   import 'codemirror/addon/hint/show-hint.css'
+  import { getDate } from '@/utils'
 
   let CodeMirror = require('codemirror/lib/codemirror')
   require('codemirror/addon/edit/matchbrackets')
   require('codemirror/addon/selection/active-line')
   require('codemirror/mode/sql/sql')
   require('codemirror/addon/hint/show-hint')
-  require('codemirror/addon/hint/sql-hint')**/
+  require('codemirror/addon/hint/sql-hint')
   export default {
     name: 'codeMirror',
+    components: {
+      codemirror
+    },
     data () {
       return {
+        activeName: 'first',
         dataForm: {
           datasourceId: this.$route.params.datasourceId || '',
           sql: this.$route.params.sql || ''
@@ -77,7 +86,8 @@
       this.selectOption()
     },
     mounted () {
-      /** let mime = 'text/x-mariadb'
+      let mime = 'text/x-mariadb'
+      var that = this
       // let theme = 'ambiance'//设置主题，不设置的会使用默认主题
       let editor = CodeMirror.fromTextArea(this.$refs.mycode, {
         mode: mime, // 选择对应代码编辑器的语言，我这边选的是数据库，根据个人情况自行设置即可
@@ -97,11 +107,15 @@
       })
       editor.setValue(this.dataForm.sql)
       // 代码自动提示功能，记住使用cursorActivity事件不要使用change事件，这是一个坑，那样页面直接会卡死
-      editor.on('cursorActivity', function () {
+      editor.on('cursorActivity', function (a, b) {
+        that.dataForm.sql = editor.getValue()
         editor.showHint()
-      })**/
+      })
     },
     methods: {
+      handleClick (tab, event) {
+        console.log(tab, event)
+      },
       selectOption () {
         // 下拉框
         this.$http({
@@ -137,7 +151,8 @@
               )
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.returnStatus = JSON.stringify({status: data.resultBean.status})
+                const time = getDate(data.resultBean.timestamp, 'year')
+                this.returnStatus = time + ' ' + JSON.stringify({status: data.resultBean.status})
                 this.returnData = JSON.stringify({data: data.resultBean.data, message: data.resultBean.message})
                 if (data.resultBean.status === '2') {
                   this.instanceId = data.resultBean.traceId
@@ -166,7 +181,8 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.returnStatus += `\n${JSON.stringify({status: data.resultBean.status})}`
+                const time = getDate(data.resultBean.timestamp, 'year')
+                this.returnStatus += `\n${time} ${JSON.stringify({status: data.resultBean.status})}`
                 this.returnData += JSON.stringify({data: data.resultBean.data, message: data.resultBean.message})
                 if (data.resultBean.status === '2') {
                   this.returnData += '\n继续执行'
@@ -197,8 +213,9 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
+                const time = getDate(data.resultBean.timestamp, 'year')
                 clearInterval(window.clearnum)
-                this.returnStatus += `\n${JSON.stringify({status: data.resultBean.status})}`
+                this.returnStatus += `\n${time} ${JSON.stringify({status: data.resultBean.status})}`
                 this.returnData += '\n停止执行'
               } else {
                 this.$message.error(data.msg)

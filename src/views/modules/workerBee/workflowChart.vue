@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div id="myDiagramDiv"></div>
+    <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
+    <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
+    <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
   </div>
 </template>
 
@@ -34,8 +36,9 @@ export default{
             'commandHandler.deletesTree': true,
             layout:
               $(go.TreeLayout,
-                { angle: 0, arrangement: go.TreeLayout.ArrangementFixedRoots }),
+                { angle: 90, arrangement: go.TreeLayout.ArrangementFixedRoots }),
             'undoManager.isEnabled': true
+            // isReadOnly: true // 只读
           })
 
       mySelf.myDiagram.addDiagramListener('Modified', function (e) {
@@ -49,7 +52,7 @@ export default{
         }
       })
       var bluegrad = $(go.Brush, 'Linear', { 0: '#C4ECFF', 1: '#70D4FF' })
-      var greengrad = $(go.Brush, 'Linear', { 0: '#B1E2A5', 1: '#7AE060' })
+      // var greengrad = $(go.Brush, 'Linear', { 0: '#B1E2A5', 1: '#7AE060' })
       var actionTemplate =
         $(go.Panel, 'Horizontal',
           $(go.Shape,
@@ -89,7 +92,7 @@ export default{
 
                 $(go.Panel, 'Table',
                   { stretch: go.GraphObject.Horizontal },
-                  $(go.TextBlock, '流量/比例',
+                  $(go.TextBlock, '条件',
                     {
                       alignment: go.Spot.Left,
                       font: '10pt Verdana, sans-serif'
@@ -119,13 +122,58 @@ export default{
             $('TreeExpanderButton')
           )
        )
-      mySelf.myDiagram.nodeTemplateMap.add('Terminal',
+      mySelf.myDiagram.nodeTemplateMap.add('Start',
         $(go.Node, 'Spot',
           $(go.Shape, 'Circle',
-            { width: 55, height: 55, fill: greengrad, stroke: null }
+            { width: 80, height: 80, fill: '#17B3A3', stroke: null }
           ),
           $(go.TextBlock,
-            { font: '10pt Verdana, sans-serif' },
+            {
+              font: '10pt Verdana, sans-serif',
+              stroke: '#fff'
+            },
+            new go.Binding('text')
+          )
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('Judge',
+        $(go.Node, 'Spot',
+          $(go.Shape, 'Diamond',
+            {fill: '#00A9C9', strokeWidth: 0}
+          ),
+          $(go.TextBlock,
+            {
+              font: '10pt Verdana, sans-serif',
+              stroke: '#fff'
+            },
+            new go.Binding('text')
+          )
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('Condition',
+        $(go.Node, 'Spot',
+          $(go.Shape, 'Rectangle',
+            {height: 25, fill: 'blue', strokeWidth: 0}
+          ),
+          $(go.TextBlock,
+            {
+              font: '10pt Verdana, sans-serif',
+              stroke: '#fff'
+            },
+            new go.Binding('text')
+          )
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('End',
+        $(go.Node, 'Spot',
+          $(go.Shape, 'Circle',
+            { width: 55, height: 55, fill: '#79C900', stroke: null }
+          ),
+          $(go.TextBlock,
+            {
+              font: '10pt Verdana, sans-serif',
+              stroke: '#fff'
+            },
             new go.Binding('text')
           )
         )
@@ -147,8 +195,32 @@ export default{
             new go.Binding('visible', 'answer', function (a) { return (!!a) })
           )
         )
-      var nodeDataArray = this.dataAllList.nodeDataArray
-      var linkDataArray = this.dataAllList.linkDataArray
+      var nodeDataArray = [
+        { key: 1, text: '工作流预览', category: 'Start' },
+        { key: 2, text: '我是工作流1', category: 'Judge' },
+        { key: 3, text: '我是工作流2', category: 'Judge' },
+        { key: 5, text: '这个数据1', category: 'Condition' },
+        { key: 6, text: '这个数据2', category: 'Condition' },
+        { key: 8, text: '这个数据3', category: 'Condition' },
+        { key: 9, text: '这个数据4', category: 'Condition' },
+        { key: 10, text: '完成1', category: 'End' },
+        { key: 11, text: '完成2', category: 'End' },
+        { key: 12, text: '完成3', category: 'End' },
+        { key: 13, text: '完成4', category: 'End' }
+      ]
+      var linkDataArray = [
+        { from: 1, to: 2, answer: '是' },
+        { from: 1, to: 3, answer: '是' },
+        { from: 1, to: 4, answer: '是' },
+        { from: 2, to: 5, answer: '是' },
+        { from: 2, to: 6, answer: '否' },
+        { from: 3, to: 8, answer: '是' },
+        { from: 3, to: 9, answer: '否' },
+        { from: 5, to: 10 },
+        { from: 6, to: 11 },
+        { from: 8, to: 12 },
+        { from: 9, to: 13 }
+      ]
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
           copiesArrays: true,
@@ -157,6 +229,7 @@ export default{
           linkDataArray: linkDataArray
         })
     },
+
     // 放大事件
     enlarge () {
       var mySelf = this
