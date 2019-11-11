@@ -1,13 +1,7 @@
 <template>
   <div>
-    <el-form :inline="true" :model="dataForm" >
-      <el-form-item label="任务类型" prop="templatename">
-        <el-select filterable v-model="dataForm.templatename" clearable>
-          <el-option v-for="item in templateList" :value="item.value" :key="item.value" :label="item.label"/>
-        </el-select>
-      </el-form-item>
+    <el-form :inline="true">
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -26,7 +20,7 @@
         prop="id"
         header-align="center"
         align="center"
-        label="任务ID"/>
+        label="任务定义名称"/>
       <el-table-column
         prop="project"
         header-align="center"
@@ -36,12 +30,87 @@
         prop="serviceName"
         header-align="center"
         align="center"
-        label="任务名称"/>
+        label="任务描述"/>
       <el-table-column
         prop="group"
         header-align="center"
         align="center"
-        label="任务"/>
+        label="任务具体id"/>
+      <el-table-column
+        prop="owner"
+        header-align="center"
+        align="center"
+        label="任务归属"/>
+      <el-table-column
+        prop="user"
+        header-align="center"
+        align="center"
+        label="任务使用者"/>
+      <el-table-column
+        prop="retryCount"
+        header-align="center"
+        align="center"
+        label="重试次数"/>
+      <el-table-column
+        prop="timeoutSeconds"
+        header-align="center"
+        align="center"
+        label="任务执行超时时间"/>
+      <el-table-column
+        prop="retryDelaySeconds"
+        header-align="center"
+        align="center"
+        label="重试延迟时间"/>
+      <el-table-column
+        prop="responseTimeoutSeconds"
+        header-align="center"
+        align="center"
+        label="响应超时时间"/>
+      <el-table-column
+        prop="concurrentExecLimit"
+        header-align="center"
+        align="center"
+        label="并发执行限制"/>
+      <el-table-column
+        prop="inputTemplate"
+        header-align="center"
+        align="center"
+        label="输入模板"/>
+      <el-table-column
+        prop="rateLimitPerFrequency"
+        header-align="center"
+        align="center"
+        label="频率限制"/>
+      <el-table-column
+        prop="isolation_groupId"
+        header-align="center"
+        align="center"
+        label="隔离组ID"/>
+      <el-table-column
+        prop="executionNameSpace"
+        header-align="center"
+        align="center"
+        label="执行命名空间"/>
+      <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="备注"/>
+      <el-table-column
+        prop="ownerApp"
+        header-align="center"
+        align="center"
+        label="所属系统"/>
+      <el-table-column
+        prop="createdBy"
+        header-align="center"
+        align="center"
+        label="创建者姓名"/>
+      <el-table-column
+        prop="updatedBy"
+        header-align="center"
+        align="center"
+        label="更新者姓名"/>
       <el-table-column
         prop="enable"
         header-align="center"
@@ -74,15 +143,11 @@
 
 <script>
   import AddOrUpdate from './metadata-add-or-update'
-  import { metadataList, allRuleTemplate } from '@/api/workerBee/metadata'
+  import { metadataList } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
-        dataForm: {
-          templatename: ''
-        },
         dataList: [],
-        templateList: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -103,8 +168,7 @@
         this.dataListLoading = true
         const dataBody = {
           'page': this.pageIndex,
-          'limit': this.pageSize,
-          'templatename': this.dataForm.templatename
+          'limit': this.pageSize
         }
         metadataList(dataBody).then(({data}) => {
           if (data && data.code === 0) {
@@ -115,12 +179,6 @@
             this.totalPage = 0
           }
           this.dataListLoading = false
-        })
-        // 任务类型
-        allRuleTemplate(['datasource_config_type'], false).then(({data}) => {
-          if (data && data.code === 0) {
-            this.templateList = data.dicMap.datasource_config_type
-          }
         })
       },
       // 每页数
@@ -145,10 +203,6 @@
       addOrUpdateHandle (id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          if (this.isNull(id) && this.isNull(this.dataForm.templatename)) {
-            alert('请先选择任务类型')
-            return
-          }
           this.$refs.addOrUpdate.init(id)
         })
       },
