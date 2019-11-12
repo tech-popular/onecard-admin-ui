@@ -7,6 +7,7 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button type="primary" @click="resetHandle()">重置</el-button>
+        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -16,6 +17,7 @@
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
           <el-button type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button>
+          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <!-- <el-button type="text" @click="clickFlowEdit(scope.row)">编辑工作流</el-button> -->
         </template>
       </el-table-column>
@@ -48,12 +50,15 @@
       <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
       <showFlowEdit :dataAllList="dataAllList" @refreshDataList="getDataList"/>
     </el-dialog>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
   </div>
 </template>
 
 <script>
   import showFlow from './workflowChart'
   import showFlowEdit from './workflowChartEdit'
+  import AddOrUpdate from './workFlow-add-or-update'
   export default {
     data () {
       return {
@@ -78,12 +83,15 @@
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
-        sketchMap: false
+        sketchMap: false,
+        addOrUpdateVisible: false
+
       }
     },
     components: {
       showFlow,
-      showFlowEdit
+      showFlowEdit,
+      AddOrUpdate
     },
     methods: {
       // 获取数据列表
@@ -136,7 +144,13 @@
       //     }
       //   })
       // },
-  
+      // 新增 / 修改
+      addOrUpdateHandle (id) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id)
+        })
+      },
       /** 查看示意图 */
       clickSketchMap (value) {
         this.visible = true
