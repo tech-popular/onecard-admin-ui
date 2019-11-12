@@ -104,9 +104,10 @@
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                'name': this.dataForm.name,
-                'type': this.dataForm.type,
-                'description': this.dataForm.description,
+                'script': this.dataForm.script,
+                'requestFields': this.dataForm.requestFields,
+                'responseFields': this.dataForm.responseFields,
+                'responseType': this.dataForm.responseType,
                 'enable': this.dataForm.enable
               })
             }).then(({data}) => {

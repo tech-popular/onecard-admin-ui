@@ -131,7 +131,7 @@
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
-      :current-page="pageIndex"
+      :current-page="pageNum"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
       :total="totalPage"
@@ -143,13 +143,13 @@
 
 <script>
   import AddOrUpdate from './metadata-add-or-update'
-  import { metadataList } from '@/api/workerBee/metadata'
+  import { beeTaskList } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
         dataList: [],
-        pageIndex: 1,
-        pageSize: 10,
+        pageNum: 1, // 当前页
+        pageSize: 10, // 默认每页10条
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
@@ -167,10 +167,10 @@
       getDataList () {
         this.dataListLoading = true
         const dataBody = {
-          'page': this.pageIndex,
-          'limit': this.pageSize
+          'pageNum': this.pageNum,
+          'pageSize': this.pageSize
         }
-        metadataList(dataBody).then(({data}) => {
+        beeTaskList(dataBody).then(({data}) => {
           if (data && data.code === 0) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
@@ -184,12 +184,12 @@
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
-        this.pageIndex = 1
+        this.pageNum = 1
         this.getDataList()
       },
       // 当前页
       currentChangeHandle (val) {
-        this.pageIndex = val
+        this.pageNum = val
         this.getDataList()
       },
       // 多选
