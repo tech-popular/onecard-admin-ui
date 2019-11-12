@@ -18,6 +18,13 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: {
           '^/proxyApi': '/'
+        },
+        '/fengChao': {
+          target: 'http://bee-dingning.sk.9f.cn/canary-admin',
+          changeOrigin: true,
+          pathRewrite: {
+          '^/fengChao': '/'
+        },
         }
       }
     },
