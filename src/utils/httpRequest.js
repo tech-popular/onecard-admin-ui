@@ -49,10 +49,9 @@ http.adornUrl = (actionName) => {
   //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
   // }
   // 工蜂项目 凤凰大屏
-  if (actionName.indexOf('fengChao') !== -1) {
-    actionName = actionName.replace(/fengChao\//, '')
-    console.log(actionName)
-    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/fengChao' : window.SITE_CONFIG.baseUrl) + actionName
+  if (actionName.indexOf('gongFeng') !== -1) {
+    actionName = actionName.replace(/gongFeng\//, '')
+    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/gongFeng' : window.SITE_CONFIG.baseUrl) + actionName
   } else {
     return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
   }

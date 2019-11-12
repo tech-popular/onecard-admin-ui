@@ -14,18 +14,18 @@ module.exports = {
     // 代理列表, 是否开启代理通过[./dev.env.js]配置
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
       '/proxyApi': {
-        target: 'http://test.tech.9fbank.com/canary-admin',
+        target: 'http://10.205.15.72:8000/canary-admin',
         changeOrigin: true,
         pathRewrite: {
           '^/proxyApi': '/'
         },
-        '/fengChao': {
-          target: 'http://bee-dingning.sk.9f.cn/canary-admin',
-          changeOrigin: true,
-          pathRewrite: {
-          '^/fengChao': '/'
-        },
-        }
+      },
+      '/gongFeng': {
+        target: 'http://10.205.15.72:8000/canary-admin',
+        changeOrigin: true,
+        pathRewrite: {
+        '^/gongFeng': '/'
+      },
       }
     },
     // Various Dev Server settings
