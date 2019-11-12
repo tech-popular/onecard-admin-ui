@@ -18,24 +18,20 @@
           <el-radio :label="1">正常</el-radio>
         </el-radio-group>
     </el-form-item>
-    <!-- aviator_类型1 -->
-    <metadata-aviator v-if="dataForm.type == '0'" ref="metadataAviator"/>
-    <!-- cassandra_类型2 -->
-    <metadata-cassandra v-if="dataForm.type == '1'" ref="metadataCassandra"/>
-    <!-- decision_类型3 -->
-    <metadata-decision v-if="dataForm.type == '2'" ref="metadataDecision"/>
+    <!-- aviator --- 类型1 -->
+    <metadata-aviator v-if="dataForm.type == '0'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataAviator"/>
+    <!-- cassandra --- 类型2 -->
+    <metadata-cassandra v-if="dataForm.type == '1'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataCassandra"/>
+    <!-- decision --- 类型3 -->
+    <metadata-decision v-if="dataForm.type == '2'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataDecision"/>
     </el-form>
-    <span slot="footer">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-    </span>
   </el-dialog>
 </template>
 
 <script>
-  import metadataAviator from './metadata-aviator'
-  import metadataCassandra from './metadata-cassandra'
-  import metadataDecision from './metadata-decision'
+  import metadataAviator from './metadataSon/metadata-aviator'
+  import metadataCassandra from './metadataSon/metadata-cassandra'
+  import metadataDecision from './metadataSon/metadata-decision'
   export default {
     data () {
       return {
@@ -43,7 +39,7 @@
         dataForm: {
           id: 0,
           name: '', // 任务定义名称
-          type: '', // 任务类型
+          type: '0', // 任务类型
           description: '', // 任务描述
           enable: 1
         },
@@ -123,37 +119,17 @@
           }
         })
       },
-      // 表单提交
-      dataFormSubmit () {
+      // 校验是否通过
+      fatherCheck () {
+        let res = false
         this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/canary/canaryproject/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'name': this.dataForm.name,
-                'type': this.dataForm.type,
-                'description': this.dataForm.description,
-                'enable': this.dataForm.enable
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          }
+          res = valid
         })
+        return res
+      },
+      // 弹窗状态
+      hideVisible (data) {
+        this.visible = data
       }
     }
   }
