@@ -56,15 +56,15 @@
       <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/>
     </el-dialog>
     <!-- 弹窗编辑示意图 -->
-    <el-dialog
+    <!-- <el-dialog
       title="工作流编辑"
       :close-on-click-modal="false"
       :before-close="handleClosede"
       fullscreen
       :visible.sync="visibleEdit">
-      <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
+      <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/>
       <showFlowEdit :dataAllList="dataAllList" @refreshDataList="getDataList"/>
-    </el-dialog>
+    </el-dialog> -->
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
   </div>
