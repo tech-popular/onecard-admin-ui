@@ -16,6 +16,27 @@
     <el-form-item label="返回结果" prop="description">
       <el-input v-model="dataForm.outputParameters" placeholder="返回结果"/>
     </el-form-item>
+     <el-form-item label="创建人姓名">
+      <el-input v-model="dataForm.createdBy" placeholder="创建人姓名"/>
+    </el-form-item>
+     <el-form-item label="归属系统">
+      <el-input v-model="dataForm.ownerApp"/>
+    </el-form-item>
+    <el-form-item label="是否重试">
+      <el-radio-group v-model="dataForm.restartable">
+          <el-radio :label="0">不重试</el-radio>
+          <el-radio :label="1">重试</el-radio>
+        </el-radio-group>
+    </el-form-item>
+    <el-form-item label="版本">
+      <el-input v-model="dataForm.version" placeholder="版本"/>
+    </el-form-item>
+     <!-- <el-form-item label="什么版本">
+      <el-input v-model="dataForm.schemaVersion" placeholder="什么版本"/>
+    </el-form-item> -->
+    <!-- <el-form-item label="返回结果">
+      <el-input v-model="dataForm.tasks" placeholder="返回结果"/>
+    </el-form-item> -->
     </el-form>
     <span slot="footer">
       <el-button @click="visible = false">取消</el-button>
@@ -34,7 +55,15 @@
           owner: '',
           user: '',
           inputParameters: '',
-          description: ''
+          description: '',
+          createdBy: '',
+          outputParameters: '',
+          ownerApp: '',
+          restartable: 0,
+          schemaVersion: 0,
+          tasks: '',
+          version: ''
+
         },
         dataRule: {
           name: [

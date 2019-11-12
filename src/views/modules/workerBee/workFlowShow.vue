@@ -6,13 +6,28 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
-        <el-button type="primary" @click="resetHandle()">重置</el-button>
+        <el-button @click="resetHandle()">重置</el-button>
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="ID" header-align="center" align="center" label="工作流编号"/>
-      <el-table-column prop="workerBee" header-align="center" align="center" label="工作流"/>
+      <el-table-column prop="id" header-align="center" align="center" label="工作流编号"/>
+      <el-table-column prop="name" header-align="center" align="center" label="工作流名称"/>
+      <el-table-column prop="owner" header-align="center" align="center" label="拥有者"/>
+      <el-table-column prop="user" header-align="center" align="center" label="使用者"/>
+      <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参"/>
+      <el-table-column
+        prop="description"
+        label="返回结果"
+        header-align="center"
+        align="center"
+        width="100">
+        <template slot-scope="scope" >
+          <el-tag
+            :type="scope.row.description === '成功' ? 'success' : 'danger'"
+            disable-transitions>{{scope.row.description}}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
@@ -69,14 +84,22 @@
         },
         dataList: [
           {
-            ID: '10001',
-            workerBee: '工作流1'
+            id: '10001',
+            name: '工作流1',
+            owner: 'lvzhiming',
+            user: '万卡',
+            inputParameters: '工作流入参',
+            description: '成功'
           },
           {
-            ID: '10002',
-            workerBee: '工作流2'
-
-          }],
+            id: '10002',
+            name: '工作流2',
+            owner: 'Hrbp',
+            user: '万卡',
+            inputParameters: '工作流入参',
+            description: '失败'
+          }
+        ],
         dataAllList: {},
         workerBee: '',
         pageIndex: 1,
@@ -170,7 +193,7 @@
       /** 重置 */
       resetHandle () {
         this.pageIndex = 1
-        this.dataList = []
+        this.dataForm = []
       },
       // 取消或关闭流程图弹窗
       datano () {
