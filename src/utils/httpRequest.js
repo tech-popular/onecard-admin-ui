@@ -48,9 +48,11 @@ http.adornUrl = (actionName) => {
   //   console.log('2222')
   //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
   // }
-  // 工封项目 凤凰大屏
-  if (actionName.indexOf('fengChao')) {
-    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/fengChao/' : window.SITE_CONFIG.baseUrl) + actionName
+  // 工蜂项目 凤凰大屏
+  if (actionName.indexOf('fengChao') !== -1) {
+    actionName = actionName.replace(/fengChao\//, '')
+    console.log(actionName)
+    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/fengChao' : window.SITE_CONFIG.baseUrl) + actionName
   } else {
     return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
   }
