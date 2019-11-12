@@ -92,40 +92,15 @@
       },
       // 表单提交
       dataFormSubmit () {
-        // let res = this.$parent.fatherCheck()
         let res = this.$emit('fatherCheck')
         if (res === false) { // 如果父组件没有检查成功, 就停止
           return false
         }
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/canary/canaryproject/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'script': this.dataForm.script,
-                'requestFields': this.dataForm.requestFields,
-                'responseFields': this.dataForm.responseFields,
-                'responseType': this.dataForm.responseType,
-                'enable': this.dataForm.enable
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
+            alert('submit!')
           } else {
+            console.log('error submit!!')
             return false
           }
         })
