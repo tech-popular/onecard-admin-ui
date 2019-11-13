@@ -1,9 +1,6 @@
 <template>
     <div class="aviator">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="30%">
-        <el-form-item label="主键" prop="id">
-        <el-input v-model="dataForm.id" placeholder="主键"/>
-        </el-form-item>
         <el-form-item label="topic" prop="topic">
         <el-input v-model="dataForm.topic" placeholder="topic"/>
         </el-form-item>
@@ -35,16 +32,12 @@
     data () {
       return {
         dataForm: {
-          id: 0, // 主键id
           topic: '', // topic
           requestFields: '', // 请求参数的fieldId数组
           enable: 1
         },
         requestFieldsList: [],
         dataRule: {
-          id: [
-            { required: true, message: '主键id不能为空', trigger: 'blur' }
-          ],
           topic: [
             { required: true, message: 'topic不能为空', trigger: 'blur' }
           ]

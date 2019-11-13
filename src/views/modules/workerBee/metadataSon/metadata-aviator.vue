@@ -35,6 +35,7 @@
     data () {
       return {
         dataForm: {
+          id: 0,
           http: {
             requestFields: '', // 请求参数的fieldId数组
             responseFields: '', // 响应参数的fieldId数组
@@ -59,10 +60,27 @@
         }
       }
     },
+    mounted () {
+      this.init()
+    },
     methods: {
-      init () {
+      init (id) {
+        this.id = this.fatherData.id
+        console.log(this.id)
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
+          if (this.dataForm.id) {
+            this.$http({
+              url: this.$http.adornUrl(`/gongFeng/beeTask/info/${this.dataForm.id}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.fatherData = data.beeTaskDef
+                this.dataForm.http = data.http
+              }
+            })
+          }
         })
       },
       // 取消

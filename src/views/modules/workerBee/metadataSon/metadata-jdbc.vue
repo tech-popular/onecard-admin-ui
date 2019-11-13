@@ -1,9 +1,6 @@
 <template>
     <div class="aviator">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="30%">
-        <el-form-item label="主键" prop="id">
-        <el-input v-model="dataForm.id" placeholder="主键"/>
-        </el-form-item>
         <el-form-item label="子流程id" prop="script">
         <el-input v-model="dataForm.script" placeholder="子流程id"/>
         </el-form-item>
@@ -45,7 +42,6 @@
     data () {
       return {
         dataForm: {
-          id: 0, // 主键id
           script: '', // 子流程id
           requestFields: '', // 请求参数的fieldId数组
           responseFields: '', // 响应参数的fieldId数组
@@ -65,9 +61,6 @@
           }
         ],
         dataRule: {
-          id: [
-            { required: true, message: '主键id不能为空', trigger: 'blur' }
-          ],
           script: [
             { required: true, message: '子流程id不能为空', trigger: 'blur' }
           ],
