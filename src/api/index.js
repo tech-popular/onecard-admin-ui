@@ -8,6 +8,22 @@ function httpPost (url, params, flag = true) {
     data: http.adornData(params, flag)
   })
 }
+// PUT 请求
+function httpPut (url, params, flag = true) {
+  return http({
+    method: 'put',
+    url: http.adornUrl(url),
+    data: http.adornData(params, flag)
+  })
+}
+// DELETE 请求
+function httpDelete (url, params, flag = true) {
+  return http({
+    method: 'delete',
+    url: http.adornUrl(url),
+    data: http.adornData(params, flag)
+  })
+}
 // GET 请求
 function httpGet (url, data = {}, flag = true) {
   if (data.utcParam) { // utcParam 为数组
@@ -24,5 +40,7 @@ function httpGet (url, data = {}, flag = true) {
 }
 export {
   httpPost,
-  httpGet
+  httpGet,
+  httpPut,
+  httpDelete
 }

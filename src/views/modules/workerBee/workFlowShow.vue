@@ -16,35 +16,33 @@
       <el-table-column prop="owner" header-align="center" align="center" label="拥有者"/>
       <el-table-column prop="user" header-align="center" align="center" label="使用者"/>
       <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参"/>
-      <el-table-column
-        prop="description"
-        label="返回结果"
-        header-align="center"
-        align="center"
-        width="100">
-        <template slot-scope="scope" >
-          <el-tag
-            :type="scope.row.description === '成功' ? 'success' : 'danger'"
-            disable-transitions>{{scope.row.description}}</el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column prop="description" header-align="center" align="center" label="工作流入参"/>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
           <el-button type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <!-- <el-button type="text" @click="clickFlowEdit(scope.row)">编辑工作流</el-button> -->
+          <el-button type="text" @click="clickFlowEdit(scope.row.id)">数据关系</el-button>
+          <el-button type="text" style="color:#f56c6c" @click="deleted(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
-      :current-page="pageIndex"
+      :current-page="pageNum"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"/>
+    <!-- <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageNum"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"/> -->
     <!-- 弹窗查看示意图 -->
     <el-dialog
       title="工作流预览"
@@ -55,16 +53,8 @@
       <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
       <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/>
     </el-dialog>
-    <!-- 弹窗编辑示意图 -->
-    <!-- <el-dialog
-      title="工作流编辑"
-      :close-on-click-modal="false"
-      :before-close="handleClosede"
-      fullscreen
-      :visible.sync="visibleEdit">
-      <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/>
-      <showFlowEdit :dataAllList="dataAllList" @refreshDataList="getDataList"/>
-    </el-dialog> -->
+    <!-- 数据关系 -->
+    <taskFlow v-if="visibleEdit" ref="taskFlow"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
   </div>
@@ -72,8 +62,10 @@
 
 <script>
   import showFlow from './workflowChart'
-  import showFlowEdit from './workflowChartEdit'
+  import taskFlow from './taskFlow'
   import AddOrUpdate from './workFlow-add-or-update'
+  import { workFlowList, deleteWorkFlow } from '@/api/workerBee/workFlow'
+
   export default {
     data () {
       return {
@@ -102,49 +94,47 @@
         ],
         dataAllList: {},
         workerBee: '',
-        pageIndex: 1,
-        pageSize: 10,
+        pageNum: 1, // 当前页
+        pageSize: 10, // 默认每页10条
         totalPage: 0,
         dataListLoading: false,
         sketchMap: false,
         addOrUpdateVisible: false
-
       }
     },
     components: {
       showFlow,
-      showFlowEdit,
+      taskFlow,
       AddOrUpdate
+    },
+    mounted () {
+      this.getDataList()
     },
     methods: {
       // 获取数据列表
-      // getDataList () {
-      //   this.$refs['dataForm'].validate((valid) => {
-      //     if (valid) {
-      //       this.dataListLoading = true
-      //       this.$http({
-      //         url: this.$http.adornUrl('/cash/flowchart/list'),
-      //         method: 'get',
-      //         params: this.$http.adornParams({
-      //           'page': this.pageIndex,
-      //           'limit': this.pageSize,
-      //           'phone': this.dataForm.phone,
-      //           'startTime': this.dataForm.startDataTime ? this.dataForm.startDataTime : '',
-      //           'endTime': this.dataForm.endDataTime ? this.dataForm.endDataTime : ''
-      //         })
-      //       }).then(({data}) => {
-      //         if (data && data.code === 0) {
-      //           this.dataList = data.page.list
-      //           this.totalPage = data.page.totalCount
-      //         } else {
-      //           this.dataList = []
-      //           this.totalPage = 0
-      //         }
-      //         this.dataListLoading = false
-      //       })
-      //     }
-      //   })
-      // },
+      getDataList () {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.dataListLoading = true
+            const dataBody = {
+              'pageNum': this.pageNum,
+              'pageSize': this.pageSize,
+              'name': this.dataForm.workerBee
+            }
+            workFlowList(dataBody, false).then(({data}) => {
+              if (data && data.code === 0) {
+                console.log(data, '接口数据')
+                this.dataList = data.list
+                this.totalPage = data.totalCount
+              } else {
+                this.dataList = []
+                this.totalPage = 0
+              }
+              this.dataListLoading = false
+            })
+          }
+        })
+      },
   
       /** 查看示意图接口 */
       // getDataFlowList () {
@@ -174,26 +164,39 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
+      // 数据关系
+      clickFlowEdit (id) {
+        this.visibleEdit = true
+        this.$nextTick(() => {
+          this.$refs.taskFlow.init(id)
+        })
+      },
+      // 删除
+      deleted (value) {
+        console.log(value)
+        const dataBody = value
+        deleteWorkFlow(dataBody, false).then(({data}) => {
+          if (data && data.code === 0) {
+            this.getDataList()
+          }
+        })
+      },
       /** 查看示意图 */
       clickSketchMap (value) {
         this.visible = true
         this.workerBee = value.workerBee
         // this.getDataFlowList()
       },
-      clickFlowEdit (value) {
-        this.visibleEdit = true
-        this.workerBee = value.workerBee
-        // this.getDataFlowList()
-      },
       /** 查询 */
       searchHandle () {
-        this.pageIndex = 1
+        this.pageNum = 1
         this.getDataList()
       },
       /** 重置 */
       resetHandle () {
-        this.pageIndex = 1
+        this.pageNum = 1
         this.dataForm = []
+        this.getDataList()
       },
       // 取消或关闭流程图弹窗
       datano () {
@@ -206,12 +209,12 @@
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
-        this.pageIndex = 1
+        this.pageNum = 1
         this.getDataList()
       },
       // 当前页
       currentChangeHandle (val) {
-        this.pageIndex = val
+        this.pageNum = val
         this.getDataList()
       }
     }

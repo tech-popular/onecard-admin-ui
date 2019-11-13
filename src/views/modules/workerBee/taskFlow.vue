@@ -1,8 +1,8 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog title="数据关系" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
-    <el-form-item label="工作流名称" prop="name">
-      <el-input v-model="dataForm.name" placeholder="工作流名称"/>
+    <el-form-item label="任务名称" prop="name">
+      <el-input v-model="dataForm.name" placeholder="任务名称"/>
     </el-form-item>
      <el-form-item label="拥有者" prop="owner">
       <el-input v-model="dataForm.owner" placeholder="拥有者"/>
@@ -31,9 +31,9 @@
     <el-form-item label="版本">
       <el-input v-model="dataForm.version" placeholder="版本"/>
     </el-form-item>
-     <!-- <el-form-item label="什么版本">
+    <el-form-item label="什么版本">
       <el-input v-model="dataForm.schemaVersion" placeholder="什么版本"/>
-    </el-form-item> -->
+    </el-form-item>
     <el-form-item label="流">
       <el-input v-model="dataForm.tasks" placeholder="流"/>
     </el-form-item>
