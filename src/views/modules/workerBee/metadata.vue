@@ -3,31 +3,29 @@
     <el-form :inline="true">
       <el-form-item>
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <!-- <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
-      :data="dataList" border
+      :data="newList" border
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
       style="width: 100%;">
       <el-table-column
-        prop="id"
+        prop="name"
         header-align="center"
         align="center"
         label="任务定义名称"/>
       <el-table-column
-        prop="project"
+        prop="type"
         header-align="center"
         align="center"
         label="任务类型"/>
       <el-table-column
-        prop="serviceName"
+        prop="description"
         header-align="center"
         align="center"
         label="任务描述"/>
       <el-table-column
-        prop="group"
+        prop="taskDetailDefId"
         header-align="center"
         align="center"
         label="任务具体id"/>
@@ -138,7 +136,7 @@
 
 <script>
   import AddOrUpdate from './metadata-add-or-update'
-  import { beeTaskList } from '@/api/workerBee/metadata'
+  import { beeTaskList, deleteBeeTask } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
@@ -147,8 +145,8 @@
         pageSize: 10, // 默认每页10条
         totalPage: 0,
         dataListLoading: false,
-        dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        newList: []
       }
     },
     components: {
@@ -156,9 +154,6 @@
     },
     activated () {
       this.getDataList()
-    },
-    computed: {
-      // ...
     },
     methods: {
       // 获取数据列表
@@ -172,10 +167,11 @@
           if (data && data.code === 0) {
             this.dataList = data.list
             this.totalPage = data.totalCount
-            // for (let i = 0; i < this.dataList.length; i++) {
-            //   console.log(this.dataList[i].beeTaskDef.id)
-            // }
-            // console.log(this.dataList, '数据源')
+            var arrList = []
+            for (let i = 0, length = this.dataList.length; i < length; i++) {
+              arrList.push(this.dataList[i].beeTaskDef)
+              this.newList = arrList
+            }
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -194,10 +190,6 @@
         this.pageNum = val
         this.getDataList()
       },
-      // 多选
-      selectionChangeHandle (val) {
-        this.dataListSelections = val
-      },
       isNull (value) {
         return value == '' || value == null || value == undefined
       },
@@ -210,19 +202,15 @@
       },
       // 删除
       deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定删除操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/canary/canaryproject/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({data}) => {
+          const dataBody = {
+            utcParam: [id]
+          }
+          deleteBeeTask(dataBody).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',

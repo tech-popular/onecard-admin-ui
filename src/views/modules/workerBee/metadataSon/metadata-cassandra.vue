@@ -1,9 +1,6 @@
 <template>
     <div class="aviator">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="30%">
-        <el-form-item label="主键" prop="id">
-        <el-input v-model="dataForm.id" placeholder="主键"/>
-        </el-form-item>
         <el-form-item label="cql" prop="cql">
         <el-input v-model="dataForm.cql" placeholder="cql"/>
         </el-form-item>
@@ -65,9 +62,6 @@
           }
         ],
         dataRule: {
-          id: [
-            { required: true, message: '主键id不能为空', trigger: 'blur' }
-          ],
           cql: [
             { required: true, message: 'cql不能为空', trigger: 'blur' }
           ],
@@ -92,12 +86,9 @@
       },
       // 表单提交
       dataFormSubmit () {
-        let res = this.$emit('fatherCheck')
-        if (res === false) { // 如果父组件没有检查成功, 就停止
-          return false
-        }
+        let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
+          if (valid && res) {
             alert('submit!')
           } else {
             console.log('error submit!!')

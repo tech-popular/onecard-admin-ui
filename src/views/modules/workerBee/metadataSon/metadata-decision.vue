@@ -1,9 +1,6 @@
 <template>
     <div class="aviator">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="30%">
-        <el-form-item label="主键" prop="id">
-        <el-input v-model="dataForm.id" placeholder="主键"/>
-        </el-form-item>
         <el-form-item label="判断case参数" prop="caseValueParam">
         <el-input v-model="dataForm.caseValueParam" placeholder="判断case参数"/>
         </el-form-item>
@@ -38,7 +35,6 @@
     data () {
       return {
         dataForm: {
-          id: 0, // 主键id
           caseValueParam: '', // 判断case参数
           caseExpression: '', // 判断表达式
           caseSwitch: '', // switch判断项集合
@@ -46,9 +42,6 @@
         },
         caseSwitchList: [],
         dataRule: {
-          id: [
-            { required: true, message: '主键id不能为空', trigger: 'blur' }
-          ],
           caseValueParam: [
             { required: true, message: '判断case参数不能为空', trigger: 'blur' }
           ],
@@ -76,12 +69,9 @@
       },
       // 表单提交
       dataFormSubmit () {
-        let res = this.$emit('fatherCheck')
-        if (res === false) { // 如果父组件没有检查成功, 就停止
-          return false
-        }
+        let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
+          if (valid && res) {
             alert('submit!')
           } else {
             console.log('error submit!!')
