@@ -66,12 +66,9 @@
       },
       // 表单提交
       dataFormSubmit () {
-        let res = this.$emit('fatherCheck')
-        if (res === false) { // 如果父组件没有检查成功, 就停止
-          return false
-        }
+        let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
+          if (valid && res) {
             alert('submit!')
           } else {
             console.log('error submit!!')

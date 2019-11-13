@@ -1,29 +1,19 @@
 <template>
     <div class="aviator">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="30%">
-        <el-form-item label="主键" prop="id">
-        <el-input v-model="dataForm.id" placeholder="主键"/>
+        <el-form-item label="请求参数的fieldId数组" prop="http.requestFields">
+        <el-input v-model="dataForm.http.requestFields" placeholder="请求参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="子流程id" prop="script">
-        <el-input v-model="dataForm.script" placeholder="子流程id"/>
+        <el-form-item label="响应参数的fieldId数组" prop="http.responseFields">
+        <el-input v-model="dataForm.http.responseFields" placeholder="响应参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组" prop="requestFields">
-          <el-select filterable v-model="dataForm.requestFields" placeholder="请选择">
-          <el-option v-for="item in requestFieldsList" :value="item.value" :key="item.value" :label="item.label"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="响应参数的fieldId数组" prop="responseFields">
-          <el-select filterable v-model="dataForm.responseFields" placeholder="请选择">
-          <el-option v-for="item in responseFieldsList" :value="item.value" :key="item.value" :label="item.label"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="响应参数的数据类型" prop="responseType">
-          <el-select filterable v-model="dataForm.responseType" placeholder="请选择">
+        <el-form-item label="响应参数的数据类型" prop="http.responseType">
+          <el-select filterable v-model="dataForm.http.responseType" placeholder="请选择">
           <el-option v-for="item in responseTypeList" :value="item.value" :key="item.value" :label="item.label"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="是否启用" prop="enable">
-        <el-radio-group v-model="dataForm.enable">
+        <el-form-item label="是否启用" prop="http.enable">
+        <el-radio-group v-model="dataForm.http.enable">
           <el-radio :label="0">禁用</el-radio>
           <el-radio :label="1">正常</el-radio>
           </el-radio-group>
@@ -45,15 +35,13 @@
     data () {
       return {
         dataForm: {
-          id: 0, // 主键id
-          script: '', // 子流程id
-          requestFields: '', // 请求参数的fieldId数组
-          responseFields: '', // 响应参数的fieldId数组
-          responseType: '', // 响应参数的数据类型
-          enable: 1
+          http: {
+            requestFields: '', // 请求参数的fieldId数组
+            responseFields: '', // 响应参数的fieldId数组
+            responseType: '', // 响应参数的数据类型
+            enable: 1
+          }
         },
-        requestFieldsList: [],
-        responseFieldsList: [],
         responseTypeList: [
           {
             value: '0',
@@ -65,12 +53,6 @@
           }
         ],
         dataRule: {
-          id: [
-            { required: true, message: '主键id不能为空', trigger: 'blur' }
-          ],
-          script: [
-            { required: true, message: '子流程id不能为空', trigger: 'blur' }
-          ],
           responseType: [
             { required: true, message: '请选择数据类型', trigger: 'blur' }
           ]
@@ -96,15 +78,17 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid && res) {
             this.$http({
-              url: this.$http.adornUrl(`/canary/canaryproject/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/gongFeng/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'script': this.dataForm.script,
-                'requestFields': this.dataForm.requestFields,
-                'responseFields': this.dataForm.responseFields,
-                'responseType': this.dataForm.responseType,
-                'enable': this.dataForm.enable
+                'beeTaskDef': this.fatherData,
+                'http': this.dataForm.http,
+                'gdbc': null,
+                'kafka': null,
+                'cassandra': null,
+                'groovy': null,
+                'aviator': null,
+                'decision': null
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -113,7 +97,7 @@
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
-                    this.visible = false
+                    this.$emit('hideVisibleClick', this.hideVisible)
                     this.$emit('refreshDataList')
                   }
                 })

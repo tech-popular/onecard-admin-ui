@@ -12,18 +12,12 @@
     <el-form-item label="任务描述" prop="description">
       <el-input v-model="dataForm.description" placeholder="任务"/>
     </el-form-item>
-    <el-form-item label="是否启用" prop="enable">
-      <el-radio-group v-model="dataForm.enable">
-          <el-radio :label="0">禁用</el-radio>
-          <el-radio :label="1">正常</el-radio>
-        </el-radio-group>
-    </el-form-item>
     <!-- aviator --- 类型1 -->
-    <metadata-aviator v-if="dataForm.type == '0'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataAviator"/>
+    <metadata-aviator v-if="dataForm.type == 'HTTP'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataAviator"/>
     <!-- cassandra --- 类型2 -->
-    <metadata-cassandra v-if="dataForm.type == '1'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataCassandra"/>
+    <metadata-cassandra v-if="dataForm.type == 'GDBC'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataCassandra"/>
     <!-- decision --- 类型3 -->
-    <metadata-decision v-if="dataForm.type == '2'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataDecision"/>
+    <metadata-decision v-if="dataForm.type == 'KAFKA'" :fatherData='dataForm' @hideVisibleClick="hideVisible" ref="metadataDecision"/>
     </el-form>
   </el-dialog>
 </template>
@@ -39,38 +33,37 @@
         dataForm: {
           id: 0,
           name: '', // 任务定义名称
-          type: '0', // 任务类型
-          description: '', // 任务描述
-          enable: 1
+          type: 'HTTP', // 任务类型
+          description: '' // 任务描述
         },
         ruleTypeList: [
           {
-            value: '0',
-            label: '类型1'
+            value: 'HTTP',
+            label: 'HTTP'
           },
           {
-            value: '1',
-            label: '类型2'
+            value: 'GDBC',
+            label: 'GDBC'
           },
           {
-            value: '2',
-            label: '类型3'
+            value: 'KAFKA',
+            label: 'KAFKA'
           },
           {
-            value: '3',
-            label: '类型4'
+            value: 'CASSANDRA',
+            label: 'CASSANDRA'
           },
           {
-            value: '4',
-            label: '类型5'
+            value: 'GROOVY',
+            label: 'GROOVY'
           },
           {
-            value: '5',
-            label: '类型6'
+            value: 'AVIATOR',
+            label: 'AVIATOR'
           },
           {
-            value: '6',
-            label: '类型7'
+            value: 'DECISION',
+            label: 'DECISION'
           }
         ],
         dataRule: {
@@ -82,9 +75,6 @@
           ],
           description: [
             { required: true, message: '任务描述不能为空', trigger: 'blur' }
-          ],
-          enable: [
-            { required: true, message: '是否启用不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -105,15 +95,14 @@
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/canary/canaryproject/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/gongFeng/beeTask/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.name = data.canaryProject.name
-                this.dataForm.type = data.canaryProject.type
-                this.dataForm.description = data.canaryProject.description
-                this.dataForm.enable = data.canaryProject.enable
+                this.dataForm.name = data.beeTaskDef.name
+                this.dataForm.type = data.beeTaskDef.type
+                this.dataForm.description = data.beeTaskDef.description
               }
             })
           }
