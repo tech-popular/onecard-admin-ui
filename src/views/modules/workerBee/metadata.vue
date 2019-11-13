@@ -3,7 +3,7 @@
     <el-form :inline="true">
       <el-form-item>
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <!-- <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
@@ -11,11 +11,6 @@
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50"/>
       <el-table-column
         prop="id"
         header-align="center"
@@ -162,6 +157,9 @@
     activated () {
       this.getDataList()
     },
+    computed: {
+      // ...
+    },
     methods: {
       // 获取数据列表
       getDataList () {
@@ -174,10 +172,9 @@
           if (data && data.code === 0) {
             this.dataList = data.list
             this.totalPage = data.totalCount
-            for (let i = 0; i < this.dataList.length; i++) {
-              // 'id' = this.dataList[i].beeTaskDef.id
-              console.log(this.dataList[i].beeTaskDef.id)
-            }
+            // for (let i = 0; i < this.dataList.length; i++) {
+            //   console.log(this.dataList[i].beeTaskDef.id)
+            // }
           } else {
             this.dataList = []
             this.totalPage = 0
