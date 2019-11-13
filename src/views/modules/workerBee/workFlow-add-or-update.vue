@@ -1,6 +1,12 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+    <el-form-item label="工作流任务" prop="region">
+      <el-select v-model="dataForm.region" placeholder="请选择工作流任务" prop="name" style="width:100%">
+        <el-option label="任务一" value="shanghai"></el-option>
+        <el-option label="任务二" value="beijing"></el-option>
+      </el-select>
+    </el-form-item>
     <el-form-item label="工作流名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="工作流名称"/>
     </el-form-item>
@@ -19,7 +25,7 @@
      <el-form-item label="创建人姓名">
       <el-input v-model="dataForm.createdBy" placeholder="创建人姓名"/>
     </el-form-item>
-     <el-form-item label="归属系统">
+    <el-form-item label="归属系统">
       <el-input v-model="dataForm.ownerApp"/>
     </el-form-item>
     <el-form-item label="是否重试">
@@ -51,6 +57,7 @@
       return {
         visible: false,
         dataForm: {
+          region: '',
           name: '',
           owner: '',
           user: '',
@@ -80,6 +87,9 @@
           ],
           description: [
             { required: true, message: '返回结果不能为空', trigger: 'blur' }
+          ],
+          region: [
+            { required: true, message: '请选择工作流任务', trigger: 'blur' }
           ]
         }
       }
