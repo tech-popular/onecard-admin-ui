@@ -1,28 +1,24 @@
 <template>
     <div class="aviator">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="30%">
-        <el-form-item label="子流程id" prop="script">
-        <el-input v-model="dataForm.script" placeholder="子流程id"/>
-        </el-form-item>
+      <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
         <el-form-item label="请求参数的fieldId数组" prop="requestFields">
-          <el-select filterable v-model="dataForm.requestFields" placeholder="请选择">
-          <el-option v-for="item in requestFieldsList" :value="item.value" :key="item.value" :label="item.label"/>
-          </el-select>
+        <el-input v-model="fatherData.requestFields" placeholder="请求参数的fieldId数组"/>
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields">
-          <el-select filterable v-model="dataForm.responseFields" placeholder="请选择">
-          <el-option v-for="item in responseFieldsList" :value="item.value" :key="item.value" :label="item.label"/>
-          </el-select>
+        <el-input v-model="fatherData.responseFields" placeholder="响应参数的fieldId数组"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType">
-          <el-select filterable v-model="dataForm.responseType" placeholder="请选择">
+          <el-select filterable v-model="fatherData.responseType" placeholder="请选择">
           <el-option v-for="item in responseTypeList" :value="item.value" :key="item.value" :label="item.label"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="是否启用" prop="enable">
-        <el-radio-group v-model="dataForm.enable">
-          <el-radio :label="0">禁用</el-radio>
-          <el-radio :label="1">正常</el-radio>
+        <el-form-item label="缓存生成的key需要的字段" prop="cacheKeyFields">
+        <el-input v-model="fatherData.cacheKeyFields" placeholder="缓存生成的key需要的字段"/>
+        </el-form-item>
+        <el-form-item label="是否启用" prop="form.enable">
+        <el-radio-group v-model="fatherData.enable">
+          <el-radio :label="false">禁用</el-radio>
+          <el-radio :label="true">正常</el-radio>
           </el-radio-group>
         </el-form-item>
     </el-form>
@@ -41,15 +37,6 @@
     ],
     data () {
       return {
-        dataForm: {
-          script: '', // 子流程id
-          requestFields: '', // 请求参数的fieldId数组
-          responseFields: '', // 响应参数的fieldId数组
-          responseType: '', // 响应参数的数据类型
-          enable: 1
-        },
-        requestFieldsList: [],
-        responseFieldsList: [],
         responseTypeList: [
           {
             value: '0',
@@ -61,22 +48,16 @@
           }
         ],
         dataRule: {
-          script: [
-            { required: true, message: '子流程id不能为空', trigger: 'blur' }
-          ],
           responseType: [
             { required: true, message: '请选择数据类型', trigger: 'blur' }
+          ],
+          cacheKeyFields: [
+            { required: true, message: '请输入缓存生成的key需要的字段', trigger: 'blur' }
           ]
         }
       }
     },
     methods: {
-      init () {
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-        })
-      },
-      // 取消
       cancel () {
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -88,9 +69,8 @@
         let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['dataForm'].validate((valid) => {
           if (valid && res) {
-            alert('submit!')
+            this.$emit('dataFormSumbit', this.fatherData)
           } else {
-            console.log('error submit!!')
             return false
           }
         })
