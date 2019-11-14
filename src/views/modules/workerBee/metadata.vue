@@ -10,6 +10,11 @@
       v-loading="dataListLoading"
       style="width: 100%;">
       <el-table-column
+        prop="taskDetailDefId"
+        header-align="center"
+        align="center"
+        label="任务具体id"/>
+      <el-table-column
         prop="name"
         header-align="center"
         align="center"
@@ -25,11 +30,6 @@
         align="center"
         label="任务描述"/>
       <el-table-column
-        prop="taskDetailDefId"
-        header-align="center"
-        align="center"
-        label="任务具体id"/>
-      <el-table-column
         prop="owner"
         header-align="center"
         align="center"
@@ -39,7 +39,7 @@
         header-align="center"
         align="center"
         label="任务使用者"/>
-      <el-table-column
+      <!-- <el-table-column
         prop="retryCount"
         header-align="center"
         align="center"
@@ -48,7 +48,7 @@
         prop="timeoutSeconds"
         header-align="center"
         align="center"
-        label="任务执行超时时间"/>
+        label="任务执行超时时间"/> -->
       <el-table-column
         prop="retryDelaySeconds"
         header-align="center"
@@ -59,7 +59,7 @@
         header-align="center"
         align="center"
         label="响应超时时间"/>
-      <el-table-column
+      <!-- <el-table-column
         prop="concurrentExecLimit"
         header-align="center"
         align="center"
@@ -83,27 +83,12 @@
         prop="executionNameSpace"
         header-align="center"
         align="center"
-        label="执行命名空间"/>
-      <el-table-column
-        prop="remark"
-        header-align="center"
-        align="center"
-        label="备注"/>
+        label="执行命名空间"/> -->
       <el-table-column
         prop="ownerApp"
         header-align="center"
         align="center"
         label="所属系统"/>
-      <el-table-column
-        prop="createdBy"
-        header-align="center"
-        align="center"
-        label="创建者姓名"/>
-      <el-table-column
-        prop="updatedBy"
-        header-align="center"
-        align="center"
-        label="更新者姓名"/>
       <el-table-column
         prop="enable"
         header-align="center"
@@ -114,6 +99,11 @@
           <el-tag v-else size="small" type="danger">禁用</el-tag>
         </template>
       </el-table-column>
+      <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="备注"/>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
