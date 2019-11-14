@@ -34,8 +34,8 @@
     @hideVisibleClick="hideVisible" ref="metadataGroovy"/>
     <!-- AVIATOR 类型6 -->
     <metadata-aviator
-    v-if="dataForm.type == 'AVIATOR'" :fatherData='dataForm' 
-    @hideVisibleClick="hideVisible" ref="metadataAviator"/>
+    v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData' 
+    @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataAviator"/>
     <!-- DECISION 类型7 -->
     <metadata-decision
     v-if="dataForm.type == 'DECISION'" :fatherData='dataForm' 
@@ -102,7 +102,8 @@
           description: [
             { required: true, message: '任务描述不能为空', trigger: 'blur' }
           ]
-        }
+        },
+        fatherData: {}
       }
     },
     components: {
@@ -122,7 +123,17 @@
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
-          // this.$refs['dataForm'].resetFields()
+          this.$refs['dataForm'].resetFields()
+          this.$http({
+            url: this.$http.adornUrl(`/gongFeng/beeTask/info/${id}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.dataForm = data.beeTaskDef
+              this.fatherData = data[this.dataForm.type.toLowerCase()]
+            }
+          })
         })
       },
       // 校验是否通过
@@ -136,6 +147,37 @@
       // 弹窗状态
       hideVisible (data) {
         this.visible = data
+      },
+      dataFormSumbit (form) {
+        let data = {
+          'http': null,
+          'gdbc': null,
+          'kafka': null,
+          'cassandra': null,
+          'groovy': null,
+          'aviator': null,
+          'decision': null
+        }
+        for (let key in data) {
+          if (this.dataForm.type.toLowerCase() == key) {
+            data[key] = form
+          }
+        }
+        let newData = {
+          'beeTaskDef': this.dataForm,
+          ...data
+        }
+        this.$http({
+          url: this.$http.adornUrl(`/gongFeng/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'update'}`),
+          method: 'post',
+          data: this.$http.adornData(newData)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.visible = false
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       }
     }
   }
