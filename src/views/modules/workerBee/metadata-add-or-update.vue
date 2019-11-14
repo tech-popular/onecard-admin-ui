@@ -159,8 +159,7 @@
           ]
         },
         fatherData: {
-          enable: true,
-          enableCache: true
+          enable: true
         }
       }
     },
@@ -204,8 +203,7 @@
       // 弹窗状态
       hideVisible (data) {
         this.fatherData = {
-          enable: true,
-          enableCache: true
+          enable: true
         }
         this.visible = data
       },
