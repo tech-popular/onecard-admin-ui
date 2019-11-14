@@ -16,11 +16,14 @@
     <el-form-item label="返回结果" prop="outputParameters">
       <el-input v-model="dataForm.outputParameters" placeholder="返回结果"/>
     </el-form-item>
+    <el-form-item label="描述">
+      <el-input v-model="dataForm.description" placeholder="描述"/>
+    </el-form-item>
      <el-form-item label="创建人姓名">
       <el-input v-model="dataForm.createdBy" placeholder="创建人姓名"/>
     </el-form-item>
     <el-form-item label="归属系统">
-      <el-input v-model="dataForm.ownerApp"/>
+      <el-input v-model="dataForm.ownerApp" placeholder="归属系统"/>
     </el-form-item>
     <el-form-item label="是否重试">
       <el-radio-group v-model="dataForm.restartable">
@@ -31,15 +34,12 @@
     <el-form-item label="版本">
       <el-input v-model="dataForm.version" placeholder="版本"/>
     </el-form-item>
-     <!-- <el-form-item label="什么版本">
-      <el-input v-model="dataForm.schemaVersion" placeholder="什么版本"/>
+    <!-- <el-form-item label="Tasks">
+      <el-input v-model="dataForm.tasks" placeholder="Tasks"/>
     </el-form-item> -->
-    <el-form-item label="流">
-      <el-input v-model="dataForm.tasks" placeholder="流"/>
-    </el-form-item>
     </el-form>
     <span slot="footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="datano()">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
@@ -62,7 +62,7 @@
           ownerApp: '',
           restartable: 0,
           schemaVersion: 0,
-          tasks: '',
+          // tasks: '',
           version: ''
         },
         dataRule: {
@@ -100,7 +100,6 @@
             const updateIds = this.updateId
             getUpdateWorkFlow(dataBody, updateIds).then(({data}) => {
               if (data && data.code === 0) {
-                console.log(data.beeWorkFlowVo)
                 this.dataForm.name = data.beeWorkFlowVo.name
                 this.dataForm.owner = data.beeWorkFlowVo.owner
                 this.dataForm.user = data.beeWorkFlowVo.user
@@ -111,7 +110,7 @@
                 this.dataForm.ownerApp = data.beeWorkFlowVo.ownerApp
                 this.dataForm.restartable = data.beeWorkFlowVo.restartable
                 this.dataForm.schemaVersion = data.beeWorkFlowVo.schemaVersion
-                this.dataForm.tasks = data.beeWorkFlowVo.tasks
+                // this.dataForm.tasks = data.beeWorkFlowVo.tasks
                 this.dataForm.version = data.beeWorkFlowVo.version
               }
             })
@@ -141,6 +140,9 @@
             })
           }
         })
+      },
+      datano () {
+        this.visible = false
       }
     }
   }
