@@ -1,6 +1,9 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+    <el-form-item label="任务具体id" prop="id">
+      <el-input v-model="dataForm.id" placeholder="任务具体id"/>
+    </el-form-item>
     <el-form-item label="任务定义名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="任务"/>
     </el-form-item>
@@ -12,28 +15,25 @@
     <el-form-item label="任务描述" prop="description">
       <el-input v-model="dataForm.description" placeholder="任务"/>
     </el-form-item>
-    <el-form-item label="任务具体id" prop="id">
-      <el-input v-model="dataForm.id" placeholder="任务具体id"/>
-    </el-form-item>
     <el-form-item label="任务归属" prop="owner">
       <el-input v-model="dataForm.owner" placeholder="任务归属"/>
     </el-form-item>
     <el-form-item label="任务使用者" prop="user">
       <el-input v-model="dataForm.user" placeholder="任务使用者"/>
     </el-form-item>
-    <el-form-item label="重试次数" prop="retryCount">
+    <!-- <el-form-item label="重试次数" prop="retryCount">
       <el-input v-model="dataForm.retryCount" placeholder="重试次数"/>
     </el-form-item>
     <el-form-item label="任务执行超时时间" prop="timeoutSeconds">
       <el-input v-model="dataForm.timeoutSeconds" placeholder="任务执行超时时间"/>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item label="入参数据的key的ID集合" prop="inputParams">
       <el-input v-model="dataForm.inputParams" placeholder="入参数据的key的ID集合"/>
     </el-form-item>
     <el-form-item label="出参数据的key的ID集合" prop="outputParams">
       <el-input v-model="dataForm.outputParams" placeholder="出参数据的key的ID集合"/>
     </el-form-item>
-    <el-form-item label="并发执行限制" prop="concurrentExeclimit">
+    <!-- <el-form-item label="并发执行限制" prop="concurrentExeclimit">
       <el-input v-model="dataForm.concurrentExeclimit" placeholder="并发执行限制"/>
     </el-form-item>
     <el-form-item label="输入模板" prop="inputTemplate">
@@ -47,26 +47,20 @@
     </el-form-item>
     <el-form-item label="执行命名空间" prop="executionNameSpace">
       <el-input v-model="dataForm.executionNameSpace" placeholder="执行命名空间"/>
-    </el-form-item>
-    <el-form-item label="备注" prop="remark">
-      <el-input v-model="dataForm.remark" placeholder="备注"/>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item label="所属系统" prop="ownerApp">
       <el-input v-model="dataForm.ownerApp" placeholder="所属系统"/>
     </el-form-item>
-    <el-form-item label="创建者姓名" prop="createdBy">
-      <el-input v-model="dataForm.createdBy" placeholder="创建者姓名"/>
-    </el-form-item>
-    <el-form-item label="更新者姓名" prop="updatedBy">
-      <el-input v-model="dataForm.updatedBy" placeholder="更新者姓名"/>
+    <el-form-item label="备注" prop="remark">
+      <el-input v-model="dataForm.remark" placeholder="备注"/>
     </el-form-item>
     <!-- HTTP 类型1 -->
     <metadata-http
     v-if="dataForm.type == 'HTTP'" :fatherData='fatherData' 
     @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataHttp"/>
-    <!-- GDBC 类型2 -->
+    <!-- JDBC 类型2 -->
     <metadata-jdbc
-    v-if="dataForm.type == 'GDBC'" :fatherData='fatherData' 
+    v-if="dataForm.type == 'JDBC'" :fatherData='fatherData' 
     @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataJdbc"/>
     <!-- KAFKA 类型3 -->
     <metadata-kafka
@@ -105,25 +99,23 @@
       return {
         visible: false,
         dataForm: {
+          id: 0, // 任务具体id
           name: '', // 任务定义名称
           type: 'HTTP', // 任务类型
           description: '', // 任务描述
-          id: 0, // 任务具体id
           owner: '', // 任务归属
           user: '', // 任务使用者
-          retryCount: 0, // 重试次数
-          timeoutSeconds: 0, // 任务执行超时时间
+          // retryCount: 0, // 重试次数
+          // timeoutSeconds: 0, // 任务执行超时时间
           inputParams: '', // 入参数据的key的ID集合
           outputParams: '', // 出参数据的key的ID集合
-          concurrentExeclimit: 0, // 并发执行限制
-          inputTemplate: '', // 输入模板
-          rateLimitPerFrequency: 0, // 频率限制
-          isolationGroupId: 0, // 隔离组ID
-          executionNameSpace: '', // 执行命名空间
-          remark: '', // 备注
+          // concurrentExeclimit: 0, // 并发执行限制
+          // inputTemplate: '', // 输入模板
+          // rateLimitPerFrequency: 0, // 频率限制
+          // isolationGroupId: 0, // 隔离组ID
+          // executionNameSpace: '', // 执行命名空间
           ownerApp: '', // 所属系统
-          createdBy: '', // 创建者姓名
-          updatedBy: '' // 更新者姓名
+          remark: '' // 备注
         },
         ruleTypeList: [
           {
@@ -131,8 +123,8 @@
             label: 'HTTP'
           },
           {
-            value: 'GDBC',
-            label: 'GDBC'
+            value: 'JDBC',
+            label: 'JDBC'
           },
           {
             value: 'KAFKA',

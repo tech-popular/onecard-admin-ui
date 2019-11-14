@@ -1,146 +1,103 @@
 <template>
-  <el-dialog title="数据关系" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
-    <el-form-item label="任务名称" prop="name">
-      <el-input v-model="dataForm.name" placeholder="任务名称"/>
-    </el-form-item>
-     <el-form-item label="拥有者" prop="owner">
-      <el-input v-model="dataForm.owner" placeholder="拥有者"/>
-    </el-form-item>
-    <el-form-item label="使用者" prop="user">
-      <el-input v-model="dataForm.user" placeholder="使用者"/>
-    </el-form-item>
-    <el-form-item label="工作流入参" prop="inputParameters">
-      <el-input v-model="dataForm.inputParameters" placeholder="工作流入参"/>
-    </el-form-item>
-    <el-form-item label="返回结果" prop="outputParameters">
-      <el-input v-model="dataForm.outputParameters" placeholder="返回结果"/>
-    </el-form-item>
-     <el-form-item label="创建人姓名">
-      <el-input v-model="dataForm.createdBy" placeholder="创建人姓名"/>
-    </el-form-item>
-    <el-form-item label="归属系统">
-      <el-input v-model="dataForm.ownerApp"/>
-    </el-form-item>
-    <el-form-item label="是否重试">
-      <el-radio-group v-model="dataForm.restartable">
-          <el-radio :label="0">不重试</el-radio>
-          <el-radio :label="1">重试</el-radio>
-        </el-radio-group>
-    </el-form-item>
-    <el-form-item label="版本">
-      <el-input v-model="dataForm.version" placeholder="版本"/>
-    </el-form-item>
-    <el-form-item label="什么版本">
-      <el-input v-model="dataForm.schemaVersion" placeholder="什么版本"/>
-    </el-form-item>
-    <el-form-item label="流">
-      <el-input v-model="dataForm.tasks" placeholder="流"/>
-    </el-form-item>
-    </el-form>
-    <span slot="footer">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-    </span>
-  </el-dialog>
+  <div>
+    <el-dialog title="数据关系" :close-on-click-modal="false" :visible.sync="visible">
+    <el-button type="primary" style="margin-bottom: 15px;" @click="addOrUpdateHandle()">新增</el-button>
+    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+        <el-table-column prop="flowId" header-align="center" align="center" label="工作流ID"/>
+        <el-table-column prop="id" header-align="center" align="center" label="任务名称"/>
+        <el-table-column prop="name" header-align="center" align="center" label="参考数据"/>
+        <el-table-column prop="owner" header-align="center" align="center" label="父级ID"/>
+        <el-table-column prop="user" header-align="center" align="center" label="任务ID"/>
+        <el-table-column prop="description" header-align="center" align="center" label="备注"/>
+      </el-table>
+      <el-pagination
+        @size-change="sizeChangeHandle"
+        @current-change="currentChangeHandle"
+        :current-page="pageNum"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="pageSize"
+        :total="totalPage"
+        layout="total, sizes, prev, pager, next, jumper"/>
+      <span slot="footer">
+        <el-button @click="visible = false">取消</el-button>
+        <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+  </div>
 </template>
 
 <script>
-  import { saveWorkFlow, getUpdateWorkFlow } from '@/api/workerBee/workFlow'
+  import { getUpdateWorkFlow } from '@/api/workerBee/workFlow'
+  import AddOrUpdate from './taskFlow-add-or-update'
+
   export default {
     data () {
       return {
         visible: false,
-        dataForm: {
-          name: '',
-          owner: '',
-          user: '',
-          inputParameters: '',
-          description: '',
-          createdBy: '',
-          outputParameters: '',
-          ownerApp: '',
-          restartable: 0,
-          schemaVersion: 0,
-          tasks: '',
-          version: ''
-        },
-        dataRule: {
-          name: [
-            { required: true, message: '工作流名称不能为空', trigger: 'blur' }
-          ],
-          owner: [
-            { required: true, message: '拥有者不能为空', trigger: 'blur' }
-          ],
-          user: [
-            { required: true, message: '使用者不能为空', trigger: 'blur' }
-          ],
-          inputParameters: [
-            { required: true, message: '工作流入参不能为空', trigger: 'blur' }
-          ],
-          outputParameters: [
-            { required: true, message: '返回结果不能为空', trigger: 'blur' }
-          ]
-        },
-        updateId: ''
+        dataList: [
+          {
+            flowId: 1,
+            id: '10001',
+            name: '工作流1',
+            owner: 'lvzhiming',
+            user: '万卡',
+            inputParameters: '工作流入参',
+            description: '成功'
+          },
+          {
+            flowId: 2,
+            id: '10002',
+            name: '工作流2',
+            owner: 'Hrbp',
+            user: '万卡',
+            inputParameters: '工作流入参',
+            description: '失败'
+          }
+        ],
+        pageNum: 1, // 当前页
+        pageSize: 10, // 默认每页10条
+        totalPage: 0,
+        addOrUpdateVisible: false
       }
     },
     components: {
-  
+      AddOrUpdate
     },
     methods: {
       init (id) {
-        this.updateId = id
-        this.dataForm.id = id || 0
+        console.log(id, 'youel')
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             const dataBody = id
-            const updateIds = this.updateId
-            getUpdateWorkFlow(dataBody, updateIds).then(({data}) => {
+            getUpdateWorkFlow(dataBody).then(({data}) => {
               if (data && data.code === 0) {
-                console.log(data.beeWorkFlowVo)
-                this.dataForm.name = data.beeWorkFlowVo.name
-                this.dataForm.owner = data.beeWorkFlowVo.owner
-                this.dataForm.user = data.beeWorkFlowVo.user
-                this.dataForm.inputParameters = data.beeWorkFlowVo.inputParameters
-                this.dataForm.description = data.beeWorkFlowVo.description
-                this.dataForm.createdBy = data.beeWorkFlowVo.createdBy
-                this.dataForm.outputParameters = data.beeWorkFlowVo.outputParameters
-                this.dataForm.ownerApp = data.beeWorkFlowVo.ownerApp
-                this.dataForm.restartable = data.beeWorkFlowVo.restartable
-                this.dataForm.schemaVersion = data.beeWorkFlowVo.schemaVersion
-                this.dataForm.tasks = data.beeWorkFlowVo.tasks
-                this.dataForm.version = data.beeWorkFlowVo.version
+  
               }
             })
           }
         })
       },
-      // 表单提交
-      dataFormSubmit () {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            const dataBody = this.dataForm
-            const dataUpdateId = this.updateId
-            saveWorkFlow(dataBody, dataUpdateId).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1000,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          }
+      // 新增 / 修改
+      addOrUpdateHandle (id) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id)
         })
+      },
+      // 每页数
+      sizeChangeHandle (val) {
+        this.pageSize = val
+        this.pageNum = 1
+        this.getDataList()
+      },
+      // 当前页
+      currentChangeHandle (val) {
+        this.pageNum = val
+        this.getDataList()
       }
     }
   }
