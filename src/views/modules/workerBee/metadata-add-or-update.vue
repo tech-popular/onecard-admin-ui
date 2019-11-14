@@ -8,7 +8,7 @@
       <el-input v-model="dataForm.name" placeholder="任务"/>
     </el-form-item>
     <el-form-item label="任务类型" prop="type">
-        <el-select filterable v-model="dataForm.type" placeholder="请选择">
+        <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()'>
           <el-option v-for="item in ruleTypeList" :value="item.value" :key="item.value" :label="item.label"/>
         </el-select>
       </el-form-item>
@@ -99,7 +99,7 @@
       return {
         visible: false,
         dataForm: {
-          id: 0, // 任务具体id
+          id: '', // 任务具体id
           name: '', // 任务定义名称
           type: 'HTTP', // 任务类型
           description: '', // 任务描述
@@ -159,7 +159,8 @@
           ]
         },
         fatherData: {
-          enable: true
+          enable: true,
+          enableCache: 1
         }
       }
     },
@@ -174,7 +175,7 @@
     },
     methods: {
       init (id) {
-        this.dataForm.id = id || 0
+        this.dataForm.id = id || ''
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -192,6 +193,13 @@
           }
         })
       },
+      // 任务类型
+      clickType () {
+        this.fatherData = {
+          enable: true,
+          enableCache: 1
+        }
+      },
       // 校验是否通过
       fatherCheck () {
         let res = false
@@ -203,7 +211,8 @@
       // 弹窗状态
       hideVisible (data) {
         this.fatherData = {
-          enable: true
+          enable: true,
+          enableCache: 1
         }
         this.visible = data
       },
@@ -221,6 +230,10 @@
           if (this.dataForm.type.toLowerCase() == key) {
             data[key] = form
           }
+        }
+        this.dataForm = {
+          ...this.dataForm,
+          id: Number(this.dataForm.id)
         }
         let newData = {
           'beeTaskDef': this.dataForm,
