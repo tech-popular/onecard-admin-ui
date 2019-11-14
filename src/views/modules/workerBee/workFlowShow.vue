@@ -124,8 +124,8 @@
             workFlowList(dataBody, false).then(({data}) => {
               if (data && data.code === 0) {
                 console.log(data, '接口数据')
-                this.dataList = data.list
-                this.totalPage = data.totalCount
+                this.dataList = data.data.list
+                this.totalPage = data.data.totalCount
               } else {
                 this.dataList = []
                 this.totalPage = 0

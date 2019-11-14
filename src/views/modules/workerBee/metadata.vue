@@ -110,7 +110,7 @@
         align="center"
         label="是否启用">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small" >正常</el-tag>
+          <el-tag v-if="scope.row.enable === true" size="small" >正常</el-tag>
           <el-tag v-else size="small" type="danger">禁用</el-tag>
         </template>
       </el-table-column>
@@ -211,7 +211,7 @@
             utcParam: [id]
           }
           deleteBeeTask(dataBody).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 500) {
               this.$message({
                 message: '操作成功',
                 type: 'success',

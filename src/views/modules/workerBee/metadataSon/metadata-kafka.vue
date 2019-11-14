@@ -1,18 +1,16 @@
 <template>
     <div class="aviator">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="30%">
+      <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
         <el-form-item label="topic" prop="topic">
-        <el-input v-model="dataForm.topic" placeholder="topic"/>
+        <el-input v-model="fatherData.topic" placeholder="topic"/>
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields">
-          <el-select filterable v-model="dataForm.requestFields" placeholder="请选择">
-          <el-option v-for="item in requestFieldsList" :value="item.value" :key="item.value" :label="item.label"/>
-          </el-select>
+        <el-input v-model="fatherData.requestFields" placeholder="请求参数的fieldId数组"/>
         </el-form-item>
         <el-form-item label="是否启用" prop="enable">
-        <el-radio-group v-model="dataForm.enable">
-          <el-radio :label="0">禁用</el-radio>
-          <el-radio :label="1">正常</el-radio>
+        <el-radio-group v-model="fatherData.enable">
+          <el-radio :label="false">禁用</el-radio>
+          <el-radio :label="true">正常</el-radio>
           </el-radio-group>
         </el-form-item>
     </el-form>
@@ -31,40 +29,30 @@
     ],
     data () {
       return {
-        dataForm: {
-          topic: '', // topic
-          requestFields: '', // 请求参数的fieldId数组
-          enable: 1
-        },
-        requestFieldsList: [],
         dataRule: {
           topic: [
-            { required: true, message: 'topic不能为空', trigger: 'blur' }
+            { required: true, message: '请输入topic', trigger: 'blur' }
+          ],
+          requestFields: [
+            { required: true, message: '请输入请求参数的fieldId数组', trigger: 'blur' }
           ]
         }
       }
     },
     methods: {
-      init () {
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-        })
-      },
-      // 取消
       cancel () {
         this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
+          this.$refs['fatherData'].resetFields()
         })
         this.$emit('hideVisibleClick', this.hideVisible)
       },
       // 表单提交
       dataFormSubmit () {
         let res = this.$parent.$parent.$parent.fatherCheck()
-        this.$refs['dataForm'].validate((valid) => {
+        this.$refs['fatherData'].validate((valid) => {
           if (valid && res) {
-            alert('submit!')
+            this.$emit('dataFormSumbit', this.fatherData)
           } else {
-            console.log('error submit!!')
             return false
           }
         })
