@@ -15,13 +15,19 @@
           <el-option v-for="item in responseTypeList" :value="item.value" :key="item.value" :label="item.label"/>
           </el-select>
         </el-form-item>
+        <el-form-item label="是否使用缓存" prop="enableCache">
+          <el-radio-group v-model="fatherData.enableCache">
+            <el-radio :label="0">不启用</el-radio>
+            <el-radio :label="1">启用</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="缓存生成的key需要的字段" prop="cacheKeyFields">
         <el-input v-model="fatherData.cacheKeyFields" placeholder="缓存生成的key需要的字段"/>
         </el-form-item>
         <el-form-item label="是否启用" prop="enable">
-        <el-radio-group v-model="fatherData.enable">
-          <el-radio :label="false">禁用</el-radio>
-          <el-radio :label="true">正常</el-radio>
+          <el-radio-group v-model="fatherData.enable">
+            <el-radio :label="false">禁用</el-radio>
+            <el-radio :label="true">正常</el-radio>
           </el-radio-group>
         </el-form-item>
     </el-form>
@@ -40,6 +46,10 @@
     ],
     data () {
       return {
+        fatherData: {
+          datasourceId: 0,
+          enableCache: 0
+        },
         responseTypeList: [
           {
             value: '0',
