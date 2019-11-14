@@ -211,7 +211,7 @@
             utcParam: [id]
           }
           deleteBeeTask(dataBody).then(({data}) => {
-            if (data && data.code === 500) {
+            if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
                 type: 'success',
