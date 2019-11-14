@@ -46,9 +46,6 @@
     ],
     data () {
       return {
-        fatherData: {
-          datasourceId: 0
-        },
         responseTypeList: [
           {
             value: '0',

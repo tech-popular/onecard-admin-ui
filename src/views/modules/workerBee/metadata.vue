@@ -10,7 +10,7 @@
       v-loading="dataListLoading"
       style="width: 100%;">
       <el-table-column
-        prop="taskDetailDefId"
+        prop="id"
         header-align="center"
         align="center"
         label="任务具体id"/>
