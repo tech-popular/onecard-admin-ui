@@ -12,8 +12,8 @@
     <el-form-item label="任务描述" prop="description">
       <el-input v-model="dataForm.description" placeholder="任务"/>
     </el-form-item>
-    <el-form-item label="任务具体id" prop="taskDetailDefid">
-      <el-input v-model="dataForm.taskDetailDefid" placeholder="任务具体id"/>
+    <el-form-item label="任务具体id" prop="id">
+      <el-input v-model="dataForm.id" placeholder="任务具体id"/>
     </el-form-item>
     <el-form-item label="任务归属" prop="owner">
       <el-input v-model="dataForm.owner" placeholder="任务归属"/>
@@ -105,11 +105,10 @@
       return {
         visible: false,
         dataForm: {
-          id: 0,
           name: '', // 任务定义名称
           type: 'HTTP', // 任务类型
           description: '', // 任务描述
-          taskDetailDefid: 0, // 任务具体id
+          id: 0, // 任务具体id
           owner: '', // 任务归属
           user: '', // 任务使用者
           retryCount: 0, // 重试次数
@@ -163,7 +162,7 @@
           type: [
             { required: true, message: '请选择任务类型', trigger: 'change' }
           ],
-          taskDetailDefid: [
+          id: [
             { required: true, message: '任务具体id必填', trigger: 'blur' }
           ]
         },
