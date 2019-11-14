@@ -14,32 +14,32 @@
     </el-form-item>
     <!-- HTTP 类型1 -->
     <metadata-http
-    v-if="dataForm.type == 'HTTP'" :fatherData='dataForm' 
-    @hideVisibleClick="hideVisible" ref="metadataHttp"/>
+    v-if="dataForm.type == 'HTTP'" :fatherData='fatherData' 
+    @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataHttp"/>
     <!-- GDBC 类型2 -->
     <metadata-jdbc
-    v-if="dataForm.type == 'GDBC'" :fatherData='dataForm' 
-    @hideVisibleClick="hideVisible" ref="metadataJdbc"/>
+    v-if="dataForm.type == 'GDBC'" :fatherData='fatherData' 
+    @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataJdbc"/>
     <!-- KAFKA 类型3 -->
     <metadata-kafka
-    v-if="dataForm.type == 'KAFKA'" :fatherData='dataForm' 
-    @hideVisibleClick="hideVisible" ref="metadataKafka"/>
+    v-if="dataForm.type == 'KAFKA'" :fatherData='fatherData' 
+    @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataKafka"/>
     <!-- CASSANDRA 类型4 -->
     <metadata-cassandra
-    v-if="dataForm.type == 'CASSANDRA'" :fatherData='dataForm' 
-    @hideVisibleClick="hideVisible" ref="metadataCassandra"/>
+    v-if="dataForm.type == 'CASSANDRA'" :fatherData='fatherData' 
+    @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataCassandra"/>
     <!-- GROOVY 类型5 -->
     <metadata-groovy
-    v-if="dataForm.type == 'GROOVY'" :fatherData='dataForm' 
-    @hideVisibleClick="hideVisible" ref="metadataGroovy"/>
+    v-if="dataForm.type == 'GROOVY'" :fatherData='fatherData' 
+    @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataGroovy"/>
     <!-- AVIATOR 类型6 -->
     <metadata-aviator
     v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData' 
     @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataAviator"/>
     <!-- DECISION 类型7 -->
     <metadata-decision
-    v-if="dataForm.type == 'DECISION'" :fatherData='dataForm' 
-    @hideVisibleClick="hideVisible" ref="metadataDecision"/>
+    v-if="dataForm.type == 'DECISION'" :fatherData='fatherData' 
+    @hideVisibleClick="hideVisible" @dataFormSumbit="dataFormSumbit" ref="metadataDecision"/>
     </el-form>
   </el-dialog>
 </template>
@@ -115,9 +115,6 @@
       metadataAviator, // 类型6
       metadataDecision // 类型7
     },
-    activated () {
-      // ...
-    },
     methods: {
       init (id) {
         this.dataForm.id = id || 0
@@ -168,7 +165,7 @@
           ...data
         }
         this.$http({
-          url: this.$http.adornUrl(`/gongFeng/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'update'}`),
+          url: this.$http.adornUrl(`/gongFeng/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`),
           method: 'post',
           data: this.$http.adornData(newData)
         }).then(({data}) => {

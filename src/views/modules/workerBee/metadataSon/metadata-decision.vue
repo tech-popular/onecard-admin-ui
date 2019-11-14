@@ -10,7 +10,7 @@
         <el-form-item label="switch判断项集合" prop="caseSwitchList">
         <el-input v-model="fatherData.caseSwitchList" placeholder="switch判断项集合"/>
         </el-form-item>
-        <el-form-item label="是否启用" prop="form.enable">
+        <el-form-item label="是否启用" prop="enable">
         <el-radio-group v-model="fatherData.enable">
           <el-radio :label="false">禁用</el-radio>
           <el-radio :label="true">正常</el-radio>
@@ -42,14 +42,14 @@
     methods: {
       cancel () {
         this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
+          this.$refs['fatherData'].resetFields()
         })
         this.$emit('hideVisibleClick', this.hideVisible)
       },
       // 表单提交
       dataFormSubmit () {
         let res = this.$parent.$parent.$parent.fatherCheck()
-        this.$refs['dataForm'].validate((valid) => {
+        this.$refs['fatherData'].validate((valid) => {
           if (valid && res) {
             this.$emit('dataFormSumbit', this.fatherData)
           } else {
