@@ -10,7 +10,7 @@
 		popper-class="ld-select_tree-drop"
 		@focus="changeDefaultCheck"
 	>
-    <el-option style="padding: 0 23px">
+    <el-option style="padding: 0 23px" v-if="ifTrue" :value="valueTitle">
       <el-checkbox v-model="checked" @change="allSelect">全选</el-checkbox>
     </el-option>
 		<el-option :value="valueTitle">
@@ -73,15 +73,16 @@ export default {
   },
   data () {
     return {
-      valueId: this.value, // 初始值
       valueTitle: this.defaultCheckNodes.join(','),
       chooseNodes: [],
       checkedKeys: [],
-      checked: false
+      checked: false,
+      ifTrue: true
     }
   },
   watch: {
     defaultCheckNodes (newVal) {
+      this.ifTrue = true
       this.valueTitle = newVal.join(',')
     }
   },
@@ -159,15 +160,18 @@ export default {
     },
     clearHandle () {
       this.valueTitle = ''
+      this.ifTrue = true
       this.remoteMethod(this.valueTitle)
       this.$emit('checkNode', [], this.index)
     },
     remoteMethod (val) {
+      this.ifTrue = true
       this.valueTitle = val
       this.$refs.selectTree.filter(val)
     },
     filterNode (value, data) { // 2019/04/10 删除自定义的过滤
       if (!value) return true
+      this.ifTrue = false
       return data.name.indexOf(value) !== -1
     },
     // 是否全选
