@@ -190,8 +190,8 @@ export default {
       const hadCheckedKeys = checked.checkedNodes
       this.checkedKeys = []
       for (let i = 0; i < hadCheckedKeys.length; i++) {
-        if (hadCheckedKeys[i].children) {
-          this.checkedKeys = [...this.checkedKeys, ...hadCheckedKeys[i].children.map(val => val.name)]
+        if (!hadCheckedKeys[i].children) {
+          this.checkedKeys.push(hadCheckedKeys[i].name)
         }
       }
       if (this.checkedKeys.length == this.optionIds.length) {
