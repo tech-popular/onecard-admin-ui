@@ -578,11 +578,10 @@ export default {
     },
     // 下拉框数据 处理
     selectConfig (res) {
-      let selectMap = res.data.selection[0].selectMap
+      let selectMap = res.data.selection[0].selectionMap.selectMap
       let selectList = []
       this.optionIds = []
       for (let key in selectMap) {
-        if (key != '所有产品') {
           selectList.push({
             name: key,
             children: selectMap[key].map(item => {
@@ -592,7 +591,6 @@ export default {
             })
           })
           this.optionIds = [...this.optionIds, ...selectMap[key]]
-        }
       }
       this.options = selectList
     }
