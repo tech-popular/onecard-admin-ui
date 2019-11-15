@@ -1,9 +1,6 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
-    <el-form-item label="任务具体id" prop="id">
-      <el-input v-model="dataForm.id" placeholder="任务具体id"/>
-    </el-form-item>
     <el-form-item label="任务定义名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="任务"/>
     </el-form-item>
@@ -99,7 +96,7 @@
       return {
         visible: false,
         dataForm: {
-          id: '', // 任务具体id
+          id: '',
           name: '', // 任务定义名称
           type: 'HTTP', // 任务类型
           description: '', // 任务描述
@@ -153,9 +150,6 @@
           ],
           type: [
             { required: true, message: '请选择任务类型', trigger: 'change' }
-          ],
-          id: [
-            { required: true, message: '任务具体id必填', trigger: 'blur' }
           ]
         },
         fatherData: {
@@ -186,7 +180,16 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm = data.beeTaskDef
+                this.dataForm.id = data.beeTaskDef.id
+                this.dataForm.name = data.beeTaskDef.name
+                this.dataForm.type = data.beeTaskDef.type
+                this.dataForm.description = data.beeTaskDef.description
+                this.dataForm.owner = data.beeTaskDef.owner
+                this.dataForm.user = data.beeTaskDef.user
+                this.dataForm.inputParams = data.beeTaskDef.inputParams
+                this.dataForm.outputParams = data.beeTaskDef.outputParams
+                this.dataForm.ownerApp = data.beeTaskDef.ownerApp
+                this.dataForm.remark = data.beeTaskDef.remark
                 this.fatherData = data[this.dataForm.type.toLowerCase()]
               }
             })
