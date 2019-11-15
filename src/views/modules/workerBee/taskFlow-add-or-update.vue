@@ -5,11 +5,11 @@
       <el-input v-model="dataForm.name" placeholder="工作流id"/>
     </el-form-item>
     <el-form-item label="任务Id" prop="inputParameters">
-      <el-select v-model="value" placeholder="任务Id">
+      <el-select v-model="dataForm.newprojectid" placeholder="任务Id">
         <el-option
           v-for="item in options"
           :key="item.value"
-          :label="item.label"
+          :label="item.id"
           :value="item.value">
         </el-option>
       </el-select>
