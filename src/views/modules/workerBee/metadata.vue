@@ -18,7 +18,8 @@
         prop="name"
         header-align="center"
         align="center"
-        label="任务定义名称"/>
+        label="任务定义名称"
+        width="150px"/>
       <el-table-column
         prop="type"
         header-align="center"
@@ -38,7 +39,8 @@
         prop="user"
         header-align="center"
         align="center"
-        label="任务使用者"/>
+        label="任务使用者"
+        width="150px"/>
       <!-- <el-table-column
         prop="retryCount"
         header-align="center"
@@ -48,7 +50,7 @@
         prop="timeoutSeconds"
         header-align="center"
         align="center"
-        label="任务执行超时时间"/> -->
+        label="任务执行超时时间"/>
       <el-table-column
         prop="retryDelaySeconds"
         header-align="center"
@@ -58,7 +60,7 @@
         prop="responseTimeoutSeconds"
         header-align="center"
         align="center"
-        label="响应超时时间"/>
+        label="响应超时时间"/> -->
       <!-- <el-table-column
         prop="concurrentExecLimit"
         header-align="center"
@@ -89,16 +91,6 @@
         header-align="center"
         align="center"
         label="所属系统"/>
-      <el-table-column
-        prop="enable"
-        header-align="center"
-        align="center"
-        label="是否启用">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === true" size="small" >正常</el-tag>
-          <el-tag v-else size="small" type="danger">禁用</el-tag>
-        </template>
-      </el-table-column>
       <el-table-column
         prop="remark"
         header-align="center"
