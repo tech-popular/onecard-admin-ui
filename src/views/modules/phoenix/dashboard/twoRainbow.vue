@@ -1,31 +1,28 @@
 <template>
-  <div class="mod-demo-echarts"> 
-    <el-row :gutter="20"> 
-      <el-col v-for="(outdata, index) in arr" :key="outdata.id" class='echartList Rainbow'>
+  <div class="mod-demo-echarts">
+    <el-row :gutter="20">
+      <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList Rainbow">
         <el-card>
-            <el-select v-model="selectedList && selectedList.data && selectedList.data.length > 0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr" class='selectList' multiple placeholder="全部" v-show="outdata.selection[0]" @visible-change="changeValue1(outdata, index)" @remove-tag="changeTag(outdata)">
-              <el-option
-                v-for="item in selection"
-                :key="item.name"
-                :label="item.value"
-                :value="item.name">
-              </el-option>
-            </el-select>
-            <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
-          </el-card>
-          <div class="funnelList">
-            <ul v-show="arr[index].type == 'funnel'">
-              <li :key='index' v-for="(item, index) in outdata.legend.data">{{item.name}}{{item.metric}}{{item.metric_unit}}<span class="colorRed" :class="{'percentRise' : item.percentRise}">{{item.percentRise ? '↑' : '↓'}}</span>{{item.percent}}{{item.percent_unit}}</li>
-            </ul>
-            <ul>
-            </ul>
-          </div>  
+          <select-tree
+            class="selectList"
+            :options="options"
+            :optionIds="optionIds"
+            :index="index"
+            :defaultCheckNodes="hadSelectedList[index]"
+            @checkNode="checkNode"
+          ></select-tree>
+          <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
+        </el-card>
+        <funnel :outdata="outdata"/>
       </el-col>
-    </el-row> 
+    </el-row>
   </div>
 </template>
 <script>
+import selectTree from './selectTree'
+import funnel from './funnel'
 export default {
+  components: { selectTree, funnel },
   props: {
     arr: {
       type: Array,
@@ -38,12 +35,28 @@ export default {
     selectedList: {
       type: Object,
       default: []
+    },
+    options: {
+      type: Array,
+      default: []
+    },
+    optionIds: {
+      type: Array,
+      default: []
+    },
+    hadSelectedList: {
+      type: Array,
+      default: []
     }
   },
   data () {
     return {}
   },
   methods: {
+    checkNode (data, index) {
+      data = [...new Set(data)]
+      this.$emit('checkNode', data, index, this.arr[index].selection[0])
+    },
     changeValue1 (data, index) {
       this.$emit('changeValue1', data, index)
     },
@@ -54,66 +67,38 @@ export default {
 }
 </script>
 <style lang="scss">
-
-  .mod-demo-echarts {
-    .el-card__body{
-      padding: 10px;
-    }
-    .chart-box {
-      min-height: 400px;
-    }
-    .lineCharts {
-      min-height: 200px;
-    }
-    .echartList{
-      position: relative;
-    }
-    .funnelStyle{
-      width: 33.33%;
-    }
-    .Rainbow:nth-child(odd){
-      width: 30%;
-    }
-    .Rainbow:nth-child(even){
-      width: 70%;
-    }
-    .selectList{
-      position: absolute;
-      width: 25%;
-      top: 20px;
-      left: 70%;
-      z-index: 9;
-    }
+.mod-demo-echarts {
+  .el-card__body {
+    padding: 10px;
   }
-  li{
-    list-style: none;
+  .chart-box {
+    min-height: 400px;
   }
-  .funnelList{
-    ul{
-      position: absolute;
-      width: 170px;
-      height: 200px;
-      top: 90px;
-      left: 20px;
-      padding: 0;
-      li{
-        color: #555;
-        margin-top: 41px;
-      }
-      li:nth-child(1){
-        margin-top: -71px;
-        left: 150px;
-        width: 100px;
-        position: absolute;
-        text-align: center;
-      }
-    }
+  .lineCharts {
+    min-height: 200px;
   }
-  .colorRed{
-    color: red;
+  .echartList {
+    position: relative;
   }
-  .percentRise{
-    color: green;
+  .funnelStyle {
+    width: 33.33%;
   }
+  .Rainbow:nth-child(odd) {
+    width: 35%;
+  }
+  .Rainbow:nth-child(even) {
+    width: 65%;
+  }
+  .selectList {
+    position: absolute;
+    width: 40%;
+    top: 5px;
+    left: 57%;
+    z-index: 9;
+  }
+}
+li {
+  list-style: none;
+}
 
 </style>
