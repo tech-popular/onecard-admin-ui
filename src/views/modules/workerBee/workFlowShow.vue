@@ -35,14 +35,6 @@
       :page-size="pageSize"
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"/>
-    <!-- <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageNum"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper"/> -->
     <!-- 弹窗查看示意图 -->
     <el-dialog
       title="工作流预览"
@@ -122,8 +114,7 @@
               'name': this.dataForm.workerBee
             }
             workFlowList(dataBody, false).then(({data}) => {
-              if (data && data.code === 0) {
-                console.log(data, '接口数据')
+              if (data && data.message === 'success') {
                 this.dataList = data.data.list
                 this.totalPage = data.data.totalCount
               } else {
@@ -173,7 +164,6 @@
       },
       // 删除
       deleted (value) {
-        console.log(value)
         const dataBody = value
         deleteWorkFlow(dataBody, false).then(({data}) => {
           if (data && data.code === 0) {

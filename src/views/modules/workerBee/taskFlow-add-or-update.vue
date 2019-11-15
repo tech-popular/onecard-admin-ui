@@ -1,11 +1,18 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog title="新增任务关系" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
-    <el-form-item label="工作流Id" prop="name">
-      <el-input v-model="dataForm.name" placeholder="工作流id"/>
+    <el-form-item label="工作流Id" prop="flowId">
+      <el-select v-model="dataForm.flowId" placeholder="工作流Id" style="width:100%">
+        <el-option
+          v-for="item in flowIdlist"
+          :key="item.value"
+          :label="item.id"
+          :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
-    <el-form-item label="任务Id" prop="inputParameters">
-      <el-select v-model="dataForm.newprojectid" placeholder="任务Id">
+    <el-form-item label="任务Id" prop="taskId">
+      <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -14,8 +21,8 @@
         </el-option>
       </el-select>
     </el-form-item>
-     <el-form-item label="任务加入任务Id" prop="owner">
-        <el-select v-model="value" placeholder="任务加入任务Id">
+     <el-form-item label="任务加入任务Id" prop="preTask">
+        <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -24,8 +31,8 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="父级Id" prop="user">
-      <el-select v-model="value" placeholder="父级id">
+    <el-form-item label="父级Id" prop="parentTask">
+      <el-select v-model="dataForm.parentTask" placeholder="父级Id" style="width:100%">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -34,13 +41,12 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="参考名称" prop="owner">
-      <el-input v-model="dataForm.owner" placeholder="参考数据"/>
+    <el-form-item label="执行下标" prop="index">
+      <el-input v-model="dataForm.index" placeholder="执行下标"/>
     </el-form-item>
-    <el-form-item label="执行下标" prop="owner">
-      <el-input v-model="dataForm.owner" placeholder="参考数据"/>
+    <el-form-item label="参考名称" prop="taskReferenceName">
+      <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
     </el-form-item>
-  
     <el-form-item label="备注" prop="inputParameters">
       <el-input v-model="dataForm.inputParameters" placeholder="备注"/>
     </el-form-item>
@@ -54,74 +60,79 @@
 </template>
 
 <script>
-  import { saveWorkFlow, getUpdateWorkFlow } from '@/api/workerBee/workFlow'
+  import { saveWorkTaskFlow } from '@/api/workerBee/workFlow'
   export default {
     data () {
       return {
         visible: false,
         dataForm: {
-          name: '',
-          owner: '',
-          user: '',
-          inputParameters: '',
-          description: '',
-          createdBy: '',
-          outputParameters: '',
-          ownerApp: '',
-          restartable: 0,
-          schemaVersion: 0,
-          tasks: '',
-          version: ''
+          flowId: -1,
+          taskId: -1,
+          index: -1,
+          parentTask: -1,
+          preTask: -1,
+          taskReferenceName: '',
+          inputParameters: ''
         },
         dataRule: {
-          name: [
-            { required: true, message: '工作流名称不能为空', trigger: 'blur' }
+          flowId: [
+            { required: true, message: '工作流Id不能为空', trigger: 'blur' }
           ],
-          owner: [
-            { required: true, message: '拥有者不能为空', trigger: 'blur' }
+          taskId: [
+            { required: true, message: '请选择任务Id', trigger: 'blur' }
           ],
-          user: [
-            { required: true, message: '使用者不能为空', trigger: 'blur' }
+          index: [
+            { required: true, message: '请选择任务Id', trigger: 'blur' }
+          ],
+          parentTask: [
+            { required: true, message: '请选择父级Id', trigger: 'blur' }
+          ],
+          taskReferenceName: [
+            { required: true, message: '参考名称不能为空', trigger: 'blur' }
           ],
           inputParameters: [
-            { required: true, message: '工作流入参不能为空', trigger: 'blur' }
+            { required: true, message: '备注不能为空', trigger: 'blur' }
           ],
-          outputParameters: [
-            { required: true, message: '返回结果不能为空', trigger: 'blur' }
+          preTask: [
+            { required: true, message: '请选择任务加入任务Id', trigger: 'blur' }
           ]
         },
-        updateId: ''
+        flowIdlist: [{
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }]
       }
     },
     components: {
   
     },
+    mounted () {
+      this.init()
+    },
     methods: {
-      init (id) {
-        this.dataForm.id = id || 0
+      init (value) {
+        console.log(value, '携带参数')
         this.visible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
-            const dataBody = id
-            getUpdateWorkFlow(dataBody).then(({data}) => {
-              if (data && data.code === 0) {
-                console.log(data.beeWorkFlowVo)
-                this.dataForm.name = data.beeWorkFlowVo.name
-                this.dataForm.owner = data.beeWorkFlowVo.owner
-                this.dataForm.user = data.beeWorkFlowVo.user
-              }
-            })
-          }
-        })
+        value.map()
       },
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             const dataBody = this.dataForm
-            const dataUpdateId = this.updateId
-            saveWorkFlow(dataBody, dataUpdateId).then(({data}) => {
+            saveWorkTaskFlow(dataBody).then(({data}) => {
               if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
