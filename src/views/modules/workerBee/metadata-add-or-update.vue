@@ -1,14 +1,11 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
-    <el-form-item label="任务具体id" prop="id">
-      <el-input v-model="dataForm.id" placeholder="任务具体id"/>
-    </el-form-item>
     <el-form-item label="任务定义名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="任务"/>
     </el-form-item>
     <el-form-item label="任务类型" prop="type">
-        <el-select filterable v-model="dataForm.type" placeholder="请选择">
+        <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()'>
           <el-option v-for="item in ruleTypeList" :value="item.value" :key="item.value" :label="item.label"/>
         </el-select>
       </el-form-item>
@@ -99,7 +96,7 @@
       return {
         visible: false,
         dataForm: {
-          id: 0, // 任务具体id
+          id: '',
           name: '', // 任务定义名称
           type: 'HTTP', // 任务类型
           description: '', // 任务描述
@@ -153,13 +150,11 @@
           ],
           type: [
             { required: true, message: '请选择任务类型', trigger: 'change' }
-          ],
-          id: [
-            { required: true, message: '任务具体id必填', trigger: 'blur' }
           ]
         },
         fatherData: {
-          enable: true
+          enable: true,
+          enableCache: 1
         }
       }
     },
@@ -174,7 +169,7 @@
     },
     methods: {
       init (id) {
-        this.dataForm.id = id || 0
+        this.dataForm.id = id || ''
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -185,12 +180,28 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm = data.beeTaskDef
+                this.dataForm.id = data.beeTaskDef.id
+                this.dataForm.name = data.beeTaskDef.name
+                this.dataForm.type = data.beeTaskDef.type
+                this.dataForm.description = data.beeTaskDef.description
+                this.dataForm.owner = data.beeTaskDef.owner
+                this.dataForm.user = data.beeTaskDef.user
+                this.dataForm.inputParams = data.beeTaskDef.inputParams
+                this.dataForm.outputParams = data.beeTaskDef.outputParams
+                this.dataForm.ownerApp = data.beeTaskDef.ownerApp
+                this.dataForm.remark = data.beeTaskDef.remark
                 this.fatherData = data[this.dataForm.type.toLowerCase()]
               }
             })
           }
         })
+      },
+      // 任务类型
+      clickType () {
+        this.fatherData = {
+          enable: true,
+          enableCache: 1
+        }
       },
       // 校验是否通过
       fatherCheck () {
@@ -203,7 +214,8 @@
       // 弹窗状态
       hideVisible (data) {
         this.fatherData = {
-          enable: true
+          enable: true,
+          enableCache: 1
         }
         this.visible = data
       },
@@ -221,6 +233,10 @@
           if (this.dataForm.type.toLowerCase() == key) {
             data[key] = form
           }
+        }
+        this.dataForm = {
+          ...this.dataForm,
+          id: Number(this.dataForm.id)
         }
         let newData = {
           'beeTaskDef': this.dataForm,

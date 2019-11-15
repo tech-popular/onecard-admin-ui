@@ -46,10 +46,6 @@
     ],
     data () {
       return {
-        fatherData: {
-          datasourceId: 0,
-          enableCache: 0
-        },
         responseTypeList: [
           {
             value: '0',

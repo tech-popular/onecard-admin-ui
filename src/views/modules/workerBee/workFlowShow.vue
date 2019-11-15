@@ -16,7 +16,7 @@
       <el-table-column prop="owner" header-align="center" align="center" label="拥有者"/>
       <el-table-column prop="user" header-align="center" align="center" label="使用者"/>
       <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参"/>
-      <el-table-column prop="description" header-align="center" align="center" label="工作流入参"/>
+      <el-table-column prop="description" header-align="center" align="center" label="描述"/>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->

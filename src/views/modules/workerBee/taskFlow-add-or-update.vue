@@ -1,17 +1,48 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
-    <el-form-item label="工作流id" prop="name">
+    <el-form-item label="工作流Id" prop="name">
       <el-input v-model="dataForm.name" placeholder="工作流id"/>
     </el-form-item>
-     <el-form-item label="参考数据" prop="owner">
+    <el-form-item label="任务Id" prop="inputParameters">
+      <el-select v-model="dataForm.newprojectid" placeholder="任务Id">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.id"
+          :value="item.value">
+        </el-option>
+      </el-select>
+    </el-form-item>
+     <el-form-item label="任务加入任务Id" prop="owner">
+        <el-select v-model="value" placeholder="任务加入任务Id">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="父级Id" prop="user">
+      <el-select v-model="value" placeholder="父级id">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="参考名称" prop="owner">
       <el-input v-model="dataForm.owner" placeholder="参考数据"/>
     </el-form-item>
-    <el-form-item label="父级id" prop="user">
-      <el-input v-model="dataForm.user" placeholder="父级id"/>
+    <el-form-item label="执行下标" prop="owner">
+      <el-input v-model="dataForm.owner" placeholder="参考数据"/>
     </el-form-item>
-    <el-form-item label="任务id" prop="inputParameters">
-      <el-input v-model="dataForm.inputParameters" placeholder="任务id"/>
+  
+    <el-form-item label="备注" prop="inputParameters">
+      <el-input v-model="dataForm.inputParameters" placeholder="备注"/>
     </el-form-item>
    
     </el-form>
@@ -67,29 +98,18 @@
     },
     methods: {
       init (id) {
-        this.updateId = id
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             const dataBody = id
-            const updateIds = this.updateId
-            getUpdateWorkFlow(dataBody, updateIds).then(({data}) => {
+            getUpdateWorkFlow(dataBody).then(({data}) => {
               if (data && data.code === 0) {
                 console.log(data.beeWorkFlowVo)
                 this.dataForm.name = data.beeWorkFlowVo.name
                 this.dataForm.owner = data.beeWorkFlowVo.owner
                 this.dataForm.user = data.beeWorkFlowVo.user
-                this.dataForm.inputParameters = data.beeWorkFlowVo.inputParameters
-                this.dataForm.description = data.beeWorkFlowVo.description
-                this.dataForm.createdBy = data.beeWorkFlowVo.createdBy
-                this.dataForm.outputParameters = data.beeWorkFlowVo.outputParameters
-                this.dataForm.ownerApp = data.beeWorkFlowVo.ownerApp
-                this.dataForm.restartable = data.beeWorkFlowVo.restartable
-                this.dataForm.schemaVersion = data.beeWorkFlowVo.schemaVersion
-                this.dataForm.tasks = data.beeWorkFlowVo.tasks
-                this.dataForm.version = data.beeWorkFlowVo.version
               }
             })
           }
