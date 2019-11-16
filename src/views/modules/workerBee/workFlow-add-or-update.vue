@@ -131,7 +131,8 @@
                   duration: 1000,
                   onClose: () => {
                     this.visible = false
-                    this.$emit('refreshDataList')
+                    this.resetForm()
+                    // this.$emit('refreshDataList')
                   }
                 })
               } else {
@@ -143,6 +144,10 @@
       },
       datano () {
         this.visible = false
+        this.resetForm()
+      },
+      resetForm (dataForm) {
+        this.$refs[dataForm].resetFields()
       }
     }
   }

@@ -23,7 +23,7 @@
       </span>
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init" />
   </div>
 </template>
 
@@ -53,11 +53,11 @@
     methods: {
       init (id) {
         this.visible = true
-        this.flowId = id
+        this.flowId = localStorage.getItem('id')
         const dataBody = {
           'pageNum': this.pageNum,
           'pageSize': this.pageSize,
-          'flowId': id
+          'flowId': this.flowId
         }
         this.$nextTick(() => {
           workFlowTaskList(dataBody).then(({data}) => {
@@ -83,7 +83,7 @@
         this.pageNum = 1
         this.init()
       },
-      // 当前页
+      // 下一页
       currentChangeHandle (val) {
         this.pageNum = val
         this.init()

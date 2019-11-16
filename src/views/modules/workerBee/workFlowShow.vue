@@ -154,9 +154,7 @@
       // 数据关系
       clickFlowEdit (id) {
         this.visibleEdit = true
-        this.$nextTick(() => {
-          this.$refs.taskFlow.init(id)
-        })
+        localStorage.setItem('id', id)
       },
       // 删除弹窗获取值
       deleteddialog (value) {
