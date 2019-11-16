@@ -53,7 +53,7 @@
     methods: {
       init (id) {
         this.visible = true
-        this.flowId = localStorage.getItem('id')
+        this.flowId = id
         const dataBody = {
           'pageNum': this.pageNum,
           'pageSize': this.pageSize,
