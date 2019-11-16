@@ -9,7 +9,7 @@
 <script>
 import go from 'gojs'
 export default{
-
+  props: ['dataAllList'],
   data () {
     return {
 
@@ -195,38 +195,38 @@ export default{
             new go.Binding('visible', 'answer', function (a) { return (!!a) })
           )
         )
-      var nodeDataArray = [
-        { key: 1, text: '工作流预览', category: 'Start' },
-        { key: 2, text: '我是工作流1', category: 'Judge' },
-        { key: 3, text: '我是工作流2', category: 'Judge' },
-        { key: 5, text: '这个数据1', category: 'Condition' },
-        { key: 6, text: '这个数据2', category: 'Condition' },
-        { key: 8, text: '这个数据3', category: 'Condition' },
-        { key: 9, text: '这个数据4', category: 'Condition' },
-        { key: 10, text: '完成1', category: 'End' },
-        { key: 11, text: '完成2', category: 'End' },
-        { key: 12, text: '完成3', category: 'End' },
-        { key: 13, text: '完成4', category: 'End' }
-      ]
-      var linkDataArray = [
-        { from: 1, to: 2, answer: '是' },
-        { from: 1, to: 3, answer: '是' },
-        { from: 1, to: 4, answer: '是' },
-        { from: 2, to: 5, answer: '是' },
-        { from: 2, to: 6, answer: '否' },
-        { from: 3, to: 8, answer: '是' },
-        { from: 3, to: 9, answer: '否' },
-        { from: 5, to: 10 },
-        { from: 6, to: 11 },
-        { from: 8, to: 12 },
-        { from: 9, to: 13 }
-      ]
+      // var nodeDataArray = [
+      //   { key: 1, text: '工作流预览', category: 'Start' },
+      //   { key: 2, text: '我是工作流1', category: 'Judge' },
+      //   { key: 3, text: '我是工作流2', category: 'Judge' },
+      //   { key: 5, text: '这个数据1', category: 'Condition' },
+      //   { key: 6, text: '这个数据2', category: 'Condition' },
+      //   { key: 8, text: '这个数据3', category: 'Condition' },
+      //   { key: 9, text: '这个数据4', category: 'Condition' },
+      //   { key: 10, text: '完成1', category: 'End' },
+      //   { key: 11, text: '完成2', category: 'End' },
+      //   { key: 12, text: '完成3', category: 'End' },
+      //   { key: 13, text: '完成4', category: 'End' }
+      // ]
+      // var linkDataArray = [
+      //   { from: 1, to: 2, answer: '是' },
+      //   { from: 1, to: 3, answer: '是' },
+      //   { from: 1, to: 4, answer: '是' },
+      //   { from: 2, to: 5, answer: '是' },
+      //   { from: 2, to: 6, answer: '否' },
+      //   { from: 3, to: 8, answer: '是' },
+      //   { from: 3, to: 9, answer: '否' },
+      //   { from: 5, to: 10 },
+      //   { from: 6, to: 11 },
+      //   { from: 8, to: 12 },
+      //   { from: 9, to: 13 }
+      // ]
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
           copiesArrays: true,
           copiesArrayObjects: true,
-          nodeDataArray: nodeDataArray,
-          linkDataArray: linkDataArray
+          nodeDataArray: this.dataAllList.nodeDataArrays,
+          linkDataArray: this.dataAllList.linkDataArrays
         })
     },
 

@@ -42,8 +42,8 @@
       :before-close="handleClosede"
       fullscreen
       :visible.sync="visible">
-      <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
-      <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/>
+      <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/>
+      <!-- <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
     </el-dialog>
     <!-- 删除弹窗 -->
     <el-dialog
@@ -124,26 +124,26 @@
       },
   
       /** 查看示意图接口 */
-      // getDataFlowList () {
-      //   this.$http({
-      //     url: this.$http.adornUrl(`/cash/flowchart/showphone`),
-      //     method: 'post',
-      //     data: this.$http.adornData({
-      //       'phone': this.phone,
-      //       'createTime': this.createTime,
-      //       'serialNumber': this.serialNumber
-      //     })
-      //   }).then(({data}) => {
-      //     if (data && data.code === 0) {
-      //       this.sketchMap = true
-      //       this.visible = true
-      //       this.sketchMap = true
-      //       this.dataAllList = data.list
-      //     } else {
-      //       return false
-      //     }
-      //   })
-      // },
+      getDataFlowList () {
+        this.$http({
+          url: this.$http.adornUrl(`/bee/workflow/showFlow/${1}`),
+          method: 'get',
+          data: this.$http.adornData({
+            'phone': this.phone,
+            'createTime': this.createTime,
+            'serialNumber': this.serialNumber
+          })
+        }).then(({data}) => {
+          if (data && data.status === 0) {
+            this.sketchMap = true
+            this.visible = true
+            this.sketchMap = true
+            this.dataAllList = data.data
+          } else {
+            return false
+          }
+        })
+      },
       // 新增 / 修改
       addOrUpdateHandle (id) {
         this.addOrUpdateVisible = true
@@ -175,7 +175,7 @@
       clickSketchMap (value) {
         this.visible = true
         this.workerBee = value.workerBee
-        // this.getDataFlowList()
+        this.getDataFlowList()
       },
       /** 查询 */
       searchHandle () {
