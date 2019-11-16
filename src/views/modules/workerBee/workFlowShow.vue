@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :inline="true" :model="dataForm" :rules="rules" ref="dataForm">
+    <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="工作流">
         <el-input v-model="dataForm.workerBee" placeholder="工作流" clearable />
       </el-form-item>
@@ -23,7 +23,7 @@
           <el-button type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" @click="clickFlowEdit(scope.row.id)">数据关系</el-button>
-          <el-button type="text" style="color:#f56c6c" @click="deleted(scope.row.id)">删除</el-button>
+          <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -45,6 +45,17 @@
       <!-- <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
       <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/>
     </el-dialog>
+    <!-- 删除弹窗 -->
+    <el-dialog
+      title="删除"
+      :visible.sync="deleteVisible"
+      width="30%">
+      <span>确定删除吗？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="deleteVisible = false">取 消</el-button>
+        <el-button type="primary" @click="deleted()">确 定</el-button>
+      </span>
+    </el-dialog>
     <!-- 数据关系 -->
     <taskFlow v-if="visibleEdit" ref="taskFlow"/>
     <!-- 弹窗, 新增 / 修改 -->
@@ -62,28 +73,12 @@
     data () {
       return {
         visible: false,
+        deleteVisible: false,
         visibleEdit: false,
         dataForm: {
           workerBee: ''
         },
-        dataList: [
-          {
-            id: '10001',
-            name: '工作流1',
-            owner: 'lvzhiming',
-            user: '万卡',
-            inputParameters: '工作流入参',
-            description: '成功'
-          },
-          {
-            id: '10002',
-            name: '工作流2',
-            owner: 'Hrbp',
-            user: '万卡',
-            inputParameters: '工作流入参',
-            description: '失败'
-          }
-        ],
+        dataList: [],
         dataAllList: {},
         workerBee: '',
         pageNum: 1, // 当前页
@@ -91,7 +86,8 @@
         totalPage: 0,
         dataListLoading: false,
         sketchMap: false,
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        deletedId: ''
       }
     },
     components: {
@@ -162,11 +158,17 @@
           this.$refs.taskFlow.init(id)
         })
       },
+      // 删除弹窗获取值
+      deleteddialog (value) {
+        this.deletedId = value
+        this.deleteVisible = true
+      },
       // 删除
-      deleted (value) {
-        const dataBody = value
+      deleted () {
+        const dataBody = this.deletedId
         deleteWorkFlow(dataBody, false).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.message === 'success') {
+            this.deleteVisible = false
             this.getDataList()
           }
         })

@@ -7,7 +7,7 @@
         <el-table-column prop="taskReferenceName" header-align="center" align="center" label="参考任务名称"/>
         <el-table-column prop="preTask" header-align="center" align="center" label="父级ID"/>
         <el-table-column prop="taskId" header-align="center" align="center" label="任务ID"/>
-        <el-table-column prop="rateLimited" header-align="center" align="center" label="备注"/>
+        <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
       </el-table>
       <el-pagination
         @size-change="sizeChangeHandle"
@@ -40,6 +40,7 @@
         pageSize: 10, // 默认每页10条
         totalPage: 0,
         addOrUpdateVisible: false,
+        dataListLoading: false,
         list: ''
       }
     },
@@ -60,9 +61,11 @@
         }
         this.$nextTick(() => {
           workFlowTaskList(dataBody).then(({data}) => {
+            this.dataListLoading = true
             if (data && data.message === 'success') {
               this.dataList = data.data.list
               this.totalPage = data.data.totalCount
+              this.dataListLoading = false
             }
           })
         })
@@ -71,7 +74,7 @@
       addOrUpdateHandle () {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(this.dataList)
+          this.$refs.addOrUpdate.init(this.dataList, this.flowId)
         })
       },
       // 每页数

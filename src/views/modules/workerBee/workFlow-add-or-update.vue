@@ -99,19 +99,19 @@
             const dataBody = id
             const updateIds = this.updateId
             getUpdateWorkFlow(dataBody, updateIds).then(({data}) => {
-              if (data && data.code === 0) {
-                this.dataForm.name = data.beeWorkFlowVo.name
-                this.dataForm.owner = data.beeWorkFlowVo.owner
-                this.dataForm.user = data.beeWorkFlowVo.user
-                this.dataForm.inputParameters = data.beeWorkFlowVo.inputParameters
-                this.dataForm.description = data.beeWorkFlowVo.description
-                this.dataForm.createdBy = data.beeWorkFlowVo.createdBy
-                this.dataForm.outputParameters = data.beeWorkFlowVo.outputParameters
-                this.dataForm.ownerApp = data.beeWorkFlowVo.ownerApp
-                this.dataForm.restartable = data.beeWorkFlowVo.restartable
-                this.dataForm.schemaVersion = data.beeWorkFlowVo.schemaVersion
-                // this.dataForm.tasks = data.beeWorkFlowVo.tasks
-                this.dataForm.version = data.beeWorkFlowVo.version
+              if (data && data.message === 'success') {
+                this.dataForm.name = data.data.name
+                this.dataForm.owner = data.data.owner
+                this.dataForm.user = data.data.user
+                this.dataForm.inputParameters = data.data.inputParameters
+                this.dataForm.description = data.data.description
+                this.dataForm.createdBy = data.data.createdBy
+                this.dataForm.outputParameters = data.data.outputParameters
+                this.dataForm.ownerApp = data.data.ownerApp
+                this.dataForm.restartable = data.data.restartable
+                this.dataForm.schemaVersion = data.data.schemaVersion
+                // this.dataForm.tasks = data.data.tasks
+                this.dataForm.version = data.data.version
               }
             })
           }
@@ -124,7 +124,7 @@
             const dataBody = this.dataForm
             const dataUpdateId = this.updateId
             saveWorkFlow(dataBody, dataUpdateId).then(({data}) => {
-              if (data && data.code === 0) {
+              if (data && data.message === 'success') {
                 this.$message({
                   message: '操作成功',
                   type: 'success',

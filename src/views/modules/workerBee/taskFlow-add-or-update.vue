@@ -5,50 +5,57 @@
       <el-select v-model="dataForm.flowId" placeholder="工作流Id" style="width:100%">
         <el-option
           v-for="item in flowIdlist"
-          :key="item.value"
-          :label="item.id"
-          :value="item.value">
+          :key="item"
+          :label="item"
+          :value="item">
         </el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="任务Id" prop="taskId">
       <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%">
         <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.id"
-          :value="item.value">
+          v-for="item in taskIdlist"
+          :key="item"
+          :label="item"
+          :value="item">
         </el-option>
       </el-select>
     </el-form-item>
      <el-form-item label="任务加入任务Id" prop="preTask">
         <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
         <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
+          v-for="item in preTasklist"
+          :key="item"
+          :label="item"
+          :value="item">
         </el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="父级Id" prop="parentTask">
       <el-select v-model="dataForm.parentTask" placeholder="父级Id" style="width:100%">
         <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
+          v-for="item in parentTasklist"
+          :key="item"
+          :label="item"
+          :value="item">
         </el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="执行下标" prop="index">
-      <el-input v-model="dataForm.index" placeholder="执行下标"/>
+      <el-select v-model="dataForm.index" placeholder="执行下标" style="width:100%">
+        <el-option
+          v-for="item in indexlist"
+          :key="item"
+          :label="item"
+          :value="item">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="参考名称" prop="taskReferenceName">
       <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
     </el-form-item>
-    <el-form-item label="备注" prop="inputParameters">
-      <el-input v-model="dataForm.inputParameters" placeholder="备注"/>
+    <el-form-item label="备注" prop="remark">
+      <el-input v-model="dataForm.remark" placeholder="备注"/>
     </el-form-item>
    
     </el-form>
@@ -66,13 +73,13 @@
       return {
         visible: false,
         dataForm: {
-          flowId: -1,
+          flowId: '',
           taskId: -1,
           index: -1,
           parentTask: -1,
           preTask: -1,
           taskReferenceName: '',
-          inputParameters: ''
+          remark: ''
         },
         dataRule: {
           flowId: [
@@ -90,29 +97,18 @@
           taskReferenceName: [
             { required: true, message: '参考名称不能为空', trigger: 'blur' }
           ],
-          inputParameters: [
+          remark: [
             { required: true, message: '备注不能为空', trigger: 'blur' }
           ],
           preTask: [
             { required: true, message: '请选择任务加入任务Id', trigger: 'blur' }
           ]
         },
-        flowIdlist: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }]
+        flowIdlist: [],
+        taskIdlist: [],
+        preTasklist: [],
+        parentTasklist: [],
+        indexlist: []
       }
     },
     components: {
@@ -122,10 +118,16 @@
       this.init()
     },
     methods: {
-      init (value) {
-        console.log(value, '携带参数')
+      init (value, flowId) {
+        this.dataForm.flowId = flowId
         this.visible = true
-        value.map()
+        value.map(item => {
+          this.flowIdlist.push(item.flowId)
+          this.taskIdlist.push(item.taskId)
+          this.preTasklist.push(item.preTask)
+          this.parentTasklist.push(item.parentTask)
+          this.indexlist.push(item.index)
+        })
       },
       // 表单提交
       dataFormSubmit () {
@@ -133,7 +135,7 @@
           if (valid) {
             const dataBody = this.dataForm
             saveWorkTaskFlow(dataBody).then(({data}) => {
-              if (data && data.code === 0) {
+              if (data && data.message === 'success') {
                 this.$message({
                   message: '操作成功',
                   type: 'success',
