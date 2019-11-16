@@ -66,7 +66,7 @@
   import showFlow from './workflowChart'
   import taskFlow from './taskFlow'
   import AddOrUpdate from './workFlow-add-or-update'
-  import { workFlowList, deleteWorkFlow } from '@/api/workerBee/workFlow'
+  import { workFlowList, deleteWorkFlow, workFlowShow } from '@/api/workerBee/workFlow'
 
   export default {
     data () {
@@ -124,15 +124,8 @@
   
       /** 查看示意图接口 */
       getDataFlowList () {
-        this.$http({
-          url: this.$http.adornUrl(`bee/workflow/showFlow/${this.workerBee}`),
-          method: 'get',
-          data: this.$http.adornData({
-            'phone': this.phone,
-            'createTime': this.createTime,
-            'serialNumber': this.serialNumber
-          })
-        }).then(({data}) => {
+        const dataBody = this.workerBee
+        workFlowShow(dataBody).then(({data}) => {
           if (data && data.status === 0) {
             this.sketchMap = true
             this.visible = true
