@@ -9,3 +9,4 @@ export const deleteWorkFlow = (params) => httpDelete(gf + `/bee/workflow/delete/
 
 export const workFlowTaskList = (params, flag) => httpGet(gf + '/bee/workflowtask/list', params, flag) // 工作流任务关系列表
 export const saveWorkTaskFlow = (params) => httpPost(gf + '/bee/workflowtask/add', params) // 新增表单提交
+export const getAllBeeTaskList = (params, flag) => httpPost(gf + '/beeTask/getAllBeeTaskList', params, flag) // 工作流任务关系列表
