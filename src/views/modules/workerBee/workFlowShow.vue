@@ -20,7 +20,7 @@
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-button type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button>
+          <el-button type="text" @click="clickSketchMap(scope.row.id)">查看工作流</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" @click="clickFlowEdit(scope.row.id)">数据关系</el-button>
           <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
@@ -43,7 +43,6 @@
       fullscreen
       :visible.sync="visible">
       <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/>
-      <!-- <showFlow :dataAllList="dataAllList" @refreshDataList="getDataList"/> -->
     </el-dialog>
     <!-- 删除弹窗 -->
     <el-dialog
@@ -126,7 +125,7 @@
       /** 查看示意图接口 */
       getDataFlowList () {
         this.$http({
-          url: this.$http.adornUrl(`/bee/workflow/showFlow/${1}`),
+          url: this.$http.adornUrl(`bee/workflow/showFlow/${this.workerBee}`),
           method: 'get',
           data: this.$http.adornData({
             'phone': this.phone,
@@ -137,7 +136,6 @@
           if (data && data.status === 0) {
             this.sketchMap = true
             this.visible = true
-            this.sketchMap = true
             this.dataAllList = data.data
           } else {
             return false
@@ -154,7 +152,9 @@
       // 数据关系
       clickFlowEdit (id) {
         this.visibleEdit = true
-        localStorage.setItem('id', id)
+        this.$nextTick(() => {
+          this.$refs.taskFlow.init(id)
+        })
       },
       // 删除弹窗获取值
       deleteddialog (value) {
@@ -174,7 +174,7 @@
       /** 查看示意图 */
       clickSketchMap (value) {
         this.visible = true
-        this.workerBee = value.workerBee
+        this.workerBee = value
         this.getDataFlowList()
       },
       /** 查询 */
