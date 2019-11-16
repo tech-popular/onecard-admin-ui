@@ -146,7 +146,7 @@
           'pageSize': this.pageSize
         }
         beeTaskList(dataBody).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.status === 0) {
             this.dataList = data.list
             this.totalPage = data.totalCount
             var arrList = []
@@ -193,7 +193,7 @@
             utcParam: [id]
           }
           deleteBeeTask(dataBody).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.status === 0) {
               this.$message({
                 message: '操作成功',
                 type: 'success',

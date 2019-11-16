@@ -179,7 +179,7 @@
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
-              if (data && data.code === 0) {
+              if (data && data.status === 0) {
                 this.dataForm.id = data.beeTaskDef.id
                 this.dataForm.name = data.beeTaskDef.name
                 this.dataForm.type = data.beeTaskDef.type
@@ -247,7 +247,7 @@
           method: 'post',
           data: this.$http.adornData(newData)
         }).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.status === 0) {
             this.$message({
               message: '操作成功',
               type: 'success',
