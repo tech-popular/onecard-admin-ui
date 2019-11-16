@@ -4,6 +4,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import common from './modules/common'
 import user from './modules/user'
 import reportChart from './modules/report-chart'
+import workFlow from './modules/workFlow'
 
 Vue.use(Vuex)
 
@@ -11,7 +12,8 @@ export default new Vuex.Store({
   modules: {
     common,
     user,
-    reportChart
+    reportChart,
+    workFlow
   },
   mutations: {
     // 重置vuex本地储存状态

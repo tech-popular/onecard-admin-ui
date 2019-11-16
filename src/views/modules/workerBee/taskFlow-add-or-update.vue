@@ -136,14 +136,13 @@
             const dataBody = this.dataForm
             saveWorkTaskFlow(dataBody).then(({data}) => {
               if (data && data.message === 'success') {
-                this.dataForm = {}
                 this.$message({
                   message: '操作成功',
                   type: 'success',
                   duration: 200,
                   onClose: () => {
                     this.visible = false
-                    this.$emit('refreshDataList')
+                    this.$emit('refreshDataList', this.dataForm.flowId)
                     this.dataForm.taskReferenceName = ''
                     this.dataForm.remark = ''
                   }
