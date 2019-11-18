@@ -161,6 +161,7 @@ export default {
     clearHandle () {
       this.valueTitle = ''
       this.ifTrue = true
+      this.checked = false
       this.remoteMethod(this.valueTitle)
       this.$emit('checkNode', [], this.index)
     },

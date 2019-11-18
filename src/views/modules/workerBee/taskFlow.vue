@@ -67,17 +67,13 @@
     },
     methods: {
       init (id) {
-        console.log(id, 'youel')
         this.visible = true
-<<<<<<< HEAD
-=======
         this.flowId = this.$store.state.workFlow.id
         const dataBody = {
           'pageNum': this.pageNum,
           'pageSize': this.pageSize,
           'flowId': this.flowId
         }
->>>>>>> 034cbc4f07ad6421347951b9eedf5662caa8dfe2
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {

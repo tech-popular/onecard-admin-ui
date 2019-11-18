@@ -100,20 +100,6 @@
       init (id) {
         this.dataForm.id = id || 0
         this.visible = true
-<<<<<<< HEAD
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
-            const dataBody = id
-            getUpdateWorkFlow(dataBody).then(({data}) => {
-              if (data && data.code === 0) {
-                console.log(data.beeWorkFlowVo)
-                this.dataForm.name = data.beeWorkFlowVo.name
-                this.dataForm.owner = data.beeWorkFlowVo.owner
-                this.dataForm.user = data.beeWorkFlowVo.user
-              }
-            })
-=======
         value.map(item => {
           this.flowIdlist.push(item.flowId)
           this.preTasklist.push(item.preTask)
@@ -124,7 +110,6 @@
         getAllBeeTaskList(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.taskIdlist = data.data
->>>>>>> 034cbc4f07ad6421347951b9eedf5662caa8dfe2
           }
         })
       },
@@ -143,11 +128,8 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
-<<<<<<< HEAD
-=======
                     this.dataForm.taskReferenceName = ''
                     this.dataForm.remark = ''
->>>>>>> 034cbc4f07ad6421347951b9eedf5662caa8dfe2
                   }
                 })
               } else {

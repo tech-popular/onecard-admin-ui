@@ -582,15 +582,15 @@ export default {
       let selectList = []
       this.optionIds = []
       for (let key in selectMap) {
-          selectList.push({
-            name: key,
-            children: selectMap[key].map(item => {
-              return {
-                name: item
-              }
-            })
+        selectList.push({
+          name: key,
+          children: selectMap[key].map(item => {
+            return {
+              name: item
+            }
           })
-          this.optionIds = [...this.optionIds, ...selectMap[key]]
+        })
+        this.optionIds = [...this.optionIds, ...selectMap[key]]
       }
       this.options = selectList
     }
