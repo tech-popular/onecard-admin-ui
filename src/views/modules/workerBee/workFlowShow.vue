@@ -41,6 +41,7 @@
       :close-on-click-modal="false"
       :before-close="handleClosede"
       fullscreen
+      style="max-height: 100vh"
       :visible.sync="visible">
       <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/>
     </el-dialog>
