@@ -167,6 +167,7 @@
       // 数据关系
       clickFlowEdit (id) {
         this.visibleEdit = true
+        this.$store.commit('workFlow/setFlowId', id)
         this.$nextTick(() => {
           this.$refs.taskFlow.init(id)
         })
