@@ -3,16 +3,36 @@
     <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
+    <el-dialog title="节点数据" :close-on-click-modal="false" :visible.sync="visible" :modal-append-to-body='false'>
+    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+      <el-table-column prop="flowId" header-align="center" align="center" label="节点ID"/>
+      <el-table-column prop="taskReferenceName" header-align="center" align="center" label="节点名称"/>
+    </el-table>
+    <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageNum"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import go from 'gojs'
+import { workFlowTaskList } from '@/api/workerBee/workFlow'
+
 export default{
   props: ['dataAllList'],
   data () {
     return {
-      visible: false
+      visible: false,
+      dataList: [],
+      pageNum: 1, // 当前页
+      pageSize: 10, // 默认每页10条
+      totalPage: 0
     }
   },
 
@@ -87,9 +107,25 @@ export default{
       //   {from: '4', to: '5', answer: null}
       // ]
       mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
-        mySelf.$alert(e.subject.part.data.dital, {
-          showConfirmButton: false
+        mySelf.visible = true
+        console.log(e.subject.part.data, '获取id')
+        const dataBody = {
+          'pageNum': mySelf.pageNum,
+          'pageSize': mySelf.pageSize,
+          'flowId': mySelf.flowId
+        }
+        workFlowTaskList(dataBody).then(({data}) => {
+          mySelf.dataListLoading = true
+          if (data && data.message === 'success') {
+            mySelf.dataList = data.data.list
+            mySelf.totalPage = data.data.totalCount
+            mySelf.dataListLoading = false
+          }
         })
+
+        // mySelf.$alert(e.subject.part.data.dital, {
+        //   showConfirmButton: false
+        // })
       })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
@@ -111,6 +147,18 @@ export default{
     narrow () {
       var mySelf = this
       mySelf.myDiagram.scale -= 0.1
+    },
+    // 每页数
+    sizeChangeHandle (val) {
+      this.pageSize = val
+      this.pageNum = 1
+      this.init()
+    },
+      // 下一页
+    currentChangeHandle (val) {
+      this.pageNum = val
+      this.flowId = localStorage.getItem('id')
+      this.init()
     }
   }
 
