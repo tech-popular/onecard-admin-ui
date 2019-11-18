@@ -123,7 +123,6 @@
         this.visible = true
         value.map(item => {
           this.flowIdlist.push(item.flowId)
-          // this.taskIdlist.push(item.taskId)
           this.preTasklist.push(item.preTask)
           this.parentTasklist.push(item.parentTask)
           this.indexlist.push(item.index)
@@ -148,7 +147,7 @@
                   duration: 200,
                   onClose: () => {
                     this.visible = false
-                    this.$emit('refreshDataList', this.dataForm.flowId)
+                    this.$emit('refreshDataList')
                     this.dataForm.taskReferenceName = ''
                     this.dataForm.remark = ''
                   }

@@ -52,7 +52,7 @@ export default {
     methods: {
       init (id) {
         this.visible = true
-        this.flowId = id
+        this.flowId = this.$store.state.workFlow.id
         const dataBody = {
           'pageNum': this.pageNum,
           'pageSize': this.pageSize,

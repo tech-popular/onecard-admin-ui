@@ -1,14 +1,12 @@
 export default {
   namespaced: true,
   state: {
-    all: {
-      ID: ''
-    }
+    id: ''
   },
 
   mutations: {
-    setFlowId (state, all) {
-      state.all = all
+    setFlowId (state, id) {
+      state.id = id
     }
   }
 }
