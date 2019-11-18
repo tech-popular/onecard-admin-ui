@@ -12,12 +12,12 @@
       </el-select>
     </el-form-item>
     <el-form-item label="任务Id" prop="taskId">
-      <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%">
+      <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable>
         <el-option
           v-for="item in taskIdlist"
-          :key="item"
-          :label="item"
-          :value="item">
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
         </el-option>
       </el-select>
     </el-form-item>
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-  import { saveWorkTaskFlow } from '@/api/workerBee/workFlow'
+  import { saveWorkTaskFlow, getAllBeeTaskList } from '@/api/workerBee/workFlow'
   export default {
     data () {
       return {
@@ -123,10 +123,15 @@
         this.visible = true
         value.map(item => {
           this.flowIdlist.push(item.flowId)
-          this.taskIdlist.push(item.taskId)
           this.preTasklist.push(item.preTask)
           this.parentTasklist.push(item.parentTask)
           this.indexlist.push(item.index)
+        })
+        const dataBody = {}
+        getAllBeeTaskList(dataBody, false).then(({data}) => {
+          if (data && data.message === 'success') {
+            this.taskIdlist = data.data
+          }
         })
       },
       // 表单提交
@@ -136,7 +141,6 @@
             const dataBody = this.dataForm
             saveWorkTaskFlow(dataBody).then(({data}) => {
               if (data && data.message === 'success') {
-                this.dataForm = {}
                 this.$message({
                   message: '操作成功',
                   type: 'success',

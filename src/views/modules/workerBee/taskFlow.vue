@@ -30,8 +30,7 @@
 <script>
   import { workFlowTaskList } from '@/api/workerBee/workFlow'
   import AddOrUpdate from './taskFlow-add-or-update'
-
-  export default {
+export default {
     data () {
       return {
         visible: false,
@@ -53,7 +52,7 @@
     methods: {
       init (id) {
         this.visible = true
-        this.flowId = id
+        this.flowId = this.$store.state.workFlow.id
         const dataBody = {
           'pageNum': this.pageNum,
           'pageSize': this.pageSize,
@@ -86,6 +85,7 @@
       // 下一页
       currentChangeHandle (val) {
         this.pageNum = val
+        this.flowId = localStorage.getItem('id')
         this.init()
       }
     }

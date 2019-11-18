@@ -398,6 +398,8 @@ export default {
             tem.legend.data[i].percent_unit
           tem.legend.data[i].name = legendNameElse
           tem.legend.data[i].textStyle = chartsConfig.textStyle
+        } else {
+          tem.legend.data[i].textStyle = chartsConfig.textStyle
         }
       }
       tem['tooltip'] = chartsConfig.tooltip
@@ -435,6 +437,7 @@ export default {
         }
         this.barRightList.push(tem)
       }
+      console.log(tem)
     },
     // 饼图数据处理
     pieConfig (tem) {
@@ -578,20 +581,26 @@ export default {
     },
     // 下拉框数据 处理
     selectConfig (res) {
-      let selectMap = res.data.selection[0].selectionMap.selectMap
+      let selectMap = {}
+      if (res.data.selection[0].selectionMap !== null) {
+        selectMap = res.data.selection[0].selectionMap.selectMap
+      }
       let selectList = []
       this.optionIds = []
-      for (let key in selectMap) {
-        selectList.push({
-          name: key,
-          children: selectMap[key].map(item => {
-            return {
-              name: item
-            }
+      if (JSON.stringify(selectMap) != '{}') {
+        for (let key in selectMap) {
+          selectList.push({
+            name: key,
+            children: selectMap[key].map(item => {
+              return {
+                name: item
+              }
+            })
           })
-        })
-        this.optionIds = [...this.optionIds, ...selectMap[key]]
+          this.optionIds = [...this.optionIds, ...selectMap[key]]
+        }
       }
+
       this.options = selectList
     }
   }
