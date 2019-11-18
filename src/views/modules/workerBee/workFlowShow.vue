@@ -159,6 +159,8 @@
       // },
       // 新增 / 修改
       addOrUpdateHandle (id) {
+        this.$store.commit('workerBee/updateId', 3)
+        console.log(this.$store.state.workerBee)
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)

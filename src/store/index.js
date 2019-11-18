@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import cloneDeep from 'lodash/cloneDeep'
 import common from './modules/common'
+import workerBee from './modules/workerBee'
 import user from './modules/user'
 import reportChart from './modules/report-chart'
 
@@ -11,7 +12,8 @@ export default new Vuex.Store({
   modules: {
     common,
     user,
-    reportChart
+    reportChart,
+    workerBee
   },
   mutations: {
     // 重置vuex本地储存状态
