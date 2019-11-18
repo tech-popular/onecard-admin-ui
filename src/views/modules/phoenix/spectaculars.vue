@@ -498,10 +498,20 @@ export default {
     },
     // 雷达 数据处理
     radarConfig (tem) {
-      tem.tooltip = {}
+      const dataLabel = ['3期', '6期', '12期', '24期', '36期', '其他期限']
+      tem.tooltip = {
+        // trigger: 'axis',
+        formatter: function (params, ticket, callback) {
+          var showHtm = ''
+          for (var i = 0; i < params.value.length; i++) {
+            showHtm += dataLabel[i] + '：' + params.value[i] + '%' + '<br>'
+          }
+          return showHtm
+        }
+      }
       tem.series[1] &&
         (tem.series[1].itemStyle = {
-          color: '#f6e58d'
+          color: 'green'
         })
       tem.legend.orient = 'vertical'
       tem.legend.left = 'right'
