@@ -1,8 +1,8 @@
 <template>
-  <el-dialog title="新增任务关系" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog title="新增任务关系" @close="taskDialgClose" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
     <el-form-item label="工作流Id" prop="flowId">
-      <el-select v-model="dataForm.flowId" placeholder="工作流Id" style="width:100%">
+      <el-select v-model="dataForm.flowId" placeholder="工作流Id" style="width:100%" disabled>
         <el-option
           v-for="item in flowIdlist"
           :key="item"
@@ -158,6 +158,12 @@
             })
           }
         })
+      },
+      taskDialgClose () {
+        this.visible = false
+        this.dataForm.taskId = -1
+        this.dataForm.taskReferenceName = ''
+        this.dataForm.remark = ''
       }
     }
   }

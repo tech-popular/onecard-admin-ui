@@ -3,7 +3,7 @@
     <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
-    <el-dialog title="节点数据" :modal-append-to-body='false' :close-on-click-modal="false" :visible.sync="visible">
+    <el-dialog title="节点数据" :modal-append-to-body='false' :append-to-body="true"  @close="workFlowChartDialgClose" :visible.sync="visible">
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="flowId" header-align="center" align="center" label="节点ID"/>
       <el-table-column prop="taskReferenceName" header-align="center" align="center" label="节点名称"/>
@@ -159,6 +159,9 @@ export default{
       this.pageNum = val
       this.flowId = localStorage.getItem('id')
       this.init()
+    },
+    workFlowChartDialgClose () {
+      this.visible = false
     }
   }
 
