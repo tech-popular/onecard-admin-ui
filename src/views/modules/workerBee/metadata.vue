@@ -172,9 +172,6 @@
         this.pageNum = val
         this.getDataList()
       },
-      isNull (value) {
-        return value == '' || value == null || value == undefined
-      },
       // 新增 / 修改
       addOrUpdateHandle (id) {
         this.addOrUpdateVisible = true
