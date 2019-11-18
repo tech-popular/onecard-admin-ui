@@ -3,18 +3,21 @@ import { fprice, getChinese } from '@/utils'
 export const chartsConfig = {
   // 设置标签名字样式
   textStyle: {
+    padding: [0, 15, 0, 0],
     rich: {
       a: {
         color: 'green',
         fontWeight: 600,
         fontSize: 16,
-        lineHeight: 10
+        lineHeight: 10,
+        padding: 10
       },
       b: {
         color: 'red',
         fontWeight: 600,
         fontSize: 16,
-        lineHeight: 10
+        lineHeight: 10,
+        padding: [0, 20, 0, 20]
       }
     }
   },

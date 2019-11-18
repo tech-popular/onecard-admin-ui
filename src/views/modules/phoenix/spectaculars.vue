@@ -398,6 +398,8 @@ export default {
             tem.legend.data[i].percent_unit
           tem.legend.data[i].name = legendNameElse
           tem.legend.data[i].textStyle = chartsConfig.textStyle
+        } else {
+          tem.legend.data[i].textStyle = chartsConfig.textStyle
         }
       }
       tem['tooltip'] = chartsConfig.tooltip
@@ -435,6 +437,7 @@ export default {
         }
         this.barRightList.push(tem)
       }
+      console.log(tem)
     },
     // 饼图数据处理
     pieConfig (tem) {
