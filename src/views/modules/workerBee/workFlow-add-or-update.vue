@@ -128,11 +128,11 @@
                 this.$message({
                   message: '操作成功',
                   type: 'success',
-                  duration: 1000,
+                  duration: 300,
                   onClose: () => {
                     this.visible = false
+                    this.$emit('refreshDataList')
                     this.resetForm()
-                    // this.$emit('refreshDataList')
                   }
                 })
               } else {

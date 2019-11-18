@@ -578,7 +578,10 @@ export default {
     },
     // 下拉框数据 处理
     selectConfig (res) {
-      let selectMap = res.data.selection[0].selectionMap.selectMap
+      let selectMap = {}
+      if (!res.data.selection[0].selectionMap == null) {
+        selectMap = res.data.selection[0].selectionMap.selectMap
+      }
       let selectList = []
       this.optionIds = []
       for (let key in selectMap) {
