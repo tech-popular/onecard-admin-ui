@@ -64,7 +64,6 @@
 </template>
 <script>
 import echarts from 'echarts'
-import watermark from './dashboard/watermark'
 import fiveFunnel from './dashboard/fiveFunnel'
 import fourQuadrant from './dashboard/fourQuadrant'
 import threeMonitor from './dashboard/threeMonitor'
@@ -125,7 +124,6 @@ export default {
     this.mark = getQueryString('mark')
   },
   mounted () {
-    watermark.set(this.$store.state.user.name)
     if (!this.sidebarFold) {
       this.sidebarFold = !this.sidebarFold
     }
@@ -218,7 +216,7 @@ export default {
                 placeholder: this.list.placeholder || this.defaultSelection.placeholder,
                 items: mark == '1' ? [{
                   name: this.value,
-                  value: this.value
+                  value: [this.value]
                 }] : [],
                 columnName: this.list.columnName || this.defaultSelection.columnName,
                 mark: this.list.mark || this.defaultSelection.mark
