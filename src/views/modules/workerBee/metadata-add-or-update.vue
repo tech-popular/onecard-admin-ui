@@ -1,8 +1,9 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
     <el-form-item label="任务定义名称" prop="name">
-      <el-input v-model="dataForm.name" placeholder="任务"/>
+      <el-input v-model="dataForm.name" v-if="!dataFormValue" placeholder="任务"/>
+      <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
     </el-form-item>
     <el-form-item label="任务类型" prop="type">
         <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()'>
@@ -114,6 +115,7 @@
           ownerApp: '', // 所属系统
           remark: '' // 备注
         },
+        dataFormValue: '',
         ruleTypeList: [
           {
             value: 'HTTP',
@@ -168,8 +170,9 @@
       metadataDecision // 类型7
     },
     methods: {
-      init (id) {
+      init (id, value) {
         this.dataForm.id = id || ''
+        this.dataFormValue = value
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()

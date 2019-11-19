@@ -95,7 +95,7 @@ export default{
       mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
         mySelf.addOrUpdateVisible = true
         mySelf.$nextTick(() => {
-          mySelf.$refs.addOrUpdate.init(e.subject.part.data.key)
+          mySelf.$refs.addOrUpdate.init(e.subject.part.data.key, '查看')
         })
       })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
