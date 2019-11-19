@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-demo-echarts">
+  <div class="mod-demo-echarts" id='dashboard'>
     <el-alert title type="warning" v-if="list.items && list.items.length > 0" :closable="false">
       <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
         <el-option
@@ -64,6 +64,7 @@
 </template>
 <script>
 import echarts from 'echarts'
+import watermark from './dashboard/watermark'
 import fiveFunnel from './dashboard/fiveFunnel'
 import fourQuadrant from './dashboard/fourQuadrant'
 import threeMonitor from './dashboard/threeMonitor'
@@ -124,6 +125,7 @@ export default {
     this.mark = getQueryString('mark')
   },
   mounted () {
+    watermark.set(this.$store.state.user.name)
     if (!this.sidebarFold) {
       this.sidebarFold = !this.sidebarFold
     }
@@ -367,7 +369,7 @@ export default {
       this.apiItems = value.map((tem, index) => {
         return {
           name: tem,
-          value: tem
+          value: [tem]
         }
       })
       this.queryList(data, this.apiItems)
@@ -591,27 +593,20 @@ export default {
     },
     // 下拉框数据 处理
     selectConfig (res) {
-      let selectMap = {}
-      if (res.data.selection[0].selectionMap !== null) {
-        selectMap = res.data.selection[0].selectionMap.selectMap
-      }
-      let selectList = []
-      this.optionIds = []
-      if (JSON.stringify(selectMap) != '{}') {
-        for (let key in selectMap) {
-          selectList.push({
-            name: key,
-            children: selectMap[key].map(item => {
-              return {
-                name: item
-              }
-            })
+      let selectList = res.data.selection[0].selectList
+      let list = []
+      selectList.forEach(item => {
+        this.optionIds = [...this.optionIds, ...item.value]
+        list.push({
+          name: item.name,
+          children: item.value.map(val => {
+            return {
+              name: val
+            }
           })
-          this.optionIds = [...this.optionIds, ...selectMap[key]]
-        }
-      }
-
-      this.options = selectList
+        })
+      })
+      this.options = list
     }
   }
 }
