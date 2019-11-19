@@ -68,8 +68,9 @@ export default{
       )
       mySelf.myDiagram.nodeTemplateMap.add('End',
         $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
           $(go.Shape, 'Circle', {fill: '#79C900'}),
-          $(go.TextBlock, { stroke: '#fff' }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 10, stroke: '#fff' }, new go.Binding('text'))
         )
       )
       // var nodeDataArray = [
