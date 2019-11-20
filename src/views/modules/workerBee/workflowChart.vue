@@ -73,6 +73,46 @@ export default{
           $(go.TextBlock, { margin: 10, stroke: '#fff' }, new go.Binding('text'))
         )
       )
+      // 替换LinkTemplateMap中的默认链接模板
+      mySelf.myDiagram.linkTemplate =
+        $(go.Link,  // 整个连接面板
+          {
+            routing: go.Link.AvoidsNodes,
+            curve: go.Link.JumpOver,
+            corner: 5,
+            toShortLength: 4,
+            relinkableFrom: true,
+            relinkableTo: true,
+            reshapable: true,
+            resegmentable: true,
+            // 鼠标悬停巧妙地突出显示链接:
+            mouseEnter: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'rgba(30,144,255,0.2)' },
+            mouseLeave: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'transparent' },
+            selectionAdorned: false
+          },
+          new go.Binding('points').makeTwoWay(),
+          $(go.Shape,  // 高光形状，通常是透明的
+            { isPanelMain: true, strokeWidth: 8, stroke: 'transparent', name: 'HIGHLIGHT' }),
+          $(go.Shape,  // 链接路径形状
+            { isPanelMain: true, stroke: 'gray', strokeWidth: 2 },
+            new go.Binding('stroke', 'isSelected', function (sel) { return sel ? 'dodgerblue' : 'gray' }).ofObject()),
+          $(go.Shape,  // 箭头
+            { toArrow: 'standard', strokeWidth: 0, fill: 'gray' }),
+          $(go.Panel, 'Auto',  // 链接标签，通常不可见
+            { visible: false, name: 'LABEL', segmentIndex: 2, segmentFraction: 0.5 },
+            new go.Binding('visible', 'visible').makeTwoWay(),
+            $(go.Shape, 'RoundedRectangle',  // 标签形状
+              { fill: '#F8F8F8', strokeWidth: 0 }), // 条件格式“是”“否”背景色
+            $(go.TextBlock, '是',  // 标签
+              {
+                textAlign: 'center',
+                font: '10pt helvetica, arial, sans-serif',
+                stroke: '#333333',
+                editable: true
+              },
+              new go.Binding('text').makeTwoWay())
+          )
+        )
       // var nodeDataArray = [
       //   {key: '0', text: '工作流预览', category: 'Start'},
       //   {key: '1', text: '数据1', category: 'Condition', dital: '这是详情'},

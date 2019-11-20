@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="查看" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog title="查看" :modal-append-to-body='false' :append-to-body="true" @close="showClisk" :visible.sync="visible">
     <el-form :model="dataForm" ref="dataForm" label-width="20%">
     <el-form-item label="任务Id">
       <el-input v-model="dataForm.taskId" disabled placeholder="任务Id"/>
@@ -34,7 +34,14 @@
     data () {
       return {
         visible: false,
-        dataForm: {}
+        dataForm: {
+          taskId: '',
+          taskReferenceName: '',
+          type: '',
+          remark: '',
+          caseExpression: '',
+          caseValueParam: ''
+        }
       }
     },
     components: {
@@ -55,6 +62,9 @@
             })
           }
         })
+      },
+      showClisk () {
+        this.visible = false
       }
     }
   }
