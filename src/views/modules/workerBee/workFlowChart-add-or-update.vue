@@ -22,9 +22,9 @@
       <el-input v-model="dataForm.description" disabled placeholder="决策参考"/>
     </el-form-item>
     <el-form-item label="是否启用" prop="enable">
-    <el-radio-group v-model="dataForm.enable" disabled>
-      <el-radio :label="false">禁用</el-radio>
-      <el-radio :label="true">正常</el-radio>
+      <el-radio-group v-model="dataForm.enable" disabled>
+        <el-radio :label="false">禁用</el-radio>
+        <el-radio :label="true">正常</el-radio>
       </el-radio-group>
     </el-form-item>
     
