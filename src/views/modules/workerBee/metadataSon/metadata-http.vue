@@ -1,6 +1,9 @@
 <template>
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
+        <el-form-item label="URL" prop="url">
+        <el-input v-model="fatherData.url" placeholder="URL"/>
+        </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="请求参数的fieldId数组"/>
         </el-form-item>
@@ -75,7 +78,7 @@
         let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['fatherData'].validate((valid) => {
           if (valid && res) {
-            this.$emit('dataFormSumbit', this.fatherData)
+            this.$emit('dataFormSubmit', this.fatherData)
           } else {
             return false
           }

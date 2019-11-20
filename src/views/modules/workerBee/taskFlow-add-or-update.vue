@@ -2,14 +2,7 @@
   <el-dialog title="新增任务关系" @close="taskDialgClose" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
     <el-form-item label="工作流Id" prop="flowId">
-      <el-select v-model="dataForm.flowId" placeholder="工作流Id" style="width:100%" disabled>
-        <el-option
-          v-for="item in flowIdlist"
-          :key="item"
-          :label="item"
-          :value="item">
-        </el-option>
-      </el-select>
+      <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
     </el-form-item>
     <el-form-item label="任务Id" prop="taskId">
       <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable>
@@ -60,7 +53,7 @@
    
     </el-form>
     <span slot="footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="taskDialgClose">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
@@ -104,7 +97,6 @@
             { required: true, message: '请选择任务加入任务Id', trigger: 'blur' }
           ]
         },
-        flowIdlist: [],
         taskIdlist: [],
         preTasklist: [],
         parentTasklist: [],
@@ -122,7 +114,6 @@
         this.dataForm.flowId = flowId
         this.visible = true
         value.map(item => {
-          this.flowIdlist.push(item.flowId)
           this.preTasklist.push(item.preTask)
           this.parentTasklist.push(item.parentTask)
           this.indexlist.push(item.index)
@@ -162,8 +153,14 @@
       taskDialgClose () {
         this.visible = false
         this.dataForm.taskId = -1
+        this.dataForm.index = -1
+        this.dataForm.parentTask = -1
+        this.dataForm.preTask = -1
         this.dataForm.taskReferenceName = ''
         this.dataForm.remark = ''
+        this.preTasklist = []
+        this.parentTasklist = []
+        this.indexlist = []
       }
     }
   }

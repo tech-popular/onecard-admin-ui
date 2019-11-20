@@ -62,7 +62,6 @@
           ownerApp: '',
           restartable: 0,
           schemaVersion: 0,
-          // tasks: '',
           version: ''
         },
         dataRule: {

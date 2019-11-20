@@ -18,6 +18,8 @@
   import MainNavbar from './main-navbar'
   import MainSidebar from './main-sidebar'
   import MainContent from './main-content'
+  import watermark from '@/utils/watermark'
+
   export default {
     data () {
       return {
@@ -43,7 +45,10 @@
       },
       userName: {
         get () { return this.$store.state.user.name },
-        set (val) { this.$store.commit('user/updateName', val) }
+        set (val) {
+          this.$store.commit('user/updateName', val)
+          watermark.set(this.$store.state.user.name)
+        }
       }
     },
     created () {
