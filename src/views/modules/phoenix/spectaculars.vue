@@ -363,6 +363,7 @@ export default {
       this.changeValue1(data, 'remove')
     },
     checkNode (value, index, data) {
+      this.hadSelectedList = []
       this.hadSelectedList[index] = value
       this.apiItems = value.map((tem, index) => {
         return {
