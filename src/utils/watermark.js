@@ -9,7 +9,7 @@ let setWatermark = (str) => {
 
   let can = document.createElement('canvas')
   can.width = 300
-  can.height = 260
+  can.height = 155
 
   let cans = can.getContext('2d')
   cans.rotate(-20 * Math.PI / 180)
