@@ -9,7 +9,7 @@
 
 <script>
 import go from 'gojs'
-import AddOrUpdate from './metadata-add-or-update'
+import AddOrUpdate from './workFlowChart-add-or-update'
 
 export default{
   props: ['dataAllList'],
