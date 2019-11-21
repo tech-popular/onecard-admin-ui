@@ -54,8 +54,8 @@ export default{
             layout:
               $(go.TreeLayout,
                 { angle: 90, arrangement: go.TreeLayout.ArrangementFixedRoots }),
-            'undoManager.isEnabled': true
-            // isReadOnly: true // 只读
+            'undoManager.isEnabled': true,
+            isReadOnly: true // 只读
           })
       mySelf.myDiagram.nodeTemplateMap.add('Start',
           $(go.Node, 'Auto',
@@ -140,7 +140,11 @@ export default{
       //   {from: '4', to: '5', answer: null}
       // ]
       mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
-        mySelf.addOrUpdateVisible = true
+        if (e.subject.part.data.category === 'Start' || e.subject.part.data.category === 'End') {
+          mySelf.addOrUpdateVisible = false
+        } else {
+          mySelf.addOrUpdateVisible = true
+        }
         mySelf.$nextTick(() => {
           mySelf.$refs.addOrUpdate.init(e.subject.part.data.key, '查看')
         })
