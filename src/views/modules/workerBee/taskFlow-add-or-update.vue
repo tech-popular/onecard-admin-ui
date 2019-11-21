@@ -102,7 +102,11 @@
               value: 'Descision',
               label: 'Descision'
             }
-          ]
+          ],
+          type: '',
+          caseValueParam: '',
+          caseExpression: '',
+          caseSwitchList: ''
         },
         taskIdlist: [],
         preTasklist: [],
@@ -148,6 +152,10 @@
                     this.$emit('refreshDataList')
                     this.dataForm.taskReferenceName = ''
                     this.dataForm.remark = ''
+                    this.dataForm.type = ''
+                    this.dataForm.caseValueParam = ''
+                    this.dataForm.caseExpression = ''
+                    this.dataForm.caseSwitchList = ''
                   }
                 })
               } else {
@@ -165,6 +173,10 @@
         this.dataForm.preTask = -1
         this.dataForm.taskReferenceName = ''
         this.dataForm.remark = ''
+        this.dataForm.type = ''
+        this.dataForm.caseValueParam = ''
+        this.dataForm.caseExpression = ''
+        this.dataForm.caseSwitchList = ''
         this.preTasklist = []
         this.parentTasklist = []
         this.indexlist = []
