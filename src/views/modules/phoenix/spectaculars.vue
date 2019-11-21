@@ -492,7 +492,7 @@ export default {
       tem.series[0].data.forEach((item, index) => {
         item.name = `{c|${item.name}  ${item.value}人}  ${
           item.percentRise ? '{a|↑}' : '{b|↓}'
-        }  {d|${item.percent}%}`
+        }  ${item.percentRise ? '{d|' + item.percent + '%}' : '{e|' + item.percent + '%}'}`
       })
       Object.assign(tem.series[0], funnelStyle)
       tem.tooltip.formatter = '{a}<br/>{b}'

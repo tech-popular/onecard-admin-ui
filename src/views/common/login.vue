@@ -161,7 +161,7 @@
               url: this.$http.adornUrl('/sys/login'),
               method: 'post',
               data: this.$http.adornData({
-                'username': this.dataForm.userName,
+                'username': this.dataForm.email,
                 'password': this.dataForm.password,
                 'uuid': this.dataForm.uuid,
                 'captcha': this.dataForm.captcha

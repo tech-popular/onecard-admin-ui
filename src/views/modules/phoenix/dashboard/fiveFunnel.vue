@@ -87,7 +87,7 @@ li {
     top: 15px;
     z-index: 100;
     .el-radio {
-      margin: 0 10px;
+      margin: 0 6px;
     }
   }
 }

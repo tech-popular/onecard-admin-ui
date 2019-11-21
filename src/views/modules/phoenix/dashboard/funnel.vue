@@ -7,7 +7,7 @@
           <span :class="index !== 0 ? 'funnel-left inline': ''">{{item.metric}}{{item.metric_unit}}</span><span class="colorRed " :class="{'percentRise' : item.percentRise, 'inline': index !== 0}">
             {{item.percentRise ? '↑' : '↓'}}
           </span>
-          <span :class="index !== 0 ? 'funnel-right inline' : ''">{{item.percent}}{{item.percent_unit}}</span>
+          <span :class="{'percentRise' : item.percentRise, 'funnel-right inline colorRed': index !== 0}">{{item.percent}}{{item.percent_unit}}</span>
         </p>
       </li>
     </ul>
@@ -56,7 +56,7 @@ export default {
         padding-top: -2px; 
       }
       .funnel-right {
-        left: 60px;
+        left: 63px;
         top: 6px;
         width: 42px;
         font-size: 12px;

@@ -26,7 +26,12 @@ export const chartsConfig = {
       d: {
         fontSize: 12,
         fontWeight: 700,
-        color: '#000'
+        color: 'green'
+      },
+      e: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: 'red'
       }
     }
   },
