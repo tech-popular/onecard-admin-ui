@@ -41,51 +41,6 @@
         align="center"
         label="任务使用者"
         width="150px"/>
-      <!-- <el-table-column
-        prop="retryCount"
-        header-align="center"
-        align="center"
-        label="重试次数"/>
-      <el-table-column
-        prop="timeoutSeconds"
-        header-align="center"
-        align="center"
-        label="任务执行超时时间"/>
-      <el-table-column
-        prop="retryDelaySeconds"
-        header-align="center"
-        align="center"
-        label="重试延迟时间"/>
-      <el-table-column
-        prop="responseTimeoutSeconds"
-        header-align="center"
-        align="center"
-        label="响应超时时间"/> -->
-      <!-- <el-table-column
-        prop="concurrentExecLimit"
-        header-align="center"
-        align="center"
-        label="并发执行限制"/>
-      <el-table-column
-        prop="inputTemplate"
-        header-align="center"
-        align="center"
-        label="输入模板"/>
-      <el-table-column
-        prop="rateLimitPerFrequency"
-        header-align="center"
-        align="center"
-        label="频率限制"/>
-      <el-table-column
-        prop="isolation_groupId"
-        header-align="center"
-        align="center"
-        label="隔离组ID"/>
-      <el-table-column
-        prop="executionNameSpace"
-        header-align="center"
-        align="center"
-        label="执行命名空间"/> -->
       <el-table-column
         prop="ownerApp"
         header-align="center"
