@@ -20,8 +20,8 @@
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-button type="text" @click="clickSketchMap(scope.row.id)">预览工作流</el-button>
-          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改工作流</el-button>
+          <el-button type="text" @click="clickSketchMap(scope.row.id)">预览</el-button>
+          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" @click="clickFlowEdit(scope.row.id)">任务关系</el-button>
           <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
         </template>

@@ -14,7 +14,7 @@ let setWatermark = (str) => {
   let cans = can.getContext('2d')
   cans.rotate(-20 * Math.PI / 180)
   cans.font = '15px Vedana'
-  cans.fillStyle = '#e1e0e0'
+  cans.fillStyle = 'rgba(0, 0, 0, 0.1)'
   cans.textAlign = 'left'
   cans.textBaseline = 'Middle'
   cans.fillText(str, can.width / 20, can.height)
@@ -23,13 +23,13 @@ let setWatermark = (str) => {
   div.id = id
   div.style.pointerEvents = 'none'
   div.style.top = '3px'
-  div.style.left = '0px'
+  div.style.left = '200px'
   div.style.position = 'fixed'
   div.style.zIndex = '100000'
   div.style.width = document.documentElement.clientWidth + 'px'
   div.style.height = document.documentElement.clientHeight + 'px'
   div.style.background = 'url(' + can.toDataURL('image/png') + ') left top repeat'
-  document.body.appendChild(div)
+  document.getElementsByClassName('site-content')[0].appendChild(div)
   return id
 }
 
