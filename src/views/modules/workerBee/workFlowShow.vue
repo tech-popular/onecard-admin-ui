@@ -20,9 +20,9 @@
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-button type="text" @click="clickSketchMap(scope.row.id)">查看工作流</el-button>
-          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" @click="clickFlowEdit(scope.row.id)">数据关系</el-button>
+          <el-button type="text" @click="clickSketchMap(scope.row.id)">预览工作流</el-button>
+          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改工作流</el-button>
+          <el-button type="text" @click="clickFlowEdit(scope.row.id)">任务关系</el-button>
           <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -38,8 +38,7 @@
     <!-- 弹窗查看示意图 -->
     <el-dialog
       title="工作流预览"
-      :close-on-click-modal="false"
-      :before-close="handleClosede"
+      @close="handleClosede"
       fullscreen
       style="max-height: 100vh"
       :visible.sync="visible">
@@ -129,7 +128,7 @@
         workFlowShow(dataBody).then(({data}) => {
           if (data && data.status === 0) {
             this.sketchMap = true
-            this.visible = true
+            // this.visible = true
             this.dataAllList = data.data
           } else {
             return false
@@ -184,9 +183,6 @@
         this.getDataList()
       },
       // 取消或关闭流程图弹窗
-      datano () {
-        this.handleClosede()
-      },
       handleClosede () {
         this.dataAllList = {}
         this.visible = false

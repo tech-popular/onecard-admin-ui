@@ -595,6 +595,7 @@ export default {
     selectConfig (res) {
       let selectList = res.data.selection[0].selectList
       let list = []
+      this.optionIds = []
       selectList.forEach(item => {
         this.optionIds = [...this.optionIds, ...item.value]
         list.push({

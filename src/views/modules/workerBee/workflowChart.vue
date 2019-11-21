@@ -12,11 +12,22 @@ import go from 'gojs'
 import AddOrUpdate from './workFlowChart-add-or-update'
 
 export default{
-  props: ['dataAllList'],
+  props:
+  {
+    dataAllList: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  watch: {
+    dataAllList (newValue, oldValue) {
+      this.init()
+    }
+  },
+  // props: ['dataAllList'],
   data () {
     return {
       addOrUpdateVisible: false
-
     }
   },
   components: {
@@ -73,6 +84,41 @@ export default{
           $(go.TextBlock, { margin: 10, stroke: '#fff' }, new go.Binding('text'))
         )
       )
+      // 替换LinkTemplateMap中的默认链接模板
+      mySelf.myDiagram.linkTemplate =
+        $(go.Link, go.Link.Orthogonal,
+          {
+            routing: go.Link.AvoidsNodes,
+            curve: go.Link.JumpOver,
+            corner: 5,
+            toShortLength: 4,
+            relinkableFrom: true,
+            relinkableTo: true,
+            reshapable: true,
+            resegmentable: true,
+            // 鼠标悬停巧妙地突出显示链接:
+            mouseEnter: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'rgba(30,144,255,0.2)' },
+            mouseLeave: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'transparent' },
+            selectionAdorned: false
+          },
+          new go.Binding('points').makeTwoWay(),
+          $(go.Shape,  // 链接路径形状
+            { isPanelMain: true, stroke: 'gray', strokeWidth: 2 },
+            new go.Binding('stroke', 'isSelected', function (sel) { return sel ? 'dodgerblue' : 'gray' }).ofObject()),
+          $(go.Shape,
+            { toArrow: 'standard', strokeWidth: 0, fill: 'gray' }
+          ),
+          $(go.TextBlock, go.Link.OrientUpright,
+            {
+              background: 'white',
+              visible: false,
+              segmentIndex: -2,
+              segmentOrientation: go.Link.None
+            },
+            new go.Binding('text', 'answer'),
+            new go.Binding('visible', 'answer', function (a) { return (!!a) })
+          )
+        )
       // var nodeDataArray = [
       //   {key: '0', text: '工作流预览', category: 'Start'},
       //   {key: '1', text: '数据1', category: 'Condition', dital: '这是详情'},
