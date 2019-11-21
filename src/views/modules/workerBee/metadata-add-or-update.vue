@@ -208,7 +208,7 @@
           if (valid) {
             let data = {
               'http': null,
-              'gdbc': null,
+              'jdbc': null,
               'kafka': null,
               'cassandra': null,
               'groovy': null,

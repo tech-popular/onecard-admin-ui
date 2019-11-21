@@ -2,15 +2,15 @@
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
         <el-form-item label="判断case参数" prop="caseValueParam">
-        <el-input v-model="fatherData.caseValueParam" placeholder="判断case参数"/>
+        <el-input v-model="fatherData.caseValueParam" placeholder="请输入判断case参数"/>
         </el-form-item>
-        <el-form-item label="判断表达式" prop="caseExpression">
-        <el-input v-model="fatherData.caseExpression" placeholder="判断表达式"/>
+        <el-form-item label="判断表达式">
+        <el-input v-model="fatherData.caseExpression" placeholder="请输入判断表达式"/>
         </el-form-item>
-        <el-form-item label="switch判断项集合" prop="caseSwitchList">
-        <el-input v-model="fatherData.caseSwitchList" placeholder="switch判断项集合"/>
+        <el-form-item label="switch判断项集合">
+        <el-input v-model="fatherData.caseSwitchList" placeholder="请输入switch判断项集合"/>
         </el-form-item>
-        <el-form-item label="是否启用" prop="enable">
+        <el-form-item label="是否启用">
         <el-radio-group v-model="fatherData.enable">
           <el-radio :label="false">禁用</el-radio>
           <el-radio :label="true">正常</el-radio>
@@ -51,7 +51,7 @@
         let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['fatherData'].validate((valid) => {
           if (valid && res) {
-            this.$emit('dataFormSumbit', this.fatherData)
+            this.$emit('dataFormSubmit', this.fatherData)
           } else {
             return false
           }

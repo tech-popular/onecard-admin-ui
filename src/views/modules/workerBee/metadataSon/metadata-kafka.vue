@@ -2,12 +2,12 @@
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
         <el-form-item label="topic" prop="topic">
-        <el-input v-model="fatherData.topic" placeholder="topic"/>
+        <el-input v-model="fatherData.topic" placeholder="请输入topic"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组" prop="requestFields">
-        <el-input v-model="fatherData.requestFields" placeholder="请求参数的fieldId数组"/>
+        <el-form-item label="请求参数的fieldId数组">
+        <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="是否启用" prop="enable">
+        <el-form-item label="是否启用">
         <el-radio-group v-model="fatherData.enable">
           <el-radio :label="false">禁用</el-radio>
           <el-radio :label="true">正常</el-radio>
@@ -32,9 +32,6 @@
         dataRule: {
           topic: [
             { required: true, message: '请输入topic', trigger: 'blur' }
-          ],
-          requestFields: [
-            { required: true, message: '请输入请求参数的fieldId数组', trigger: 'blur' }
           ]
         }
       }
@@ -51,7 +48,7 @@
         let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['fatherData'].validate((valid) => {
           if (valid && res) {
-            this.$emit('dataFormSumbit', this.fatherData)
+            this.$emit('dataFormSubmit', this.fatherData)
           } else {
             return false
           }
