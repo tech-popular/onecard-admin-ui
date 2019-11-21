@@ -93,6 +93,7 @@ export default {
       defaultSelection: [], // 调用默认接口存的数据
       mark: '', // 区分是哪个列表点过来的
       selectedList: {},
+      timer: null, // 定时器
       options: [],
       optionIds: [],
       hadSelectedList: [], // 已选择的数据
@@ -128,6 +129,7 @@ export default {
       this.sidebarFold = !this.sidebarFold
     }
     this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+    this.autoReload()
   },
   activated () {
     // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -438,7 +440,6 @@ export default {
         }
         this.barRightList.push(tem)
       }
-      console.log(tem)
     },
     // 饼图数据处理
     pieConfig (tem) {
@@ -488,14 +489,14 @@ export default {
           rich: chartsConfig.textStyle.rich
         }
       }
-      Object.assign(tem.series[0], funnelStyle)
-
       tem.series[0].data.forEach((item, index) => {
-        item.name = `${item.name}  ${item.value}人  ${
+        item.name = `{c|${item.name}  ${item.value}人}  ${
           item.percentRise ? '{a|↑}' : '{b|↓}'
-        }  ${item.percent}%`
+        }  {d|${item.percent}%}`
       })
+      Object.assign(tem.series[0], funnelStyle)
       tem.tooltip.formatter = '{a}<br/>{b}'
+      tem.color = ['#634cff', '#febe76', '#31c5d3', '#FF4040', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a']
     },
     // 雷达 数据处理
     radarConfig (tem) {
@@ -606,7 +607,16 @@ export default {
         })
       })
       this.options = list
+    },
+    autoReload () {
+      this.timer = setInterval(() => {
+        this.queryList()
+      }, 1000 * 60 * 30)
     }
+  },
+  destroyed () {
+    clearInterval(this.timer)
+    this.timer = null
   }
 }
 </script>

@@ -2,23 +2,12 @@
   <div class="mod-demo-echarts">
     <el-row :gutter="20">
       <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList funnelStyle">
-        <el-card>
-          <el-select
-            v-model="selectedList && selectedList.data && selectedList.data.length > 0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr"
-            class="selectList"
-            multiple
-            placeholder="全部"
-            v-show="outdata.selection[0]"
-            @visible-change="changeValue1(outdata, index)"
-            @remove-tag="changeTag(outdata)"
-          >
-            <el-option
-              v-for="item in selection"
-              :key="item.name"
-              :label="item.value"
-              :value="item.name"
-            ></el-option>
-          </el-select>
+        <el-card class="funnel-card">
+          <div class="funnel-radio" v-if="index == 0">
+            <el-radio v-model="radio" label="0" @change="selectFunnel">全量</el-radio>
+            <el-radio v-model="radio" label="1" @change="selectFunnel">信息流</el-radio>
+            <el-radio v-model="radio" label="2" @change="selectFunnel">应用市场</el-radio>
+          </div>
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
         <funnel :outdata="outdata" />
@@ -45,7 +34,9 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      radio: '0'
+    }
   },
   methods: {
     changeValue1 (data, index) {
@@ -53,6 +44,9 @@ export default {
     },
     changeTag (data) {
       this.$emit('changeTag', data)
+    },
+    selectFunnel () {
+      console.log(this.radio)
     }
   }
 }
@@ -84,5 +78,17 @@ export default {
 }
 li {
   list-style: none;
+}
+.funnel-card {
+  position: relative;
+  .funnel-radio {
+    position: absolute;
+    right: 0;
+    top: 15px;
+    z-index: 100;
+    .el-radio {
+      margin: 0 10px;
+    }
+  }
 }
 </style>
