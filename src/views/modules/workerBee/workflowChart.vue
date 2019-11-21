@@ -3,19 +3,25 @@
     <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
   </div>
 </template>
 
 <script>
 import go from 'gojs'
-export default{
+import AddOrUpdate from './workFlowChart-add-or-update'
 
+export default{
+  props: ['dataAllList'],
   data () {
     return {
+      addOrUpdateVisible: false
 
     }
   },
-
+  components: {
+    AddOrUpdate
+  },
   mounted () {
     this.init()
   },
@@ -40,193 +46,67 @@ export default{
             'undoManager.isEnabled': true
             // isReadOnly: true // 只读
           })
-
-      mySelf.myDiagram.addDiagramListener('Modified', function (e) {
-        var button = document.getElementById('SaveButton')
-        if (button) button.disabled = !mySelf.myDiagram.isModified
-        var idx = document.title.indexOf('*')
-        if (mySelf.myDiagram.isModified) {
-          if (idx < 0) document.title += '*'
-        } else {
-          if (idx >= 0) document.title = document.title.substr(0, idx)
-        }
-      })
-      var bluegrad = $(go.Brush, 'Linear', { 0: '#C4ECFF', 1: '#70D4FF' })
-      // var greengrad = $(go.Brush, 'Linear', { 0: '#B1E2A5', 1: '#7AE060' })
-      var actionTemplate =
-        $(go.Panel, 'Horizontal',
-          $(go.Shape,
-            { width: 12, height: 12 },
-            new go.Binding('figure'),
-            new go.Binding('fill')
-          ),
-          $(go.TextBlock,
-            { font: '10pt Verdana, sans-serif' },
-            new go.Binding('text')
-          )
-       )
-      mySelf.myDiagram.nodeTemplate =
-        $(go.Node, 'Vertical',
-          { selectionObjectName: 'BODY' },
-          $(go.Panel, 'Auto',
-            { name: 'BODY' },
-            $(go.Shape, 'Rectangle',
-              { fill: bluegrad, stroke: null }
-            ),
-            $(go.Panel, 'Vertical',
-              { margin: 3 },
-
-              $(go.TextBlock,
-                {
-                  stretch: go.GraphObject.Horizontal,
-                  font: 'bold 12pt Verdana, sans-serif'
-                },
-                new go.Binding('text', 'question')
-              ),
-
-              $(go.Panel, 'Vertical',
-                { stretch: go.GraphObject.Horizontal, visible: false },
-                new go.Binding('visible', 'actions', function (acts) {
-                  return (Array.isArray(acts) && acts.length > 0)
-                }),
-
-                $(go.Panel, 'Table',
-                  { stretch: go.GraphObject.Horizontal },
-                  $(go.TextBlock, '条件',
-                    {
-                      alignment: go.Spot.Left,
-                      font: '10pt Verdana, sans-serif'
-                    }
-                  ),
-                  $('PanelExpanderButton', 'COLLAPSIBLE',
-                    { column: 1, alignment: go.Spot.Right }
-                  )
-                ),
-
-                $(go.Panel, 'Vertical',
-                  {
-                    name: 'COLLAPSIBLE',
-                    padding: 2,
-                    stretch: go.GraphObject.Horizontal,
-                    background: 'white',
-                    defaultAlignment: go.Spot.Left,
-                    itemTemplate: actionTemplate
-                  },
-                  new go.Binding('itemArray', 'actions')
-                )
-              )
-            )
-          ),
-          $(go.Panel,
-            { height: 17 },
-            $('TreeExpanderButton')
-          )
-       )
       mySelf.myDiagram.nodeTemplateMap.add('Start',
-        $(go.Node, 'Spot',
-          $(go.Shape, 'Circle',
-            { width: 80, height: 80, fill: '#17B3A3', stroke: null }
-          ),
-          $(go.TextBlock,
-            {
-              font: '10pt Verdana, sans-serif',
-              stroke: '#fff'
-            },
-            new go.Binding('text')
+          $(go.Node, 'Auto',
+            $(go.Shape, 'Circle', { fill: '#17B3A3' }),
+            $(go.TextBlock, { stroke: '#fff' }, new go.Binding('text'))
           )
         )
-      )
       mySelf.myDiagram.nodeTemplateMap.add('Judge',
-        $(go.Node, 'Spot',
-          $(go.Shape, 'Diamond',
-            {fill: '#00A9C9', strokeWidth: 0}
-          ),
-          $(go.TextBlock,
-            {
-              font: '10pt Verdana, sans-serif',
-              stroke: '#fff'
-            },
-            new go.Binding('text')
-          )
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'Diamond', {fill: '#538779'}),
+          $(go.TextBlock, { stroke: '#fff', margin: 8 }, new go.Binding('text'))
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('Condition',
-        $(go.Node, 'Spot',
-          $(go.Shape, 'Rectangle',
-            {height: 25, fill: 'blue', strokeWidth: 0}
-          ),
-          $(go.TextBlock,
-            {
-              font: '10pt Verdana, sans-serif',
-              stroke: '#fff'
-            },
-            new go.Binding('text')
-          )
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#58ce7a' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('End',
-        $(go.Node, 'Spot',
-          $(go.Shape, 'Circle',
-            { width: 55, height: 55, fill: '#79C900', stroke: null }
-          ),
-          $(go.TextBlock,
-            {
-              font: '10pt Verdana, sans-serif',
-              stroke: '#fff'
-            },
-            new go.Binding('text')
-          )
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'Circle', {fill: '#79C900'}),
+          $(go.TextBlock, { margin: 10, stroke: '#fff' }, new go.Binding('text'))
         )
       )
-      mySelf.myDiagram.linkTemplate =
-        $(go.Link, go.Link.Orthogonal,
-          { deletable: false, corner: 10 },
-          $(go.Shape,
-            { strokeWidth: 2 }
-          ),
-          $(go.TextBlock, go.Link.OrientUpright,
-            {
-              background: 'white',
-              visible: false,
-              segmentIndex: -2,
-              segmentOrientation: go.Link.None
-            },
-            new go.Binding('text', 'answer'),
-            new go.Binding('visible', 'answer', function (a) { return (!!a) })
-          )
-        )
-      var nodeDataArray = [
-        { key: 1, text: '工作流预览', category: 'Start' },
-        { key: 2, text: '我是工作流1', category: 'Judge' },
-        { key: 3, text: '我是工作流2', category: 'Judge' },
-        { key: 5, text: '这个数据1', category: 'Condition' },
-        { key: 6, text: '这个数据2', category: 'Condition' },
-        { key: 8, text: '这个数据3', category: 'Condition' },
-        { key: 9, text: '这个数据4', category: 'Condition' },
-        { key: 10, text: '完成1', category: 'End' },
-        { key: 11, text: '完成2', category: 'End' },
-        { key: 12, text: '完成3', category: 'End' },
-        { key: 13, text: '完成4', category: 'End' }
-      ]
-      var linkDataArray = [
-        { from: 1, to: 2, answer: '是' },
-        { from: 1, to: 3, answer: '是' },
-        { from: 1, to: 4, answer: '是' },
-        { from: 2, to: 5, answer: '是' },
-        { from: 2, to: 6, answer: '否' },
-        { from: 3, to: 8, answer: '是' },
-        { from: 3, to: 9, answer: '否' },
-        { from: 5, to: 10 },
-        { from: 6, to: 11 },
-        { from: 8, to: 12 },
-        { from: 9, to: 13 }
-      ]
+      // var nodeDataArray = [
+      //   {key: '0', text: '工作流预览', category: 'Start'},
+      //   {key: '1', text: '数据1', category: 'Condition', dital: '这是详情'},
+      //   {key: '2', text: '数据数据数据数据2', category: 'Condition', dital: '这是详情2'},
+      //   {key: '3', text: '数据3', category: 'Condition', dital: '这是详情3'},
+      //   {key: '4', text: '数据4', category: 'Condition', dital: '这是详情4'},
+      //   {key: '5', text: '条件500000000000000', category: 'Judge'},
+      //   {key: '6', text: '数据5', category: 'Condition', dital: '这是详情5'},
+      //   {key: '7', text: '数据6', category: 'Condition', dital: '这是详情6'}
+      // ]
+      // var linkDataArray = [
+      //   {from: '0', to: '1', answer: null},
+      //   {from: '1', to: '2', answer: '是'},
+      //   {from: '1', to: '3', answer: null},
+      //   {from: '2', to: '4', answer: null},
+      //   {from: '3', to: '4', answer: null},
+      //   {from: '5', to: '6', answer: null},
+      //   {from: '5', to: '7', answer: null},
+      //   {from: '4', to: '5', answer: null}
+      // ]
+      mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
+        mySelf.addOrUpdateVisible = true
+        mySelf.$nextTick(() => {
+          mySelf.$refs.addOrUpdate.init(e.subject.part.data.key, '查看')
+        })
+      })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
           copiesArrays: true,
           copiesArrayObjects: true,
-          nodeDataArray: nodeDataArray,
-          linkDataArray: linkDataArray
+          // nodeDataArray: nodeDataArray,
+          // linkDataArray: linkDataArray
+          nodeDataArray: this.dataAllList.nodeDataArrays,
+          linkDataArray: this.dataAllList.linkDataArrays
         })
     },
 

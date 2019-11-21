@@ -48,9 +48,14 @@ http.adornUrl = (actionName) => {
   //   console.log('2222')
   //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
   // }
-  return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
+  // 工蜂项目 凤凰大屏
+  if (actionName.indexOf('gongFeng') !== -1) {
+    actionName = actionName.replace(/gongFeng\//, '')
+    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/gongFeng' : window.SITE_CONFIG.baseUrl) + actionName
+  } else {
+    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
+  }
 }
-
 /**
  * get请求参数处理
  * @param {*} params 参数对象
