@@ -76,12 +76,8 @@
     <metadata-aviator
     v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataAviator"/>
-    <!-- DECISION 类型7 -->
-    <metadata-decision
-    v-if="dataForm.type == 'DECISION'" :fatherData='fatherData'
-    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataDecision"/>
     </el-form>
-    <div v-if="dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
+    <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
@@ -95,8 +91,7 @@
   import metadataCassandra from './metadataSon/metadata-cassandra'
   import metadataGroovy from './metadataSon/metadata-groovy'
   import metadataAviator from './metadataSon/metadata-aviator'
-  import metadataDecision from './metadataSon/metadata-decision'
-  import { getBeeTaskTypeList } from '@/api/workerBee/metadata'
+  import { getBeeTaskTypeList, infoBeeTask } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
@@ -142,8 +137,7 @@
       metadataKafka, // KAFKA
       metadataCassandra, // CASSANDRA
       metadataGroovy, // GROOVY
-      metadataAviator, // AVIATOR
-      metadataDecision // DECISION
+      metadataAviator // AVIATOR
     },
     methods: {
       init (id, value) {
@@ -158,11 +152,10 @@
             }
           })
           if (id) {
-            this.$http({
-              url: this.$http.adornUrl(`/gongFeng/beeTask/info/${id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
+            const dataBody = {
+              utcParam: [id]
+            }
+            infoBeeTask(dataBody).then(({data}) => {
               if (data && data.status === 0) {
                 this.dataForm.id = data.beeTaskDef.id
                 this.dataForm.name = data.beeTaskDef.name
@@ -212,10 +205,7 @@
               'kafka': null,
               'cassandra': null,
               'groovy': null,
-              'aviator': null,
-              'decision': null,
-              'FORK_JOIN': null,
-              'JOIN': null
+              'aviator': null
             }
             if (form) {
               for (let key in data) {
