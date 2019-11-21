@@ -13,7 +13,11 @@
 </template>
 
 <script>
+  import watermark from '@/utils/watermark'
   export default {
+    mounted () {
+      watermark.set(this.$store.state.user.name)
+    }
   }
 </script>
 
