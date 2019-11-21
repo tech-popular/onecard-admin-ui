@@ -185,6 +185,17 @@
       },
       // 切换 登录方式
       changeType () {
+        this.dataElseForm = {
+          phone: '',
+          captcha: '',
+          code: ''
+        }
+        this.dataForm = {
+          email: '',
+          password: '',
+          uuid: '',
+          captcha: ''
+        }
         this.getCaptcha()
         this.type = !this.type
       },
