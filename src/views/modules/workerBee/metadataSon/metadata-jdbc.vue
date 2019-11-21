@@ -7,6 +7,9 @@
         <el-form-item label="数据源id">
         <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
         </el-form-item>
+        <el-form-item label="is_query">
+        <el-input v-model="fatherData.isQuery" placeholder="is_query"/>
+        </el-form-item>
         <el-form-item label="请求参数的fieldId数组">
         <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>

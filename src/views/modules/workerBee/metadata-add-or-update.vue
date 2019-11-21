@@ -19,33 +19,12 @@
     <el-form-item label="任务使用者" prop="user">
       <el-input v-model="dataForm.user" placeholder="任务使用者"/>
     </el-form-item>
-    <!-- <el-form-item label="重试次数" prop="retryCount">
-      <el-input v-model="dataForm.retryCount" placeholder="重试次数"/>
-    </el-form-item>
-    <el-form-item label="任务执行超时时间" prop="timeoutSeconds">
-      <el-input v-model="dataForm.timeoutSeconds" placeholder="任务执行超时时间"/>
-    </el-form-item> -->
     <el-form-item label="入参数据的key的ID集合" prop="inputParams">
       <el-input v-model="dataForm.inputParams" placeholder="入参数据的key的ID集合"/>
     </el-form-item>
     <el-form-item label="出参数据的key的ID集合" prop="outputParams">
       <el-input v-model="dataForm.outputParams" placeholder="出参数据的key的ID集合"/>
     </el-form-item>
-    <!-- <el-form-item label="并发执行限制" prop="concurrentExeclimit">
-      <el-input v-model="dataForm.concurrentExeclimit" placeholder="并发执行限制"/>
-    </el-form-item>
-    <el-form-item label="输入模板" prop="inputTemplate">
-      <el-input v-model="dataForm.inputTemplate" placeholder="输入模板"/>
-    </el-form-item>
-    <el-form-item label="频率限制" prop="rateLimitPerFrequency">
-      <el-input v-model="dataForm.rateLimitPerFrequency" placeholder="频率限制"/>
-    </el-form-item>
-    <el-form-item label="隔离组ID" prop="isolationGroupId">
-      <el-input v-model="dataForm.isolationGroupId" placeholder="隔离组ID"/>
-    </el-form-item>
-    <el-form-item label="执行命名空间" prop="executionNameSpace">
-      <el-input v-model="dataForm.executionNameSpace" placeholder="执行命名空间"/>
-    </el-form-item> -->
     <el-form-item label="所属系统" prop="ownerApp">
       <el-input v-model="dataForm.ownerApp" placeholder="所属系统"/>
     </el-form-item>
@@ -103,15 +82,8 @@
           description: '', // 任务描述
           owner: '', // 任务归属
           user: '', // 任务使用者
-          // retryCount: 0, // 重试次数
-          // timeoutSeconds: 0, // 任务执行超时时间
           inputParams: '', // 入参数据的key的ID集合
           outputParams: '', // 出参数据的key的ID集合
-          // concurrentExeclimit: 0, // 并发执行限制
-          // inputTemplate: '', // 输入模板
-          // rateLimitPerFrequency: 0, // 频率限制
-          // isolationGroupId: 0, // 隔离组ID
-          // executionNameSpace: '', // 执行命名空间
           ownerApp: '', // 所属系统
           remark: '' // 备注
         },
