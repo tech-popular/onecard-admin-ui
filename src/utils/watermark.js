@@ -29,7 +29,7 @@ let setWatermark = (str) => {
   div.style.width = document.documentElement.clientWidth + 'px'
   div.style.height = document.documentElement.clientHeight + 'px'
   div.style.background = 'url(' + can.toDataURL('image/png') + ') left top repeat'
-  document.getElementsByClassName('site-content')[0].appendChild(div)
+  document.body.appendChild(div)
   return id
 }
 
