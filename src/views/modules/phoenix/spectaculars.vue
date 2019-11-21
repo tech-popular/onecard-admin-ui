@@ -438,7 +438,6 @@ export default {
         }
         this.barRightList.push(tem)
       }
-      console.log(tem)
     },
     // 饼图数据处理
     pieConfig (tem) {
@@ -594,6 +593,7 @@ export default {
     selectConfig (res) {
       let selectList = res.data.selection[0].selectList
       let list = []
+      this.optionIds = []
       selectList.forEach(item => {
         this.optionIds = [...this.optionIds, ...item.value]
         list.push({
