@@ -28,10 +28,6 @@ export default {
       type: Array,
       default: []
     },
-    selection: {
-      type: Array,
-      default: []
-    },
     selectedList: {
       type: Object,
       default: []

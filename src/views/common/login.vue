@@ -196,6 +196,7 @@
           uuid: '',
           captcha: ''
         }
+        this.$refs
         this.getCaptcha()
         this.type = !this.type
       },
@@ -317,7 +318,7 @@
     }
     .login-btn-submit {
       width: 100%;
-      margin-top: 38px;
+      margin-top: 10px;
     }
   }
 </style>

@@ -25,7 +25,6 @@
       :options="options"
       :optionIds="optionIds"
       :arr="arr"
-      :selection="selection"
       :selectedList="selectedList"
       :hadSelectedList="hadSelectedList"
       @changeValue1="changeValue1"
@@ -37,6 +36,9 @@
       v-if="mark == '3'"
       :simpleList="simpleList"
       :barRightList="barRightList"
+      :options="options"
+      :optionIds="optionIds"
+      :hadSelectedList="hadSelectedList"
       @clickALlCheck="clickALlCheck"
     ></three-monitor>
     <!-- 四象限&&小卡 -->
@@ -94,9 +96,18 @@ export default {
       mark: '', // 区分是哪个列表点过来的
       selectedList: {},
       timer: null, // 定时器
+      visualizeSelection: [{
+        'name': 'visualize过滤策略',
+        'type': 'visualize',
+        'placeholder': '',
+        'items': [],
+        'columnName': '',
+        'mark': ''
+      }],
       options: [],
       optionIds: [],
       hadSelectedList: [], // 已选择的数据
+      hadSelectedParamsList: [], // 已选择的参数
       barRightList: [] // 右侧柱状图数据
     }
   },
@@ -116,6 +127,7 @@ export default {
         this.visualizeId = 1
         this.list = []
         this.hadSelectedList = []
+        this.hadSelectedParamsList = []
         this.mark = getQueryString('mark')
         this.mark == '1' ? this.getDefaultSelection() : this.queryList()
       }
@@ -139,6 +151,10 @@ export default {
     if (this.myCharts) {
       this.myCharts.resize()
     }
+  },
+  destroyed () {
+    clearInterval(this.timer)
+    this.timer = null
   },
   methods: {
     // 全选功能
@@ -202,7 +218,7 @@ export default {
         })
     },
     // 获取列表
-    queryList (selectVal, selectionData) {
+    queryList (visualizeSelection = this.visualizeSelection, selectionData) {
       let { mark } = this.$data
       this.$http({
         url: this.$http.adornUrl('/phoenix/dashboard'),
@@ -225,17 +241,7 @@ export default {
               }
             ],
             visualizeId: this.visualizeId,
-            visualizeSelection: [
-              // 图表
-              {
-                name: 'visualize过滤策略',
-                type: 'visualize',
-                placeholder: selectVal ? selectVal.placeholder : '',
-                items: selectionData ? this.apiItems : [],
-                columnName: selectVal ? selectVal.columnName : '',
-                mark: selectVal ? selectVal.mark : ''
-              }
-            ]
+            visualizeSelection
           },
           header: {
             lat: 0.0,
@@ -365,15 +371,16 @@ export default {
       this.changeValue1(data, 'remove')
     },
     checkNode (value, index, data) {
-      this.hadSelectedList = []
+      // this.hadSelectedList = []
       this.hadSelectedList[index] = value
-      this.apiItems = value.map((tem, index) => {
+      data.items = value.map((tem, index) => {
         return {
           name: tem,
           value: [tem]
         }
       })
-      this.queryList(data, this.apiItems)
+      this.hadSelectedParamsList[index] = data
+      this.queryList(this.hadSelectedParamsList)
     },
     // 折线柱数据处理
     barConfig (tem, index) {
@@ -417,18 +424,7 @@ export default {
         tem.legend.data = [...[first], ...tem.legend.data]
       }
       if (this.mark == '2' && (index == 1 || index == 3)) {
-        tem.color = [
-          '#f1675d',
-          '#eee',
-          '#f1675d',
-          '#febe76',
-          '#f6e58d',
-          '#99ce7e',
-          '#31c5d3',
-          '#686ee0',
-          '#b466f0',
-          'grey'
-        ]
+        tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
         tem.series[1].stack = 'line'
         tem.series[1].type = 'bar'
       }
@@ -614,10 +610,6 @@ export default {
         this.queryList()
       }, 1000 * 60 * 30)
     }
-  },
-  destroyed () {
-    clearInterval(this.timer)
-    this.timer = null
   }
 }
 </script>
