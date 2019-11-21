@@ -194,7 +194,7 @@
               'beeTaskDef': this.dataForm,
               ...data
             }
-            beeTask(newData, `/gongFeng/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
+            beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
               if (data && data.status === 0) {
                 this.$message({
                   message: '操作成功',
