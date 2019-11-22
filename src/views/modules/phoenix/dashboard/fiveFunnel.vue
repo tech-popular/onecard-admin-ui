@@ -4,9 +4,9 @@
       <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList funnelStyle">
         <el-card class="funnel-card">
           <div class="funnel-radio" v-if="index == 0">
-            <el-radio v-model="radio" label="0" @change="selectFunnel">全量</el-radio>
-            <el-radio v-model="radio" label="1" @change="selectFunnel">信息流</el-radio>
-            <el-radio v-model="radio" label="2" @change="selectFunnel">应用市场</el-radio>
+            <el-radio v-model="radio" label="市场渠道" @change="selectFunnel(index)">全量</el-radio>
+            <el-radio v-model="radio" label="信息流" @change="selectFunnel(index)">信息流</el-radio>
+            <el-radio v-model="radio" label="应用市场" @change="selectFunnel(index)">应用市场</el-radio>
           </div>
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
@@ -35,7 +35,7 @@ export default {
   },
   data () {
     return {
-      radio: '0'
+      radio: '市场渠道'
     }
   },
   methods: {
@@ -45,8 +45,9 @@ export default {
     changeTag (data) {
       this.$emit('changeTag', data)
     },
-    selectFunnel () {
+    selectFunnel (index) {
       console.log(this.radio)
+      this.$emit('checkNode', [this.radio], index, this.arr[index].selection[0])
     }
   }
 }

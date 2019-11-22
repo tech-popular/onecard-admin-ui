@@ -51,6 +51,7 @@
       :selectedList="selectedList"
       @changeValue1="changeValue1"
       @changeTag="changeTag"
+      @checkNode="checkNode"
     ></five-funnel>
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
@@ -129,6 +130,19 @@ export default {
         this.hadSelectedList = []
         this.hadSelectedParamsList = []
         this.mark = getQueryString('mark')
+        if (this.mark == '5') {
+          this.visualizeSelection = [{
+            'name': 'visualize过滤策略',
+            'type': 'visualize',
+            'placeholder': '\\{sourceType\\}',
+            'items': [{
+              'name': '市场渠道',
+              'value': ['市场渠道']
+            }],
+            'columnName': 'source_type',
+            'mark': 'IN'
+          }]
+        }
         this.mark == '1' ? this.getDefaultSelection() : this.queryList()
       }
     }
@@ -139,6 +153,19 @@ export default {
   mounted () {
     if (!this.sidebarFold) {
       this.sidebarFold = !this.sidebarFold
+    }
+    if (this.mark == '5') {
+      this.visualizeSelection = [{
+        'name': 'visualize过滤策略',
+        'type': 'visualize',
+        'placeholder': '\\{sourceType\\}',
+        'items': [{
+          'name': '市场渠道',
+          'value': ['市场渠道']
+        }],
+        'columnName': 'source_type',
+        'mark': 'IN'
+      }]
     }
     this.mark == '1' ? this.getDefaultSelection() : this.queryList()
     this.autoReload()
@@ -271,12 +298,7 @@ export default {
     },
     initCharts (tem, index) {
       tem.selectListArr = []
-      if (
-        tem.type != 'quadrant' &&
-        tem.type != 'simple' &&
-        tem.type != 'line' &&
-        this.mark != '3'
-      ) {
+      if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
         this.arr.push(tem)
       }
       tem['grid'] = chartsConfig.grid
@@ -288,6 +310,7 @@ export default {
       }
       // 通过tem.type类型找到对应的方法执行 参数是 tem, index
       this[`${tem.type}Config`](tem, index)
+
       if (tem.selection[0]) {
         this.selection =
           tem.selection[0].selectList && tem.selection[0].selectList.length > 0
@@ -301,12 +324,7 @@ export default {
           this.chartsInit(this.myCharts, label, tem)
           return false
         }
-        if (
-          tem.type != 'quadrant' &&
-          tem.type != 'simple' &&
-          tem.type != 'line' &&
-          this.mark != '3'
-        ) {
+        if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
           let label = 'J_chartLineBox' + tem.id
           this.chartsInit(this.chartPie, label, tem)
         } else if (tem.type == 'line') {

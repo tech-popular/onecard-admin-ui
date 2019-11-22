@@ -46,7 +46,7 @@
             <el-form-item prop="captcha" v-show="!if_code">
               <el-row :gutter="20">
                 <el-col :span="14">
-                  <el-input v-model="dataElseForm.captcha" placeholder="验证码">
+                  <el-input v-model="dataElseForm.captcha" placeholder="验证码" @blur="checkIfCaptcha">
                   </el-input>
                 </el-col>
                 <el-col :span="10" class="login-captcha">
@@ -54,10 +54,10 @@
                 </el-col>
               </el-row>
             </el-form-item>
-            <el-form-item prop="code" v-show="if_code">
+            <el-form-item prop="verifyCode" v-show="if_code">
               <el-row :gutter="20">
                 <el-col :span="14">
-                  <el-input v-model="dataElseForm.code" placeholder="短信验证码">
+                  <el-input v-model="dataElseForm.verifyCode" placeholder="短信验证码">
                   </el-input>
                 </el-col>
                 <el-col :span="10" class="login-captcha">
@@ -103,23 +103,19 @@
           callback(new Error('手机号不能为空'))
         } else if (!isMobile(value)) {
           callback(new Error('手机号格式有误'))
-        } else if (!await this.checkMobile(value)) { // 校验 库里 是否有该手机号
-          callback(new Error('该账号尚未开通权限'))
         } else {
           callback()
         }
       }
       var validateCaptcha = async (rule, value, callback) => {
         if (!value) {
-          callback(new Error('验证码不能为空'))
-        } else if (!await this.checkIfCaptcha(value)) { // 校验 图片验证码是否正确
-          callback(new Error('验证码输入错误'))
+          callback(new Error('图片验证码不能为空'))
         } else {
-          this.if_code = true
           callback()
         }
       }
       return {
+        ifTrueCaptcha: false,
         type: true,
         if_code: false,
         dataElseForm: {
@@ -156,7 +152,7 @@
           captcha: [
             { required: true, trigger: 'blur', validator: validateCaptcha }
           ],
-          code: [
+          verifyCode: [
             { required: true, message: '短信验证码不能为空', trigger: 'blur' }
           ]
         },
@@ -173,7 +169,10 @@
       dataFormSubmit (form) {
         this.$refs[form].validate((valid) => {
           if (valid) {
-            const params = form == 'dataForm' ? this.dataForm : this.dataElseForm
+            const params = form == 'dataForm' ? this.dataForm : {
+              mobile: this.dataElseForm.mobile,
+              verifyCode: this.dataElseForm.verifyCode
+            }
             const url = form == 'dataForm' ? '/sys/login' : '/sys/mobileLogin'
             loginIn(params, url).then(({data}) => {
               if (data && data.code === 0) {
@@ -216,49 +215,46 @@
       },
       // 获取验证
       getCode () {
+        this.timer = setInterval(() => {
+          this.time--
+          if (this.time <= 0) {
+            clearInterval(this.timer)
+            this.time = 60
+            this.timer = null
+          }
+        }, 1000)
         const data = {
           mobile: this.dataElseForm.mobile
         }
-        sendCode(data).then((res) => {
-          console.log(res)
-          this.timer = setInterval(() => {
-            this.time--
-            if (this.time <= 0) {
-              clearInterval(this.timer)
-              this.time = 60
-              this.timer = null
-            }
-          }, 1000)
+        sendCode(data).then((data) => {
+          if (data && data.code == 0) {
+            this.$message({
+              message: '短信验证码发送成功',
+              type: 'success'
+            })
+          } else {
+            this.$message({
+              message: '短信验证码发送失败',
+              type: 'warning'
+            })
+          }
         })
       },
-      async checkEmail (value) {
-        let res = await new Promise(resolve => {
-          resolve(true)
-        })
-        return res
-      },
-      async checkMobile (value) {
-        let res = await new Promise(resolve => {
-          resolve(true)
-        })
-        return res
-      },
-      async checkIfCaptcha () {
-        let val = await new Promise(resolve => {
+      checkIfCaptcha () {
+        if (this.dataElseForm.captcha) {
           const data = {
             uuid: this.dataElseForm.uuid,
             captcha: this.dataElseForm.captcha
           }
-          checkCaptcha(data).then(res => {
-            console.log(res)
-            if (res.code == 0) {
-              resolve(true)
+          checkCaptcha(data).then(({data}) => {
+            if (data.code == 0) {
+              this.if_code = true
             } else {
-              resolve(false)
+              this.dataElseForm.captcha = ''
+              this.$message.error('图片验证码错误')
             }
           })
-        })
-        return val
+        }
       }
     }
   }

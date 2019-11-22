@@ -19,11 +19,10 @@
       <el-form-item label="手机号" prop="mobile">
         <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
       </el-form-item>
-      <el-form-item label="角色" prop="roleIdList">
-        <el-select v-model="dataForm.roleIdList" filterable placeholder="请选择">
-          <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId">
-          </el-option>
-        </el-select>
+      <el-form-item label="角色" size="mini" prop="roleIdList">
+        <el-checkbox-group v-model="dataForm.roleIdList">
+          <el-checkbox v-for="role in roleList" :key="role.roleId" :label="role.roleId">{{ role.roleName }}</el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
       <el-form-item label="数据权限" size="mini" prop="systenandIdList">
         <el-checkbox-group v-model="dataForm.systenandIdList">
@@ -35,9 +34,6 @@
           <el-radio :label="0">禁用</el-radio>
           <el-radio :label="1">正常</el-radio>
         </el-radio-group>
-      </el-form-item>
-      <el-form-item label="备注">
-        <el-input v-model="dataForm.mobile" placeholder="备注"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -72,11 +68,8 @@
         }
       }
       var validateEmail = (rule, value, callback) => {
-        const reg = new RegExp(/9fbank|ithro/)
         if (!isEmail(value)) {
           callback(new Error('邮箱格式错误'))
-        } else if (!reg.test(value)) {
-          callback(new Error('账号格式有误'))
         } else {
           callback()
         }
@@ -122,9 +115,6 @@
           mobile: [
             { required: true, message: '手机号不能为空', trigger: 'blur' },
             { validator: validateMobile, trigger: 'blur' }
-          ],
-          roleIdList: [
-            { required: true, message: '角色不能为空', trigger: 'blur' }
           ]
         }
       }
