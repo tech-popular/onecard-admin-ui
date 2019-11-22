@@ -10,8 +10,8 @@
         <div class="login-main" v-show="type">
           <h3 class="login-title">账号密码登录</h3>
           <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
-            <el-form-item prop="email">
-              <el-input v-model="dataForm.email" placeholder="邮箱"></el-input>
+            <el-form-item prop="username">
+              <el-input v-model="dataForm.username" placeholder="邮箱"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
@@ -27,7 +27,7 @@
                 </el-col>
               </el-row>
             </el-form-item>
-            <p class='forgetPass' @click="forgetPass">忘记密码</p>
+            <!-- <p class='forgetPass' @click="forgetPass">忘记密码</p> -->
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')">登录</el-button>
             </el-form-item>
@@ -40,8 +40,8 @@
         <div class="login-main" v-show="!type">
           <h3 class="login-title">手机验证码登录</h3>
           <el-form :model="dataElseForm" :rules="elseRule" ref="dataElseForm" @keyup.enter.native="dataFormSubmit()" status-icon>
-            <el-form-item prop="phone">
-              <el-input v-model="dataElseForm.phone" placeholder="手机号"></el-input>
+            <el-form-item prop="mobile">
+              <el-input v-model="dataElseForm.mobile" placeholder="手机号"></el-input>
             </el-form-item>
             <el-form-item prop="captcha" v-show="!if_code">
               <el-row :gutter="20">
@@ -80,51 +80,67 @@
 
 <script>
   import { getUUID } from '@/utils'
-  import { isEmail, isMobile } from '@/utils/validate'
+  import { loginIn, sendCode, checkCaptcha } from '@/api/account'
+  import { isMobile } from '@/utils/validate'
   export default {
     data () {
-      var validateEmail = async (rule, value, callback) => {
-        const reg = new RegExp(/9fbank|ithro/)
-        if (!value) {
-          callback(new Error('邮箱不能为空'))
-        } else if (!reg.test(value)) {
-          callback(new Error('账号格式有误'))
-        } else if (!isEmail(value)) {
-          callback(new Error('账号格式有误'))
-        } else if (!await this.checkEmail(value)) { // 校验 库里 是否有该邮箱
-          callback(new Error('该账号尚未开通权限'))
-        } else {
-          callback()
-        }
-      }
+      // var validateEmail = async (rule, value, callback) => {
+      //   const reg = new RegExp(/9fbank|ithro/)
+      //   if (!value) {
+      //     callback(new Error('邮箱不能为空'))
+      //   } else if (!reg.test(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else if (!isEmail(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else if (!await this.checkEmail(value)) { // 校验 库里 是否有该邮箱
+      //     callback(new Error('该账号尚未开通权限'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
       var validateMobile = async (rule, value, callback) => {
         if (!value) {
           callback(new Error('手机号不能为空'))
         } else if (!isMobile(value)) {
           callback(new Error('手机号格式有误'))
-        } else if (!await this.checkMobile(value)) { // 校验 库里 是否有该邮箱
+        } else if (!await this.checkMobile(value)) { // 校验 库里 是否有该手机号
           callback(new Error('该账号尚未开通权限'))
         } else {
           callback()
         }
       }
+      var validateCaptcha = async (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('验证码不能为空'))
+        } else if (!await this.checkIfCaptcha(value)) { // 校验 图片验证码是否正确
+          callback(new Error('验证码输入错误'))
+        } else {
+          this.if_code = true
+          callback()
+        }
+      }
       return {
         type: true,
-        if_code: true,
+        if_code: false,
         dataElseForm: {
-          phone: '',
+          mobile: '',
           captcha: '',
-          code: ''
+          verifyCode: '',
+          uuid: ''
         },
         dataForm: {
-          email: '',
+          // email: '',
+          username: '',
           password: '',
           uuid: '',
           captcha: ''
         },
         dataRule: {
-          email: [
-            { required: true, trigger: 'blur', validator: validateEmail }
+          // email: [
+          //   { required: true, trigger: 'blur', validator: validateEmail }
+          // ],
+          username: [
+            { required: true, message: '账号不能为空', trigger: 'blur' }
           ],
           password: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -134,11 +150,11 @@
           ]
         },
         elseRule: {
-          phone: [
+          mobile: [
             { required: true, trigger: 'blur', validator: validateMobile }
           ],
           captcha: [
-            { required: true, message: '验证码不能为空', trigger: 'blur' }
+            { required: true, trigger: 'blur', validator: validateCaptcha }
           ],
           code: [
             { required: true, message: '短信验证码不能为空', trigger: 'blur' }
@@ -157,16 +173,9 @@
       dataFormSubmit (form) {
         this.$refs[form].validate((valid) => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl('/sys/login'),
-              method: 'post',
-              data: this.$http.adornData({
-                'username': this.dataForm.email,
-                'password': this.dataForm.password,
-                'uuid': this.dataForm.uuid,
-                'captcha': this.dataForm.captcha
-              })
-            }).then(({data}) => {
+            const params = form == 'dataForm' ? this.dataForm : this.dataElseForm
+            const url = form == 'dataForm' ? '/sys/login' : '/sys/mobileLogin'
+            loginIn(params, url).then(({data}) => {
               if (data && data.code === 0) {
                 this.$cookie.set('token', data.token)
                 this.$router.replace({ name: 'home' })
@@ -180,23 +189,24 @@
       },
       // 获取验证码
       getCaptcha () {
-        this.dataForm.uuid = getUUID()
-        this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
+        const uuid = getUUID()
+        this.dataElseForm.uuid = this.dataForm.uuid = uuid
+        this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${uuid}`)
       },
       // 切换 登录方式
       changeType () {
         this.dataElseForm = {
-          phone: '',
+          mobile: '',
           captcha: '',
-          code: ''
+          verifyCode: '',
+          uuid: ''
         }
         this.dataForm = {
-          email: '',
+          username: '',
           password: '',
           uuid: '',
           captcha: ''
         }
-        this.$refs
         this.getCaptcha()
         this.type = !this.type
       },
@@ -206,14 +216,20 @@
       },
       // 获取验证
       getCode () {
-        this.timer = setInterval(() => {
-          this.time--
-          if (this.time <= 0) {
-            clearInterval(this.timer)
-            this.time = 60
-            this.timer = null
-          }
-        }, 1000)
+        const data = {
+          mobile: this.dataElseForm.mobile
+        }
+        sendCode(data).then((res) => {
+          console.log(res)
+          this.timer = setInterval(() => {
+            this.time--
+            if (this.time <= 0) {
+              clearInterval(this.timer)
+              this.time = 60
+              this.timer = null
+            }
+          }, 1000)
+        })
       },
       async checkEmail (value) {
         let res = await new Promise(resolve => {
@@ -226,6 +242,23 @@
           resolve(true)
         })
         return res
+      },
+      async checkIfCaptcha () {
+        let val = await new Promise(resolve => {
+          const data = {
+            uuid: this.dataElseForm.uuid,
+            captcha: this.dataElseForm.captcha
+          }
+          checkCaptcha(data).then(res => {
+            console.log(res)
+            if (res.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          })
+        })
+        return val
       }
     }
   }
