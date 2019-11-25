@@ -39,7 +39,7 @@ export default {
     padding: 0;
     li {
       color: #555;
-      margin-top: 41px;
+      margin-top: 50px;
       .inline {
         position: absolute;
         left: 50px;

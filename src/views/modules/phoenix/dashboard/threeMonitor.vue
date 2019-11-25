@@ -16,7 +16,7 @@
       <div class="monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
         <div :id="'barCharts' + item.id" class="barCharts"></div>
         <select-tree
-            class="selectList"
+            class="monitorSelectList"
             :options="options"
             :optionIds="optionIds"
             :index="index"
@@ -58,6 +58,7 @@ export default {
   },
   methods: {
     checkNode (data, index) {
+      console.log(data)
       data = [...new Set(data)]
       this.$emit('checkNode', data, index, this.barRightList[index].selection[0])
     }
@@ -119,7 +120,7 @@ li {
   border: none;
   border-radius: 5px;
 }
-.selectList {
+.monitorSelectList {
     position: absolute;
     width: 200px;
     top: -8px;

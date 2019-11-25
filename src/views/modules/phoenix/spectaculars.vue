@@ -12,47 +12,43 @@
     </el-alert>
     <!-- 授信路径监控 -->
     <one-credit
-      v-if="mark == '1'"
+      v-if="mark == '1' && !ifMockTest"
       :arr="arr"
       :selection="selection"
       :selectedList="selectedList"
-      @changeValue1="changeValue1"
-      @changeTag="changeTag"
+      @checkNode="checkNode"
     ></one-credit>
+    <one-test v-if="mark == '1' && ifMockTest"></one-test>
     <!-- 彩虹评级期限 -->
     <two-rainbow
-      v-if="mark == '2'"
+      v-if="mark == '2' && !ifMockTest"
       :options="options"
       :optionIds="optionIds"
       :arr="arr"
-      :selectedList="selectedList"
       :hadSelectedList="hadSelectedList"
-      @changeValue1="changeValue1"
-      @changeTag="changeTag"
       @checkNode="checkNode"
     ></two-rainbow>
+    <two-test v-if="mark == '2' && ifMockTest"></two-test>
     <!-- 机构资金监控 -->
     <three-monitor
-      v-if="mark == '3'"
+      v-if="mark == '3' && !ifMockTest"
       :simpleList="simpleList"
       :barRightList="barRightList"
       :options="options"
       :optionIds="optionIds"
       :hadSelectedList="hadSelectedList"
-      @clickALlCheck="clickALlCheck"
+      @checkNode="checkNode"
     ></three-monitor>
+    <three-test v-if="mark == '3' && ifMockTest"></three-test>
     <!-- 四象限&&小卡 -->
     <four-quadrant v-if="mark == '4'" :quadrantList="quadrantList"></four-quadrant>
     <!-- 渠道整体转化率 -->
     <five-funnel
-      v-if="mark == '5'"
+      v-if="mark == '5' && !ifMockTest"
       :arr="arr"
-      :selection="selection"
-      :selectedList="selectedList"
-      @changeValue1="changeValue1"
-      @changeTag="changeTag"
       @checkNode="checkNode"
     ></five-funnel>
+    <five-test v-if="mark == '5' && ifMockTest"></five-test>
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
@@ -72,12 +68,16 @@ import fourQuadrant from './dashboard/fourQuadrant'
 import threeMonitor from './dashboard/threeMonitor'
 import twoRainbow from './dashboard/twoRainbow'
 import oneCredit from './dashboard/oneCredit'
+import oneTest from './dashboard/mockVue/oneTest'
+import twoTest from './dashboard/mockVue/twoTest'
+import threeTest from './dashboard/mockVue/threeTest'
+import fiveTest from './dashboard/mockVue/fiveTest'
 import { chartsConfig } from './dashboard/chartsConfig'
 import { getQueryString } from '@/utils'
 import 'echarts/lib/chart/funnel'
 import 'echarts/lib/chart/radar'
 export default {
-  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit },
+  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fiveTest },
   data () {
     return {
       chartPie: null,
@@ -97,13 +97,26 @@ export default {
       mark: '', // 区分是哪个列表点过来的
       selectedList: {},
       timer: null, // 定时器
-      visualizeSelection: [{
+      ifMockTest: true,
+      visualizeSelection: [],
+      params1: [{
         'name': 'visualize过滤策略',
         'type': 'visualize',
         'placeholder': '',
         'items': [],
         'columnName': '',
         'mark': ''
+      }],
+      params5: [{
+        'name': 'visualize过滤策略',
+        'type': 'visualize',
+        'placeholder': '\\{sourceType\\}',
+        'items': [{
+          'name': '市场渠道',
+          'value': ['市场渠道']
+        }],
+        'columnName': 'source_type',
+        'mark': 'IN'
       }],
       options: [],
       optionIds: [],
@@ -127,21 +140,14 @@ export default {
       if (to.path.indexOf('phoenix-spectaculars') != -1) {
         this.visualizeId = 1
         this.list = []
+        this.ifMockTest = true
         this.hadSelectedList = []
         this.hadSelectedParamsList = []
         this.mark = getQueryString('mark')
         if (this.mark == '5') {
-          this.visualizeSelection = [{
-            'name': 'visualize过滤策略',
-            'type': 'visualize',
-            'placeholder': '\\{sourceType\\}',
-            'items': [{
-              'name': '市场渠道',
-              'value': ['市场渠道']
-            }],
-            'columnName': 'source_type',
-            'mark': 'IN'
-          }]
+          this.visualizeSelection = this.params5
+        } else {
+          this.visualizeSelection = this.params1
         }
         this.mark == '1' ? this.getDefaultSelection() : this.queryList()
       }
@@ -155,17 +161,9 @@ export default {
       this.sidebarFold = !this.sidebarFold
     }
     if (this.mark == '5') {
-      this.visualizeSelection = [{
-        'name': 'visualize过滤策略',
-        'type': 'visualize',
-        'placeholder': '\\{sourceType\\}',
-        'items': [{
-          'name': '市场渠道',
-          'value': ['市场渠道']
-        }],
-        'columnName': 'source_type',
-        'mark': 'IN'
-      }]
+      this.visualizeSelection = this.params5
+    } else {
+      this.visualizeSelection = this.params1
     }
     this.mark == '1' ? this.getDefaultSelection() : this.queryList()
     this.autoReload()
@@ -184,47 +182,6 @@ export default {
     this.timer = null
   },
   methods: {
-    // 全选功能
-    clickALlCheck (index, arrValue) {
-      let selectall = document.getElementById('selectall' + index)
-      let flag = selectall.getAttribute('flag')
-      let selectArr = ''
-      if (arrValue == 'arr') {
-        selectArr = this.arr[index].legend.data
-      } else {
-        selectArr = this.barRightList[index].legend.data
-      }
-      let val = ''
-      if (flag == 1) {
-        val = false
-        selectall.setAttribute('flag', 0)
-        selectall.value = '全选中'
-      } else {
-        val = true
-        selectall.setAttribute('flag', 1)
-        selectall.value = '全不选'
-      }
-      let obj = {}
-      let selectName = []
-      selectArr.forEach((item, indx) => {
-        selectName.push(item.name)
-      })
-      selectName.forEach((item, indx) => {
-        obj[item] = val
-      })
-      if (arrValue == 'arr') {
-        this.arr[index].legend.selected = obj
-      } else {
-        this.barRightList[index].legend.selected = obj
-      }
-      if (arrValue == 'barRightList') {
-        let label = 'barCharts' + this.barRightList[index].id
-        this.chartsInit(this.chartPie, label, this.barRightList[index])
-      } else {
-        let label = 'J_chartLineBox' + this.arr[index].id
-        this.chartsInit(this.chartPie, label, this.arr[index])
-      }
-    },
     // 获取默认选择项
     getDefaultSelection () {
       this.$http({
@@ -280,6 +237,7 @@ export default {
       }).then(({ data }) => {
         let res = data.response
         if (res.status == '1') {
+          this.ifMockTest = false
           if (res.data.selection.length) {
             this.list = res.data.selection[0]
             this.selectConfig(res)
@@ -340,53 +298,6 @@ export default {
       this.lineList = []
       this.simpleList = []
       this.queryList()
-    },
-    changeValue1 (data, type) {
-      if (type == 'remove') {
-        this.apiItems = []
-        this.arr = []
-        this.lineList = []
-        this.selectedList = {
-          id: this.selectedList.id,
-          data: this.selectedList.data.selectListArr
-        }
-        this.selectedList.data.forEach((tem, index) => {
-          var obj = {
-            name: tem,
-            value: tem
-          }
-          this.apiItems.push(obj)
-        })
-        this.visibleChange = false
-        this.queryList(data.selection[0], data.selectListArr)
-        return false
-      }
-      if (this.visibleChange) {
-        this.apiItems = []
-        this.arr = []
-        this.lineList = []
-        data.selectListArr.forEach((tem, index) => {
-          var obj = {
-            name: tem,
-            value: tem
-          }
-          this.apiItems.push(obj)
-        })
-        this.selectedList = {
-          data: data.selectListArr,
-          id: data.id
-        }
-        this.queryList(data.selection[0], data.selectListArr)
-        this.visibleChange = false
-      } else {
-        this.visibleChange = true
-      }
-    },
-    changeTag (data) {
-      this.visibleChange = true
-      this.apiItems = []
-      this.lineList = []
-      this.changeValue1(data, 'remove')
     },
     checkNode (value, index, data) {
       // this.hadSelectedList = []
@@ -625,6 +536,8 @@ export default {
     },
     autoReload () {
       this.timer = setInterval(() => {
+        this.hadSelectedList = []
+        this.hadSelectedParamsList = []
         this.queryList()
       }, 1000 * 60 * 30)
     }

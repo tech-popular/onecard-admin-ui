@@ -3,13 +3,13 @@
     <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList" :span="12">
       <el-card>
         <el-select
-          v-model="selectedList && selectedList.data && selectedList.data.length > 0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr"
+          v-model="value"
           class="selectList"
           multiple
           placeholder="全部"
           v-show="outdata.selection[0]"
-          @visible-change="changeValue1(outdata, index)"
-          @remove-tag="changeTag(outdata)"
+          @visible-change="checkNode(index)"
+          @remove-tag="checkNode(index)"
         >
           <el-option
             v-for="item in selection"
@@ -43,14 +43,13 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      value: []
+    }
   },
   methods: {
-    changeValue1 (data, index) {
-      this.$emit('changeValue1', data, index)
-    },
-    changeTag (data) {
-      this.$emit('changeTag', data)
+    checkNode (index) {
+      this.$emit('checkNode', this.value, index, this.arr[index].selection[0])
     }
   }
 }

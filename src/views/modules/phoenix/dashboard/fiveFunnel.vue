@@ -4,9 +4,9 @@
       <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList funnelStyle">
         <el-card class="funnel-card">
           <div class="funnel-radio" v-if="index == 0">
-            <el-radio v-model="radio" label="市场渠道" @change="selectFunnel(index)">全量</el-radio>
-            <el-radio v-model="radio" label="信息流" @change="selectFunnel(index)">信息流</el-radio>
-            <el-radio v-model="radio" label="应用市场" @change="selectFunnel(index)">应用市场</el-radio>
+            <el-radio v-model="radio" label="市场渠道" @change="checkNode(index)">全量</el-radio>
+            <el-radio v-model="radio" label="信息流" @change="checkNode(index)">信息流</el-radio>
+            <el-radio v-model="radio" label="应用市场" @change="checkNode(index)">应用市场</el-radio>
           </div>
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
@@ -23,14 +23,6 @@ export default {
     arr: {
       type: Array,
       default: []
-    },
-    selection: {
-      type: Array,
-      default: []
-    },
-    selectedList: {
-      type: Object,
-      default: []
     }
   },
   data () {
@@ -39,14 +31,7 @@ export default {
     }
   },
   methods: {
-    changeValue1 (data, index) {
-      this.$emit('changeValue1', data, index)
-    },
-    changeTag (data) {
-      this.$emit('changeTag', data)
-    },
-    selectFunnel (index) {
-      console.log(this.radio)
+    checkNode (index) {
       this.$emit('checkNode', [this.radio], index, this.arr[index].selection[0])
     }
   }
@@ -88,7 +73,10 @@ li {
     top: 15px;
     z-index: 100;
     .el-radio {
-      margin: 0 6px;
+      margin: 0;
+    }
+    .el-radio__label {
+      padding: 0 5px;
     }
   }
 }

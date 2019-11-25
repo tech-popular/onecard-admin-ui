@@ -194,12 +194,12 @@
       },
       // 切换 登录方式
       changeType () {
-        this.dataElseForm = {
-          mobile: '',
-          captcha: '',
-          verifyCode: '',
-          uuid: ''
-        }
+        // this.dataElseForm = {
+        //   mobile: '',
+        //   captcha: '',
+        //   verifyCode: '',
+        //   uuid: ''
+        // }
         this.dataForm = {
           username: '',
           password: '',
