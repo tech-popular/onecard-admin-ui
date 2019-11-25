@@ -362,7 +362,7 @@ export default {
       if (this.mark == '2' && (index == 1 || index == 3)) {
         tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
         tem.series[1].stack = 'line'
-        tem.series[1].type = 'line'
+        tem.series[1].type = 'bar'
       }
       if (this.mark == '3' && tem.positi && tem.positi == 'right') {
         // 机构资金右侧数据
