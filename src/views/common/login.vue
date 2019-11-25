@@ -234,7 +234,7 @@
             }, 1000)
           } else {
             this.$message({
-              message: '短信验证码发送失败',
+              message: data.msg,
               type: 'warning'
             })
           }
