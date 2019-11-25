@@ -218,7 +218,7 @@
         const data = {
           mobile: this.dataElseForm.mobile
         }
-        sendCode(data).then((data) => {
+        sendCode(data).then(({data}) => {
           if (data && data.code == 0) {
             this.$message({
               message: '短信验证码发送成功',
