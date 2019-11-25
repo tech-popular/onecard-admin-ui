@@ -346,8 +346,9 @@ export default {
       tem['tooltip'] = chartsConfig.tooltip
       if (this.mark == '3') { // 机构资金 legend 排序
         let first = {}
-        if (tem.legend.data[0].name == '昨日累计数据') {
+        if (tem.legend.data[0].name.indexOf('昨日') !== -1) {
           first = JSON.parse(JSON.stringify(tem.legend.data[0]))
+          console.log(first)
           tem.legend.data.splice(0, 1)
         }
         tem.legend.data.sort((a, b) => {
