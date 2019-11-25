@@ -215,14 +215,6 @@
       },
       // 获取验证
       getCode () {
-        this.timer = setInterval(() => {
-          this.time--
-          if (this.time <= 0) {
-            clearInterval(this.timer)
-            this.time = 60
-            this.timer = null
-          }
-        }, 1000)
         const data = {
           mobile: this.dataElseForm.mobile
         }
@@ -232,6 +224,14 @@
               message: '短信验证码发送成功',
               type: 'success'
             })
+            this.timer = setInterval(() => {
+              this.time--
+              if (this.time <= 0) {
+                clearInterval(this.timer)
+                this.time = 60
+                this.timer = null
+              }
+            }, 1000)
           } else {
             this.$message({
               message: '短信验证码发送失败',
