@@ -15,20 +15,22 @@
     <div class="monitorRight">
       <div class="monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
         <div :id="'barCharts' + item.id" class="barCharts"></div>
-        <input
-          class="allChecked"
-          :id="'selectall' + index"
-          @click="clickALlCheck(index, 'barRightList')"
-          type="button"
-          value="全不选"
-          flag="1"
-        />
+        <select-tree
+            class="monitorSelectList"
+            :options="options"
+            :optionIds="optionIds"
+            :index="index"
+            :defaultCheckNodes="hadSelectedList[index]"
+            @checkNode="checkNode"
+          ></select-tree>
       </div>
     </div>
   </div>
 </template>
 <script>
+import selectTree from './selectTree'
 export default {
+  components: { selectTree },
   props: {
     simpleList: {
       type: Array,
@@ -37,14 +39,28 @@ export default {
     barRightList: {
       type: Array,
       default: []
+    },
+    options: {
+      type: Array,
+      default: []
+    },
+    optionIds: {
+      type: Array,
+      default: []
+    },
+    hadSelectedList: {
+      type: Array,
+      default: []
     }
   },
   data () {
     return {}
   },
   methods: {
-    clickALlCheck (index, type) {
-      this.$emit('clickALlCheck', index, type)
+    checkNode (data, index) {
+      console.log(data)
+      data = [...new Set(data)]
+      this.$emit('checkNode', data, index, this.barRightList[index].selection[0])
     }
   }
 }
@@ -103,5 +119,12 @@ li {
   color: #fff;
   border: none;
   border-radius: 5px;
+}
+.monitorSelectList {
+    position: absolute;
+    width: 200px;
+    top: -8px;
+    left: 160px;
+    z-index: 9;
 }
 </style>

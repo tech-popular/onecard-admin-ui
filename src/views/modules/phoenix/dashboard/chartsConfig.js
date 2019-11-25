@@ -17,7 +17,21 @@ export const chartsConfig = {
         fontWeight: 600,
         fontSize: 16,
         lineHeight: 10,
-        padding: [0, 20, 0, 20]
+        padding: [0, 10, 0, 10]
+      },
+      c: {
+        fontSize: 10.5,
+        color: '#000'
+      },
+      d: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: 'green'
+      },
+      e: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: 'red'
       }
     }
   },

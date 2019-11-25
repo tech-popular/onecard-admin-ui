@@ -28,14 +28,6 @@ export default {
       type: Array,
       default: []
     },
-    selection: {
-      type: Array,
-      default: []
-    },
-    selectedList: {
-      type: Object,
-      default: []
-    },
     options: {
       type: Array,
       default: []
@@ -56,12 +48,6 @@ export default {
     checkNode (data, index) {
       data = [...new Set(data)]
       this.$emit('checkNode', data, index, this.arr[index].selection[0])
-    },
-    changeValue1 (data, index) {
-      this.$emit('changeValue1', data, index)
-    },
-    changeTag (data) {
-      this.$emit('changeTag', data)
     }
   }
 }

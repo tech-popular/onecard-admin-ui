@@ -12,44 +12,44 @@
     </el-alert>
     <!-- 授信路径监控 -->
     <one-credit
-      v-if="mark == '1'"
+      v-if="mark == '1' && !ifMockTest"
       :arr="arr"
       :selection="selection"
       :selectedList="selectedList"
-      @changeValue1="changeValue1"
-      @changeTag="changeTag"
+      @checkNode="checkNode"
     ></one-credit>
+    <one-test v-if="mark == '1' && ifMockTest"></one-test>
     <!-- 彩虹评级期限 -->
     <two-rainbow
-      v-if="mark == '2'"
+      v-if="mark == '2' && !ifMockTest"
       :options="options"
       :optionIds="optionIds"
       :arr="arr"
-      :selection="selection"
-      :selectedList="selectedList"
       :hadSelectedList="hadSelectedList"
-      @changeValue1="changeValue1"
-      @changeTag="changeTag"
       @checkNode="checkNode"
     ></two-rainbow>
+    <two-test v-if="mark == '2' && ifMockTest"></two-test>
     <!-- 机构资金监控 -->
     <three-monitor
-      v-if="mark == '3'"
+      v-if="mark == '3' && !ifMockTest"
       :simpleList="simpleList"
       :barRightList="barRightList"
-      @clickALlCheck="clickALlCheck"
+      :options="options"
+      :optionIds="optionIds"
+      :hadSelectedList="hadSelectedList"
+      @checkNode="checkNode"
     ></three-monitor>
+    <three-test v-if="mark == '3' && ifMockTest"></three-test>
     <!-- 四象限&&小卡 -->
-    <four-quadrant v-if="mark == '4'" :quadrantList="quadrantList"></four-quadrant>
+    <four-quadrant v-if="mark == '4' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
+    <four-test v-if="mark == '4' && ifMockTest"></four-test>
     <!-- 渠道整体转化率 -->
     <five-funnel
-      v-if="mark == '5'"
+      v-if="mark == '5' && !ifMockTest"
       :arr="arr"
-      :selection="selection"
-      :selectedList="selectedList"
-      @changeValue1="changeValue1"
-      @changeTag="changeTag"
+      @checkNode="checkNode"
     ></five-funnel>
+    <five-test v-if="mark == '5' && ifMockTest"></five-test>
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
@@ -69,12 +69,17 @@ import fourQuadrant from './dashboard/fourQuadrant'
 import threeMonitor from './dashboard/threeMonitor'
 import twoRainbow from './dashboard/twoRainbow'
 import oneCredit from './dashboard/oneCredit'
+import oneTest from './dashboard/mockVue/oneTest'
+import twoTest from './dashboard/mockVue/twoTest'
+import threeTest from './dashboard/mockVue/threeTest'
+import fourTest from './dashboard/mockVue/fourTest'
+import fiveTest from './dashboard/mockVue/fiveTest'
 import { chartsConfig } from './dashboard/chartsConfig'
 import { getQueryString } from '@/utils'
 import 'echarts/lib/chart/funnel'
 import 'echarts/lib/chart/radar'
 export default {
-  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit },
+  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest },
   data () {
     return {
       chartPie: null,
@@ -93,9 +98,32 @@ export default {
       defaultSelection: [], // 调用默认接口存的数据
       mark: '', // 区分是哪个列表点过来的
       selectedList: {},
+      timer: null, // 定时器
+      ifMockTest: true,
+      visualizeSelection: [],
+      params1: [{
+        'name': 'visualize过滤策略',
+        'type': 'visualize',
+        'placeholder': '',
+        'items': [],
+        'columnName': '',
+        'mark': ''
+      }],
+      params5: [{
+        'name': 'visualize过滤策略',
+        'type': 'visualize',
+        'placeholder': '\\{sourceType\\}',
+        'items': [{
+          'name': '市场渠道',
+          'value': ['市场渠道']
+        }],
+        'columnName': 'source_type',
+        'mark': 'IN'
+      }],
       options: [],
       optionIds: [],
       hadSelectedList: [], // 已选择的数据
+      hadSelectedParamsList: [], // 已选择的参数
       barRightList: [] // 右侧柱状图数据
     }
   },
@@ -114,8 +142,15 @@ export default {
       if (to.path.indexOf('phoenix-spectaculars') != -1) {
         this.visualizeId = 1
         this.list = []
+        this.ifMockTest = true
         this.hadSelectedList = []
+        this.hadSelectedParamsList = []
         this.mark = getQueryString('mark')
+        if (this.mark == '5') {
+          this.visualizeSelection = this.params5
+        } else {
+          this.visualizeSelection = this.params1
+        }
         this.mark == '1' ? this.getDefaultSelection() : this.queryList()
       }
     }
@@ -127,7 +162,13 @@ export default {
     if (!this.sidebarFold) {
       this.sidebarFold = !this.sidebarFold
     }
+    if (this.mark == '5') {
+      this.visualizeSelection = this.params5
+    } else {
+      this.visualizeSelection = this.params1
+    }
     this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+    this.autoReload()
   },
   activated () {
     // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -138,48 +179,11 @@ export default {
       this.myCharts.resize()
     }
   },
+  destroyed () {
+    clearInterval(this.timer)
+    this.timer = null
+  },
   methods: {
-    // 全选功能
-    clickALlCheck (index, arrValue) {
-      let selectall = document.getElementById('selectall' + index)
-      let flag = selectall.getAttribute('flag')
-      let selectArr = ''
-      if (arrValue == 'arr') {
-        selectArr = this.arr[index].legend.data
-      } else {
-        selectArr = this.barRightList[index].legend.data
-      }
-      let val = ''
-      if (flag == 1) {
-        val = false
-        selectall.setAttribute('flag', 0)
-        selectall.value = '全选中'
-      } else {
-        val = true
-        selectall.setAttribute('flag', 1)
-        selectall.value = '全不选'
-      }
-      let obj = {}
-      let selectName = []
-      selectArr.forEach((item, indx) => {
-        selectName.push(item.name)
-      })
-      selectName.forEach((item, indx) => {
-        obj[item] = val
-      })
-      if (arrValue == 'arr') {
-        this.arr[index].legend.selected = obj
-      } else {
-        this.barRightList[index].legend.selected = obj
-      }
-      if (arrValue == 'barRightList') {
-        let label = 'barCharts' + this.barRightList[index].id
-        this.chartsInit(this.chartPie, label, this.barRightList[index])
-      } else {
-        let label = 'J_chartLineBox' + this.arr[index].id
-        this.chartsInit(this.chartPie, label, this.arr[index])
-      }
-    },
     // 获取默认选择项
     getDefaultSelection () {
       this.$http({
@@ -200,7 +204,7 @@ export default {
         })
     },
     // 获取列表
-    queryList (selectVal, selectionData) {
+    queryList (visualizeSelection = this.visualizeSelection, selectionData) {
       let { mark } = this.$data
       this.$http({
         url: this.$http.adornUrl('/phoenix/dashboard'),
@@ -223,17 +227,7 @@ export default {
               }
             ],
             visualizeId: this.visualizeId,
-            visualizeSelection: [
-              // 图表
-              {
-                name: 'visualize过滤策略',
-                type: 'visualize',
-                placeholder: selectVal ? selectVal.placeholder : '',
-                items: selectionData ? this.apiItems : [],
-                columnName: selectVal ? selectVal.columnName : '',
-                mark: selectVal ? selectVal.mark : ''
-              }
-            ]
+            visualizeSelection
           },
           header: {
             lat: 0.0,
@@ -245,6 +239,7 @@ export default {
       }).then(({ data }) => {
         let res = data.response
         if (res.status == '1') {
+          this.ifMockTest = false
           if (res.data.selection.length) {
             this.list = res.data.selection[0]
             this.selectConfig(res)
@@ -263,12 +258,7 @@ export default {
     },
     initCharts (tem, index) {
       tem.selectListArr = []
-      if (
-        tem.type != 'quadrant' &&
-        tem.type != 'simple' &&
-        tem.type != 'line' &&
-        this.mark != '3'
-      ) {
+      if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
         this.arr.push(tem)
       }
       tem['grid'] = chartsConfig.grid
@@ -280,6 +270,7 @@ export default {
       }
       // 通过tem.type类型找到对应的方法执行 参数是 tem, index
       this[`${tem.type}Config`](tem, index)
+
       if (tem.selection[0]) {
         this.selection =
           tem.selection[0].selectList && tem.selection[0].selectList.length > 0
@@ -293,12 +284,7 @@ export default {
           this.chartsInit(this.myCharts, label, tem)
           return false
         }
-        if (
-          tem.type != 'quadrant' &&
-          tem.type != 'simple' &&
-          tem.type != 'line' &&
-          this.mark != '3'
-        ) {
+        if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
           let label = 'J_chartLineBox' + tem.id
           this.chartsInit(this.chartPie, label, tem)
         } else if (tem.type == 'line') {
@@ -315,63 +301,17 @@ export default {
       this.simpleList = []
       this.queryList()
     },
-    changeValue1 (data, type) {
-      if (type == 'remove') {
-        this.apiItems = []
-        this.arr = []
-        this.lineList = []
-        this.selectedList = {
-          id: this.selectedList.id,
-          data: this.selectedList.data.selectListArr
-        }
-        this.selectedList.data.forEach((tem, index) => {
-          var obj = {
-            name: tem,
-            value: tem
-          }
-          this.apiItems.push(obj)
-        })
-        this.visibleChange = false
-        this.queryList(data.selection[0], data.selectListArr)
-        return false
-      }
-      if (this.visibleChange) {
-        this.apiItems = []
-        this.arr = []
-        this.lineList = []
-        data.selectListArr.forEach((tem, index) => {
-          var obj = {
-            name: tem,
-            value: tem
-          }
-          this.apiItems.push(obj)
-        })
-        this.selectedList = {
-          data: data.selectListArr,
-          id: data.id
-        }
-        this.queryList(data.selection[0], data.selectListArr)
-        this.visibleChange = false
-      } else {
-        this.visibleChange = true
-      }
-    },
-    changeTag (data) {
-      this.visibleChange = true
-      this.apiItems = []
-      this.lineList = []
-      this.changeValue1(data, 'remove')
-    },
     checkNode (value, index, data) {
-      this.hadSelectedList = []
+      // this.hadSelectedList = []
       this.hadSelectedList[index] = value
-      this.apiItems = value.map((tem, index) => {
+      data.items = value.map((tem, index) => {
         return {
           name: tem,
           value: [tem]
         }
       })
-      this.queryList(data, this.apiItems)
+      this.hadSelectedParamsList[index] = data
+      this.queryList(this.hadSelectedParamsList)
     },
     // 折线柱数据处理
     barConfig (tem, index) {
@@ -404,29 +344,23 @@ export default {
         }
       }
       tem['tooltip'] = chartsConfig.tooltip
-      if (this.mark == '3') {
-        var first = JSON.parse(JSON.stringify(tem.legend.data[0]))
-        tem.legend.data.splice(0, 1)
+      if (this.mark == '3') { // 机构资金 legend 排序
+        let first = {}
+        if (tem.legend.data[0].name == '昨日累计数据') {
+          first = JSON.parse(JSON.stringify(tem.legend.data[0]))
+          tem.legend.data.splice(0, 1)
+        }
         tem.legend.data.sort((a, b) => {
           if (a.metric_unit) {
             return b.metric - a.metric
           }
         })
-        tem.legend.data = [...[first], ...tem.legend.data]
+        if (JSON.stringify(first) !== '{}') {
+          tem.legend.data = [...[first], ...tem.legend.data]
+        }
       }
       if (this.mark == '2' && (index == 1 || index == 3)) {
-        tem.color = [
-          '#f1675d',
-          '#eee',
-          '#f1675d',
-          '#febe76',
-          '#f6e58d',
-          '#99ce7e',
-          '#31c5d3',
-          '#686ee0',
-          '#b466f0',
-          'grey'
-        ]
+        tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
         tem.series[1].stack = 'line'
         tem.series[1].type = 'bar'
       }
@@ -487,14 +421,14 @@ export default {
           rich: chartsConfig.textStyle.rich
         }
       }
-      Object.assign(tem.series[0], funnelStyle)
-
       tem.series[0].data.forEach((item, index) => {
-        item.name = `${item.name}  ${item.value}人  ${
+        item.name = `{c|${item.name}  ${item.value}人}  ${
           item.percentRise ? '{a|↑}' : '{b|↓}'
-        }  ${item.percent}%`
+        }  ${item.percentRise ? '{d|' + item.percent + '%}' : '{e|' + item.percent + '%}'}`
       })
+      Object.assign(tem.series[0], funnelStyle)
       tem.tooltip.formatter = '{a}<br/>{b}'
+      tem.color = ['#634cff', '#febe76', '#31c5d3', '#FF4040', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a']
     },
     // 雷达 数据处理
     radarConfig (tem) {
@@ -517,10 +451,11 @@ export default {
       tem.legend.left = 'right'
       tem.legend.itemGap = 20
       tem.series.forEach((item, ind) => {
-        item.data.map(val => {
+        item.data.map((val, i) => {
           val.label = {
             normal: {
               show: true,
+              position: ind == 0 ? 'left' : 'right',
               formatter: function (params) {
                 return params.value + '%'
               }
@@ -606,6 +541,13 @@ export default {
         })
       })
       this.options = list
+    },
+    autoReload () {
+      this.timer = setInterval(() => {
+        this.hadSelectedList = []
+        this.hadSelectedParamsList = []
+        this.queryList()
+      }, 1000 * 60 * 30)
     }
   }
 }
@@ -621,6 +563,9 @@ export default {
   }
   .lineCharts {
     min-height: 200px;
+  }
+  .el-loading-spinner {
+    font-size: 40px;
   }
 }
 li {
