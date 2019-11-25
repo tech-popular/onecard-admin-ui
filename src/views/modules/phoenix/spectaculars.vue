@@ -342,15 +342,20 @@ export default {
         }
       }
       tem['tooltip'] = chartsConfig.tooltip
-      if (this.mark == '3') {
-        var first = JSON.parse(JSON.stringify(tem.legend.data[0]))
-        tem.legend.data.splice(0, 1)
+      if (this.mark == '3') { // 机构资金 legend 排序
+        let first = {}
+        if (tem.legend.data[0].name == '昨日累计数据') {
+          first = JSON.parse(JSON.stringify(tem.legend.data[0]))
+          tem.legend.data.splice(0, 1)
+        }
         tem.legend.data.sort((a, b) => {
           if (a.metric_unit) {
             return b.metric - a.metric
           }
         })
-        tem.legend.data = [...[first], ...tem.legend.data]
+        if (JSON.stringify(first) !== '{}') {
+          tem.legend.data = [...[first], ...tem.legend.data]
+        }
       }
       if (this.mark == '2' && (index == 1 || index == 3)) {
         tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
