@@ -200,12 +200,12 @@
         //   verifyCode: '',
         //   uuid: ''
         // }
-        this.dataForm = {
-          username: '',
-          password: '',
-          uuid: '',
-          captcha: ''
-        }
+        // this.dataForm = {
+        //   username: '',
+        //   password: '',
+        //   uuid: '',
+        //   captcha: ''
+        // }
         this.getCaptcha()
         this.type = !this.type
       },

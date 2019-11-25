@@ -41,7 +41,8 @@
     ></three-monitor>
     <three-test v-if="mark == '3' && ifMockTest"></three-test>
     <!-- 四象限&&小卡 -->
-    <four-quadrant v-if="mark == '4'" :quadrantList="quadrantList"></four-quadrant>
+    <four-quadrant v-if="mark == '4' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
+    <four-test v-if="mark == '4' && ifMockTest"></four-test>
     <!-- 渠道整体转化率 -->
     <five-funnel
       v-if="mark == '5' && !ifMockTest"
@@ -71,13 +72,14 @@ import oneCredit from './dashboard/oneCredit'
 import oneTest from './dashboard/mockVue/oneTest'
 import twoTest from './dashboard/mockVue/twoTest'
 import threeTest from './dashboard/mockVue/threeTest'
+import fourTest from './dashboard/mockVue/fourTest'
 import fiveTest from './dashboard/mockVue/fiveTest'
 import { chartsConfig } from './dashboard/chartsConfig'
 import { getQueryString } from '@/utils'
 import 'echarts/lib/chart/funnel'
 import 'echarts/lib/chart/radar'
 export default {
-  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fiveTest },
+  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest },
   data () {
     return {
       chartPie: null,
@@ -360,7 +362,7 @@ export default {
       if (this.mark == '2' && (index == 1 || index == 3)) {
         tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
         tem.series[1].stack = 'line'
-        tem.series[1].type = 'bar'
+        tem.series[1].type = 'line'
       }
       if (this.mark == '3' && tem.positi && tem.positi == 'right') {
         // 机构资金右侧数据
@@ -449,10 +451,11 @@ export default {
       tem.legend.left = 'right'
       tem.legend.itemGap = 20
       tem.series.forEach((item, ind) => {
-        item.data.map(val => {
+        item.data.map((val, i) => {
           val.label = {
             normal: {
               show: true,
+              position: ind == 0 ? 'left' : 'right',
               formatter: function (params) {
                 return params.value + '%'
               }
@@ -560,6 +563,9 @@ export default {
   }
   .lineCharts {
     min-height: 200px;
+  }
+  .el-loading-spinner {
+    font-size: 40px;
   }
 }
 li {
