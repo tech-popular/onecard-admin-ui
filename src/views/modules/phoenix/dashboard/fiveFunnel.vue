@@ -2,23 +2,12 @@
   <div class="mod-demo-echarts">
     <el-row :gutter="20">
       <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList funnelStyle">
-        <el-card>
-          <el-select
-            v-model="selectedList && selectedList.data && selectedList.data.length > 0 && selectedList.id == outdata.id ? selectedList.data : outdata.selectListArr"
-            class="selectList"
-            multiple
-            placeholder="全部"
-            v-show="outdata.selection[0]"
-            @visible-change="changeValue1(outdata, index)"
-            @remove-tag="changeTag(outdata)"
-          >
-            <el-option
-              v-for="item in selection"
-              :key="item.name"
-              :label="item.value"
-              :value="item.name"
-            ></el-option>
-          </el-select>
+        <el-card class="funnel-card">
+          <div class="funnel-radio" v-if="index == 0">
+            <el-radio v-model="radio" label="市场渠道" @change="checkNode(index)">全量</el-radio>
+            <el-radio v-model="radio" label="信息流" @change="checkNode(index)">信息流</el-radio>
+            <el-radio v-model="radio" label="应用市场" @change="checkNode(index)">应用市场</el-radio>
+          </div>
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
         <funnel :outdata="outdata" />
@@ -34,25 +23,16 @@ export default {
     arr: {
       type: Array,
       default: []
-    },
-    selection: {
-      type: Array,
-      default: []
-    },
-    selectedList: {
-      type: Object,
-      default: []
     }
   },
   data () {
-    return {}
+    return {
+      radio: '市场渠道'
+    }
   },
   methods: {
-    changeValue1 (data, index) {
-      this.$emit('changeValue1', data, index)
-    },
-    changeTag (data) {
-      this.$emit('changeTag', data)
+    checkNode (index) {
+      this.$emit('checkNode', [this.radio], index, this.arr[index].selection[0])
     }
   }
 }
@@ -84,5 +64,20 @@ export default {
 }
 li {
   list-style: none;
+}
+.funnel-card {
+  position: relative;
+  .funnel-radio {
+    position: absolute;
+    right: 0;
+    top: 15px;
+    z-index: 100;
+    .el-radio {
+      margin: 0;
+    }
+    .el-radio__label {
+      padding: 0 5px;
+    }
+  }
 }
 </style>

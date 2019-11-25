@@ -3,11 +3,11 @@
     <ul v-show="outdata.type == 'funnel'">
       <li :key="index" v-for="(item, index) in outdata.legend.data">
         <p class="funnelInfo">{{item.name}}</p>
-        <p class="funnelInfo">{{item.metric}}{{item.metric_unit}}
-          <span class="colorRed" :class="{'percentRise' : item.percentRise}">
+        <p class="funnelInfo">
+          <span :class="index !== 0 ? 'funnel-left inline': ''">{{item.metric}}{{item.metric_unit}}</span><span class="colorRed " :class="{'percentRise' : item.percentRise, 'inline': index !== 0}">
             {{item.percentRise ? '↑' : '↓'}}
           </span>
-          {{item.percent}}{{item.percent_unit}}
+          <span :class="{'percentRise' : item.percentRise, 'funnel-right inline colorRed': index !== 0}">{{item.percent}}{{item.percent_unit}}</span>
         </p>
       </li>
     </ul>
@@ -27,23 +27,47 @@ export default {
 <style lang="scss">
 .funnelList {
   .funnelInfo {
+    position: relative;
     margin: 0;
   }
   ul {
     position: absolute;
-    width: 170px;
+    width: 180px;
     height: 200px;
-    top: 90px;
+    top: 70px;
     left: 20px;
     padding: 0;
     li {
       color: #555;
-      margin-top: 41px;
+      margin-top: 50px;
+      .inline {
+        position: absolute;
+        left: 50px;
+        display: inline-block;
+      }
+      .funnel-left {
+        left: 0;
+        font-size: 21px;
+        width: 36px;
+        text-align: center;
+        transform: scale(0.5);
+        -webkit-transform: scale(0.5);
+        margin-right: -16px;
+        padding-top: -2px; 
+      }
+      .funnel-right {
+        left: 63px;
+        top: 6px;
+        width: 42px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      
     }
     li:nth-child(1) {
-      margin-top: -71px;
-      left: 150px;
-      width: 100px;
+      margin-top: -50px;
+      left: 145px;
+      width: 170px;
       position: absolute;
       text-align: center;
     }
