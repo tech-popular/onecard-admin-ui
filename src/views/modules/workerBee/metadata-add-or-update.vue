@@ -70,7 +70,7 @@
   import metadataCassandra from './metadataSon/metadata-cassandra'
   import metadataGroovy from './metadataSon/metadata-groovy'
   import metadataAviator from './metadataSon/metadata-aviator'
-  import { getBeeTaskTypeList, infoBeeTask } from '@/api/workerBee/metadata'
+  import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
@@ -194,11 +194,7 @@
               'beeTaskDef': this.dataForm,
               ...data
             }
-            this.$http({
-              url: this.$http.adornUrl(`/gongFeng/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`),
-              method: 'post',
-              data: this.$http.adornData(newData)
-            }).then(({data}) => {
+            beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
               if (data && data.status === 0) {
                 this.$message({
                   message: '操作成功',

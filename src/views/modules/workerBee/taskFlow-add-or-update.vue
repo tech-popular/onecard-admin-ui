@@ -66,6 +66,15 @@
       <el-form-item label="switch判断项集合">
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
+      <el-form-item label="任务入参">
+        <el-input v-model="dataForm.inputParams" placeholder="任务入参"/>
+      </el-form-item>
+      <el-form-item label="任务出参别名映射">
+        <el-input v-model="dataForm.outputParams" placeholder="任务出参别名映射"/>
+      </el-form-item>
+      <el-form-item label="子流程i">
+        <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/>
+      </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"/>
       </el-form-item>
@@ -106,7 +115,10 @@
           type: '',
           caseValueParam: '',
           caseExpression: '',
-          caseSwitchList: ''
+          caseSwitchList: '',
+          inputParams: '',
+          outputParams: '',
+          subWorkFlow: ''
         },
         taskIdlist: [],
         preTasklist: [],
@@ -156,6 +168,9 @@
                     this.dataForm.caseValueParam = ''
                     this.dataForm.caseExpression = ''
                     this.dataForm.caseSwitchList = ''
+                    this.dataForm.inputParams = ''
+                    this.dataForm.outputParams = ''
+                    this.dataForm.subWorkFlow = ''
                   }
                 })
               } else {
@@ -177,6 +192,9 @@
         this.dataForm.caseValueParam = ''
         this.dataForm.caseExpression = ''
         this.dataForm.caseSwitchList = ''
+        this.dataForm.inputParams = ''
+        this.dataForm.outputParams = ''
+        this.dataForm.subWorkFlow = ''
         this.preTasklist = []
         this.parentTasklist = []
         this.indexlist = []
