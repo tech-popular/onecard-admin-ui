@@ -4,12 +4,15 @@
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <!-- <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="addChartChairle" @refreshDataList="getDataList"/> -->
+
   </div>
 </template>
 
 <script>
 import go from 'gojs'
 import AddOrUpdate from './workFlowChart-add-or-update'
+// import workFlowChartChairle from './workFlowChartChairle'
 
 export default{
   props:
@@ -27,11 +30,13 @@ export default{
   // props: ['dataAllList'],
   data () {
     return {
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      workFlowChartChairlevisible: false
     }
   },
   components: {
     AddOrUpdate
+    // workFlowChartChairle
   },
   mounted () {
     this.init()
@@ -139,6 +144,7 @@ export default{
       //   {from: '5', to: '7', answer: null},
       //   {from: '4', to: '5', answer: null}
       // ]
+      // 查看
       mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
         if (e.subject.part.data.category === 'Start' || e.subject.part.data.category === 'End') {
           mySelf.addOrUpdateVisible = false
@@ -149,6 +155,17 @@ export default{
           mySelf.$refs.addOrUpdate.init(e.subject.part.data.key, '查看')
         })
       })
+      // 右击查看子流程
+      // mySelf.myDiagram.onObjectDoubleClicked('ObjectSingleClicked', function (e) {
+      //   if (e.subject.part.data.category === 'Start' || e.subject.part.data.category === 'End') {
+      //     mySelf.workFlowChartChairlevisible = false
+      //   } else {
+      //     mySelf.workFlowChartChairlevisible = true
+      //   }
+      //   mySelf.$nextTick(() => {
+      //     mySelf.$refs.addChartChairle.init(e.subject.part.data.key, '查看')
+      //   })
+      // })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
           copiesArrays: true,

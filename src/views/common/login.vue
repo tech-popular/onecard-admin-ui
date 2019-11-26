@@ -3,8 +3,7 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <div class="brand-info">
-          <h2 class="brand-info__text">蜂巢系统</h2>
-          <p class="brand-info__intro">提供平台的全方位的报警监控。</p>
+          <h2 class="brand-info__text">金丝雀系统</h2>
         </div>
         <!-- 账号密码登录 -->
         <div class="login-main" v-show="type">
