@@ -5,17 +5,25 @@
         <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
       </el-form-item>
       <el-form-item label="任务Id">
-        <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable>
+        <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable @change="onSelectedDrug">
           <el-option
             v-for="item in taskIdlist"
             :key="item.id"
             :label="item.name"
-            :value="item.id">
+            :value="item.name">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="任务类型">
-        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable>
+        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable  v-if="dataFormType === true">
+          <el-option
+            v-for="item in dataForm.ruleTypeList"
+            :key="item.value"
+            :label="item.value"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        <el-select v-model="dataForm.type" disabled placeholder="任务类型" style="width:100%" filterable v-else>
           <el-option
             v-for="item in dataForm.ruleTypeList"
             :key="item.value"
@@ -82,6 +90,7 @@
     data () {
       return {
         visible: false,
+        dataFormType: true,
         dataForm: {
           flowId: '',
           taskId: -1,
@@ -171,6 +180,13 @@
             })
           }
         })
+      },
+      onSelectedDrug (selVal) {
+        var findVal = this.taskIdlist.find(item => {
+          return item.name === selVal
+        })
+        this.dataForm.type = findVal.type
+        this.dataFormType = false
       },
       taskDialgClose () {
         this.visible = false
