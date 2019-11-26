@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="新增任务关系" @close="taskDialgClose" :visible.sync="visible">
-    <el-form :model="dataForm" ref="dataForm" label-width="20%">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
       <el-form-item label="工作流Id">
         <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
       </el-form-item>
@@ -64,8 +64,11 @@
       <el-form-item label="switch判断项集合">
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
-      <el-form-item label="任务入参">
+      <el-form-item label="任务入参" prop="inputParams">
         <el-input v-model="dataForm.inputParams" placeholder="任务入参"/>
+      </el-form-item>
+       <el-form-item label="任务出参别名映射" prop="outputParams">
+        <el-input v-model="dataForm.outputParams" placeholder="任务出参别名映射"/>
       </el-form-item>
       <el-form-item label="任务加入任务Id">
         <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
@@ -76,10 +79,6 @@
             :value="item">
           </el-option>
         </el-select>
-      </el-form-item>
-
-      <el-form-item label="任务出参别名映射">
-        <el-input v-model="dataForm.outputParams" placeholder="任务出参别名映射"/>
       </el-form-item>
       <el-form-item label="子流程ID">
         <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/>
@@ -118,6 +117,14 @@
           inputParams: '',
           outputParams: '',
           subWorkFlow: ''
+        },
+        dataRule: {
+          inputParams: [
+            { required: true, message: '任务入参不能为空', trigger: 'blur' }
+          ],
+          outputParams: [
+            { required: true, message: '任务出参别名映射不能为空', trigger: 'blur' }
+          ]
         },
         taskIdlist: [],
         preTasklist: [],
