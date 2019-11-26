@@ -4,10 +4,12 @@
     <el-button type="primary" style="margin-bottom: 15px;" @click="addOrUpdateHandle()">新增</el-button>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="flowId" header-align="center" align="center" label="工作流ID"/>
-      <el-table-column prop="taskReferenceName" header-align="center" align="center" label="参考任务名称"/>
+      <el-table-column prop="taskReferenceName" header-align="center" align="center" label="参考任务名"/>
       <el-table-column prop="parentTask" header-align="center" align="center" label="父级ID"/>
       <el-table-column prop="preTask" header-align="center" align="center" label="上一个任务ID"/>
       <el-table-column prop="taskId" header-align="center" align="center" label="任务ID"/>
+      <el-table-column prop="inputParams" header-align="center" align="center" label="任务入参"/>
+      <el-table-column prop="outputParams" header-align="center" align="center" label="任务出参别名映射"/>
       <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
     </el-table>
     <el-pagination
