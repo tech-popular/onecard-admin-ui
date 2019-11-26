@@ -46,7 +46,7 @@
             <el-form-item prop="captcha">
               <el-row :gutter="20">
                 <el-col :span="14">
-                  <el-input v-model="dataElseForm.captcha" placeholder="验证码">
+                  <el-input v-model="dataElseForm.captcha" placeholder="验证码" @blur='checkCaptcha'>
                   </el-input>
                 </el-col>
                 <el-col :span="10" class="login-captcha">
@@ -110,6 +110,8 @@
       var validateCaptcha = async (rule, value, callback) => {
         if (!value) {
           callback(new Error('图片验证码不能为空'))
+        } else if (!await this.checkCaptcha()) {
+          callback(new Error('图片验证码输入有误'))
         } else {
           callback()
         }
@@ -201,18 +203,6 @@
       },
       // 切换 登录方式
       changeType () {
-        // this.dataElseForm = {
-        //   mobile: '',
-        //   captcha: '',
-        //   verifyCode: '',
-        //   uuid: ''
-        // }
-        // this.dataForm = {
-        //   username: '',
-        //   password: '',
-        //   uuid: '',
-        //   captcha: ''
-        // }
         this.type = !this.type
       },
       // 忘记密码
@@ -220,42 +210,53 @@
 
       },
       // 获取验证
-      getCode () {
-        const data = {
-          uuid: this.dataElseForm.uuid,
-          captcha: this.dataElseForm.captcha
-        }
-        checkCaptcha(data).then(({data}) => {
-          if (data.code == 0) {
-            const data = {
-              mobile: this.dataElseForm.mobile
-            }
-            sendCode(data).then(({data}) => {
-              if (data && data.code == 0) {
-                this.$message({
-                  message: '短信验证码发送成功',
-                  type: 'success'
-                })
-                this.timer = setInterval(() => {
-                  this.time--
-                  if (this.time <= 0) {
-                    clearInterval(this.timer)
-                    this.time = 60
-                    this.timer = null
-                  }
-                }, 1000)
-              } else {
-                this.$message({
-                  message: data.msg,
-                  type: 'warning'
-                })
-              }
-            })
-          } else {
-            this.dataElseForm.captcha = ''
-            this.$message.error('图片验证码错误')
+      async getCode () {
+        let result = await this.checkCaptcha()
+        if (result) {
+          const data = {
+            mobile: this.dataElseForm.mobile
           }
+          sendCode(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.$message({
+                message: '短信验证码发送成功',
+                type: 'success'
+              })
+              this.timer = setInterval(() => {
+                this.time--
+                if (this.time <= 0) {
+                  clearInterval(this.timer)
+                  this.time = 60
+                  this.timer = null
+                }
+              }, 1000)
+            } else {
+              this.$message({
+                message: data.msg,
+                type: 'warning'
+              })
+            }
+          })
+        } else {
+          this.$refs.dataElseForm.validateField('captcha')
+        }
+      },
+      // 校验图片验证码
+      async checkCaptcha () {
+        let res = await new Promise(resolve => {
+          const data = {
+            uuid: this.dataElseForm.uuid,
+            captcha: this.dataElseForm.captcha
+          }
+          checkCaptcha(data).then(({data}) => {
+            if (data.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          })
         })
+        return res
       }
     }
   }

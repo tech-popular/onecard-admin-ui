@@ -311,7 +311,7 @@ export default {
     init (id) {
       // 数据源权限tenant
       this.$http({
-        url: this.$http.adornUrl(`/sys/systenant/select`),
+        url: this.$http.adornUrl(`/sys/systenant/getTenantInfoByUser`),
         method: 'get',
         params: this.$http.adornParams()
       }).then(({ data }) => {
