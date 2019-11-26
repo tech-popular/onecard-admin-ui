@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'"  @close="datano" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
     <el-form-item label="工作流名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="工作流名称"/>
@@ -133,7 +133,9 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
-                    this.resetForm()
+                    this.dataForm.description = ''
+                    this.dataForm.createdBy = ''
+                    this.dataForm.ownerApp = ''
                   }
                 })
               } else {
@@ -145,10 +147,9 @@
       },
       datano () {
         this.visible = false
-        this.resetForm()
-      },
-      resetForm (dataForm) {
-        this.$refs[dataForm].resetFields()
+        this.dataForm.description = ''
+        this.dataForm.createdBy = ''
+        this.dataForm.ownerApp = ''
       }
     }
   }
