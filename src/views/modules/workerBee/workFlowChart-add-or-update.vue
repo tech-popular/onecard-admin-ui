@@ -19,6 +19,12 @@
     <el-form-item label="决策参考" prop="description">
       <el-input v-model="dataForm.caseValueParam" disabled placeholder="决策参考"/>
     </el-form-item>
+    <el-form-item label="出参" prop="inputparams ">
+      <el-input v-model="dataForm.inputparams " disabled placeholder="出参"/>
+    </el-form-item>
+    <el-form-item label="入参" prop="outputparams">
+      <el-input v-model="dataForm.outputparams" disabled placeholder="入参"/>
+    </el-form-item>
     
     </el-form>
     <!-- <div v-if="dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
