@@ -346,8 +346,9 @@ export default {
       tem['tooltip'] = chartsConfig.tooltip
       if (this.mark == '3') { // 机构资金 legend 排序
         let first = {}
-        if (tem.legend.data[0].name == '昨日累计数据') {
+        if (tem.legend.data[0].name.indexOf('昨日') !== -1) {
           first = JSON.parse(JSON.stringify(tem.legend.data[0]))
+          console.log(first)
           tem.legend.data.splice(0, 1)
         }
         tem.legend.data.sort((a, b) => {
@@ -361,7 +362,7 @@ export default {
       }
       if (this.mark == '2' && (index == 1 || index == 3)) {
         tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
-        tem.series[1].stack = 'line'
+        tem.series[1].stack = '11'
         tem.series[1].type = 'bar'
       }
       if (this.mark == '3' && tem.positi && tem.positi == 'right') {

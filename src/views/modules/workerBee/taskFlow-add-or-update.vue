@@ -1,11 +1,11 @@
 <template>
   <el-dialog title="新增任务关系" @close="taskDialgClose" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+    <el-form :model="dataForm" ref="dataForm" label-width="20%">
       <el-form-item label="工作流Id">
         <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
       </el-form-item>
       <el-form-item label="任务Id">
-        <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable>
+        <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable @change="onSelectedDrug">
           <el-option
             v-for="item in taskIdlist"
             :key="item.id"
@@ -15,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="任务类型">
-        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable>
+        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable  v-if="dataFormType === true">
           <el-option
             v-for="item in dataForm.ruleTypeList"
             :key="item.value"
@@ -23,14 +23,12 @@
             :value="item.value">
           </el-option>
         </el-select>
-      </el-form-item>
-      <el-form-item label="任务加入任务Id">
-          <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
+        <el-select v-model="dataForm.type" disabled placeholder="任务类型" style="width:100%" filterable v-else>
           <el-option
-            v-for="item in preTasklist"
-            :key="item"
-            :label="item"
-            :value="item">
+            v-for="item in dataForm.ruleTypeList"
+            :key="item.value"
+            :label="item.value"
+            :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
@@ -72,7 +70,7 @@
       <el-form-item label="任务出参别名映射">
         <el-input v-model="dataForm.outputParams" placeholder="任务出参别名映射"/>
       </el-form-item>
-      <el-form-item label="子流程i">
+      <el-form-item label="子流程ID">
         <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
@@ -92,12 +90,12 @@
     data () {
       return {
         visible: false,
+        dataFormType: true,
         dataForm: {
           flowId: '',
           taskId: -1,
-          index: -1,
+          index: 1,
           parentTask: -1,
-          preTask: -1,
           taskReferenceName: '',
           remark: '',
           ruleTypeList: [
@@ -136,17 +134,20 @@
       init (value, flowId) {
         this.dataForm.flowId = flowId
         this.visible = true
-        value.map(item => {
-          this.preTasklist.push(item.preTask)
-          this.parentTasklist.push(item.parentTask)
-          this.indexlist.push(item.index)
-        })
         const dataBody = {}
         getAllBeeTaskList(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.taskIdlist = data.data
           }
         })
+        value && value.map(item => {
+          this.parentTasklist.push(item.id)
+          this.indexlist.push(item.index)
+        })
+        var max = this.indexlist.reduce(function (a, b) {
+          return b > a ? b : a
+        })
+        this.dataForm.index = max + 1
       },
       // 表单提交
       dataFormSubmit () {
@@ -174,18 +175,24 @@
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             })
           }
         })
       },
+      onSelectedDrug (event, item) {
+        var findVal = this.taskIdlist.find(item => {
+          return item.id === event
+        })
+        this.dataForm.type = findVal.type
+        this.dataFormType = false
+      },
       taskDialgClose () {
         this.visible = false
         this.dataForm.taskId = -1
-        this.dataForm.index = -1
+        this.dataForm.index = 1
         this.dataForm.parentTask = -1
-        this.dataForm.preTask = -1
         this.dataForm.taskReferenceName = ''
         this.dataForm.remark = ''
         this.dataForm.type = ''
