@@ -19,11 +19,11 @@
     <el-form-item label="决策参考" prop="description">
       <el-input v-model="dataForm.caseValueParam" disabled placeholder="决策参考"/>
     </el-form-item>
-    <el-form-item label="出参" prop="inputparams ">
-      <el-input v-model="dataForm.inputparams " disabled placeholder="出参"/>
+    <el-form-item label="出参" prop="inputParams">
+      <el-input v-model="dataForm.inputParams " disabled placeholder="出参"/>
     </el-form-item>
-    <el-form-item label="入参" prop="outputparams">
-      <el-input v-model="dataForm.outputparams" disabled placeholder="入参"/>
+    <el-form-item label="入参" prop="outputParams">
+      <el-input v-model="dataForm.outputParams" disabled placeholder="入参"/>
     </el-form-item>
     
     </el-form>
@@ -62,6 +62,8 @@
           if (id) {
             const dataBody = id
             getTaskDefWithWorkFlowTask(dataBody).then(({data}) => {
+              console.log(data, 'data')
+  
               if (data && data.status === 0) {
                 this.dataForm = data.data
               }
