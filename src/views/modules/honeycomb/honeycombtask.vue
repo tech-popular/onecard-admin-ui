@@ -1,12 +1,20 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
-      <el-form-item>
+      <el-form-item label="任务ID: ">
+        <el-autocomplete
+          v-model="dataForm.id"
+          placeholder="请输入任务ID"
+          class="input-with-select"
+          @keyup.enter.native="getDataList()"
+        ></el-autocomplete>
+      </el-form-item>
+      <el-form-item label="任务名称: ">
         <!--<el-input v-model="dataForm.key" placeholder="参数名" clearable  @keyup.enter.native="getDataList()"></el-input>-->
         <el-autocomplete
           v-model="dataForm.key"
           :fetch-suggestions="querySearchAsync"
-          placeholder="请输入内容"
+          placeholder="请输入任务名称"
           @select="handleSelect"
           class="input-with-select"
           @keyup.enter.native="getDataList()"
@@ -111,7 +119,7 @@
 </template>
 <style>
   .input-with-select  {
-    width: 380px;
+    width: 180px;
   }
 </style>
 <script>
@@ -122,7 +130,8 @@
     data () {
       return {
         dataForm: {
-          key: ''
+          key: '',
+          id: ''
         },
         restaurants: [],
         dataList: [],
@@ -182,7 +191,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'id': this.dataForm.id
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
