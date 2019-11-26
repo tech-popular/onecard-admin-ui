@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="新增任务关系" @close="taskDialgClose" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+    <el-form :model="dataForm" ref="dataForm" label-width="20%">
       <el-form-item label="工作流Id">
         <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
       </el-form-item>
@@ -134,7 +134,13 @@
       init (value, flowId) {
         this.dataForm.flowId = flowId
         this.visible = true
-        value.map(item => {
+        const dataBody = {}
+        getAllBeeTaskList(dataBody, false).then(({data}) => {
+          if (data && data.message === 'success') {
+            this.taskIdlist = data.data
+          }
+        })
+        value && value.map(item => {
           this.parentTasklist.push(item.id)
           this.indexlist.push(item.index)
         })
@@ -142,12 +148,6 @@
           return b > a ? b : a
         })
         this.dataForm.index = max + 1
-        const dataBody = {}
-        getAllBeeTaskList(dataBody, false).then(({data}) => {
-          if (data && data.message === 'success') {
-            this.taskIdlist = data.data
-          }
-        })
       },
       // 表单提交
       dataFormSubmit () {

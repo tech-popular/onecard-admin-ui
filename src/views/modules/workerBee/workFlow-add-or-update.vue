@@ -112,7 +112,6 @@
                 this.dataForm.ownerApp = data.data.ownerApp
                 this.dataForm.restartable = data.data.restartable
                 this.dataForm.schemaVersion = data.data.schemaVersion
-                // this.dataForm.tasks = data.data.tasks
                 this.dataForm.version = data.data.version
               }
             })
@@ -138,7 +137,7 @@
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             })
           }
