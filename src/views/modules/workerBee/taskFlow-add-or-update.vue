@@ -10,7 +10,7 @@
             v-for="item in taskIdlist"
             :key="item.id"
             :label="item.name"
-            :value="item.name">
+            :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -181,9 +181,9 @@
           }
         })
       },
-      onSelectedDrug (selVal) {
+      onSelectedDrug (event, item) {
         var findVal = this.taskIdlist.find(item => {
-          return item.name === selVal
+          return item.id === event
         })
         this.dataForm.type = findVal.type
         this.dataFormType = false
