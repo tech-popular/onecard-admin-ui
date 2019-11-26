@@ -2,12 +2,12 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
       <el-form-item label="任务ID: ">
-        <el-autocomplete
+        <el-input
           v-model="dataForm.id"
           placeholder="请输入任务ID"
           class="input-with-select"
           @keyup.enter.native="getDataList()"
-        ></el-autocomplete>
+        ></el-input>
       </el-form-item>
       <el-form-item label="任务名称: ">
         <!--<el-input v-model="dataForm.key" placeholder="参数名" clearable  @keyup.enter.native="getDataList()"></el-input>-->

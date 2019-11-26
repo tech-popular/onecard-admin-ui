@@ -43,18 +43,18 @@
             <el-form-item prop="mobile">
               <el-input v-model="dataElseForm.mobile" placeholder="手机号"></el-input>
             </el-form-item>
-            <el-form-item prop="captcha" v-show="!if_code">
+            <el-form-item prop="captcha">
               <el-row :gutter="20">
                 <el-col :span="14">
-                  <el-input v-model="dataElseForm.captcha" placeholder="验证码" @blur="checkIfCaptcha">
+                  <el-input v-model="dataElseForm.captcha" placeholder="验证码">
                   </el-input>
                 </el-col>
                 <el-col :span="10" class="login-captcha">
-                  <img :src="captchaPath" @click="getCaptcha()" alt="">
+                  <img :src="phoneCaptchaPath" @click="getPhoneCaptcha()" alt="">
                 </el-col>
               </el-row>
             </el-form-item>
-            <el-form-item prop="verifyCode" v-show="if_code">
+            <el-form-item prop="verifyCode">
               <el-row :gutter="20">
                 <el-col :span="14">
                   <el-input v-model="dataElseForm.verifyCode" placeholder="短信验证码">
@@ -157,12 +157,14 @@
           ]
         },
         captchaPath: '',
+        phoneCaptchaPath: '',
         time: 60,
         timer: null
       }
     },
     created () {
       this.getCaptcha()
+      this.getPhoneCaptcha()
     },
     methods: {
       // 提交表单
@@ -189,8 +191,13 @@
       // 获取验证码
       getCaptcha () {
         const uuid = getUUID()
-        this.dataElseForm.uuid = this.dataForm.uuid = uuid
+        this.dataForm.uuid = uuid
         this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${uuid}`)
+      },
+      getPhoneCaptcha () {
+        const uuid = getUUID()
+        this.dataElseForm.uuid = uuid
+        this.phoneCaptchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${uuid}`)
       },
       // 切换 登录方式
       changeType () {
@@ -206,7 +213,6 @@
         //   uuid: '',
         //   captcha: ''
         // }
-        this.getCaptcha()
         this.type = !this.type
       },
       // 忘记密码
@@ -216,45 +222,40 @@
       // 获取验证
       getCode () {
         const data = {
-          mobile: this.dataElseForm.mobile
+          uuid: this.dataElseForm.uuid,
+          captcha: this.dataElseForm.captcha
         }
-        sendCode(data).then(({data}) => {
-          if (data && data.code == 0) {
-            this.$message({
-              message: '短信验证码发送成功',
-              type: 'success'
-            })
-            this.timer = setInterval(() => {
-              this.time--
-              if (this.time <= 0) {
-                clearInterval(this.timer)
-                this.time = 60
-                this.timer = null
+        checkCaptcha(data).then(({data}) => {
+          if (data.code == 0) {
+            const data = {
+              mobile: this.dataElseForm.mobile
+            }
+            sendCode(data).then(({data}) => {
+              if (data && data.code == 0) {
+                this.$message({
+                  message: '短信验证码发送成功',
+                  type: 'success'
+                })
+                this.timer = setInterval(() => {
+                  this.time--
+                  if (this.time <= 0) {
+                    clearInterval(this.timer)
+                    this.time = 60
+                    this.timer = null
+                  }
+                }, 1000)
+              } else {
+                this.$message({
+                  message: data.msg,
+                  type: 'warning'
+                })
               }
-            }, 1000)
-          } else {
-            this.$message({
-              message: data.msg,
-              type: 'warning'
             })
+          } else {
+            this.dataElseForm.captcha = ''
+            this.$message.error('图片验证码错误')
           }
         })
-      },
-      checkIfCaptcha () {
-        if (this.dataElseForm.captcha) {
-          const data = {
-            uuid: this.dataElseForm.uuid,
-            captcha: this.dataElseForm.captcha
-          }
-          checkCaptcha(data).then(({data}) => {
-            if (data.code == 0) {
-              this.if_code = true
-            } else {
-              this.dataElseForm.captcha = ''
-              this.$message.error('图片验证码错误')
-            }
-          })
-        }
       }
     }
   }
