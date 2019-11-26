@@ -3,6 +3,7 @@
     <el-dialog title="数据关系" :close-on-click-modal="false" :visible.sync="visible">
     <el-button type="primary" style="margin-bottom: 15px;" @click="addOrUpdateHandle()">新增</el-button>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+      <el-table-column prop="id" header-align="center" align="center" label="id"/>
       <el-table-column prop="flowId" header-align="center" align="center" label="工作流ID"/>
       <el-table-column prop="taskReferenceName" header-align="center" align="center" label="参考任务名"/>
       <el-table-column prop="parentTask" header-align="center" align="center" label="父级ID"/>

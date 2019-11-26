@@ -16,6 +16,9 @@
     <el-form-item label="返回结果" prop="outputParameters">
       <el-input v-model="dataForm.outputParameters" placeholder="返回结果"/>
     </el-form-item>
+     <el-form-item label="版本" prop="version">
+      <el-input v-model="dataForm.version" placeholder="版本"/>
+    </el-form-item>
     <el-form-item label="描述">
       <el-input v-model="dataForm.description" placeholder="描述"/>
     </el-form-item>
@@ -30,9 +33,6 @@
           <el-radio :label="0">不重试</el-radio>
           <el-radio :label="1">重试</el-radio>
         </el-radio-group>
-    </el-form-item>
-    <el-form-item label="版本">
-      <el-input v-model="dataForm.version" placeholder="版本"/>
     </el-form-item>
     <!-- <el-form-item label="Tasks">
       <el-input v-model="dataForm.tasks" placeholder="Tasks"/>
@@ -79,6 +79,9 @@
           ],
           outputParameters: [
             { required: true, message: '返回结果不能为空', trigger: 'blur' }
+          ],
+          version: [
+            { required: true, message: '版本不能为空', trigger: 'blur' }
           ]
         },
         updateId: ''

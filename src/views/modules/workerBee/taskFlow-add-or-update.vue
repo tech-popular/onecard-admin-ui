@@ -24,16 +24,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="任务加入任务Id">
-          <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
-          <el-option
-            v-for="item in preTasklist"
-            :key="item"
-            :label="item"
-            :value="item">
-          </el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="父级Id">
         <el-select v-model="dataForm.parentTask" placeholder="父级Id" style="width:100%">
           <el-option
@@ -72,7 +62,7 @@
       <el-form-item label="任务出参别名映射">
         <el-input v-model="dataForm.outputParams" placeholder="任务出参别名映射"/>
       </el-form-item>
-      <el-form-item label="子流程i">
+      <el-form-item label="子流程ID">
         <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
@@ -95,9 +85,8 @@
         dataForm: {
           flowId: '',
           taskId: -1,
-          index: -1,
+          index: 1,
           parentTask: -1,
-          preTask: -1,
           taskReferenceName: '',
           remark: '',
           ruleTypeList: [
@@ -137,10 +126,13 @@
         this.dataForm.flowId = flowId
         this.visible = true
         value.map(item => {
-          this.preTasklist.push(item.preTask)
-          this.parentTasklist.push(item.parentTask)
+          this.parentTasklist.push(item.id)
           this.indexlist.push(item.index)
         })
+        var max = this.indexlist.reduce(function (a, b) {
+          return b > a ? b : a
+        })
+        this.dataForm.index = max + 1
         const dataBody = {}
         getAllBeeTaskList(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
@@ -183,9 +175,8 @@
       taskDialgClose () {
         this.visible = false
         this.dataForm.taskId = -1
-        this.dataForm.index = -1
+        this.dataForm.index = 1
         this.dataForm.parentTask = -1
-        this.dataForm.preTask = -1
         this.dataForm.taskReferenceName = ''
         this.dataForm.remark = ''
         this.dataForm.type = ''
