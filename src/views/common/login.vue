@@ -153,10 +153,10 @@
           ],
           captcha: [
             { required: true, trigger: 'blur', validator: validateCaptcha }
-          ],
-          verifyCode: [
-            { required: true, message: '短信验证码不能为空', trigger: 'blur' }
           ]
+          // verifyCode: [
+          //   { required: true, message: '短信验证码不能为空', trigger: 'blur' }
+          // ]
         },
         captchaPath: '',
         phoneCaptchaPath: '',
@@ -327,6 +327,8 @@
         cursor: pointer;
       }
       .loginMethod {
+        width: 140px;
+        margin: 0 auto;
         text-align: center;
         color: #17B3A3;
         cursor: pointer;
