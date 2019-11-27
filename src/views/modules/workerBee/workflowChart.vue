@@ -8,9 +8,9 @@
     <el-tooltip class="item" effect="dark" :content='outParameterValue' placement="top-start">
       <el-button type="primary" style="margin-bottom: 20px;">流程出参</el-button>
     </el-tooltip>
-    <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
+    <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"/>
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
-    <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="workFlowChartChairle"/>
+    <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="addSubProcess"/>
   </div>
 </template>
 
@@ -36,7 +36,6 @@ export default{
       this.init()
     }
   },
-  // props: ['dataAllList'],
   data () {
     return {
       addOrUpdateVisible: false,
@@ -52,7 +51,6 @@ export default{
   mounted () {
     this.init()
   },
-
   methods: {
     init () {
       console.log(this.list, 'list')
@@ -173,6 +171,14 @@ export default{
       mySelf.myDiagram.addDiagramListener('ObjectContextClicked', function (e) {
         var part = e.subject.part
         console.log(part.key, '右击事件')
+        if (part.data.category === 'Start' || part.data.category === 'End') {
+          mySelf.workFlowChartChairlevisible = false
+        } else {
+          mySelf.workFlowChartChairlevisible = true
+        }
+        mySelf.$nextTick(() => {
+          mySelf.$refs.addSubProcess.init(part.data.key, '子流程')
+        })
       })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
@@ -183,10 +189,6 @@ export default{
           nodeDataArray: this.dataAllList.nodeDataArrays,
           linkDataArray: this.dataAllList.linkDataArrays
         })
-    },
-    // 双击执行的方法
-    handlerDC (e, obj) {
-      console.log(e, obj, 'ppppx')
     },
     // 放大事件
     enlarge () {
