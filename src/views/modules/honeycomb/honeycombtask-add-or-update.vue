@@ -115,7 +115,12 @@
           ></el-option>
         </el-select>
       </el-form-item>
-
+      <el-form-item label="是否启用" prop="enable">
+        <el-radio-group v-model="dataForm.enable">
+          <el-radio :label="0">禁用</el-radio>
+          <el-radio :label="1">正常</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-collapse v-model="activeNames">
         <el-collapse-item title="高级选项" name="1">
           <el-form-item label="id规则" prop="idRule">
@@ -189,12 +194,6 @@
           </el-form-item>
           <el-form-item label="标签" prop="tags">
             <el-input v-model="dataForm.tags" placeholder="标签"></el-input>
-          </el-form-item>
-          <el-form-item label="是否启用" prop="enable">
-            <el-radio-group v-model="dataForm.enable">
-              <el-radio :label="0">禁用</el-radio>
-              <el-radio :label="1">正常</el-radio>
-            </el-radio-group>
           </el-form-item>
         </el-collapse-item>
         <el-collapse-item name="2"></el-collapse-item>
