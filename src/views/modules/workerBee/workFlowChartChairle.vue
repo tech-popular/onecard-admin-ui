@@ -12,7 +12,7 @@ export default {
     return {
       visible: false,
       id: '',
-      SubProcessList: {}
+      SubProcessList: []
     }
   },
   methods: {

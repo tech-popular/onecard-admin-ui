@@ -170,7 +170,6 @@ export default{
       // 右击查看子流程
       mySelf.myDiagram.addDiagramListener('ObjectContextClicked', function (e) {
         var part = e.subject.part
-        console.log(part.key, '右击事件')
         if (part.data.category === 'Start' || part.data.category === 'End') {
           mySelf.workFlowChartChairlevisible = false
         } else {
