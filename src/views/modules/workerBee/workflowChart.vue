@@ -3,16 +3,15 @@
     <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
-    <!-- <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="addChartChairle" @refreshDataList="getDataList"/> -->
-
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
+    <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="workFlowChartChairle"/>
   </div>
 </template>
 
 <script>
 import go from 'gojs'
 import AddOrUpdate from './workFlowChart-add-or-update'
-// import workFlowChartChairle from './workFlowChartChairle'
+import workFlowChartChairle from './workFlowChartChairle'
 
 export default{
   props:
@@ -35,8 +34,8 @@ export default{
     }
   },
   components: {
-    AddOrUpdate
-    // workFlowChartChairle
+    AddOrUpdate,
+    workFlowChartChairle
   },
   mounted () {
     this.init()
@@ -156,16 +155,19 @@ export default{
         })
       })
       // 右击查看子流程
-      // mySelf.myDiagram.onObjectDoubleClicked('ObjectSingleClicked', function (e) {
-      //   if (e.subject.part.data.category === 'Start' || e.subject.part.data.category === 'End') {
-      //     mySelf.workFlowChartChairlevisible = false
-      //   } else {
-      //     mySelf.workFlowChartChairlevisible = true
-      //   }
-      //   mySelf.$nextTick(() => {
-      //     mySelf.$refs.addChartChairle.init(e.subject.part.data.key, '查看')
-      //   })
-      // })
+      mySelf.myDiagram.nodeTemplate =
+        $(go.Node, 'Horizontal',
+          $(go.Panel, 'Auto',
+            $(go.Shape, // 节点形状和背景颜色的设置
+                  { fill: '#1F4963' },
+                  new go.Binding('fill', 'color')
+            ),
+            {doubleClick: function (e, node) { // 双击事件
+              mySelf.handlerDC(e, node)// 双击执行的方法
+            }
+            }
+          )
+        )
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
           copiesArrays: true,
@@ -176,7 +178,10 @@ export default{
           linkDataArray: this.dataAllList.linkDataArrays
         })
     },
-
+    // 双击执行的方法
+    handlerDC (e, obj) {
+      console.log(e, obj, 'ppppx')
+    },
     // 放大事件
     enlarge () {
       var mySelf = this

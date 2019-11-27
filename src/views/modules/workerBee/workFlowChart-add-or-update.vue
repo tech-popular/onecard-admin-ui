@@ -62,8 +62,6 @@
           if (id) {
             const dataBody = id
             getTaskDefWithWorkFlowTask(dataBody).then(({data}) => {
-              console.log(data, 'data')
-  
               if (data && data.status === 0) {
                 this.dataForm = data.data
               }
