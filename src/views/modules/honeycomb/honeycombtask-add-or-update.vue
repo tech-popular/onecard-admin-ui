@@ -356,7 +356,7 @@ export default {
             if (data && data.code === 0) {
               this.dataForm.name = data.honeycombTask.name
               this.dataForm.inDatasource = data.honeycombTask.inDatasource
-              this.dataForm.computeType = data.honeycombTask.computeType
+              this.dataForm.computeType = data.honeycombTask.computeType == 'simple' ? '简单类型' : '复杂类型'
               this.dataForm.sql = data.honeycombTask.sql
               this.dataForm.period = data.honeycombTask.period
               this.dataForm.transformerConfig =
