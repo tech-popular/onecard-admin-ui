@@ -170,19 +170,10 @@ export default{
         })
       })
       // 右击查看子流程
-      mySelf.myDiagram.nodeTemplate =
-        $(go.Node, 'Horizontal',
-          $(go.Panel, 'Auto',
-            $(go.Shape, // 节点形状和背景颜色的设置
-                  { fill: '#1F4963' },
-                  new go.Binding('fill', 'color')
-            ),
-            {doubleClick: function (e, node) { // 双击事件
-              mySelf.handlerDC(e, node)// 双击执行的方法
-            }
-            }
-          )
-        )
+      mySelf.myDiagram.addDiagramListener('ObjectContextClicked', function (e) {
+        var part = e.subject.part
+        console.log(part.key, '右击事件')
+      })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
           copiesArrays: true,
