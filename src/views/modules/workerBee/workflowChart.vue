@@ -2,6 +2,12 @@
   <div>
     <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
+    <el-tooltip class="item" effect="dark" :content='intParameterValue' placement="top-start">
+      <el-button type="primary" style="margin-bottom: 20px;">流程入参</el-button>
+    </el-tooltip>
+    <el-tooltip class="item" effect="dark" :content='outParameterValue' placement="top-start">
+      <el-button type="primary" style="margin-bottom: 20px;">流程出参</el-button>
+    </el-tooltip>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
     <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="workFlowChartChairle"/>
@@ -19,6 +25,10 @@ export default{
     dataAllList: {
       type: Object,
       default: () => {}
+    },
+    list: {
+      type: Object,
+      default: () => {}
     }
   },
   watch: {
@@ -30,7 +40,9 @@ export default{
   data () {
     return {
       addOrUpdateVisible: false,
-      workFlowChartChairlevisible: false
+      workFlowChartChairlevisible: false,
+      intParameterValue: '流程入参',
+      outParameterValue: '流程出参'
     }
   },
   components: {
@@ -43,6 +55,9 @@ export default{
 
   methods: {
     init () {
+      console.log(this.list, 'list')
+      this.intParameterValue = this.list.inputParameters
+      this.outParameterValue = this.list.outputParameters
       var mySelf = this
       if (mySelf.myDiagram) {
         this.myDiagram.div = null
