@@ -27,7 +27,7 @@
                 </el-col>
               </el-row>
             </el-form-item>
-            <!-- <p class='forgetPass' @click="forgetPass">忘记密码</p> -->
+            <p class='forgetPass' @click="forgetPass">忘记密码</p>
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')">登录</el-button>
             </el-form-item>

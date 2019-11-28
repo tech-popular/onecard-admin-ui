@@ -315,11 +315,51 @@ export default {
     },
     // 折线柱数据处理
     barConfig (tem, index) {
+      this.parLegendConfig(tem)
+      tem['tooltip'] = chartsConfig.tooltip
+      if (this.mark == '2' && (index == 1 || index == 3)) {
+        tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
+        tem.series[1].stack = '11'
+        tem.series[1].type = 'bar'
+      }
+      if (this.mark == '3' && tem.positi && tem.positi == 'right') {
+        // 机构资金右侧数据
+        this.threeMarkConfig(tem)
+      }
+    },
+    // 对 机构资金 config配置
+    threeMarkConfig (tem) {
+      let first = {}
+      let second = {}
+      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
+        first = JSON.parse(JSON.stringify(tem.legend.data[0]))
+        tem.legend.data.splice(0, 1)
+      }
+      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
+        second = JSON.parse(JSON.stringify(tem.legend.data[0]))
+        tem.legend.data.splice(0, 1)
+      }
+      tem.legend.data.sort((a, b) => {
+        if (a.metric_unit) {
+          return b.metric - a.metric
+        }
+      })
+      if (JSON.stringify(first) !== '{}') {
+        tem.legend.data = [...[first], ...[second], ...tem.legend.data]
+      }
+      tem.legend.type = tem.legendType || 'scroll'
+      tem.title.textStyle = {
+        fontSize: '12'
+      }
+      this.barRightList.push(tem)
+    },
+    // 对柱状图的legend 做统一处理
+    parLegendConfig (tem) {
       for (let i = 0; i < tem.series.length; i++) {
         if (tem.legend.data && tem.legend.data[i].metric && tem.series) {
-          var seriesNameElse = tem.series[i].name + '\n\n ' +
+          var seriesNameElse = tem.series[i].name + '\n' +
                 tem.legend.data[i].metric +
-                tem.legend.data[i].metric_unit +
+                (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
                 (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
                 tem.legend.data[i].percent +
                 tem.legend.data[i].percent_unit
@@ -331,9 +371,9 @@ export default {
       }
       for (let i = 0; i < tem.legend.data.length; i++) {
         if (tem.legend.data[i].metric) {
-          var legendNameElse = tem.legend.data[i].name + '\n\n ' +
+          var legendNameElse = tem.legend.data[i].name + '\n' +
             tem.legend.data[i].metric +
-            tem.legend.data[i].metric_unit +
+            (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
             (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
             tem.legend.data[i].percent +
             tem.legend.data[i].percent_unit
@@ -342,36 +382,6 @@ export default {
         } else {
           tem.legend.data[i].textStyle = chartsConfig.textStyle
         }
-      }
-      tem['tooltip'] = chartsConfig.tooltip
-      if (this.mark == '3') { // 机构资金 legend 排序
-        let first = {}
-        if (tem.legend.data[0].name.indexOf('昨日') !== -1) {
-          first = JSON.parse(JSON.stringify(tem.legend.data[0]))
-          console.log(first)
-          tem.legend.data.splice(0, 1)
-        }
-        tem.legend.data.sort((a, b) => {
-          if (a.metric_unit) {
-            return b.metric - a.metric
-          }
-        })
-        if (JSON.stringify(first) !== '{}') {
-          tem.legend.data = [...[first], ...tem.legend.data]
-        }
-      }
-      if (this.mark == '2' && (index == 1 || index == 3)) {
-        tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
-        tem.series[1].stack = '11'
-        tem.series[1].type = 'bar'
-      }
-      if (this.mark == '3' && tem.positi && tem.positi == 'right') {
-        // 机构资金右侧数据
-        tem.legend.type = tem.legendType || 'scroll'
-        tem.title.textStyle = {
-          fontSize: '14'
-        }
-        this.barRightList.push(tem)
       }
     },
     // 饼图数据处理
@@ -413,7 +423,8 @@ export default {
     // 漏斗数据处理
     funnelConfig (tem) {
       let funnelStyle = {
-        left: '15%',
+        left: 'center',
+        top: '80px',
         width: '70%',
         label: {
           show: true,
@@ -428,7 +439,10 @@ export default {
         }  ${item.percentRise ? '{d|' + item.percent + '%}' : '{e|' + item.percent + '%}'}`
       })
       Object.assign(tem.series[0], funnelStyle)
-      tem.tooltip.formatter = '{a}<br/>{b}'
+      // tem.tooltip.formatter = '{a}<br/>{b}'
+      tem.title.left = 'center'
+      tem.title.top = '10px'
+      delete tem.tooltip
       tem.color = ['#634cff', '#febe76', '#31c5d3', '#FF4040', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a']
     },
     // 雷达 数据处理
@@ -505,6 +519,17 @@ export default {
     // 四象限 数据处理
     quadrantConfig (tem) {
       this.quadrantList = tem.legend.extend
+      let { a, b, c, d } = this.quadrantList.quadrant
+      this.quadrantList.quadrant = {...c, ...d, ...a, ...b}
+      // let arr = []
+      // for (let key in this.quadrantList.quadrant) {
+      //   arr.push({
+      //     name: key,
+      //     value: this.quadrantList.quadrant[key]
+      //   })
+      // }
+      // this.quadrantList.quadrant = arr
+      // console.log(this.quadrantList.quadrant)
     },
     // line 折现数据处理
     lineConfig (tem) {

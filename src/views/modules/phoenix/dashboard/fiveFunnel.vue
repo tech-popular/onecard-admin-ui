@@ -70,7 +70,7 @@ li {
   .funnel-radio {
     position: absolute;
     right: 0;
-    top: 15px;
+    top: 5px;
     z-index: 100;
     .el-radio {
       margin: 0;
