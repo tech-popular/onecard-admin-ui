@@ -9,22 +9,13 @@
     element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading"
     element-loading-background="rgba(0, 0, 0, 0.1)">
-      <div class="quadrantLeft">
-        
-      </div>
-      <div class="quadrantRight">
-      </div>
+      <div class="quadrantLeft"></div>
+      <div class="quadrantRight"></div>
     </div>
   </div>
 </template>
 <script>
 export default {
-  props: {
-    quadrantList: {
-      type: Object,
-      default: []
-    }
-  },
   data () {
     return {
       loading: true

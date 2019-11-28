@@ -11,6 +11,7 @@
             :defaultCheckNodes="hadSelectedList[index]"
             @checkNode="checkNode"
           ></select-tree>
+          <span v-if="index == 0">{{outdata.name}}</span>
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
         <funnel :outdata="outdata"/>
@@ -70,10 +71,10 @@ export default {
     width: 33.33%;
   }
   .Rainbow:nth-child(odd) {
-    width: 35%;
+    width: 30%;
   }
   .Rainbow:nth-child(even) {
-    width: 65%;
+    width: 70%;
   }
   .selectList {
     position: absolute;

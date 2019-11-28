@@ -449,7 +449,6 @@ export default {
     radarConfig (tem) {
       const dataLabel = ['3期', '6期', '12期', '24期', '36期', '其他期限']
       tem.tooltip = {
-        // trigger: 'axis',
         formatter: function (params, ticket, callback) {
           var showHtm = ''
           for (var i = 0; i < params.value.length; i++) {
@@ -470,9 +469,9 @@ export default {
           val.label = {
             normal: {
               show: true,
-              position: ind == 0 ? 'left' : 'right',
+              position: ind == 0 ? 'bottom' : 'right',
               formatter: function (params) {
-                return params.value + '%'
+                return params.value ? (params.value + '%') : ''
               }
             }
           }
@@ -484,20 +483,10 @@ export default {
       if (tem.series.length > 0) {
         tem.series[0].radius = ['45%', '65%']
         tem.series[1] && (tem.series[1].radius = ['0%', '20%'])
-        tem.color = [
-          '#f1675d',
-          '#febe76',
-          '#f6e58d',
-          '#99ce7e',
-          '#31c5d3',
-          '#686ee0',
-          '#b466f0',
-          'grey'
-        ]
-        // tem.legend.orient = 'vertical'
-        // tem.legend.left = 'right'
+        tem.color = ['#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
         tem.legend.top = 'bottom'
         tem.legend.itemGap = 20
+        tem.legend.data = []
         if (tem.type == 'pies') {
           tem.series.forEach((item, ind) => {
             item.label = {
@@ -512,22 +501,28 @@ export default {
                 }
               }
             }
+            item.data.forEach((val, i) => {
+              if (val.value == 0) {
+                item.data.splice(i, 1)
+              }
+            })
           })
         }
       }
     },
     // 四象限 数据处理
     quadrantConfig (tem) {
-      this.quadrantList = tem.legend.extend
       let arr = []
-      for (let key in this.quadrantList.quadrant) {
+      for (let key in tem.legend.extend.quadrant) {
         arr.push({
           name: key,
-          value: this.quadrantList.quadrant[key]
+          value: tem.legend.extend.quadrant[key]
         })
       }
       const newArr = arr.splice(0, 2)
-      this.quadrantList.quadrant = [...arr, ...newArr]
+      tem.legend.extend.quadrant = [...arr, ...newArr]
+      this.quadrantList = tem.legend.extend
+      console.log(this.quadrantList)
     },
     // line 折现数据处理
     lineConfig (tem) {

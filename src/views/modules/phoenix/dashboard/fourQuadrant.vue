@@ -58,7 +58,7 @@ export default {
   props: {
     quadrantList: {
       type: Object,
-      default: []
+      default: () => {}
     }
   },
   data () {
