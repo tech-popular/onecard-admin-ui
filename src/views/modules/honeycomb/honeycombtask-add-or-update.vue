@@ -430,7 +430,7 @@ export default {
               id: this.dataForm.id || undefined,
               name: this.dataForm.name,
               inDatasource: this.dataForm.inDatasource,
-              computeType: this.dataForm.computeType,
+              computeType: this.dataForm.computeType == '简单类型' ? 'simple' : 'mix',
               sql: this.dataForm.sql,
               period: this.dataForm.period,
               transformerConfig: this.dataForm.transformerConfig,
