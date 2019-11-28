@@ -1,8 +1,8 @@
 <template>
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
-        <el-form-item label="子流程id" prop="script">
-          <el-input v-model="fatherData.script" placeholder="请输入子流程id"/>
+        <el-form-item label="表达式" prop="script">
+          <el-input v-model="fatherData.script" placeholder="请输入表达式"/>
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组">
         <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
@@ -37,7 +37,7 @@
       return {
         dataRule: {
           script: [
-            { required: true, message: '请输入子流程id', trigger: 'blur' }
+            { required: true, message: '请输入表达式', trigger: 'blur' }
           ]
         }
       }

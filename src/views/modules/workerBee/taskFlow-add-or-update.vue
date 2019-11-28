@@ -154,7 +154,7 @@
           }
         })
         value && value.map(item => {
-          this.preTasklist.push(item.preTask)
+          this.preTasklist.push(item.index)
           this.parentTasklist.push(item.id)
           this.indexlist.push(item.index)
         })
@@ -176,7 +176,7 @@
                   duration: 200,
                   onClose: () => {
                     this.visible = false
-                    this.dataFormType = false
+                    this.dataFormType = true
                     this.$emit('refreshDataList')
                     this.dataForm.taskReferenceName = ''
                     this.dataForm.remark = ''
@@ -205,7 +205,7 @@
       },
       taskDialgClose () {
         this.visible = false
-        this.dataFormType = false
+        this.dataFormType = true
         this.dataForm.taskId = -1
         this.dataForm.index = 1
         this.dataForm.preTask = -1
