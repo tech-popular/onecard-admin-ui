@@ -114,8 +114,8 @@ export default{
             reshapable: true,
             resegmentable: true,
             // 鼠标悬停巧妙地突出显示链接:
-            mouseEnter: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'rgba(30,144,255,0.2)' },
-            mouseLeave: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'transparent' },
+            // mouseEnter: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'rgba(30,144,255,0.2)' },
+            // mouseLeave: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'transparent' },
             selectionAdorned: false
           },
           new go.Binding('points').makeTwoWay(),
@@ -170,14 +170,21 @@ export default{
       // 右击查看子流程
       mySelf.myDiagram.addDiagramListener('ObjectContextClicked', function (e) {
         var part = e.subject.part
-        if (part.data.category === 'Start' || part.data.category === 'End') {
-          mySelf.workFlowChartChairlevisible = false
+        if (part.data.subWorkFlow) {
+          if (part.data.category === 'Start' || part.data.category === 'End') {
+            mySelf.workFlowChartChairlevisible = false
+          } else {
+            mySelf.workFlowChartChairlevisible = true
+          }
+          mySelf.$nextTick(() => {
+            mySelf.$refs.addSubProcess.init(part.data.subWorkFlow, '子流程')
+          })
         } else {
-          mySelf.workFlowChartChairlevisible = true
+          mySelf.$message({
+            message: '没有子流程哦!',
+            type: 'warning'
+          })
         }
-        mySelf.$nextTick(() => {
-          mySelf.$refs.addSubProcess.init(part.data.key, '子流程')
-        })
       })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
