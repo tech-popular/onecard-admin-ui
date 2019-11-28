@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
       </el-form-item>
       <el-form-item label="任务Id">
-        <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable>
+        <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable @change="onSelectedDrug">
           <el-option
             v-for="item in taskIdlist"
             :key="item.id"
@@ -15,22 +15,20 @@
         </el-select>
       </el-form-item>
       <el-form-item label="任务类型">
-        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable>
+        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable  v-if="dataFormType === true">
           <el-option
             v-for="item in dataForm.ruleTypeList"
-            :key="item.value"
-            :label="item.value"
-            :value="item.value">
+            :key="item.baseName"
+            :label="item.baseName"
+            :value="item.baseName">
           </el-option>
         </el-select>
-      </el-form-item>
-      <el-form-item label="任务加入任务Id">
-          <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
+        <el-select v-model="dataForm.type" disabled placeholder="任务类型" style="width:100%" filterable v-else>
           <el-option
-            v-for="item in preTasklist"
-            :key="item"
-            :label="item"
-            :value="item">
+            v-for="item in dataForm.ruleTypeList"
+            :key="item.baseName"
+            :label="item.baseName"
+            :value="item.baseName">
           </el-option>
         </el-select>
       </el-form-item>
@@ -66,6 +64,25 @@
       <el-form-item label="switch判断项集合">
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
+      <el-form-item label="任务入参" prop="inputParams">
+        <el-input v-model="dataForm.inputParams" placeholder="任务入参"/>
+      </el-form-item>
+       <el-form-item label="任务出参别名映射" prop="outputParams">
+        <el-input v-model="dataForm.outputParams" placeholder="任务出参别名映射"/>
+      </el-form-item>
+      <el-form-item label="任务加入任务Id">
+        <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
+          <el-option
+            v-for="item in preTasklist"
+            :key="item"
+            :label="item"
+            :value="item">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="子流程ID">
+        <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/>
+      </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"/>
       </el-form-item>
@@ -78,30 +95,35 @@
 </template>
 
 <script>
-  import { saveWorkTaskFlow, getAllBeeTaskList } from '@/api/workerBee/workFlow'
+  import { saveWorkTaskFlow, getAllBeeTaskList, getNotBaseTypeList } from '@/api/workerBee/workFlow'
   export default {
     data () {
       return {
         visible: false,
+        dataFormType: true,
         dataForm: {
           flowId: '',
           taskId: -1,
-          index: -1,
-          parentTask: -1,
+          index: 1,
           preTask: -1,
+          parentTask: -1,
           taskReferenceName: '',
           remark: '',
-          ruleTypeList: [
-            {
-              value: 'Fork',
-              label: 'Fork'
-            }, {
-              value: 'Join',
-              label: 'Join'
-            }, {
-              value: 'Descision',
-              label: 'Descision'
-            }
+          ruleTypeList: [],
+          type: '',
+          caseValueParam: '',
+          caseExpression: '',
+          caseSwitchList: '',
+          inputParams: '',
+          outputParams: '',
+          subWorkFlow: ''
+        },
+        dataRule: {
+          inputParams: [
+            { required: true, message: '任务入参不能为空', trigger: 'blur' }
+          ],
+          outputParams: [
+            { required: true, message: '任务出参别名映射不能为空', trigger: 'blur' }
           ]
         },
         taskIdlist: [],
@@ -120,17 +142,26 @@
       init (value, flowId) {
         this.dataForm.flowId = flowId
         this.visible = true
-        value.map(item => {
-          this.preTasklist.push(item.preTask)
-          this.parentTasklist.push(item.parentTask)
-          this.indexlist.push(item.index)
-        })
         const dataBody = {}
         getAllBeeTaskList(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.taskIdlist = data.data
           }
         })
+        getNotBaseTypeList().then(({data}) => {
+          if (data && data.message === 'success') {
+            this.dataForm.ruleTypeList = data.data
+          }
+        })
+        value && value.map(item => {
+          this.preTasklist.push(item.index)
+          this.parentTasklist.push(item.id)
+          this.indexlist.push(item.index)
+        })
+        var max = this.indexlist.reduce(function (a, b) {
+          return b > a ? b : a
+        })
+        this.dataForm.index = max + 1
       },
       // 表单提交
       dataFormSubmit () {
@@ -145,26 +176,49 @@
                   duration: 200,
                   onClose: () => {
                     this.visible = false
+                    this.dataFormType = true
                     this.$emit('refreshDataList')
                     this.dataForm.taskReferenceName = ''
                     this.dataForm.remark = ''
+                    this.dataForm.type = ''
+                    this.dataForm.caseValueParam = ''
+                    this.dataForm.caseExpression = ''
+                    this.dataForm.caseSwitchList = ''
+                    this.dataForm.inputParams = ''
+                    this.dataForm.outputParams = ''
+                    this.dataForm.subWorkFlow = ''
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             })
           }
         })
       },
+      onSelectedDrug (event, item) {
+        var findVal = this.taskIdlist.find(item => {
+          return item.id === event
+        })
+        this.dataForm.type = findVal.type
+        this.dataFormType = false
+      },
       taskDialgClose () {
         this.visible = false
+        this.dataFormType = true
         this.dataForm.taskId = -1
-        this.dataForm.index = -1
-        this.dataForm.parentTask = -1
+        this.dataForm.index = 1
         this.dataForm.preTask = -1
+        this.dataForm.parentTask = -1
         this.dataForm.taskReferenceName = ''
         this.dataForm.remark = ''
+        this.dataForm.type = ''
+        this.dataForm.caseValueParam = ''
+        this.dataForm.caseExpression = ''
+        this.dataForm.caseSwitchList = ''
+        this.dataForm.inputParams = ''
+        this.dataForm.outputParams = ''
+        this.dataForm.subWorkFlow = ''
         this.preTasklist = []
         this.parentTasklist = []
         this.indexlist = []

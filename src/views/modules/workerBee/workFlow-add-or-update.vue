@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'"  @close="datano" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
     <el-form-item label="工作流名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="工作流名称"/>
@@ -16,6 +16,9 @@
     <el-form-item label="返回结果" prop="outputParameters">
       <el-input v-model="dataForm.outputParameters" placeholder="返回结果"/>
     </el-form-item>
+     <el-form-item label="版本" prop="version">
+      <el-input v-model="dataForm.version" placeholder="版本"/>
+    </el-form-item>
     <el-form-item label="描述">
       <el-input v-model="dataForm.description" placeholder="描述"/>
     </el-form-item>
@@ -30,9 +33,6 @@
           <el-radio :label="0">不重试</el-radio>
           <el-radio :label="1">重试</el-radio>
         </el-radio-group>
-    </el-form-item>
-    <el-form-item label="版本">
-      <el-input v-model="dataForm.version" placeholder="版本"/>
     </el-form-item>
     <!-- <el-form-item label="Tasks">
       <el-input v-model="dataForm.tasks" placeholder="Tasks"/>
@@ -79,6 +79,9 @@
           ],
           outputParameters: [
             { required: true, message: '返回结果不能为空', trigger: 'blur' }
+          ],
+          version: [
+            { required: true, message: '版本不能为空', trigger: 'blur' }
           ]
         },
         updateId: ''
@@ -109,7 +112,6 @@
                 this.dataForm.ownerApp = data.data.ownerApp
                 this.dataForm.restartable = data.data.restartable
                 this.dataForm.schemaVersion = data.data.schemaVersion
-                // this.dataForm.tasks = data.data.tasks
                 this.dataForm.version = data.data.version
               }
             })
@@ -131,11 +133,13 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
-                    this.resetForm()
+                    this.dataForm.description = ''
+                    this.dataForm.createdBy = ''
+                    this.dataForm.ownerApp = ''
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             })
           }
@@ -143,10 +147,9 @@
       },
       datano () {
         this.visible = false
-        this.resetForm()
-      },
-      resetForm (dataForm) {
-        this.$refs[dataForm].resetFields()
+        this.dataForm.description = ''
+        this.dataForm.createdBy = ''
+        this.dataForm.ownerApp = ''
       }
     }
   }

@@ -20,8 +20,8 @@
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-button type="text" @click="clickSketchMap(scope.row.id)">预览工作流</el-button>
-          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改工作流</el-button>
+          <el-button type="text" @click="clickSketchMap(scope.row.id,scope.row)">预览</el-button>
+          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" @click="clickFlowEdit(scope.row.id)">任务关系</el-button>
           <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
         </template>
@@ -42,7 +42,7 @@
       fullscreen
       style="max-height: 100vh"
       :visible.sync="visible">
-      <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" @refreshDataList="getDataList"/>
+      <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" :list="list" @refreshDataList="getDataList"/>
     </el-dialog>
     <!-- 删除弹窗 -->
     <el-dialog
@@ -80,6 +80,7 @@
         dataList: [],
         dataAllList: {},
         workerBee: '',
+        list: '',
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
         totalPage: 0,
@@ -166,8 +167,9 @@
         })
       },
       /** 查看示意图 */
-      clickSketchMap (value) {
+      clickSketchMap (value, list) {
         this.visible = true
+        this.list = list
         this.workerBee = value
         this.getDataFlowList()
       },

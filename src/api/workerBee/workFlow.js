@@ -11,3 +11,4 @@ export const workFlowTaskList = (params, flag) => httpGet(gf + '/bee/workflowtas
 export const saveWorkTaskFlow = (params) => httpPost(gf + '/bee/workflowtask/add', params) // 新增表单提交
 export const getAllBeeTaskList = (params, flag) => httpPost(gf + '/beeTask/getAllBeeTaskList', params, flag) // 工作流任务关系列表
 export const getTaskDefWithWorkFlowTask = (params) => httpGet(gf + `/bee/workflow/getshowPicWorkFlowTask/${params}`) // 初始化列表
+export const getNotBaseTypeList = () => httpGet(gf + '/beeTask/getNotBaseTypeList') // 初始化TYPE列表

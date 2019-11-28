@@ -2,19 +2,31 @@
   <div>
     <el-button type="primary" icon="el-icon-zoom-in" @click="enlarge()" style="margin-bottom: 20px;"/>
     <el-button type="primary" icon="el-icon-zoom-out" @click="narrow()" style="margin-bottom: 20px;"/>
-    <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <el-tooltip class="item" effect="dark" :content='intParameterValue' placement="top-start">
+      <el-button type="primary" style="margin-bottom: 20px;">流程入参</el-button>
+    </el-tooltip>
+    <el-tooltip class="item" effect="dark" :content='outParameterValue' placement="top-start">
+      <el-button type="primary" style="margin-bottom: 20px;">流程出参</el-button>
+    </el-tooltip>
+    <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"/>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
+    <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="addSubProcess"/>
   </div>
 </template>
 
 <script>
 import go from 'gojs'
 import AddOrUpdate from './workFlowChart-add-or-update'
+import workFlowChartChairle from './workFlowChartChairle'
 
 export default{
   props:
   {
     dataAllList: {
+      type: Object,
+      default: () => {}
+    },
+    list: {
       type: Object,
       default: () => {}
     }
@@ -24,21 +36,26 @@ export default{
       this.init()
     }
   },
-  // props: ['dataAllList'],
   data () {
     return {
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      workFlowChartChairlevisible: false,
+      intParameterValue: '流程入参',
+      outParameterValue: '流程出参'
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    workFlowChartChairle
   },
   mounted () {
     this.init()
   },
-
   methods: {
     init () {
+      console.log(this.list, 'list')
+      this.intParameterValue = this.list.inputParameters
+      this.outParameterValue = this.list.outputParameters
       var mySelf = this
       if (mySelf.myDiagram) {
         this.myDiagram.div = null
@@ -54,8 +71,8 @@ export default{
             layout:
               $(go.TreeLayout,
                 { angle: 90, arrangement: go.TreeLayout.ArrangementFixedRoots }),
-            'undoManager.isEnabled': true
-            // isReadOnly: true // 只读
+            'undoManager.isEnabled': true,
+            isReadOnly: true // 只读
           })
       mySelf.myDiagram.nodeTemplateMap.add('Start',
           $(go.Node, 'Auto',
@@ -139,10 +156,27 @@ export default{
       //   {from: '5', to: '7', answer: null},
       //   {from: '4', to: '5', answer: null}
       // ]
+      // 查看
       mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
-        mySelf.addOrUpdateVisible = true
+        if (e.subject.part.data.category === 'Start' || e.subject.part.data.category === 'End') {
+          mySelf.addOrUpdateVisible = false
+        } else {
+          mySelf.addOrUpdateVisible = true
+        }
         mySelf.$nextTick(() => {
           mySelf.$refs.addOrUpdate.init(e.subject.part.data.key, '查看')
+        })
+      })
+      // 右击查看子流程
+      mySelf.myDiagram.addDiagramListener('ObjectContextClicked', function (e) {
+        var part = e.subject.part
+        if (part.data.category === 'Start' || part.data.category === 'End') {
+          mySelf.workFlowChartChairlevisible = false
+        } else {
+          mySelf.workFlowChartChairlevisible = true
+        }
+        mySelf.$nextTick(() => {
+          mySelf.$refs.addSubProcess.init(part.data.key, '子流程')
         })
       })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
@@ -155,7 +189,6 @@ export default{
           linkDataArray: this.dataAllList.linkDataArrays
         })
     },
-
     // 放大事件
     enlarge () {
       var mySelf = this

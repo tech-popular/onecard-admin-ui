@@ -3,14 +3,15 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <div class="brand-info">
-          <h2 class="brand-info__text">蜂巢系统</h2>
+          <h2 class="brand-info__text">金丝雀系统</h2>
           <p class="brand-info__intro">提供平台的全方位的报警监控。</p>
         </div>
-        <div class="login-main">
-          <h3 class="login-title">管理员登录</h3>
+        <!-- 账号密码登录 -->
+        <div class="login-main" v-show="type">
+          <h3 class="login-title">账号密码登录</h3>
           <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
-            <el-form-item prop="userName">
-              <el-input v-model="dataForm.userName" placeholder="帐号"></el-input>
+            <el-form-item prop="username">
+              <el-input v-model="dataForm.username" placeholder="邮箱"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
@@ -26,8 +27,49 @@
                 </el-col>
               </el-row>
             </el-form-item>
+            <!-- <p class='forgetPass' @click="forgetPass">忘记密码</p> -->
             <el-form-item>
-              <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit()">登录</el-button>
+              <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')">登录</el-button>
+            </el-form-item>
+            <el-form-item>
+              <p class='loginMethod' @click="changeType">手机验证码登录</p>
+            </el-form-item>
+          </el-form>
+        </div>
+        <!-- 手机验证码登录 -->
+        <div class="login-main" v-show="!type">
+          <h3 class="login-title">手机验证码登录</h3>
+          <el-form :model="dataElseForm" :rules="elseRule" ref="dataElseForm" @keyup.enter.native="dataFormSubmit()" status-icon>
+            <el-form-item prop="mobile">
+              <el-input v-model="dataElseForm.mobile" placeholder="手机号"></el-input>
+            </el-form-item>
+            <el-form-item prop="captcha">
+              <el-row :gutter="20">
+                <el-col :span="14">
+                  <el-input v-model="dataElseForm.captcha" placeholder="验证码" @blur='checkCaptcha'>
+                  </el-input>
+                </el-col>
+                <el-col :span="10" class="login-captcha">
+                  <img :src="phoneCaptchaPath" @click="getPhoneCaptcha()" alt="">
+                </el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item prop="verifyCode">
+              <el-row :gutter="20">
+                <el-col :span="14">
+                  <el-input v-model="dataElseForm.verifyCode" placeholder="短信验证码">
+                  </el-input>
+                </el-col>
+                <el-col :span="10" class="login-captcha">
+                  <el-button class="code" type="primary" @click="getCode()" :disabled="timer ? true : false">{{timer ? time + 's' : '获取验证码'}}</el-button>
+                </el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item>
+              <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataElseForm')">登录</el-button>
+            </el-form-item>
+            <el-form-item>
+              <p class='loginMethod' @click="changeType">账号密码登录</p>
             </el-form-item>
           </el-form>
         </div>
@@ -38,18 +80,65 @@
 
 <script>
   import { getUUID } from '@/utils'
+  import { loginIn, sendCode, checkCaptcha } from '@/api/account'
+  import { isMobile } from '@/utils/validate'
   export default {
     data () {
+      // var validateEmail = async (rule, value, callback) => {
+      //   const reg = new RegExp(/9fbank|ithro/)
+      //   if (!value) {
+      //     callback(new Error('邮箱不能为空'))
+      //   } else if (!reg.test(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else if (!isEmail(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else if (!await this.checkEmail(value)) { // 校验 库里 是否有该邮箱
+      //     callback(new Error('该账号尚未开通权限'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
+      var validateMobile = async (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('手机号不能为空'))
+        } else if (!isMobile(value)) {
+          callback(new Error('手机号格式有误'))
+        } else {
+          callback()
+        }
+      }
+      var validateCaptcha = async (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('图片验证码不能为空'))
+        } else if (!await this.checkCaptcha()) {
+          callback(new Error('图片验证码输入有误'))
+        } else {
+          callback()
+        }
+      }
       return {
+        ifTrueCaptcha: false,
+        type: true,
+        if_code: false,
+        dataElseForm: {
+          mobile: '',
+          captcha: '',
+          verifyCode: '',
+          uuid: ''
+        },
         dataForm: {
-          userName: '',
+          // email: '',
+          username: '',
           password: '',
           uuid: '',
           captcha: ''
         },
         dataRule: {
-          userName: [
-            { required: true, message: '帐号不能为空', trigger: 'blur' }
+          // email: [
+          //   { required: true, trigger: 'blur', validator: validateEmail }
+          // ],
+          username: [
+            { required: true, message: '账号不能为空', trigger: 'blur' }
           ],
           password: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -58,27 +147,38 @@
             { required: true, message: '验证码不能为空', trigger: 'blur' }
           ]
         },
-        captchaPath: ''
+        elseRule: {
+          mobile: [
+            { required: true, trigger: 'blur', validator: validateMobile }
+          ],
+          captcha: [
+            { required: true, trigger: 'blur', validator: validateCaptcha }
+          ]
+          // verifyCode: [
+          //   { required: true, message: '短信验证码不能为空', trigger: 'blur' }
+          // ]
+        },
+        captchaPath: '',
+        phoneCaptchaPath: '',
+        time: 60,
+        timer: null
       }
     },
     created () {
       this.getCaptcha()
+      this.getPhoneCaptcha()
     },
     methods: {
       // 提交表单
-      dataFormSubmit () {
-        this.$refs['dataForm'].validate((valid) => {
+      dataFormSubmit (form) {
+        this.$refs[form].validate((valid) => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl('/sys/login'),
-              method: 'post',
-              data: this.$http.adornData({
-                'username': this.dataForm.userName,
-                'password': this.dataForm.password,
-                'uuid': this.dataForm.uuid,
-                'captcha': this.dataForm.captcha
-              })
-            }).then(({data}) => {
+            const params = form == 'dataForm' ? this.dataForm : {
+              mobile: this.dataElseForm.mobile,
+              verifyCode: this.dataElseForm.verifyCode
+            }
+            const url = form == 'dataForm' ? '/sys/login' : '/sys/mobileLogin'
+            loginIn(params, url).then(({data}) => {
               if (data && data.code === 0) {
                 this.$cookie.set('token', data.token)
                 this.$router.replace({ name: 'home' })
@@ -92,8 +192,71 @@
       },
       // 获取验证码
       getCaptcha () {
-        this.dataForm.uuid = getUUID()
-        this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
+        const uuid = getUUID()
+        this.dataForm.uuid = uuid
+        this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${uuid}`)
+      },
+      getPhoneCaptcha () {
+        const uuid = getUUID()
+        this.dataElseForm.uuid = uuid
+        this.phoneCaptchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${uuid}`)
+      },
+      // 切换 登录方式
+      changeType () {
+        this.type = !this.type
+      },
+      // 忘记密码
+      forgetPass () {
+
+      },
+      // 获取验证
+      async getCode () {
+        let result = await this.checkCaptcha()
+        if (result) {
+          const data = {
+            mobile: this.dataElseForm.mobile
+          }
+          sendCode(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.$message({
+                message: '短信验证码发送成功',
+                type: 'success'
+              })
+              this.timer = setInterval(() => {
+                this.time--
+                if (this.time <= 0) {
+                  clearInterval(this.timer)
+                  this.time = 60
+                  this.timer = null
+                }
+              }, 1000)
+            } else {
+              this.$message({
+                message: data.msg,
+                type: 'warning'
+              })
+            }
+          })
+        } else {
+          this.$refs.dataElseForm.validateField('captcha')
+        }
+      },
+      // 校验图片验证码
+      async checkCaptcha () {
+        let res = await new Promise(resolve => {
+          const data = {
+            uuid: this.dataElseForm.uuid,
+            captcha: this.dataElseForm.captcha
+          }
+          checkCaptcha(data).then(({data}) => {
+            if (data.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          })
+        })
+        return res
       }
     }
   }
@@ -159,9 +322,25 @@
       width: 470px;
       min-height: 100%;
       background-color: #fff;
+      .forgetPass {
+        color: #17B3A3;
+        cursor: pointer;
+      }
+      .loginMethod {
+        width: 140px;
+        margin: 0 auto;
+        text-align: center;
+        color: #17B3A3;
+        cursor: pointer;
+      }
+      .code {
+        width: 135px;
+      }
     }
     .login-title {
       font-size: 16px;
+      text-align: center;
+      margin: 25px 0;
     }
     .login-captcha {
       overflow: hidden;
@@ -172,7 +351,7 @@
     }
     .login-btn-submit {
       width: 100%;
-      margin-top: 38px;
+      margin-top: 10px;
     }
   }
 </style>
