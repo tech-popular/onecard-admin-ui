@@ -356,7 +356,7 @@ export default {
             if (data && data.code === 0) {
               this.dataForm.name = data.honeycombTask.name
               this.dataForm.inDatasource = data.honeycombTask.inDatasource
-              this.dataForm.computeType = data.honeycombTask.computeType == 'simple' ? '简单类型' : '复杂类型'
+              this.dataForm.computeType = data.honeycombTask.computeType == 'simple' ? '0' : '1'
               this.dataForm.sql = data.honeycombTask.sql
               this.dataForm.period = data.honeycombTask.period
               this.dataForm.transformerConfig =
@@ -430,7 +430,7 @@ export default {
               id: this.dataForm.id || undefined,
               name: this.dataForm.name,
               inDatasource: this.dataForm.inDatasource,
-              computeType: this.dataForm.computeType == '简单类型' ? 'simple' : 'mix',
+              computeType: this.dataForm.computeType,
               sql: this.dataForm.sql,
               period: this.dataForm.period,
               transformerConfig: this.dataForm.transformerConfig,
