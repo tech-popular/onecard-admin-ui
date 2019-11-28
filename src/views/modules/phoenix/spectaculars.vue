@@ -296,7 +296,7 @@ export default {
     selectGet () {
       this.arr = []
       this.apiItems = []
-      this.quadrantList = []
+      this.quadrantList = {}
       this.lineList = []
       this.simpleList = []
       this.queryList()
@@ -519,17 +519,15 @@ export default {
     // 四象限 数据处理
     quadrantConfig (tem) {
       this.quadrantList = tem.legend.extend
-      let { a, b, c, d } = this.quadrantList.quadrant
-      this.quadrantList.quadrant = {...c, ...d, ...a, ...b}
-      // let arr = []
-      // for (let key in this.quadrantList.quadrant) {
-      //   arr.push({
-      //     name: key,
-      //     value: this.quadrantList.quadrant[key]
-      //   })
-      // }
-      // this.quadrantList.quadrant = arr
-      // console.log(this.quadrantList.quadrant)
+      let arr = []
+      for (let key in this.quadrantList.quadrant) {
+        arr.push({
+          name: key,
+          value: this.quadrantList.quadrant[key]
+        })
+      }
+      const newArr = arr.splice(0, 2)
+      this.quadrantList.quadrant = [...arr, ...newArr]
     },
     // line 折现数据处理
     lineConfig (tem) {

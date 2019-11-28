@@ -22,9 +22,9 @@
           </div>
         </div>
         <div class="quadrantLeftRight">
-          <div :key="index" v-for="(value, key, index) in quadrantList.quadrant">
-            <p>{{key}}</p>
-            <ul :key="indexList" v-for="(valueList, keyList, indexList) in value">
+          <div :key="index" v-for="(item, index) in quadrantList.quadrant">
+            <p>{{item.name}}</p>
+            <ul :key="indexList" v-for="(valueList, keyList, indexList) in item.value">
               <li>
                 {{valueList.metric}}{{valueList.metric_unit}}
                 <span
