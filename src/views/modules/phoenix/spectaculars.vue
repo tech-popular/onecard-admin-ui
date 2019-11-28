@@ -12,26 +12,23 @@
     </el-alert>
     <!-- 授信路径监控 -->
     <one-credit
-      v-if="mark == '1' && !ifMockTest"
       :arr="arr"
       :selection="selection"
       :selectedList="selectedList"
       @checkNode="checkNode"
     ></one-credit>
-    <one-test v-if="mark == '1' && ifMockTest"></one-test>
+    <!-- <one-test v-if="mark == '1' && ifMockTest"></one-test> -->
     <!-- 彩虹评级期限 -->
     <two-rainbow
-      v-if="mark == '2' && !ifMockTest"
       :options="options"
       :optionIds="optionIds"
       :arr="arr"
       :hadSelectedList="hadSelectedList"
       @checkNode="checkNode"
     ></two-rainbow>
-    <two-test v-if="mark == '2' && ifMockTest"></two-test>
+    <!-- <two-test v-if="mark == '2' && ifMockTest"></two-test> -->
     <!-- 机构资金监控 -->
     <three-monitor
-      v-if="mark == '3' && !ifMockTest"
       :simpleList="simpleList"
       :barRightList="barRightList"
       :options="options"
@@ -39,17 +36,16 @@
       :hadSelectedList="hadSelectedList"
       @checkNode="checkNode"
     ></three-monitor>
-    <three-test v-if="mark == '3' && ifMockTest"></three-test>
+    <!-- <three-test v-if="mark == '3' && ifMockTest"></three-test> -->
     <!-- 四象限&&小卡 -->
-    <four-quadrant v-if="mark == '4' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
-    <four-test v-if="mark == '4' && ifMockTest"></four-test>
+    <four-quadrant v-if='quadrantList.length' :quadrantList="quadrantList"></four-quadrant>
+    <!-- <four-test v-if="mark == '4' && ifMockTest"></four-test> -->
     <!-- 渠道整体转化率 -->
     <five-funnel
-      v-if="mark == '5' && !ifMockTest"
       :arr="arr"
       @checkNode="checkNode"
     ></five-funnel>
-    <five-test v-if="mark == '5' && ifMockTest"></five-test>
+    <!-- <five-test v-if="mark == '5' && ifMockTest"></five-test> -->
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
@@ -522,7 +518,6 @@ export default {
       const newArr = arr.splice(0, 2)
       tem.legend.extend.quadrant = [...arr, ...newArr]
       this.quadrantList = tem.legend.extend
-      console.log(this.quadrantList)
     },
     // line 折现数据处理
     lineConfig (tem) {

@@ -11,7 +11,8 @@
             :defaultCheckNodes="hadSelectedList[index]"
             @checkNode="checkNode"
           ></select-tree>
-          <span v-if="index == 0">{{outdata.name}}</span>
+          <span v-if="index == 0" class="twoNameToday">{{outdata.series[0].name}}</span>
+          <span v-if="index == 0" class="twoNameYesday">{{outdata.series[1].name}}</span>
           <div :id="'J_chartLineBox' + outdata.id" class="chart-box"></div>
         </el-card>
         <funnel :outdata="outdata"/>
@@ -87,5 +88,18 @@ export default {
 li {
   list-style: none;
 }
-
+.twoNameToday {
+  position: absolute;
+  left: 48%;
+  top: 25%;
+  z-index: 100;
+  color: #000;
+}
+.twoNameYesday {
+  position: absolute;
+  left: 48%;
+  top: 45%;
+  z-index: 100;
+  color: #000;
+}
 </style>
