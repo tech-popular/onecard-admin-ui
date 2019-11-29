@@ -24,7 +24,7 @@
           <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" @click="clickFlowEdit(scope.row.id)">任务关系</el-button>
           <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
-          <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button>
+          <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
         </template>
       </el-table-column>
     </el-table>
