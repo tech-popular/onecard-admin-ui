@@ -10,7 +10,8 @@
     </el-tooltip>
     <div class="tag-group" style="margin-bottom: 20px; color:'#fff'">
       <span class="tag-group__title">节点颜色值：</span>
-      <el-button type="primary" size="mini" style="background: #103a87; border:none">THTTP</el-button>
+      <el-button type="primary" size="mini" style="background: #538779; border:none">条件</el-button>
+      <el-button type="primary" size="mini" style="background: #103a87; border:none">HTTP</el-button>
       <el-button type="primary" size="mini" style="background: #6d89b1; border:none">JDBC</el-button>
       <el-button type="primary" size="mini" style="background: #ed6e19; border:none">KAFKA</el-button>
       <el-button type="primary" size="mini" style="background: #e39f24; border:none">GROOVY</el-button>
@@ -108,7 +109,7 @@ export default{
           $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
         )
       )
-      mySelf.myDiagram.nodeTemplateMap.add('THTTP',
+      mySelf.myDiagram.nodeTemplateMap.add('HTTP',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#103a87' }),
@@ -295,8 +296,15 @@ export default{
 }
  </script>
 <style lang="scss" scoped>
-.yulan{
-  position:absolute;
-  background: red;
-}
+.diamond{   
+  width: 20px;   
+  height: 20px;   
+  border:none;
+  background-color: #538779;   
+  transform:rotate(45deg);   
+  -ms-transform:rotate(45deg); /* Internet Explorer */   
+  -moz-transform:rotate(45deg); /* Firefox */  
+   -webkit-transform:rotate(45deg); /* Safari 和 Chrome */   
+   -o-transform:rotate(45deg); /* Opera */   
+   margin:50px auto;/*让菱形浏览器上居中*/  }
 </style>
