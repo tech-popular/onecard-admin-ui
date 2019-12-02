@@ -6,11 +6,24 @@
       <el-button type="primary" style="margin-bottom: 20px;">流程入参</el-button>
     </el-tooltip>
     <el-tooltip class="item" effect="dark" :content='outParameterValue' placement="top-start">
-      <el-button type="primary" style="margin-bottom: 20px;">流程出参</el-button>
+      <el-button type="primary" style="margin-bottom: 20px">流程出参</el-button>
     </el-tooltip>
+    <div class="tag-group" style="margin-bottom: 20px; color:'#fff'">
+      <span class="tag-group__title">节点颜色值：</span>
+      <el-button type="primary" size="mini" style="background: #103a87; border:none">HTTP</el-button>
+      <el-button type="primary" size="mini" style="background: #6d89b1; border:none">JDBC</el-button>
+      <el-button type="primary" size="mini" style="background: #ed6e19; border:none">KAFKA</el-button>
+      <el-button type="primary" size="mini" style="background: #e39f24; border:none">GROOVY</el-button>
+      <el-button type="primary" size="mini" style="background: #e559f2; border:none">DECISION</el-button>
+      <el-button type="primary" size="mini" style="background: #8859f2; border:none">CASSANDRA</el-button>
+      <el-button type="primary" size="mini" style="background: #863816; border:none">AVIATOR</el-button>
+      <el-button type="primary" size="mini" style="background: #f43574; border:none">FORK_JOIN</el-button>
+      <el-button type="primary" size="mini" style="background: #430b98; border:none">JOIN</el-button>
+      <el-button type="primary" size="mini" style="background: #065361; border:none">SUB_WORKFLOW</el-button>
+    </div>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
-    <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="workFlowChartChairle"/>
+    <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="addSubProcess"/>
   </div>
 </template>
 
@@ -36,7 +49,6 @@ export default{
       this.init()
     }
   },
-  // props: ['dataAllList'],
   data () {
     return {
       addOrUpdateVisible: false,
@@ -52,10 +64,8 @@ export default{
   mounted () {
     this.init()
   },
-
   methods: {
     init () {
-      console.log(this.list, 'list')
       this.intParameterValue = this.list.inputParameters
       this.outParameterValue = this.list.outputParameters
       var mySelf = this
@@ -85,7 +95,7 @@ export default{
       mySelf.myDiagram.nodeTemplateMap.add('Judge',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
-          $(go.Shape, 'Diamond', {fill: '#538779'}),
+          $(go.Shape, 'Diamond', {fill: '#e559f2'}),
           $(go.TextBlock, { stroke: '#fff', margin: 8 }, new go.Binding('text'))
         )
       )
@@ -93,6 +103,76 @@ export default{
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#58ce7a' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('HTTP',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#103a87' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('JDBC',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#6d89b1' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('KAFKA',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#ed6e19' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('GROOVY',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#e39f24' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('DECISION',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#e559f2' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('CASSANDRA',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#8859f2' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('AVIATOR',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#863816' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('FORK_JOIN',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#f43574' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('JOIN',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#430b98' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('SUB_WORKFLOW',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#065361' }),
           $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
         )
       )
@@ -116,8 +196,8 @@ export default{
             reshapable: true,
             resegmentable: true,
             // 鼠标悬停巧妙地突出显示链接:
-            mouseEnter: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'rgba(30,144,255,0.2)' },
-            mouseLeave: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'transparent' },
+            // mouseEnter: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'rgba(30,144,255,0.2)' },
+            // mouseLeave: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'transparent' },
             selectionAdorned: false
           },
           new go.Binding('points').makeTwoWay(),
@@ -139,10 +219,10 @@ export default{
           )
         )
       // var nodeDataArray = [
-      //   {key: '0', text: '工作流预览', category: 'Start'},
-      //   {key: '1', text: '数据1', category: 'Condition', dital: '这是详情'},
-      //   {key: '2', text: '数据数据数据数据2', category: 'Condition', dital: '这是详情2'},
-      //   {key: '3', text: '数据3', category: 'Condition', dital: '这是详情3'},
+      //   {key: '0', text: '工作流预览', category: 'Start', color: ''},
+      //   {key: '1', text: 'http', category: 'THTTP', dital: '这是详情'},
+      //   {key: '2', text: 'jdbk', category: 'JDBC', dital: '这是详情2'},
+      //   {key: '3', text: 'json', category: 'Condition', dital: '这是详情3'},
       //   {key: '4', text: '数据4', category: 'Condition', dital: '这是详情4'},
       //   {key: '5', text: '条件500000000000000', category: 'Judge'},
       //   {key: '6', text: '数据5', category: 'Condition', dital: '这是详情5'},
@@ -172,7 +252,21 @@ export default{
       // 右击查看子流程
       mySelf.myDiagram.addDiagramListener('ObjectContextClicked', function (e) {
         var part = e.subject.part
-        console.log(part.key, '右击事件')
+        if (part.data.subWorkFlow) {
+          if (part.data.category === 'Start' || part.data.category === 'End') {
+            mySelf.workFlowChartChairlevisible = false
+          } else {
+            mySelf.workFlowChartChairlevisible = true
+          }
+          mySelf.$nextTick(() => {
+            mySelf.$refs.addSubProcess.init(part.data.subWorkFlow, '子流程')
+          })
+        } else {
+          mySelf.$message({
+            message: '没有子流程哦!',
+            type: 'warning'
+          })
+        }
       })
       mySelf.myDiagram.model = $(go.GraphLinksModel,
         {
@@ -183,10 +277,6 @@ export default{
           nodeDataArray: this.dataAllList.nodeDataArrays,
           linkDataArray: this.dataAllList.linkDataArrays
         })
-    },
-    // 双击执行的方法
-    handlerDC (e, obj) {
-      console.log(e, obj, 'ppppx')
     },
     // 放大事件
     enlarge () {
@@ -203,5 +293,15 @@ export default{
 }
  </script>
 <style lang="scss" scoped>
-
+.diamond{   
+  width: 20px;   
+  height: 20px;   
+  border:none;
+  background-color: #538779;   
+  transform:rotate(45deg);   
+  -ms-transform:rotate(45deg); /* Internet Explorer */   
+  -moz-transform:rotate(45deg); /* Firefox */  
+   -webkit-transform:rotate(45deg); /* Safari 和 Chrome */   
+   -o-transform:rotate(45deg); /* Opera */   
+   margin:50px auto;/*让菱形浏览器上居中*/  }
 </style>
