@@ -2,16 +2,16 @@
   <el-dialog title="子流程" :modal-append-to-body='false' :append-to-body="true" @close="showClisk" :visible.sync="visible">
     <div class="tag-group" style="margin-bottom: 20px; color:'#fff'">
       <span class="tag-group__title">节点颜色值：</span>
-      <el-button type="primary" size="mini" style="background: #103a87; border:none">HTTP</el-button>
-      <el-button type="primary" size="mini" style="background: #6d89b1; border:none">JDBC</el-button>
-      <el-button type="primary" size="mini" style="background: #ed6e19; border:none">KAFKA</el-button>
-      <el-button type="primary" size="mini" style="background: #e39f24; border:none">GROOVY</el-button>
-      <el-button type="primary" size="mini" style="background: #e559f2; border:none">DECISION</el-button>
-      <el-button type="primary" size="mini" style="background: #8859f2; border:none">CASSANDRA</el-button>
-      <el-button type="primary" size="mini" style="background: #863816; border:none">AVIATOR</el-button>
-      <el-button type="primary" size="mini" style="background: #f43574; border:none">FORK_JOIN</el-button>
-      <el-button type="primary" size="mini" style="background: #430b98; border:none">JOIN</el-button>
-      <el-button type="primary" size="mini" style="background: #065361; border:none">SUB_WORKFLOW</el-button>
+        <el-button type="primary" size="mini" style="background: #103a87; border:none; margin-top: 5px">HTTP</el-button>
+        <el-button type="primary" size="mini" style="background: #6d89b1; border:none; margin-top: 5px">JDBC</el-button>
+        <el-button type="primary" size="mini" style="background: #ed6e19; border:none; margin-top: 5px">KAFKA</el-button>
+        <el-button type="primary" size="mini" style="background: #e39f24; border:none; margin-top: 5px">GROOVY</el-button>
+        <el-button type="primary" size="mini" style="background: #e559f2; border:none; margin-top: 5px">DECISION</el-button>
+        <el-button type="primary" size="mini" style="background: #8859f2; border:none; margin-top: 5px">CASSANDRA</el-button>
+        <el-button type="primary" size="mini" style="background: #863816; border:none; margin-top: 5px">AVIATOR</el-button>
+        <el-button type="primary" size="mini" style="background: #f43574; border:none; margin-top: 5px">FORK_JOIN</el-button>
+        <el-button type="primary" size="mini" style="background: #430b98; border:none; margin-top: 5px">JOIN</el-button>
+        <el-button type="primary" size="mini" style="background: #065361; border:none; margin-top: 5px">SUB_WORKFLOW</el-button>
     </div>
     <div id="mySubProcess" style="width:100%; height:650px; background-color: #ccc;"/>
   </el-dialog>
