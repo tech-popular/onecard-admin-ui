@@ -116,6 +116,7 @@
 
 <script>
   import AddOrUpdate from './user-add-or-update'
+  import { getRolesList } from '@/api/account'
   export default {
     data () {
       return {
@@ -123,7 +124,7 @@
           userName: '',
           email: '',
           mobile: '',
-          role: ''
+          roleId: ''
         },
         dataList: [],
         roles: [],
@@ -141,7 +142,15 @@
     activated () {
       this.getDataList()
     },
+    mounted () {
+      this.getRoles()
+    },
     methods: {
+      getRoles () {
+        getRolesList().then((res) => {
+          console.log(res)
+        })
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -151,7 +160,10 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'username': this.dataForm.userName
+            'username': this.dataForm.userName,
+            'email': this.dataForm.email,
+            'mobile': this.dataForm.mobile,
+            'roleId': this.dataForm.roleId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {

@@ -49,6 +49,7 @@
 
 <script>
   import { isEmail, isMobile } from '@/utils/validate'
+  import { checkUserName, checkMobile } from '@/api/account'
   export default {
     data () {
       var validatePassword = (rule, value, callback) => {
@@ -81,9 +82,20 @@
           callback()
         }
       }
-      var validateMobile = (rule, value, callback) => {
+      var validateMobile = async (rule, value, callback) => {
         if (!isMobile(value)) {
           callback(new Error('手机号格式错误'))
+        } else if (!await this.checkIfMobile()) {
+          callback(new Error('该手机号已被注册'))
+        } else {
+          callback()
+        }
+      }
+      var validateUserName = async (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('用户名不能为空'))
+        } else if (!await this.checkIfMobile()) {
+          callback(new Error('用户名已经存在'))
         } else {
           callback()
         }
@@ -107,7 +119,7 @@
         systenantList: [],
         dataRule: {
           userName: [
-            { required: true, message: '用户名不能为空', trigger: 'blur' }
+            { required: true, validator: validateUserName, trigger: 'blur' }
           ],
           password: [
             { validator: validatePassword, trigger: 'blur' }
@@ -217,6 +229,28 @@
             this.dataForm.ismodifyPasswd = ''
           }
         })
+      },
+      async checkIfUsername () {
+        const data = {
+          userName: this.dataForm.userName
+        }
+        let res = await new Promise(resolve => {
+          checkUserName(data).then(() => {
+
+          })
+        })
+        return res
+      },
+      async checkIfMobile () {
+        let res = await new Promise(resolve => {
+          const data = {
+            mobile: this.dataForm.mobile
+          }
+          checkMobile(data).then(() => {
+
+          })
+        })
+        return res
       }
     }
   }

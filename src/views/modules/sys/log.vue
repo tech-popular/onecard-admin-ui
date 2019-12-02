@@ -95,7 +95,9 @@ export default {
         params: this.$http.adornParams({
           page: this.pageIndex,
           limit: this.pageSize,
-          key: this.dataForm.key
+          key: this.dataForm.key,
+          startTime: this.dataForm.time[0],
+          endTime: this.dataForm.time[1]
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {

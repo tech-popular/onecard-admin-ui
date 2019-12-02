@@ -1,6 +1,6 @@
 <template>
   <div class="mod-demo-echarts" id='dashboard'>
-    <el-alert title type="warning" v-if="list.items && list.items.length > 0" :closable="false">
+    <!-- <el-alert title type="warning" v-if="list.items && list.items.length > 0" :closable="false">
       <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
         <el-option
           v-for="item in list.items"
@@ -9,26 +9,39 @@
           :value="item.name"
         ></el-option>
       </el-select>
-    </el-alert>
+    </el-alert> -->
+    <el-card class="box-card" v-if="list.items && list.items.length > 0">
+      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
+        <el-option
+          v-for="item in list.items"
+          :key="item.name"
+          :label="item.value"
+          :value="item.name"
+        ></el-option>
+      </el-select>
+    </el-card>
     <!-- 授信路径监控 -->
     <one-credit
+      v-if="type == '1' && !ifMockTest"
       :arr="arr"
       :selection="selection"
       :selectedList="selectedList"
       @checkNode="checkNode"
     ></one-credit>
-    <!-- <one-test v-if="mark == '1' && ifMockTest"></one-test> -->
+    <one-test v-if="type == '1' && ifMockTest"></one-test>
     <!-- 彩虹评级期限 -->
     <two-rainbow
+      v-if="type == '2' && !ifMockTest"
       :options="options"
       :optionIds="optionIds"
       :arr="arr"
       :hadSelectedList="hadSelectedList"
       @checkNode="checkNode"
     ></two-rainbow>
-    <!-- <two-test v-if="mark == '2' && ifMockTest"></two-test> -->
+    <two-test v-if="type == '2' && ifMockTest"></two-test>
     <!-- 机构资金监控 -->
     <three-monitor
+      v-if="type == '3' && !ifMockTest"
       :simpleList="simpleList"
       :barRightList="barRightList"
       :options="options"
@@ -36,16 +49,17 @@
       :hadSelectedList="hadSelectedList"
       @checkNode="checkNode"
     ></three-monitor>
-    <!-- <three-test v-if="mark == '3' && ifMockTest"></three-test> -->
+    <three-test v-if="type == '3' && ifMockTest"></three-test>
     <!-- 四象限&&小卡 -->
-    <four-quadrant v-if='quadrantList.length' :quadrantList="quadrantList"></four-quadrant>
-    <!-- <four-test v-if="mark == '4' && ifMockTest"></four-test> -->
+    <four-quadrant v-if="type == '6' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
+    <four-test v-if="type == '6' && ifMockTest"></four-test>
     <!-- 渠道整体转化率 -->
     <five-funnel
+      v-if="type == '5' && !ifMockTest"
       :arr="arr"
       @checkNode="checkNode"
     ></five-funnel>
-    <!-- <five-test v-if="mark == '5' && ifMockTest"></five-test> -->
+    <five-test v-if="type == '5' && ifMockTest"></five-test>
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
@@ -85,7 +99,6 @@ export default {
       visualizes: [],
       arr: [], // 有几个图表
       visibleChange: false,
-      apiItems: [],
       visualizeId: 1, // 图表筛选框
       selection: [],
       lineList: [], // 框框加折线图数据
@@ -93,6 +106,7 @@ export default {
       quadrantList: {}, // 四象限数据
       defaultSelection: [], // 调用默认接口存的数据
       mark: '', // 区分是哪个列表点过来的
+      type: '', // 区分是什么类型的大屏
       selectedList: {},
       timer: null, // 定时器
       ifMockTest: true,
@@ -142,6 +156,7 @@ export default {
         this.hadSelectedList = []
         this.hadSelectedParamsList = []
         this.mark = getQueryString('mark')
+        this.type = getQueryString('type')
         if (this.mark == '5') {
           this.visualizeSelection = this.params5
         } else {
@@ -153,6 +168,7 @@ export default {
   },
   created () {
     this.mark = getQueryString('mark')
+    this.type = getQueryString('type')
   },
   mounted () {
     if (!this.sidebarFold) {
@@ -291,7 +307,6 @@ export default {
     },
     selectGet () {
       this.arr = []
-      this.apiItems = []
       this.quadrantList = {}
       this.lineList = []
       this.simpleList = []
@@ -315,7 +330,7 @@ export default {
       tem['tooltip'] = chartsConfig.tooltip
       if (this.mark == '2' && (index == 1 || index == 3)) {
         tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
-        tem.series[1].stack = '11'
+        tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
         tem.series[1].type = 'bar'
       }
       if (this.mark == '3' && tem.positi && tem.positi == 'right') {
@@ -347,6 +362,8 @@ export default {
       tem.title.textStyle = {
         fontSize: '12'
       }
+      tem.color[1] = '#eee'
+      tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
       this.barRightList.push(tem)
     },
     // 对柱状图的legend 做统一处理
@@ -569,6 +586,9 @@ export default {
 
 <style lang="scss">
 .mod-demo-echarts {
+  .box-card {
+    margin-bottom: 8px;
+  }
   .el-card__body {
     padding: 10px;
   }

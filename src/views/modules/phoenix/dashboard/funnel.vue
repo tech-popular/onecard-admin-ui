@@ -4,10 +4,11 @@
       <li :key="index" v-for="(item, index) in outdata.legend.data">
         <p class="funnelInfo funnelInfoOther">{{item.name}}</p>
         <p class="funnelInfo">
-          <span :class="index !== 0 ? 'funnel-left inline': ''">{{item.metric}}{{item.metric_unit}}</span><span class="colorRed " :class="{'percentRise' : item.percentRise, 'inline': index !== 0}">
+          <span :class="index !== 0 ? 'funnel-left inline': ''">{{item.metric}}{{item.metric_unit}}</span>
+          <span class="colorRed " :class="{'percentRise' : item.percentRise, 'inline': index !== 0}">
             {{item.percentRise ? '↑' : '↓'}}
           </span>
-          <span :class="{'percentRise' : item.percentRise, 'funnel-right inline colorRed': index !== 0}">{{item.percent}}{{item.percent_unit}}</span>
+          <span class="colorRed " :class="{'percentRise' : item.percentRise, 'funnel-right inline': index !== 0}">{{item.percent}}{{item.percent_unit}}</span>
         </p>
       </li>
     </ul>

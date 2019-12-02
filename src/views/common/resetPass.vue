@@ -8,6 +8,7 @@
         ref="ruleForm"
         label-width="100px"
         class="demo-ruleForm"
+        v-if="!effective"
       >
         <el-form-item>
           <h2 class="resrt-title reset-input">重置密码</h2>
@@ -34,11 +35,21 @@
           <el-button type="primary" @click="submitForm('ruleForm')" class="sumbit reset-input">确 认</el-button>
         </el-form-item>
       </el-form>
+      <div v-if="effective">
+        <p class="effective">该链接已失效，请重新获取链接</p>
+        <p class="effective">
+          <el-button type="primary" @click="back">返回</el-button>
+        </p>
+      </div>
     </div>
   </div>
 </template>
 <script>
+import { resetPass } from '@/api/account'
 export default {
+  mounted () {
+    document.body.removeChild(document.getElementById('1.23452384164.123412415'))
+  },
   data () {
     var validatePass = (rule, value, callback) => {
       let reg = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[._~!@#$^&*])[A-Za-z0-9._~!@#$^&*]{6,16}$/
@@ -74,19 +85,31 @@ export default {
       rules: {
         pass: [{ validator: validatePass, trigger: 'blur' }],
         checkPass: [{ validator: validatePass2, trigger: 'blur' }]
-      }
+      },
+      effective: true // 是否有效
     }
   },
   methods: {
     submitForm (formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          alert('submit!')
+          const data = {
+            token: '',
+            userId: '',
+            password: '',
+            passwordNew: ''
+          }
+          resetPass(data).then(() => {
+
+          })
         } else {
           console.log('error submit!!')
           return false
         }
       })
+    },
+    back () {
+      this.$router.push('/login')
     }
   }
 }
@@ -105,6 +128,10 @@ export default {
   }
   .sumbit {
     margin-top: 30px;
+  }
+  .effective {
+    text-align: center;
+    font-size: 26px;
   }
 }
 </style>

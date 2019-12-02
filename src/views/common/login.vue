@@ -80,24 +80,24 @@
 
 <script>
   import { getUUID } from '@/utils'
-  import { loginIn, sendCode, checkCaptcha } from '@/api/account'
-  import { isMobile } from '@/utils/validate'
+  import { loginIn, sendCode, checkCaptcha, checkEmail, forgetPass } from '@/api/account'
+  import { isMobile, isEmail } from '@/utils/validate'
   export default {
     data () {
-      // var validateEmail = async (rule, value, callback) => {
-      //   const reg = new RegExp(/9fbank|ithro/)
-      //   if (!value) {
-      //     callback(new Error('邮箱不能为空'))
-      //   } else if (!reg.test(value)) {
-      //     callback(new Error('账号格式有误'))
-      //   } else if (!isEmail(value)) {
-      //     callback(new Error('账号格式有误'))
-      //   } else if (!await this.checkEmail(value)) { // 校验 库里 是否有该邮箱
-      //     callback(new Error('该账号尚未开通权限'))
-      //   } else {
-      //     callback()
-      //   }
-      // }
+      var validateEmail = async (rule, value, callback) => {
+        const reg = new RegExp(/9fbank|ithro/)
+        if (!value) {
+          callback(new Error('邮箱不能为空'))
+        } else if (!reg.test(value)) {
+          callback(new Error('账号格式有误'))
+        } else if (!isEmail(value)) {
+          callback(new Error('账号格式有误'))
+        } else if (!await this.checkEmailTrue(value)) { // 校验 库里 是否有该邮箱
+          callback(new Error('该账号尚未开通权限'))
+        } else {
+          callback()
+        }
+      }
       var validateMobile = async (rule, value, callback) => {
         if (!value) {
           callback(new Error('手机号不能为空'))
@@ -127,16 +127,16 @@
           uuid: ''
         },
         dataForm: {
-          // email: '',
+          email: '',
           username: '',
           password: '',
           uuid: '',
           captcha: ''
         },
         dataRule: {
-          // email: [
-          //   { required: true, trigger: 'blur', validator: validateEmail }
-          // ],
+          email: [
+            { required: true, trigger: 'blur', validator: validateEmail }
+          ],
           username: [
             { required: true, message: '账号不能为空', trigger: 'blur' }
           ],
@@ -154,9 +154,6 @@
           captcha: [
             { required: true, trigger: 'blur', validator: validateCaptcha }
           ]
-          // verifyCode: [
-          //   { required: true, message: '短信验证码不能为空', trigger: 'blur' }
-          // ]
         },
         captchaPath: '',
         phoneCaptchaPath: '',
@@ -207,7 +204,14 @@
       },
       // 忘记密码
       forgetPass () {
-
+        const data = {
+          userId: '',
+          email: '',
+          url: ''
+        }
+        forgetPass(data).then(() => {
+  
+        })
       },
       // 获取验证
       async getCode () {
@@ -254,6 +258,17 @@
             } else {
               resolve(false)
             }
+          })
+        })
+        return res
+      },
+      async checkEmailTrue () {
+        let res = await new Promise(resolve => {
+          const data = {
+            email: this.dataForm.email
+          }
+          checkEmail(data).then(() => {
+
           })
         })
         return res
@@ -323,14 +338,14 @@
       min-height: 100%;
       background-color: #fff;
       .forgetPass {
-        color: #17B3A3;
+        color: #2093f7;
         cursor: pointer;
       }
       .loginMethod {
         width: 140px;
         margin: 0 auto;
         text-align: center;
-        color: #17B3A3;
+        color: #2093f7;
         cursor: pointer;
       }
       .code {
