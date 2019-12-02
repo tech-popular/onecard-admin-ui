@@ -22,9 +22,7 @@
       <el-button type="primary" size="mini" style="background: #430b98; border:none">JOIN</el-button>
       <el-button type="primary" size="mini" style="background: #065361; border:none">SUB_WORKFLOW</el-button>
     </div>
-    <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;">
-      <div class="yulan">1111</div>
-    </div>
+    <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
     <workFlowChartChairle v-if="workFlowChartChairlevisible" ref="addSubProcess"/>
   </div>
@@ -98,7 +96,7 @@ export default{
       mySelf.myDiagram.nodeTemplateMap.add('Judge',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
-          $(go.Shape, 'Diamond', {fill: '#538779'}),
+          $(go.Shape, 'Diamond', {fill: '#e559f2'}),
           $(go.TextBlock, { stroke: '#fff', margin: 8 }, new go.Binding('text'))
         )
       )
