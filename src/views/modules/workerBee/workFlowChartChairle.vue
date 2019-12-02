@@ -1,5 +1,18 @@
 <template>
   <el-dialog title="子流程" :modal-append-to-body='false' :append-to-body="true" @close="showClisk" :visible.sync="visible">
+    <div class="tag-group" style="margin-bottom: 20px; color:'#fff'">
+      <span class="tag-group__title">节点颜色值：</span>
+      <el-button type="primary" size="mini" style="background: #103a87; border:none">HTTP</el-button>
+      <el-button type="primary" size="mini" style="background: #6d89b1; border:none">JDBC</el-button>
+      <el-button type="primary" size="mini" style="background: #ed6e19; border:none">KAFKA</el-button>
+      <el-button type="primary" size="mini" style="background: #e39f24; border:none">GROOVY</el-button>
+      <el-button type="primary" size="mini" style="background: #e559f2; border:none">DECISION</el-button>
+      <el-button type="primary" size="mini" style="background: #8859f2; border:none">CASSANDRA</el-button>
+      <el-button type="primary" size="mini" style="background: #863816; border:none">AVIATOR</el-button>
+      <el-button type="primary" size="mini" style="background: #f43574; border:none">FORK_JOIN</el-button>
+      <el-button type="primary" size="mini" style="background: #430b98; border:none">JOIN</el-button>
+      <el-button type="primary" size="mini" style="background: #065361; border:none">SUB_WORKFLOW</el-button>
+    </div>
     <div id="mySubProcess" style="width:100%; height:650px; background-color: #ccc;"/>
   </el-dialog>
 </template>
@@ -62,6 +75,76 @@ export default {
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#58ce7a' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('HTTP',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#103a87' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('JDBC',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#6d89b1' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('KAFKA',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#ed6e19' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('GROOVY',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#e39f24' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('DECISION',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#e559f2' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('CASSANDRA',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#8859f2' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('AVIATOR',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#863816' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('FORK_JOIN',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#f43574' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('JOIN',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#430b98' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('SUB_WORKFLOW',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#065361' }),
           $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
         )
       )
