@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="工作流">
-        <el-input v-model="dataForm.workerBee" placeholder="工作流" clearable />
+      <el-form-item label="工作流名称">
+        <el-input v-model="dataForm.workerBee" placeholder="工作流名称" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
