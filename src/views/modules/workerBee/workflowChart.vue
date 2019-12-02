@@ -10,7 +10,6 @@
     </el-tooltip>
     <div class="tag-group" style="margin-bottom: 20px; color:'#fff'">
       <span class="tag-group__title">节点颜色值：</span>
-      <el-button type="primary" size="mini" style="background: #538779; border:none">条件</el-button>
       <el-button type="primary" size="mini" style="background: #103a87; border:none">HTTP</el-button>
       <el-button type="primary" size="mini" style="background: #6d89b1; border:none">JDBC</el-button>
       <el-button type="primary" size="mini" style="background: #ed6e19; border:none">KAFKA</el-button>
