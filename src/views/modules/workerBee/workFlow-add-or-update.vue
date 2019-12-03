@@ -11,10 +11,10 @@
       <el-input v-model="dataForm.user" placeholder="使用者"/>
     </el-form-item>
     <el-form-item label="工作流入参" prop="inputParameters">
-      <el-input v-model="dataForm.inputParameters" placeholder="工作流入参"/>
+      <el-input v-model="dataForm.inputParameters" placeholder="多个参数用英文逗号隔开，例：name,costumerId"/>
     </el-form-item>
     <el-form-item label="返回结果" prop="outputParameters">
-      <el-input v-model="dataForm.outputParameters" placeholder="返回结果"/>
+      <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
     </el-form-item>
      <el-form-item label="版本" prop="version">
       <el-input v-model="dataForm.version" placeholder="版本"/>

@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="工作流">
-        <el-input v-model="dataForm.workerBee" placeholder="工作流" clearable />
+      <el-form-item label="工作流名称">
+        <el-input v-model="dataForm.workerBee" placeholder="工作流名称" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -24,6 +24,7 @@
           <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" @click="clickFlowEdit(scope.row.id)">任务关系</el-button>
           <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
+          <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -55,6 +56,15 @@
         <el-button type="primary" @click="deleted()">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 弹窗查看示意图 -->
+    <el-dialog
+      title="2.0工作流预览"
+      @close="handleClosede"
+      fullscreen
+      style="max-height: 100vh"
+      :visible.sync="flowTaskFlowVisible">
+      <flowTaskFlow v-if="flowTaskFlow"/>
+    </el-dialog>
     <!-- 数据关系 -->
     <taskFlow v-if="visibleEdit" ref="taskFlow"/>
     <!-- 弹窗, 新增 / 修改 -->
@@ -65,6 +75,7 @@
 <script>
   import showFlow from './workflowChart'
   import taskFlow from './taskFlow'
+  import flowTaskFlow from './marketingDecision'
   import AddOrUpdate from './workFlow-add-or-update'
   import { workFlowList, deleteWorkFlow, workFlowShow } from '@/api/workerBee/workFlow'
 
@@ -74,6 +85,8 @@
         visible: false,
         deleteVisible: false,
         visibleEdit: false,
+        flowTaskFlowVisible: false,
+        flowTaskFlow: false,
         dataForm: {
           workerBee: ''
         },
@@ -93,7 +106,8 @@
     components: {
       showFlow,
       taskFlow,
-      AddOrUpdate
+      AddOrUpdate,
+      flowTaskFlow
     },
     mounted () {
       this.getDataList()
@@ -199,6 +213,11 @@
       currentChangeHandle (val) {
         this.pageNum = val
         this.getDataList()
+      },
+      // 2.0工作流
+      clickFlowShow () {
+        this.flowTaskFlowVisible = true
+        this.flowTaskFlow = true
       }
     }
   }

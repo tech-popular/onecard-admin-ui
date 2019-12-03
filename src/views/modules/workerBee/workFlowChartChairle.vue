@@ -1,5 +1,18 @@
 <template>
   <el-dialog title="子流程" :modal-append-to-body='false' :append-to-body="true" @close="showClisk" :visible.sync="visible">
+    <div class="tag-group" style="margin-bottom: 20px; color:'#fff'">
+      <span class="tag-group__title">节点颜色值：</span>
+        <el-button type="primary" size="mini" style="background: #103a87; border:none; margin-top: 5px">HTTP</el-button>
+        <el-button type="primary" size="mini" style="background: #6d89b1; border:none; margin-top: 5px">JDBC</el-button>
+        <el-button type="primary" size="mini" style="background: #ed6e19; border:none; margin-top: 5px">KAFKA</el-button>
+        <el-button type="primary" size="mini" style="background: #e39f24; border:none; margin-top: 5px">GROOVY</el-button>
+        <el-button type="primary" size="mini" style="background: #e559f2; border:none; margin-top: 5px">DECISION</el-button>
+        <el-button type="primary" size="mini" style="background: #8859f2; border:none; margin-top: 5px">CASSANDRA</el-button>
+        <el-button type="primary" size="mini" style="background: #863816; border:none; margin-top: 5px">AVIATOR</el-button>
+        <el-button type="primary" size="mini" style="background: #f43574; border:none; margin-top: 5px">FORK_JOIN</el-button>
+        <el-button type="primary" size="mini" style="background: #430b98; border:none; margin-top: 5px">JOIN</el-button>
+        <el-button type="primary" size="mini" style="background: #065361; border:none; margin-top: 5px">SUB_WORKFLOW</el-button>
+    </div>
     <div id="mySubProcess" style="width:100%; height:650px; background-color: #ccc;"/>
   </el-dialog>
 </template>
@@ -11,28 +24,29 @@ export default {
   data () {
     return {
       visible: false,
-      id: '',
-      SubProcessList: []
+      subWorkFlow: '',
+      SubProcessList: {}
     }
   },
   methods: {
-    init (id) {
+    init (subWorkFlow) {
       this.visible = true
-      this.id = id || ''
+      this.subWorkFlow = subWorkFlow || ''
       this.$nextTick(() => {
-        const dataBody = id
+        const dataBody = subWorkFlow
         workFlowShow(dataBody).then(({data}) => {
           if (data && data.status === 0) {
             this.SubProcessList = data.data
+            console.log(this.SubProcessList, '+++++++++++++')
           }
-        })
-        var mySelf = this
-        if (mySelf.myDiagram) {
-          this.myDiagram.div = null
-        }
-        const $ = go.GraphObject.make
+        }).then(() => {
+          var mySelf = this
+          if (mySelf.myDiagram) {
+            this.myDiagram.div = null
+          }
+          const $ = go.GraphObject.make
 
-        mySelf.myDiagram =
+          mySelf.myDiagram =
         $(go.Diagram, 'mySubProcess',
           {
             allowCopy: false,
@@ -44,27 +58,97 @@ export default {
             'undoManager.isEnabled': true,
             isReadOnly: true // 只读
           })
-        mySelf.myDiagram.nodeTemplateMap.add('Start',
+          mySelf.myDiagram.nodeTemplateMap.add('Start',
           $(go.Node, 'Auto',
             $(go.Shape, 'Circle', { fill: '#17B3A3' }),
             $(go.TextBlock, { stroke: '#fff' }, new go.Binding('text'))
           )
         )
-        mySelf.myDiagram.nodeTemplateMap.add('Judge',
+          mySelf.myDiagram.nodeTemplateMap.add('Judge',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'Diamond', {fill: '#538779'}),
           $(go.TextBlock, { stroke: '#fff', margin: 8 }, new go.Binding('text'))
         )
       )
-        mySelf.myDiagram.nodeTemplateMap.add('Condition',
+          mySelf.myDiagram.nodeTemplateMap.add('Condition',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#58ce7a' }),
           $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
         )
       )
-        mySelf.myDiagram.nodeTemplateMap.add('End',
+          mySelf.myDiagram.nodeTemplateMap.add('HTTP',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#103a87' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('JDBC',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#6d89b1' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('KAFKA',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#ed6e19' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('GROOVY',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#e39f24' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('DECISION',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#e559f2' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('CASSANDRA',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#8859f2' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('AVIATOR',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#863816' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('FORK_JOIN',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#f43574' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('JOIN',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#430b98' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('SUB_WORKFLOW',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#065361' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('End',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'Circle', {fill: '#79C900'}),
@@ -72,7 +156,7 @@ export default {
         )
       )
       // 替换LinkTemplateMap中的默认链接模板
-        mySelf.myDiagram.linkTemplate =
+          mySelf.myDiagram.linkTemplate =
         $(go.Link, go.Link.Orthogonal,
           {
             routing: go.Link.AvoidsNodes,
@@ -83,9 +167,6 @@ export default {
             relinkableTo: true,
             reshapable: true,
             resegmentable: true,
-            // 鼠标悬停巧妙地突出显示链接:
-            mouseEnter: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'rgba(30,144,255,0.2)' },
-            mouseLeave: function (e, link) { link.findObject('HIGHLIGHT').stroke = 'transparent' },
             selectionAdorned: false
           },
           new go.Binding('points').makeTwoWay(),
@@ -106,13 +187,14 @@ export default {
             new go.Binding('visible', 'answer', function (a) { return (!!a) })
           )
         )
-        mySelf.myDiagram.model = $(go.GraphLinksModel,
-          {
-            copiesArrays: true,
-            copiesArrayObjects: true,
-            nodeDataArray: this.SubProcessList.nodeDataArrays,
-            linkDataArray: this.SubProcessList.linkDataArrays
-          })
+          mySelf.myDiagram.model = $(go.GraphLinksModel,
+            {
+              copiesArrays: true,
+              copiesArrayObjects: true,
+              nodeDataArray: this.SubProcessList.nodeDataArrays,
+              linkDataArray: this.SubProcessList.linkDataArrays
+            })
+        })
       })
     },
     showClisk () {
