@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-demo-echarts">
+  <div class="mod-demo-echarts height_funnel">
     <el-row :gutter="20">
       <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList funnelStyle">
         <el-card class="funnel-card">
@@ -38,6 +38,9 @@ export default {
 }
 </script>
 <style lang="scss">
+.height_funnel {
+  margin-top: 50px;
+}
 .mod-demo-echarts {
   .el-card__body {
     padding: 10px;
