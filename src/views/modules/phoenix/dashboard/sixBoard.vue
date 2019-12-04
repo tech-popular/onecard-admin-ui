@@ -1,5 +1,5 @@
 <template>
-  <div class="monitor">
+  <div class="new-monitor">
     <div class="monitorLeft" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
       <div :key="item.id" v-for="(item) in simpleList">
         <p>{{item.legend.extend.simple[0].name}}</p>
@@ -16,13 +16,13 @@
       <div class="monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
         <div :id="'barCharts' + item.id" class="barCharts"></div>
         <select-tree
-          class="monitorSelectList"
-          :options="options"
-          :optionIds="optionIds"
-          :index="index"
-          :defaultCheckNodes="hadSelectedList[index]"
-          @checkNode="checkNode"
-        ></select-tree>
+            class="monitorSelectList"
+            :options="options"
+            :optionIds="optionIds"
+            :index="index"
+            :defaultCheckNodes="hadSelectedList[index]"
+            @checkNode="checkNode"
+          ></select-tree>
       </div>
     </div>
   </div>
@@ -59,12 +59,7 @@ export default {
   methods: {
     checkNode (data, index) {
       data = [...new Set(data)]
-      this.$emit(
-        'checkNode',
-        data,
-        index,
-        this.barRightList[index].selection[0]
-      )
+      this.$emit('checkNode', data, index, this.barRightList[index].selection[0])
     }
   }
 }
@@ -81,7 +76,7 @@ li {
   color: green;
 }
 
-.monitor {
+.new-monitor {
   width: 100%;
   // background: #f0f4f8;
   margin-top: 20px;
@@ -102,9 +97,10 @@ li {
     }
   }
   .monitorRight {
-    flex: 5;
+    flex: 7;
     .monitorRightList {
-      width: 50%;
+      width: 45%;
+      display: inline-block;
       margin: 20px;
       position: relative;
       box-sizing: border-box;
@@ -125,10 +121,10 @@ li {
   border-radius: 5px;
 }
 .monitorSelectList {
-  position: absolute;
-  width: 200px;
-  top: -8px;
-  left: 160px;
-  z-index: 9;
+    position: absolute;
+    width: 200px;
+    top: -8px;
+    left: 160px;
+    z-index: 9;
 }
 </style>

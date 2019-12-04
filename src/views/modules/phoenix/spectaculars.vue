@@ -70,7 +70,7 @@
       :hadSelectedList="hadSelectedList"
       @checkNode="checkNode"
     ></six-board>
-    <three-test v-if="type == '4' && ifMockTest"></three-test>
+    <six-test v-if="type == '4' && ifMockTest"></six-test>
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
@@ -96,12 +96,13 @@ import twoTest from './dashboard/mockVue/twoTest'
 import threeTest from './dashboard/mockVue/threeTest'
 import fourTest from './dashboard/mockVue/fourTest'
 import fiveTest from './dashboard/mockVue/fiveTest'
+import sixTest from './dashboard/mockVue/sixTest'
 import { chartsConfig } from './dashboard/chartsConfig'
 import { getQueryString } from '@/utils'
 import 'echarts/lib/chart/funnel'
 import 'echarts/lib/chart/radar'
 export default {
-  components: { sixBoard, fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest },
+  components: { sixBoard, fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest, sixTest },
   data () {
     return {
       chartPie: null,
@@ -345,7 +346,7 @@ export default {
         tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
         tem.series[1].type = 'bar'
       }
-      if (this.mark == '3' && tem.positi && tem.positi == 'right') {
+      if (this.type == '3' && tem.positi && tem.positi == 'right') {
         // 机构资金右侧数据
         this.threeMarkConfig(tem)
       }
