@@ -11,7 +11,7 @@
       </el-select>
     </el-alert> -->
     <el-card class="box-card" v-if="list.items && list.items.length > 0">
-      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
+      <el-select v-model="value" @change="selectGet()">
         <el-option
           v-for="item in list.items"
           :key="item.name"
