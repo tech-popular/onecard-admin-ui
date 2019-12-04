@@ -15,6 +15,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()" type="primary">查询</el-button>
+        <el-button @click="reset()" type="primary">重置</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%">
@@ -67,6 +68,7 @@
 </template>
 
 <script>
+import { getDate } from '@/utils'
 export default {
   data () {
     return {
@@ -95,9 +97,9 @@ export default {
         params: this.$http.adornParams({
           page: this.pageIndex,
           limit: this.pageSize,
-          key: this.dataForm.key,
-          startTime: this.dataForm.time[0],
-          endTime: this.dataForm.time[1]
+          username: this.dataForm.key,
+          startTime: this.dataForm.time.length ? getDate(this.dataForm.time[0], 'year') : '',
+          endTime: this.dataForm.time.length ? getDate(this.dataForm.time[1], 'year') : ''
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -120,6 +122,12 @@ export default {
     currentChangeHandle (val) {
       this.pageIndex = val
       this.getDataList()
+    },
+    reset () {
+      this.dataForm = {
+        key: '',
+        time: []
+      }
     }
   }
 }

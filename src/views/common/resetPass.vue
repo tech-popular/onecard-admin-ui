@@ -8,7 +8,7 @@
         ref="ruleForm"
         label-width="100px"
         class="demo-ruleForm"
-        v-if="!effective"
+        v-if="effective == 1"
       >
         <el-form-item>
           <h2 class="resrt-title reset-input">重置密码</h2>
@@ -35,7 +35,7 @@
           <el-button type="primary" @click="submitForm('ruleForm')" class="sumbit reset-input">确 认</el-button>
         </el-form-item>
       </el-form>
-      <div v-if="effective">
+      <div v-if="effective == 2">
         <p class="effective">该链接已失效，请重新获取链接</p>
         <p class="effective">
           <el-button type="primary" @click="back">返回</el-button>
@@ -45,11 +45,9 @@
   </div>
 </template>
 <script>
-import { resetPass } from '@/api/account'
+import { resetPass, checkUrl } from '@/api/account'
+import { getQueryString } from '@/utils'
 export default {
-  mounted () {
-    document.body.removeChild(document.getElementById('1.23452384164.123412415'))
-  },
   data () {
     var validatePass = (rule, value, callback) => {
       let reg = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[._~!@#$^&*])[A-Za-z0-9._~!@#$^&*]{6,16}$/
@@ -86,7 +84,23 @@ export default {
         pass: [{ validator: validatePass, trigger: 'blur' }],
         checkPass: [{ validator: validatePass2, trigger: 'blur' }]
       },
-      effective: true // 是否有效
+      token: '',
+      userId: '',
+      effective: 0 // 是否有效
+    }
+  },
+  created () {
+    this.token = getQueryString('token')
+    this.userId = getQueryString('userId')
+    this.$nextTick(() => {
+      this.checkIfUrl()
+    })
+  },
+  mounted () {
+    // 去掉 水印
+    const id = '1.23452384164.123412415'
+    if (document.getElementById(id) !== null) {
+      document.body.removeChild(document.getElementById(id))
     }
   },
   methods: {
@@ -94,13 +108,21 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           const data = {
-            token: '',
-            userId: '',
-            password: '',
-            passwordNew: ''
+            token: this.token,
+            userId: this.userId,
+            password: this.dataForm.pass,
+            passwordNew: this.dataForm.checkPass
           }
-          resetPass(data).then(() => {
-
+          resetPass(data).then(({ data }) => {
+            if (data && data.code == 0) {
+              this.$message({
+                message: '重置密码成功',
+                type: 'success'
+              })
+              setTimeout(() => {
+                this.$router.push('/login')
+              }, 1500)
+            }
           })
         } else {
           console.log('error submit!!')
@@ -110,6 +132,19 @@ export default {
     },
     back () {
       this.$router.push('/login')
+    },
+    checkIfUrl () {
+      const value = {
+        token: this.token,
+        userId: this.userId
+      }
+      checkUrl(value).then(({ data }) => {
+        if (data && data.code == 0) {
+          this.effective = 1
+        } else {
+          this.effective = 2
+        }
+      })
     }
   }
 }

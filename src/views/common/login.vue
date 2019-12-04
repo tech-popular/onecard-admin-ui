@@ -10,8 +10,8 @@
         <div class="login-main" v-show="type">
           <h3 class="login-title">账号密码登录</h3>
           <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
-            <el-form-item prop="username">
-              <el-input v-model="dataForm.username" placeholder="邮箱"></el-input>
+            <el-form-item prop="email">
+              <el-input v-model="dataForm.email" placeholder="邮箱"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
@@ -27,7 +27,7 @@
                 </el-col>
               </el-row>
             </el-form-item>
-            <p class='forgetPass' @click="forgetPass">忘记密码</p>
+            <p class='forgetPass' @click="forgetToPass">忘记密码</p>
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')">登录</el-button>
             </el-form-item>
@@ -128,7 +128,6 @@
         },
         dataForm: {
           email: '',
-          username: '',
           password: '',
           uuid: '',
           captcha: ''
@@ -136,9 +135,6 @@
         dataRule: {
           email: [
             { required: true, trigger: 'blur', validator: validateEmail }
-          ],
-          username: [
-            { required: true, message: '账号不能为空', trigger: 'blur' }
           ],
           password: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -157,13 +153,16 @@
         },
         captchaPath: '',
         phoneCaptchaPath: '',
+        userId: '',
         time: 60,
-        timer: null
+        timer: null,
+        url: ''
       }
     },
     created () {
       this.getCaptcha()
       this.getPhoneCaptcha()
+      this.url = location.origin + '/#/resetPassword'
     },
     methods: {
       // 提交表单
@@ -203,15 +202,27 @@
         this.type = !this.type
       },
       // 忘记密码
-      forgetPass () {
-        const data = {
-          userId: '',
-          email: '',
-          url: ''
+      async forgetToPass () {
+        let flag = await this.checkEmailTrue()
+        if (flag) {
+          const data = {
+            userId: this.userId,
+            email: this.dataForm.email,
+            url: this.url
+          }
+          forgetPass(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.$message({
+                message: data.msg,
+                type: 'success'
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        } else {
+          this.$refs.dataForm.validateField('email')
         }
-        forgetPass(data).then(() => {
-  
-        })
       },
       // 获取验证
       async getCode () {
@@ -267,8 +278,13 @@
           const data = {
             email: this.dataForm.email
           }
-          checkEmail(data).then(() => {
-
+          checkEmail(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.userId = data.userId
+              resolve(true)
+            } else {
+              resolve(false)
+            }
           })
         })
         return res
@@ -338,6 +354,7 @@
       min-height: 100%;
       background-color: #fff;
       .forgetPass {
+        width: 60px;
         color: #2093f7;
         cursor: pointer;
       }

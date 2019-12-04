@@ -11,8 +11,8 @@
         <el-input v-model="dataForm.userName" placeholder="用户姓名" clearable></el-input>
       </el-form-item>
       <el-form-item label="角色: ">
-        <el-select v-model="dataForm.role" filterable placeholder="请选择">
-          <el-option v-for="item in roles" :key="item.id" :label="item.project +'--'+ item.serviceName" :value="item.id">
+        <el-select v-model="dataForm.role" filterable clearable placeholder="请选择">
+          <el-option v-for="item in roles" :key="item.roleId" :label="item.roleName" :value="item.roleId">
           </el-option>
         </el-select>
       </el-form-item>
@@ -70,13 +70,13 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="role"
+        prop="roleName"
         header-align="center"
         align="center"
         label="角色">
       </el-table-column>
       <el-table-column
-        prop="user"
+        prop="createrName"
         header-align="center"
         align="center"
         label="创建人">
@@ -124,7 +124,7 @@
           userName: '',
           email: '',
           mobile: '',
-          roleId: ''
+          role: ''
         },
         dataList: [],
         roles: [],
@@ -147,8 +147,10 @@
     },
     methods: {
       getRoles () {
-        getRolesList().then((res) => {
-          console.log(res)
+        getRolesList().then(({data}) => {
+          if (data && data.code == 0) {
+            this.roles = data.list
+          }
         })
       },
       // 获取数据列表
@@ -163,7 +165,7 @@
             'username': this.dataForm.userName,
             'email': this.dataForm.email,
             'mobile': this.dataForm.mobile,
-            'roleId': this.dataForm.roleId
+            'roleId': this.dataForm.role
           })
         }).then(({data}) => {
           if (data && data.code === 0) {

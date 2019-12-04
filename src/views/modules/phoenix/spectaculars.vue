@@ -329,7 +329,7 @@ export default {
       this.parLegendConfig(tem)
       tem['tooltip'] = chartsConfig.tooltip
       if (this.mark == '2' && (index == 1 || index == 3)) {
-        tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
+        tem.color = ['#f1675d', '#eee', '#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
         tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
         tem.series[1].type = 'bar'
       }
@@ -461,6 +461,8 @@ export default {
     // 雷达 数据处理
     radarConfig (tem) {
       const dataLabel = ['3期', '6期', '12期', '24期', '36期', '其他期限']
+      const color = ['#ED6354', '#5C62E6']
+      tem.color = color
       tem.tooltip = {
         formatter: function (params, ticket, callback) {
           var showHtm = ''
@@ -470,14 +472,21 @@ export default {
           return showHtm
         }
       }
-      tem.series[1] &&
-        (tem.series[1].itemStyle = {
-          color: 'green'
-        })
       tem.legend.orient = 'vertical'
       tem.legend.left = 'right'
       tem.legend.itemGap = 20
       tem.series.forEach((item, ind) => {
+        item.itemStyle = {
+          normal: {
+            color: color[ind],
+            lineStyle: {
+              color: color[ind]
+            },
+            areaStyle: {
+              color: color[ind]
+            }
+          }
+        }
         item.data.map((val, i) => {
           val.label = {
             normal: {
@@ -496,7 +505,7 @@ export default {
       if (tem.series.length > 0) {
         tem.series[0].radius = ['45%', '65%']
         tem.series[1] && (tem.series[1].radius = ['0%', '20%'])
-        tem.color = ['#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
+        tem.color = ['#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
         tem.legend.top = 'bottom'
         tem.legend.itemGap = 20
         tem.legend.data = []

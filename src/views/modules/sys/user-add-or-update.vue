@@ -20,7 +20,7 @@
         <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
       </el-form-item>
       <el-form-item label="角色" prop="roleIdList">
-        <el-select v-model="dataForm.roleIdList" filterable placeholder="请选择">
+        <el-select v-model="dataForm.roleIdList" filterable multiple placeholder="请选择">
           <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId">
           </el-option>
         </el-select>
@@ -37,7 +37,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="备注">
-        <el-input v-model="dataForm.mobile" placeholder="备注"></el-input>
+        <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -53,14 +53,21 @@
   export default {
     data () {
       var validatePassword = (rule, value, callback) => {
+        let reg = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[._~!@#$^&*])[A-Za-z0-9._~!@#$^&*]{6,16}$/
         if (!this.dataForm.id && !/\S/.test(value)) {
           callback(new Error('密码不能为空'))
+        } else if (!reg.test(value) && value != this.checkedPass) {
+          callback(
+          new Error(
+            '密码长度为6到16个字符,设置时使用英文字母、数字和符号的组合'
+          )
+        )
         } else {
           callback()
         }
       }
       var validateComfirmPassword = (rule, value, callback) => {
-        if (this.dataForm.ismodifyPasswd === 'modify') {
+        if (this.dataForm.password != this.checkedPass) {
           if (!this.dataForm.id && !/\S/.test(value)) {
             callback(new Error('确认密码不能为空'))
           } else if (this.dataForm.password !== value) {
@@ -85,7 +92,7 @@
       var validateMobile = async (rule, value, callback) => {
         if (!isMobile(value)) {
           callback(new Error('手机号格式错误'))
-        } else if (!await this.checkIfMobile()) {
+        } else if (!await this.checkIfMobile() && value != this.checkedMobile) {
           callback(new Error('该手机号已被注册'))
         } else {
           callback()
@@ -94,7 +101,7 @@
       var validateUserName = async (rule, value, callback) => {
         if (!value) {
           callback(new Error('用户名不能为空'))
-        } else if (!await this.checkIfMobile()) {
+        } else if (!await this.checkIfUsername() && value != this.checkedName) {
           callback(new Error('用户名已经存在'))
         } else {
           callback()
@@ -114,7 +121,8 @@
           mobile: '',
           roleIdList: [],
           systenandIdList: [],
-          status: 1
+          status: 1,
+          remark: ''
         },
         systenantList: [],
         dataRule: {
@@ -136,13 +144,20 @@
             { validator: validateMobile, trigger: 'blur' }
           ],
           roleIdList: [
-            { required: true, message: '角色不能为空', trigger: 'blur' }
+            { required: true, message: '角色不能为空', trigger: 'change' }
           ]
-        }
+        },
+        checkedName: '',
+        checkedMobile: '',
+        checkedPass: ''
       }
     },
     methods: {
       init (id) {
+        this.checkedName = ''
+        this.checkedMobile = ''
+        this.checkedName = ''
+        this.remark = ''
         // 数据权限列表
         this.$http({
           url: this.$http.adornUrl(`/sys/systenant/nonullselect`),
@@ -164,6 +179,7 @@
           this.visible = true
           this.$nextTick(() => {
             this.$refs['dataForm'].resetFields()
+            this.$refs['dataForm'].clearValidate()
           })
         }).then(() => {
           if (this.dataForm.id) {
@@ -174,20 +190,26 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dataForm.userName = data.user.username
+                this.checkedName = data.user.username
                 this.dataForm.salt = data.user.salt
                 this.dataForm.email = data.user.email
                 this.dataForm.mobile = data.user.mobile
+                this.dataForm.remark = data.user.remark
+                this.checkedMobile = data.user.mobile
                 this.dataForm.password = data.user.password
+                this.checkedPass = data.user.password
                 this.dataForm.roleIdList = data.user.roleIdList
                 this.dataForm.status = data.user.status
                 this.dataForm.systenandIdList = data.user.systenandIdList
+                this.$refs.dataForm.validateField('userName')
+                this.$refs.dataForm.validateField('password')
               }
             })
           }
         })
       },
       cleanData () {
-        this.dataForm.password = ''
+        // this.dataForm.password = ''
       },
       midifyflag () {
         this.dataForm.ismodifyPasswd = 'modify'
@@ -209,7 +231,8 @@
                 'status': this.dataForm.status,
                 'roleIdList': this.dataForm.roleIdList,
                 'ismodifyPasswd': this.dataForm.ismodifyPasswd,
-                'systenandIdList': this.dataForm.systenandIdList
+                'systenandIdList': this.dataForm.systenandIdList,
+                'remark': this.dataForm.remark
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -232,11 +255,15 @@
       },
       async checkIfUsername () {
         const data = {
-          userName: this.dataForm.userName
+          username: this.dataForm.userName
         }
         let res = await new Promise(resolve => {
-          checkUserName(data).then(() => {
-
+          checkUserName(data).then(({data}) => {
+            if (data && data.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
           })
         })
         return res
@@ -246,8 +273,12 @@
           const data = {
             mobile: this.dataForm.mobile
           }
-          checkMobile(data).then(() => {
-
+          checkMobile(data).then(({data}) => {
+            if (data && data.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
           })
         })
         return res

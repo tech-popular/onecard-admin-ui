@@ -117,7 +117,7 @@ export const chartsConfig = {
           getChinese(item.seriesName) +
           '</span> : ' +
           fprice(item.value, 0) +
-          '人</span>'
+          '</span>'
       })
       return result
     }

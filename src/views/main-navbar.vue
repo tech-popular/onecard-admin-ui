@@ -102,3 +102,8 @@
     }
   }
 </script>
+<style lang="scss">
+.site-navbar {
+  background-color: #202b30;
+}
+</style>
