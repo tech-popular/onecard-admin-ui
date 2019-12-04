@@ -293,15 +293,4 @@ export default{
 }
  </script>
 <style lang="scss" scoped>
-.diamond{   
-  width: 20px;   
-  height: 20px;   
-  border:none;
-  background-color: #538779;   
-  transform:rotate(45deg);   
-  -ms-transform:rotate(45deg); /* Internet Explorer */   
-  -moz-transform:rotate(45deg); /* Firefox */  
-   -webkit-transform:rotate(45deg); /* Safari 和 Chrome */   
-   -o-transform:rotate(45deg); /* Opera */   
-   margin:50px auto;/*让菱形浏览器上居中*/  }
 </style>
