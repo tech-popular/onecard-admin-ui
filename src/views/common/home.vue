@@ -12,13 +12,7 @@
   </div>
 </template>
 
-<script>
-  export default {
-    mounted () {
-      // watermark.set(this.$store.state.user.name)
-    }
-  }
-</script>
+<script></script>
 
 <style>
   .mod-home {

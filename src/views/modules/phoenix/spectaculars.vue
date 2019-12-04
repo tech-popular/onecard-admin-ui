@@ -1,6 +1,6 @@
 <template>
   <div class="mod-demo-echarts" id='dashboard'>
-    <el-alert title type="warning" v-if="list.items && list.items.length > 0" :closable="false">
+    <!-- <el-alert title type="warning" v-if="list.items && list.items.length > 0" :closable="false">
       <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
         <el-option
           v-for="item in list.items"
@@ -9,29 +9,39 @@
           :value="item.name"
         ></el-option>
       </el-select>
-    </el-alert>
+    </el-alert> -->
+    <el-card class="box-card" v-if="list.items && list.items.length > 0">
+      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
+        <el-option
+          v-for="item in list.items"
+          :key="item.name"
+          :label="item.value"
+          :value="item.name"
+        ></el-option>
+      </el-select>
+    </el-card>
     <!-- 授信路径监控 -->
     <one-credit
-      v-if="mark == '1' && !ifMockTest"
+      v-if="type == '1' && !ifMockTest"
       :arr="arr"
       :selection="selection"
       :selectedList="selectedList"
       @checkNode="checkNode"
     ></one-credit>
-    <one-test v-if="mark == '1' && ifMockTest"></one-test>
+    <one-test v-if="type == '1' && ifMockTest"></one-test>
     <!-- 彩虹评级期限 -->
     <two-rainbow
-      v-if="mark == '2' && !ifMockTest"
+      v-if="type == '2' && !ifMockTest"
       :options="options"
       :optionIds="optionIds"
       :arr="arr"
       :hadSelectedList="hadSelectedList"
       @checkNode="checkNode"
     ></two-rainbow>
-    <two-test v-if="mark == '2' && ifMockTest"></two-test>
+    <two-test v-if="type == '2' && ifMockTest"></two-test>
     <!-- 机构资金监控 -->
     <three-monitor
-      v-if="mark == '3' && !ifMockTest"
+      v-if="type == '3' && !ifMockTest"
       :simpleList="simpleList"
       :barRightList="barRightList"
       :options="options"
@@ -39,17 +49,17 @@
       :hadSelectedList="hadSelectedList"
       @checkNode="checkNode"
     ></three-monitor>
-    <three-test v-if="mark == '3' && ifMockTest"></three-test>
+    <three-test v-if="type == '3' && ifMockTest"></three-test>
     <!-- 四象限&&小卡 -->
-    <four-quadrant v-if="mark == '4' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
-    <four-test v-if="mark == '4' && ifMockTest"></four-test>
+    <four-quadrant v-if="type == '6' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
+    <four-test v-if="type == '6' && ifMockTest"></four-test>
     <!-- 渠道整体转化率 -->
     <five-funnel
-      v-if="mark == '5' && !ifMockTest"
+      v-if="type == '5' && !ifMockTest"
       :arr="arr"
       @checkNode="checkNode"
     ></five-funnel>
-    <five-test v-if="mark == '5' && ifMockTest"></five-test>
+    <five-test v-if="type == '5' && ifMockTest"></five-test>
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
@@ -89,7 +99,6 @@ export default {
       visualizes: [],
       arr: [], // 有几个图表
       visibleChange: false,
-      apiItems: [],
       visualizeId: 1, // 图表筛选框
       selection: [],
       lineList: [], // 框框加折线图数据
@@ -97,6 +106,7 @@ export default {
       quadrantList: {}, // 四象限数据
       defaultSelection: [], // 调用默认接口存的数据
       mark: '', // 区分是哪个列表点过来的
+      type: '', // 区分是什么类型的大屏
       selectedList: {},
       timer: null, // 定时器
       ifMockTest: true,
@@ -146,6 +156,7 @@ export default {
         this.hadSelectedList = []
         this.hadSelectedParamsList = []
         this.mark = getQueryString('mark')
+        this.type = getQueryString('type')
         if (this.mark == '5') {
           this.visualizeSelection = this.params5
         } else {
@@ -157,6 +168,7 @@ export default {
   },
   created () {
     this.mark = getQueryString('mark')
+    this.type = getQueryString('type')
   },
   mounted () {
     if (!this.sidebarFold) {
@@ -295,8 +307,7 @@ export default {
     },
     selectGet () {
       this.arr = []
-      this.apiItems = []
-      this.quadrantList = []
+      this.quadrantList = {}
       this.lineList = []
       this.simpleList = []
       this.queryList()
@@ -315,11 +326,53 @@ export default {
     },
     // 折线柱数据处理
     barConfig (tem, index) {
+      this.parLegendConfig(tem)
+      tem['tooltip'] = chartsConfig.tooltip
+      if (this.mark == '2' && (index == 1 || index == 3)) {
+        tem.color = ['#f1675d', '#eee', '#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
+        tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+        tem.series[1].type = 'bar'
+      }
+      if (this.mark == '3' && tem.positi && tem.positi == 'right') {
+        // 机构资金右侧数据
+        this.threeMarkConfig(tem)
+      }
+    },
+    // 对 机构资金 config配置
+    threeMarkConfig (tem) {
+      let first = {}
+      let second = {}
+      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
+        first = JSON.parse(JSON.stringify(tem.legend.data[0]))
+        tem.legend.data.splice(0, 1)
+      }
+      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
+        second = JSON.parse(JSON.stringify(tem.legend.data[0]))
+        tem.legend.data.splice(0, 1)
+      }
+      tem.legend.data.sort((a, b) => {
+        if (a.metric_unit) {
+          return b.metric - a.metric
+        }
+      })
+      if (JSON.stringify(first) !== '{}') {
+        tem.legend.data = [...[first], ...[second], ...tem.legend.data]
+      }
+      tem.legend.type = tem.legendType || 'scroll'
+      tem.title.textStyle = {
+        fontSize: '12'
+      }
+      tem.color[1] = '#eee'
+      tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+      this.barRightList.push(tem)
+    },
+    // 对柱状图的legend 做统一处理
+    parLegendConfig (tem) {
       for (let i = 0; i < tem.series.length; i++) {
         if (tem.legend.data && tem.legend.data[i].metric && tem.series) {
-          var seriesNameElse = tem.series[i].name + '\n\n ' +
+          var seriesNameElse = tem.series[i].name + '\n' +
                 tem.legend.data[i].metric +
-                tem.legend.data[i].metric_unit +
+                (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
                 (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
                 tem.legend.data[i].percent +
                 tem.legend.data[i].percent_unit
@@ -331,9 +384,9 @@ export default {
       }
       for (let i = 0; i < tem.legend.data.length; i++) {
         if (tem.legend.data[i].metric) {
-          var legendNameElse = tem.legend.data[i].name + '\n\n ' +
+          var legendNameElse = tem.legend.data[i].name + '\n' +
             tem.legend.data[i].metric +
-            tem.legend.data[i].metric_unit +
+            (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
             (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
             tem.legend.data[i].percent +
             tem.legend.data[i].percent_unit
@@ -342,36 +395,6 @@ export default {
         } else {
           tem.legend.data[i].textStyle = chartsConfig.textStyle
         }
-      }
-      tem['tooltip'] = chartsConfig.tooltip
-      if (this.mark == '3') { // 机构资金 legend 排序
-        let first = {}
-        if (tem.legend.data[0].name.indexOf('昨日') !== -1) {
-          first = JSON.parse(JSON.stringify(tem.legend.data[0]))
-          console.log(first)
-          tem.legend.data.splice(0, 1)
-        }
-        tem.legend.data.sort((a, b) => {
-          if (a.metric_unit) {
-            return b.metric - a.metric
-          }
-        })
-        if (JSON.stringify(first) !== '{}') {
-          tem.legend.data = [...[first], ...tem.legend.data]
-        }
-      }
-      if (this.mark == '2' && (index == 1 || index == 3)) {
-        tem.color = ['#f1675d', '#eee', '#f1675d', '#febe76', '#f6e58d', '#99ce7e', '#31c5d3', '#686ee0', '#b466f0', 'grey']
-        tem.series[1].stack = '11'
-        tem.series[1].type = 'bar'
-      }
-      if (this.mark == '3' && tem.positi && tem.positi == 'right') {
-        // 机构资金右侧数据
-        tem.legend.type = tem.legendType || 'scroll'
-        tem.title.textStyle = {
-          fontSize: '14'
-        }
-        this.barRightList.push(tem)
       }
     },
     // 饼图数据处理
@@ -413,7 +436,8 @@ export default {
     // 漏斗数据处理
     funnelConfig (tem) {
       let funnelStyle = {
-        left: '15%',
+        left: 'center',
+        top: '80px',
         width: '70%',
         label: {
           show: true,
@@ -428,14 +452,18 @@ export default {
         }  ${item.percentRise ? '{d|' + item.percent + '%}' : '{e|' + item.percent + '%}'}`
       })
       Object.assign(tem.series[0], funnelStyle)
-      tem.tooltip.formatter = '{a}<br/>{b}'
+      // tem.tooltip.formatter = '{a}<br/>{b}'
+      tem.title.left = 'center'
+      tem.title.top = '10px'
+      delete tem.tooltip
       tem.color = ['#634cff', '#febe76', '#31c5d3', '#FF4040', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a']
     },
     // 雷达 数据处理
     radarConfig (tem) {
       const dataLabel = ['3期', '6期', '12期', '24期', '36期', '其他期限']
+      const color = ['#ED6354', '#5C62E6']
+      tem.color = color
       tem.tooltip = {
-        // trigger: 'axis',
         formatter: function (params, ticket, callback) {
           var showHtm = ''
           for (var i = 0; i < params.value.length; i++) {
@@ -444,21 +472,28 @@ export default {
           return showHtm
         }
       }
-      tem.series[1] &&
-        (tem.series[1].itemStyle = {
-          color: 'green'
-        })
       tem.legend.orient = 'vertical'
       tem.legend.left = 'right'
       tem.legend.itemGap = 20
       tem.series.forEach((item, ind) => {
+        item.itemStyle = {
+          normal: {
+            color: color[ind],
+            lineStyle: {
+              color: color[ind]
+            },
+            areaStyle: {
+              color: color[ind]
+            }
+          }
+        }
         item.data.map((val, i) => {
           val.label = {
             normal: {
               show: true,
-              position: ind == 0 ? 'left' : 'right',
+              position: ind == 0 ? 'bottom' : 'right',
               formatter: function (params) {
-                return params.value + '%'
+                return params.value ? (params.value + '%') : ''
               }
             }
           }
@@ -470,20 +505,10 @@ export default {
       if (tem.series.length > 0) {
         tem.series[0].radius = ['45%', '65%']
         tem.series[1] && (tem.series[1].radius = ['0%', '20%'])
-        tem.color = [
-          '#f1675d',
-          '#febe76',
-          '#f6e58d',
-          '#99ce7e',
-          '#31c5d3',
-          '#686ee0',
-          '#b466f0',
-          'grey'
-        ]
-        // tem.legend.orient = 'vertical'
-        // tem.legend.left = 'right'
+        tem.color = ['#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
         tem.legend.top = 'bottom'
         tem.legend.itemGap = 20
+        tem.legend.data = []
         if (tem.type == 'pies') {
           tem.series.forEach((item, ind) => {
             item.label = {
@@ -498,12 +523,26 @@ export default {
                 }
               }
             }
+            item.data.forEach((val, i) => {
+              if (val.value == 0) {
+                item.data.splice(i, 1)
+              }
+            })
           })
         }
       }
     },
     // 四象限 数据处理
     quadrantConfig (tem) {
+      let arr = []
+      for (let key in tem.legend.extend.quadrant) {
+        arr.push({
+          name: key,
+          value: tem.legend.extend.quadrant[key]
+        })
+      }
+      const newArr = arr.splice(0, 2)
+      tem.legend.extend.quadrant = [...arr, ...newArr]
       this.quadrantList = tem.legend.extend
     },
     // line 折现数据处理
@@ -556,6 +595,9 @@ export default {
 
 <style lang="scss">
 .mod-demo-echarts {
+  .box-card {
+    margin-bottom: 8px;
+  }
   .el-card__body {
     padding: 10px;
   }

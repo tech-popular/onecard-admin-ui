@@ -10,8 +10,8 @@
         <div class="login-main" v-show="type">
           <h3 class="login-title">账号密码登录</h3>
           <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
-            <el-form-item prop="username">
-              <el-input v-model="dataForm.username" placeholder="邮箱"></el-input>
+            <el-form-item prop="email">
+              <el-input v-model="dataForm.email" placeholder="邮箱"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
@@ -27,7 +27,7 @@
                 </el-col>
               </el-row>
             </el-form-item>
-            <!-- <p class='forgetPass' @click="forgetPass">忘记密码</p> -->
+            <p class='forgetPass' @click="forgetToPass">忘记密码</p>
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')">登录</el-button>
             </el-form-item>
@@ -80,24 +80,24 @@
 
 <script>
   import { getUUID } from '@/utils'
-  import { loginIn, sendCode, checkCaptcha } from '@/api/account'
-  import { isMobile } from '@/utils/validate'
+  import { loginIn, sendCode, checkCaptcha, checkEmail, forgetPass } from '@/api/account'
+  import { isMobile, isEmail } from '@/utils/validate'
   export default {
     data () {
-      // var validateEmail = async (rule, value, callback) => {
-      //   const reg = new RegExp(/9fbank|ithro/)
-      //   if (!value) {
-      //     callback(new Error('邮箱不能为空'))
-      //   } else if (!reg.test(value)) {
-      //     callback(new Error('账号格式有误'))
-      //   } else if (!isEmail(value)) {
-      //     callback(new Error('账号格式有误'))
-      //   } else if (!await this.checkEmail(value)) { // 校验 库里 是否有该邮箱
-      //     callback(new Error('该账号尚未开通权限'))
-      //   } else {
-      //     callback()
-      //   }
-      // }
+      var validateEmail = async (rule, value, callback) => {
+        const reg = new RegExp(/9fbank|ithro/)
+        if (!value) {
+          callback(new Error('邮箱不能为空'))
+        } else if (!reg.test(value)) {
+          callback(new Error('账号格式有误'))
+        } else if (!isEmail(value)) {
+          callback(new Error('账号格式有误'))
+        } else if (!await this.checkEmailTrue(value)) { // 校验 库里 是否有该邮箱
+          callback(new Error('该账号尚未开通权限'))
+        } else {
+          callback()
+        }
+      }
       var validateMobile = async (rule, value, callback) => {
         if (!value) {
           callback(new Error('手机号不能为空'))
@@ -127,18 +127,14 @@
           uuid: ''
         },
         dataForm: {
-          // email: '',
-          username: '',
+          email: '',
           password: '',
           uuid: '',
           captcha: ''
         },
         dataRule: {
-          // email: [
-          //   { required: true, trigger: 'blur', validator: validateEmail }
-          // ],
-          username: [
-            { required: true, message: '账号不能为空', trigger: 'blur' }
+          email: [
+            { required: true, trigger: 'blur', validator: validateEmail }
           ],
           password: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -154,19 +150,19 @@
           captcha: [
             { required: true, trigger: 'blur', validator: validateCaptcha }
           ]
-          // verifyCode: [
-          //   { required: true, message: '短信验证码不能为空', trigger: 'blur' }
-          // ]
         },
         captchaPath: '',
         phoneCaptchaPath: '',
+        userId: '',
         time: 60,
-        timer: null
+        timer: null,
+        url: ''
       }
     },
     created () {
       this.getCaptcha()
       this.getPhoneCaptcha()
+      this.url = location.origin + '/#/resetPassword'
     },
     methods: {
       // 提交表单
@@ -206,8 +202,27 @@
         this.type = !this.type
       },
       // 忘记密码
-      forgetPass () {
-
+      async forgetToPass () {
+        let flag = await this.checkEmailTrue()
+        if (flag) {
+          const data = {
+            userId: this.userId,
+            email: this.dataForm.email,
+            url: this.url
+          }
+          forgetPass(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.$message({
+                message: data.msg,
+                type: 'success'
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        } else {
+          this.$refs.dataForm.validateField('email')
+        }
       },
       // 获取验证
       async getCode () {
@@ -250,6 +265,22 @@
           }
           checkCaptcha(data).then(({data}) => {
             if (data.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          })
+        })
+        return res
+      },
+      async checkEmailTrue () {
+        let res = await new Promise(resolve => {
+          const data = {
+            email: this.dataForm.email
+          }
+          checkEmail(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.userId = data.userId
               resolve(true)
             } else {
               resolve(false)
@@ -323,14 +354,15 @@
       min-height: 100%;
       background-color: #fff;
       .forgetPass {
-        color: #17B3A3;
+        width: 60px;
+        color: #2093f7;
         cursor: pointer;
       }
       .loginMethod {
         width: 140px;
         margin: 0 auto;
         text-align: center;
-        color: #17B3A3;
+        color: #2093f7;
         cursor: pointer;
       }
       .code {

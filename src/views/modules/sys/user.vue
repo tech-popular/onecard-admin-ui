@@ -1,8 +1,20 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
+      <el-form-item label="邮箱账号: ">
+        <el-input v-model="dataForm.email" placeholder="邮箱账号" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="手机号: ">
+        <el-input v-model="dataForm.mobile" placeholder="手机号" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="用户姓名: ">
+        <el-input v-model="dataForm.userName" placeholder="用户姓名" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="角色: ">
+        <el-select v-model="dataForm.role" filterable clearable placeholder="请选择">
+          <el-option v-for="item in roles" :key="item.roleId" :label="item.roleName" :value="item.roleId">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -58,6 +70,18 @@
         </template>
       </el-table-column>
       <el-table-column
+        prop="roleName"
+        header-align="center"
+        align="center"
+        label="角色">
+      </el-table-column>
+      <el-table-column
+        prop="createrName"
+        header-align="center"
+        align="center"
+        label="创建人">
+      </el-table-column>
+      <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
@@ -92,13 +116,18 @@
 
 <script>
   import AddOrUpdate from './user-add-or-update'
+  import { getRolesList } from '@/api/account'
   export default {
     data () {
       return {
         dataForm: {
-          userName: ''
+          userName: '',
+          email: '',
+          mobile: '',
+          role: ''
         },
         dataList: [],
+        roles: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -113,7 +142,17 @@
     activated () {
       this.getDataList()
     },
+    mounted () {
+      this.getRoles()
+    },
     methods: {
+      getRoles () {
+        getRolesList().then(({data}) => {
+          if (data && data.code == 0) {
+            this.roles = data.list
+          }
+        })
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -123,7 +162,10 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'username': this.dataForm.userName
+            'username': this.dataForm.userName,
+            'email': this.dataForm.email,
+            'mobile': this.dataForm.mobile,
+            'roleId': this.dataForm.role
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
