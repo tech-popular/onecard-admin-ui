@@ -60,6 +60,17 @@
       @checkNode="checkNode"
     ></five-funnel>
     <five-test v-if="type == '5' && ifMockTest"></five-test>
+    <!-- 万卡漏斗监控 -->
+    <six-board
+      v-if="type == '4' && !ifMockTest"
+      :simpleList="simpleList"
+      :barRightList="barRightList"
+      :options="options"
+      :optionIds="optionIds"
+      :hadSelectedList="hadSelectedList"
+      @checkNode="checkNode"
+    ></six-board>
+    <three-test v-if="type == '4' && ifMockTest"></three-test>
     <!-- 其他总体数据展示 -->
     <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
@@ -74,6 +85,7 @@
 </template>
 <script>
 import echarts from 'echarts'
+import sixBoard from './dashboard/sixBoard'
 import fiveFunnel from './dashboard/fiveFunnel'
 import fourQuadrant from './dashboard/fourQuadrant'
 import threeMonitor from './dashboard/threeMonitor'
@@ -89,7 +101,7 @@ import { getQueryString } from '@/utils'
 import 'echarts/lib/chart/funnel'
 import 'echarts/lib/chart/radar'
 export default {
-  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest },
+  components: { sixBoard, fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest },
   data () {
     return {
       chartPie: null,
