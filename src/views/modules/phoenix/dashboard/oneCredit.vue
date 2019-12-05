@@ -12,7 +12,7 @@
           @remove-tag="checkNode(index)"
         >
           <el-option
-            v-for="item in selection"
+            v-for="item in selectedList"
             :key="item.name"
             :label="item.value"
             :value="item.name"
@@ -33,12 +33,8 @@ export default {
       type: Array,
       default: []
     },
-    selection: {
-      type: Array,
-      default: []
-    },
     selectedList: {
-      type: Object,
+      type: Array,
       default: []
     }
   },

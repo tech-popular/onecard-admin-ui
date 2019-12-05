@@ -8,7 +8,7 @@
         <el-input v-model="dataForm.userName" placeholder="登录帐号"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password" :class="{ 'is-required': !dataForm.id }">
-        <el-input v-model="dataForm.password" type="password" placeholder="密码" @focus="cleanData()" @blur="midifyflag()"></el-input>
+        <el-input v-model="dataForm.password" autocomplete='off' type="password" placeholder="密码" @focus="cleanData()" @blur="midifyflag()"></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="comfirmPassword" :class="{ 'is-required': !dataForm.id }">
         <el-input v-model="dataForm.comfirmPassword" type="password" placeholder="确认密码"></el-input>
@@ -144,7 +144,7 @@
             { validator: validateMobile, trigger: 'blur' }
           ],
           roleIdList: [
-            { required: true, message: '角色不能为空', trigger: 'change' }
+            { required: true, message: '角色不能为空', trigger: 'blur' }
           ]
         },
         checkedName: '',
@@ -157,7 +157,7 @@
         this.checkedName = ''
         this.checkedMobile = ''
         this.checkedName = ''
-        this.remark = ''
+        this.dataForm.remark = ''
         // 数据权限列表
         this.$http({
           url: this.$http.adornUrl(`/sys/systenant/nonullselect`),

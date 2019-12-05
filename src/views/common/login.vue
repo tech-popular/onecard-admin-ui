@@ -10,8 +10,8 @@
         <div class="login-main" v-show="type">
           <h3 class="login-title">账号密码登录</h3>
           <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
-            <el-form-item prop="email">
-              <el-input v-model="dataForm.email" placeholder="邮箱"></el-input>
+            <el-form-item prop="username">
+              <el-input v-model="dataForm.username" placeholder="邮箱"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
@@ -81,23 +81,23 @@
 <script>
   import { getUUID } from '@/utils'
   import { loginIn, sendCode, checkCaptcha, checkEmail, forgetPass } from '@/api/account'
-  import { isMobile, isEmail } from '@/utils/validate'
+  import { isMobile } from '@/utils/validate'
   export default {
     data () {
-      var validateEmail = async (rule, value, callback) => {
-        const reg = new RegExp(/9fbank|ithro/)
-        if (!value) {
-          callback(new Error('邮箱不能为空'))
-        } else if (!reg.test(value)) {
-          callback(new Error('账号格式有误'))
-        } else if (!isEmail(value)) {
-          callback(new Error('账号格式有误'))
-        } else if (!await this.checkEmailTrue(value)) { // 校验 库里 是否有该邮箱
-          callback(new Error('该账号尚未开通权限'))
-        } else {
-          callback()
-        }
-      }
+      // var validateEmail = async (rule, value, callback) => {
+      //   const reg = new RegExp(/9fbank|ithro/)
+      //   if (!value) {
+      //     callback(new Error('邮箱不能为空'))
+      //   } else if (!reg.test(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else if (!isEmail(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else if (!await this.checkEmailTrue(value)) { // 校验 库里 是否有该邮箱
+      //     callback(new Error('该账号尚未开通权限'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
       var validateMobile = async (rule, value, callback) => {
         if (!value) {
           callback(new Error('手机号不能为空'))
@@ -127,14 +127,18 @@
           uuid: ''
         },
         dataForm: {
-          email: '',
+          // email: '',
+          username: '',
           password: '',
           uuid: '',
           captcha: ''
         },
         dataRule: {
-          email: [
-            { required: true, trigger: 'blur', validator: validateEmail }
+          // email: [
+          //   { required: true, trigger: 'blur', validator: validateEmail }
+          // ],
+          username: [
+            { required: true, trigger: 'blur', message: '账号不能为空' }
           ],
           password: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -160,9 +164,10 @@
       }
     },
     created () {
+      const url = location.href.split('#')[0]
       this.getCaptcha()
       this.getPhoneCaptcha()
-      this.url = location.origin + '/#/resetPassword'
+      this.url = url + '#/resetPassword'
     },
     methods: {
       // 提交表单
@@ -207,7 +212,8 @@
         if (flag) {
           const data = {
             userId: this.userId,
-            email: this.dataForm.email,
+            // email: this.dataForm.email,
+            username: this.dataForm.username,
             url: this.url
           }
           forgetPass(data).then(({data}) => {
@@ -221,6 +227,9 @@
             }
           })
         } else {
+          this.$message({
+            message: '请输入合法的邮箱'
+          })
           this.$refs.dataForm.validateField('email')
         }
       },
@@ -276,7 +285,8 @@
       async checkEmailTrue () {
         let res = await new Promise(resolve => {
           const data = {
-            email: this.dataForm.email
+            // email: this.dataForm.email
+            email: this.dataForm.username
           }
           checkEmail(data).then(({data}) => {
             if (data && data.code == 0) {

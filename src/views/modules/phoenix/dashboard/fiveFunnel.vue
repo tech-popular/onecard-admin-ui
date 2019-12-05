@@ -39,7 +39,7 @@ export default {
 </script>
 <style lang="scss">
 .height_funnel {
-  margin-top: 50px;
+  margin-top: 100px;
 }
 .mod-demo-echarts {
   .el-card__body {
