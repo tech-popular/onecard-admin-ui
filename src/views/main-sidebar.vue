@@ -5,6 +5,8 @@
         :default-active="menuActiveName || 'home'"
         :collapse="sidebarFold"
         :collapseTransition="false"
+        active-text-color="#fff"
+        text-color="#fff"
         class="site-sidebar__menu">
         <el-menu-item index="home" @click="$router.push({ name: 'home' })">
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
@@ -122,3 +124,8 @@
     }
   }
 </script>
+<style lang="scss">
+.site-sidebar__inner .el-menu-item.is-active {
+   background-color: #2093f7 !important;
+}
+</style>

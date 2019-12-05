@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-demo-echarts">
+  <div class="mod-demo-echarts height_funnel">
     <el-row :gutter="20">
       <el-col v-for="(outdata, index) in arr" :key="outdata.id" class="echartList funnelStyle">
         <el-card class="funnel-card">
@@ -38,6 +38,9 @@ export default {
 }
 </script>
 <style lang="scss">
+.height_funnel {
+  margin-top: 100px;
+}
 .mod-demo-echarts {
   .el-card__body {
     padding: 10px;
@@ -70,7 +73,7 @@ li {
   .funnel-radio {
     position: absolute;
     right: 0;
-    top: 15px;
+    top: 5px;
     z-index: 100;
     .el-radio {
       margin: 0;

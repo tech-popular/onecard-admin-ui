@@ -94,6 +94,7 @@
             if (data && data.code === 0) {
               clearLoginInfo()
               this.$router.push({ name: 'login' })
+              document.body.removeChild(document.getElementById('1.23452384164.123412415'))
             }
           })
         }).catch(() => {})
@@ -101,3 +102,8 @@
     }
   }
 </script>
+<style lang="scss">
+.site-navbar {
+  background-color: #202b30;
+}
+</style>

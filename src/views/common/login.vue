@@ -27,7 +27,7 @@
                 </el-col>
               </el-row>
             </el-form-item>
-            <!-- <p class='forgetPass' @click="forgetPass">忘记密码</p> -->
+            <p class='forgetPass' @click="forgetToPass">忘记密码</p>
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')">登录</el-button>
             </el-form-item>
@@ -80,7 +80,7 @@
 
 <script>
   import { getUUID } from '@/utils'
-  import { loginIn, sendCode, checkCaptcha } from '@/api/account'
+  import { loginIn, sendCode, checkCaptcha, checkEmail, forgetPass } from '@/api/account'
   import { isMobile } from '@/utils/validate'
   export default {
     data () {
@@ -92,7 +92,7 @@
       //     callback(new Error('账号格式有误'))
       //   } else if (!isEmail(value)) {
       //     callback(new Error('账号格式有误'))
-      //   } else if (!await this.checkEmail(value)) { // 校验 库里 是否有该邮箱
+      //   } else if (!await this.checkEmailTrue(value)) { // 校验 库里 是否有该邮箱
       //     callback(new Error('该账号尚未开通权限'))
       //   } else {
       //     callback()
@@ -138,7 +138,7 @@
           //   { required: true, trigger: 'blur', validator: validateEmail }
           // ],
           username: [
-            { required: true, message: '账号不能为空', trigger: 'blur' }
+            { required: true, trigger: 'blur', message: '账号不能为空' }
           ],
           password: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -154,19 +154,20 @@
           captcha: [
             { required: true, trigger: 'blur', validator: validateCaptcha }
           ]
-          // verifyCode: [
-          //   { required: true, message: '短信验证码不能为空', trigger: 'blur' }
-          // ]
         },
         captchaPath: '',
         phoneCaptchaPath: '',
+        userId: '',
         time: 60,
-        timer: null
+        timer: null,
+        url: ''
       }
     },
     created () {
+      const url = location.href.split('#')[0]
       this.getCaptcha()
       this.getPhoneCaptcha()
+      this.url = url + '#/resetPassword'
     },
     methods: {
       // 提交表单
@@ -206,8 +207,31 @@
         this.type = !this.type
       },
       // 忘记密码
-      forgetPass () {
-
+      async forgetToPass () {
+        let flag = await this.checkEmailTrue()
+        if (flag) {
+          const data = {
+            userId: this.userId,
+            // email: this.dataForm.email,
+            username: this.dataForm.username,
+            url: this.url
+          }
+          forgetPass(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.$message({
+                message: data.msg,
+                type: 'success'
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        } else {
+          this.$message({
+            message: '请输入合法的邮箱'
+          })
+          this.$refs.dataForm.validateField('email')
+        }
       },
       // 获取验证
       async getCode () {
@@ -250,6 +274,23 @@
           }
           checkCaptcha(data).then(({data}) => {
             if (data.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          })
+        })
+        return res
+      },
+      async checkEmailTrue () {
+        let res = await new Promise(resolve => {
+          const data = {
+            // email: this.dataForm.email
+            email: this.dataForm.username
+          }
+          checkEmail(data).then(({data}) => {
+            if (data && data.code == 0) {
+              this.userId = data.userId
               resolve(true)
             } else {
               resolve(false)
@@ -323,14 +364,15 @@
       min-height: 100%;
       background-color: #fff;
       .forgetPass {
-        color: #17B3A3;
+        width: 60px;
+        color: #2093f7;
         cursor: pointer;
       }
       .loginMethod {
         width: 140px;
         margin: 0 auto;
         text-align: center;
-        color: #17B3A3;
+        color: #2093f7;
         cursor: pointer;
       }
       .code {

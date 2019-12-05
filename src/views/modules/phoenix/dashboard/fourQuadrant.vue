@@ -1,10 +1,10 @@
 <template>
   <div class="quadrant">
-    <h3>四象限&&小X卡</h3>
-    <div class="titleName">
+    <h3>四象限</h3>
+    <!-- <div class="titleName">
       <p>四象限</p>
       <p>小X卡</p>
-    </div>
+    </div> -->
     <div class="mainText">
       <div class="quadrantLeft">
         <div class="quadrantLeftLeft">
@@ -22,9 +22,9 @@
           </div>
         </div>
         <div class="quadrantLeftRight">
-          <div :key="index" v-for="(value, key, index) in quadrantList.quadrant">
-            <p>{{key}}</p>
-            <ul :key="indexList" v-for="(valueList, keyList, indexList) in value">
+          <div :key="index" v-for="(item, index) in quadrantList.quadrant">
+            <p>{{item.name}}</p>
+            <ul :key="indexList" v-for="(valueList, keyList, indexList) in item.value">
               <li>
                 {{valueList.metric}}{{valueList.metric_unit}}
                 <span
@@ -36,7 +36,7 @@
           </div>
         </div>
       </div>
-      <div class="quadrantRight">
+      <!-- <div class="quadrantRight">
         <div
           :key="index"
           class="quadrantRightList"
@@ -49,7 +49,7 @@
             </ul>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -58,7 +58,7 @@ export default {
   props: {
     quadrantList: {
       type: Object,
-      default: []
+      default: () => {}
     }
   },
   data () {

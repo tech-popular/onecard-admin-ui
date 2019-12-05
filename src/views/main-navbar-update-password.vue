@@ -28,6 +28,20 @@
   import { clearLoginInfo } from '@/utils'
   export default {
     data () {
+      var validatePassword = (rule, value, callback) => {
+        let reg = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[._~!@#$^&*])[A-Za-z0-9._~!@#$^&*]{6,16}$/
+        if (!value) {
+          callback(new Error('密码不能为空'))
+        } else if (!reg.test(value)) {
+          callback(
+          new Error(
+            '密码长度为6到16个字符,设置时使用英文字母、数字和符号的组合'
+          )
+        )
+        } else {
+          callback()
+        }
+      }
       var validateConfirmPassword = (rule, value, callback) => {
         if (this.dataForm.newPassword !== value) {
           callback(new Error('确认密码与新密码不一致'))
@@ -47,7 +61,7 @@
             { required: true, message: '原密码不能为空', trigger: 'blur' }
           ],
           newPassword: [
-            { required: true, message: '新密码不能为空', trigger: 'blur' }
+            { required: true, validator: validatePassword, trigger: 'blur' }
           ],
           confirmPassword: [
             { required: true, message: '确认密码不能为空', trigger: 'blur' },
