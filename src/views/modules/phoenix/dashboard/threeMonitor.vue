@@ -99,7 +99,7 @@ li {
   .monitorRight {
     flex: 5;
     .monitorRightList {
-      margin: 20px;
+      margin: 50px 10px;
       position: relative;
       box-sizing: border-box;
     }

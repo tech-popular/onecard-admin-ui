@@ -32,6 +32,9 @@ export const chartsConfig = {
         fontSize: 12,
         fontWeight: 700,
         color: 'red'
+      },
+      f: {
+        padding: [5, 0, 5, 0]
       }
     }
   },

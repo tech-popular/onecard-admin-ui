@@ -264,6 +264,8 @@ export default {
         let res = data.response
         if (res.status == '1') {
           this.ifMockTest = false
+          this.options = []
+          this.optionIds = []
           if (res.data.selection.length) {
             this.list = res.data.selection[0]
             this.value = this.list.items.length ? this.list.items[0].name : ''
@@ -379,7 +381,7 @@ export default {
     parLegendConfig (tem) {
       for (let i = 0; i < tem.series.length; i++) {
         if (tem.legend.data && tem.legend.data[i].metric && tem.series) {
-          var seriesNameElse = tem.series[i].name + '\n' +
+          var seriesNameElse = '{f|' + tem.series[i].name + '}' + '\n' +
                 tem.legend.data[i].metric +
                 (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
                 (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
@@ -393,7 +395,7 @@ export default {
       }
       for (let i = 0; i < tem.legend.data.length; i++) {
         if (tem.legend.data[i].metric) {
-          var legendNameElse = tem.legend.data[i].name + '\n' +
+          var legendNameElse = '{f|' + tem.legend.data[i].name + '}' + '\n' +
             tem.legend.data[i].metric +
             (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
             (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
