@@ -11,7 +11,8 @@
         class="site-navbar__menu"
         mode="horizontal">
         <el-menu-item class="site-navbar__switch" index="0" @click="sidebarFold = !sidebarFold">
-          <icon-svg name="zhedie"></icon-svg>
+          <!-- <icon-svg name="zhedie"></icon-svg> -->
+          <img :src="sidebarFold ? right : left" alt="">
         </el-menu-item>
       </el-menu>
       <el-menu
@@ -49,7 +50,9 @@
   export default {
     data () {
       return {
-        updatePassowrdVisible: false
+        updatePassowrdVisible: false,
+        left: require('../assets/img/left.png'),
+        right: require('../assets/img/right.png')
       }
     },
     components: {

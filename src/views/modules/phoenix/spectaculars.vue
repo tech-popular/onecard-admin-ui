@@ -108,7 +108,7 @@ export default {
       chartPie: null,
       myCharts: null,
       list: [],
-      value: '预授信（常规黑指）',
+      value: '',
       visualizes: [],
       arr: [], // 有几个图表
       visibleChange: false,
