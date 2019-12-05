@@ -1,16 +1,15 @@
 <template>
   <div class="new-monitor">
-    <div class="monitorLeft" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
-      <div :key="item.id" v-for="(item) in simpleList">
-        <p>{{item.legend.extend.simple[0].name}}</p>
-        <p>
-          {{item.legend.extend.simple[0].metric}}{{item.legend.extend.simple[0].metric_unit}}
-          <span
-            class="colorRed"
-            :class="{'percentRise' : item.legend.extend.simple[0].percentRise}"
-          >{{item.legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{item.legend.extend.simple[0].percent}}{{item.legend.extend.simple[0].percent_unit}}</span>
-        </p>
+    <div class="monitorLeft" v-if="lineList[0] || lineList[1] || lineList[2]">
+      <div v-if="lineList && lineList.length > 0" class="line">
+      <div :key="item.id" v-for="(item) in lineList">
+        <div class="lineEvery">
+          <p>{{item.titleName}}</p>
+          <h3>{{item.series[0].data[item.series[0].data.length-1].percent}}</h3>
+          <div :id="'lineCharts' + item.id" class="lineCharts"></div>
+        </div>
       </div>
+    </div>
     </div>
     <div class="monitorRight">
       <div class="monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
@@ -32,7 +31,7 @@ import selectTree from './selectTree'
 export default {
   components: { selectTree },
   props: {
-    simpleList: {
+    lineList: {
       type: Array,
       default: []
     },

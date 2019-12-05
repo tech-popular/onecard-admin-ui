@@ -63,7 +63,7 @@
     <!-- 万卡漏斗监控 -->
     <six-board
       v-if="type == '4' && !ifMockTest"
-      :simpleList="simpleList"
+      :lineList="lineList"
       :barRightList="barRightList"
       :options="options"
       :optionIds="optionIds"
@@ -72,7 +72,7 @@
     ></six-board>
     <six-test v-if="type == '4' && ifMockTest"></six-test>
     <!-- 其他总体数据展示 -->
-    <div v-if="lineList && lineList.length > 0" class="line">
+    <!-- <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
         <div class="lineEvery">
           <p>{{item.titleName}}</p>
@@ -80,7 +80,7 @@
           <div :id="'lineCharts' + item.id" class="lineCharts"></div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
