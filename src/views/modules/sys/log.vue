@@ -48,7 +48,7 @@
         label="创建时间"
       ></el-table-column>
       <el-table-column
-        prop="createDate"
+        prop="loginTime"
         header-align="center"
         align="center"
         width="180"
