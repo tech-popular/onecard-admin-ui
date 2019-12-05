@@ -24,7 +24,6 @@
     <one-credit
       v-if="type == '1' && !ifMockTest"
       :arr="arr"
-      :selection="selection"
       :selectedList="selectedList"
       @checkNode="checkNode"
     ></one-credit>
@@ -107,7 +106,7 @@ export default {
       defaultSelection: [], // 调用默认接口存的数据
       mark: '', // 区分是哪个列表点过来的
       type: '', // 区分是什么类型的大屏
-      selectedList: {},
+      selectedList: [],
       timer: null, // 定时器
       ifMockTest: true,
       visualizeSelection: [],
@@ -568,6 +567,7 @@ export default {
     selectConfig (res) {
       let selectList = res.data.selection[0].selectList
       let list = []
+      let selectionList = []
       this.optionIds = []
       selectList.forEach(item => {
         this.optionIds = [...this.optionIds, ...item.value]
@@ -579,8 +579,13 @@ export default {
             }
           })
         })
+        selectionList.push({
+          name: item.name,
+          value: item.value[0]
+        })
       })
       this.options = list
+      this.selectedList = selectionList
     },
     autoReload () {
       this.timer = setInterval(() => {
