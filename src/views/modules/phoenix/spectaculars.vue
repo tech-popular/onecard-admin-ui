@@ -221,6 +221,7 @@ export default {
         .then(resp => {
           let res = resp.data
           this.defaultSelection = res.response.data[0]
+          this.value = this.defaultSelection.items[0].name
         })
         .then(() => {
           this.queryList()
@@ -266,7 +267,6 @@ export default {
           if (res.data.selection.length) {
             this.list = res.data.selection[0]
             this.value = this.list.items.length ? this.list.items[0].name : ''
-            console.log(this.value)
             this.selectConfig(res)
           }
           this.arr = []

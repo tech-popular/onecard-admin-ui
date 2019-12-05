@@ -17,6 +17,7 @@
         <div :id="'barCharts' + item.id" class="barCharts"></div>
         <select-tree
             class="monitorSelectList"
+            v-show="optionIds.length"
             :options="options"
             :optionIds="optionIds"
             :index="index"
