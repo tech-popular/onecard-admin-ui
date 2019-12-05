@@ -15,7 +15,7 @@
         <el-option
           v-for="item in list.items"
           :key="item.name"
-          :label="item.value"
+          :label="item.name"
           :value="item.name"
         ></el-option>
       </el-select>
@@ -112,7 +112,6 @@ export default {
       arr: [], // 有几个图表
       visibleChange: false,
       visualizeId: 1, // 图表筛选框
-      selection: [],
       lineList: [], // 框框加折线图数据
       simpleList: [], // 侧边数据
       quadrantList: {}, // 四象限数据
@@ -191,7 +190,7 @@ export default {
     } else {
       this.visualizeSelection = this.params1
     }
-    this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+    this.type == '1' ? this.getDefaultSelection() : this.queryList()
     this.autoReload()
   },
   activated () {
@@ -215,7 +214,7 @@ export default {
         method: 'post',
         data: {
           data: {
-            dashboardId: 1
+            dashboardId: this.mark
           }
         }
       })
@@ -242,7 +241,7 @@ export default {
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection.placeholder,
-                items: mark == '1' ? [{
+                items: this.type == '1' ? [{
                   name: this.value,
                   value: [this.value]
                 }] : [],
@@ -266,6 +265,8 @@ export default {
           this.ifMockTest = false
           if (res.data.selection.length) {
             this.list = res.data.selection[0]
+            this.value = this.list.items.length ? this.list.items[0].name : ''
+            console.log(this.value)
             this.selectConfig(res)
           }
           this.arr = []
@@ -296,14 +297,10 @@ export default {
       this[`${tem.type}Config`](tem, index)
 
       if (tem.selection[0]) {
-        this.selection =
-          tem.selection[0].selectList && tem.selection[0].selectList.length > 0
-            ? tem.selection[0].selectList
-            : tem.selection[0].items
         this.visualizeId = tem.id
       }
       setTimeout(() => {
-        if (this.mark == '3' && tem.positi == 'right') {
+        if (tem.positi == 'right') {
           let label = 'barCharts' + tem.id
           this.chartsInit(this.myCharts, label, tem)
           return false
