@@ -143,6 +143,7 @@ export default {
       }],
       options: [],
       optionIds: [],
+      color: ['#f1675d', '#eee', '#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999'],
       hadSelectedList: [], // 已选择的数据
       hadSelectedParamsList: [], // 已选择的参数
       barRightList: [] // 右侧柱状图数据
@@ -173,7 +174,7 @@ export default {
         } else {
           this.visualizeSelection = this.params1
         }
-        this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+        this.type == '1' ? this.getDefaultSelection() : this.queryList()
       }
     }
   },
@@ -221,7 +222,7 @@ export default {
         .then(resp => {
           let res = resp.data
           this.defaultSelection = res.response.data[0]
-          this.value = this.defaultSelection.items[0].name
+          this.value = this.defaultSelection ? this.defaultSelection.items[0].name : ''
         })
         .then(() => {
           this.queryList()
@@ -241,13 +242,13 @@ export default {
               {
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
-                placeholder: this.list.placeholder || this.defaultSelection.placeholder,
+                placeholder: this.list.placeholder || this.defaultSelection ? this.defaultSelection.placeholder : '',
                 items: this.type == '1' ? [{
                   name: this.value,
                   value: [this.value]
                 }] : [],
-                columnName: this.list.columnName || this.defaultSelection.columnName,
-                mark: this.list.mark || this.defaultSelection.mark
+                columnName: this.list.columnName || this.defaultSelection ? this.defaultSelection.columnName : '',
+                mark: this.list.mark || this.defaultSelection ? this.defaultSelection.mark : ''
               }
             ],
             visualizeId: this.visualizeId,
@@ -285,9 +286,6 @@ export default {
     },
     initCharts (tem, index) {
       tem.selectListArr = []
-      if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
-        this.arr.push(tem)
-      }
       tem['grid'] = chartsConfig.grid
       tem['color'] = chartsConfig.color
       Object.assign(tem.title, chartsConfig.title)
@@ -295,6 +293,10 @@ export default {
       if (tem.xAxis) {
         Object.assign(tem.xAxis, chartsConfig.xAxis)
       }
+      if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
+        this.arr.push(tem)
+      }
+
       // 通过tem.type类型找到对应的方法执行 参数是 tem, index
       this[`${tem.type}Config`](tem, index)
 
@@ -340,9 +342,11 @@ export default {
       this.parLegendConfig(tem)
       tem['tooltip'] = chartsConfig.tooltip
       if (this.mark == '2' && (index == 1 || index == 3)) {
-        tem.color = ['#f1675d', '#eee', '#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
+        tem.color = this.color
         tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
         tem.series[1].type = 'bar'
+      } else {
+        tem.color = chartsConfig.color
       }
       if (this.type == '3' && tem.positi && tem.positi == 'right') {
         // 机构资金右侧数据
@@ -373,7 +377,7 @@ export default {
       tem.title.textStyle = {
         fontSize: '12'
       }
-      tem.color[1] = '#eee'
+      // tem.color[1] = '#eee'
       tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
       this.barRightList.push(tem)
     },

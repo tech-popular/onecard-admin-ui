@@ -1,11 +1,11 @@
 <template>
   <div class="new-monitor">
-    <div class="monitorLeft" v-if="lineList[0] || lineList[1] || lineList[2]">
+    <div class="monitorLeft" v-if="lineList.length">
       <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
         <div class="lineEvery">
           <p>{{item.titleName}}</p>
-          <h3>{{item.series[0].data[item.series[0].data.length-1].percent}}</h3>
+          <h3>{{item.series[0].data[item.series[0].data.length - 1].percent}}</h3>
           <div :id="'lineCharts' + item.id" class="lineCharts"></div>
         </div>
       </div>
@@ -16,6 +16,7 @@
         <div :id="'barCharts' + item.id" class="barCharts"></div>
         <select-tree
             class="monitorSelectList"
+            v-show="optionIds.length"
             :options="options"
             :optionIds="optionIds"
             :index="index"

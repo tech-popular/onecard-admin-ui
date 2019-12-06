@@ -9,13 +9,8 @@
     <div class="monitorLeft">
       <div :key="item" v-for="item in num"></div>
     </div>
-    <div class="monitorCenter">
-      <div class="monitorRightList" :key="item" v-for="item in num">
-        <div :id="'mock' + item" class="barCharts"></div>
-      </div>
-    </div>
     <div class="monitorRight">
-      <div class="monitorRightList" :key="item" v-for="item in num">
+      <div class="monitorRightList" :key="item" v-for="item in nums">
         <div :id="'mock' + item" class="barCharts"></div>
       </div>
     </div>
@@ -27,6 +22,7 @@ export default {
   data () {
     return {
       num: 2,
+      nums: 4,
       loading: true,
       option: {
         color: ['rgb(221, 221, 221)'],
@@ -45,28 +41,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: [
-              '1',
-              '2',
-              '3',
-              '4',
-              '5',
-              '6',
-              '7',
-              '8',
-              '9',
-              '10',
-              '11',
-              '12',
-              '13',
-              '14',
-              '15',
-              '16',
-              '17',
-              '18',
-              '19',
-              '20'
-            ],
+            data: [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20' ],
             axisTick: {
               alignWithLabel: true
             }
@@ -82,35 +57,14 @@ export default {
             name: '直接访问',
             type: 'bar',
             barWidth: '60%',
-            data: [
-              10,
-              52,
-              200,
-              334,
-              390,
-              330,
-              220,
-              123,
-              167,
-              190,
-              156,
-              245,
-              123,
-              167,
-              190,
-              156,
-              245,
-              190,
-              156,
-              245
-            ]
+            data: [10, 52, 200, 334, 390, 330, 220, 123, 167, 190, 156, 245, 123, 167, 190, 156, 245, 190, 156, 245]
           }
         ]
       }
     }
   },
   mounted () {
-    for (let i = 1; i <= this.num; i++) {
+    for (let i = 1; i <= this.nums; i++) {
       const chart = echarts.init(document.getElementById('mock' + i))
       chart.setOption(this.option, true)
     }
@@ -131,7 +85,6 @@ li {
 
 .monitor {
   width: 100%;
-  // background: #f0f4f8;
   margin-top: 20px;
   display: flex;
   .monitorLeft {
@@ -150,22 +103,12 @@ li {
       }
     }
   }
-  .monitorCenter {
-    flex: 3;
-    .monitorRightList {
-      margin: 20px;
-      position: relative;
-      box-sizing: border-box;
-    }
-    .barCharts {
-      min-height: 300px;
-      max-height: 300px;
-    }
-  }
   .monitorRight {
-    flex: 3;
+    flex: 7;
     .monitorRightList {
       margin: 20px;
+      width: 46%;
+      display: inline-block;
       position: relative;
       box-sizing: border-box;
     }
