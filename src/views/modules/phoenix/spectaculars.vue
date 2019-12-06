@@ -345,10 +345,8 @@ export default {
         tem.color = this.color
         tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
         tem.series[1].type = 'bar'
-      } else {
-        tem.color = chartsConfig.color
       }
-      if (this.type == '3' && tem.positi && tem.positi == 'right') {
+      if (tem.positi && tem.positi == 'right') {
         // 机构资金右侧数据
         this.threeMarkConfig(tem)
       }
