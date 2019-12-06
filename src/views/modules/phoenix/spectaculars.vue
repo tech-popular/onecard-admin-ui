@@ -16,7 +16,7 @@
           v-for="item in list.items"
           :key="item.name"
           :label="item.name"
-          :value="item.name"
+          :value="item"
         ></el-option>
       </el-select>
     </el-card>
@@ -108,6 +108,8 @@ export default {
       myCharts: null,
       list: [],
       value: '',
+      name: '',
+      reqParams: {},
       visualizes: [],
       arr: [], // 有几个图表
       visibleChange: false,
@@ -222,7 +224,11 @@ export default {
         .then(resp => {
           let res = resp.data
           this.defaultSelection = res.response.data[0]
-          this.value = this.defaultSelection ? this.defaultSelection.items[0].name : ''
+          this.value = this.defaultSelection ? this.defaultSelection.items[0].value[0] : ''
+          this.reqParams = {
+            name: this.defaultSelection ? this.defaultSelection.items[0].name : '',
+            value: [this.defaultSelection ? this.defaultSelection.items[0].value[0] : '']
+          }
         })
         .then(() => {
           this.queryList()
@@ -243,10 +249,7 @@ export default {
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection ? this.defaultSelection.placeholder : '',
-                items: this.type == '1' ? [{
-                  name: this.value,
-                  value: [this.value]
-                }] : [],
+                items: (this.type == '1' || this.type == '4') ? [this.reqParams] : [],
                 columnName: this.list.columnName || this.defaultSelection ? this.defaultSelection.columnName : '',
                 mark: this.list.mark || this.defaultSelection ? this.defaultSelection.mark : ''
               }
@@ -323,6 +326,7 @@ export default {
       this.quadrantList = {}
       this.lineList = []
       this.simpleList = []
+      this.reqParams = this.value
       this.queryList()
     },
     checkNode (value, index, data) {
@@ -353,24 +357,24 @@ export default {
     },
     // 对 机构资金 config配置
     threeMarkConfig (tem) {
-      let first = {}
-      let second = {}
-      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
-        first = JSON.parse(JSON.stringify(tem.legend.data[0]))
-        tem.legend.data.splice(0, 1)
-      }
-      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
-        second = JSON.parse(JSON.stringify(tem.legend.data[0]))
-        tem.legend.data.splice(0, 1)
+      let another = []
+      // 排序 将今日 昨日 上月的数据 截取放到前面
+      for (let i = 0; i < tem.legend.data.length; i++) {
+        if ((tem.legend.data[i].name.indexOf('昨日') !== -1) || (tem.legend.data[i].name.indexOf('今日') != -1) || (tem.legend.data[i].name.indexOf('上月') != -1)) {
+          another.push(JSON.parse(JSON.stringify(tem.legend.data[i])))
+          tem.legend.data.splice(i, 1)
+          i--
+        }
       }
       tem.legend.data.sort((a, b) => {
         if (a.metric_unit) {
           return b.metric - a.metric
         }
       })
-      if (JSON.stringify(first) !== '{}') {
-        tem.legend.data = [...[first], ...[second], ...tem.legend.data]
+      if (another.length) {
+        tem.legend.data = [...another, ...tem.legend.data]
       }
+      /*********************************************************/
       tem.legend.type = tem.legendType || 'scroll'
       tem.title.textStyle = {
         fontSize: '12'

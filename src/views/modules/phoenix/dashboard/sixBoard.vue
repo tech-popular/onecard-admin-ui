@@ -1,6 +1,6 @@
 <template>
   <div class="new-monitor">
-    <div class="monitorLeft" v-if="lineList.length">
+    <div class="new-monitorLeft" v-if="lineList.length">
       <div v-if="lineList && lineList.length > 0" class="line">
       <div :key="item.id" v-for="(item) in lineList">
         <div class="lineEvery">
@@ -11,11 +11,11 @@
       </div>
     </div>
     </div>
-    <div class="monitorRight">
-      <div class="monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
+    <div class="new-monitorRight">
+      <div class="new-monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
         <div :id="'barCharts' + item.id" class="barCharts"></div>
         <select-tree
-            class="monitorSelectList"
+            class="new-monitorSelectList"
             v-show="optionIds.length"
             :options="options"
             :optionIds="optionIds"
@@ -81,7 +81,7 @@ li {
   // background: #f0f4f8;
   margin-top: 20px;
   display: flex;
-  .monitorLeft {
+  .new-monitorLeft {
     flex: 1;
     & > div {
       border-radius: 10px;
@@ -96,9 +96,9 @@ li {
       }
     }
   }
-  .monitorRight {
+  .new-monitorRight {
     flex: 7;
-    .monitorRightList {
+    .new-monitorRightList {
       width: 45%;
       display: inline-block;
       margin: 20px;
@@ -120,7 +120,7 @@ li {
   border: none;
   border-radius: 5px;
 }
-.monitorSelectList {
+.new-monitorSelectList {
     position: absolute;
     width: 200px;
     top: -8px;
