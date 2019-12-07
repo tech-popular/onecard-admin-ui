@@ -176,7 +176,7 @@ export default {
         } else {
           this.visualizeSelection = this.params1
         }
-        this.type == '1' ? this.getDefaultSelection() : this.queryList()
+        (this.type == '1' || this.type == '4') ? this.getDefaultSelection() : this.queryList()
       }
     }
   },
@@ -193,8 +193,8 @@ export default {
     } else {
       this.visualizeSelection = this.params1
     }
-    this.type == '1' ? this.getDefaultSelection() : this.queryList()
-    this.autoReload()
+    (this.type == '1' || this.type == '4') ? this.getDefaultSelection() : this.queryList()
+    this.autoReload() 
   },
   activated () {
     // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -237,6 +237,7 @@ export default {
     // 获取列表
     queryList (visualizeSelection = this.visualizeSelection, selectionData) {
       let { mark } = this.$data
+      const items = JSON.stringify(this.reqParams) == '{}' ? [] : [this.reqParams]
       this.$http({
         url: this.$http.adornUrl('/phoenix/dashboard'),
         method: 'post',
@@ -249,7 +250,7 @@ export default {
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
                 placeholder: this.list.placeholder || this.defaultSelection ? this.defaultSelection.placeholder : '',
-                items: (this.type == '1' || this.type == '4') ? [this.reqParams] : [],
+                items: (this.type == '1' || this.type == '4') ? items : [],
                 columnName: this.list.columnName || this.defaultSelection ? this.defaultSelection.columnName : '',
                 mark: this.list.mark || this.defaultSelection ? this.defaultSelection.mark : ''
               }
