@@ -4,8 +4,11 @@
       <div v-if="lineList && lineList.length > 0" class="line">
         <div :key="item.id" v-for="(item) in lineList">
           <div class="lineEvery">
-            <p>{{item.titleName}}</p>
-            <h3>{{item.series[0].data[item.series[0].data.length - 1].value}}</h3>
+            <div class="line_div">
+              <p>{{item.titleName}}</p>
+              <h3>{{item.series[0].data[item.series[0].data.length - 1].value}}%</h3>
+            </div>
+            
             <div :id="'lineCharts' + item.id" class="lineCharts"></div>
           </div>
         </div>
@@ -139,18 +142,30 @@ li {
   margin-top: 20px;
   & > div {
     .lineEvery {
+      position: relative;
       text-align: center;
       max-width: 400px;
-      padding-top: 40px;
-      p {
-        padding-top: 20px;
+      padding-top: 25px;
+      .line_div {
+        position: absolute;
+        width: 200px;
+        left: 50%;
+        margin-left: -100px;
+        z-index: 10;
+      }
+      h3 {
+        width: 100%;
+        font-size: 26px;
+        margin-top: 10px;
+        position: absolute;
       }
     }
   }
 }
 .lineCharts {
-  width: 200px;
-  height: 150px;
-  overflow: hidden;
+  left: -20px;
+  margin-left: 20px;
+  width: 250px;
+  height: 300px;
 }
 </style>

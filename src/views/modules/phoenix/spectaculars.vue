@@ -1,23 +1,8 @@
 <template>
-  <div class="mod-demo-echarts" id='dashboard'>
-    <!-- <el-alert title type="warning" v-if="list.items && list.items.length > 0" :closable="false">
-      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
-        <el-option
-          v-for="item in list.items"
-          :key="item.name"
-          :label="item.value"
-          :value="item.name"
-        ></el-option>
-      </el-select>
-    </el-alert> -->
+  <div class="mod-demo-echarts" id="dashboard">
     <el-card class="box-card" v-if="list.items && list.items.length > 0">
       <el-select v-model="value" @change="selectGet()">
-        <el-option
-          v-for="item in list.items"
-          :key="item.name"
-          :label="item.name"
-          :value="item"
-        ></el-option>
+        <el-option v-for="item in list.items" :key="item.name" :label="item.name" :value="item"></el-option>
       </el-select>
     </el-card>
     <!-- 授信路径监控 -->
@@ -53,11 +38,7 @@
     <four-quadrant v-if="type == '6' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
     <four-test v-if="type == '6' && ifMockTest"></four-test>
     <!-- 渠道整体转化率 -->
-    <five-funnel
-      v-if="type == '5' && !ifMockTest"
-      :arr="arr"
-      @checkNode="checkNode"
-    ></five-funnel>
+    <five-funnel v-if="type == '5' && !ifMockTest" :arr="arr" @checkNode="checkNode"></five-funnel>
     <five-test v-if="type == '5' && ifMockTest"></five-test>
     <!-- 万卡漏斗监控 -->
     <six-board
@@ -70,16 +51,6 @@
       @checkNode="checkNode"
     ></six-board>
     <six-test v-if="type == '4' && ifMockTest"></six-test>
-    <!-- 其他总体数据展示 -->
-    <!-- <div v-if="lineList && lineList.length > 0" class="line">
-      <div :key="item.id" v-for="(item) in lineList">
-        <div class="lineEvery">
-          <p>{{item.titleName}}</p>
-          <h3>{{item.series[0].data[item.series[0].data.length-1].percent}}</h3>
-          <div :id="'lineCharts' + item.id" class="lineCharts"></div>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 <script>
@@ -101,12 +72,25 @@ import { getQueryString } from '@/utils'
 import 'echarts/lib/chart/funnel'
 import 'echarts/lib/chart/radar'
 export default {
-  components: { sixBoard, fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest, sixTest },
+  components: {
+    sixBoard,
+    fourQuadrant,
+    threeMonitor,
+    twoRainbow,
+    fiveFunnel,
+    oneCredit,
+    oneTest,
+    twoTest,
+    threeTest,
+    fourTest,
+    fiveTest,
+    sixTest
+  },
   data () {
     return {
       chartPie: null,
       myCharts: null,
-      list: [],
+      list: {},
       value: '',
       name: '',
       reqParams: {},
@@ -124,28 +108,45 @@ export default {
       timer: null, // 定时器
       ifMockTest: true,
       visualizeSelection: [],
-      params1: [{
-        'name': 'visualize过滤策略',
-        'type': 'visualize',
-        'placeholder': '',
-        'items': [],
-        'columnName': '',
-        'mark': ''
-      }],
-      params5: [{
-        'name': 'visualize过滤策略',
-        'type': 'visualize',
-        'placeholder': '\\{sourceType\\}',
-        'items': [{
-          'name': '市场渠道',
-          'value': ['市场渠道']
-        }],
-        'columnName': 'source_type',
-        'mark': 'IN'
-      }],
+      params1: [
+        {
+          name: 'visualize过滤策略',
+          type: 'visualize',
+          placeholder: '',
+          items: [],
+          columnName: '',
+          mark: ''
+        }
+      ],
+      params5: [
+        {
+          name: 'visualize过滤策略',
+          type: 'visualize',
+          placeholder: '\\{sourceType\\}',
+          items: [
+            {
+              name: '市场渠道',
+              value: ['市场渠道']
+            }
+          ],
+          columnName: 'source_type',
+          mark: 'IN'
+        }
+      ],
       options: [],
       optionIds: [],
-      color: ['#f1675d', '#eee', '#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999'],
+      color: [
+        '#f1675d',
+        '#eee',
+        '#ED6354',
+        '#FFC175',
+        '#FEEC8D',
+        '#A3D47D',
+        '#59CBDD',
+        '#5C62E6',
+        '#A85BF8',
+        '#999999'
+      ],
       hadSelectedList: [], // 已选择的数据
       hadSelectedParamsList: [], // 已选择的参数
       barRightList: [] // 右侧柱状图数据
@@ -165,7 +166,7 @@ export default {
     $route (to) {
       if (to.path.indexOf('phoenix-spectaculars') != -1) {
         this.visualizeId = 1
-        this.list = []
+        this.list = {}
         this.ifMockTest = true
         this.hadSelectedList = []
         this.hadSelectedParamsList = []
@@ -176,7 +177,9 @@ export default {
         } else {
           this.visualizeSelection = this.params1
         }
-        (this.type == '1' || this.type == '4') ? this.getDefaultSelection() : this.queryList()
+        this.type == '1' || this.type == '4'
+          ? this.getDefaultSelection()
+          : this.queryList()
       }
     }
   },
@@ -193,7 +196,9 @@ export default {
     } else {
       this.visualizeSelection = this.params1
     }
-    (this.type == '1' || this.type == '4') ? this.getDefaultSelection() : this.queryList()
+    this.type == '1' || this.type == '4'
+      ? this.getDefaultSelection()
+      : this.queryList()
     this.autoReload()
   },
   activated () {
@@ -224,10 +229,18 @@ export default {
         .then(resp => {
           let res = resp.data
           this.defaultSelection = res.response.data[0]
-          this.value = this.defaultSelection ? this.defaultSelection.items[0].value[0] : ''
+          this.value = this.defaultSelection
+            ? this.defaultSelection.items[0].value[0]
+            : ''
           this.reqParams = {
-            name: this.defaultSelection ? this.defaultSelection.items[0].name : '',
-            value: [this.defaultSelection ? this.defaultSelection.items[0].value[0] : '']
+            name: this.defaultSelection
+              ? this.defaultSelection.items[0].name
+              : '',
+            value: [
+              this.defaultSelection
+                ? this.defaultSelection.items[0].value[0]
+                : ''
+            ]
           }
         })
         .then(() => {
@@ -237,7 +250,8 @@ export default {
     // 获取列表
     queryList (visualizeSelection = this.visualizeSelection, selectionData) {
       let { mark } = this.$data
-      const items = JSON.stringify(this.reqParams) == '{}' ? [] : [this.reqParams]
+      const items =
+        JSON.stringify(this.reqParams) == '{}' ? [] : [this.reqParams]
       this.$http({
         url: this.$http.adornUrl('/phoenix/dashboard'),
         method: 'post',
@@ -249,10 +263,19 @@ export default {
               {
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
-                placeholder: this.list.placeholder || this.defaultSelection ? this.defaultSelection.placeholder : '',
-                items: (this.type == '1' || this.type == '4') ? items : [],
-                columnName: this.list.columnName || this.defaultSelection ? this.defaultSelection.columnName : '',
-                mark: this.list.mark || this.defaultSelection ? this.defaultSelection.mark : ''
+                placeholder:
+                  this.list.placeholder || this.defaultSelection
+                    ? this.defaultSelection.placeholder
+                    : '',
+                items: this.type == '1' || this.type == '4' ? items : [],
+                columnName:
+                  this.list.columnName || this.defaultSelection
+                    ? this.defaultSelection.columnName
+                    : '',
+                mark:
+                  this.list.mark || this.defaultSelection
+                    ? this.defaultSelection.mark
+                    : ''
               }
             ],
             visualizeId: this.visualizeId,
@@ -272,8 +295,12 @@ export default {
           this.options = []
           this.optionIds = []
           if (res.data.selection.length) {
-            this.list = res.data.selection[0]
-            this.value = this.list.items.length ? this.list.items[0].name : ''
+            if (JSON.stringify(this.list) == '{}') {
+              this.list = res.data.selection[0]
+              this.value = this.list.items.length
+                ? this.list.items[0].name
+                : ''
+            }
             this.selectConfig(res)
           }
           this.arr = []
@@ -297,7 +324,12 @@ export default {
       if (tem.xAxis) {
         Object.assign(tem.xAxis, chartsConfig.xAxis)
       }
-      if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
+      if (
+        tem.type != 'quadrant' &&
+        tem.type != 'simple' &&
+        tem.type != 'line' &&
+        this.mark != '3'
+      ) {
         this.arr.push(tem)
       }
 
@@ -313,7 +345,12 @@ export default {
           this.chartsInit(this.myCharts, label, tem)
           return false
         }
-        if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
+        if (
+          tem.type != 'quadrant' &&
+          tem.type != 'simple' &&
+          tem.type != 'line' &&
+          this.mark != '3'
+        ) {
           let label = 'J_chartLineBox' + tem.id
           this.chartsInit(this.chartPie, label, tem)
         } else if (tem.type == 'line') {
@@ -361,7 +398,11 @@ export default {
       let another = []
       // 排序 将今日 昨日 上月的数据 截取放到前面
       for (let i = 0; i < tem.legend.data.length; i++) {
-        if ((tem.legend.data[i].name.indexOf('昨日') !== -1) || (tem.legend.data[i].name.indexOf('今日') != -1) || (tem.legend.data[i].name.indexOf('上月') != -1)) {
+        if (
+          tem.legend.data[i].name.indexOf('昨日') !== -1 ||
+          tem.legend.data[i].name.indexOf('今日') != -1 ||
+          tem.legend.data[i].name.indexOf('上月') != -1
+        ) {
           another.push(JSON.parse(JSON.stringify(tem.legend.data[i])))
           tem.legend.data.splice(i, 1)
           i--
@@ -390,12 +431,18 @@ export default {
     parLegendConfig (tem) {
       for (let i = 0; i < tem.series.length; i++) {
         if (tem.legend.data && tem.legend.data[i].metric && tem.series) {
-          var seriesNameElse = '{f|' + tem.series[i].name + '}' + '\n' +
-                tem.legend.data[i].metric +
-                (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
-                (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
-                tem.legend.data[i].percent +
-                tem.legend.data[i].percent_unit
+          var seriesNameElse =
+            '{f|' +
+            tem.series[i].name +
+            '}' +
+            '\n' +
+            tem.legend.data[i].metric +
+            (tem.legend.data[i].metric_unit == '￥'
+              ? ''
+              : tem.legend.data[i].metric_unit) +
+            (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
+            tem.legend.data[i].percent +
+            tem.legend.data[i].percent_unit
           tem.series[i].name = seriesNameElse
           if (!tem.series[i].data) {
             tem.legend.data[i]['icon'] = 'image://'
@@ -404,9 +451,15 @@ export default {
       }
       for (let i = 0; i < tem.legend.data.length; i++) {
         if (tem.legend.data[i].metric) {
-          var legendNameElse = '{f|' + tem.legend.data[i].name + '}' + '\n' +
+          var legendNameElse =
+            '{f|' +
+            tem.legend.data[i].name +
+            '}' +
+            '\n' +
             tem.legend.data[i].metric +
-            (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
+            (tem.legend.data[i].metric_unit == '￥'
+              ? ''
+              : tem.legend.data[i].metric_unit) +
             (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
             tem.legend.data[i].percent +
             tem.legend.data[i].percent_unit
@@ -469,14 +522,30 @@ export default {
       tem.series[0].data.forEach((item, index) => {
         item.name = `{c|${item.name}  ${item.value}人}  ${
           item.percentRise ? '{a|↑}' : '{b|↓}'
-        }  ${item.percentRise ? '{d|' + item.percent + '%}' : '{e|' + item.percent + '%}'}`
+        }  ${
+          item.percentRise
+            ? '{d|' + item.percent + '%}'
+            : '{e|' + item.percent + '%}'
+        }`
       })
       Object.assign(tem.series[0], funnelStyle)
       // tem.tooltip.formatter = '{a}<br/>{b}'
       tem.title.left = 'center'
       tem.title.top = '10px'
       delete tem.tooltip
-      tem.color = ['#634cff', '#febe76', '#31c5d3', '#FF4040', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a']
+      tem.color = [
+        '#634cff',
+        '#febe76',
+        '#31c5d3',
+        '#FF4040',
+        '#f1675d',
+        '#f6e58d',
+        '#686ee0',
+        '#99ce7e',
+        '#b466f0',
+        '#f7b500',
+        '#48a37a'
+      ]
     },
     // 雷达 数据处理
     radarConfig (tem) {
@@ -513,7 +582,7 @@ export default {
               show: true,
               position: ind == 0 ? 'bottom' : 'right',
               formatter: function (params) {
-                return params.value ? (params.value + '%') : ''
+                return params.value ? params.value + '%' : ''
               }
             }
           }
@@ -525,7 +594,16 @@ export default {
       if (tem.series.length > 0) {
         tem.series[0].radius = ['45%', '65%']
         tem.series[1] && (tem.series[1].radius = ['0%', '20%'])
-        tem.color = ['#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
+        tem.color = [
+          '#ED6354',
+          '#FFC175',
+          '#FEEC8D',
+          '#A3D47D',
+          '#59CBDD',
+          '#5C62E6',
+          '#A85BF8',
+          '#999999'
+        ]
         tem.legend.top = 'bottom'
         tem.legend.itemGap = 20
         tem.legend.data = []
@@ -570,27 +648,38 @@ export default {
       tem.titleName = tem.title.text
       tem.title = {}
       tem.yAxis.show = false
+      tem.xAxis.axisTick.length = 20
       tem.yAxis.splitNumber = 5
       tem.xAxis.show = false
       tem.series[0].name = ''
-      // tem.grid.top = ''
       tem.series[0].areaStyle = {}
       tem.series.forEach((item, ind) => {
         item.data.map((val, i) => {
           val.label = {
             normal: {
-              show: true
+              show: true,
+              formatter: function (params) {
+                return params.value ? params.value + '%' : ''
+              }
             }
           }
         })
         item.areaStyle = {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-            offset: 0,
-            color: 'rgb(255, 158, 68)'
-          }, {
-            offset: 1,
-            color: 'rgb(255, 70, 131)'
-          }])
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: 'rgb(255, 158, 68)'
+            },
+            {
+              offset: 1,
+              color: 'rgb(255, 70, 131)'
+            }
+          ])
+        }
+        item.itemStyle = {
+          normal: {
+            fontSize: 30
+          }
         }
       })
       this.lineList.push(tem)
@@ -661,22 +750,4 @@ export default {
 li {
   list-style: none;
 }
-// .line {
-//   width: 100%;
-//   height: 300px;
-//   background: #f0f4f8;
-//   margin-top: 20px;
-//   & > div {
-//     .lineEvery {
-//       text-align: center;
-//       max-width: 400px;
-//       p {
-//         padding-top: 20px;
-//       }
-//     }
-//   }
-// }
-// .lineCharts {
-//   width: 400px;
-// }
 </style>
