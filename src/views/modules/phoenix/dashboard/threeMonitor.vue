@@ -17,6 +17,7 @@
         <div :id="'barCharts' + item.id" class="barCharts"></div>
         <select-tree
             class="monitorSelectList"
+            v-show="optionIds.length"
             :options="options"
             :optionIds="optionIds"
             :index="index"
@@ -58,7 +59,6 @@ export default {
   },
   methods: {
     checkNode (data, index) {
-      console.log(data)
       data = [...new Set(data)]
       this.$emit('checkNode', data, index, this.barRightList[index].selection[0])
     }
@@ -79,7 +79,6 @@ li {
 
 .monitor {
   width: 100%;
-  // background: #f0f4f8;
   margin-top: 20px;
   display: flex;
   .monitorLeft {
@@ -100,8 +99,7 @@ li {
   .monitorRight {
     flex: 5;
     .monitorRightList {
-      // background: #ccc;
-      margin: 20px;
+      margin: 50px 10px;
       position: relative;
       box-sizing: border-box;
     }

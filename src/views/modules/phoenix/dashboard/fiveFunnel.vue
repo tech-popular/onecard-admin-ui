@@ -57,13 +57,6 @@ export default {
   .funnelStyle {
     width: 33.33%;
   }
-  // .selectList {
-  //   position: absolute;
-  //   width: 25%;
-  //   top: 20px;
-  //   left: 70%;
-  //   z-index: 9;
-  // }
 }
 li {
   list-style: none;

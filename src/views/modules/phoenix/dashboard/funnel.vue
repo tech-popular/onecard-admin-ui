@@ -36,11 +36,10 @@ export default {
   }
   ul {
     position: absolute;
-    width: 180px;
+    width: calc(100% - 20px);
     height: 200px;
     top: 70px;
-    left: 20px;
-    padding: 0;
+    padding: 0 20px;
     li {
       color: #555;
       margin-top: 50px;
@@ -70,9 +69,7 @@ export default {
     }
     li:nth-child(1) {
       margin-top: -30px;
-      left: 145px;
-      width: 170px;
-      position: absolute;
+      width: 100%;
       text-align: center;
     }
   }

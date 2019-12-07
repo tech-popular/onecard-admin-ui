@@ -12,34 +12,6 @@
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">首页</span>
         </el-menu-item>
-        <!-- <el-submenu index="demo">
-          <template slot="title">
-            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
-            <span>demo</span>
-          </template>
-          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'demo-echarts' })">
-            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">echarts</span>
-          </el-menu-item>
-          <el-menu-item index="demo-ueditor" @click="$router.push({ name: 'demo-ueditor' })">
-            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">ueditor</span>
-          </el-menu-item>
-        </el-submenu> -->
-        <!-- <el-submenu index="report">
-          <template slot="title">
-            <icon-svg name="shoucangfill" class="site-sidebar__menu-icon"></icon-svg>
-            <span>凤凰系统</span>
-          </template>
-          <el-menu-item index="report-list" @click="$router.push({ name: 'phoenix-spectaculars' })">
-            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">看板</span>
-          </el-menu-item>
-          <el-menu-item index="chart-list" @click="$router.push({ name: 'phoenix-visual' })">
-            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">新建可视化</span>
-          </el-menu-item>
-        </el-submenu> -->
         <sub-menu
           v-for="menu in menuList"
           :key="menu.menuId"

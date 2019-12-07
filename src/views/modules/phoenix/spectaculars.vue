@@ -1,23 +1,8 @@
 <template>
-  <div class="mod-demo-echarts" id='dashboard'>
-    <!-- <el-alert title type="warning" v-if="list.items && list.items.length > 0" :closable="false">
-      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
-        <el-option
-          v-for="item in list.items"
-          :key="item.name"
-          :label="item.value"
-          :value="item.name"
-        ></el-option>
-      </el-select>
-    </el-alert> -->
+  <div class="mod-demo-echarts" id="dashboard">
     <el-card class="box-card" v-if="list.items && list.items.length > 0">
-      <el-select v-model="value" placeholder="预授信（常规黑指）" @change="selectGet()">
-        <el-option
-          v-for="item in list.items"
-          :key="item.name"
-          :label="item.value"
-          :value="item.name"
-        ></el-option>
+      <el-select v-model="value" @change="selectGet()">
+        <el-option v-for="item in list.items" :key="item.name" :label="item.name" :value="item"></el-option>
       </el-select>
     </el-card>
     <!-- 授信路径监控 -->
@@ -53,26 +38,24 @@
     <four-quadrant v-if="type == '6' && !ifMockTest" :quadrantList="quadrantList"></four-quadrant>
     <four-test v-if="type == '6' && ifMockTest"></four-test>
     <!-- 渠道整体转化率 -->
-    <five-funnel
-      v-if="type == '5' && !ifMockTest"
-      :arr="arr"
-      @checkNode="checkNode"
-    ></five-funnel>
+    <five-funnel v-if="type == '5' && !ifMockTest" :arr="arr" @checkNode="checkNode"></five-funnel>
     <five-test v-if="type == '5' && ifMockTest"></five-test>
-    <!-- 其他总体数据展示 -->
-    <div v-if="lineList && lineList.length > 0" class="line">
-      <div :key="item.id" v-for="(item) in lineList">
-        <div class="lineEvery">
-          <p>{{item.titleName}}</p>
-          <h3>{{item.series[0].data[item.series[0].data.length-1].percent}}</h3>
-          <div :id="'lineCharts' + item.id" class="lineCharts"></div>
-        </div>
-      </div>
-    </div>
+    <!-- 万卡漏斗监控 -->
+    <six-board
+      v-if="type == '4' && !ifMockTest"
+      :lineList="lineList"
+      :barRightList="barRightList"
+      :options="options"
+      :optionIds="optionIds"
+      :hadSelectedList="hadSelectedList"
+      @checkNode="checkNode"
+    ></six-board>
+    <six-test v-if="type == '4' && ifMockTest"></six-test>
   </div>
 </template>
 <script>
 import echarts from 'echarts'
+import sixBoard from './dashboard/sixBoard'
 import fiveFunnel from './dashboard/fiveFunnel'
 import fourQuadrant from './dashboard/fourQuadrant'
 import threeMonitor from './dashboard/threeMonitor'
@@ -83,23 +66,38 @@ import twoTest from './dashboard/mockVue/twoTest'
 import threeTest from './dashboard/mockVue/threeTest'
 import fourTest from './dashboard/mockVue/fourTest'
 import fiveTest from './dashboard/mockVue/fiveTest'
+import sixTest from './dashboard/mockVue/sixTest'
 import { chartsConfig } from './dashboard/chartsConfig'
 import { getQueryString } from '@/utils'
 import 'echarts/lib/chart/funnel'
 import 'echarts/lib/chart/radar'
 export default {
-  components: { fourQuadrant, threeMonitor, twoRainbow, fiveFunnel, oneCredit, oneTest, twoTest, threeTest, fourTest, fiveTest },
+  components: {
+    sixBoard,
+    fourQuadrant,
+    threeMonitor,
+    twoRainbow,
+    fiveFunnel,
+    oneCredit,
+    oneTest,
+    twoTest,
+    threeTest,
+    fourTest,
+    fiveTest,
+    sixTest
+  },
   data () {
     return {
       chartPie: null,
       myCharts: null,
-      list: [],
-      value: '预授信（常规黑指）',
+      list: {},
+      value: '',
+      name: '',
+      reqParams: {},
       visualizes: [],
       arr: [], // 有几个图表
       visibleChange: false,
       visualizeId: 1, // 图表筛选框
-      selection: [],
       lineList: [], // 框框加折线图数据
       simpleList: [], // 侧边数据
       quadrantList: {}, // 四象限数据
@@ -110,27 +108,45 @@ export default {
       timer: null, // 定时器
       ifMockTest: true,
       visualizeSelection: [],
-      params1: [{
-        'name': 'visualize过滤策略',
-        'type': 'visualize',
-        'placeholder': '',
-        'items': [],
-        'columnName': '',
-        'mark': ''
-      }],
-      params5: [{
-        'name': 'visualize过滤策略',
-        'type': 'visualize',
-        'placeholder': '\\{sourceType\\}',
-        'items': [{
-          'name': '市场渠道',
-          'value': ['市场渠道']
-        }],
-        'columnName': 'source_type',
-        'mark': 'IN'
-      }],
+      params1: [
+        {
+          name: 'visualize过滤策略',
+          type: 'visualize',
+          placeholder: '',
+          items: [],
+          columnName: '',
+          mark: ''
+        }
+      ],
+      params5: [
+        {
+          name: 'visualize过滤策略',
+          type: 'visualize',
+          placeholder: '\\{sourceType\\}',
+          items: [
+            {
+              name: '市场渠道',
+              value: ['市场渠道']
+            }
+          ],
+          columnName: 'source_type',
+          mark: 'IN'
+        }
+      ],
       options: [],
       optionIds: [],
+      color: [
+        '#f1675d',
+        '#eee',
+        '#ED6354',
+        '#FFC175',
+        '#FEEC8D',
+        '#A3D47D',
+        '#59CBDD',
+        '#5C62E6',
+        '#A85BF8',
+        '#999999'
+      ],
       hadSelectedList: [], // 已选择的数据
       hadSelectedParamsList: [], // 已选择的参数
       barRightList: [] // 右侧柱状图数据
@@ -150,7 +166,7 @@ export default {
     $route (to) {
       if (to.path.indexOf('phoenix-spectaculars') != -1) {
         this.visualizeId = 1
-        this.list = []
+        this.list = {}
         this.ifMockTest = true
         this.hadSelectedList = []
         this.hadSelectedParamsList = []
@@ -161,7 +177,9 @@ export default {
         } else {
           this.visualizeSelection = this.params1
         }
-        this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+        this.type == '1' || this.type == '4'
+          ? this.getDefaultSelection()
+          : this.queryList()
       }
     }
   },
@@ -178,7 +196,9 @@ export default {
     } else {
       this.visualizeSelection = this.params1
     }
-    this.mark == '1' ? this.getDefaultSelection() : this.queryList()
+    this.type == '1' || this.type == '4'
+      ? this.getDefaultSelection()
+      : this.queryList()
     this.autoReload()
   },
   activated () {
@@ -202,13 +222,26 @@ export default {
         method: 'post',
         data: {
           data: {
-            dashboardId: 1
+            dashboardId: this.mark
           }
         }
       })
         .then(resp => {
           let res = resp.data
           this.defaultSelection = res.response.data[0]
+          this.value = this.defaultSelection
+            ? this.defaultSelection.items[0].value[0]
+            : ''
+          this.reqParams = {
+            name: this.defaultSelection
+              ? this.defaultSelection.items[0].name
+              : '',
+            value: [
+              this.defaultSelection
+                ? this.defaultSelection.items[0].value[0]
+                : ''
+            ]
+          }
         })
         .then(() => {
           this.queryList()
@@ -217,6 +250,8 @@ export default {
     // 获取列表
     queryList (visualizeSelection = this.visualizeSelection, selectionData) {
       let { mark } = this.$data
+      const items =
+        JSON.stringify(this.reqParams) == '{}' ? [] : [this.reqParams]
       this.$http({
         url: this.$http.adornUrl('/phoenix/dashboard'),
         method: 'post',
@@ -228,13 +263,19 @@ export default {
               {
                 name: 'dashBoard过滤策略',
                 type: 'dashBoard',
-                placeholder: this.list.placeholder || this.defaultSelection.placeholder,
-                items: mark == '1' ? [{
-                  name: this.value,
-                  value: [this.value]
-                }] : [],
-                columnName: this.list.columnName || this.defaultSelection.columnName,
-                mark: this.list.mark || this.defaultSelection.mark
+                placeholder:
+                  this.list.placeholder || this.defaultSelection
+                    ? this.defaultSelection.placeholder
+                    : '',
+                items: this.type == '1' || this.type == '4' ? items : [],
+                columnName:
+                  this.list.columnName || this.defaultSelection
+                    ? this.defaultSelection.columnName
+                    : '',
+                mark:
+                  this.list.mark || this.defaultSelection
+                    ? this.defaultSelection.mark
+                    : ''
               }
             ],
             visualizeId: this.visualizeId,
@@ -251,8 +292,15 @@ export default {
         let res = data.response
         if (res.status == '1') {
           this.ifMockTest = false
+          this.options = []
+          this.optionIds = []
           if (res.data.selection.length) {
-            this.list = res.data.selection[0]
+            if (JSON.stringify(this.list) == '{}') {
+              this.list = res.data.selection[0]
+              this.value = this.list.items.length
+                ? this.list.items[0].name
+                : ''
+            }
             this.selectConfig(res)
           }
           this.arr = []
@@ -269,9 +317,6 @@ export default {
     },
     initCharts (tem, index) {
       tem.selectListArr = []
-      if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
-        this.arr.push(tem)
-      }
       tem['grid'] = chartsConfig.grid
       tem['color'] = chartsConfig.color
       Object.assign(tem.title, chartsConfig.title)
@@ -279,23 +324,33 @@ export default {
       if (tem.xAxis) {
         Object.assign(tem.xAxis, chartsConfig.xAxis)
       }
+      if (
+        tem.type != 'quadrant' &&
+        tem.type != 'simple' &&
+        tem.type != 'line' &&
+        this.mark != '3'
+      ) {
+        this.arr.push(tem)
+      }
+
       // 通过tem.type类型找到对应的方法执行 参数是 tem, index
       this[`${tem.type}Config`](tem, index)
 
       if (tem.selection[0]) {
-        this.selection =
-          tem.selection[0].selectList && tem.selection[0].selectList.length > 0
-            ? tem.selection[0].selectList
-            : tem.selection[0].items
         this.visualizeId = tem.id
       }
       setTimeout(() => {
-        if (this.mark == '3' && tem.positi == 'right') {
+        if (tem.positi == 'right') {
           let label = 'barCharts' + tem.id
           this.chartsInit(this.myCharts, label, tem)
           return false
         }
-        if (tem.type != 'quadrant' && tem.type != 'simple' && tem.type != 'line' && this.mark != '3') {
+        if (
+          tem.type != 'quadrant' &&
+          tem.type != 'simple' &&
+          tem.type != 'line' &&
+          this.mark != '3'
+        ) {
           let label = 'J_chartLineBox' + tem.id
           this.chartsInit(this.chartPie, label, tem)
         } else if (tem.type == 'line') {
@@ -309,6 +364,7 @@ export default {
       this.quadrantList = {}
       this.lineList = []
       this.simpleList = []
+      this.reqParams = this.value
       this.queryList()
     },
     checkNode (value, index, data) {
@@ -328,53 +384,65 @@ export default {
       this.parLegendConfig(tem)
       tem['tooltip'] = chartsConfig.tooltip
       if (this.mark == '2' && (index == 1 || index == 3)) {
-        tem.color = ['#f1675d', '#eee', '#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
+        tem.color = this.color
         tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
         tem.series[1].type = 'bar'
       }
-      if (this.mark == '3' && tem.positi && tem.positi == 'right') {
+      if (tem.positi && tem.positi == 'right') {
         // 机构资金右侧数据
         this.threeMarkConfig(tem)
       }
     },
     // 对 机构资金 config配置
     threeMarkConfig (tem) {
-      let first = {}
-      let second = {}
-      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
-        first = JSON.parse(JSON.stringify(tem.legend.data[0]))
-        tem.legend.data.splice(0, 1)
-      }
-      if (tem.legend.data[0].name.indexOf('昨日') !== -1 || tem.legend.data[0].name.indexOf('今日') !== -1) {
-        second = JSON.parse(JSON.stringify(tem.legend.data[0]))
-        tem.legend.data.splice(0, 1)
+      let another = []
+      // 排序 将今日 昨日 上月的数据 截取放到前面
+      for (let i = 0; i < tem.legend.data.length; i++) {
+        if (
+          tem.legend.data[i].name.indexOf('昨日') !== -1 ||
+          tem.legend.data[i].name.indexOf('今日') != -1 ||
+          tem.legend.data[i].name.indexOf('上月') != -1
+        ) {
+          another.push(JSON.parse(JSON.stringify(tem.legend.data[i])))
+          tem.legend.data.splice(i, 1)
+          i--
+        }
       }
       tem.legend.data.sort((a, b) => {
         if (a.metric_unit) {
           return b.metric - a.metric
         }
       })
-      if (JSON.stringify(first) !== '{}') {
-        tem.legend.data = [...[first], ...[second], ...tem.legend.data]
+      if (another.length) {
+        tem.legend.data = [...another, ...tem.legend.data]
       }
+      /*********************************************************/
       tem.legend.type = tem.legendType || 'scroll'
       tem.title.textStyle = {
         fontSize: '12'
       }
-      tem.color[1] = '#eee'
-      tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+      // tem.color[1] = '#eee'
+      if (this.type == '3') {
+        tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+      }
       this.barRightList.push(tem)
     },
     // 对柱状图的legend 做统一处理
     parLegendConfig (tem) {
       for (let i = 0; i < tem.series.length; i++) {
         if (tem.legend.data && tem.legend.data[i].metric && tem.series) {
-          var seriesNameElse = tem.series[i].name + '\n' +
-                tem.legend.data[i].metric +
-                (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
-                (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
-                tem.legend.data[i].percent +
-                tem.legend.data[i].percent_unit
+          var seriesNameElse =
+            '{f|' +
+            tem.series[i].name +
+            '}' +
+            '\n' +
+            tem.legend.data[i].metric +
+            (tem.legend.data[i].metric_unit == '￥'
+              ? ''
+              : tem.legend.data[i].metric_unit) +
+            (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
+            tem.legend.data[i].percent +
+            tem.legend.data[i].percent_unit
           tem.series[i].name = seriesNameElse
           if (!tem.series[i].data) {
             tem.legend.data[i]['icon'] = 'image://'
@@ -383,9 +451,15 @@ export default {
       }
       for (let i = 0; i < tem.legend.data.length; i++) {
         if (tem.legend.data[i].metric) {
-          var legendNameElse = tem.legend.data[i].name + '\n' +
+          var legendNameElse =
+            '{f|' +
+            tem.legend.data[i].name +
+            '}' +
+            '\n' +
             tem.legend.data[i].metric +
-            (tem.legend.data[i].metric_unit == '￥' ? '' : tem.legend.data[i].metric_unit) +
+            (tem.legend.data[i].metric_unit == '￥'
+              ? ''
+              : tem.legend.data[i].metric_unit) +
             (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
             tem.legend.data[i].percent +
             tem.legend.data[i].percent_unit
@@ -448,14 +522,30 @@ export default {
       tem.series[0].data.forEach((item, index) => {
         item.name = `{c|${item.name}  ${item.value}人}  ${
           item.percentRise ? '{a|↑}' : '{b|↓}'
-        }  ${item.percentRise ? '{d|' + item.percent + '%}' : '{e|' + item.percent + '%}'}`
+        }  ${
+          item.percentRise
+            ? '{d|' + item.percent + '%}'
+            : '{e|' + item.percent + '%}'
+        }`
       })
       Object.assign(tem.series[0], funnelStyle)
       // tem.tooltip.formatter = '{a}<br/>{b}'
       tem.title.left = 'center'
       tem.title.top = '10px'
       delete tem.tooltip
-      tem.color = ['#634cff', '#febe76', '#31c5d3', '#FF4040', '#f1675d', '#f6e58d', '#686ee0', '#99ce7e', '#b466f0', '#f7b500', '#48a37a']
+      tem.color = [
+        '#634cff',
+        '#febe76',
+        '#31c5d3',
+        '#FF4040',
+        '#f1675d',
+        '#f6e58d',
+        '#686ee0',
+        '#99ce7e',
+        '#b466f0',
+        '#f7b500',
+        '#48a37a'
+      ]
     },
     // 雷达 数据处理
     radarConfig (tem) {
@@ -492,7 +582,7 @@ export default {
               show: true,
               position: ind == 0 ? 'bottom' : 'right',
               formatter: function (params) {
-                return params.value ? (params.value + '%') : ''
+                return params.value ? params.value + '%' : ''
               }
             }
           }
@@ -504,7 +594,16 @@ export default {
       if (tem.series.length > 0) {
         tem.series[0].radius = ['45%', '65%']
         tem.series[1] && (tem.series[1].radius = ['0%', '20%'])
-        tem.color = ['#ED6354', '#FFC175', '#FEEC8D', '#A3D47D', '#59CBDD', '#5C62E6', '#A85BF8', '#999999']
+        tem.color = [
+          '#ED6354',
+          '#FFC175',
+          '#FEEC8D',
+          '#A3D47D',
+          '#59CBDD',
+          '#5C62E6',
+          '#A85BF8',
+          '#999999'
+        ]
         tem.legend.top = 'bottom'
         tem.legend.itemGap = 20
         tem.legend.data = []
@@ -548,9 +647,41 @@ export default {
     lineConfig (tem) {
       tem.titleName = tem.title.text
       tem.title = {}
+      tem.yAxis.show = false
+      tem.xAxis.axisTick.length = 20
+      tem.yAxis.splitNumber = 5
+      tem.xAxis.show = false
       tem.series[0].name = ''
-      tem.grid.top = ''
       tem.series[0].areaStyle = {}
+      tem.series.forEach((item, ind) => {
+        item.data.map((val, i) => {
+          val.label = {
+            normal: {
+              show: true,
+              formatter: function (params) {
+                return params.value ? params.value + '%' : ''
+              }
+            }
+          }
+        })
+        item.areaStyle = {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: 'rgb(255, 158, 68)'
+            },
+            {
+              offset: 1,
+              color: 'rgb(255, 70, 131)'
+            }
+          ])
+        }
+        item.itemStyle = {
+          normal: {
+            fontSize: 30
+          }
+        }
+      })
       this.lineList.push(tem)
     },
     simpleConfig (tem) {
@@ -618,23 +749,5 @@ export default {
 }
 li {
   list-style: none;
-}
-.line {
-  width: 100%;
-  height: 300px;
-  background: #f0f4f8;
-  margin-top: 20px;
-  & > div {
-    .lineEvery {
-      text-align: center;
-      max-width: 400px;
-      p {
-        padding-top: 20px;
-      }
-    }
-  }
-}
-.lineCharts {
-  width: 400px;
 }
 </style>
