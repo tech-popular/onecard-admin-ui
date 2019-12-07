@@ -194,7 +194,7 @@ export default {
       this.visualizeSelection = this.params1
     }
     (this.type == '1' || this.type == '4') ? this.getDefaultSelection() : this.queryList()
-    this.autoReload() 
+    this.autoReload()
   },
   activated () {
     // 由于给echart添加了resize事件, 在组件激活时需要重新resize绘画一次, 否则出现空白bug
@@ -567,9 +567,20 @@ export default {
     lineConfig (tem) {
       tem.titleName = tem.title.text
       tem.title = {}
+      tem.yAxis.show = false
+      tem.xAxis.show = false
       tem.series[0].name = ''
-      tem.grid.top = ''
+      // tem.grid.top = ''
       tem.series[0].areaStyle = {}
+      tem.series.forEach((item, ind) => {
+        item.data.map((val, i) => {
+          val.label = {
+            normal: {
+              show: true
+            }
+          }
+        })
+      })
       this.lineList.push(tem)
     },
     simpleConfig (tem) {
@@ -638,22 +649,22 @@ export default {
 li {
   list-style: none;
 }
-.line {
-  width: 100%;
-  height: 300px;
-  background: #f0f4f8;
-  margin-top: 20px;
-  & > div {
-    .lineEvery {
-      text-align: center;
-      max-width: 400px;
-      p {
-        padding-top: 20px;
-      }
-    }
-  }
-}
-.lineCharts {
-  width: 400px;
-}
+// .line {
+//   width: 100%;
+//   height: 300px;
+//   background: #f0f4f8;
+//   margin-top: 20px;
+//   & > div {
+//     .lineEvery {
+//       text-align: center;
+//       max-width: 400px;
+//       p {
+//         padding-top: 20px;
+//       }
+//     }
+//   }
+// }
+// .lineCharts {
+//   width: 400px;
+// }
 </style>

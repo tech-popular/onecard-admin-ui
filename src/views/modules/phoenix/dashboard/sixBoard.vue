@@ -2,27 +2,27 @@
   <div class="new-monitor">
     <div class="new-monitorLeft" v-if="lineList.length">
       <div v-if="lineList && lineList.length > 0" class="line">
-      <div :key="item.id" v-for="(item) in lineList">
-        <div class="lineEvery">
-          <p>{{item.titleName}}</p>
-          <h3>{{item.series[0].data[item.series[0].data.length - 1].percent}}</h3>
-          <div :id="'lineCharts' + item.id" class="lineCharts"></div>
+        <div :key="item.id" v-for="(item) in lineList">
+          <div class="lineEvery">
+            <p>{{item.titleName}}</p>
+            <h3>{{item.series[0].data[item.series[0].data.length - 1].value}}</h3>
+            <div :id="'lineCharts' + item.id" class="lineCharts"></div>
+          </div>
         </div>
       </div>
-    </div>
     </div>
     <div class="new-monitorRight">
       <div class="new-monitorRightList" :key="item.id" v-for="(item, index) in barRightList">
         <div :id="'barCharts' + item.id" class="barCharts"></div>
         <select-tree
-            class="new-monitorSelectList"
-            v-show="optionIds.length"
-            :options="options"
-            :optionIds="optionIds"
-            :index="index"
-            :defaultCheckNodes="hadSelectedList[index]"
-            @checkNode="checkNode"
-          ></select-tree>
+          class="new-monitorSelectList"
+          v-show="optionIds.length"
+          :options="options"
+          :optionIds="optionIds"
+          :index="index"
+          :defaultCheckNodes="hadSelectedList[index]"
+          @checkNode="checkNode"
+        ></select-tree>
       </div>
     </div>
   </div>
@@ -59,7 +59,12 @@ export default {
   methods: {
     checkNode (data, index) {
       data = [...new Set(data)]
-      this.$emit('checkNode', data, index, this.barRightList[index].selection[0])
+      this.$emit(
+        'checkNode',
+        data,
+        index,
+        this.barRightList[index].selection[0]
+      )
     }
   }
 }
@@ -85,10 +90,9 @@ li {
     flex: 1;
     & > div {
       border-radius: 10px;
-      margin: 40px 20px;
       background: #ccc;
       text-align: center;
-      padding: 100px 7px;
+      padding-top: 50px;
       div {
         font-size: 12px;
         line-height: 12px;
@@ -99,7 +103,7 @@ li {
   .new-monitorRight {
     flex: 7;
     .new-monitorRightList {
-      width: 45%;
+      width: 46%;
       display: inline-block;
       margin: 20px;
       position: relative;
@@ -121,10 +125,28 @@ li {
   border-radius: 5px;
 }
 .new-monitorSelectList {
-    position: absolute;
-    width: 200px;
-    top: -8px;
-    left: 160px;
-    z-index: 9;
+  position: absolute;
+  width: 200px;
+  top: -8px;
+  left: 160px;
+  z-index: 9;
+}
+.line {
+  width: 100%;
+  height: 300px;
+  background: #f0f4f8;
+  margin-top: 20px;
+  & > div {
+    .lineEvery {
+      text-align: center;
+      max-width: 400px;
+      p {
+        padding-top: 20px;
+      }
+    }
+  }
+}
+.lineCharts {
+  width: 250px;
 }
 </style>
