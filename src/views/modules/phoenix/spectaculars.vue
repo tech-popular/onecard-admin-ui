@@ -381,7 +381,9 @@ export default {
         fontSize: '12'
       }
       // tem.color[1] = '#eee'
-      tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+      if (this.type == '3') {
+        tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+      }
       this.barRightList.push(tem)
     },
     // 对柱状图的legend 做统一处理
@@ -568,6 +570,7 @@ export default {
       tem.titleName = tem.title.text
       tem.title = {}
       tem.yAxis.show = false
+      tem.yAxis.splitNumber = 5
       tem.xAxis.show = false
       tem.series[0].name = ''
       // tem.grid.top = ''
@@ -580,6 +583,15 @@ export default {
             }
           }
         })
+        item.areaStyle = {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+            offset: 0,
+            color: 'rgb(255, 158, 68)'
+          }, {
+            offset: 1,
+            color: 'rgb(255, 70, 131)'
+          }])
+        }
       })
       this.lineList.push(tem)
     },

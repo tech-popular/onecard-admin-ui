@@ -1,16 +1,16 @@
 <template>
   <div
-    class="monitor"
+    class="new-monitor"
     v-loading="loading"
     element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading"
     element-loading-background="rgba(0, 0, 0, 0.1)"
   >
-    <div class="monitorLeft">
+    <div class="new-monitorLeft">
       <div :key="item" v-for="item in num"></div>
     </div>
-    <div class="monitorRight">
-      <div class="monitorRightList" :key="item" v-for="item in nums">
+    <div class="new-monitorRight">
+      <div class="new-monitorRightList" :key="item" v-for="item in nums">
         <div :id="'mock' + item" class="barCharts"></div>
       </div>
     </div>
@@ -83,18 +83,16 @@ li {
   color: green;
 }
 
-.monitor {
+.new-monitor {
   width: 100%;
   margin-top: 20px;
   display: flex;
-  .monitorLeft {
+  .new-monitorLeft {
     flex: 1;
     & > div {
       border-radius: 10px;
-      margin: 40px 20px;
       background: #ccc;
       text-align: center;
-      padding: 100px 7px;
       height: 300px;
       div {
         font-size: 12px;
@@ -103,9 +101,9 @@ li {
       }
     }
   }
-  .monitorRight {
+  .new-monitorRight {
     flex: 7;
-    .monitorRightList {
+    .new-monitorRightList {
       margin: 20px;
       width: 46%;
       display: inline-block;
@@ -126,12 +124,5 @@ li {
   color: #fff;
   border: none;
   border-radius: 5px;
-}
-.monitorSelectList {
-  position: absolute;
-  width: 200px;
-  top: -8px;
-  left: 160px;
-  z-index: 9;
 }
 </style>

@@ -113,7 +113,8 @@ export const chartsConfig = {
     formatter: params => {
       var result = params[0].axisValue
       params.map((item, i) => {
-        result +=
+        if (item.value || item.seriesName.indexOf('昨日') !== -1 || item.seriesName.indexOf('今日') !== -1) {
+          result +=
           '<br/><span style="position:relative;left:0;top:-1px;display:inline-block;margin-right:5px;border-radius:  px;width:10px;height:10px;background:' +
           item.color +
           '"></span><span style="color:#fff;">' +
@@ -121,6 +122,7 @@ export const chartsConfig = {
           '</span> : ' +
           fprice(item.value, 0) +
           '</span>'
+        }
       })
       return result
     }

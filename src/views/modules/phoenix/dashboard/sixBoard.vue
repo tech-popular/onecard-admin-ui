@@ -92,18 +92,19 @@ li {
       border-radius: 10px;
       background: #ccc;
       text-align: center;
-      padding-top: 50px;
       div {
         font-size: 12px;
         line-height: 12px;
         margin-bottom: 10px;
+        background: #ccc;
+        border-radius: 20px;
       }
     }
   }
   .new-monitorRight {
     flex: 7;
     .new-monitorRightList {
-      width: 46%;
+      width: 45%;
       display: inline-block;
       margin: 20px;
       position: relative;
@@ -133,13 +134,14 @@ li {
 }
 .line {
   width: 100%;
-  height: 300px;
+  height: 150px;
   background: #f0f4f8;
   margin-top: 20px;
   & > div {
     .lineEvery {
       text-align: center;
       max-width: 400px;
+      padding-top: 40px;
       p {
         padding-top: 20px;
       }
@@ -147,6 +149,8 @@ li {
   }
 }
 .lineCharts {
-  width: 250px;
+  width: 200px;
+  height: 150px;
+  overflow: hidden;
 }
 </style>
