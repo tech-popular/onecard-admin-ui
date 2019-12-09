@@ -2,7 +2,7 @@
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
         <el-form-item label="sql" prop="sql">
-        <el-input v-model="fatherData.sql" placeholder="请输入sql"/>
+        <el-input type="textarea" v-model="fatherData.sql" placeholder="请输入sql"/>
         </el-form-item>
         <el-form-item label="数据源id">
         <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
