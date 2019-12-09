@@ -25,6 +25,12 @@
             <el-radio :label="1">启用</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="是否启用解析模板">
+          <el-radio-group v-model="fatherData.parsTemplate">
+            <el-radio :label="0">不启用</el-radio>
+            <el-radio :label="1">启用</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="缓存生成的key需要的字段">
         <el-input v-model="fatherData.cacheKeyFields" placeholder="请输入缓存生成的key需要的字段"/>
         </el-form-item>
