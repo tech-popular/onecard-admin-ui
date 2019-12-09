@@ -421,52 +421,55 @@ export default {
       tem.title.textStyle = {
         fontSize: '12'
       }
-      // tem.color[1] = '#eee'
-      if (this.type == '3') {
-        tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+      if (this.type == '3' && tem.series[1]) {
+        if (tem.series[1].name.indexOf('今日') != -1) {
+          tem.series[1].stack = '11' // 将柱状图变成双列 柱状图
+        }
       }
       this.barRightList.push(tem)
     },
     // 对柱状图的legend 做统一处理
     parLegendConfig (tem) {
-      for (let i = 0; i < tem.series.length; i++) {
-        if (tem.legend.data && tem.legend.data[i].metric && tem.series) {
-          var seriesNameElse =
-            '{f|' +
-            tem.series[i].name +
-            '}' +
-            '\n' +
-            tem.legend.data[i].metric +
-            (tem.legend.data[i].metric_unit == '￥'
-              ? ''
-              : tem.legend.data[i].metric_unit) +
-            (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
-            tem.legend.data[i].percent +
-            tem.legend.data[i].percent_unit
-          tem.series[i].name = seriesNameElse
-          if (!tem.series[i].data) {
-            tem.legend.data[i]['icon'] = 'image://'
+      if (tem.series) {
+        for (let i = 0; i < tem.series.length; i++) {
+          if (tem.legend.data && tem.legend.data[i].metric && tem.series) {
+            var seriesNameElse =
+              '{f|' +
+              tem.series[i].name +
+              '}' +
+              '\n' +
+              tem.legend.data[i].metric +
+              (tem.legend.data[i].metric_unit == '￥'
+                ? ''
+                : tem.legend.data[i].metric_unit) +
+              (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
+              tem.legend.data[i].percent +
+              tem.legend.data[i].percent_unit
+            tem.series[i].name = seriesNameElse
+            if (!tem.series[i].data) {
+              tem.legend.data[i]['icon'] = 'image://'
+            }
           }
         }
-      }
-      for (let i = 0; i < tem.legend.data.length; i++) {
-        if (tem.legend.data[i].metric) {
-          var legendNameElse =
-            '{f|' +
-            tem.legend.data[i].name +
-            '}' +
-            '\n' +
-            tem.legend.data[i].metric +
-            (tem.legend.data[i].metric_unit == '￥'
-              ? ''
-              : tem.legend.data[i].metric_unit) +
-            (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
-            tem.legend.data[i].percent +
-            tem.legend.data[i].percent_unit
-          tem.legend.data[i].name = legendNameElse
-          tem.legend.data[i].textStyle = chartsConfig.textStyle
-        } else {
-          tem.legend.data[i].textStyle = chartsConfig.textStyle
+        for (let i = 0; i < tem.legend.data.length; i++) {
+          if (tem.legend.data[i].metric) {
+            var legendNameElse =
+              '{f|' +
+              tem.legend.data[i].name +
+              '}' +
+              '\n' +
+              tem.legend.data[i].metric +
+              (tem.legend.data[i].metric_unit == '￥'
+                ? ''
+                : tem.legend.data[i].metric_unit) +
+              (tem.legend.data[i].percentRise ? '{a|↑}' : '{b|↓}') +
+              tem.legend.data[i].percent +
+              tem.legend.data[i].percent_unit
+            tem.legend.data[i].name = legendNameElse
+            tem.legend.data[i].textStyle = chartsConfig.textStyle
+          } else {
+            tem.legend.data[i].textStyle = chartsConfig.textStyle
+          }
         }
       }
     },
@@ -651,8 +654,11 @@ export default {
       tem.xAxis.axisTick.length = 20
       tem.yAxis.splitNumber = 5
       tem.xAxis.show = false
-      tem.series[0].name = ''
-      tem.series[0].areaStyle = {}
+      if (tem.series[0]) {
+        tem.series[0].name = ''
+        tem.series[0].areaStyle = {}
+      }
+
       tem.series.forEach((item, ind) => {
         item.data.map((val, i) => {
           val.label = {
