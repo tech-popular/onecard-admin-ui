@@ -80,6 +80,16 @@
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   export default {
     data () {
+      var checkDecisionName = (rule, value, callback) => {
+        const nullValue = /^[^\s]+$/
+        if (!value) {
+          callback(new Error('请输入任务定义名称'))
+        }
+        if (!nullValue.test(value)) {
+          callback(new Error('不能输入含空格的任务定义名称'))
+        }
+        callback()
+      }
       return {
         visible: false,
         dataForm: {
@@ -98,7 +108,7 @@
         ruleTypeList: [],
         dataRule: {
           name: [
-            { required: true, message: '任务定义名称不能为空', trigger: 'blur' }
+            { required: true, validator: checkDecisionName, trigger: 'change' }
           ],
           type: [
             { required: true, message: '请选择任务类型', trigger: 'change' }

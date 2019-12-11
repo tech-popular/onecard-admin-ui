@@ -1,35 +1,35 @@
 <template>
   <el-dialog :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
-    <el-form-item label="1234" prop="name">
-      <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-      <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+    <el-form-item label="超时时间" prop="autoCommitIntervalMs">
+      <el-input v-model="dataForm.autoCommitIntervalMs" placeholder="超时时间"/>
     </el-form-item>
-    <el-form-item label="任务类型" prop="type">
-        <el-select filterable v-model="dataForm.type" placeholder="请选择">
-          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
-        </el-select>
-      </el-form-item>
-    <el-form-item label="任务描述" prop="description">
-      <el-input v-model="dataForm.description" placeholder="任务"/>
+    <el-form-item label="偏移量重置机制" prop="autoOffsetReset">
+      <el-input v-model="dataForm.autoOffsetReset" placeholder="偏移量重置机制"/>
     </el-form-item>
-    <el-form-item label="任务归属" prop="owner">
-      <el-input v-model="dataForm.owner" placeholder="任务归属"/>
+    <el-form-item label="kafka地址" prop="bootstrapServers">
+      <el-input v-model="dataForm.bootstrapServers" placeholder="kafka地址"/>
     </el-form-item>
-    <el-form-item label="任务使用者" prop="user">
-      <el-input v-model="dataForm.user" placeholder="任务使用者"/>
+    <el-form-item label="消费者名字" prop="consumerName">
+      <el-input v-model="dataForm.consumerName" placeholder="消费者名字"/>
     </el-form-item>
-    <el-form-item label="入参数据的key的ID集合" prop="inputParams">
-      <el-input v-model="dataForm.inputParams" placeholder="多个参数用英文逗号隔开"/>
+    <el-form-item label="工作流编号" prop="flowId">
+      <el-input v-model="dataForm.flowId" placeholder="工作流编号"/>
     </el-form-item>
-    <el-form-item label="出参数据的key的ID集合" prop="outputParams">
-      <el-input v-model="dataForm.outputParams" placeholder="出参数据的key的ID集合"/>
+    <el-form-item label="分组名称" prop="groupId">
+      <el-input v-model="dataForm.groupId" placeholder="分组名称"/>
     </el-form-item>
-    <el-form-item label="所属系统" prop="ownerApp">
-      <el-input v-model="dataForm.ownerApp" placeholder="所属系统"/>
+    <el-form-item label="topic名称" prop="topic">
+      <el-input v-model="dataForm.topic" placeholder="topic名称"/>
     </el-form-item>
-    <el-form-item label="备注" prop="remark">
-      <el-input v-model="dataForm.remark" placeholder="备注"/>
+    <el-form-item label="版本号" prop="version">
+      <el-input v-model="dataForm.version" placeholder="版本号"/>
+    </el-form-item>
+    <el-form-item label="是否自动提交" prop="enableAutoCommit">
+    <el-radio-group v-model="dataForm.enableAutoCommit">
+      <el-radio :label="true">是</el-radio>
+      <el-radio :label="false">否</el-radio>
+      </el-radio-group>
     </el-form-item>
     </el-form>
    
@@ -47,25 +47,46 @@
       return {
         visible: false,
         dataForm: {
-          id: '',
-          name: '', // 任务定义名称
-          type: '', // 任务类型
-          description: '', // 任务描述
-          owner: '', // 任务归属
-          user: '', // 任务使用者
-          inputParams: '', // 入参数据的key的ID集合
-          outputParams: '', // 出参数据的key的ID集合
-          ownerApp: '', // 所属系统
-          remark: '' // 备注
+          autoCommitIntervalMs: '',
+          autoOffsetReset: '',
+          bootstrapServers: '',
+          consumerName: '',
+          flowId: '',
+          groupId: '',
+          topic: '',
+          version: '',
+          ownerApp: '',
+          enableAutoCommit: ''
         },
         dataFormValue: '',
         ruleTypeList: [],
         dataRule: {
-          name: [
-            { required: true, message: '任务定义名称不能为空', trigger: 'blur' }
+          autoCommitIntervalMs: [
+            { required: true, message: '超时时间不能为空', trigger: 'blur' }
           ],
-          type: [
-            { required: true, message: '请选择任务类型', trigger: 'change' }
+          autoOffsetReset: [
+            { required: true, message: '偏移量重置机制不能为空', trigger: 'blur' }
+          ],
+          bootstrapServers: [
+            { required: true, message: 'kafka地址不能为空', trigger: 'change' }
+          ],
+          consumerName: [
+            { required: true, message: '消费者名字不能为空', trigger: 'change' }
+          ],
+          flowId: [
+            { required: true, message: '工作流编号不能为空', trigger: 'change' }
+          ],
+          groupId: [
+            { required: true, message: '分组名称不能为空', trigger: 'change' }
+          ],
+          topic: [
+            { required: true, message: 'topic名称不能为空', trigger: 'change' }
+          ],
+          version: [
+            { required: true, message: '版本号不能为空', trigger: 'change' }
+          ],
+          enableAutoCommit: [
+            { required: true, message: '是否自动提交不能为空', trigger: 'change' }
           ]
         },
         fatherData: {
@@ -107,10 +128,8 @@
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            let newData = {
-              'beeTaskDef': this.dataForm
-            }
-            beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
+            const dataBody = this.dataForm
+            beeTask(dataBody, `/bee/mkafka/${!this.dataForm.id ? 'add' : 'upd'}`).then(({data}) => {
               if (data && data.status === 0) {
                 this.$message({
                   message: '操作成功',

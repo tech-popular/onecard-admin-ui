@@ -10,42 +10,37 @@
       v-loading="dataListLoading"
       style="width: 100%;">
       <el-table-column
-        prop="id"
+        prop="flowId"
         header-align="center"
         align="center"
-        label="任务具体id"/>
+        label="流程编号"/>
       <el-table-column
-        prop="name"
+        prop="consumer_name"
         header-align="center"
         align="center"
-        label="任务定义名称"
+        label="消费者名字"
         width="150px"/>
       <el-table-column
-        prop="type"
+        prop="topic"
         header-align="center"
         align="center"
-        label="任务类型"/>
+        label="topic名称"/>
       <el-table-column
-        prop="description"
+        prop="bootstrapServers"
         header-align="center"
         align="center"
-        label="任务描述"/>
+        label="kafka地址"/>
       <el-table-column
-        prop="owner"
+        prop="groupId"
         header-align="center"
         align="center"
-        label="任务归属"/>
+        label="分组名称"/>
       <el-table-column
-        prop="user"
+        prop="version"
         header-align="center"
         align="center"
-        label="任务使用者"
+        label="版本号"
         width="150px"/>
-      <el-table-column
-        prop="ownerApp"
-        header-align="center"
-        align="center"
-        label="所属系统"/>
       <el-table-column
         prop="remark"
         header-align="center"
