@@ -1,14 +1,17 @@
 <template>
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
-        <el-form-item label="模板名称'" prop="topic">
-          <el-input v-model="fatherData.topic" placeholder="请输入模板名称'"/>
+        <el-form-item label="模板名称" prop="name">
+          <el-input v-model="fatherData.name" placeholder="请输入模板名称'"/>
         </el-form-item>
-        <el-form-item label="topic" prop="topic">
-          <el-input v-model="fatherData.topic" placeholder="请输入topic"/>
+        <el-form-item label="模板中需要赋值的字段" prop="requestFields">
+          <el-input v-model="fatherData.requestFields" placeholder="请输入模板中需要赋值的字段"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组">
-          <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
+        <el-form-item label="返回字段值" prop="responseFields">
+          <el-input v-model="fatherData.responseFields" placeholder="请输入请返回字段值"/>
+        </el-form-item>
+        <el-form-item label="未解析的模板" prop="template">
+          <el-input v-model="fatherData.template" placeholder="请输入请未解析的模板"/>
         </el-form-item>
         <el-form-item label="是否启用">
           <el-radio-group v-model="fatherData.enable">
@@ -33,8 +36,17 @@
     data () {
       return {
         dataRule: {
-          topic: [
-            { required: true, message: '请输入topic', trigger: 'blur' }
+          name: [
+            { required: true, message: '请输入模板名称', trigger: 'blur' }
+          ],
+          requestFields: [
+            { required: true, message: '请输入模板中需要赋值的字段', trigger: 'blur' }
+          ],
+          responseFields: [
+            { required: true, message: '请输入请返回字段值', trigger: 'blur' }
+          ],
+          template: [
+            { required: true, message: '请输入请未解析的模板', trigger: 'blur' }
           ]
         }
       }

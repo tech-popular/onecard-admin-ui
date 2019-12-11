@@ -73,7 +73,7 @@
 
 <script>
   import AddOrUpdate from './kafka-add-or-update'
-  import { beeTaskList, deleteBeeTask } from '@/api/workerBee/metadata'
+  import { beeTaskList, deleteBeeTask } from '@/api/workerBee/kafka'
   export default {
     data () {
       return {

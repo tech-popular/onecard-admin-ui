@@ -57,7 +57,7 @@
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataAviator"/>
      <!-- AVIATOR 类型7 -->
     <metadata-freemarke
-    v-if="dataForm.type == 'FREEMARKE'" :fatherData='fatherData'
+    v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
     </el-form>
    
@@ -189,7 +189,7 @@
               'cassandra': null,
               'groovy': null,
               'aviator': null,
-              'freemarke': null
+              'freemarker': null
             }
             if (form) {
               for (let key in data) {
