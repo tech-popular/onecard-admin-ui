@@ -55,7 +55,12 @@
     <metadata-aviator
     v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataAviator"/>
+     <!-- AVIATOR 类型7 -->
+    <metadata-freemarke
+    v-if="dataForm.type == 'FREEMARKE'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
     </el-form>
+   
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -70,6 +75,8 @@
   import metadataCassandra from './metadataSon/metadata-cassandra'
   import metadataGroovy from './metadataSon/metadata-groovy'
   import metadataAviator from './metadataSon/metadata-aviator'
+  import metadataFreemarke from './metadataSon/metadata-freemarke'
+
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   export default {
     data () {
@@ -110,7 +117,8 @@
       metadataKafka, // KAFKA
       metadataCassandra, // CASSANDRA
       metadataGroovy, // GROOVY
-      metadataAviator // AVIATOR
+      metadataAviator, // AVIATOR
+      metadataFreemarke // Freemarke
     },
     methods: {
       init (id, value) {
@@ -180,7 +188,8 @@
               'kafka': null,
               'cassandra': null,
               'groovy': null,
-              'aviator': null
+              'aviator': null,
+              'freemarke': null
             }
             if (form) {
               for (let key in data) {
