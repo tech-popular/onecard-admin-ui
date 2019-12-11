@@ -52,7 +52,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="参考名称">
+      <el-form-item label="参考名称" prop="taskReferenceName" :rules="dataRule.taskReferenceName">
         <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
       </el-form-item>
       <el-form-item label="判断case参数">
@@ -124,6 +124,9 @@
           ],
           outputParams: [
             { required: true, message: '任务出参别名映射不能为空', trigger: 'blur' }
+          ],
+          taskReferenceName: [
+            { required: true, message: '参考名称不能为空', trigger: 'blur' }
           ]
         },
         taskIdlist: [],

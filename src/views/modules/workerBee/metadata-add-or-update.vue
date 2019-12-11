@@ -100,7 +100,7 @@
         fatherData: {
           enable: true,
           enableCache: 1,
-          parsTemplate: 0
+          parsTemplate: false
         }
       }
     },
@@ -151,7 +151,7 @@
         this.fatherData = {
           enable: true,
           enableCache: 1,
-          parsTemplate: 0
+          parsTemplate: false
         }
       },
       // 校验是否通过
@@ -167,7 +167,7 @@
         this.fatherData = {
           enable: true,
           enableCache: 1,
-          parsTemplate: 0
+          parsTemplate: false
         }
         this.visible = data
       },

@@ -2,7 +2,7 @@
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
         <el-form-item label="sql" prop="sql">
-        <el-input v-model="fatherData.sql" placeholder="请输入sql"/>
+        <el-input type="textarea" autosize v-model="fatherData.sql" placeholder="请输入sql"/>
         </el-form-item>
         <el-form-item label="数据源id">
         <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
@@ -27,8 +27,8 @@
         </el-form-item>
         <el-form-item label="是否启用解析模板">
           <el-radio-group v-model="fatherData.parsTemplate">
-            <el-radio :label="0">不启用</el-radio>
-            <el-radio :label="1">启用</el-radio>
+            <el-radio :label="false">不启用</el-radio>
+            <el-radio :label="true">启用</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="缓存生成的key需要的字段">
