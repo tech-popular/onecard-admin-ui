@@ -2,13 +2,13 @@
   <div class="monitor">
     <div class="monitorLeft" v-if="simpleList[0] || simpleList[1] || simpleList[2]">
       <div :key="item.id" v-for="(item) in simpleList">
-        <p>{{item.legend.extend.simple[0].name}}</p>
+        <p>{{item.legend.extend.simple[0] ? item.legend.extend.simple[0].name : ''}}</p>
         <p>
-          {{item.legend.extend.simple[0].metric}}{{item.legend.extend.simple[0].metric_unit}}
+          {{item.legend.extend.simple[0] ? item.legend.extend.simple[0].metric : ''}}{{item.legend.extend.simple[0] ? item.legend.extend.simple[0].metric_unit : ''}}
           <span
             class="colorRed"
-            :class="{'percentRise' : item.legend.extend.simple[0].percentRise}"
-          >{{item.legend.extend.simple[0].percentRise ? '↑' : '↓'}} {{item.legend.extend.simple[0].percent}}{{item.legend.extend.simple[0].percent_unit}}</span>
+            :class="{'percentRise' : item.legend.extend.simple[0] ? item.legend.extend.simple[0].percentRise : ''}"
+          >{{item.legend.extend.simple[0] ? (item.legend.extend.simple[0].percentRise ? '↑' : '↓') : ''}} {{item.legend.extend.simple[0] ? item.legend.extend.simple[0].percent : ''}}{{item.legend.extend.simple[0] ?item.legend.extend.simple[0].percent_unit : ''}}</span>
         </p>
       </div>
     </div>

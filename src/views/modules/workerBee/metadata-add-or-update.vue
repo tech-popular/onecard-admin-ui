@@ -99,7 +99,8 @@
         },
         fatherData: {
           enable: true,
-          enableCache: 1
+          enableCache: 1,
+          parsTemplate: false
         }
       }
     },
@@ -149,7 +150,8 @@
       clickType () {
         this.fatherData = {
           enable: true,
-          enableCache: 1
+          enableCache: 1,
+          parsTemplate: false
         }
       },
       // 校验是否通过
@@ -164,7 +166,8 @@
       hideVisible (data) {
         this.fatherData = {
           enable: true,
-          enableCache: 1
+          enableCache: 1,
+          parsTemplate: false
         }
         this.visible = data
       },
