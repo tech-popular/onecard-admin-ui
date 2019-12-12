@@ -41,6 +41,16 @@
         align="center"
         label="版本号"
         width="150px"/>
+        <el-table-column
+        prop="enable"
+        header-align="center"
+        align="center"
+        label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.enable === true" size="small" >启动</el-tag>
+          <el-tag v-else size="small" type="danger">停止</el-tag>
+        </template>
+      </el-table-column>
       <!-- <el-table-column
         prop="remark"
         header-align="center"
@@ -50,7 +60,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="action(scope.row.id)">启用</el-button>
+          <el-button type="text" size="small" @click="action(scope.row.id)">启动</el-button>
           <el-button type="text" size="small" @click="storp(scope.row.id)">停止</el-button>
         </template>
       </el-table-column>
