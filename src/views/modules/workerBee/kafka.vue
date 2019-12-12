@@ -6,7 +6,7 @@
       </el-form-item>
     </el-form>
     <el-table
-      :data="newList" border
+      :data="dataList" border
       v-loading="dataListLoading"
       style="width: 100%;">
       <el-table-column
@@ -15,7 +15,7 @@
         align="center"
         label="流程编号"/>
       <el-table-column
-        prop="consumer_name"
+        prop="consumerName"
         header-align="center"
         align="center"
         label="消费者名字"
@@ -41,15 +41,17 @@
         align="center"
         label="版本号"
         width="150px"/>
-      <el-table-column
+      <!-- <el-table-column
         prop="remark"
         header-align="center"
         align="center"
-        label="备注"/>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+        label="备注"/> -->
+      <el-table-column fixed="right" header-align="center" align="center" width="180" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="action(scope.row.id)">启用</el-button>
+          <el-button type="text" size="small" @click="storp(scope.row.id)">停止</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -68,7 +70,7 @@
 
 <script>
   import AddOrUpdate from './kafka-add-or-update'
-  import { beeTaskList, deleteBeeTask } from '@/api/workerBee/kafka'
+  import { beeTaskList, deleteBeeTask, start, stop } from '@/api/workerBee/kafka'
   export default {
     data () {
       return {
@@ -77,8 +79,7 @@
         pageSize: 10, // 默认每页10条
         totalPage: 0,
         dataListLoading: false,
-        addOrUpdateVisible: false,
-        newList: []
+        addOrUpdateVisible: false
       }
     },
     components: {
@@ -99,11 +100,6 @@
           if (data && data.status === 0) {
             this.dataList = data.list
             this.totalPage = data.totalCount
-            var arrList = []
-            for (let i = 0, length = this.dataList.length; i < length; i++) {
-              arrList.push(this.dataList[i].beeTaskDef)
-              this.newList = arrList
-            }
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -136,9 +132,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          const dataBody = {
-            utcParam: [id]
-          }
+          const dataBody = id
           deleteBeeTask(dataBody).then(({data}) => {
             if (data && data.status === 0) {
               this.$message({
@@ -154,7 +148,56 @@
             }
           })
         })
+      },
+      // 启动
+      action (id) {
+        this.$confirm(`确定启动?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          const dataBody = id
+          start(dataBody).then(({data}) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        })
+      },
+      // 停止
+      storp (id) {
+        this.$confirm(`确定停止?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          const dataBody = id
+          stop(dataBody).then(({data}) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        })
       }
+
     }
   }
 </script>

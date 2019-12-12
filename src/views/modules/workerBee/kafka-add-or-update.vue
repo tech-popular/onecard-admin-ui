@@ -5,7 +5,10 @@
       <el-input v-model="dataForm.autoCommitIntervalMs" placeholder="超时时间"/>
     </el-form-item>
     <el-form-item label="偏移量重置机制" prop="autoOffsetReset">
-      <el-input v-model="dataForm.autoOffsetReset" placeholder="偏移量重置机制"/>
+      <el-select v-model="dataForm.autoOffsetReset" placeholder="请选择偏移量重置机制">
+        <el-option label="earliest" value="earliest"></el-option>
+        <el-option label="latest" value="latest"></el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="kafka地址" prop="bootstrapServers">
       <el-input v-model="dataForm.bootstrapServers" placeholder="kafka地址"/>
@@ -41,9 +44,18 @@
 </template>
 
 <script>
-  import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
+  import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
   export default {
     data () {
+      var nullandnumber = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入'))
+        }
+        if (!Number(value)) {
+          callback(new Error('请输入数字类型'))
+        }
+        callback()
+      }
       return {
         visible: false,
         dataForm: {
@@ -55,14 +67,13 @@
           groupId: '',
           topic: '',
           version: '',
-          ownerApp: '',
           enableAutoCommit: ''
         },
         dataFormValue: '',
         ruleTypeList: [],
         dataRule: {
           autoCommitIntervalMs: [
-            { required: true, message: '超时时间不能为空', trigger: 'blur' }
+            { required: true, validator: nullandnumber, trigger: 'blur' }
           ],
           autoOffsetReset: [
             { required: true, message: '偏移量重置机制不能为空', trigger: 'blur' }
@@ -74,7 +85,7 @@
             { required: true, message: '消费者名字不能为空', trigger: 'change' }
           ],
           flowId: [
-            { required: true, message: '工作流编号不能为空', trigger: 'change' }
+            { required: true, validator: nullandnumber, trigger: 'change' }
           ],
           groupId: [
             { required: true, message: '分组名称不能为空', trigger: 'change' }
@@ -83,21 +94,19 @@
             { required: true, message: 'topic名称不能为空', trigger: 'change' }
           ],
           version: [
-            { required: true, message: '版本号不能为空', trigger: 'change' }
+            { required: true, validator: nullandnumber, trigger: 'change' }
           ],
           enableAutoCommit: [
             { required: true, message: '是否自动提交不能为空', trigger: 'change' }
           ]
-        },
-        fatherData: {
-          enable: true,
-          enableCache: 1,
-          parsTemplate: false
         }
       }
     },
     components: {
   
+    },
+    mounted () {
+      this.init()
     },
     methods: {
       init (id, value) {
@@ -106,19 +115,18 @@
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-          getBeeTaskTypeList().then(({data}) => {
-            if (data && data.status === 0) {
-              this.ruleTypeList = data.data
-            }
-          })
           if (id) {
-            const dataBody = {
-              utcParam: [id]
-            }
+            const dataBody = this.dataForm.id
             infoBeeTask(dataBody).then(({data}) => {
-              if (data && data.status === 0) {
-  
-              }
+              this.dataForm.autoCommitIntervalMs = data.data.autoCommitIntervalMs
+              this.dataForm.autoOffsetReset = data.data.autoOffsetReset
+              this.dataForm.bootstrapServers = data.data.bootstrapServers
+              this.dataForm.consumerName = data.data.consumerName
+              this.dataForm.flowId = data.data.flowId
+              this.dataForm.groupId = data.data.groupId
+              this.dataForm.topic = data.data.topic
+              this.dataForm.version = data.data.version
+              this.dataForm.enableAutoCommit = data.data.enableAutoCommit
             })
           }
         })
@@ -129,7 +137,8 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             const dataBody = this.dataForm
-            beeTask(dataBody, `/bee/mkafka/${!this.dataForm.id ? 'add' : 'upd'}`).then(({data}) => {
+            const dataUpdateId = this.dataForm.id
+            saveorupt(dataBody, dataUpdateId).then(({data}) => {
               if (data && data.status === 0) {
                 this.$message({
                   message: '操作成功',
