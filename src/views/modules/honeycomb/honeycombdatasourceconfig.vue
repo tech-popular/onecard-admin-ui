@@ -2,7 +2,13 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.key" placeholder="数据库名字" clearable @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="dataForm.datasourceType" placeholder="数据眼类型" clearable @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="dataForm.datasourceDepartment" placeholder="数据源所属部门" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -39,6 +45,12 @@
         header-align="center"
         align="center"
         label="数据源类型">
+      </el-table-column>
+      <el-table-column
+        prop="datasourceDepartment"
+        header-align="center"
+        align="center"
+        label="数据源所属部门">
       </el-table-column>
       <el-table-column
         prop="driver"
@@ -120,7 +132,9 @@
     data () {
       return {
         dataForm: {
-          key: ''
+          key: '',
+          datasourceDepartment: '',
+          datasourceType: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -147,7 +161,9 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'datasourceDepartment': this.dataForm.datasourceDepartment,
+            'datasourceType': this.dataForm.datasourceType
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
