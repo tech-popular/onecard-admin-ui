@@ -126,7 +126,7 @@
               this.dataForm.groupId = data.data.groupId
               this.dataForm.topic = data.data.topic
               this.dataForm.version = data.data.version
-              this.dataForm.enableAutoCommit = data.data.enableAutoCommit
+              this.dataForm.enableAutoCommit = JSON.parse(data.data.enableAutoCommit)
             })
           }
         })
