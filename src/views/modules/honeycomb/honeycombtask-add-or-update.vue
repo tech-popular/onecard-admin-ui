@@ -355,7 +355,7 @@ export default {
         smartIndent: true,
         lineNumbers: true,
         matchBrackets: true,
-        autofocus: true,
+        // autofocus: true,
         extraKeys: {'Ctrl': 'autocomplete'}, // 自定义快捷键
         hintOptions: {
           tables: {}
