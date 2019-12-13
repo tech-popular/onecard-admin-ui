@@ -3,7 +3,6 @@
     <el-dialog
       :title="!dataForm.id ? '新增' : '修改'"
       :close-on-click-modal="false"
-      z-index="99"
       :visible.sync="visible"
     >
       <el-form
@@ -207,7 +206,7 @@
       </span>
     </el-dialog>
     <!-- 测试 sql -->
-    <el-dialog :visible.sync="sqlVisible">
+    <el-dialog :visible.sync="sqlVisible" width="800px">
       <el-form :model="dataSql" ref="dataSql" :rules="sqlRule">
         <el-form-item label="任务列表">
           <el-input v-model="dataSql.taskId" placeholder="周期" type="text" disabled></el-input>
@@ -216,12 +215,19 @@
           <el-input v-model="dataSql.datasourceId" placeholder="周期" type="text" disabled></el-input>
         </el-form-item>
         <el-form-item prop="sql">
-          <textarea
+          <!-- <textarea
             ref="mycode"
             class="codesql"
             v-model="dataSql.sql"
-            style="height:200px;width:600px;"
-          ></textarea>
+            style="height:200px;width:100%"
+          ></textarea>-->
+          <codemirror
+            ref="mycode"
+            :value="dataSql.sql"
+            :options="cmOptions"
+            @changes="changes"
+            class="code"
+          ></codemirror>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="dataSqlSubmit()">执行</el-button>
@@ -230,10 +236,10 @@
       </el-form>
       <el-tabs v-model="activeName" type="card">
         <el-tab-pane label="执行状态" name="first">
-          <el-input type="textarea" ref="returnData" v-model="returnStatus" autosize></el-input>
+          <el-input type="textarea" ref="returnData" v-model="returnStatus" autosize min="4"></el-input>
         </el-tab-pane>
         <el-tab-pane label="执行结果" name="second">
-          <el-input type="textarea" ref="returnData" v-model="returnData" autosize></el-input>
+          <el-input type="textarea" ref="returnData" v-model="returnData" autosize min='4'></el-input>
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -242,20 +248,23 @@
 
 <script>
 import cron from '@/components/cron'
+import { codemirror } from 'vue-codemirror'
 import { getDate } from '@/utils'
-import 'codemirror/theme/ambiance.css'
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/addon/hint/show-hint.css'
+// import 'codemirror/theme/ambiance.css'
+// import 'codemirror/lib/codemirror.css'
+// import 'codemirror/addon/hint/show-hint.css'
 
-let CodeMirror = require('codemirror/lib/codemirror')
-require('codemirror/addon/edit/matchbrackets')
-require('codemirror/addon/selection/active-line')
-require('codemirror/mode/sql/sql')
-require('codemirror/addon/hint/show-hint')
-require('codemirror/addon/hint/sql-hint')
+// let CodeMirror = require('codemirror/lib/codemirror')
+// require('codemirror/addon/edit/matchbrackets')
+// require('codemirror/addon/selection/active-line')
+// require('codemirror/mode/sql/sql')
+// require('codemirror/addon/hint/show-hint')
+// require('codemirror/addon/hint/sql-hint')
 export default {
+  name: 'codeMirror',
   components: {
-    cron
+    cron,
+    codemirror
   },
   data () {
     return {
@@ -336,34 +345,28 @@ export default {
       activeName: 'first',
       sqlRule: {
         datasourceId: [
-            { required: true, message: '输入数据源不能为空', trigger: 'blur' }
+          { required: true, message: '输入数据源不能为空', trigger: 'blur' }
         ],
-        sql: [
-            { required: true, message: 'sql不能为空', trigger: 'blur' }
-        ]
+        sql: [{ required: true, message: 'sql不能为空', trigger: 'blur' }]
+      },
+      cmOptions: {
+        mode: 'text/x-mariadb',
+        indentWithTabs: true,
+        smartIndent: true,
+        lineNumbers: true,
+        matchBrackets: true,
+        autofocus: true,
+        extraKeys: {'Ctrl': 'autocomplete'}, // 自定义快捷键
+        hintOptions: {
+          tables: {}
+        }
       }
     }
   },
-  mounted () {
-    let mime = 'text/x-mariadb'
-    var that = this
-    let editor = CodeMirror.fromTextArea(this.$refs.mycode, {
-      mode: mime, // 选择对应代码编辑器的语言，我这边选的是数据库，根据个人情况自行设置即可
-      indentWithTabs: true,
-      smartIndent: true,
-      lineNumbers: true,
-      matchBrackets: true,
-      extraKeys: {'Ctrl': 'autocomplete'}, // 自定义快捷键
-      hintOptions: { // 自定义提示选项
-        tables: {
-        }
-      }
-    })
-    editor.setValue(this.dataSql.sql)
-    editor.on('cursorActivity', function (a, b) {
-      that.dataSql.sql = editor.getValue()
-      editor.showHint()
-    })
+  computed: {
+    codemirror () {
+      return this.$refs.mycode.codemirror
+    }
   },
   methods: {
     addDomain () {
@@ -373,22 +376,14 @@ export default {
       })
     },
     testSQL () {
-      // this.visible = false
       this.sqlVisible = true
+      this.returnData = ''
+      this.returnStatus = ''
       this.dataSql = {
         datasourceId: this.dataForm.inDatasource,
         sql: this.dataForm.sql,
         taskId: this.dataForm.id
       }
-      // this.$router.push({
-      //   path: 'honeycomb-honeycombtaskpreview',
-      //   name: 'honeycomb-honeycombtaskpreview',
-      //   params: {
-      //     sql: this.dataForm.sql,
-      //     datasourceId: this.dataForm.inDatasource,
-      //     taskId: this.dataForm.id
-      //   }
-      // })
     },
     removeDomain (item) {
       var index = this.dataForm.honeycombOutDatasourceEntitys.indexOf(item)
@@ -397,6 +392,7 @@ export default {
       }
     },
     init (id) {
+      // this.codeMirror()
       // 数据源权限tenant
       this.$http({
         url: this.$http.adornUrl(`/sys/systenant/getTenantInfoByUser`),
@@ -560,21 +556,30 @@ export default {
         }
       })
     },
-      // sql表单提交
+    changes (value) {
+      this.dataSql.sql = this.codemirror.getValue()
+    },
+    // sql表单提交
     dataSqlSubmit () {
-      this.$refs['dataSql'].validate((valid) => {
+      this.$refs['dataSql'].validate(valid => {
         if (valid) {
           this.returnData = ''
           this.returnStatus = ''
           this.$http({
-            url: this.$http.adornUrl(`/honeycomb/honeycombtaskpreview/preview/sql`),
+            url: this.$http.adornUrl(
+              `/honeycomb/honeycombtaskpreview/preview/sql`
+            ),
             method: 'post',
             data: this.$http.adornData(this.dataSql)
-          }).then(({data}) => {
+          }).then(({ data }) => {
             if (data && data.code === 0) {
               const time = getDate(data.resultBean.timestamp, 'year')
-              this.returnStatus = time + ' ' + JSON.stringify({status: data.resultBean.status})
-              this.returnData = JSON.stringify({data: data.resultBean.data, message: data.resultBean.message})
+              this.returnStatus =
+                time + ' ' + JSON.stringify({ status: data.resultBean.status })
+              this.returnData = JSON.stringify({
+                data: data.resultBean.data,
+                message: data.resultBean.message
+              })
               if (data.resultBean.status === '2') {
                 this.instanceId = data.resultBean.traceId
                 this.returnData += '\n继续执行'
@@ -591,20 +596,27 @@ export default {
       })
     },
     continueMaxcomputepreview () {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataSql'].validate(valid => {
         if (valid) {
           this.$http({
-            url: this.$http.adornUrl(`/honeycomb/honeycombtaskpreview/preview/maxcompute`),
+            url: this.$http.adornUrl(
+              `/honeycomb/honeycombtaskpreview/preview/maxcompute`
+            ),
             method: 'post',
             data: this.$http.adornData({
-              'instanceId': this.instanceId || undefined,
-              'datasourceId': this.dataSql.datasourceId
+              instanceId: this.instanceId || undefined,
+              datasourceId: this.dataSql.datasourceId
             })
-          }).then(({data}) => {
+          }).then(({ data }) => {
             if (data && data.code === 0) {
               const time = getDate(data.resultBean.timestamp, 'year')
-              this.returnStatus += `\n${time} ${JSON.stringify({status: data.resultBean.status})}`
-              this.returnData += JSON.stringify({data: data.resultBean.data, message: data.resultBean.message})
+              this.returnStatus += `\n${time} ${JSON.stringify({
+                status: data.resultBean.status
+              })}`
+              this.returnData += JSON.stringify({
+                data: data.resultBean.data,
+                message: data.resultBean.message
+              })
               if (data.resultBean.status === '2') {
                 this.returnData += '\n继续执行'
                 clearInterval(window.clearnum)
@@ -623,20 +635,24 @@ export default {
       })
     },
     stopMaxcomputepreview () {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataSql'].validate(valid => {
         if (valid) {
           this.$http({
-            url: this.$http.adornUrl(`/honeycomb/honeycombtaskpreview/preview/stopmaxcompute`),
+            url: this.$http.adornUrl(
+              `/honeycomb/honeycombtaskpreview/preview/stopmaxcompute`
+            ),
             method: 'post',
             data: this.$http.adornData({
-              'instanceId': this.instanceId || undefined,
-              'datasourceId': this.dataSql.datasourceId
+              instanceId: this.instanceId || undefined,
+              datasourceId: this.dataSql.datasourceId
             })
-          }).then(({data}) => {
+          }).then(({ data }) => {
             if (data && data.code === 0) {
               const time = getDate(data.resultBean.timestamp, 'year')
               clearInterval(window.clearnum)
-              this.returnStatus += `\n${time} ${JSON.stringify({status: data.resultBean.status})}`
+              this.returnStatus += `\n${time} ${JSON.stringify({
+                status: data.resultBean.status
+              })}`
               this.returnData += '\n停止执行'
             } else {
               this.$message.error(data.msg)
