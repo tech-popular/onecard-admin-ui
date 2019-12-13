@@ -250,16 +250,15 @@
 import cron from '@/components/cron'
 import { codemirror } from 'vue-codemirror'
 import { getDate } from '@/utils'
-// import 'codemirror/theme/ambiance.css'
-// import 'codemirror/lib/codemirror.css'
-// import 'codemirror/addon/hint/show-hint.css'
+import 'codemirror/theme/ambiance.css'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/addon/hint/show-hint.css'
 
-// let CodeMirror = require('codemirror/lib/codemirror')
-// require('codemirror/addon/edit/matchbrackets')
-// require('codemirror/addon/selection/active-line')
-// require('codemirror/mode/sql/sql')
-// require('codemirror/addon/hint/show-hint')
-// require('codemirror/addon/hint/sql-hint')
+require('codemirror/addon/edit/matchbrackets')
+require('codemirror/addon/selection/active-line')
+require('codemirror/mode/sql/sql')
+require('codemirror/addon/hint/show-hint')
+require('codemirror/addon/hint/sql-hint')
 export default {
   name: 'codeMirror',
   components: {
