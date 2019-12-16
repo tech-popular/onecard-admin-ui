@@ -48,11 +48,35 @@
   export default {
     data () {
       var nullandnumber = (rule, value, callback) => {
+        const nullValue = /^[^\s]+$/
         if (!value) {
           callback(new Error('请输入'))
         }
+        if (!nullValue.test(value)) {
+          callback(new Error('不能输入含空格'))
+        }
         if (!Number(value)) {
           callback(new Error('请输入数字类型'))
+        }
+        callback()
+      }
+      var nullkongge = (rule, value, callback) => {
+        const nullValue = /^[^\s]+$/
+        if (!value) {
+          callback(new Error('请输入'))
+        }
+        if (!nullValue.test(value)) {
+          callback(new Error('不能输入含空格'))
+        }
+        callback()
+      }
+      var nullkonggeselect = (rule, value, callback) => {
+        const nullValue = /^[^\s]+$/
+        if (!value) {
+          callback(new Error('请选择'))
+        }
+        if (!nullValue.test(value)) {
+          callback(new Error('不能输入含空格'))
         }
         callback()
       }
@@ -76,28 +100,28 @@
             { required: true, validator: nullandnumber, trigger: 'blur' }
           ],
           autoOffsetReset: [
-            { required: true, message: '偏移量重置机制不能为空', trigger: 'blur' }
+            { required: true, validator: nullkonggeselect, trigger: 'blur' }
           ],
           bootstrapServers: [
-            { required: true, message: 'kafka地址不能为空', trigger: 'change' }
+            { required: true, validator: nullkongge, trigger: 'change' }
           ],
           consumerName: [
-            { required: true, message: '消费者名字不能为空', trigger: 'change' }
+            { required: true, validator: nullkongge, trigger: 'change' }
           ],
           flowId: [
             { required: true, validator: nullandnumber, trigger: 'change' }
           ],
           groupId: [
-            { required: true, message: '分组名称不能为空', trigger: 'change' }
+            { required: true, validator: nullkongge, trigger: 'change' }
           ],
           topic: [
-            { required: true, message: 'topic名称不能为空', trigger: 'change' }
+            { required: true, validator: nullkongge, trigger: 'change' }
           ],
           version: [
             { required: true, validator: nullandnumber, trigger: 'change' }
           ],
           enableAutoCommit: [
-            { required: true, message: '是否自动提交不能为空', trigger: 'change' }
+            { required: true, validator: nullkonggeselect, trigger: 'change' }
           ]
         }
       }
