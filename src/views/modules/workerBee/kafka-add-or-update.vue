@@ -2,7 +2,7 @@
   <el-dialog :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
     <el-form-item label="超时时间" prop="autoCommitIntervalMs">
-      <el-input v-model="dataForm.autoCommitIntervalMs" placeholder="超时时间"/>
+      <el-input v-model="dataForm.autoCommitIntervalMs" style="width:95%" placeholder="超时时间"/>  ms
     </el-form-item>
     <el-form-item label="偏移量重置机制" prop="autoOffsetReset">
       <el-select v-model="dataForm.autoOffsetReset" placeholder="请选择偏移量重置机制">
