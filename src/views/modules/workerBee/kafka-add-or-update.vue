@@ -91,7 +91,7 @@
           groupId: '',
           topic: '',
           version: '',
-          enableAutoCommit: ''
+          enableAutoCommit: true
         },
         dataFormValue: '',
         ruleTypeList: [],
