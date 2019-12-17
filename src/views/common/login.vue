@@ -3,7 +3,7 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <div class="brand-info">
-          <h2 class="brand-info__text">金丝雀系统</h2>
+          <h2 class="brand-info__text">架构综合服务平台</h2>
           <p class="brand-info__intro">提供平台的全方位的报警监控。</p>
         </div>
         <!-- 账号密码登录 -->
