@@ -37,16 +37,16 @@
         </el-form-item>
         <el-form-item
           v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
-          :label="'输出数据源'+index"
+          :label="'输出数据源' + index"
           :key="outdata.key"
           :prop="dataForm.honeycombOutDatasourceEntitys.outTableName"
           :rules="{
       required: true, message: '表名不能为空', trigger: 'blur'}"
         >
           <el-row :gutter="24">
-            <el-col :span="9">
+            <el-col :span="7">
               <div class="grid-content bg-purple">
-                <el-select v-model="outdata.outDatasource" placeholder="请选择">
+                <el-select v-model="outdata.outDatasource" @change="selectOutData(index)" placeholder="请选择">
                   <el-option
                     v-for="item in datasourceoptions"
                     :key="item.id"
@@ -56,17 +56,41 @@
                 </el-select>
               </div>
             </el-col>
-            <el-col :span="9">
+            <el-col :span="9" v-if='!redisListData[index] || !redisListData[index].show'>
               <div class="grid-content bg-purple">
                 <el-input v-model="outdata.outTableName"></el-input>
               </div>
             </el-col>
             <el-col :span="4">
               <div class="grid-content bg-purple">
-                <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
+                <el-button @click.prevent="removeDomain(outdata, index)">删除</el-button>
               </div>
             </el-col>
           </el-row>
+          <el-form-item v-if='redisListData[index] && redisListData[index].show' class="el-redis-item">
+            <el-row :gutter="24">
+              <el-col :span="6">
+                <div class="grid-content bg-purple">
+                  <el-input v-model="redisListData[index].name" placeholder="redis数据格式"></el-input>
+                </div>
+              </el-col>
+              <el-col :span="6">
+                <div class="grid-content bg-purple">
+                  <el-input v-model="redisListData[index].key" placeholder="redisKey"></el-input>
+                </div>
+              </el-col>
+              <el-col :span="6">
+                <div class="grid-content bg-purple">
+                  <el-input v-model="redisListData[index].type" placeholder="key拼接时间"></el-input>
+                </div>
+              </el-col>
+              <el-col :span="6">
+                <div class="grid-content bg-purple">
+                  <el-input v-model="redisListData[index].time" placeholder="key失效时间"></el-input>
+                </div>
+              </el-col>
+            </el-row>
+          </el-form-item>
         </el-form-item>
         <el-form-item>
           <el-button @click="addDomain">新增输出数据源</el-button>
@@ -239,7 +263,7 @@
           <el-input type="textarea" ref="returnData" v-model="returnStatus" autosize min="4"></el-input>
         </el-tab-pane>
         <el-tab-pane label="执行结果" name="second">
-          <el-input type="textarea" ref="returnData" v-model="returnData" autosize min='4'></el-input>
+          <el-input type="textarea" ref="returnData" v-model="returnData" autosize min="4"></el-input>
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -253,7 +277,6 @@ import { getDate } from '@/utils'
 import 'codemirror/theme/ambiance.css'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
-
 require('codemirror/addon/edit/matchbrackets')
 require('codemirror/addon/selection/active-line')
 require('codemirror/mode/sql/sql')
@@ -355,11 +378,18 @@ export default {
         lineNumbers: true,
         matchBrackets: true,
         // autofocus: true,
-        extraKeys: {'Ctrl': 'autocomplete'}, // 自定义快捷键
+        extraKeys: { Ctrl: 'autocomplete' }, // 自定义快捷键
         hintOptions: {
           tables: {}
         }
-      }
+      },
+      redis: {
+        name: '',
+        key: '',
+        type: '',
+        time: ''
+      },
+      redisListData: []
     }
   },
   computed: {
@@ -384,14 +414,15 @@ export default {
         taskId: this.dataForm.id
       }
     },
-    removeDomain (item) {
+    removeDomain (item, i) {
       var index = this.dataForm.honeycombOutDatasourceEntitys.indexOf(item)
       if (index !== -1) {
         this.dataForm.honeycombOutDatasourceEntitys.splice(index, 1)
       }
+      this.redisListData.splice(i, 1)
     },
     init (id) {
-      // this.codeMirror()
+      this.redisListData = []
       // 数据源权限tenant
       this.$http({
         url: this.$http.adornUrl(`/sys/systenant/getTenantInfoByUser`),
@@ -465,6 +496,30 @@ export default {
               this.dataForm.isMergeTask = data.honeycombTask.isMergeTask
               this.dataForm.honeycombOutDatasourceEntitys =
                 data.honeycombTask.honeycombOutDatasourceEntitys
+              this.dataForm.honeycombOutDatasourceEntitys.forEach((val, i) => {
+                this.$set(this.redisListData, i, {
+                  name: '',
+                  key: '',
+                  time: '',
+                  type: ''
+                })
+                let id = val.outDatasource
+                let datasource = this.datasourceoptions.filter(item => item.id == id)
+                if (datasource[0].datasourceName == 'redis') {
+                  let arr = val.outTableName.split('#')
+                  this.$set(this.redisListData, i, {
+                    show: true,
+                    name: arr[0],
+                    key: arr[1],
+                    type: arr[2] || '',
+                    time: arr[3] || ''
+                  })
+                } else {
+                  this.$set(this.redisListData, i, {
+                    show: false
+                  })
+                }
+              })
             }
           })
         } else {
@@ -501,6 +556,9 @@ export default {
     },
     // 表单提交
     dataFormSubmit () {
+      if (!this.checkRedisList()) {
+        return false
+      }
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           this.showCronBox = false
@@ -660,7 +718,65 @@ export default {
           })
         }
       })
+    },
+    // 输出源
+    selectOutData (index) {
+      this.$set(this.redisListData, index, {
+        name: '',
+        key: '',
+        time: '',
+        type: ''
+      })
+      let id = this.dataForm.honeycombOutDatasourceEntitys[index].outDatasource
+      let datasource = this.datasourceoptions.filter(item => item.id == id)
+      if (datasource[0].datasourceName == 'redis') {
+        this.$set(this.redisListData, index, {
+          show: true
+        })
+      } else {
+        this.$set(this.redisListData, index, {
+          show: false
+        })
+      }
+    },
+    checkRedisList () {
+      for (let i = 0; i < this.redisListData.length; i++) {
+        if (this.redisListData[i].show && !this.redisListData[i].name) {
+          this.$message({
+            type: 'warning',
+            message: '请输入redis数据格式'
+          })
+          return false
+        }
+        if (this.redisListData[i].show && !this.redisListData[i].key) {
+          this.$message({
+            type: 'warning',
+            message: '请输入redis key'
+          })
+          return false
+        }
+      }
+      return true
+    }
+  },
+  watch: {
+    redisListData: {
+      handler (newVal, oldVal) {
+        newVal.forEach((item, index) => {
+          if (item.show) {
+            let outTableName = item.name + '#' + item.key + '#' + (item.type ? item.type : '') + '#' + (item.time ? item.time : '') + '#'
+            this.$set(this.dataForm.honeycombOutDatasourceEntitys[index], 'outTableName', outTableName)
+          }
+        })
+      },
+      immediate: true,
+      deep: true
     }
   }
 }
 </script>
+<style lang="scss">
+.el-redis-item {
+  margin-top: 20px !important;
+}
+</style>

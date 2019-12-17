@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.key" placeholder="数据库名字" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-input v-model="dataForm.datasourceType" placeholder="数据眼类型" clearable @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.datasourceType" placeholder="数据源类型" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item>
         <el-input v-model="dataForm.datasourceDepartment" placeholder="数据源所属部门" clearable @keyup.enter.native="getDataList()"></el-input>
