@@ -28,7 +28,7 @@
     <el-form-item label="版本号" prop="version">
       <el-input v-model="dataForm.version" placeholder="版本号"/>
     </el-form-item>
-    <el-form-item label="是否自动提交" prop="enableAutoCommit">
+    <el-form-item label="是否自动提交">
     <el-radio-group v-model="dataForm.enableAutoCommit">
       <el-radio :label="true">是</el-radio>
       <el-radio :label="false">否</el-radio>
@@ -119,9 +119,6 @@
           ],
           version: [
             { required: true, validator: nullandnumber, trigger: 'change' }
-          ],
-          enableAutoCommit: [
-            { required: true, validator: nullkonggeselect, trigger: 'change' }
           ]
         }
       }
