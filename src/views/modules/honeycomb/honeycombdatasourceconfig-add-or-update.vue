@@ -74,28 +74,28 @@
         datasourceTypeOptions: [],
         dataRule: {
           datasourceName: [
-            { required: true, message: '数据库名字不能为空', trigger: 'blur' }
+            { required: false, message: '数据库名字不能为空', trigger: 'blur' }
           ],
           datasourceType: [
-            { required: true, message: '数据源类型必须是mysql,postgre,maxCompute,kafka,ftp,es ', trigger: 'blur' }
+            { required: false, message: '数据源类型必须是mysql,postgre,maxCompute,kafka,ftp,es ', trigger: 'blur' }
           ],
           datasourceDepartment: [
-            { required: true, message: '数据源部门驱动不能为空', trigger: 'blur' }
+            { required: false, message: '数据源部门驱动不能为空', trigger: 'blur' }
           ],
           driver: [
-            { required: true, message: '数据库驱动不能为空', trigger: 'blur' }
+            { required: false, message: '数据库驱动不能为空', trigger: 'blur' }
           ],
           user: [
-            { required: true, message: '数据库用户名不能为空', trigger: 'blur' }
+            { required: false, message: '数据库用户名不能为空', trigger: 'blur' }
           ],
           passwd: [
-            { required: true, message: '数据库密码不能为空', trigger: 'blur' }
+            { required: false, message: '数据库密码不能为空', trigger: 'blur' }
           ],
           url: [
-            { required: true, message: '数据库url不能为空', trigger: 'blur' }
+            { required: false, message: '数据库url不能为空', trigger: 'blur' }
           ],
           version: [
-            { required: true, message: '版本号不能为空', trigger: 'blur' }
+            { required: false, message: '版本号不能为空', trigger: 'blur' }
           ]
         }
       }
