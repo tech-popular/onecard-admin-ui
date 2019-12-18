@@ -416,17 +416,17 @@ export default {
           value: 'redisTypeString',
           label: 'string'
         },
+        // {
+        //   value: 'redisTypeList',
+        //   label: 'list'
+        // },
+        // {
+        //   value: 'redisTypeSet',
+        //   label: 'set'
+        // },
         {
-          value: 'redisTypeList',
-          label: 'list'
-        },
-        {
-          value: 'redisTypeSet',
-          label: 'set'
-        },
-        {
-          value: 'redisTypezSet',
-          label: 'zSeet'
+          value: 'redisTypeZSet',
+          label: 'zSet'
         }
       ],
       redisTypes: [
