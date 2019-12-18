@@ -39,9 +39,6 @@
           v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
           :label="'输出数据源' + index"
           :key="outdata.key"
-          :prop="dataForm.honeycombOutDatasourceEntitys.outTableName"
-          :rules="{
-      required: true, message: '表名不能为空', trigger: 'blur'}"
         >
           <el-row :gutter="24">
             <el-col :span="7">
