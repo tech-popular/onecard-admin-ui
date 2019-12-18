@@ -369,7 +369,8 @@ export default {
             trigger: 'blur'
           }
         ],
-        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }]
+        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
+        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur' }]
       },
       dataSql: {
         datasourceId: '',
