@@ -46,7 +46,11 @@
           <el-row :gutter="24">
             <el-col :span="7">
               <div class="grid-content bg-purple">
-                <el-select v-model="outdata.outDatasource" @change="selectOutData(index)" placeholder="请选择">
+                <el-select
+                  v-model="outdata.outDatasource"
+                  @change="selectOutData(index)"
+                  placeholder="请选择"
+                >
                   <el-option
                     v-for="item in datasourceoptions"
                     :key="item.id"
@@ -56,7 +60,7 @@
                 </el-select>
               </div>
             </el-col>
-            <el-col :span="9" v-if='!redisListData[index] || !redisListData[index].show'>
+            <el-col :span="9" v-if="!redisListData[index] || !redisListData[index].show">
               <div class="grid-content bg-purple">
                 <el-input v-model="outdata.outTableName"></el-input>
               </div>
@@ -67,26 +71,42 @@
               </div>
             </el-col>
           </el-row>
-          <el-form-item v-if='redisListData[index] && redisListData[index].show' class="el-redis-item">
+          <el-form-item
+            v-if="redisListData[index] && redisListData[index].show"
+            class="el-redis-item"
+          >
             <el-row :gutter="24">
-              <el-col :span="6">
+              <el-col :span="5">
                 <div class="grid-content bg-purple">
-                  <el-input v-model="redisListData[index].name" placeholder="redis数据格式"></el-input>
+                  <el-select v-model="redisListData[index].name" placeholder="redis数据格式" clearable>
+                    <el-option
+                      v-for="item in redisNames"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
                 </div>
               </el-col>
               <el-col :span="6">
                 <div class="grid-content bg-purple">
-                  <el-input v-model="redisListData[index].key" placeholder="redisKey"></el-input>
+                  <el-input v-model="redisListData[index].key" placeholder="redisKey" clearable></el-input>
                 </div>
               </el-col>
               <el-col :span="6">
                 <div class="grid-content bg-purple">
-                  <el-input v-model="redisListData[index].type" placeholder="key拼接时间"></el-input>
+                  <el-select v-model="redisListData[index].type" placeholder="key拼接时间" clearable>
+                    <el-option v-for="item in redisTypes" :key="item" :label="item" :value="item"></el-option>
+                  </el-select>
                 </div>
               </el-col>
-              <el-col :span="6">
+              <el-col :span="7">
                 <div class="grid-content bg-purple">
-                  <el-input v-model="redisListData[index].time" placeholder="key失效时间"></el-input>
+                  <el-input v-model="redisListData[index].time" placeholder="key失效时间" clearable @input="redisListData[index].time = redisListData[index].time.replace(/[^\d]/g,'')">
+                    <el-select v-model="redisListData[index].unit" slot="append">
+                      <el-option v-for="item in redisUnits" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                  </el-input>
                 </div>
               </el-col>
             </el-row>
@@ -387,9 +407,55 @@ export default {
         name: '',
         key: '',
         type: '',
-        time: ''
+        time: '',
+        unit: ''
       },
-      redisListData: []
+      redisListData: [],
+      redisNames: [
+        {
+          value: 'redisTypeString',
+          label: 'string'
+        },
+        {
+          value: 'redisTypeList',
+          label: 'list'
+        },
+        {
+          value: 'redisTypeSet',
+          label: 'set'
+        },
+        {
+          value: 'redisTypezSet',
+          label: 'zSeet'
+        }
+      ],
+      redisTypes: [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyyMMdd',
+        'yyyy-MM-dd',
+        'yyyy_MM_dd',
+        'yyyy',
+        'MM',
+        'dd'
+      ],
+      redisUnits: [
+        {
+          value: '1',
+          label: '秒'
+        },
+        {
+          value: '2',
+          label: '分钟'
+        },
+        {
+          value: '3',
+          label: '小时'
+        },
+        {
+          value: '4',
+          label: '天'
+        }
+      ]
     }
   },
   computed: {
@@ -501,10 +567,13 @@ export default {
                   name: '',
                   key: '',
                   time: '',
-                  type: ''
+                  type: '',
+                  unit: '1'
                 })
                 let id = val.outDatasource
-                let datasource = this.datasourceoptions.filter(item => item.id == id)
+                let datasource = this.datasourceoptions.filter(
+                  item => item.id == id
+                )
                 if (datasource[0].datasourceName == 'redis') {
                   let arr = val.outTableName.split('#')
                   this.$set(this.redisListData, i, {
@@ -512,7 +581,8 @@ export default {
                     name: arr[0],
                     key: arr[1],
                     type: arr[2] || '',
-                    time: arr[3] || ''
+                    time: arr[3] || '',
+                    unit: '1'
                   })
                 } else {
                   this.$set(this.redisListData, i, {
@@ -725,13 +795,15 @@ export default {
         name: '',
         key: '',
         time: '',
-        type: ''
+        type: '',
+        unit: '1'
       })
       let id = this.dataForm.honeycombOutDatasourceEntitys[index].outDatasource
       let datasource = this.datasourceoptions.filter(item => item.id == id)
       if (datasource[0].datasourceName == 'redis') {
         this.$set(this.redisListData, index, {
-          show: true
+          show: true,
+          unit: '1'
         })
       } else {
         this.$set(this.redisListData, index, {
@@ -762,10 +834,34 @@ export default {
   watch: {
     redisListData: {
       handler (newVal, oldVal) {
+        let unitCount = {
+          '1': 1,
+          '2': 60,
+          '3': 60 * 60,
+          '4': 60 * 60 * 24
+        }
         newVal.forEach((item, index) => {
           if (item.show) {
-            let outTableName = item.name + '#' + item.key + '#' + (item.type ? item.type : '') + '#' + (item.time ? item.time : '') + '#'
-            this.$set(this.dataForm.honeycombOutDatasourceEntitys[index], 'outTableName', outTableName)
+            let time = 0
+            for (let key in unitCount) {
+              if (item.unit == key) {
+                time = item.time ? Number(item.time) * unitCount[key] : ''
+              }
+            }
+            let outTableName =
+              item.name +
+              '#' +
+              item.key +
+              '#' +
+              (item.type ? item.type : '') +
+              '#' +
+              (time || '') +
+              '#'
+            this.$set(
+              this.dataForm.honeycombOutDatasourceEntitys[index],
+              'outTableName',
+              outTableName
+            )
           }
         })
       },
@@ -778,5 +874,8 @@ export default {
 <style lang="scss">
 .el-redis-item {
   margin-top: 20px !important;
+}
+.bg-purple .el-input-group__append {
+  width: 80px;
 }
 </style>
