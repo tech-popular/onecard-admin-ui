@@ -1,6 +1,6 @@
 <template>
   <el-dialog :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="23%">
     <el-form-item label="自动提交超时时间(ms)" prop="autoCommitIntervalMs">
       <el-input v-model="dataForm.autoCommitIntervalMs" placeholder="超时时间"/>
     </el-form-item>
