@@ -849,9 +849,9 @@ export default {
               '#' +
               item.key +
               '#' +
-              (item.type ? item.type : '') +
+              (item.type ? item.type : ' ') +
               '#' +
-              (time || '') +
+              (time || ' ') +
               '#'
             this.$set(
               this.dataForm.honeycombOutDatasourceEntitys[index],
