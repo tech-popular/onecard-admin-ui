@@ -2,7 +2,7 @@
   <nav class="site-navbar" :class="'site-navbar--' + navbarLayoutType">
     <div class="site-navbar__header">
       <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
-        <a class="site-navbar__brand-lg" href="javascript:;">金丝雀系统</a>
+        <a class="site-navbar__brand-lg" href="javascript:;">架构综合服务平台</a>
         <a class="site-navbar__brand-mini" href="javascript:;"><icon-svg style="transform: scale(1.4, 1.4)" name="bird"></icon-svg></a>
       </h1>
     </div>
@@ -51,8 +51,8 @@
     data () {
       return {
         updatePassowrdVisible: false,
-        left: require('../assets/img/left.png'),
-        right: require('../assets/img/right.png')
+        left: require('../assets/img/left1.png'),
+        right: require('../assets/img/right1.png')
       }
     },
     components: {

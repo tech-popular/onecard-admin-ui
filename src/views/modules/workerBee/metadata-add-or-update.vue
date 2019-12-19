@@ -55,7 +55,12 @@
     <metadata-aviator
     v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataAviator"/>
+     <!-- AVIATOR 类型7 -->
+    <metadata-freemarke
+    v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
     </el-form>
+   
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -70,9 +75,21 @@
   import metadataCassandra from './metadataSon/metadata-cassandra'
   import metadataGroovy from './metadataSon/metadata-groovy'
   import metadataAviator from './metadataSon/metadata-aviator'
+  import metadataFreemarke from './metadataSon/metadata-freemarke'
+
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   export default {
     data () {
+      var checkDecisionName = (rule, value, callback) => {
+        const nullValue = /^[^\s]+$/
+        if (!value) {
+          callback(new Error('请输入任务定义名称'))
+        }
+        if (!nullValue.test(value)) {
+          callback(new Error('不能输入含空格的任务定义名称'))
+        }
+        callback()
+      }
       return {
         visible: false,
         dataForm: {
@@ -91,7 +108,7 @@
         ruleTypeList: [],
         dataRule: {
           name: [
-            { required: true, message: '任务定义名称不能为空', trigger: 'blur' }
+            { required: true, validator: checkDecisionName, trigger: 'change' }
           ],
           type: [
             { required: true, message: '请选择任务类型', trigger: 'change' }
@@ -110,7 +127,8 @@
       metadataKafka, // KAFKA
       metadataCassandra, // CASSANDRA
       metadataGroovy, // GROOVY
-      metadataAviator // AVIATOR
+      metadataAviator, // AVIATOR
+      metadataFreemarke // Freemarke
     },
     methods: {
       init (id, value) {
@@ -180,7 +198,8 @@
               'kafka': null,
               'cassandra': null,
               'groovy': null,
-              'aviator': null
+              'aviator': null,
+              'freemarker': null
             }
             if (form) {
               for (let key in data) {

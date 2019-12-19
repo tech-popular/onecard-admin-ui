@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px">
     <el-form-item label="数据库名字" prop="datasourceName">
       <el-input v-model="dataForm.datasourceName" placeholder="数据库名字"></el-input>
     </el-form-item>
@@ -16,6 +16,9 @@
           :value="item.value">
         </el-option>
       </el-select>
+    </el-form-item>
+    <el-form-item label="数据源所属部门" prop="datasourceDepartment">
+      <el-input v-model="dataForm.datasourceDepartment" placeholder="数据源所属部门"></el-input>
     </el-form-item>
     <el-form-item label="数据库驱动" prop="driver">
       <el-input v-model="dataForm.driver" placeholder="数据库驱动"></el-input>
@@ -58,6 +61,7 @@
           id: 0,
           datasourceName: '',
           datasourceType: '',
+          datasourceDepartment: '',
           driver: '',
           user: '',
           passwd: '',
@@ -70,25 +74,28 @@
         datasourceTypeOptions: [],
         dataRule: {
           datasourceName: [
-            { required: true, message: '数据库名字不能为空', trigger: 'blur' }
+            { required: false, message: '数据库名字不能为空', trigger: 'blur' }
           ],
           datasourceType: [
-            { required: true, message: '数据源类型必须是mysql,postgre,maxCompute,kafka,ftp,es ', trigger: 'blur' }
+            { required: false, message: '数据源类型必须是mysql,postgre,maxCompute,kafka,ftp,es ', trigger: 'blur' }
+          ],
+          datasourceDepartment: [
+            { required: false, message: '数据源部门驱动不能为空', trigger: 'blur' }
           ],
           driver: [
-            { required: true, message: '数据库驱动不能为空', trigger: 'blur' }
+            { required: false, message: '数据库驱动不能为空', trigger: 'blur' }
           ],
           user: [
-            { required: true, message: '数据库用户名不能为空', trigger: 'blur' }
+            { required: false, message: '数据库用户名不能为空', trigger: 'blur' }
           ],
           passwd: [
-            { required: true, message: '数据库密码不能为空', trigger: 'blur' }
+            { required: false, message: '数据库密码不能为空', trigger: 'blur' }
           ],
           url: [
-            { required: true, message: '数据库url不能为空', trigger: 'blur' }
+            { required: false, message: '数据库url不能为空', trigger: 'blur' }
           ],
           version: [
-            { required: true, message: '版本号不能为空', trigger: 'blur' }
+            { required: false, message: '版本号不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -117,6 +124,7 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dataForm.datasourceName = data.honeycombDatasourceConfig.datasourceName
+                this.dataForm.datasourceDepartment = data.honeycombDatasourceConfig.datasourceDepartment
                 this.dataForm.datasourceType = data.honeycombDatasourceConfig.datasourceType
                 this.dataForm.driver = data.honeycombDatasourceConfig.driver
                 this.dataForm.user = data.honeycombDatasourceConfig.user
@@ -141,6 +149,7 @@
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
                 'datasourceName': this.dataForm.datasourceName,
+                'datasourceDepartment': this.dataForm.datasourceDepartment,
                 'datasourceType': this.dataForm.datasourceType,
                 'driver': this.dataForm.driver,
                 'user': this.dataForm.user,
