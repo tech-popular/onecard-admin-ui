@@ -51,8 +51,8 @@
     data () {
       return {
         updatePassowrdVisible: false,
-        left: require('../assets/img/left.png'),
-        right: require('../assets/img/right.png')
+        left: require('../assets/img/left1.png'),
+        right: require('../assets/img/right1.png')
       }
     },
     components: {
