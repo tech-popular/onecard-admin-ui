@@ -39,9 +39,6 @@
           v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
           :label="'输出数据源' + index"
           :key="outdata.key"
-          :prop="dataForm.honeycombOutDatasourceEntitys.outTableName"
-          :rules="{
-      required: true, message: '表名不能为空', trigger: 'blur'}"
         >
           <el-row :gutter="24">
             <el-col :span="7">
@@ -71,47 +68,45 @@
               </div>
             </el-col>
           </el-row>
-          <el-form-item
-            v-if="redisListData[index] && redisListData[index].show"
-            class="el-redis-item"
-          >
-            <el-row :gutter="24">
-              <el-col :span="5">
-                <div class="grid-content bg-purple">
-                  <el-select v-model="redisListData[index].name" placeholder="redis数据格式" clearable>
-                    <el-option
-                      v-for="item in redisNames"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    ></el-option>
-                  </el-select>
-                </div>
-              </el-col>
-              <el-col :span="6">
-                <div class="grid-content bg-purple">
-                  <el-input v-model="redisListData[index].key" placeholder="redisKey" clearable></el-input>
-                </div>
-              </el-col>
-              <el-col :span="6">
-                <div class="grid-content bg-purple">
-                  <el-select v-model="redisListData[index].type" placeholder="key拼接时间" clearable>
-                    <el-option v-for="item in redisTypes" :key="item" :label="item" :value="item"></el-option>
-                  </el-select>
-                </div>
-              </el-col>
-              <el-col :span="7">
-                <div class="grid-content bg-purple">
-                  <el-input v-model="redisListData[index].time" placeholder="key失效时间" clearable @input="redisListData[index].time = redisListData[index].time.replace(/[^\d]/g,'')">
-                    <el-select v-model="redisListData[index].unit" slot="append">
-                      <el-option v-for="item in redisUnits" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                    </el-select>
-                  </el-input>
-                </div>
-              </el-col>
-            </el-row>
-          </el-form-item>
+          <div v-if="redisListData[index] && redisListData[index].show" class='redis-config' style="marginLeft: -130px">
+            <el-form-item class="el-redis-item" label="redis数据格式">
+              <el-select v-model="redisListData[index].name" placeholder="redis数据格式" clearable>
+                <el-option
+                  v-for="item in redisNames"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item class="el-redis-item" label="redisKey">
+              <el-input v-model="redisListData[index].key" placeholder="redisKey" clearable></el-input>
+            </el-form-item>
+            <el-form-item class="el-redis-item" label="key拼接时间">
+              <el-select v-model="redisListData[index].type" placeholder="key拼接时间" clearable>
+                <el-option v-for="item in redisTypes" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item class="el-redis-item" label="key失效时间">
+              <el-input
+                v-model="redisListData[index].time"
+                placeholder="key失效时间"
+                clearable
+                @input="redisListData[index].time = redisListData[index].time.replace(/[^\d]/g,'')"
+              >
+                <el-select v-model="redisListData[index].unit" slot="append">
+                  <el-option
+                    v-for="item in redisUnits"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-input>
+            </el-form-item>
+          </div>
         </el-form-item>
+
         <el-form-item>
           <el-button @click="addDomain">新增输出数据源</el-button>
         </el-form-item>
@@ -374,7 +369,8 @@ export default {
             trigger: 'blur'
           }
         ],
-        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }]
+        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
+        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur' }]
       },
       dataSql: {
         datasourceId: '',
@@ -853,9 +849,9 @@ export default {
               '#' +
               item.key +
               '#' +
-              (item.type ? item.type : '') +
+              (item.type ? item.type : ' ') +
               '#' +
-              (time || '') +
+              (time || ' ') +
               '#'
             this.$set(
               this.dataForm.honeycombOutDatasourceEntitys[index],
@@ -875,7 +871,7 @@ export default {
 .el-redis-item {
   margin-top: 20px !important;
 }
-.bg-purple .el-input-group__append {
+.redis-config .el-input-group__append {
   width: 80px;
 }
 </style>
