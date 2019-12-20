@@ -304,6 +304,14 @@ export default {
     codemirror
   },
   data () {
+    const validateNull = (rule, value, callback) => {
+      value = value.trim()
+      if (!value) {
+        callback(new Error(rule.message))
+      } else {
+        callback()
+      }
+    }
     return {
       showCronBox: false,
       visible: false,
@@ -357,20 +365,20 @@ export default {
       ],
       dataRule: {
         name: [
-          { required: true, message: '任务名称不能为空', trigger: 'blur' }
+          { required: true, message: '任务名称不能为空', trigger: 'blur', validator: validateNull }
         ],
         inDatasource: [
-          { required: true, message: '输入数据源不能为空', trigger: 'blur' }
+          { required: true, message: '输入数据源不能为空', trigger: 'change' }
         ],
         computeType: [
           {
             required: true,
             message: '计算类型:1 简单 2 复杂不能为空',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
-        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur' }]
+        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
       },
       dataSql: {
         datasourceId: '',

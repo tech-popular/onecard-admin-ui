@@ -36,6 +36,14 @@
 <script>
   export default {
     data () {
+      const validateNull = (rule, value, callback) => {
+        value = value.trim()
+        if (!value) {
+          callback(new Error(rule.message))
+        } else {
+          callback()
+        }
+      }
       return {
         visible: false,
         dataForm: {
@@ -53,13 +61,13 @@
         typeoptions: [],
         dataRule: {
           tableName: [
-            { required: true, message: '表名称不能为空', trigger: 'blur' }
+            { required: true, message: '表名称不能为空', trigger: 'blur', validator: validateNull }
           ],
           pk: [
-            { required: true, message: '表的主键不能为空', trigger: 'blur' }
+            { required: true, message: '表的主键不能为空', trigger: 'blur', validator: validateNull }
           ],
           maxcomputeSpace: [
-            { required: true, message: '空间名不能为空', trigger: 'blur' }
+            { required: true, message: '空间名不能为空', trigger: 'blur', validator: validateNull }
           ],
           type: [
             { required: true, message: '0是5分钟合并，1是t+1合并不能为空', trigger: 'blur' }
