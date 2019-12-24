@@ -385,7 +385,7 @@ export default {
     width: 100%;
     height: 100%;
     content: "";
-    background-image: url(~@/assets/img/login_bg.jpeg);
+    background-image: url(~@/assets/img/login_bg.jpg);
     background-size: cover;
   }
   .site-content__wrapper {
@@ -428,7 +428,7 @@ export default {
     margin-left: -235px;
     padding: 30px 60px 20px;
     width: 470px;
-    background: rgba(0, 0, 0, 0.5) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
     .login-tri-top {
       position: absolute;
       top: 0;
