@@ -575,10 +575,13 @@ export default {
                   unit: '1'
                 })
                 let id = val.outDatasource
+                console.log(id)
                 let datasource = this.datasourceoptions.filter(
                   item => item.id == id
                 )
-                if (datasource[0].datasourceName == 'redis') {
+                console.log(datasource)
+                if (datasource[0].datasourceType == 'redis' || datasource[0].datasourceType == 'singleRedis') {
+                  console.log(22222)
                   let arr = val.outTableName.split('#')
                   this.$set(this.redisListData, i, {
                     show: true,
@@ -804,7 +807,7 @@ export default {
       })
       let id = this.dataForm.honeycombOutDatasourceEntitys[index].outDatasource
       let datasource = this.datasourceoptions.filter(item => item.id == id)
-      if (datasource[0].datasourceName == 'redis') {
+      if (datasource[0].datasourceType == 'redis' || datasource[0].datasourceType == 'singleRedis') {
         this.$set(this.redisListData, index, {
           show: true,
           unit: '1'
