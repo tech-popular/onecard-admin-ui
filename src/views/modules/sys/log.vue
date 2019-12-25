@@ -20,7 +20,7 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%">
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="username" header-align="center" align="center" label="用户名"></el-table-column>
+      <el-table-column prop="username" header-align="center" align="center" label="用户姓名"></el-table-column>
       <el-table-column prop="operation" header-align="center" align="center" label="用户操作"></el-table-column>
       <el-table-column
         prop="method"
