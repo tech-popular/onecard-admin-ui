@@ -6,7 +6,7 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="应用名称" prop="serviceName">
       <el-select v-model="dataForm.serviceName" placeholder="请选择">
-        <el-option v-for="item in serviceNameoptions" :key="item.serviceName" :label="item.project +'--'+ item.serviceName" :value="item.serviceName">
+        <el-option v-for="item in serviceNameoptions" :key="item.id" :label="item.project +'--'+ item.serviceName" :value="item.serviceName">
         </el-option>
       </el-select>
     </el-form-item>
@@ -60,7 +60,16 @@
 
 <script>
   export default {
+  
     data () {
+      const validateNull = (rule, value, callback) => {
+        value = value.trim()
+        if (!value) {
+          callback(new Error(rule.message))
+        } else {
+          callback()
+        }
+      }
       return {
         visible: false,
         dataForm: {
@@ -70,7 +79,7 @@
           inDatasource: '',
           sql: '',
           alarmRatio: '',
-          period: 10,
+          period: '10',
           timeType: '',
           enable: 1,
           createdTime: '',
@@ -81,19 +90,19 @@
         datasourceoptions: [],
         dataRule: {
           serviceName: [
-            { required: true, message: '应用名称不能为空', trigger: 'blur' }
+            { required: true, message: '应用名称不能为空', trigger: 'change' }
           ],
           title: [
-            { required: true, message: '标题不能为空', trigger: 'blur' }
+            { required: true, message: '标题不能为空', trigger: 'blur', validator: validateNull }
           ],
           inDatasource: [
             { required: true, message: '输入数据源不能为空', trigger: 'blur' }
           ],
           sql: [
-            { required: true, message: '执行sql不能为空', trigger: 'blur' }
+            { required: true, message: '执行sql不能为空', trigger: 'blur', validator: validateNull }
           ],
           period: [
-            { required: true, message: '执行周期分钟，默认10分钟不能为空', trigger: 'blur' }
+            { required: true, message: '执行周期分钟，默认10分钟不能为空', trigger: 'blur', validator: validateNull }
           ],
           timeType: [
             { required: true, message: '时间类型不能为空', trigger: 'blur' }

@@ -304,6 +304,14 @@ export default {
     codemirror
   },
   data () {
+    const validateNull = (rule, value, callback) => {
+      value = value.trim()
+      if (!value) {
+        callback(new Error(rule.message))
+      } else {
+        callback()
+      }
+    }
     return {
       showCronBox: false,
       visible: false,
@@ -357,20 +365,20 @@ export default {
       ],
       dataRule: {
         name: [
-          { required: true, message: '任务名称不能为空', trigger: 'blur' }
+          { required: true, message: '任务名称不能为空', trigger: 'blur', validator: validateNull }
         ],
         inDatasource: [
-          { required: true, message: '输入数据源不能为空', trigger: 'blur' }
+          { required: true, message: '输入数据源不能为空', trigger: 'change' }
         ],
         computeType: [
           {
             required: true,
             message: '计算类型:1 简单 2 复杂不能为空',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
-        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur' }]
+        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
       },
       dataSql: {
         datasourceId: '',
@@ -567,10 +575,13 @@ export default {
                   unit: '1'
                 })
                 let id = val.outDatasource
+                console.log(id)
                 let datasource = this.datasourceoptions.filter(
                   item => item.id == id
                 )
-                if (datasource[0].datasourceName == 'redis') {
+                console.log(datasource)
+                if (datasource[0].datasourceType == 'redis' || datasource[0].datasourceType == 'singleRedis') {
+                  console.log(22222)
                   let arr = val.outTableName.split('#')
                   this.$set(this.redisListData, i, {
                     show: true,
@@ -796,7 +807,7 @@ export default {
       })
       let id = this.dataForm.honeycombOutDatasourceEntitys[index].outDatasource
       let datasource = this.datasourceoptions.filter(item => item.id == id)
-      if (datasource[0].datasourceName == 'redis') {
+      if (datasource[0].datasourceType == 'redis' || datasource[0].datasourceType == 'singleRedis') {
         this.$set(this.redisListData, index, {
           show: true,
           unit: '1'

@@ -6,7 +6,7 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="应用名称" prop="serviceName">
       <el-select v-model="dataForm.serviceName" placeholder="请选择">
-        <el-option v-for="item in serviceNameoptions" :key="item.serviceName" :label="item.serviceName" :value="item.serviceName">
+        <el-option v-for="item in serviceNameoptions" :key="item.id" :label="item.serviceName" :value="item.serviceName">
         </el-option>
       </el-select>
     </el-form-item>
@@ -63,6 +63,14 @@
 <script>
   export default {
     data () {
+      const validateNull = (rule, value, callback) => {
+        value = value.trim()
+        if (!value) {
+          callback(new Error(rule.message))
+        } else {
+          callback()
+        }
+      }
       return {
         visible: false,
         dataForm: {
@@ -91,7 +99,7 @@
             { required: true, message: '协议不能为空', trigger: 'blur' }
           ],
           uri: [
-            { required: true, message: '资源不能为空', trigger: 'blur' }
+            { required: true, message: '资源不能为空', trigger: 'blur', validator: validateNull }
           ],
           serviceType: [
             { required: true, message: '应用类型不能为空', trigger: 'blur' }
