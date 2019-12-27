@@ -63,7 +63,7 @@
   
     data () {
       const validateNull = (rule, value, callback) => {
-        value = value.trim()
+        value = (value + '').trim()
         if (!value) {
           callback(new Error(rule.message))
         } else {
