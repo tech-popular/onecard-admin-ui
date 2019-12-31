@@ -196,7 +196,6 @@
               this.dataForm.enable = false
             }
             if (!this.dataForm.id) {
-              console.log(this.dataForm)
               addIndexManage(this.dataForm).then(({data}) => {
                 if (data && data.status === 0) {
                   this.$message({
