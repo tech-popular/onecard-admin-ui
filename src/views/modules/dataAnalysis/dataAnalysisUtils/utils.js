@@ -19,3 +19,54 @@ export const deepClone = (obj) => {
     return obj
   }
 }
+
+export const generateBig = (q) => {
+  return q
+}
+export const findRuleIndex = (arr, val, position) => { // 查找index索引
+  var res = ''
+  function _find (arr, val, position) {
+    var temp = ''
+    arr.forEach((item, index) => {
+      temp = position != undefined ? position + ',' + index : index
+      if (item.ruleCode === val.ruleCode) {
+        res = temp
+        // return
+      } else if (item.rules instanceof Array) {
+        temp = _find(item.rules, val, temp)
+      }
+    })
+  }
+  _find(arr, val, position)
+  return res
+}
+
+export const findVueSelectItemIndex = (arr, val, position) => { // 查找index索引
+  var res = ''
+  function _find (arr, val, position) {
+    var temp = ''
+    arr.forEach((item, index) => {
+      temp = position != undefined ? position + ',' + index : index
+      if (item.id === val.fieldCode) {
+        res = temp
+        // return
+      } else if (item.children instanceof Array) {
+        temp = _find(item.children, val, temp)
+      }
+    })
+  }
+  _find(arr, val, position)
+  return res
+}
+
+export const getAbc = (index) => {
+  var aCode = 65
+  var zCode = 90
+  var len = zCode - aCode + 1
+  var result = ''
+  while (index >= 0) {
+    result = String.fromCharCode(index % len + aCode) + result
+    index = Math.floor(index / len) - 1
+  }
+  return result
+}
