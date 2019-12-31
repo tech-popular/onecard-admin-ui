@@ -47,7 +47,7 @@ export const findVueSelectItemIndex = (arr, val, position) => { // 查找index�
     var temp = ''
     arr.forEach((item, index) => {
       temp = position != undefined ? position + ',' + index : index
-      if (item.id === val.fieldCode) {
+      if (item.id === val) {
         res = temp
         // return
       } else if (item.children instanceof Array) {

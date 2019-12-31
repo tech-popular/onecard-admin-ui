@@ -19,7 +19,7 @@ for (let i = 0; i < Math.floor(Math.random() * 10 + 1); i++) {
 export function apiManageList () {
   return {
     // isOpen: false,
-    url: '/dataAnalysis/apiManage/list',
+    url: '/apiManage/list',
     type: 'get',
     data: {
       'msg': 'success',
