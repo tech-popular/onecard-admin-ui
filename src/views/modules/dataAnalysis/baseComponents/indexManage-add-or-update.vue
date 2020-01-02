@@ -59,6 +59,17 @@
           callback()
         }
       }
+      let checkSpace = (rule, value, callback) => {
+        const spaceReg = /^[^\S]+$/
+        setTimeout(() => {
+          if (spaceReg.test(value)) {
+            callback()
+          } else {
+            callback(new Error('不输入含空格'))
+          }
+        }, 100)
+      }
+
       return {
         visible: false,
         dataForm: {
@@ -90,10 +101,18 @@
         ],
         dataRule: {
           englishName: [
-            { required: true, message: '请输入指标名', trigger: 'blur' }
+            { required: true, message: '请输入指标名', trigger: 'blur' },
+            {
+              validator: checkSpace,
+              trigger: 'blur'
+            }
           ],
           chineseName: [
-            { required: true, message: '请输入指标标题', trigger: 'blur' }
+            { required: true, message: '请输入指标标题', trigger: 'blur' },
+            {
+              validator: checkSpace,
+              trigger: 'blur'
+            }
           ],
           fieldType: [
             { required: true, message: '请选择指标类型', trigger: 'change' }
