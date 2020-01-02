@@ -30,7 +30,11 @@
       <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="指标类别"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式"></el-table-column>
       <el-table-column prop="sourceDatasource" header-align="center" align="center" label="指标数据源"></el-table-column>
-      <el-table-column prop="remark" header-align="center" align="center" label="指标描述" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="remark" header-align="center" align="center" label="指标描述" show-overflow-tooltip>
+        <template slot-scope="scope">
+          <span>{{ scope.row.remark }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
