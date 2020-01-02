@@ -60,7 +60,7 @@
         }
       }
       let checkSpace = (rule, value, callback) => {
-        const spaceReg = /^[^\S]+$/
+        const spaceReg = /^\S*$/
         setTimeout(() => {
           if (spaceReg.test(value)) {
             callback()
