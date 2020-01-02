@@ -20,9 +20,6 @@ export const deepClone = (obj) => {
   }
 }
 
-export const generateBig = (q) => {
-  return q
-}
 export const findRuleIndex = (arr, val, position) => { // 查找index索引
   var res = ''
   function _find (arr, val, position) {
@@ -69,4 +66,18 @@ export const getAbc = (index) => {
     index = Math.floor(index / len) - 1
   }
   return result
+}
+
+export const nullandnumber = (rule, value, callback) => {
+  const nullValue = /^[^\s]+$/
+  if (!value) {
+    callback(new Error('请输入'))
+  }
+  if (!nullValue.test(value)) {
+    callback(new Error('不能输入含空格'))
+  }
+  if (!Number(value)) {
+    callback(new Error('请输入数字类型'))
+  }
+  callback()
 }
