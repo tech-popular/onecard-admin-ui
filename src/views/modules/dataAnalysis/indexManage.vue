@@ -30,7 +30,7 @@
       <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="指标类别"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式"></el-table-column>
       <el-table-column prop="sourceDatasource" header-align="center" align="center" label="指标数据源"></el-table-column>
-      <el-table-column prop="remark" header-align="center" align="center" label="指标描述"></el-table-column>
+      <el-table-column prop="remark" header-align="center" align="center" label="指标描述" show-overflow-tooltip></el-table-column>
       <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
@@ -142,7 +142,7 @@
       getFieldTypeList () {
         let params = 6
         indexManageTypeList(params).then(({data}) => {
-          if (data && data.status === 0) {
+          if (data && data.status === '1') {
             this.fieldTypeList = data.data
           }
         })
@@ -159,10 +159,9 @@
               'pageSize': this.pageSize
             }
             indexManageList(params, false).then(({data}) => {
-              console.log(data)
               if (data && data.status === '1') {
                 this.dataList = data.data.list
-                this.totalCount = data.total
+                this.totalCount = data.data.total
               } else {
                 this.dataList = []
                 this.totalCount = 0
