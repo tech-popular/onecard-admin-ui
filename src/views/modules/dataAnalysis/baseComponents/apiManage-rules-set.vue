@@ -61,7 +61,7 @@
                   v-model="item.params[0].value"
                   type="datetime"
                   placeholder="选择日期时间"
-                  value-format="yyyy-MM-dd hh:mm:ss"
+                  format="yyyy-MM-dd HH:mm:ss"
                 >
                 </el-date-picker>
               </el-form-item>
@@ -73,7 +73,7 @@
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   :default-time="['00:00:00']"
-                  value-format="yyyy-MM-dd hh:mm:ss"
+                  format="yyyy-MM-dd HH:mm:ss"
                   @change="data => selectEnumsChange(data, item)"
                   class="itemIput-big"
                 >
@@ -176,7 +176,7 @@ export default {
       this.parent.switchSymbol(ruleCode, this.parent.ruleConfig)
     },
     fieldCodeChange (node, ruleItem) { // 指标改变时，对应的操作符也更新
-      this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId })
+      this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { englishName: node.englishName, fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId })
     },
     selectOperateChange (val, ruleItem) { // 操作符改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
@@ -274,7 +274,6 @@ export default {
   .tree-select {
     display: inline-block;
     width: 200px;
-    height: 40px;
     line-height: 38px;
   }
   .pane-rules-inline {
@@ -291,7 +290,7 @@ export default {
     width: 366px;
   }
   .itemIput-small {
-    width: 100px;
+    width: 140px;
   }
   .itemOperateIput {
     width: 180px;

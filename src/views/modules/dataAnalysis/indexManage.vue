@@ -159,8 +159,9 @@
               'pageSize': this.pageSize
             }
             indexManageList(params, false).then(({data}) => {
-              if (data && data.message === 'success') {
-                this.dataList = data.data
+              console.log(data)
+              if (data && data.status === '1') {
+                this.dataList = data.data.list
                 this.totalCount = data.total
               } else {
                 this.dataList = []

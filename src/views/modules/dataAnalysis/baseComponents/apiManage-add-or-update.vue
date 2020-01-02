@@ -18,7 +18,7 @@
           <el-form-item label="API入参" prop="inParam">
             <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-radio>
           </el-form-item>
-          <el-form-item label="API出参" prop="outParams" style="height: 40px;">
+          <el-form-item label="API出参" prop="outParams">
             <Treeselect
               :options="outParamsIndexList"
               :disable-branch-nodes="true"
@@ -140,6 +140,7 @@ export default {
       this.tag = ''
       this.outParams = []
       this.outParamsIndexList = []
+      this.expression = ''
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.tag = tag
@@ -280,7 +281,8 @@ export default {
         tree.forEach(item => {
           let obj = {}
           if (item.fieldType) {
-            obj.id = item.englishName
+            obj.id = item.englishName + '-' + item.id
+            obj.englishName = item.englishName
             obj.label = item.chineseName
             obj.fieldType = item.fieldType
             obj.enumTypeNum = item.enumTypeNum
@@ -356,6 +358,7 @@ export default {
             } else {
               expArr.push(item.ruleCode)
               expStr = expArr.join(' ' + arr.relation + ' ')
+              console.log(expStr)
             }
             // 获取表达式end
           } else {
@@ -371,6 +374,7 @@ export default {
       if (type !== 'switch') {
         this.ruleConfig = arr
       }
+      console.log(9999, this.expression)
     },
     updateRulesArr (arr, citem, obj) { // 更新数组的数据
       arr.rules.forEach(item => {
@@ -476,6 +480,7 @@ export default {
           }
         })
       }
+      console.log(data)
       this.updateConditionId(this.ruleConfig, undefined, 'switch')
     },
     addRules () { // 添加一级条件
