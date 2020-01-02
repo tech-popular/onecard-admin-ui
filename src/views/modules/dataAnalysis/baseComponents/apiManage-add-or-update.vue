@@ -13,7 +13,7 @@
         <h3>基本信息</h3>
         <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="API名称" prop="name">
-            <el-input v-model="baseForm.name" placeholder="API名称" clearable  class="base-pane-item" />
+            <el-input v-model.trim="baseForm.name" placeholder="API名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
             <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-radio>
@@ -64,7 +64,7 @@
 <script>
 import rulesSet from './apiManage-rules-set'
 import { selectOperate, selectAllCata, enumTypeList, savaApiInfo, updateApiInfo, viewApiInfo } from '@/api/dataAnalysis/apiManage'
-import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone, nullandnumber } from '../dataAnalysisUtils/utils'
+import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
@@ -113,7 +113,7 @@ export default {
       outParams: [],
       baseRule: { // 基本信息校验规则
         name: [
-          { required: true, validator: nullandnumber, trigger: 'blur' }
+          { required: true, message: '请输入API名称', trigger: 'blur' }
         ],
         inParam: [
           { required: true, message: '请选择API入参', trigger: 'change' }

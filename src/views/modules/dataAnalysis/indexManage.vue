@@ -128,7 +128,7 @@
       // 获取指标类别
       getCategoryIdList () {
         indexManageMinCataList().then(({data}) => {
-          if (data && data.status === 0) {
+          if (data && data.status === '1') {
             this.categoryIdList = data.data
             this.categoryIdList.unshift({
               id: '',
@@ -147,7 +147,7 @@
           }
         })
       },
-  
+
       // 获取数据列表
       getDataList () {
         this.$refs['dataForm'].validate((valid) => {
