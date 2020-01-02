@@ -4,7 +4,7 @@
     <div style="flex: 1">
       <div v-for="(item, index) in data.rules" :key="index">
         <el-form :model="item" ref="ruleForm" :inline="true" v-if="!item.rules || !item.rules.length">
-          <el-form-item prop="fieldCode" :rules="{required: isRequired, message: '不能为空', trigger: 'change'}">
+          <el-form-item prop="fieldCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
             <Treeselect
               :options="item.indexList"
               :disable-branch-nodes="true"
@@ -19,7 +19,7 @@
               class="tree-select"
           />
           </el-form-item>
-          <el-form-item prop="func" :rules="{required: isRequired, message: '不能为空', trigger: 'change'}">
+          <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
             <el-select v-model="item.func" class="itemOperateIput" @change="data => selectOperateChange(data, item)" @visible-change="data => selectOperateVisible(data, item)">
               <el-option v-for="(fitem, findex) in item.selectOperateList" :value="fitem.code" :key="findex" :label="fitem.title"/>
             </el-select>
@@ -27,27 +27,27 @@
           <!--条件内容区-->
           <div v-if="isEmpty(item)" class="pane-rules-inline">
             <!--string-->
-            <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '不能为空', trigger: 'blur' }" v-if="item.fieldType === 'string' || item.fieldType === ''">
+            <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.fieldType === 'string' || item.fieldType === ''">
               <el-input v-model.trim="item.params[0].value" class="itemIput" />
             </el-form-item>
             <!--number-->
             <div v-if="item.fieldType === 'number'"  class="pane-rules-inline">
               <div v-if="item.func === 'between'"  class="pane-rules-inline">
-                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '不能为空', trigger: 'blur'}">
+                <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }">
                   <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number>
                 </el-form-item>
                 于
-                <el-form-item prop="params[1].value" :rules="{required: isRequired, message: '不能为空', trigger: 'blur'}">
+                <el-form-item prop="params[1].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small"></el-input-number> 之间
                 </el-form-item>
               </div>
-              <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '不能为空', trigger: 'blur'}" v-else>
+              <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
                 <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput"></el-input-number>
               </el-form-item>
             </div>
             <!--enums-->
             <div v-if="item.fieldType === 'enums'"  class="pane-rules-inline">
-              <el-form-item prop="params[0].selectVal" :rules="{required: isRequired, message: '不能为空', trigger: 'change'}">
+              <el-form-item prop="params[0].selectVal" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
                 <el-select v-model="item.params[0].selectVal" multiple class="itemIput" @change="data => selectEnumsChange(data, item)" @visible-change="data => selectEnumsVisible(data, item)">
                   <el-option v-for="(fitem, findex) in item.selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
                 </el-select>
@@ -56,7 +56,7 @@
             <!--时间-->
             <div v-if="item.fieldType === 'date'" class="pane-rules-inline">
               <!--绝对时间-->
-              <el-form-item v-if="isDateSingleShow(item)" prop="params[0].value" :rules="{required: isRequired, message: '不能为空', trigger: 'change'}">
+              <el-form-item v-if="isDateSingleShow(item)" prop="params[0].value" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
                 <el-date-picker
                   v-model="item.params[0].value"
                   type="datetime"
@@ -66,7 +66,7 @@
                 </el-date-picker>
               </el-form-item>
               <!--区间-->
-              <el-form-item v-if="item.func === 'between'" prop="params[0].selectVal" :rules="{required: isRequired, message: '不能为空', trigger: 'change'}">
+              <el-form-item v-if="item.func === 'between'" prop="params[0].selectVal" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
                 <el-date-picker
                   v-model="item.params[0].selectVal"
                   type="datetimerange"
@@ -82,7 +82,7 @@
               <!--相对时间-->
               <div v-if="item.func === 'relative_before' || item.func === 'relative_within'" class="pane-rules-inline">
                 <!-- 在&nbsp; -->
-                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '不能为空', trigger: 'blur'}">
+                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number>
                 </el-form-item>
                 天&nbsp;
@@ -90,11 +90,11 @@
               <!--相对时间点-->
               <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
-                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '不能为空', trigger: 'blur'}">
+                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number>
                 </el-form-item>
                 天&nbsp;到&nbsp;过去&nbsp;
-                <el-form-item prop="params[1].value" :rules="{required: isRequired, message: '不能为空', trigger: 'blur'}">
+                <el-form-item prop="params[1].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small"></el-input-number>
                 </el-form-item>
                 天&nbsp;之内
