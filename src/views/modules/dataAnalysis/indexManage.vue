@@ -30,10 +30,13 @@
       <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="指标类别"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式"></el-table-column>
       <el-table-column prop="sourceDatasource" header-align="center" align="center" label="指标数据源"></el-table-column>
-      <el-table-column prop="remark" header-align="center" align="center" label="指标描述" show-overflow-tooltip>
-        <template slot-scope="scope">
-          <span>{{ scope.row.remark }}</span>
-        </template>
+      <el-table-column prop="remark" header-align="center" align="center" label="指标描述">
+      <template slot-scope="scope">
+        <el-tooltip :disabled="scope.row.remark != undefined && scope.row.remark.length > 8 ? false : true" class="item" effect="dark" placement="top">
+            <div v-html="ToBreak(scope.row.remark)" slot="content"></div>
+            <div class="oneLine">{{scope.row.remark}}</div>
+        </el-tooltip>
+      </template>
       </el-table-column>
       <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
@@ -163,6 +166,7 @@
               'pageSize': this.pageSize
             }
             indexManageList(params, false).then(({data}) => {
+              console.log(data)
               if (data && data.status === '1') {
                 this.dataList = data.data.list
                 this.totalCount = data.data.total
@@ -208,10 +212,20 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
+      },
+      ToBreak (val) {
+        if (val != undefined) {
+          val = val.replace(/[^\x00-\xff]/g, '$&\x01').replace(/.{20}\x01?/g, '$&<br>').replace(/\x01/g, '')
+        }
+        return val
       }
     }
   }
 </script>
 <style scoped>
-
+.oneLine {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 </style>
