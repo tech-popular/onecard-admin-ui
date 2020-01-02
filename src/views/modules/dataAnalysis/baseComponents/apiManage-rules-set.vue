@@ -28,7 +28,7 @@
           <div v-if="isEmpty(item)" class="pane-rules-inline">
             <!--string-->
             <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '不能为空', trigger: 'blur' }" v-if="item.fieldType === 'string' || item.fieldType === ''">
-              <el-input v-model="item.params[0].value" class="itemIput" />
+              <el-input v-model.trim="item.params[0].value" class="itemIput" />
             </el-form-item>
             <!--number-->
             <div v-if="item.fieldType === 'number'"  class="pane-rules-inline">
@@ -115,7 +115,7 @@
           </el-form-item>
         </el-form>
         <div v-else>
-          <rules-set :data="item" :is-child="true" ref="rulesSet" :is-require = "isRequired"></rules-set>
+          <rules-set :data="item" :is-child="true" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
     </div>

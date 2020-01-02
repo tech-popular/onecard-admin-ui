@@ -59,12 +59,10 @@
     },
     mounted () {
       this.getDataList()
-      console.log(window.userName)
     },
     methods: {
       // 获取数据列表
       getDataList () {
-        console.log(123)
         this.dataListLoading = true
         let params = {
           ...this.dataForm,
@@ -72,11 +70,9 @@
           'pageSize': this.pageSize
         }
         apiManageList(params).then(({data}) => {
-          console.log(data)
           if (data.status === '1') {
             this.dataList = data.data.list
             this.totalCount = data.data.total
-            console.log(this.dataList)
           } else {
             this.dataList = []
             this.totalCount = 0
