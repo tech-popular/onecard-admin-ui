@@ -13,7 +13,7 @@
         <h3>基本信息</h3>
         <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="API名称" prop="name">
-            <el-input v-model="baseForm.name" placeholder="API名称" clearable  class="base-pane-item" />
+            <el-input v-model.trim="baseForm.name" placeholder="API名称" clearable  class="base-pane-item" />
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
             <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-radio>
@@ -51,7 +51,7 @@
           </el-form-item>
         </el-form>
         <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
-          <rules-set :data="ruleConfig" ref="rulesSet" :is-require = "isRequired"></rules-set>
+          <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
     </div>
