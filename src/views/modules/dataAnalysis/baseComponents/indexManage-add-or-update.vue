@@ -159,7 +159,7 @@
       // 获取指标类别
       getCategoryIdList () {
         indexManageMinCataList().then(({data}) => {
-          if (data && data.status === 0) {
+          if (data && data.status === '1') {
             this.categoryIdList = data.data
           }
         })
@@ -169,7 +169,7 @@
       getFieldTypeList () {
         let params = 6
         indexManageTypeList(params).then(({data}) => {
-          if (data && data.status === 0) {
+          if (data && data.status === '1') {
             this.fieldTypeList = data.data
           }
         })
@@ -178,7 +178,7 @@
       // 获取枚举类型
       getEnumTypeNumList () {
         indexManageTypeNumList().then(({data}) => {
-          if (data && data.status === 0) {
+          if (data && data.status === '1') {
             this.enumTypeNumList = data.data
           }
         })
@@ -216,7 +216,7 @@
             }
             if (!this.dataForm.id) {
               addIndexManage(this.dataForm).then(({data}) => {
-                if (data && data.status === 0) {
+                if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',
                     type: 'success',
@@ -235,7 +235,7 @@
               })
             } else {
               updateIndexManage(this.dataForm.id, this.dataForm).then(({data}) => {
-                if (data && data.status === 0) {
+                if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',
                     type: 'success',
