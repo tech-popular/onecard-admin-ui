@@ -129,7 +129,7 @@
       getCategoryIdList () {
         indexManageMinCataList().then(({data}) => {
           if (data && data.status === 0) {
-            this.categoryIdList = data.dataCatalogList
+            this.categoryIdList = data.data
             this.categoryIdList.unshift({
               id: '',
               name: '全部'
@@ -143,7 +143,7 @@
         let params = 6
         indexManageTypeList(params).then(({data}) => {
           if (data && data.status === 0) {
-            this.fieldTypeList = data.enumTypeList
+            this.fieldTypeList = data.data
           }
         })
       },
@@ -160,7 +160,7 @@
             }
             indexManageList(params, false).then(({data}) => {
               if (data && data.message === 'success') {
-                this.dataList = data.list
+                this.dataList = data.data
                 this.totalCount = data.total
               } else {
                 this.dataList = []

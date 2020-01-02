@@ -160,7 +160,7 @@
       getCategoryIdList () {
         indexManageMinCataList().then(({data}) => {
           if (data && data.status === 0) {
-            this.categoryIdList = data.dataCatalogList
+            this.categoryIdList = data.data
           }
         })
       },
@@ -170,7 +170,7 @@
         let params = 6
         indexManageTypeList(params).then(({data}) => {
           if (data && data.status === 0) {
-            this.fieldTypeList = data.enumTypeList
+            this.fieldTypeList = data.data
           }
         })
       },
@@ -179,7 +179,7 @@
       getEnumTypeNumList () {
         indexManageTypeNumList().then(({data}) => {
           if (data && data.status === 0) {
-            this.enumTypeNumList = data.enumTypeList
+            this.enumTypeNumList = data.data
           }
         })
       },
