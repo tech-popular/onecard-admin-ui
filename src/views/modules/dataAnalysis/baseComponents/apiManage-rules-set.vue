@@ -33,12 +33,12 @@
             <!--number-->
             <div v-if="item.fieldType === 'number'"  class="pane-rules-inline">
               <div v-if="item.func === 'between'"  class="pane-rules-inline">
-                <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }">
+                <el-form-item prop="params[0].value" :ref="'params' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur' }">
                   <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number>
                 </el-form-item>
                 于
                 <el-form-item prop="params[1].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small"></el-input-number> 之间
+                  <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small" @blur="pramasNumBlur(item)"></el-input-number> 之间
                 </el-form-item>
               </div>
               <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
@@ -90,12 +90,12 @@
               <!--相对时间点-->
               <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
-                <el-form-item prop="params[0].value" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeTwoNumber(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number>
+                <el-form-item prop="params[0].value" :ref="'params' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
+                  <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small" :min="1"></el-input-number>
                 </el-form-item>
                 天&nbsp;到&nbsp;过去&nbsp;
-                <el-form-item prop="params[1].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small"></el-input-number>
+                <el-form-item prop="params[1].value" :rules="{ required: isRequired, message:'请输入',  trigger: 'blur'}">
+                  <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small" @blur="pramasDateBlur(item)" :min="1"></el-input-number>
                 </el-form-item>
                 天&nbsp;之内
               </div>
@@ -161,14 +161,35 @@ export default {
   },
   components: { Treeselect },
   methods: {
-    judgeTwoNumber (rule, value, callback, params) {
-      if (!value) {
+    judgeDateTwoInput (rule, value, callback, params) { // 数值介于判断
+      if (value === '') {
         callback(new Error('请输入'))
-      }
-      if (params[0].value <= params[1].value) {
+      } else if (params[0].value <= params[1].value) {
         callback(new Error('起始数值应大于终止数值'))
+      } else {
+        callback()
       }
-      callback()
+    },
+    judgeNumberTwoInput (rule, value, callback, params) { // 数值时间区间判断
+      if (value === '') {
+        callback(new Error('请输入'))
+      } else if (params[0].value >= params[1].value) {
+        callback(new Error('起始数值应小于终止数值'))
+      } else {
+        callback()
+      }
+    },
+    pramasNumBlur (item) {
+      let params = item.params
+      if (params[0].value < params[1].value) {
+        this.$refs['params' + item.ruleCode][0].clearValidate()
+      }
+    },
+    pramasDateBlur (item) {
+      let params = item.params
+      if (params[0].value > params[1].value) {
+        this.$refs['params' + item.ruleCode][0].clearValidate()
+      }
     },
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {

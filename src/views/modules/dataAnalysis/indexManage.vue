@@ -166,7 +166,6 @@
               'pageSize': this.pageSize
             }
             indexManageList(params, false).then(({data}) => {
-              console.log(data)
               if (data && data.status === '1') {
                 this.dataList = data.data.list
                 this.totalCount = data.data.total
