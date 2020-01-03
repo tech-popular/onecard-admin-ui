@@ -1,6 +1,6 @@
 import { httpGet, httpPost, httpPut } from '@/api'
 // let da = '/dataAnalysis/'
-let da = ''
+let da = '/'
 // 元数据管理任务模块
 export const apiManageList = params => httpGet(da + 'data/api/listOnPage', params) // 查询数据API列表并分页
 export const selectOperate = params => httpGet(da + `common/select/operators/${params}`) // 获取操作符
