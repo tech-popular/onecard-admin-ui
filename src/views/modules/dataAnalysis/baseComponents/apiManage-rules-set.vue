@@ -90,26 +90,26 @@
               <!--相对时间点-->
               <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
-                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+                <el-form-item prop="params[0].value" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeTwoNumber(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number>
                 </el-form-item>
                 天&nbsp;到&nbsp;过去&nbsp;
-                <el-form-item prop="params[1].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+                <el-form-item prop="params[1].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small"></el-input-number>
                 </el-form-item>
                 天&nbsp;之内
               </div>
             </div>
-            <el-form-item class="btn-group">
-              <!-- <i class="el-icon-edit cursor-pointer"></i> -->
-              <!-- <i class="el-icon-info cursor-pointer" style="color:#409eff"></i> -->
-              <el-tooltip v-if="item.func === 'relative_time_in'" placement="top">
-                <div slot="content" v-html="toolTipContent(item)"></div>
-                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
-              </el-tooltip>
-              <i class="el-icon-circle-plus cursor-pointer" @click="addChildrenRules(item, index)" v-if="!isChild || isChild && index === data.rules.length-1"></i>
-            </el-form-item>
           </div>
+          <el-form-item class="btn-group">
+            <!-- <i class="el-icon-edit cursor-pointer"></i> -->
+            <!-- <i class="el-icon-info cursor-pointer" style="color:#409eff"></i> -->
+            <el-tooltip v-if="item.func === 'relative_time_in'" placement="top">
+              <div slot="content" v-html="toolTipContent(item)"></div>
+              <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+            </el-tooltip>
+            <i class="el-icon-circle-plus cursor-pointer" @click="addChildrenRules(item, index)" v-if="!isChild || isChild && index === data.rules.length-1"></i>
+          </el-form-item>
           <el-form-item style="float: right">
             <i class="el-icon-close cursor-pointer" @click="deleteRules(item, index)"></i>
           </el-form-item>
@@ -161,6 +161,15 @@ export default {
   },
   components: { Treeselect },
   methods: {
+    judgeTwoNumber (rule, value, callback, params) {
+      if (!value) {
+        callback(new Error('请输入'))
+      }
+      if (params[0].value <= params[1].value) {
+        callback(new Error('起始数值应大于终止数值'))
+      }
+      callback()
+    },
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
         callback()
@@ -287,7 +296,7 @@ export default {
     width: 220px;
   }
   .itemIput-big {
-    width: 366px;
+    width: 372px;
   }
   .itemIput-small {
     width: 140px;

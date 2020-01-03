@@ -16,7 +16,7 @@
             <el-input v-model.trim="baseForm.name" placeholder="API名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
-            <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-radio>
+            <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
           </el-form-item>
           <el-form-item label="API出参" prop="outParams">
             <Treeselect
@@ -37,6 +37,7 @@
           </el-form-item>
           <el-form-item label="API描述">
             <el-input type="textarea"  class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
+            <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
           </el-form-item>
         </el-form>
       </div>
@@ -205,8 +206,19 @@ export default {
             this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
             this.outParamsIndexList = this.updateOutParamsList(indexList)
           })
+          this.$nextTick(() => { // 默认将验证错误信息全部清除
+            let ruleFormArr = this.getRuleForm()
+            ruleFormArr.forEach(item => {
+              item.clearValidate()
+            })
+          })
         }
       })
+    },
+    inParamChange () { // 消除入参错误提示
+      if (this.baseForm.inParam) {
+        this.$refs.baseForm.clearValidate('inParam')
+      }
     },
     updateOutParamsList (indexList) { // 获取出参默认展开列表
       let indexListArr = deepClone(indexList)
@@ -278,7 +290,7 @@ export default {
     filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
       let arr = []
       if (!!tree && tree.length !== 0) {
-        tree.forEach(item => {
+        tree.forEach((item, index) => {
           let obj = {}
           if (item.fieldType) {
             obj.id = item.englishName + '-' + item.id
@@ -292,15 +304,18 @@ export default {
           } else {
             obj.id = item.id
             obj.label = item.name
+            obj.pos = index
           }
           if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
             obj.children = this.filterAllCata(item.dataCataLogList)
+            arr.push(obj)
           } else {
             if (!item.fieldType) {
               obj.children = null
+            } else {
+              arr.push(obj)
             }
           }
-          arr.push(obj)
         })
       }
       return arr
@@ -332,6 +347,7 @@ export default {
     updateConditionId (arr, position, type) { // 每次增删时，遍历一下ruleConfig,更改每个条件的ruleCode   type:增，删，切换且或
       var expArr = []
       var expStr = ''
+      let relation = arr.relation
       function _find (arr, position) {
         var temp = ''
         var exp = []
@@ -351,14 +367,13 @@ export default {
             if (position != undefined) {
               exp.push(item.ruleCode)
               if (index === arr.rules.length - 1) {
-                let str = `(${[...new Set(exp)].join(' ' + arr.relation + ' ')})`
+                let str = `(${[...new Set(exp)].join(' ' + arr.relation + ' ')})` // 二级拼接
                 expArr.push(str)
-                expStr = expArr.join(' ' + arr.relation + ' ')
+                expStr = expArr.join(' ' + relation + ' ') // 所有一级拼接
               }
             } else {
               expArr.push(item.ruleCode)
               expStr = expArr.join(' ' + arr.relation + ' ')
-              console.log(expStr)
             }
             // 获取表达式end
           } else {
@@ -374,7 +389,6 @@ export default {
       if (type !== 'switch') {
         this.ruleConfig = arr
       }
-      console.log(9999, this.expression)
     },
     updateRulesArr (arr, citem, obj) { // 更新数组的数据
       arr.rules.forEach(item => {
@@ -480,7 +494,6 @@ export default {
           }
         })
       }
-      console.log(data)
       this.updateConditionId(this.ruleConfig, undefined, 'switch')
     },
     addRules () { // 添加一级条件
@@ -517,6 +530,9 @@ export default {
         value: node.id,
         id: node.fieldId
       })
+      if (this.outParams.length) {
+        this.$refs.baseForm.clearValidate('outParams')
+      }
     },
     outParamsDeselect (node) { // 删除出参
       this.outParams = this.outParams.filter(item => item.value !== node.id)
@@ -547,6 +563,7 @@ export default {
       return arr
     },
     saveHandle () {
+      console.log(this.baseForm)
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -559,17 +576,17 @@ export default {
       let ruleFormArr = this.getRuleForm()
       this.$nextTick(() => { // 待页面中的isRequired = true后再执行校验
         let flag = true
+        this.$refs.baseForm.validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
         ruleFormArr.forEach(item => {
           item.validate((valid) => {
             if (!valid) {
               flag = false
             }
           })
-        })
-        this.$refs.baseForm.validate((valid) => {
-          if (!valid) {
-            flag = false
-          }
         })
         if (!flag) {
           this.isRequired = false
@@ -649,5 +666,12 @@ export default {
   }
   .vue-treeselect {
     line-height: 24px;
+  }
+  .data-description-tips {
+    color: #999;
+    margin-top: 0
+  }
+  .data-description-tips span {
+    color: red
   }
 </style>

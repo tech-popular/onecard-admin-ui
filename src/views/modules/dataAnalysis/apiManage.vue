@@ -13,7 +13,15 @@
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="API名称"></el-table-column>
-      <el-table-column prop="desc" header-align="center" align="center" label="API说明"></el-table-column>
+      <el-table-column prop="desc" header-align="center" align="center" label="API说明">
+        <template slot-scope="scope">
+          <el-tooltip placement="right" v-if="scope.row.desc.length > 10">
+          <div slot="content" style="max-width: 200px;line-height: 1.5">{{scope.row.desc}}</div>
+          <span>{{`${scope.row.desc.substr(0, 10)}...`}}</span>
+        </el-tooltip>
+        <span v-else>{{scope.row.desc}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <!-- <el-table-column prop="updator" header-align="center" align="center" label="修改人"></el-table-column> -->
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
@@ -70,14 +78,14 @@
           'pageSize': this.pageSize
         }
         apiManageList(params).then(({data}) => {
-          if (data.status === '1') {
-            this.dataList = data.data.list
-            this.totalCount = data.data.total
-          } else {
+          this.dataListLoading = false
+          if (data.status !== '1' || !data.data || !data.data.list.length) {
             this.dataList = []
             this.totalCount = 0
+            return
           }
-          this.dataListLoading = false
+          this.dataList = data.data.list
+          this.totalCount = data.data.total
         })
       },
       closeDrawer () {
