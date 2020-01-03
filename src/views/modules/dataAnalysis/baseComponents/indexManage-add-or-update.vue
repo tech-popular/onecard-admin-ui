@@ -25,6 +25,9 @@
           <el-option v-for="(item, index) in categoryIdList" :value="item.id" :key="index" :label="item.name"/>
         </el-select>
       </el-form-item>
+      <el-form-item label="来源表:" prop="sourceTable">
+        <el-input v-model="dataForm.sourceTable" placeholder="" v-bind:readonly="readonly" />
+      </el-form-item>
       <el-form-item label="指标数据源:" prop="sourceDatasource">
         <el-select filterable v-model="dataForm.sourceDatasource" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
           <el-option v-for="(item, index) in sourceDatasource" :value="item.typeNum" :key="index" :label="item.typeValue"/>
@@ -80,6 +83,7 @@
           categoryId: '', // 指标类别
           enumTypeNum: '', // 枚举类型
           dataStandar: '', // 数据格式
+          sourceTable: '', // 来源表
           sourceDatasource: '', // 指标数据源
           enable: 'true', // 指标状态
           remark: '' // 描述
@@ -122,6 +126,9 @@
           ],
           enumTypeNum: [
             { validator: validateName }
+          ],
+          sourceTable: [
+            { required: true, message: '请输入来源表', trigger: 'blur' }
           ],
           sourceDatasource: [
             { required: true, message: '请选择指标数据源', trigger: 'change' }
