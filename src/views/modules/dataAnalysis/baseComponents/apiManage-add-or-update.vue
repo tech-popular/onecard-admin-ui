@@ -8,7 +8,7 @@
     class="api-manage-drawer"
   >
     <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
-    <div class="wrap">
+    <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3>基本信息</h3>
         <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
@@ -71,6 +71,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
     return {
+      loading: false,
       inParamsList: [
         {
           title: '账户编号',
@@ -131,9 +132,6 @@ export default {
       }
     }
   },
-  mounted () {
-
-  },
   components: { rulesSet, Treeselect },
   methods: {
     init (row, tag) {
@@ -142,10 +140,15 @@ export default {
       this.outParams = []
       this.outParamsIndexList = []
       this.expression = ''
+      this.loading = true
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
+      this.$nextTick(() => { // 默认将基本信息的错误提示消除
+        this.$refs.baseForm.clearValidate()
+      })
       this.tag = tag
       if (!tag) {
+        this.loading = false
         this.drawerTitle = '新增'
         this.getSelectAllCata((indexList) => {
           this.outParamsIndexList = deepClone(indexList)
@@ -205,6 +208,9 @@ export default {
           this.getSelectAllCata((indexList) => {
             this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
             this.outParamsIndexList = this.updateOutParamsList(indexList)
+            this.$nextTick(() => {
+              this.loading = false
+            })
           })
           this.$nextTick(() => { // 默认将验证错误信息全部清除
             let ruleFormArr = this.getRuleForm()
@@ -304,7 +310,6 @@ export default {
           } else {
             obj.id = item.id
             obj.label = item.name
-            obj.pos = index
           }
           if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
             obj.children = this.filterAllCata(item.dataCataLogList)
