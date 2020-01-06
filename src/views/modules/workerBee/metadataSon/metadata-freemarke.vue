@@ -28,6 +28,7 @@
 </template>
 
 <script>
+  import Filter from '../filter'
   export default {
     props: [
       'hideVisibleClick',
@@ -37,16 +38,20 @@
       return {
         dataRule: {
           name: [
-            { required: true, message: '请输入模板名称', trigger: 'blur' }
+            { required: true, message: '请输入模板名称', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           requestFields: [
-            { required: true, message: '请输入模板中需要赋值的字段', trigger: 'blur' }
+            { required: true, message: '请输入模板中需要赋值的字段', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           responseFields: [
-            { required: true, message: '请输入请返回字段值', trigger: 'blur' }
+            { required: true, message: '请输入请返回字段值', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           template: [
-            { required: true, message: '请输入请未解析的模板', trigger: 'blur' }
+            { required: true, message: '请输入请未解析的模板', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         }
       }
