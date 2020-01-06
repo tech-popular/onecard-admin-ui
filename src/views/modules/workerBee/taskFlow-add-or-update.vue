@@ -96,6 +96,7 @@
 
 <script>
   import { saveWorkTaskFlow, getAllBeeTaskList, getNotBaseTypeList } from '@/api/workerBee/workFlow'
+  import Filter from './filter'
   export default {
     data () {
       return {
@@ -120,13 +121,16 @@
         },
         dataRule: {
           inputParams: [
-            { required: true, message: '任务入参不能为空', trigger: 'blur' }
+            { required: true, message: '任务入参不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           outputParams: [
-            { required: true, message: '任务出参别名映射不能为空', trigger: 'blur' }
+            { required: true, message: '任务出参别名映射不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           taskReferenceName: [
-            { required: true, message: '参考名称不能为空', trigger: 'blur' }
+            { required: true, message: '参考名称不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },
         taskIdlist: [],

@@ -47,6 +47,7 @@
 
 <script>
   import { saveWorkFlow, getUpdateWorkFlow } from '@/api/workerBee/workFlow'
+  import Filter from './filter'
   export default {
     data () {
       return {
@@ -66,22 +67,28 @@
         },
         dataRule: {
           name: [
-            { required: true, message: '工作流名称不能为空', trigger: 'blur' }
+            { required: true, message: '工作流名称不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           owner: [
-            { required: true, message: '拥有者不能为空', trigger: 'blur' }
+            { required: true, message: '拥有者不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           user: [
-            { required: true, message: '使用者不能为空', trigger: 'blur' }
+            { required: true, message: '使用者不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           inputParameters: [
-            { required: true, message: '工作流入参不能为空', trigger: 'blur' }
+            { required: true, message: '工作流入参不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           outputParameters: [
-            { required: true, message: '返回结果不能为空', trigger: 'blur' }
+            { required: true, message: '返回结果不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           version: [
-            { required: true, message: '版本不能为空', trigger: 'blur' }
+            { required: true, message: '版本不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },
         updateId: ''

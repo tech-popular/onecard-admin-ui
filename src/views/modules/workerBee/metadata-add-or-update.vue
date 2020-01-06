@@ -78,6 +78,7 @@
   import metadataFreemarke from './metadataSon/metadata-freemarke'
 
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
+  import Filter from './filter'
   export default {
     data () {
       var checkDecisionName = (rule, value, callback) => {
@@ -108,10 +109,30 @@
         ruleTypeList: [],
         dataRule: {
           name: [
-            { required: true, validator: checkDecisionName, trigger: 'change' }
+            { required: true, validator: checkDecisionName, trigger: 'change' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           type: [
-            { required: true, message: '请选择任务类型', trigger: 'change' }
+            { required: true, message: '请选择任务类型', trigger: 'change' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          description: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          owner: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          user: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          inputParams: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          outputParams: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          remark: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },
         fatherData: {
