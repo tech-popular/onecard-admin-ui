@@ -696,10 +696,12 @@ export default {
           url(params).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
+                type: 'error',
                 message: data.message
               })
             } else {
               this.$message({
+                type: 'success',
                 message: data.message
               })
               this.visible = false
