@@ -32,7 +32,7 @@
       <el-table-column prop="sourceDatasource" header-align="center" align="center" label="指标数据源"></el-table-column>
       <el-table-column prop="remark" header-align="center" align="center" label="指标描述">
       <template slot-scope="scope">
-        <el-tooltip :disabled="scope.row.remark != undefined && scope.row.remark.length > 8 ? false : true" class="item" effect="dark" placement="top">
+        <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="ToBreak(scope.row.remark)" slot="content"></div>
             <div class="oneLine">{{scope.row.remark}}</div>
         </el-tooltip>
