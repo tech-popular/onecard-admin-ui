@@ -212,7 +212,7 @@
         this.pageNum = 1
         this.dataForm = {
           englishName: '',
-          categoryId: '',
+          categoryId: null,
           enable: ''
         }
         // this.getDataList()
