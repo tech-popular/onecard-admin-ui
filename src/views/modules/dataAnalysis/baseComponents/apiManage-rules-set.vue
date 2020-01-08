@@ -209,7 +209,7 @@ export default {
       this.parent.switchSymbol(ruleCode, this.parent.ruleConfig)
     },
     fieldCodeChange (node, ruleItem) { // 指标改变时，对应的操作符也更新
-      this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { englishName: node.englishName, fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId })
+      this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { englishName: node.englishName, fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId, format: node.dataStandar })
     },
     selectOperateChange (val, ruleItem) { // 操作符改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
