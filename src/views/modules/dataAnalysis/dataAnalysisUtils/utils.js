@@ -85,6 +85,7 @@ export const nullandnumber = (rule, value, callback) => {
 // 树 name转label
 export const nameToLabel = (arr) => {
   arr = arr.slice()
+  let results
   function toParse (arr) {
     arr.forEach(function (item, index) {
       item['id'] = item.id
@@ -102,13 +103,14 @@ export const nameToLabel = (arr) => {
     })
     return arr
   }
-  return toParse(arr)
+  results = toParse(arr)
+  return results
 }
 
 // 指标回显
 export const echoDisplay = (arr, rowId) => {
+  let result
   function toEchoDisplay (items) {
-    let result
     for (var i in items) {
       let item = items[i]
       if (rowId == item.id) {
@@ -120,12 +122,14 @@ export const echoDisplay = (arr, rowId) => {
     }
     return result
   }
-  return toEchoDisplay(arr)
+  toEchoDisplay(arr)
+  return result
 }
 
 // 指标回显选中
 export const findOption = (arr, indArr) => {
   let indArrInd = 0
+  let results
   function toFindOption (arr) {
     arr.forEach(function (item, index) {
       if (indArr[indArrInd] == index && indArrInd < indArr.length - 1) {
@@ -139,5 +143,6 @@ export const findOption = (arr, indArr) => {
     })
     return arr
   }
-  return toFindOption(arr)
+  results = toFindOption(arr)
+  return results
 }

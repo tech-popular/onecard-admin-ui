@@ -144,7 +144,7 @@
         }
       },
       // 指标类别
-      categoryIdFormat (row, column) {
+      categoryIdFormat (row) {
         return echoDisplay(this.categoryIdList, row.categoryId)
       },
 
