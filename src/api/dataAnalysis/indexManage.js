@@ -1,6 +1,6 @@
 import { httpGet, httpPost, httpPut } from '@/api'
-// let da = '/dataAnalysis/'
-let da = '/'
+let da = '/dataAnalysis/'
+// let da = '/'
 // 指标管理模块
 export const indexManageList = (params) => httpPost(da + 'dataIndexManager/list', params) // 初始化列表
 export const addIndexManage = (params) => httpPost(da + 'dataIndexManager/add', params) // 新增表单提交

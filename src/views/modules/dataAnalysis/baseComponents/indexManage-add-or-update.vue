@@ -21,9 +21,23 @@
         <el-input v-model="dataForm.dataStandar" placeholder="" v-bind:readonly="readonly" />
       </el-form-item>
       <el-form-item label="指标类别:" prop="categoryId">
-        <el-select filterable v-model="dataForm.categoryId" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
+        <!-- <el-select filterable v-model="dataForm.categoryId" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
           <el-option v-for="(item, index) in categoryIdList" :value="item.id" :key="index" :label="item.name"/>
-        </el-select>
+        </el-select> -->
+        <Treeselect
+              :options="categoryIdList"
+              :disable-branch-nodes="true"
+              :show-count="true"
+              :multiple="false"
+              :load-options="loadOptions"
+              :searchable="true"
+              :clearable="true"
+              :disabled="readonly"
+              @input="changeOption"
+              noChildrenText="暂无数据"
+              v-model="dataForm.categoryId"
+              placeholder="请选择"
+            />
       </el-form-item>
       <el-form-item label="来源表:" prop="sourceTable">
         <el-input v-model="dataForm.sourceTable" placeholder="" v-bind:readonly="readonly" />
@@ -50,7 +64,9 @@
 </template>
 <script>
   import { addIndexManage, updateIndexManage, indexManageTypeList, indexManageMinCataList, indexManageTypeNumList } from '@/api/dataAnalysis/indexManage'
-  import { deepClone } from '../dataAnalysisUtils/utils'
+  import { deepClone, findVueSelectItemIndex, nameToLabel, findOption } from '../dataAnalysisUtils/utils'
+  import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -62,6 +78,7 @@
           callback()
         }
       }
+  
       let checkSpace = (rule, value, callback) => {
         const spaceReg = /^\S*$/
         setTimeout(() => {
@@ -80,7 +97,7 @@
           englishName: '',
           chineseName: '', // 指标标题
           fieldType: '', // 数据类型
-          categoryId: '', // 指标类别
+          categoryId: null, // 指标类别
           enumTypeNum: '', // 枚举类型
           dataStandar: '', // 数据格式
           sourceTable: '', // 来源表
@@ -122,7 +139,7 @@
             { required: true, message: '请选择指标类型', trigger: 'change' }
           ],
           categoryId: [
-            { required: true, message: '请选择指标类别', trigger: 'change' }
+            { required: true, message: '请选择指标类别', trigger: 'input' }
           ],
           enumTypeNum: [
             { validator: validateName }
@@ -139,16 +156,19 @@
         }
       }
     },
+
     mounted () {
-      this.getCategoryIdList()
+      // this.getCategoryIdList()
       this.getFieldTypeList()
       this.getEnumTypeNumList()
     },
+
     computed: {
       isHaveTo: function () {
         return this.dataForm.enumTypeNum === `enums`
       }
     },
+
     watch: {
       'dataForm.fieldType': {
         handler (newVal, oldVal) {
@@ -162,12 +182,27 @@
         immediate: true
       }
     },
+
+    components: {Treeselect},
+
     methods: {
+      // 树加载
+      async loadOptions ({ action, parentNode, callback }) {
+        if (action === LOAD_CHILDREN_OPTIONS) {
+          callback()
+        }
+      },
+  
       // 获取指标类别
-      getCategoryIdList () {
+      getCategoryIdList (row) {
         indexManageMinCataList().then(({data}) => {
           if (data && data.status === '1') {
-            this.categoryIdList = data.data
+            this.categoryIdList = nameToLabel(data.data)
+            if (row) {
+              let categoryIdList = this.categoryIdList
+              let optionIndex = findVueSelectItemIndex(categoryIdList, row.categoryId).split(',')
+              this.categoryIdList = findOption(categoryIdList, optionIndex)
+            }
           }
         })
       },
@@ -191,10 +226,17 @@
         })
       },
 
+      // 指标类别选择
+      changeOption () {
+        this.$refs.dataForm.validateField('categoryId')
+      },
+
       init (row, tag) {
         this.dataForm.id = row ? row.id : ''
         this.tag = tag || ''
         this.visible = true
+        this.categoryIdList = []
+        this.getCategoryIdList(row)
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (row) {
@@ -274,5 +316,9 @@
   }
   .data-description-tips span {
     color: red
+  }
+  .vue-treeselect {
+    height: 38px;
+    line-height: 38px;
   }
 </style>
