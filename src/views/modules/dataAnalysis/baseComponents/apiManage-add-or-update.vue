@@ -131,6 +131,7 @@ export default {
       initFieldId: '',
       initEnumTypeNum: '',
       initSelectOperateList: [],
+      initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
       baseForm: {
@@ -318,7 +319,7 @@ export default {
         indexPathArr.forEach((pitem, index) => {
           if (index < indexPathArr.length - 1) {
             a[pitem].isDefaultExpanded = true
-            a = indexListArr[pitem].children
+            a = a[pitem].children
           }
         })
       })
@@ -331,13 +332,13 @@ export default {
           let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
           let indexPathArr = indexPath.split(',')
           let a = indexListArr
-          indexPathArr.forEach((item, index) => {
-            if (index < indexPathArr.length - 1) {
-              a[item].isDefaultExpanded = true
-              a = indexListArr[item].children
+          indexPathArr.forEach((fitem, findex) => {
+            if (findex < indexPathArr.length - 1) {
+              a[fitem].isDefaultExpanded = true
+              a = a[fitem].children
             }
           })
-          item.indexList = indexListArr
+          item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
         } else {
           this.updateInitRulesConfig(item, indexList)
         }
@@ -354,6 +355,7 @@ export default {
             this.initEnumTypeNum = item.enumTypeNum
             this.initSourceTable = item.sourceTable
             this.initFieldId = item.fieldId
+            this.initEnglishName = item.englishName
           } else {
             this.getInitTypeCode(item.children)
           }
@@ -422,6 +424,7 @@ export default {
         'func': this.initSelectOperateList[0].code,
         'sourceTable': this.initSourceTable,
         'fieldId': this.initFieldId,
+        'englishName': this.initEnglishName,
         'indexList': this.indexList, // 指标下拉选
         'enumTypeNum': '',
         'selectOperateList': this.initSelectOperateList, // 操作符下拉选
@@ -604,7 +607,7 @@ export default {
     getRuleForm () { // 获取所有的$refs.ruleForm,用于统一校验数据
       let ruleSet = this.$refs.rulesSet
       let ruleArr = []
-      ruleArr = ruleSet.$refs.ruleForm
+      ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
       ruleSet.$children.forEach(item => {
         if (item.$refs.ruleForm) {
           ruleArr = [...ruleArr, ...item.$refs.ruleForm]
