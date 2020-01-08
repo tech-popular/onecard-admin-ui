@@ -22,10 +22,10 @@
     <el-form-item label="描述">
       <el-input v-model="dataForm.description" placeholder="描述"/>
     </el-form-item>
-     <el-form-item label="创建人姓名">
+     <el-form-item label="创建人姓名" prop="createdBy">
       <el-input v-model="dataForm.createdBy" placeholder="创建人姓名"/>
     </el-form-item>
-    <el-form-item label="归属系统">
+    <el-form-item label="归属系统" prop="ownerApp">
       <el-input v-model="dataForm.ownerApp" placeholder="归属系统"/>
     </el-form-item>
     <el-form-item label="是否重试">
@@ -89,6 +89,12 @@
           version: [
             { required: true, message: '版本不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          createdBy: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          ownerApp: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },
         updateId: ''
