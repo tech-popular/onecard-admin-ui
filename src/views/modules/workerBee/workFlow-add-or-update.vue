@@ -22,10 +22,10 @@
     <el-form-item label="描述">
       <el-input v-model="dataForm.description" placeholder="描述"/>
     </el-form-item>
-     <el-form-item label="创建人姓名">
+     <el-form-item label="创建人姓名" prop="createdBy">
       <el-input v-model="dataForm.createdBy" placeholder="创建人姓名"/>
     </el-form-item>
-    <el-form-item label="归属系统">
+    <el-form-item label="归属系统" prop="ownerApp">
       <el-input v-model="dataForm.ownerApp" placeholder="归属系统"/>
     </el-form-item>
     <el-form-item label="是否重试">
@@ -47,6 +47,7 @@
 
 <script>
   import { saveWorkFlow, getUpdateWorkFlow } from '@/api/workerBee/workFlow'
+  import Filter from './filter'
   export default {
     data () {
       return {
@@ -66,22 +67,34 @@
         },
         dataRule: {
           name: [
-            { required: true, message: '工作流名称不能为空', trigger: 'blur' }
+            { required: true, message: '工作流名称不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           owner: [
-            { required: true, message: '拥有者不能为空', trigger: 'blur' }
+            { required: true, message: '拥有者不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           user: [
-            { required: true, message: '使用者不能为空', trigger: 'blur' }
+            { required: true, message: '使用者不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           inputParameters: [
-            { required: true, message: '工作流入参不能为空', trigger: 'blur' }
+            { required: true, message: '工作流入参不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           outputParameters: [
-            { required: true, message: '返回结果不能为空', trigger: 'blur' }
+            { required: true, message: '返回结果不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           version: [
-            { required: true, message: '版本不能为空', trigger: 'blur' }
+            { required: true, message: '版本不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          createdBy: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          ownerApp: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },
         updateId: ''
