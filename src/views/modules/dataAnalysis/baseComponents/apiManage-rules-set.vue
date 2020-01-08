@@ -306,7 +306,7 @@ export default {
   }
   .tree-select {
     display: inline-block;
-    width: 280px;
+    width: 290px;
     line-height: 38px;
   }
   .pane-rules-inline {

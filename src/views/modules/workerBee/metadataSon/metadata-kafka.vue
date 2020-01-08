@@ -22,6 +22,7 @@
 </template>
 
 <script>
+  import Filter from '../filter'
   export default {
     props: [
       'hideVisibleClick',
@@ -31,7 +32,11 @@
       return {
         dataRule: {
           topic: [
-            { required: true, message: '请输入topic', trigger: 'blur' }
+            { required: true, message: '请输入topic', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          requestFields: [
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         }
       }

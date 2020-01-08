@@ -15,6 +15,22 @@
           <el-form-item label="API名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="API名称" clearable class="base-pane-item" />
           </el-form-item>
+          <el-form-item label="接口编码" prop="department" class="item-inline">
+            <el-select v-model="baseForm.department" placeholder="请选择一级事业群" :disabled="!!id">
+              <el-option v-for="(item, index) in departmentList" :key="index" :label="item.childrenValue" :value="item.childrenNum"></el-option>
+            </el-select>
+          </el-form-item>
+          &nbsp; _
+          <el-form-item prop="apiName" class="item-inline item-code">
+            <el-input v-model.trim="baseForm.apiName" placeholder="输入字母和数字的组合" clearable class="item-code-name" :disabled="!!id" />
+          </el-form-item>
+          <!-- <el-form-item class="item-inline item-button">
+            <el-button type="success" @click="getApiCode" size="small">确认生成</el-button>
+          </el-form-item> -->
+          <el-form-item label="您创建的接口编码是：" label-width="166px">
+            {{code}}
+            <el-button type="primary" @click="copyCode" size="small" class="copy-code" v-if="isCopyBtn">复制编码</el-button>
+          </el-form-item>
           <el-form-item label="API入参" prop="inParam">
             <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
           </el-form-item>
@@ -70,6 +86,16 @@ import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
+    let validateApiName = (rule, value, callback) => {
+      const reg = /^[0-9a-zA-Z]*$/ // 只允许输入字母和数字  /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]*$/ //只允许输入字母和数字的组合
+      if (!value) {
+        callback(new Error('请输入字母和数字的组合'))
+      } else if (!reg.test(value)) {
+        callback(new Error('请输入字母和数字的组合'))
+      } else {
+        callback()
+      }
+    }
     return {
       loading: false,
       inParamsList: [
@@ -91,6 +117,7 @@ export default {
         }
       ],
       id: '',
+      flowId: '',
       tag: '',
       drawerTitle: '',
       isRequired: false,
@@ -104,14 +131,20 @@ export default {
       initFieldId: '',
       initEnumTypeNum: '',
       initSelectOperateList: [],
+      initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
       baseForm: {
         name: '',
         inParam: '',
         desc: '',
-        outParams: []
+        outParams: [],
+        department: '',
+        apiName: ''
       },
+      departmentList: [],
+      originDepartment: '', // 编辑时保留一份原始数据，以防不正当修改编码
+      originApiName: '',
       outParams: [],
       baseRule: { // 基本信息校验规则
         name: [
@@ -122,6 +155,12 @@ export default {
         ],
         outParams: [
           { required: true, message: '请选择API出参', trigger: 'change' }
+        ],
+        department: [
+          { required: true, message: '请选择一级事业群', trigger: 'change' }
+        ],
+        apiName: [
+          { validator: validateApiName, trigger: 'blur' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -133,16 +172,56 @@ export default {
     }
   },
   components: { rulesSet, Treeselect },
+  computed: {
+    code () {
+      let department = this.baseForm.department || ''
+      let apiName = this.baseForm.apiName || ''
+      if (!department && !apiName) {
+        return ''
+      }
+      return department + '_' + apiName
+    },
+    isCopyBtn () {
+      if (this.baseForm.department && this.baseForm.apiName) {
+        return true
+      }
+      return false
+    }
+  },
   methods: {
+    copyCode () { // 复制编码事件
+      this.$copyText(this.code).then(e => {
+        this.$message({
+          type: 'success',
+          message: '复制成功'
+        })
+      }, e => {
+        this.$message({
+          type: 'error',
+          message: '复制失败，请再试一次'
+        })
+      })
+    },
+    getDepartmentList () { // 获取事业部下拉数据
+      enumTypeList(17).then(res => {
+        if (res.data.status !== '1') {
+          this.departmentList = []
+        } else {
+          this.departmentList = res.data.data
+        }
+      })
+    },
     init (row, tag) {
       this.id = ''
       this.tag = ''
+      this.flowId = ''
       this.outParams = []
       this.outParamsIndexList = []
       this.expression = ''
       this.loading = true
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
+      this.getDepartmentList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -191,16 +270,21 @@ export default {
               type: 'error'
             })
           }
+          this.flowId = data.data.flowId
           let configJson = JSON.parse(data.data.configJson)
           this.baseForm = {
             name: configJson.name,
             inParam: configJson.inParam,
-            desc: configJson.desc
+            desc: configJson.desc,
+            department: configJson.department,
+            apiName: configJson.apiName
           }
+          this.originDepartment = configJson.department
+          this.originApiName = configJson.apiName
           this.outParams = configJson.outParams
           let out = []
           configJson.outParams.forEach(item => {
-            out.push(item.value)
+            out.push(item.onlyId)
           })
           this.baseForm.outParams = out
           this.ruleConfig = configJson.ruleConfig
@@ -235,7 +319,7 @@ export default {
         indexPathArr.forEach((pitem, index) => {
           if (index < indexPathArr.length - 1) {
             a[pitem].isDefaultExpanded = true
-            a = indexListArr[pitem].children
+            a = a[pitem].children
           }
         })
       })
@@ -248,13 +332,13 @@ export default {
           let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
           let indexPathArr = indexPath.split(',')
           let a = indexListArr
-          indexPathArr.forEach((item, index) => {
-            if (index < indexPathArr.length - 1) {
-              a[item].isDefaultExpanded = true
-              a = indexListArr[item].children
+          indexPathArr.forEach((fitem, findex) => {
+            if (findex < indexPathArr.length - 1) {
+              a[fitem].isDefaultExpanded = true
+              a = a[fitem].children
             }
           })
-          item.indexList = indexListArr
+          item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
         } else {
           this.updateInitRulesConfig(item, indexList)
         }
@@ -271,6 +355,7 @@ export default {
             this.initEnumTypeNum = item.enumTypeNum
             this.initSourceTable = item.sourceTable
             this.initFieldId = item.fieldId
+            this.initEnglishName = item.englishName
           } else {
             this.getInitTypeCode(item.children)
           }
@@ -339,6 +424,7 @@ export default {
         'func': this.initSelectOperateList[0].code,
         'sourceTable': this.initSourceTable,
         'fieldId': this.initFieldId,
+        'englishName': this.initEnglishName,
         'indexList': this.indexList, // 指标下拉选
         'enumTypeNum': '',
         'selectOperateList': this.initSelectOperateList, // 操作符下拉选
@@ -521,7 +607,7 @@ export default {
     getRuleForm () { // 获取所有的$refs.ruleForm,用于统一校验数据
       let ruleSet = this.$refs.rulesSet
       let ruleArr = []
-      ruleArr = ruleSet.$refs.ruleForm
+      ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
       ruleSet.$children.forEach(item => {
         if (item.$refs.ruleForm) {
           ruleArr = [...ruleArr, ...item.$refs.ruleForm]
@@ -532,7 +618,9 @@ export default {
     outParamsSelect (node) { // 选中出参
       this.outParams.push({
         title: node.label,
-        value: node.id,
+        value: node.englishName, // node.id,
+        onlyId: node.id,
+        sourceTable: node.sourceTable,
         id: node.fieldId
       })
       if (this.outParams.length) {
@@ -540,7 +628,7 @@ export default {
       }
     },
     outParamsDeselect (node) { // 删除出参
-      this.outParams = this.outParams.filter(item => item.value !== node.id)
+      this.outParams = this.outParams.filter(item => item.onlyId !== node.id)
     },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
@@ -597,19 +685,26 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           this.ruleConfig = this.updateRulesConfig(this.ruleConfig) // 过滤数据
+          this.baseForm.code = this.code
           let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)), expression: this.expression, ruleConfig: this.ruleConfig }
           let url = savaApiInfo
           if (this.id) {
             url = updateApiInfo
             params.id = this.id
+            params.flowId = this.flowId
+            params.department = this.originDepartment
+            params.apiName = this.originApiName
+            params.code = this.originDepartment + '_' + this.originApiName
           }
           url(params).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
+                type: 'error',
                 message: data.message
               })
             } else {
               this.$message({
+                type: 'success',
                 message: data.message
               })
               this.visible = false
@@ -648,6 +743,21 @@ export default {
   .drawer-close {
     position: absolute;
     right: 20px;
+  }
+  .item-inline {
+    display: inline-block;
+  }
+  .item-code {
+    margin-left: -70px;
+  }
+  .item-code-name {
+    width: 300px;
+  }
+  .item-button {
+    margin-left: -60px;
+  }
+  .copy-code {
+    margin-left: 15px;
   }
   .base-pane {
     border-bottom: 1px dashed #ccc;
