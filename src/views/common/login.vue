@@ -3,7 +3,7 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <!-- <div class="brand-info">
-          <h2 class="brand-info__text">架构综合服务平台</h2>
+          <h2 class="brand-info__text">玖富数据中台</h2>
           <p class="brand-info__intro">提供平台的全方位的报警监控。</p>
         </div>-->
         <!-- 账号密码登录 -->
@@ -21,7 +21,7 @@
             <img :src="imgLeft" alt />
           </div>
           <div class="login-title-all">
-            <h3 class="login-title">架构综合服务平台</h3>
+            <h3 class="login-title">玖富数据中台</h3>
             <p class="login-title-single">JIAGOUZONGHEFUWUPINGTAI</p>
           </div>
           <el-form
@@ -75,7 +75,7 @@
             <img :src="imgLeft" alt />
           </div>
           <div class="login-title-all">
-            <h3 class="login-title">架构综合服务平台</h3>
+            <h3 class="login-title">玖富数据中台</h3>
             <p class="login-title-single">JIAGOUZONGHEFUWUPINGTAI</p>
           </div>
           <el-form
