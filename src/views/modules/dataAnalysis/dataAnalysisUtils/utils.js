@@ -81,3 +81,63 @@ export const nullandnumber = (rule, value, callback) => {
   }
   callback()
 }
+
+// 树 name转label
+export const nameToLabel = (arr) => {
+  arr = arr.slice()
+  function toParse (arr) {
+    arr.forEach(function (item, index) {
+      item['id'] = item.id
+      item['label'] = item.name
+      if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+        item['children'] = item.children
+        toParse(item['children'])
+      } else {
+        if (Array.isArray(item.children) && item.children.length == 0) {
+          arr.splice(index, 1)// 如果一级的元素为children为[]删除该元素
+        } else {
+          delete item['children']
+        }
+      }
+    })
+    return arr
+  }
+  return toParse(arr)
+}
+
+// 指标回显
+export const echoDisplay = (arr, rowId) => {
+  function toEchoDisplay (items) {
+    let result
+    for (var i in items) {
+      let item = items[i]
+      if (rowId == item.id) {
+        result = item.name
+        break
+      } else if (item.children) {
+        result = toEchoDisplay(item.children)
+      }
+    }
+    return result
+  }
+  return toEchoDisplay(arr)
+}
+
+// 指标回显选中
+export const findOption = (arr, indArr) => {
+  let indArrInd = 0
+  function toFindOption (arr) {
+    arr.forEach(function (item, index) {
+      if (indArr[indArrInd] == index && indArrInd < indArr.length - 1) {
+        item.isDefaultExpanded = true
+        indArrInd++
+        if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+          item['children'] = item.children
+          toFindOption(item['children'])
+        }
+      }
+    })
+    return arr
+  }
+  return toFindOption(arr)
+}
