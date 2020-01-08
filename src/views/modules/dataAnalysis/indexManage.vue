@@ -1,23 +1,13 @@
 <template>
-  <div class="index-wrap">
+  <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="指标名称">
         <el-input v-model="dataForm.englishName" placeholder="" clearable />
       </el-form-item>
       <el-form-item label="指标类别">
-        <Treeselect
-              :options="categoryIdList"
-              :disable-branch-nodes="true"
-              :show-count="true"
-              :multiple="false"
-              :load-options="loadOptions"
-              :searchable="true"
-              :clearable="true"
-              noChildrenText="暂无数据"
-              v-model="dataForm.categoryId"
-              placeholder="全部"
-              style="line-height:38px"
-            />
+        <el-select v-model="dataForm.categoryId" placeholder="" filterable>
+          <el-option v-for="(item, index) in categoryIdList" :value="item.id" :key="index" :label="item.name"/>
+        </el-select>
       </el-form-item>
       <el-form-item label="指标状态">
         <el-select v-model="dataForm.enable" placeholder="指标状态">
@@ -79,16 +69,13 @@
 
 <script>
   import { indexManageList, indexManageTypeList, indexManageMinCataList } from '@/api/dataAnalysis/indexManage'
-  import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
-  import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
     data () {
       return {
         dataForm: {
           englishName: '',
-          categoryId: null,
+          categoryId: '',
           enable: ''
         },
         dataList: [],
@@ -120,8 +107,7 @@
       }
     },
     components: {
-      AddOrUpdate,
-      Treeselect
+      AddOrUpdate
     },
     mounted () {
       this.getCategoryIdList()
@@ -129,12 +115,6 @@
       this.getDataList()
     },
     methods: {
-      async loadOptions ({ action, parentNode, callback }) {
-        if (action === LOAD_CHILDREN_OPTIONS) {
-          callback()
-        }
-      },
-  
       // 数据类型
       fieldTypeFormat (row, column) {
         for (var i = 0; i < this.fieldTypeList.length; i++) {
@@ -145,18 +125,26 @@
       },
       // 指标类别
       categoryIdFormat (row, column) {
-        return echoDisplay(this.categoryIdList, row.categoryId)
+        for (var i = 0; i < this.categoryIdList.length; i++) {
+          if (row.categoryId === this.categoryIdList[i].id) {
+            return this.categoryIdList[i].name
+          }
+        }
       },
 
       // 获取指标类别
       getCategoryIdList () {
         indexManageMinCataList().then(({data}) => {
           if (data && data.status === '1') {
-            this.categoryIdList = nameToLabel(data.data)
+            this.categoryIdList = data.data
+            this.categoryIdList.unshift({
+              id: '',
+              name: '全部'
+            })
           }
         })
       },
-  
+
       // 获取数据类型
       getFieldTypeList () {
         let params = 6
@@ -177,9 +165,6 @@
               'pageNum': this.pageNum,
               'pageSize': this.pageSize
             }
-            if (!params.categoryId) {
-              params.categoryId = ''
-            }
             indexManageList(params, false).then(({data}) => {
               if (data && data.status === '1') {
                 this.dataList = data.data.list
@@ -199,7 +184,6 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(row, tag)
-          // this.$refs.addOrUpdate.getCategoryIdList(row)
         })
       },
       /** 查询 */
@@ -237,22 +221,10 @@
     }
   }
 </script>
-<style lang="scss">
-  .index-wrap{
-    & .oneLine {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-    & .vue-treeselect {
-      height: 40px;
-      line-height: 40px;
-      width: 195px;
-    }
-    & .vue-treeselect__single-value,
-    & .vue-treeselect__placeholder{
-      height: 40px;
-      line-height: 40px;
-    }
-  }
+<style scoped>
+.oneLine {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 </style>
