@@ -21,9 +21,6 @@
         <el-input v-model="dataForm.dataStandar" placeholder="" v-bind:readonly="readonly" />
       </el-form-item>
       <el-form-item label="指标类别:" prop="categoryId">
-        <!-- <el-select filterable v-model="dataForm.categoryId" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
-          <el-option v-for="(item, index) in categoryIdList" :value="item.id" :key="index" :label="item.name"/>
-        </el-select> -->
         <Treeselect
               :options="categoryIdList"
               :disable-branch-nodes="true"
