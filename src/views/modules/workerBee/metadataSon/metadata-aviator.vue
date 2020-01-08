@@ -4,13 +4,13 @@
         <el-form-item label="表达式" prop="script" :rules="dataRule.script">
           <el-input v-model="fatherData.script" placeholder="请输入表达式"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组" :rules="dataRule.requestFields">
+        <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="响应参数的fieldId数组" :rules="dataRule.responseFields">
+        <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
         <el-input v-model="fatherData.responseFields" placeholder="请输入响应参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="响应参数的数据类型" :rules="dataRule.responseType">
+        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
         <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
         </el-form-item>
         <el-form-item label="是否启用">
