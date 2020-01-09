@@ -16,6 +16,15 @@ export default {
       }
     }
     callback()
+  },
+  FlowCode: (rule, value, callback) => {
+    const nullValue = /^\w+$/
+    if (value !== '' && value !== null && value !== undefined) {
+      if (!nullValue.test(value)) {
+        callback(new Error('请输入正确格式'))
+      }
+    }
+    callback()
   }
 }
 </script>
