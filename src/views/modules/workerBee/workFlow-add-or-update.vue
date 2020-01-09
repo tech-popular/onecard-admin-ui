@@ -69,7 +69,8 @@
           ownerApp: '',
           restartable: 0,
           schemaVersion: 0,
-          version: ''
+          version: '',
+          flowCode: ''
         },
         dataRule: {
           name: [
@@ -101,6 +102,11 @@
           ],
           ownerApp: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          flowCode: [
+            { required: true, message: '工作流编码不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' },
+            { required: true, validator: Filter.FlowCode, trigger: 'change' }
           ]
         },
         updateId: ''
@@ -132,6 +138,7 @@
                 this.dataForm.restartable = data.data.restartable
                 this.dataForm.schemaVersion = data.data.schemaVersion
                 this.dataForm.version = data.data.version
+                this.dataForm.flowCode = data.data.flowCode
               }
             })
           }
