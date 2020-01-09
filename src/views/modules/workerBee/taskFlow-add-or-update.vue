@@ -55,7 +55,7 @@
       <el-form-item label="参考名称" prop="taskReferenceName" :rules="dataRule.taskReferenceName">
         <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
       </el-form-item>
-      <el-form-item label="判断case参数">
+      <el-form-item label="判断case参数" prop="caseValueParam">
         <el-input v-model="dataForm.caseValueParam" placeholder="判断case参数"/>
       </el-form-item>
       <el-form-item label="判断表达式">
@@ -80,7 +80,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="子流程ID">
+      <el-form-item label="子流程ID" prop="subWorkFlow">
         <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
@@ -131,6 +131,12 @@
           taskReferenceName: [
             { required: true, message: '参考名称不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          caseValueParam: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          subWorkFlow: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },
         taskIdlist: [],

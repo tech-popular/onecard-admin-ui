@@ -4,7 +4,7 @@
         <el-form-item label="topic" prop="topic">
           <el-input v-model="fatherData.topic" placeholder="请输入topic"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组">
+        <el-form-item label="请求参数的fieldId数组" prop="requestFields">
           <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>
         <el-form-item label="是否启用">
@@ -33,6 +33,9 @@
         dataRule: {
           topic: [
             { required: true, message: '请输入topic', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          requestFields: [
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         }

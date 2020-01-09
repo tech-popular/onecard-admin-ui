@@ -2,7 +2,8 @@
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="工作流名称">
-        <el-input v-model="dataForm.workerBee" placeholder="工作流名称" clearable />
+        <el-input v-model="dataForm.workerBee" placeholder="工作流名称" onkeyup="value=value.replace(/\s/g,'') " 
+        onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -15,6 +16,7 @@
       <el-table-column prop="name" header-align="center" align="center" label="工作流名称"/>
       <el-table-column prop="owner" header-align="center" align="center" label="拥有者"/>
       <el-table-column prop="user" header-align="center" align="center" label="使用者"/>
+      <el-table-column prop="flowCode" header-align="center" align="center" label="工作流编码"/>
       <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参"/>
       <el-table-column prop="description" header-align="center" align="center" label="描述"/>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">

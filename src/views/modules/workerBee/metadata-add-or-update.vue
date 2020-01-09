@@ -113,8 +113,7 @@
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           type: [
-            { required: true, message: '请选择任务类型', trigger: 'change' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择任务类型', trigger: 'change' }
           ],
           description: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
@@ -131,7 +130,7 @@
           outputParams: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          remark: [
+          ownerApp: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },

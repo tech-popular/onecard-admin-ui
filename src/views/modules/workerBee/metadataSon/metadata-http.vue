@@ -4,13 +4,13 @@
         <el-form-item label="URL" prop="url" :rules="dataRule.url">
         <el-input v-model="fatherData.url" placeholder="请输入URL"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组" :rules="dataRule.noKongGe">
+        <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="响应参数的fieldId数组" :rules="dataRule.noKongGe">
+        <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
         <el-input v-model="fatherData.responseFields" placeholder="请输入响应参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="响应参数的数据类型" :rules="dataRule.noKongGe">
+        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
         <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
         </el-form-item>
         <el-form-item label="是否使用缓存">
@@ -19,7 +19,7 @@
             <el-radio :label="1">启用</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="缓存生成的key需要的字段" :rules="dataRule.noKongGe">
+        <el-form-item label="缓存生成的key需要的字段" prop="cacheKeyFields" :rules="dataRule.cacheKeyFields">
         <el-input v-model="fatherData.cacheKeyFields" placeholder="请输入缓存生成的key需要的字段"/>
         </el-form-item>
         <el-form-item label="是否启用">
@@ -50,7 +50,16 @@
             { required: true, message: '请输入URL地址', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          noKongGe: [
+          requestFields: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          responseFields: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          responseType: [
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          cacheKeyFields: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         }

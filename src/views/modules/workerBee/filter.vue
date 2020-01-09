@@ -2,7 +2,7 @@
 <script>
 export default {
   /**
-   * 输入框空格校验
+   * 空格校验
    * @param rule
    * @param value
    * @param callback
@@ -13,6 +13,15 @@ export default {
     if (value !== '' && value !== null && value !== undefined) {
       if (!nullValue.test(value)) {
         callback(new Error('不能输入含空格'))
+      }
+    }
+    callback()
+  },
+  FlowCode: (rule, value, callback) => {
+    const nullValue = /^\w+$/
+    if (value !== '' && value !== null && value !== undefined) {
+      if (!nullValue.test(value)) {
+        callback(new Error('请输入正确格式'))
       }
     }
     callback()
