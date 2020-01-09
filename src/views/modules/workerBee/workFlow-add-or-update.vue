@@ -13,6 +13,9 @@
     <el-form-item label="工作流入参" prop="inputParameters">
       <el-input v-model="dataForm.inputParameters" placeholder="多个参数用英文逗号隔开，例：name,costumerId"/>
     </el-form-item>
+    <el-form-item label="工作流编码" prop="flowCode">
+      <el-input v-model="dataForm.flowCode" placeholder="只能输入英文 数字 和下划线"/>
+    </el-form-item>
     <el-form-item label="返回结果" prop="outputParameters">
       <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
     </el-form-item>
@@ -63,7 +66,8 @@
           ownerApp: '',
           restartable: 0,
           schemaVersion: 0,
-          version: ''
+          version: '',
+          flowCode: ''
         },
         dataRule: {
           name: [
@@ -95,6 +99,11 @@
           ],
           ownerApp: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          flowCode: [
+            { required: true, message: '工作流编码不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' },
+            { required: true, validator: Filter.FlowCode, trigger: 'change' }
           ]
         },
         updateId: ''
