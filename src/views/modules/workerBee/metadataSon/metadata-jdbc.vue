@@ -1,6 +1,6 @@
 <template>
     <div class="aviator">
-      <el-form :model="fatherData" ref="fatherData" label-width="30%">
+      <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
         <el-form-item label="sql" prop="sql" :rules="dataRule.sql">
         <el-input type="textarea" autosize v-model="fatherData.sql" placeholder="请输入sql"/>
         </el-form-item>
