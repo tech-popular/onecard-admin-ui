@@ -62,6 +62,7 @@
                   type="datetime"
                   placeholder="选择日期时间"
                   format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   class="itemIput"
                 >
                 </el-date-picker>
@@ -75,6 +76,7 @@
                   end-placeholder="结束日期"
                   :default-time="['00:00:00']"
                   format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   @change="data => selectEnumsChange(data, item)"
                   class="itemIput-big"
                 >

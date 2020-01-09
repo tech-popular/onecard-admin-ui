@@ -124,6 +124,7 @@ export default {
       indexList: [],
       outParamsIndexList: [],
       expression: '',
+      expressionTemplate: '',
       initFieldType: '',
       initDataStandar: '',
       initFieldCode: '',
@@ -218,6 +219,7 @@ export default {
       this.outParams = []
       this.outParamsIndexList = []
       this.expression = ''
+      this.expressionTemplate = ''
       this.loading = true
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
@@ -253,6 +255,7 @@ export default {
         'rules': []
       }
       this.expression = ''
+      this.expressionTemplate = ''
     },
     getApiInfo (id) { // 查看及编辑时请求数据
       viewApiInfo(id).then(({data}) => {
@@ -289,6 +292,7 @@ export default {
           this.baseForm.outParams = out
           this.ruleConfig = configJson.ruleConfig
           this.expression = configJson.expression
+          this.expressionTemplate = configJson.expressionTemplate
           this.getSelectAllCata((indexList) => {
             this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
             this.outParamsIndexList = this.updateOutParamsList(indexList)
@@ -438,10 +442,13 @@ export default {
     updateConditionId (arr, position, type) { // 每次增删时，遍历一下ruleConfig,更改每个条件的ruleCode   type:增，删，切换且或
       var expArr = []
       var expStr = ''
+      var expArrTemp = []
+      var expStrTemp = ''
       let relation = arr.relation
       function _find (arr, position) {
         var temp = ''
         var exp = []
+        var expTemp = []
         arr.rules.forEach((item, index) => {
           if (position != undefined) {
             temp = position + '_' + index
@@ -457,14 +464,20 @@ export default {
             // 获取表达式
             if (position != undefined) {
               exp.push(item.ruleCode)
+              expTemp.push(`{${item.ruleCode}}`)
               if (index === arr.rules.length - 1) {
                 let str = `(${[...new Set(exp)].join(' ' + arr.relation + ' ')})` // 二级拼接
+                let tempStr = `(${[...new Set(expTemp)].join(' ' + arr.relation + ' ')})` // 二级拼接
                 expArr.push(str)
                 expStr = expArr.join(' ' + relation + ' ') // 所有一级拼接
+                expArrTemp.push(tempStr)
+                expStrTemp = expArrTemp.join(' ' + relation + ' ')
               }
             } else {
               expArr.push(item.ruleCode)
               expStr = expArr.join(' ' + arr.relation + ' ')
+              expArrTemp.push(`{${item.ruleCode}}`)
+              expStrTemp = expArrTemp.join(' ' + arr.relation + ' ')
             }
             // 获取表达式end
           } else {
@@ -477,6 +490,7 @@ export default {
       }
       _find(arr, position)
       this.expression = expStr
+      this.expressionTemplate = expStrTemp
       if (type !== 'switch') {
         this.ruleConfig = arr
       }
@@ -511,11 +525,6 @@ export default {
       if (citem.func === 'between' || citem.func === 'relative_time' || citem.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
       }
-      // let subSelectList = []
-      // if (citem.func === 'relative_time') {
-      //   subSelectList = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
-      // }
-      // this.updateRulesArr(data, citem, { subSelectList: subSelectList, params: params })
       this.updateRulesArr(data, citem, { params: params })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
@@ -656,7 +665,6 @@ export default {
       return arr
     },
     saveHandle () {
-      console.log(this.baseForm)
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -686,7 +694,7 @@ export default {
         } else { // 全部校验通过后，可保存数据
           this.ruleConfig = this.updateRulesConfig(this.ruleConfig) // 过滤数据
           this.baseForm.code = this.code
-          let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)), expression: this.expression, ruleConfig: this.ruleConfig }
+          let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)), expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: this.ruleConfig }
           let url = savaApiInfo
           if (this.id) {
             url = updateApiInfo
