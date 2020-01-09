@@ -3,9 +3,10 @@ import App from '@/App'
 import router from '@/router'                 // api: https://github.com/vuejs/vue-router
 import store from '@/store'                   // api: https://github.com/vuejs/vuex
 import VueCookie from 'vue-cookie'            // api: https://github.com/alfhen/vue-cookie
-// import '@/element-ui'                         // api: https://github.com/ElemeFE/element
-import '@/icons'                              // api: http://www.iconfont.cn/
+// import '@/element-ui'                        // api: https://github.com/ElemeFE/element
+import '@/icons'
 import '@/element-ui-theme'
+                             // api: http://www.iconfont.cn/
 import ElementUI from 'element-ui'
 // import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/scss/index.scss'
@@ -15,6 +16,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import VueClipboard from 'vue-clipboard2'
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
+
 import G6 from '@antv/g6'
 Vue.use(ElementUI)
 Vue.use(VueCodemirror)
