@@ -135,6 +135,7 @@
                 this.dataForm.restartable = data.data.restartable
                 this.dataForm.schemaVersion = data.data.schemaVersion
                 this.dataForm.version = data.data.version
+                this.dataForm.flowCode = data.data.flowCode
               }
             })
           }
