@@ -13,8 +13,11 @@
     <el-form-item label="工作流入参" prop="inputParameters">
       <el-input v-model="dataForm.inputParameters" placeholder="多个参数用英文逗号隔开，例：name,costumerId"/>
     </el-form-item>
-    <el-form-item label="工作流编码" prop="flowCode">
-      <el-input v-model="dataForm.flowCode" placeholder="只能输入英文 数字 和下划线"/>
+    <el-form-item v-show="!dataForm.id ? true : false" label="工作流编码" prop="flowCode">
+      <el-input v-model="dataForm.flowCode"  placeholder="只能输入英文 数字 和下划线"/>
+    </el-form-item>
+    <el-form-item v-show="!dataForm.id ? false : true" label="工作流编码">
+      <el-input v-model="dataForm.flowCode" :disabled="true"  placeholder="只能输入英文 数字 和下划线"/>
     </el-form-item>
     <el-form-item label="返回结果" prop="outputParameters">
       <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
