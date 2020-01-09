@@ -111,8 +111,8 @@
         ],
         sourceDatasource: [ // 指标数据源
           {
-            typeNum: 'table1',
-            typeValue: 'table1'
+            typeNum: 'adb_user_label_res_da',
+            typeValue: 'adb_user_label_res_da'
           }
         ],
         enumTypeNumList: [// 枚举类型
