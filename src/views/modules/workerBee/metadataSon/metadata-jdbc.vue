@@ -59,8 +59,7 @@
       return {
         dataRule: {
           sql: [
-            { required: true, message: '请输入sql', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请输入sql', trigger: 'blur' }
           ],
           isQuery: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
