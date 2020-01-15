@@ -1,8 +1,11 @@
 <template>
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="API名称">
-        <el-input v-model="dataForm.name" placeholder="API名称" clearable />
+      <el-form-item label="分群ID">
+        <el-input v-model="dataForm.name" placeholder="分群ID" clearable />
+      </el-form-item>
+      <el-form-item label="分群名称">
+        <el-input v-model="dataForm.name" placeholder="分群名称" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -11,9 +14,9 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="API名称"></el-table-column>
-      <el-table-column prop="desc" header-align="center" align="center" label="API说明">
+      <el-table-column prop="id" header-align="center" align="center" label="分群ID"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="分群名称"></el-table-column>
+      <el-table-column prop="desc" header-align="center" align="center" label="分群说明">
         <template slot-scope="scope">
           <el-tooltip placement="right" v-if="scope.row.desc.length > 10">
           <div slot="content" style="max-width: 200px;line-height: 1.5">{{scope.row.desc}}</div>
@@ -22,14 +25,13 @@
         <span v-else>{{scope.row.desc}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
-      <!-- <el-table-column prop="updator" header-align="center" align="center" label="修改人"></el-table-column> -->
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
-      <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
+      <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
+      <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'update')">编辑</el-button>
-          <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+          <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -46,12 +48,13 @@
 </template>
 
 <script>
-  import { apiManageList } from '@/api/dataAnalysis/apiManage'
-  import AddOrUpdate from './baseComponents/apiManage-add-or-update'
+  import { dataInsightManageList, deleteDataInfo } from '@/api/dataAnalysis/dataInsightManage'
+  import AddOrUpdate from './baseComponents/dataInsightManage-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
+          id: '',
           name: ''
         },
         dataList: [],
@@ -77,7 +80,7 @@
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
-        apiManageList(params).then(({data}) => {
+        dataInsightManageList(params).then(({data}) => {
           this.dataListLoading = false
           if (data.status !== '1' || !data.data || !data.data.list.length) {
             this.dataList = []
@@ -95,6 +98,30 @@
           this.$refs.addOrUpdate.init(row, tag)
         })
       },
+      // 删除
+      deleteHandle (row) {
+        this.$confirm(`确认删除分群名称为【${row.name}】的数据?`, '提示', {
+          confirmButtonText: '删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteDataInfo(row.id).then(({data}) => {
+            if (data.status !== '1') {
+              return this.$message({
+                type: 'error',
+                message: data.message
+              })
+            }
+            this.$message({
+              type: 'success',
+              message: data.message
+            })
+            this.getDataList()
+          })
+        }).catch(() => {
+          // console.log('quxiao')
+        })
+      },
       /** 查询 */
       searchHandle () {
         this.pageNum = 1
@@ -104,7 +131,8 @@
       resetHandle () {
         this.pageNum = 1
         this.dataForm = {
-          name: ''
+          name: '',
+          id: ''
         }
         this.getDataList()
       },

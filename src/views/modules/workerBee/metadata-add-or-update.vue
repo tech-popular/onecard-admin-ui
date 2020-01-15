@@ -109,7 +109,8 @@
         ruleTypeList: [],
         dataRule: {
           name: [
-            { required: true, validator: checkDecisionName, trigger: 'change' }
+            { required: true, validator: checkDecisionName, trigger: 'change' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           type: [
             { required: true, message: '请选择任务类型', trigger: 'change' }
