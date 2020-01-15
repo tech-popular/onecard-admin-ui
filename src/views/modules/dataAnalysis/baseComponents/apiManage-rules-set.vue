@@ -54,21 +54,22 @@
               </el-form-item>
             </div>
             <!--时间-->
-            <div v-if="item.fieldType === 'date'" class="pane-rules-inline">
+            <div v-if="item.fieldType === 'date'" class="pane-rules-inline pane-rules-datetime">
               <!--绝对时间-->
-              <el-form-item v-if="isDateSingleShow(item)" prop="params[0].value" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+              <el-form-item v-show="isDateSingleShow(item)" :ref="'datetime' + item.ruleCode" prop="params[0].datetime" :rules="{required: isRequired && isDateSingleShow(item), message: '请选择', trigger: 'change'}">
                 <el-date-picker
-                  v-model="item.params[0].value"
+                  v-model="item.params[0].datetime"
                   type="datetime"
                   placeholder="选择日期时间"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
+                  @change="data => selectDateTimeChange(data, item)"
                   class="itemIput"
                 >
                 </el-date-picker>
               </el-form-item>
               <!--区间-->
-              <el-form-item v-if="item.func === 'between'" prop="params[0].selectVal" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+              <el-form-item v-show="item.func === 'between'" :ref="'datetimerange' + item.ruleCode" prop="params[0].selectVal" :rules="{required: isRequired && item.func === 'between', message: '请选择', trigger: 'change'}">
                 <el-date-picker
                   v-model="item.params[0].selectVal"
                   type="datetimerange"
@@ -106,7 +107,6 @@
           </div>
           <el-form-item class="btn-group">
             <!-- <i class="el-icon-edit cursor-pointer"></i> -->
-            <!-- <i class="el-icon-info cursor-pointer" style="color:#409eff"></i> -->
             <el-tooltip v-if="item.func === 'relative_time_in'" placement="top">
               <div slot="content" v-html="toolTipContent(item)"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
@@ -215,6 +215,10 @@ export default {
     },
     selectOperateChange (val, ruleItem) { // 操作符改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
+      if (ruleItem.fieldType === 'date') { // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
+        this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
+        this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
+      }
     },
     selectOperateVisible (val, ruleItem) { // 当操作符下拉框打开时，重新下拉请求数据
       if (val) { // 打开下拉框时
@@ -231,8 +235,11 @@ export default {
         this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem)
       }
     },
-    selectEnumsChange (val, ruleItem) {
+    selectEnumsChange (val, ruleItem) { // 处理一下多选的数据
       this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem)
+    },
+    selectDateTimeChange (val, ruleItem) { // 处理一下时间数据
+      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem)
     },
     isDateSingleShow (item) { // 单时间日期是否显示
       let showSingleArr = ['eq', 'neq', 'gt', 'lt', 'ge', 'le']
@@ -329,5 +336,8 @@ export default {
   }
   .itemOperateIput {
     width: 180px;
+  }
+  .pane-rules-datetime {
+    position: relative;
   }
 </style>
