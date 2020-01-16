@@ -10,3 +10,4 @@ export const savaDataInfo = params => httpPost(da + 'data/group/info', params) /
 export const updateDataInfo = params => httpPut(da + 'data/group/info', params) // 编辑保存
 export const viewDataInfo = id => httpGet(da + `data/group/info/${id}`) // 根据主键ID查询配置信息
 export const deleteDataInfo = id => httpDelete(da + `data/group/${id}`) // 根据主键ID删除配置信息
+export const dataPreviewInfo = params => httpPut(da + 'data/group/preview', params) // 数据预览
