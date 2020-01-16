@@ -37,16 +37,16 @@
       </div>
     </div>
     <div class="footer">
-      <!-- <el-button type="success" @click="previewHandle" size="small">数据预览</el-button> -->
-      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view'">保存</el-button>
+      <el-button type="success" @click="saveHandle('preview')" size="small">数据预览</el-button>
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
-    <!-- <data-preview-info v-if="isPreviewShow" ref="dataPreview"></data-preview-info> -->
+    <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo"></data-preview-info>
   </el-drawer>
 </template>
 <script>
 import rulesSet from './apiManage-rules-set'
-// import dataPreview from './data-preview-info'
+import dataPreviewInfo from './data-preview-info'
 import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -54,7 +54,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
     return {
-      // isPreviewShow: false,
+      isPreviewShow: true,
       loading: false,
       id: '',
       flowId: '',
@@ -91,7 +91,7 @@ export default {
       }
     }
   },
-  components: { rulesSet, Treeselect },
+  components: { rulesSet, Treeselect, dataPreviewInfo },
   methods: {
     init (row, tag) {
       this.id = ''
@@ -519,14 +519,14 @@ export default {
       })
       return arr
     },
-    // previewHandle () {
-    //   this.isPreviewShow = true
-    //   this.$nextTick(() => {
-    //     console.log(this.$refs)
-    //     // this.$refs.dataPreviewInfo.init()
-    //   })
-    // },
-    saveHandle () {
+    previewHandle () {
+      this.isPreviewShow = true
+      this.$nextTick(() => {
+        console.log(this.$refs)
+        this.$refs.dataPreviewInfo.init()
+      })
+    },
+    saveHandle (type) {
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -554,15 +554,21 @@ export default {
         if (!flag) {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
-          this.ruleConfig = this.updateRulesConfig(this.ruleConfig) // 过滤数据
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: this.ruleConfig }
+          let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig }
+          if (type === 'preview') {
+            this.isPreviewShow = true
+            this.$nextTick(() => {
+              this.$refs.dataPreviewInfo.init(params)
+            })
+            return
+          }
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
             params.id = this.id
             params.flowId = this.flowId
           }
-          console.log(params)
           url(params).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({

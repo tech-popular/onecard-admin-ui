@@ -2,7 +2,7 @@
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="分群ID">
-        <el-input v-model="dataForm.name" placeholder="分群ID" clearable />
+        <el-input v-model="dataForm.id" placeholder="分群ID" clearable />
       </el-form-item>
       <el-form-item label="分群名称">
         <el-input v-model="dataForm.name" placeholder="分群名称" clearable />

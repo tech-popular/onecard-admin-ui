@@ -34,7 +34,13 @@
           <el-form-item label="API入参" prop="inParam">
             <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
           </el-form-item>
-          <el-form-item label="API出参" prop="outParams">
+          <el-form-item label="API模式" prop="outType">
+            <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
+              <el-radio label="INDICATOR">选择模式</el-radio>
+              <el-radio label="JUDGE">判断模式（返回值为是/否在此分群）</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="API出参" prop="outParams" v-if="baseForm.outType==='INDICATOR'">
             <Treeselect
               :options="outParamsIndexList"
               :disable-branch-nodes="true"
@@ -96,6 +102,13 @@ export default {
         callback()
       }
     }
+    let validateApiOutParams = (rule, value, callback) => {
+      if (!this.baseForm.outParams.length) {
+        callback(new Error('请选择API出参'))
+      } else {
+        callback()
+      }
+    }
     return {
       loading: false,
       inParamsList: [
@@ -139,6 +152,7 @@ export default {
         name: '',
         inParam: '',
         desc: '',
+        outType: '',
         outParams: [],
         department: '',
         apiName: ''
@@ -154,8 +168,11 @@ export default {
         inParam: [
           { required: true, message: '请选择API入参', trigger: 'change' }
         ],
+        outType: [
+          { required: true, message: '请选择API模式', trigger: 'change' }
+        ],
         outParams: [
-          { required: true, message: '请选择API出参', trigger: 'change' }
+          { validator: validateApiOutParams, trigger: 'input' }
         ],
         department: [
           { required: true, message: '请选择一级事业群', trigger: 'change' }
@@ -280,7 +297,8 @@ export default {
             inParam: configJson.inParam,
             desc: configJson.desc,
             department: configJson.department,
-            apiName: configJson.apiName
+            apiName: configJson.apiName,
+            outType: configJson.outType
           }
           this.originDepartment = configJson.department
           this.originApiName = configJson.apiName
@@ -312,6 +330,12 @@ export default {
     inParamChange () { // 消除入参错误提示
       if (this.baseForm.inParam) {
         this.$refs.baseForm.clearValidate('inParam')
+      }
+    },
+    outTypeChange (val) {
+      if (val === 'JUDGE') {
+        this.baseForm.outParams = []
+        this.outParams = []
       }
     },
     updateOutParamsList (indexList) { // 获取出参默认展开列表
@@ -660,6 +684,7 @@ export default {
       if (this.outParams.length) {
         this.$refs.baseForm.clearValidate('outParams')
       }
+      console.log(this.outParams)
     },
     outParamsDeselect (node) { // 删除出参
       this.outParams = this.outParams.filter(item => item.onlyId !== node.id)
@@ -691,6 +716,7 @@ export default {
       return arr
     },
     saveHandle () {
+      console.log(this.baseForm, this.outParams)
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -704,6 +730,7 @@ export default {
       this.$nextTick(() => { // 待页面中的isRequired = true后再执行校验
         let flag = true
         this.$refs.baseForm.validate((valid) => {
+          console.log(11, valid)
           if (!valid) {
             flag = false
           }
