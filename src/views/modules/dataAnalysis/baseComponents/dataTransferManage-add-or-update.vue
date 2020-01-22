@@ -573,6 +573,12 @@
       },
 
       init (row, tag) { // 打开抽屉弹窗
+        this.baseForm.transferName = ''
+        this.baseForm.taskDescribtion = ''
+        this.baseForm.jobType = 1
+        this.baseForm.onceRunTime = ''
+        this.baseForm.runCycle = 'DAY'
+        this.baseForm.outParams = null
         this.baseForm.templateId = row ? row.id : ''
         this.tag = tag == 'edit' ? '编辑' : '新建'
         this.visible = true
@@ -580,7 +586,7 @@
         this.outParamsList = []
         this.getOutParamsList(row)
         this.$nextTick(() => {
-          // this.$refs['baseForm'].resetFields()
+          this.$refs['baseForm'].resetFields()
           if (tag) {
             this.dataDisplay(row)
           }
@@ -589,8 +595,6 @@
 
       drawerClose () { // 关闭抽屉弹窗
         this.visible = false
-        this.baseForm.jobType = 1
-        this.baseForm.runCycle = 'DAY'
         this.$parent.addOrUpdateVisible = false
       },
 
@@ -607,11 +611,7 @@
                     duration: 1500,
                     onClose: () => {
                       this.$emit('refreshDataList')
-                      this.$refs['baseForm'].resetFields()
                       this.visible = false
-                      this.baseForm.jobType = 1
-                      this.baseForm.runCycle = 'DAY'
-                      this.baseForm.outParams = null
                     }
                   })
                 } else {
@@ -627,11 +627,7 @@
                     duration: 1500,
                     onClose: () => {
                       this.$emit('refreshDataList')
-                      this.$refs['baseForm'].resetFields()
                       this.visible = false
-                      this.baseForm.jobType = 1
-                      this.baseForm.runCycle = 'DAY'
-                      this.baseForm.outParams = null
                     }
                   })
                 } else {
@@ -645,8 +641,6 @@
 
       cancelHandle () {
         this.visible = false
-        this.baseForm.jobType = 1
-        this.baseForm.runCycle = 'DAY'
         this.$parent.addOrUpdateVisible = false
       }
     }
