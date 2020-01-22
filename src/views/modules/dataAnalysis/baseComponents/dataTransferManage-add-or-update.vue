@@ -244,7 +244,7 @@
         baseForm: {
           transferName: '', // 任务名称
           templateId: '', // 分群ID
-          outParams: null,
+          outParams: [],
           taskDescribtion: '', // 描述
           jobType: 1, // 周期
           onceRunTime: '', // 运行一次运行时间
@@ -578,7 +578,7 @@
         this.baseForm.jobType = 1
         this.baseForm.onceRunTime = ''
         this.baseForm.runCycle = 'DAY'
-        this.baseForm.outParams = null
+        this.baseForm.outParams = []
         this.baseForm.templateId = row ? row.id : ''
         this.tag = tag == 'edit' ? '编辑' : '新建'
         this.visible = true
@@ -587,6 +587,7 @@
         this.getOutParamsList(row)
         this.$nextTick(() => {
           this.$refs['baseForm'].resetFields()
+  
           if (tag) {
             this.dataDisplay(row)
           }
