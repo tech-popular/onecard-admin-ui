@@ -6,17 +6,20 @@
     :append-to-body="true"
     class="prevuew-dialog"
   >
-    <div slot="title" class="title">本次用户分群共筛选出 <span>{{totalNum}} </span>条数据</div>
+    <div slot="title" class="title">本次用户分群共筛选出 <span>{{totalNum}}</span> 条数据</div>
     <div class="column-filter">
       <el-button class="column-filter-btn" type="success" size="small">字段筛选</el-button>
       <el-select v-model="checkedColumn" multiple placeholder="请选择">
         <el-option v-for="(item, index) in totalTableColumns" :key="index" :label="item.name" :value="item.value"></el-option>
       </el-select>
     </div>
-    <el-table :data="tableData" border>
+    <el-table :data="tableData" border v-loading="loading">
       <el-table-column :prop="item.value" header-align="center" align="center" :label="item.name" v-for="(item, index) in tableColumns" :key="index"></el-table-column>
     </el-table>
     <p>注：随机抽取数据供参考</p>
+    <div slot="footer">
+      <el-button type="primary" size="small" @click="visible=false">确 定</el-button>
+    </div>
   </el-dialog>
 </template>
 <script>
@@ -24,6 +27,7 @@ import { dataPreviewInfo } from '@/api/dataAnalysis/dataInsightManage'
 export default {
   data () {
     return {
+      loading: false,
       visible: false,
       isColumnShow: false,
       totalTableColumns: [],
@@ -60,12 +64,14 @@ export default {
       this.getPreviewInfo(params)
     },
     getPreviewInfo (params) {
+      this.loading = true
       this.totalTableColumns = []
       this.checkedColumn = []
       dataPreviewInfo(params).then(({data}) => {
         if (data.status !== '1') {
           this.totalNum = 0
           this.tableData = []
+          this.loading = false
           return this.$message({
             type: 'error',
             message: data.message || '数据异常'
@@ -84,6 +90,9 @@ export default {
           for (let i = 0; i < initColumns.length; i++) {
             this.checkedColumn.push(initColumns[i].value)
           }
+          this.$nextTick(() => {
+            this.loading = false
+          })
         }
       })
     }

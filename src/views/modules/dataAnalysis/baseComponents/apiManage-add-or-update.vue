@@ -172,7 +172,7 @@ export default {
           { required: true, message: '请选择API模式', trigger: 'change' }
         ],
         outParams: [
-          { validator: validateApiOutParams, trigger: 'input' }
+          { required: true, validator: validateApiOutParams, trigger: 'input' }
         ],
         department: [
           { required: true, message: '请选择一级事业群', trigger: 'change' }
