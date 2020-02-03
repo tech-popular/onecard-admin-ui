@@ -444,7 +444,7 @@
       },
 
       outParamsDeselect (node) { // 删除出参
-        this.outParams = this.outParams.filter(item => item.id !== node.id)
+        this.outParams = this.outParams.filter(item => item.id !== node.fieldId)
       },
 
       updateOutParamsList (indexList) { // 获取出参，默认展开列表
