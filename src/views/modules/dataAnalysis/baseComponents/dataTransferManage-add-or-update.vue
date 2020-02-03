@@ -278,11 +278,6 @@
           {value: 7, label: '周六'}
         ],
         dayOfMonthsList: [
-          {value: 1, label: '每月1号'},
-          {value: 2, label: '每月2号'},
-          {value: 3, label: '每月3号'},
-          {value: 31, label: '每月31号'},
-          {value: -1, label: '每月最后一天'}
         ],
         kafkaServerList: [],
         sftpServerList: [],
@@ -322,6 +317,7 @@
     },
 
     mounted () {
+      this.dataAssembly()
       this.getCusterList()
       this.getKafkaServerList()
     },
@@ -338,6 +334,16 @@
         if (action === LOAD_CHILDREN_OPTIONS) {
           callback()
         }
+      },
+
+      //  调度周期 月 数据组装
+      dataAssembly () {
+        let tempArry = []
+        for (let i = 1, j = 32; i < j; i++) {
+          tempArry.push({value: i, label: '每月' + i + '号'})
+        }
+        tempArry.push({value: -1, label: '每月最后一天'})
+        this.dayOfMonthsList = tempArry
       },
 
       // 清洗数据，按selectVue的格式重新组织指标数据
