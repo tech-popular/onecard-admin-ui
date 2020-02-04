@@ -11,8 +11,8 @@
     <div class="wrap" v-loading="loading">
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form">
         <el-form-item v-if="baseForm.transferName" label="任务名称" style="width:50%">
-            <el-input v-model.trim="baseForm.transferName" class="base-pane-item" readonly />
-          </el-form-item>
+          <el-input v-model.trim="baseForm.transferName" class="base-pane-item" readonly />
+        </el-form-item>
         <div class="base-pane">
           <h3>基本信息</h3>
             <el-form-item label="分群ID" prop="templateId">
@@ -696,7 +696,7 @@
       }
     }
     & .vue-treeselect {
-      height: 38px;
+      min-height: 38px;
       line-height: 24px;
     }
     & .base-pane {
