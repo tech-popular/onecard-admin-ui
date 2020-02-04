@@ -53,8 +53,7 @@
       return {
         dataRule: {
           cql: [
-            { required: true, message: '请输入cql', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请输入cql', trigger: 'blur' }
           ],
           isQuery: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }

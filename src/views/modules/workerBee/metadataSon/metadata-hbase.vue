@@ -1,11 +1,11 @@
 <template>
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
-        <el-form-item label="数据源地址编号" prop="zookeeperQuorumId" :rules="dataRule.zookeeperQuorumId">
-        <el-input type="number" autosize v-model="fatherData.zookeeperQuorumId" placeholder="请输入数据源地址编号"/>
+        <el-form-item label="数据源地址编号" prop="zookeeperQuorumId">
+        <el-input autosize v-model="fatherData.zookeeperQuorumId" placeholder="请输入数据源地址编号"/>
         </el-form-item>
-        <el-form-item label="hbase表名" prop="tableName">
-        <el-input v-model="fatherData.tableName" placeholder="请输入hbase表名"/>
+        <el-form-item label="HBASE表名" prop="tableName">
+        <el-input v-model="fatherData.tableName" placeholder="请输入HBASE表名"/>
         </el-form-item>
         <el-form-item label="列簇名" prop="familyName">
         <el-input v-model="fatherData.familyName" placeholder="请输入列簇名"/>
@@ -37,7 +37,6 @@
 </template>
 
 <script>
-  import Filter from '../filter'
   export default {
     props: [
       'hideVisibleClick',
@@ -46,26 +45,11 @@
     data () {
       return {
         dataRule: {
-          sql: [
-            { required: true, message: '请输入sql', trigger: 'blur' }
+          zookeeperQuorumId: [
+            { required: true, message: '请输入数据源地址编号', trigger: 'blur' }
           ],
-          isQuery: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          requestFields: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          responseFields: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          responseType: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          datasourceId: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          cacheKeyFields: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          tableName: [
+            { required: true, message: '请输入hbase表名', trigger: 'blur' }
           ]
         }
       }
