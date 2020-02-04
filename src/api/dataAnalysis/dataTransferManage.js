@@ -11,4 +11,5 @@ export const lowerDataTransferManage = (id) => httpGet(da + `dataTransfer/trigge
 export const dataTransferManageCuster = () => httpGet(da + `data/group/select/available`) // 分群ID
 export const dataTransferManageOutParams = () => httpGet(da + `dataCatalog/selectAllCata`) // 分群出参
 export const dataTransferManageOutParamsEdit = (id) => httpGet(da + `dataTransferOutParams/outParams/${id}`) // 修改回显时查询出参
-export const dataTransferManagekafka = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // kafka地址
+export const dataTransferManageKafka = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // kafka地址
+export const dataTransferManageMysql = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
