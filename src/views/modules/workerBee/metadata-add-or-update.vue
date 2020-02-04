@@ -59,6 +59,10 @@
     <metadata-freemarke
     v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
+    <!-- HBASE 类型8 -->
+    <metadataHbase
+    v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHbase"/>
     </el-form>
    
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
@@ -76,6 +80,7 @@
   import metadataGroovy from './metadataSon/metadata-groovy'
   import metadataAviator from './metadataSon/metadata-aviator'
   import metadataFreemarke from './metadataSon/metadata-freemarke'
+  import metadataHbase from './metadataSon/metadata-hbase'
 
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   import Filter from './filter'
@@ -147,7 +152,8 @@
       metadataCassandra, // CASSANDRA
       metadataGroovy, // GROOVY
       metadataAviator, // AVIATOR
-      metadataFreemarke // Freemarke
+      metadataFreemarke, // Freemarke
+      metadataHbase // Hbase
     },
     methods: {
       init (id, value) {
@@ -218,7 +224,8 @@
               'cassandra': null,
               'groovy': null,
               'aviator': null,
-              'freemarker': null
+              'freemarker': null,
+              'hbase': null
             }
             if (form) {
               for (let key in data) {
