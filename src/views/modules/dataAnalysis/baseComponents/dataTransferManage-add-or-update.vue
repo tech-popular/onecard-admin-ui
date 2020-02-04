@@ -167,29 +167,23 @@
           <el-row :gutter="20">
             <el-col style="width: 6.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
-                <el-tooltip effect="light" content="暂未开放" placement="top">
-                  <el-checkbox label="mysql" v-model="baseForm.transferType" style="margin-left: 8px;" disabled></el-checkbox>
-                </el-tooltip>
+                  <el-checkbox label="mysql" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item  prop="mysqlServer">
-                <el-tooltip effect="light" content="暂未开放" placement="top">
                   <el-select
                     v-model= "baseForm.mysqlServer"
-                    multiple
                     collapse-tags
-                    disabled
                     style="margin-left: 5px; width:220px;"
                     placeholder="请选择">
                     <el-option
-                      v-for="item in sftpServerList"
+                      v-for="item in mysqlServerList"
                       :key="item.id"
-                      :label="item.serverLocation"
+                      :label="item.name"
                       :value="item.id">
                     </el-option>
                   </el-select>
-                </el-tooltip>
               </el-form-item>
             </el-col>
           </el-row>
@@ -203,7 +197,7 @@
   </el-drawer>
 </template>
 <script>
-  import { addDataTransferManage, updateDataTransferManage, dataTransferManageOutParams, dataTransferManageOutParamsEdit, dataTransferManageCuster, dataTransferManagekafka, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
+  import { addDataTransferManage, updateDataTransferManage, dataTransferManageOutParams, dataTransferManageOutParamsEdit, dataTransferManageCuster, dataTransferManageKafka, dataTransferManageMysql, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -211,7 +205,6 @@
     data () {
       // 验证枚举类型的函数
       let validateKafkaServer = (rule, value, callback) => {
-        // 当枚举类型为空值且为必填时，抛出错误，反之通过校验
         if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
           callback(new Error('请选择数据源'))
         } else {
@@ -221,7 +214,6 @@
 
       // topic验证
       let validateKafkaServerTopic = (rule, value, callback) => {
-        // 当枚举类型为空值且为必填时，抛出错误，反之通过校验
         if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer != '' && this.baseForm.topic === '') {
           callback(new Error('请输入topic'))
         } else {
@@ -229,9 +221,8 @@
         }
       }
 
-      let validateSftpServer = (rule, value, callback) => {
-        // 当枚举类型为空值且为必填时，抛出错误，反之通过校验
-        if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.kafkaServer === '') {
+      let validateMysqlServer = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
           callback(new Error('请选择数据源'))
         } else {
           callback()
@@ -280,7 +271,7 @@
         dayOfMonthsList: [
         ],
         kafkaServerList: [],
-        sftpServerList: [],
+        mysqlServerList: [],
         baseRule: {
           templateId: [
             { required: true, message: '请选择分群ID', trigger: 'change' }
@@ -310,7 +301,7 @@
             { validator: validateKafkaServerTopic }
           ],
           mysqlServer: [
-            { validator: validateSftpServer }
+            { validator: validateMysqlServer }
           ]
         }
       }
@@ -320,6 +311,7 @@
       this.dataAssembly()
       this.getCusterList()
       this.getKafkaServerList()
+      this.getMysqlServerList()
     },
 
     computed: {
@@ -431,9 +423,21 @@
         let params = {
           type: 'kafka'
         }
-        dataTransferManagekafka(params).then(({data}) => {
+        dataTransferManageKafka(params).then(({data}) => {
           if (data && data.status === '1') {
             this.kafkaServerList = data.data
+          }
+        })
+      },
+
+      // mysql 数据源
+      getMysqlServerList () {
+        let params = {
+          type: 'mysql'
+        }
+        dataTransferManageMysql(params).then(({data}) => {
+          if (data && data.status === '1') {
+            this.mysqlServerList = data.data
           }
         })
       },
@@ -481,17 +485,19 @@
         postData.datasourceParams = []
         if (data.kafkaServer != '') {
           let tempServer = {
+            type: 'kafka',
             id: data.kafkaServer,
             topic: data.topic
           }
           postData.datasourceParams.push(tempServer)
         }
-        // if (data.mysqlServer != '') {
-        //   let tempServer = {
-        //     id: data.mysqlServer
-        //   }
-        //   postData.datasourceParams.push(tempServer)
-        // }
+        if (data.mysqlServer != '') {
+          let tempServer = {
+            type: 'mysql',
+            id: data.mysqlServer
+          }
+          postData.datasourceParams.push(tempServer)
+        }
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
@@ -536,11 +542,14 @@
             this.baseForm.templateId = disData.templateId
             this.baseForm.taskDescribtion = disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
-            this.baseForm.kafkaServer = disData.datasourceParams[0].id
-            this.baseForm.topic = disData.datasourceParams[0].topic
-            if (disData.datasourceParams[1]) {
-              this.baseForm.mysqlServer = disData.datasourceParams[1].id
-            }
+            disData.datasourceParams.forEach((item, index) => {
+              if (item.type == 'kafka') {
+                this.baseForm.kafkaServer = item.id
+                this.baseForm.topic = item.topic
+              } else if (item.type == 'mysql') {
+                this.baseForm.mysqlServer = item.id
+              }
+            })
             let tempTime = disData.taskScheduleConfig
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONLY_ONE':
