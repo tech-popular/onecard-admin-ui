@@ -16,6 +16,9 @@
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
         <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
         </el-form-item>
+        <el-form-item label="数据源id" prop="datasourceId">
+        <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
+        </el-form-item>
         <el-form-item label="是否使用缓存">
           <el-radio-group v-model="fatherData.enableCache">
             <el-radio :label="0">不启用</el-radio>
@@ -50,8 +53,7 @@
       return {
         dataRule: {
           cql: [
-            { required: true, message: '请输入cql', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请输入cql', trigger: 'blur' }
           ],
           isQuery: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
