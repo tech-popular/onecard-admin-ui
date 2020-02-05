@@ -199,6 +199,7 @@ export default {
       return val
     },
     blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
+      val = val + '' // 数据转为字符串
       if (val[val.length - 1] === '.') { // 最后一位为小数点时，则删除小数点
         val = val.substring(0, val.length - 1)
       }
