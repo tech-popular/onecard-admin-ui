@@ -4,14 +4,17 @@
         <el-form-item label="cql" prop="cql" :rules="dataRule.cql">
         <el-input type="textarea" autosize v-model="fatherData.cql" placeholder="请输入cql"/>
         </el-form-item>
+        <el-form-item label="数据源id" prop="datasourceId">
+        <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
+        </el-form-item>
         <el-form-item label="is_query" prop="isQuery" :rules="dataRule.isQuery">
         <el-input v-model="fatherData.isQuery" placeholder="is_query"/>
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>
-        <el-form-item label="数据源id" prop="datasourceId">
-        <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
+        <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
+        <el-input v-model="fatherData.responseFields" placeholder="请输入响应参数的fieldId数组"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
         <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
@@ -51,6 +54,9 @@
         dataRule: {
           cql: [
             { required: true, message: '请输入cql', trigger: 'blur' }
+          ],
+          datasourceId: [
+            { required: true, message: '请输入数据源id', trigger: 'blur' }
           ],
           isQuery: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
