@@ -2,7 +2,7 @@
     <div class="aviator">
       <el-form :model="fatherData" ref="fatherData" label-width="30%">
         <el-form-item label="cql" prop="cql" :rules="dataRule.cql">
-        <el-input v-model="fatherData.cql" placeholder="请输入cql"/>
+        <el-input type="textarea" autosize v-model="fatherData.cql" placeholder="请输入cql"/>
         </el-form-item>
         <el-form-item label="is_query" prop="isQuery" :rules="dataRule.isQuery">
         <el-input v-model="fatherData.isQuery" placeholder="is_query"/>
