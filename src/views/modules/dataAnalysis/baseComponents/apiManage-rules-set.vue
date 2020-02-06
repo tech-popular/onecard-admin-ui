@@ -195,7 +195,7 @@ export default {
       if (val.length > 1 && val[val.length - 1] === '-') { // 只能有一个’-‘
         val = val.substring(0, val.length - 1)
       }
-      val = val.replace(/[^(-.\d]/g, '') // 清除“数字”和“.”以外的字符
+      val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
       return val
     },
     blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
