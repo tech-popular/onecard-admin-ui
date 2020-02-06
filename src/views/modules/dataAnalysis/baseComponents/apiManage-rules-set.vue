@@ -170,7 +170,7 @@ export default {
     judgeDateTwoInput (rule, value, callback, params) { // 数值介于判断
       if (value === '') {
         callback(new Error('请输入'))
-      } else if (params[0].value <= params[1].value) {
+      } else if (params[0].value * 1 <= params[1].value * 1) {
         callback(new Error('起始数值应大于终止数值'))
       } else {
         callback()
@@ -179,7 +179,7 @@ export default {
     judgeNumberTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {
         callback(new Error('请输入'))
-      } else if (params[0].value >= params[1].value) {
+      } else if (params[0].value * 1 >= params[1].value * 1) {
         callback(new Error('起始数值应小于终止数值'))
       } else {
         callback()
@@ -215,7 +215,7 @@ export default {
     },
     pramasNumBlur (item, val) { // 数值 介于的判断
       let params = item.params
-      if (params[0].value < params[1].value) {
+      if (params[0].value * 1 < params[1].value * 1) {
         this.$refs['paramsl' + item.ruleCode][0].clearValidate()
         this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
@@ -223,7 +223,7 @@ export default {
     },
     pramasDateBlur (item, val) { // 时间 区间的判断
       let params = item.params
-      if (params[0].value > params[1].value) {
+      if (params[0].value * 1 > params[1].value * 1) {
         this.$refs['paramsl' + item.ruleCode][0].clearValidate()
         this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
