@@ -34,15 +34,17 @@
             <div v-if="item.fieldType === 'number'"  class="pane-rules-inline">
               <div v-if="item.func === 'between'"  class="pane-rules-inline">
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur' }">
-                  <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small" @blur="pramasNumBlur(item)"></el-input-number>
+                  <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasNumBlur(item, item.params[0].value)"></el-input>
                 </el-form-item>
                 于
                 <el-form-item prop="params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small" @blur="pramasNumBlur(item)"></el-input-number> 之间
+                  <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-number" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasNumBlur(item, item.params[1].value)"></el-input> 之间
                 </el-form-item>
               </div>
               <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
-                <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput"></el-input-number>
+                <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput"></el-input-number> -->
+                <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
               </el-form-item>
             </div>
             <!--enums-->
@@ -54,21 +56,22 @@
               </el-form-item>
             </div>
             <!--时间-->
-            <div v-if="item.fieldType === 'date'" class="pane-rules-inline">
+            <div v-if="item.fieldType === 'date'" class="pane-rules-inline pane-rules-datetime">
               <!--绝对时间-->
-              <el-form-item v-if="isDateSingleShow(item)" prop="params[0].value" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+              <el-form-item v-show="isDateSingleShow(item)" :ref="'datetime' + item.ruleCode" prop="params[0].datetime" :rules="{required: isRequired && isDateSingleShow(item), message: '请选择', trigger: 'change'}">
                 <el-date-picker
-                  v-model="item.params[0].value"
+                  v-model="item.params[0].datetime"
                   type="datetime"
                   placeholder="选择日期时间"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
+                  @change="data => selectDateTimeChange(data, item)"
                   class="itemIput"
                 >
                 </el-date-picker>
               </el-form-item>
               <!--区间-->
-              <el-form-item v-if="item.func === 'between'" prop="params[0].selectVal" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+              <el-form-item v-show="item.func === 'between'" :ref="'datetimerange' + item.ruleCode" prop="params[0].selectVal" :rules="{required: isRequired && item.func === 'between', message: '请选择', trigger: 'change'}">
                 <el-date-picker
                   v-model="item.params[0].selectVal"
                   type="datetimerange"
@@ -86,7 +89,8 @@
               <div v-if="item.func === 'relative_before' || item.func === 'relative_within'" class="pane-rules-inline">
                 <!-- 在&nbsp; -->
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number>
+                  <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number> -->
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
                 </el-form-item>
                 天&nbsp;
               </div>
@@ -94,11 +98,11 @@
               <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"  @blur="pramasDateBlur(item)" :min="1"></el-input-number>
+                  <el-input v-model="item.params[0].value" :maxlength="10" class="itemIput-small" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)" :min="1"></el-input>
                 </el-form-item>
                 天&nbsp;到&nbsp;过去&nbsp;
                 <el-form-item prop="params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input-number v-model="item.params[1].value" controls-position="right" class="itemIput-small" @blur="pramasDateBlur(item)" :min="1"></el-input-number>
+                  <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-small" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)" :min="1"></el-input>
                 </el-form-item>
                 天&nbsp;之内
               </div>
@@ -106,7 +110,6 @@
           </div>
           <el-form-item class="btn-group">
             <!-- <i class="el-icon-edit cursor-pointer"></i> -->
-            <!-- <i class="el-icon-info cursor-pointer" style="color:#409eff"></i> -->
             <el-tooltip v-if="item.func === 'relative_time_in'" placement="top">
               <div slot="content" v-html="toolTipContent(item)"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
@@ -167,7 +170,7 @@ export default {
     judgeDateTwoInput (rule, value, callback, params) { // 数值介于判断
       if (value === '') {
         callback(new Error('请输入'))
-      } else if (params[0].value <= params[1].value) {
+      } else if (params[0].value * 1 <= params[1].value * 1) {
         callback(new Error('起始数值应大于终止数值'))
       } else {
         callback()
@@ -176,25 +179,55 @@ export default {
     judgeNumberTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {
         callback(new Error('请输入'))
-      } else if (params[0].value >= params[1].value) {
+      } else if (params[0].value * 1 >= params[1].value * 1) {
         callback(new Error('起始数值应小于终止数值'))
       } else {
         callback()
       }
     },
-    pramasNumBlur (item) { // 数值 介于的判断
-      let params = item.params
-      if (params[0].value < params[1].value) {
-        this.$refs['paramsl' + item.ruleCode][0].clearValidate()
-        this.$refs['paramsr' + item.ruleCode][0].clearValidate()
+    keyupNumberInput (val) { // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
+      if (val === '.') { // 开头不能是小数点
+        val = val.replace('.', '')
       }
+      if (val.split('.').length > 2) { // 不可输入第二个小数点
+        val = val.substring(0, val.length - 1)
+      }
+      if (val.length > 1 && val[val.length - 1] === '-') { // 只能有一个’-‘
+        val = val.substring(0, val.length - 1)
+      }
+      val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
+      return val
     },
-    pramasDateBlur (item) { // 时间 区间的判断
+    blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
+      val = val + '' // 数据转为字符串
+      if (val[val.length - 1] === '.') { // 最后一位为小数点时，则删除小数点
+        val = val.substring(0, val.length - 1)
+      }
+      let reg = /^(-)?\d+(\.\d+)?$/g // 只能输入 -. 及数字 不符合要求则置空
+      if (!reg.test(val)) {
+        val = ''
+      }
+      val = val.replace(/^0+\./, '0.') // 000.8999  -> 0.889
+      val = val.replace(/^(-0+)\./, '-0.') // -000.899  -> -0.889
+      val = val.replace(/^0+([0-9])/, '$1') // 009.9 00099999  -> 9.9  999999
+      val = val.replace(/^-0+([0-9])/, '-$1') // -009.9 -00099999 -> -9.9  -999999
+      return val
+    },
+    pramasNumBlur (item, val) { // 数值 介于的判断
       let params = item.params
-      if (params[0].value > params[1].value) {
+      if (params[0].value * 1 < params[1].value * 1) {
         this.$refs['paramsl' + item.ruleCode][0].clearValidate()
         this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
+      return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
+    },
+    pramasDateBlur (item, val) { // 时间 区间的判断
+      let params = item.params
+      if (params[0].value * 1 > params[1].value * 1) {
+        this.$refs['paramsl' + item.ruleCode][0].clearValidate()
+        this.$refs['paramsr' + item.ruleCode][0].clearValidate()
+      }
+      return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
     },
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
@@ -215,6 +248,10 @@ export default {
     },
     selectOperateChange (val, ruleItem) { // 操作符改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
+      if (ruleItem.fieldType === 'date') { // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
+        this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
+        this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
+      }
     },
     selectOperateVisible (val, ruleItem) { // 当操作符下拉框打开时，重新下拉请求数据
       if (val) { // 打开下拉框时
@@ -231,8 +268,11 @@ export default {
         this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem)
       }
     },
-    selectEnumsChange (val, ruleItem) {
+    selectEnumsChange (val, ruleItem) { // 处理一下多选的数据
       this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem)
+    },
+    selectDateTimeChange (val, ruleItem) { // 处理一下时间数据
+      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem)
     },
     isDateSingleShow (item) { // 单时间日期是否显示
       let showSingleArr = ['eq', 'neq', 'gt', 'lt', 'ge', 'le']
@@ -327,7 +367,13 @@ export default {
   .itemIput-small {
     width: 140px;
   }
+  .itemIput-number {
+    width: 200px;
+  }
   .itemOperateIput {
     width: 180px;
+  }
+  .pane-rules-datetime {
+    position: relative;
   }
 </style>
