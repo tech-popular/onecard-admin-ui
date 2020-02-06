@@ -35,16 +35,16 @@
               <div v-if="item.func === 'between'"  class="pane-rules-inline">
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur' }">
                   <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
-                  <el-input v-model="item.params[0].value" class="itemIput-number" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasNumBlur(item, item.params[0].value)"></el-input>
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasNumBlur(item, item.params[0].value)"></el-input>
                 </el-form-item>
                 于
                 <el-form-item prop="params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input v-model="item.params[1].value" controls-position="right" class="itemIput-number" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasNumBlur(item, item.params[1].value)"></el-input> 之间
+                  <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-number" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasNumBlur(item, item.params[1].value)"></el-input> 之间
                 </el-form-item>
               </div>
               <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
                 <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput"></el-input-number> -->
-                <el-input v-model="item.params[0].value" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
+                <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
               </el-form-item>
             </div>
             <!--enums-->
@@ -90,7 +90,7 @@
                 <!-- 在&nbsp; -->
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number> -->
-                  <el-input v-model="item.params[0].value" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
                 </el-form-item>
                 天&nbsp;
               </div>
@@ -98,11 +98,11 @@
               <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input v-model="item.params[0].value" class="itemIput-small" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)" :min="1"></el-input>
+                  <el-input v-model="item.params[0].value" :maxlength="10" class="itemIput-small" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)" :min="1"></el-input>
                 </el-form-item>
                 天&nbsp;到&nbsp;过去&nbsp;
                 <el-form-item prop="params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input v-model="item.params[1].value" class="itemIput-small" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)" :min="1"></el-input>
+                  <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-small" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)" :min="1"></el-input>
                 </el-form-item>
                 天&nbsp;之内
               </div>
