@@ -12,53 +12,11 @@
       <div class="base-pane">
         <h3>基本信息</h3>
         <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
-          <el-form-item label="API名称" prop="name">
-            <el-input v-model.trim="baseForm.name" placeholder="API名称" clearable class="base-pane-item" />
+          <el-form-item label="分群名称" prop="name">
+            <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
           </el-form-item>
-          <el-form-item label="接口编码" prop="department" class="item-inline">
-            <el-select v-model="baseForm.department" placeholder="请选择一级事业群" :disabled="!!id">
-              <el-option v-for="(item, index) in departmentList" :key="index" :label="item.childrenValue" :value="item.childrenNum"></el-option>
-            </el-select>
-          </el-form-item>
-          &nbsp; _
-          <el-form-item prop="apiName" class="item-inline item-code">
-            <el-input v-model.trim="baseForm.apiName" placeholder="输入字母和数字的组合" clearable class="item-code-name" :disabled="!!id" />
-          </el-form-item>
-          <!-- <el-form-item class="item-inline item-button">
-            <el-button type="success" @click="getApiCode" size="small">确认生成</el-button>
-          </el-form-item> -->
-          <el-form-item label="您创建的接口编码是：" label-width="166px">
-            {{code}}
-            <el-button type="primary" @click="copyCode" size="small" class="copy-code" v-if="isCopyBtn">复制编码</el-button>
-          </el-form-item>
-          <el-form-item label="API入参" prop="inParam">
-            <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
-          </el-form-item>
-          <el-form-item label="API模式" prop="outType">
-            <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
-              <el-radio label="INDICATOR">选择模式</el-radio>
-              <el-radio label="JUDGE">判断模式（返回值为是/否在此分群）</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="API出参" prop="outParams" v-if="baseForm.outType==='INDICATOR'">
-            <Treeselect
-              :options="outParamsIndexList"
-              :disable-branch-nodes="true"
-              :show-count="true"
-              :multiple="true"
-              :load-options="loadOptions"
-              noChildrenText="暂无数据"
-              v-model="baseForm.outParams"
-              :clearable="false"
-              search-nested
-              placeholder="请选择"
-              class="base-pane-item"
-              @select="outParamsSelect"
-              @deselect="outParamsDeselect"
-            />
-          </el-form-item>
-          <el-form-item label="API描述">
-            <el-input type="textarea"  class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
+          <el-form-item label="分群描述">
+            <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
             <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
           </el-form-item>
         </el-form>
@@ -79,63 +37,31 @@
       </div>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view'">保存</el-button>
+      <el-button type="success" @click="saveHandle('preview')" size="small">数据预览</el-button>
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
+    <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo"></data-preview-info>
   </el-drawer>
 </template>
 <script>
 import rulesSet from './apiManage-rules-set'
-import { selectOperate, selectAllCata, enumTypeList, savaApiInfo, updateApiInfo, viewApiInfo } from '@/api/dataAnalysis/apiManage'
+import dataPreviewInfo from './data-preview-info'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
-    let validateApiName = (rule, value, callback) => {
-      const reg = /^[0-9a-zA-Z]*$/ // 只允许输入字母和数字  /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]*$/ //只允许输入字母和数字的组合
-      if (!value) {
-        callback(new Error('请输入字母和数字的组合'))
-      } else if (!reg.test(value)) {
-        callback(new Error('请输入字母和数字的组合'))
-      } else {
-        callback()
-      }
-    }
-    let validateApiOutParams = (rule, value, callback) => {
-      if (!this.baseForm.outParams.length) {
-        callback(new Error('请选择API出参'))
-      } else {
-        callback()
-      }
-    }
     return {
+      isPreviewShow: true,
       loading: false,
-      inParamsList: [
-        {
-          title: '账户编号',
-          value: 'account_no'
-        },
-        {
-          title: '客户编号',
-          value: 'cust_no'
-        },
-        {
-          title: '身份证号',
-          value: 'cert_id'
-        },
-        {
-          title: '手机号',
-          value: 'mobile_no'
-        }
-      ],
       id: '',
       flowId: '',
       tag: '',
       drawerTitle: '',
       isRequired: false,
       indexList: [],
-      outParamsIndexList: [],
       expression: '',
       expressionTemplate: '',
       initFieldType: '',
@@ -150,35 +76,11 @@ export default {
       visible: false,
       baseForm: {
         name: '',
-        inParam: '',
-        desc: '',
-        outType: '',
-        outParams: [],
-        department: '',
-        apiName: ''
+        desc: ''
       },
-      departmentList: [],
-      originDepartment: '', // 编辑时保留一份原始数据，以防不正当修改编码
-      originApiName: '',
-      outParams: [],
       baseRule: { // 基本信息校验规则
         name: [
-          { required: true, message: '请输入API名称', trigger: 'blur' }
-        ],
-        inParam: [
-          { required: true, message: '请选择API入参', trigger: 'change' }
-        ],
-        outType: [
-          { required: true, message: '请选择API模式', trigger: 'change' }
-        ],
-        outParams: [
-          { required: true, validator: validateApiOutParams, trigger: 'input' }
-        ],
-        department: [
-          { required: true, message: '请选择一级事业群', trigger: 'change' }
-        ],
-        apiName: [
-          { validator: validateApiName, trigger: 'blur' }
+          { required: true, message: '请输入分群名称', trigger: 'blur' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -189,58 +91,17 @@ export default {
       }
     }
   },
-  components: { rulesSet, Treeselect },
-  computed: {
-    code () {
-      let department = this.baseForm.department || ''
-      let apiName = this.baseForm.apiName || ''
-      if (!department && !apiName) {
-        return ''
-      }
-      return department + '_' + apiName
-    },
-    isCopyBtn () {
-      if (this.baseForm.department && this.baseForm.apiName) {
-        return true
-      }
-      return false
-    }
-  },
+  components: { rulesSet, Treeselect, dataPreviewInfo },
   methods: {
-    copyCode () { // 复制编码事件
-      this.$copyText(this.code).then(e => {
-        this.$message({
-          type: 'success',
-          message: '复制成功'
-        })
-      }, e => {
-        this.$message({
-          type: 'error',
-          message: '复制失败，请再试一次'
-        })
-      })
-    },
-    getDepartmentList () { // 获取事业部下拉数据
-      enumTypeList(17).then(res => {
-        if (res.data.status !== '1') {
-          this.departmentList = []
-        } else {
-          this.departmentList = res.data.data
-        }
-      })
-    },
     init (row, tag) {
       this.id = ''
       this.tag = ''
       this.flowId = ''
-      this.outParams = []
-      this.outParamsIndexList = []
       this.expression = ''
       this.expressionTemplate = ''
       this.loading = true
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
-      this.getDepartmentList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -248,22 +109,18 @@ export default {
       if (!tag) {
         this.loading = false
         this.drawerTitle = '新增'
-        this.getSelectAllCata((indexList) => {
-          this.outParamsIndexList = deepClone(indexList)
-        })
+        this.getSelectAllCata()
         this.initEmptyData()
       } else {
         this.id = row.id
         this.drawerTitle = tag === 'view' ? '查看' : '编辑'
-        this.getApiInfo(row.id)
+        this.getDataInfo(row.id)
       }
     },
     initEmptyData () { // 当数据异常时，初始化数据
       this.baseForm = {
         name: '',
-        inParam: '',
-        desc: '',
-        outParams: []
+        desc: ''
       }
       this.ruleConfig = { // 规则数据
         'ruleCode': 'rule_all',
@@ -274,10 +131,11 @@ export default {
       this.expression = ''
       this.expressionTemplate = ''
     },
-    getApiInfo (id) { // 查看及编辑时请求数据
-      viewApiInfo(id).then(({data}) => {
+    getDataInfo (id) { // 查看及编辑时请求数据
+      viewDataInfo(id).then(({data}) => {
         if (data.status !== '1') {
           this.initEmptyData()
+          this.loading = false
           return this.$message({
             message: data.message,
             type: 'error'
@@ -285,6 +143,7 @@ export default {
         } else {
           if (!data.data.configJson) {
             this.initEmptyData()
+            this.loading = false
             return this.$message({
               message: '数据异常',
               type: 'error'
@@ -294,26 +153,13 @@ export default {
           let configJson = JSON.parse(data.data.configJson)
           this.baseForm = {
             name: configJson.name,
-            inParam: configJson.inParam,
-            desc: configJson.desc,
-            department: configJson.department,
-            apiName: configJson.apiName,
-            outType: configJson.outType
+            desc: configJson.desc
           }
-          this.originDepartment = configJson.department
-          this.originApiName = configJson.apiName
-          this.outParams = configJson.outParams
-          let out = []
-          configJson.outParams.forEach(item => {
-            out.push(item.onlyId)
-          })
-          this.baseForm.outParams = out
           this.ruleConfig = configJson.ruleConfig
           this.expression = configJson.expression
           this.expressionTemplate = configJson.expressionTemplate
           this.getSelectAllCata((indexList) => {
             this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
-            this.outParamsIndexList = this.updateOutParamsList(indexList)
             this.$nextTick(() => {
               this.loading = false
             })
@@ -326,32 +172,6 @@ export default {
           })
         }
       })
-    },
-    inParamChange () { // 消除入参错误提示
-      if (this.baseForm.inParam) {
-        this.$refs.baseForm.clearValidate('inParam')
-      }
-    },
-    outTypeChange (val) {
-      if (val === 'JUDGE') {
-        this.baseForm.outParams = []
-        this.outParams = []
-      }
-    },
-    updateOutParamsList (indexList) { // 获取出参默认展开列表
-      let indexListArr = deepClone(indexList)
-      this.baseForm.outParams.forEach(item => {
-        let indexPath = findVueSelectItemIndex(indexListArr, item) + ''
-        let indexPathArr = indexPath.split(',')
-        let a = indexListArr
-        indexPathArr.forEach((pitem, index) => {
-          if (index < indexPathArr.length - 1) {
-            a[pitem].isDefaultExpanded = true
-            a = a[pitem].children
-          }
-        })
-      })
-      return indexListArr
     },
     updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
       arr.rules.forEach(item => {
@@ -603,6 +423,7 @@ export default {
     addChildreRules (data, citem) {
       let indexPath = findRuleIndex(data.rules, citem) + ''
       let indexPathArr = indexPath.split(',')
+      console.log(indexPathArr)
       if (indexPathArr.length === 1) {
         let newObj = {
           'relation': 'and',
@@ -673,22 +494,6 @@ export default {
       })
       return ruleArr
     },
-    outParamsSelect (node) { // 选中出参
-      this.outParams.push({
-        title: node.label,
-        value: node.englishName, // node.id,
-        onlyId: node.id,
-        sourceTable: node.sourceTable,
-        id: node.fieldId
-      })
-      if (this.outParams.length) {
-        this.$refs.baseForm.clearValidate('outParams')
-      }
-      console.log(this.outParams)
-    },
-    outParamsDeselect (node) { // 删除出参
-      this.outParams = this.outParams.filter(item => item.onlyId !== node.id)
-    },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
       this.$parent.addOrUpdateVisible = false
@@ -715,8 +520,14 @@ export default {
       })
       return arr
     },
-    saveHandle () {
-      console.log(this.baseForm, this.outParams)
+    previewHandle () {
+      this.isPreviewShow = true
+      this.$nextTick(() => {
+        console.log(this.$refs)
+        this.$refs.dataPreviewInfo.init()
+      })
+    },
+    saveHandle (type) {
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -730,7 +541,6 @@ export default {
       this.$nextTick(() => { // 待页面中的isRequired = true后再执行校验
         let flag = true
         this.$refs.baseForm.validate((valid) => {
-          console.log(11, valid)
           if (!valid) {
             flag = false
           }
@@ -745,17 +555,20 @@ export default {
         if (!flag) {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
-          this.ruleConfig = this.updateRulesConfig(this.ruleConfig) // 过滤数据
-          this.baseForm.code = this.code
-          let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)), expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: this.ruleConfig }
-          let url = savaApiInfo
+          let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig }
+          if (type === 'preview') {
+            this.isPreviewShow = true
+            this.$nextTick(() => {
+              this.$refs.dataPreviewInfo.init(params)
+            })
+            return
+          }
+          let url = savaDataInfo
           if (this.id) {
-            url = updateApiInfo
+            url = updateDataInfo
             params.id = this.id
             params.flowId = this.flowId
-            params.department = this.originDepartment
-            params.apiName = this.originApiName
-            params.code = this.originDepartment + '_' + this.originApiName
           }
           url(params).then(({data}) => {
             if (data.status !== '1') {
