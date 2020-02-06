@@ -245,9 +245,9 @@
       text-overflow: ellipsis;
     }
     & .vue-treeselect {
-      height: 40px;
+      min-height: 40px;
       line-height: 40px;
-      width: 195px;
+      max-width: 195px;
     }
     & .vue-treeselect__single-value,
     & .vue-treeselect__placeholder{
