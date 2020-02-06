@@ -89,10 +89,10 @@
           //   { required: true, message: '工作流入参不能为空', trigger: 'blur' },
           //   { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           // ],
-          // outputParameters: [
-          //   { required: true, message: '返回结果不能为空', trigger: 'blur' },
-          //   { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-          // ],
+          outputParameters: [
+            { required: true, message: '返回结果不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
           version: [
             { required: true, message: '版本不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
