@@ -707,6 +707,7 @@
     & .vue-treeselect {
       min-height: 38px;
       line-height: 24px;
+      max-width: 100%;
     }
     & .base-pane {
       border-bottom: 1px dashed #ccc;
