@@ -4,7 +4,7 @@
         <el-form-item label="cql" prop="cql" :rules="dataRule.cql">
         <el-input type="textarea" autosize v-model="fatherData.cql" placeholder="请输入cql"/>
         </el-form-item>
-        <el-form-item label="数据源id" prop="datasourceId">
+        <el-form-item label="数据源id" prop="datasourceId" :rules="dataRule.datasourceId">
         <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
         </el-form-item>
         <el-form-item label="is_query" prop="isQuery" :rules="dataRule.isQuery">
