@@ -141,7 +141,9 @@
         fatherData: {
           enable: true,
           enableCache: 1,
-          parsTemplate: false
+          parsTemplate: false,
+          requestFieldType: 0,
+          requestParamTemplateStatus: 0
         }
       }
     },
@@ -194,7 +196,9 @@
         this.fatherData = {
           enable: true,
           enableCache: 1,
-          parsTemplate: false
+          parsTemplate: false,
+          requestFieldType: 0,
+          requestParamTemplateStatus: 0
         }
       },
       // 校验是否通过
@@ -210,7 +214,9 @@
         this.fatherData = {
           enable: true,
           enableCache: 1,
-          parsTemplate: false
+          parsTemplate: false,
+          requestFieldType: 0,
+          requestParamTemplateStatus: 0
         }
         this.visible = data
       },
