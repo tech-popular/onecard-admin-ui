@@ -75,6 +75,12 @@
         header-align="center"
         align="center"
         label="数据库url">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.url)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.url}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="version"
@@ -98,10 +104,15 @@
         prop="remark"
         header-align="center"
         align="center"
-        label="备注信息">
+        label="备注信息">  
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.remark)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.remark}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

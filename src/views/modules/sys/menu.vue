@@ -60,16 +60,26 @@
         header-align="center"
         align="center"
         width="150"
-        :show-overflow-tooltip="true"
         label="菜单URL">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.url)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.url}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="perms"
         header-align="center"
         align="center"
         width="150"
-        :show-overflow-tooltip="true"
         label="授权标识">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.perms)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.perms}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="mark"
