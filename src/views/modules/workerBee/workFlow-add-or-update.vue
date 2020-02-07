@@ -165,7 +165,10 @@
                   }
                 })
               } else {
-                this.$message.error(data.message)
+                this.$message({
+                  message: data.message || '数据异常',
+                  type: 'error'
+                })
               }
             })
           }
