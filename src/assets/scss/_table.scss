@@ -1,0 +1,12 @@
+// table td内容超过5行显示...
+.el-table{
+  & td{
+    & .text-to-long-cut{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical
+    }
+  }
+}

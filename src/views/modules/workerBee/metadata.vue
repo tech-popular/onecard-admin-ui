@@ -19,7 +19,14 @@
         header-align="center"
         align="center"
         label="任务定义名称"
-        width="150px"/>
+        width="150px">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.name)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.name}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="type"
         header-align="center"
@@ -29,7 +36,14 @@
         prop="description"
         header-align="center"
         align="center"
-        label="任务描述"/>
+        label="任务描述">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.description)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.description}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="owner"
         header-align="center"
@@ -50,8 +64,15 @@
         prop="remark"
         header-align="center"
         align="center"
-        label="备注"/>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+        label="备注">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.remark)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.remark}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>

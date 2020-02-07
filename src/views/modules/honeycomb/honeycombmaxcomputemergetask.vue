@@ -41,6 +41,12 @@
         header-align="center"
         align="center"
         label="表名称">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.tableName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.tableName}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="pk"
@@ -52,8 +58,13 @@
         prop="mergeSql"
         header-align="center"
         align="center"
-        show-overflow-tooltip
         label="合并sql">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.mergeSql)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.mergeSql}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="maxcomputeSpace"
@@ -90,7 +101,6 @@
         </template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

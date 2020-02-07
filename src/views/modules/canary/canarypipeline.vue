@@ -50,6 +50,12 @@
         header-align="center"
         align="center"
         label="pipe值">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.value)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.value}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="enable"

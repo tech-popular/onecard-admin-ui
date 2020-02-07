@@ -13,13 +13,34 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="工作流编号"/>
-      <el-table-column prop="name" header-align="center" align="center" label="工作流名称"/>
+      <el-table-column prop="name" header-align="center" align="center" label="工作流名称">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.name)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.name}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="owner" header-align="center" align="center" label="拥有者"/>
       <el-table-column prop="user" header-align="center" align="center" label="使用者"/>
       <el-table-column prop="flowCode" header-align="center" align="center" label="工作流编码"/>
-      <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参"/>
-      <el-table-column prop="description" header-align="center" align="center" label="描述"/>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.inputParameters)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.inputParameters}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="description" header-align="center" align="center" label="描述">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.description)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.description}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
           <el-button type="text" @click="clickSketchMap(scope.row.id,scope.row)">预览</el-button>

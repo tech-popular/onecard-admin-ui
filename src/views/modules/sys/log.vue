@@ -27,17 +27,27 @@
         header-align="center"
         align="center"
         width="150"
-        :show-overflow-tooltip="true"
-        label="请求方法"
-      ></el-table-column>
+        label="请求方法">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.method)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.method}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="params"
         header-align="center"
         align="center"
         width="150"
-        :show-overflow-tooltip="true"
-        label="请求参数"
-      ></el-table-column>
+        label="请求参数">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.params)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.params}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="time" header-align="center" align="center" label="执行时长(毫秒)"></el-table-column>
       <el-table-column prop="ip" header-align="center" align="center" width="150" label="IP地址"></el-table-column>
       <el-table-column

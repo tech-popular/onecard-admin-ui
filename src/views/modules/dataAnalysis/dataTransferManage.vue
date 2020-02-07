@@ -1,5 +1,5 @@
 <template>
-  <div class="index-wrap" v-loading="loading">
+  <div v-loading="loading">
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="任务ID">
         <el-input v-model="dataForm.id" @keyup.native="number" placeholder="" clearable />
@@ -24,9 +24,9 @@
       <el-table-column prop="id" header-align="center" align="center" width="80" label="任务ID"></el-table-column>
       <el-table-column prop="transferName" header-align="center" align="center" label="任务名称">
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" placement="top">
-              <div v-html="ToBreak(scope.row.transferName)" slot="content"></div>
-              <div class="oneLine">{{scope.row.transferName}}</div>
+          <el-tooltip effect="dark" placement="top">
+              <div v-html="toBreak(scope.row.transferName)" slot="content"></div>
+              <div class="text-to-long-cut">{{scope.row.transferName}}</div>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -225,22 +225,11 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
-      },
-      ToBreak (val) {
-        if (val != undefined) {
-          val = val.replace(/[^\x00-\xff]/g, '$&\x01').replace(/.{20}\x01?/g, '$&<br>').replace(/\x01/g, '')
-        }
-        return val
       }
     }
   }
 </script>
 <style scope lang="scss">
-  .oneLine {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
   .switchStyle{
     .el-switch__label {
         position: absolute;

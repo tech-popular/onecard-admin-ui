@@ -34,6 +34,12 @@
         header-align="center"
         align="center"
         label="url">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.url)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.url}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="shortLinkUrl"
@@ -58,7 +64,6 @@
         </template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

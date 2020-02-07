@@ -40,27 +40,50 @@
         header-align="center"
         align="center"
         label="静态部分">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.chartContent)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.chartContent}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="chartLegendData"
         header-align="center"
         align="center"
         label="legend数据">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.chartLegendData)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.chartLegendData}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="chartAxisData"
         header-align="center"
         align="center"
         label="xaxis数据">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.chartAxisData)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.chartAxisData}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="chartSeriesData"
         header-align="center"
         align="center"
         label="series数据">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.chartSeriesData)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.chartSeriesData}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"
