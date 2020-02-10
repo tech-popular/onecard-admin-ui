@@ -7,6 +7,12 @@
         <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>
+        <el-form-item label="入参生成方式">
+          <el-radio-group v-model="fatherData.requestParamTemplateStatus">
+            <el-radio :label="0">普通生成</el-radio>
+            <el-radio :label="1">模板生成</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
         <el-input v-model="fatherData.responseFields" placeholder="请输入响应参数的fieldId数组"/>
         </el-form-item>

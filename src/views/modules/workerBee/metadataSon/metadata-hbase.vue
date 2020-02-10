@@ -18,14 +18,14 @@
         </el-form-item>
         <el-form-item label="是否有效">
           <el-radio-group v-model="fatherData.enable">
-            <el-radio :label="0">否</el-radio>
-            <el-radio :label="1">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+            <el-radio :label="true">是</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否缓存">
           <el-radio-group v-model="fatherData.enableCache">
-            <el-radio :label="false">否</el-radio>
-            <el-radio :label="true">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+            <el-radio :label="1">是</el-radio>
           </el-radio-group>
         </el-form-item>
     </el-form>
