@@ -8,7 +8,7 @@
       <el-input v-model="dataForm.datasourceName" placeholder="数据库名字"></el-input>
     </el-form-item>
     <el-form-item label="数据源类型" prop="datasourceType">
-      <el-select v-model="dataForm.datasourceType" placeholder="请选择">
+      <el-select v-model="dataForm.datasourceType" placeholder="请选择" @change='chageDataSourceType'>
         <el-option
           v-for="item in datasourceTypeOptions"
           :key="item.value"
@@ -17,31 +17,31 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="数据源所属部门" prop="datasourceDepartment">
+    <el-form-item label="数据源所属部门" prop="datasourceDepartment" >
       <el-input v-model="dataForm.datasourceDepartment" placeholder="数据源所属部门"></el-input>
     </el-form-item>
-    <el-form-item label="数据库驱动" prop="driver">
+    <el-form-item label="数据库驱动" prop="driver" v-if="dataFieldList.includes('driver')">
       <el-input v-model="dataForm.driver" placeholder="数据库驱动"></el-input>
     </el-form-item>
-    <el-form-item label="数据库用户名" prop="user">
+    <el-form-item label="数据库用户名" prop="user" v-if="dataFieldList.includes('user')">
       <el-input v-model="dataForm.user" placeholder="数据库用户名"></el-input>
     </el-form-item>
-    <el-form-item label="数据库密码" prop="passwd">
+    <el-form-item label="数据库密码" prop="passwd" v-if="dataFieldList.includes('passwd')">
       <el-input v-model="dataForm.passwd" placeholder="数据库密码" show-password></el-input>
     </el-form-item>
-    <el-form-item label="数据库url" prop="url">
-      <el-input v-model="dataForm.url" placeholder="数据库url"></el-input>
+    <el-form-item label="url" prop="url" v-if="dataFieldList.includes('url')">
+      <el-input v-model="dataForm.url" placeholder="url"></el-input>
     </el-form-item>
-    <el-form-item label="版本号" prop="version">
+    <el-form-item label="版本号" prop="version" v-if="dataFieldList.includes('version')">
       <el-input v-model="dataForm.version" placeholder="版本号"></el-input>
     </el-form-item>
-    <el-form-item label="创建时间" prop="createTime">
+    <el-form-item label="创建时间" prop="createTime" v-if="dataFieldList.includes('createTime')">
       <el-input v-model="dataForm.createTime" placeholder="创建时间"></el-input>
     </el-form-item>
-    <el-form-item label="更新时间" prop="updateTime">
+    <el-form-item label="更新时间" prop="updateTime" v-if="dataFieldList.includes('updateTime')">
       <el-input v-model="dataForm.updateTime" placeholder="更新时间"></el-input>
     </el-form-item>
-    <el-form-item label="备注信息" prop="remark">
+    <el-form-item label="备注信息" prop="remark" v-if="dataFieldList.includes('remark')">
       <el-input v-model="dataForm.remark" placeholder="备注信息"></el-input>
     </el-form-item>
     </el-form>
@@ -97,7 +97,8 @@
           version: [
             { required: false, message: '版本号不能为空', trigger: 'blur' }
           ]
-        }
+        },
+        dataFieldList: ['driver', 'user', 'passwd', 'url', 'version', 'createTime', 'updateTime', 'remark']
       }
     },
     methods: {
@@ -177,6 +178,26 @@
             })
           }
         })
+      },
+      chageDataSourceType () {
+        const type = this.dataForm.datasourceType
+        if (type == 'kafka' || type == 'localFile' || type == 'canary') {
+          this.dataFieldList = []
+        } else if (type == 'maxCompute') {
+          this.dataFieldList = ['url']
+        } else if (type == 'redis' || type == 'singleRedis') {
+          this.dataFieldList = ['url', 'passwd']
+        } else {
+          this.dataFieldList = ['driver', 'user', 'passwd', 'url', 'version', 'createTime', 'updateTime', 'remark']
+        }
+        this.dataForm.driver = ''
+        this.dataForm.user = ''
+        this.dataForm.passwd = ''
+        this.dataForm.url = ''
+        this.dataForm.version = ''
+        this.dataForm.createTime = ''
+        this.dataForm.updateTime = ''
+        this.dataForm.remark = ''
       }
     }
   }

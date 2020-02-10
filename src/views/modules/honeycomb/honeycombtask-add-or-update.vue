@@ -575,13 +575,10 @@ export default {
                   unit: '1'
                 })
                 let id = val.outDatasource
-                console.log(id)
                 let datasource = this.datasourceoptions.filter(
                   item => item.id == id
                 )
-                console.log(datasource)
                 if (datasource[0].datasourceType == 'redis' || datasource[0].datasourceType == 'singleRedis') {
-                  console.log(22222)
                   let arr = val.outTableName.split('#')
                   this.$set(this.redisListData, i, {
                     show: true,
@@ -827,13 +824,13 @@ export default {
           })
           return false
         }
-        if (this.redisListData[i].show && !this.redisListData[i].key) {
-          this.$message({
-            type: 'warning',
-            message: '请输入redis key'
-          })
-          return false
-        }
+        // if (this.redisListData[i].show && !this.redisListData[i].key) {
+        //   this.$message({
+        //     type: 'warning',
+        //     message: '请输入redis key'
+        //   })
+        //   return false
+        // }
       }
       return true
     }

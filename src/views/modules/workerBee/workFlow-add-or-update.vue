@@ -64,7 +64,7 @@
           user: '',
           inputParameters: '',
           description: '',
-          createdBy: '',
+          createdBy: this.$store.state.user.name,
           outputParameters: '',
           ownerApp: '',
           restartable: 0,
