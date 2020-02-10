@@ -50,7 +50,7 @@
         prop="inDatasourceName"
         header-align="center"
         align="center"
-        label="输入数据源'">
+        label="输入数据源">
         <template slot-scope="scope">
           <el-tooltip effect="dark" placement="top">
             <div v-html="toBreak(scope.row.inDatasourceName)" slot="content"></div>

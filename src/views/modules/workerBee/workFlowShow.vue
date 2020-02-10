@@ -219,7 +219,7 @@
       /** 重置 */
       resetHandle () {
         this.pageNum = 1
-        this.dataForm = []
+        this.dataForm.workerBee = ''
         this.getDataList()
       },
       // 取消或关闭流程图弹窗
