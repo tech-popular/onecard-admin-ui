@@ -7,6 +7,9 @@
         <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
         </el-form-item>
+        <el-form-item label="请求head入参" prop="requestHeadFields">
+        <el-input v-model="fatherData.requestHeadFields" placeholder="请输入请求head入参"/>
+        </el-form-item>
         <el-form-item label="入参生成方式">
           <el-radio-group v-model="fatherData.requestParamTemplateStatus">
             <el-radio :label="0">普通生成</el-radio>
