@@ -158,11 +158,11 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="11">
+            <!-- <el-col :span="11">
               <el-form-item label="topic" prop="topic">
                 <el-input v-model.trim="baseForm.topic" class="base-pane-item" style="margin-left:20px" />
               </el-form-item>
-            </el-col>
+            </el-col> -->
           </el-row>
           <el-row :gutter="20">
             <el-col style="width: 6.33333%;">
@@ -212,14 +212,14 @@
         }
       }
 
-      // topic验证
-      let validateKafkaServerTopic = (rule, value, callback) => {
-        if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer != '' && this.baseForm.topic === '') {
-          callback(new Error('请输入topic'))
-        } else {
-          callback()
-        }
-      }
+      // // topic验证
+      // let validateKafkaServerTopic = (rule, value, callback) => {
+      //   if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer != '' && this.baseForm.topic === '') {
+      //     callback(new Error('请输入topic'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
 
       let validateMysqlServer = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
@@ -245,7 +245,7 @@
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
           kafkaServer: '', // kafka数据源地址
-          topic: '',
+          // topic: '',
           mysqlServer: ''// sftp数据源地址
         },
         tag: '新增', // 说明是否是“查看”
@@ -297,9 +297,9 @@
           kafkaServer: [
             { validator: validateKafkaServer }
           ],
-          topic: [
-            { validator: validateKafkaServerTopic }
-          ],
+          // topic: [
+          //   { validator: validateKafkaServerTopic }
+          // ],
           mysqlServer: [
             { validator: validateMysqlServer }
           ]
@@ -486,8 +486,8 @@
         if (data.kafkaServer != '') {
           let tempServer = {
             type: 'kafka',
-            id: data.kafkaServer,
-            topic: data.topic
+            id: data.kafkaServer
+            // topic: data.topic
           }
           postData.datasourceParams.push(tempServer)
         }
@@ -545,7 +545,7 @@
             disData.datasourceParams.forEach((item, index) => {
               if (item.type == 'kafka') {
                 this.baseForm.kafkaServer = item.id
-                this.baseForm.topic = item.topic
+                // this.baseForm.topic = item.topic
               } else if (item.type == 'mysql') {
                 this.baseForm.mysqlServer = item.id
               }

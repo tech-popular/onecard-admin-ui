@@ -36,8 +36,8 @@
           </el-form-item>
           <el-form-item label="API模式" prop="outType">
             <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
-              <el-radio label="INDICATOR">选择模式</el-radio>
               <el-radio label="JUDGE">判断模式（返回值为是/否在此分群）</el-radio>
+              <el-radio label="INDICATOR">选择模式（返回值为所选指标）</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="API出参" prop="outParams" v-if="baseForm.outType==='INDICATOR'">
@@ -58,8 +58,18 @@
             />
           </el-form-item>
           <el-form-item label="API描述">
-            <el-input type="textarea"  class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
+            <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
             <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
+          </el-form-item>
+          <el-form-item label="分群名称" prop="custerNames">
+            <el-select v-model="baseForm.custerNames" multiple placeholder="请选择分群名称" class="base-pane-item">
+              <el-option
+                v-for="item in custerNameList"
+                :key="item.value"
+                :label="item.text"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
         </el-form>
       </div>
@@ -87,6 +97,7 @@
 <script>
 import rulesSet from './apiManage-rules-set'
 import { selectOperate, selectAllCata, enumTypeList, savaApiInfo, updateApiInfo, viewApiInfo } from '@/api/dataAnalysis/apiManage'
+import { dataTransferManageCuster } from '@/api/dataAnalysis/dataTransferManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -113,20 +124,24 @@ export default {
       loading: false,
       inParamsList: [
         {
-          title: '账户编号',
+          title: '账户编号（account_no）',
           value: 'account_no'
         },
         {
-          title: '客户编号',
+          title: '客户编号（cust_no）',
           value: 'cust_no'
         },
         {
-          title: '身份证号',
+          title: '身份证号（cert_id）',
           value: 'cert_id'
         },
         {
-          title: '手机号',
+          title: '手机号（mobile_no）',
           value: 'mobile_no'
+        },
+        {
+          title: '用户中心统一编号（UUID）',
+          value: 'UUID'
         }
       ],
       id: '',
@@ -134,6 +149,7 @@ export default {
       tag: '',
       drawerTitle: '',
       isRequired: false,
+      custerNameList: [],
       indexList: [],
       outParamsIndexList: [],
       expression: '',
@@ -152,10 +168,11 @@ export default {
         name: '',
         inParam: '',
         desc: '',
-        outType: '',
+        outType: 'JUDGE',
         outParams: [],
         department: '',
-        apiName: ''
+        apiName: '',
+        custerNames: []
       },
       departmentList: [],
       originDepartment: '', // 编辑时保留一份原始数据，以防不正当修改编码
@@ -229,6 +246,14 @@ export default {
         }
       })
     },
+    // 获取分群名称
+    getCusterList () {
+      dataTransferManageCuster().then(({data}) => {
+        if (data && data.status === '1') {
+          this.custerNameList = data.data
+        }
+      })
+    },
     init (row, tag) {
       this.id = ''
       this.tag = ''
@@ -241,6 +266,7 @@ export default {
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getDepartmentList()
+      this.getCusterList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -263,7 +289,8 @@ export default {
         name: '',
         inParam: '',
         desc: '',
-        outParams: []
+        outParams: [],
+        outType: 'JUDGE'
       }
       this.ruleConfig = { // 规则数据
         'ruleCode': 'rule_all',
