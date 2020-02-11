@@ -1,8 +1,13 @@
 <template>
   <div>
     <el-form :inline="true">
+      <el-form-item label="任务定义名称">
+        <el-input v-model="name" placeholder="" clearable />
+      </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" @click="searchHandle()">查询</el-button>
+        <el-button @click="resetHandle()">重置</el-button>
+        <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -98,6 +103,7 @@
   export default {
     data () {
       return {
+        name: '',
         dataList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
@@ -118,6 +124,7 @@
       getDataList () {
         this.dataListLoading = true
         const dataBody = {
+          'name': this.name,
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
@@ -147,6 +154,16 @@
       currentChangeHandle (val) {
         this.pageNum = val
         this.getDataList()
+      },
+      /** 查询 */
+      searchHandle () {
+        this.pageNum = 1
+        this.getDataList()
+      },
+      /** 重置 */
+      resetHandle () {
+        this.pageNum = 1
+        this.name = ''
       },
       // 新增 / 修改
       addOrUpdateHandle (id) {
