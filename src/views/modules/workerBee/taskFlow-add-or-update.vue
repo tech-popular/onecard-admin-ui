@@ -42,8 +42,8 @@
           <el-option
             v-for="(item, index) in parentTasklist"
             :key="index"
-            :label="item"
-            :value="item">
+            :label="item.name"
+            :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -194,7 +194,7 @@
         })
         value && value.map(item => {
           this.preTasklist.push(item.index)
-          this.parentTasklist.push(item.taskReferenceName)
+          this.parentTasklist.push({name: item.taskReferenceName, id: item.id})
           this.indexlist.push(item.index)
         })
         var max = 0
