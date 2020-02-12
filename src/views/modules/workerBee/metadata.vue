@@ -2,7 +2,7 @@
   <div>
     <el-form :inline="true">
       <el-form-item label="任务定义名称">
-        <el-input v-model="name" placeholder="" clearable />
+        <el-input v-model.trim="name" placeholder="" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -130,6 +130,7 @@
         }
         beeTaskList(dataBody).then(({data}) => {
           if (data && data.status === 0) {
+            this.newList = []
             this.dataList = data.list
             this.totalPage = data.totalCount
             var arrList = []
@@ -139,6 +140,7 @@
             }
           } else {
             this.dataList = []
+            this.newList = []
             this.totalPage = 0
           }
           this.dataListLoading = false
