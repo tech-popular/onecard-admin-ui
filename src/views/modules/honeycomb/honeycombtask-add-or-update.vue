@@ -855,7 +855,7 @@ export default {
             let outTableName =
               item.name +
               '#' +
-              item.key +
+              (item.key ? item.key : ' ') +
               '#' +
               (item.type ? item.type : ' ') +
               '#' +
