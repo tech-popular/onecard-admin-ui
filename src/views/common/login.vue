@@ -37,7 +37,7 @@
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
             </el-form-item>
-            <el-form-item prop="captcha">
+            <!-- <el-form-item prop="captcha">
               <el-row :gutter="20">
                 <el-col :span="14">
                   <el-input v-model="dataForm.captcha" placeholder="验证码"></el-input>
@@ -46,8 +46,8 @@
                   <img :src="captchaPath" @click="getCaptcha()" alt />
                 </el-col>
               </el-row>
-            </el-form-item>
-            <p class="forgetPass" @click="forgetToPass">忘记密码</p>
+            </el-form-item> -->
+            <!-- <p class="forgetPass" @click="forgetToPass">忘记密码</p> -->
             <el-form-item>
               <el-button
                 class="login-btn-submit"
@@ -55,13 +55,13 @@
                 @click="dataFormSubmit('dataForm')"
               >登录</el-button>
             </el-form-item>
-            <el-form-item>
+            <!-- <el-form-item>
               <p class="loginMethod" @click="changeType">手机验证码登录</p>
-            </el-form-item>
+            </el-form-item> -->
           </el-form>
         </div>
         <!-- 手机验证码登录 -->
-        <div class="login-main" v-show="!type">
+        <!-- <div class="login-main" v-show="!type">
           <div class="login-tri-top">
             <img :src="imgTop" alt />
           </div>
@@ -124,7 +124,7 @@
               <p class="loginMethod" @click="changeType">账号密码登录</p>
             </el-form-item>
           </el-form>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -139,7 +139,7 @@ import {
   checkEmail,
   forgetPass
 } from '@/api/account'
-import { isMobile } from '@/utils/validate'
+// import { isMobile } from '@/utils/validate'
 export default {
   data () {
     // var validateEmail = async (rule, value, callback) => {
@@ -156,24 +156,24 @@ export default {
     //     callback()
     //   }
     // }
-    var validateMobile = async (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('手机号不能为空'))
-      } else if (!isMobile(value)) {
-        callback(new Error('手机号格式有误'))
-      } else {
-        callback()
-      }
-    }
-    var validateCaptcha = async (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('图片验证码不能为空'))
-      } else if (!(await this.checkCaptcha())) {
-        callback(new Error('图片验证码输入有误'))
-      } else {
-        callback()
-      }
-    }
+    // var validateMobile = async (rule, value, callback) => {
+    //   if (!value) {
+    //     callback(new Error('手机号不能为空'))
+    //   } else if (!isMobile(value)) {
+    //     callback(new Error('手机号格式有误'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
+    // var validateCaptcha = async (rule, value, callback) => {
+    //   if (!value) {
+    //     callback(new Error('图片验证码不能为空'))
+    //   } else if (!(await this.checkCaptcha())) {
+    //     callback(new Error('图片验证码输入有误'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       ifTrueCaptcha: false,
       type: true,
@@ -188,8 +188,8 @@ export default {
         // email: '',
         username: '',
         password: '',
-        uuid: '',
-        captcha: ''
+        uuid: ''
+        // captcha: ''
       },
       dataRule: {
         // email: [
@@ -200,25 +200,25 @@ export default {
         ],
         password: [
           { required: true, message: '密码不能为空', trigger: 'blur' }
-        ],
-        captcha: [
-          { required: true, message: '验证码不能为空', trigger: 'blur' }
         ]
+        // captcha: [
+        //   { required: true, message: '验证码不能为空', trigger: 'blur' }
+        // ]
       },
-      elseRule: {
-        mobile: [
-          { required: true, trigger: 'blur', validator: validateMobile }
-        ],
-        captcha: [
-          { required: true, trigger: 'blur', validator: validateCaptcha }
-        ]
-      },
-      captchaPath: '',
-      phoneCaptchaPath: '',
+      // elseRule: {
+      //   mobile: [
+      //     { required: true, trigger: 'blur', validator: validateMobile }
+      //   ],
+      //   captcha: [
+      //     { required: true, trigger: 'blur', validator: validateCaptcha }
+      //   ]
+      // },
+      // captchaPath: '',
+      // phoneCaptchaPath: '',
       userId: '',
       time: 60,
       timer: null,
-      url: '',
+      // url: '',
       imgTop: require('../../assets/img/top.png'),
       imgRight: require('../../assets/img/right.png'),
       imgBottom: require('../../assets/img/bottom.png'),
@@ -226,10 +226,10 @@ export default {
     }
   },
   created () {
-    const url = location.href.split('#')[0]
+    // const url = location.href.split('#')[0]
     this.getCaptcha()
-    this.getPhoneCaptcha()
-    this.url = url + '#/resetPassword'
+    // this.getPhoneCaptcha()
+    // this.url = url + '#/resetPassword'
   },
   methods: {
     // 提交表单
