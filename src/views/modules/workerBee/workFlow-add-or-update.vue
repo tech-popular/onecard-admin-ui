@@ -10,7 +10,7 @@
     <el-form-item label="使用者" prop="user">
       <el-input v-model="dataForm.user" placeholder="使用者"/>
     </el-form-item>
-    <el-form-item label="工作流入参" prop="inputParameters">
+    <el-form-item label="工作流入参">
       <el-input v-model="dataForm.inputParameters" placeholder="多个参数用英文逗号隔开，例：name,costumerId"/>
     </el-form-item>
     <el-form-item v-show="!dataForm.id ? true : false" label="工作流编码" prop="flowCode" >
@@ -19,7 +19,7 @@
     <el-form-item v-show="!dataForm.id ? false : true" label="工作流编码">
       <el-input v-model="dataForm.flowCode" :disabled="true"  placeholder="只能输入英文 数字 和下划线"/>
     </el-form-item>
-    <el-form-item label="返回结果" prop="outputParameters">
+    <el-form-item label="返回结果">
       <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
     </el-form-item>
      <el-form-item label="版本" prop="version">
@@ -85,14 +85,14 @@
             { required: true, message: '使用者不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          inputParameters: [
-            { required: true, message: '工作流入参不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          outputParameters: [
-            { required: true, message: '返回结果不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
+          // inputParameters: [
+          //   { required: true, message: '工作流入参不能为空', trigger: 'blur' },
+          //   { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          // ],
+          // outputParameters: [
+          //   { required: true, message: '返回结果不能为空', trigger: 'blur' },
+          //   { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          // ],
           version: [
             { required: true, message: '版本不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
@@ -165,7 +165,10 @@
                   }
                 })
               } else {
-                this.$message.error(data.message)
+                this.$message({
+                  message: data.message || '数据异常',
+                  type: 'error'
+                })
               }
             })
           }
