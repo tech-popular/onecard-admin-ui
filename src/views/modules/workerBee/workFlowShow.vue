@@ -23,6 +23,7 @@
       </el-table-column>
       <el-table-column prop="owner" header-align="center" align="center" label="拥有者"/>
       <el-table-column prop="user" header-align="center" align="center" label="使用者"/>
+      <el-table-column prop="createdBy" header-align="center" align="center" label="创建人"/>
       <el-table-column prop="flowCode" header-align="center" align="center" label="工作流编码"/>
       <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参">
         <template slot-scope="scope">

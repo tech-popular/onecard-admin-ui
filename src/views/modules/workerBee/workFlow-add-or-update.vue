@@ -29,7 +29,7 @@
       <el-input v-model="dataForm.description" placeholder="描述"/>
     </el-form-item>
      <el-form-item label="创建人姓名" prop="createdBy">
-      <el-input v-model="dataForm.createdBy" placeholder="创建人姓名"/>
+      <el-input v-model="dataForm.createdBy" placeholder="创建人姓名" disabled/>
     </el-form-item>
     <el-form-item label="归属系统" prop="ownerApp">
       <el-input v-model="dataForm.ownerApp" placeholder="归属系统"/>
@@ -64,7 +64,7 @@
           user: '',
           inputParameters: '',
           description: '',
-          createdBy: '',
+          createdBy: this.$store.state.user.name,
           outputParameters: '',
           ownerApp: '',
           restartable: 0,
