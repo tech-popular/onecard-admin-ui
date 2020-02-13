@@ -50,11 +50,15 @@
         prop="chartContent"
         header-align="center"
         align="center"
-        show-overflow-tooltip
         label="模板内容">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.chartContent)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.chartContent}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

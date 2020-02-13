@@ -41,8 +41,13 @@
         prop="sql"
         header-align="center"
         align="center"
-        show-overflow-tooltip
         label="sql语句">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.sql)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.sql}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="type"
@@ -51,7 +56,6 @@
         label="组件类型">
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

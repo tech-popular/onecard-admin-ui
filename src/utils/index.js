@@ -117,3 +117,11 @@ export const getDate = (timeStamp, startType) => {
   }
   return resStr
 }
+
+// 超过100个字符换行
+export function toBreak (val) {
+  if (val != undefined) {
+    val = val.replace(/[^\x00-\xff]/g, '$&\x01').replace(/.{100}\x01?/g, '$&<br>').replace(/\x01/g, '')
+  }
+  return val
+}

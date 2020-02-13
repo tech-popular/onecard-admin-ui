@@ -39,13 +39,25 @@
         header-align="center"
         align="center"
         label="标题">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.title)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.title}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="inDatasourceName"
         header-align="center"
         align="center"
-        label="输入数据源'">
-      </el-table-column>alarmRatio
+        label="输入数据源">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.inDatasourceName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.inDatasourceName}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="alarmRatio"
         header-align="center"
@@ -56,8 +68,13 @@
         prop="sql"
         header-align="center"
         align="center"
-        show-overflow-tooltip
         label="执行sql">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.sql)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.sql}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="period"
@@ -94,7 +111,6 @@
         label="更新时间">
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

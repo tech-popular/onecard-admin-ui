@@ -32,21 +32,26 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="父级Id">
-        <el-select v-model="dataForm.parentTask" placeholder="父级Id" style="width:100%">
+      <el-form-item label="表达式参数类型:" prop="caseExpressionParamType" v-show="isDecision">
+        <el-select filterable v-model="dataForm.caseExpressionParamType" placeholder="请选择" style="width:100%">
+          <el-option v-for="(item, index) in caseExpressionParamType" :value="item.id" :key="index" :label="item.name"/>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="父级名称">
+        <el-select v-model="dataForm.parentTask" placeholder="父级名称" style="width:100%">
           <el-option
-            v-for="item in parentTasklist"
-            :key="item"
-            :label="item"
-            :value="item">
+            v-for="(item, index) in parentTasklist"
+            :key="index"
+            :label="item.name"
+            :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="执行下标">
         <el-select v-model="dataForm.index" placeholder="执行下标" style="width:100%">
           <el-option
-            v-for="item in indexlist"
-            :key="item"
+            v-for="(item, index) in indexlist"
+            :key="index"
             :label="item"
             :value="item">
           </el-option>
@@ -73,8 +78,8 @@
       <el-form-item label="任务加入任务Id">
         <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
           <el-option
-            v-for="item in preTasklist"
-            :key="item"
+            v-for="(item, index) in preTasklist"
+            :key="index"
             :label="item"
             :value="item">
           </el-option>
@@ -102,6 +107,7 @@
       return {
         visible: false,
         dataFormType: true,
+        isDecision: false, // 决策任务
         dataForm: {
           flowId: '',
           taskId: -1,
@@ -117,8 +123,13 @@
           caseSwitchList: '',
           inputParams: '',
           outputParams: '',
-          subWorkFlow: ''
+          subWorkFlow: '',
+          caseExpressionParamType: 0
         },
+        caseExpressionParamType: [
+          {id: 1, name: '集合类型'},
+          {id: 0, name: '普通类型'}
+        ],
         dataRule: {
           inputParams: [
             { required: true, message: '任务入参不能为空', trigger: 'blur' },
@@ -151,6 +162,21 @@
     mounted () {
       this.init()
     },
+
+    watch: {
+      'dataForm.type': {
+        handler (newVal, oldVal) {
+          if (newVal == 'DECISION') {
+            this.isDecision = true
+          } else {
+            this.isDecision = false
+          }
+        },
+        deep: true,
+        immediate: true
+      }
+    },
+
     methods: {
       init (value, flowId) {
         this.dataForm.flowId = flowId
@@ -168,19 +194,27 @@
         })
         value && value.map(item => {
           this.preTasklist.push(item.index)
-          this.parentTasklist.push(item.id)
+          this.parentTasklist.push({name: item.taskReferenceName, id: item.id})
           this.indexlist.push(item.index)
         })
-        var max = this.indexlist.reduce(function (a, b) {
-          return b > a ? b : a
-        })
+        var max = 0
+        if (this.indexlist.length > 0) {
+          max = this.indexlist.reduce(function (a, b) {
+            return b > a ? b : a
+          })
+        } else {
+          max = 0
+        }
         this.dataForm.index = max + 1
       },
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            const dataBody = this.dataForm
+            let dataBody = this.dataForm
+            if (dataBody.type !== 'DECISION') {
+              delete dataBody.caseExpressionParamType
+            }
             saveWorkTaskFlow(dataBody).then(({data}) => {
               if (data && data.message === 'success') {
                 this.$message({
@@ -190,6 +224,7 @@
                   onClose: () => {
                     this.visible = false
                     this.dataFormType = true
+                    this.isDecision = false
                     this.$emit('refreshDataList')
                     this.dataForm.taskReferenceName = ''
                     this.dataForm.remark = ''
@@ -200,10 +235,11 @@
                     this.dataForm.inputParams = ''
                     this.dataForm.outputParams = ''
                     this.dataForm.subWorkFlow = ''
+                    this.dataForm.caseExpressionParamType = 0
                   }
                 })
               } else {
-                this.$message.error(data.message)
+                this.$message.error(data.message ? data.message : data.msg)
               }
             })
           }
@@ -219,6 +255,7 @@
       taskDialgClose () {
         this.visible = false
         this.dataFormType = true
+        this.isDecision = false
         this.dataForm.taskId = -1
         this.dataForm.index = 1
         this.dataForm.preTask = -1
@@ -232,6 +269,7 @@
         this.dataForm.inputParams = ''
         this.dataForm.outputParams = ''
         this.dataForm.subWorkFlow = ''
+        this.dataForm.caseExpressionParamType = 0
         this.preTasklist = []
         this.parentTasklist = []
         this.indexlist = []
