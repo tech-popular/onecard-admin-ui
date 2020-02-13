@@ -81,7 +81,7 @@
 <script>
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, uploadFileInfo, templateDownload } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -249,31 +249,6 @@ export default {
         })
         return false
       }
-    },
-    submitUpload () {
-      // console.log(123)
-      // this.fileData.uploadBtnType = 'primary'
-      // this.fileData.uploadTxt = '上传中...'
-      // this.fileData.uploadBtnIcon = 'el-icon-loading'
-      // this.fileData.uploadBtnAble = true
-      uploadFileInfo({a: 1}).then(res => {
-        console.log(res)
-        if (res.data.status * 1 !== 1) {
-          this.$nextTick(() => {
-            // this.fileData.uploadBtnType = 'danger'
-            // this.fileData.uploadTxt = '上传失败，请重试'
-            // this.fileData.uploadBtnIcon = 'el-icon-refresh'
-            // this.fileData.uploadBtnAble = false
-          })
-        } else {
-          this.$nextTick(() => {
-            // this.fileData.uploadBtnType = 'success'
-            // this.fileData.uploadTxt = '上传成功'
-            // this.fileData.uploadBtnIcon = 'el-icon-check'
-            // this.fileData.uploadBtnAble = true
-          })
-        }
-      })
     },
     updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
       arr.rules.forEach(item => {
@@ -633,13 +608,26 @@ export default {
       if (this.baseForm.userType === 'excel') {
         this.$refs.baseForm.validate((valid) => {
           if (valid) {
-            console.log(this.fileData.fileList)
-            uploadFileInfo({a: 1}).then(res => {
+            let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
+            data.append('file', this.fileData.fileList[0].raw)
+            data.append('name', this.baseForm.name)
+            data.append('type', this.baseForm.type)
+            data.append('desc', this.baseForm.desc)
+            data.append('channelId', '1001')
+            console.log('submit', data, this.fileData.fileList[0].raw)
+            importExcelFile(data).then(res => {
               console.log(res)
               if (res.data.status * 1 !== 1) {
-                console.log(123)
+                this.$message({
+                  type: 'error',
+                  message: res.data.message || '保存失败'
+                })
               } else {
                 console.log(345)
+                this.$message({
+                  type: 'success',
+                  message: res.data.message || '保存成功'
+                })
               }
             })
           }
