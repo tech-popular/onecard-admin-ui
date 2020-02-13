@@ -51,6 +51,12 @@
         header-align="center"
         align="center"
         label="图片地址">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.imgurl)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.imgurl}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"

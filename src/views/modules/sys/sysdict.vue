@@ -33,12 +33,24 @@
         header-align="center"
         align="center"
         label="类型">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.type)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.type}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="description"
         header-align="center"
         align="center"
         label="描述">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.description)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.description}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="createTime"

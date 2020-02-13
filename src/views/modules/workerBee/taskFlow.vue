@@ -9,8 +9,22 @@
       <el-table-column prop="parentTask" header-align="center" align="center" label="父级ID"/>
       <el-table-column prop="preTask" header-align="center" align="center" label="上一个任务ID"/>
       <el-table-column prop="taskId" header-align="center" align="center" label="任务ID"/>
-      <el-table-column prop="inputParams" header-align="center" align="center" label="任务入参"/>
-      <el-table-column prop="outputParams" header-align="center" align="center" label="任务出参别名映射"/>
+      <el-table-column prop="inputParams" header-align="center" align="center" label="任务入参">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.inputParams)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.inputParams}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="outputParams" header-align="center" align="center" label="任务出参别名映射">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.outputParams)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.outputParams}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
     </el-table>
     <el-pagination

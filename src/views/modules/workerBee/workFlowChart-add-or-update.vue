@@ -10,6 +10,11 @@
     <el-form-item label="任务类型">
       <el-input v-model="dataForm.type" disabled placeholder="任务类型"/>
     </el-form-item>
+    <el-form-item label="表达式参数类型:" v-show="isDecision">
+        <el-select filterable v-model="dataForm.caseExpressionParamType" placeholder="请选择" style="width:100%" disabled>
+          <el-option v-for="(item, index) in caseExpressionParamType" :value="item.id" :key="index" :label="item.name"/>
+        </el-select>
+      </el-form-item>
     <el-form-item label="备注">
       <el-input v-model="dataForm.remark" disabled placeholder="备注"/>
     </el-form-item>
@@ -40,19 +45,40 @@
     data () {
       return {
         visible: false,
+        isDecision: false,
         dataForm: {
           taskId: '',
           taskReferenceName: '',
           type: '',
           remark: '',
           caseExpression: '',
-          caseValueParam: ''
-        }
+          caseValueParam: '',
+          caseExpressionParamType: 0
+        },
+        caseExpressionParamType: [
+          {id: 1, name: '集合类型'},
+          {id: 0, name: '普通类型'}
+        ]
       }
     },
     components: {
 
     },
+
+    watch: {
+      'dataForm.type': {
+        handler (newVal, oldVal) {
+          if (newVal == 'DECISION') {
+            this.isDecision = true
+          } else {
+            this.isDecision = false
+          }
+        },
+        deep: true,
+        immediate: true
+      }
+    },
+
     methods: {
       init (id) {
         this.dataForm.id = id || ''

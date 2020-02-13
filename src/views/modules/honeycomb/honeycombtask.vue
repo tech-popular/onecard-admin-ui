@@ -53,7 +53,14 @@
     >
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="任务Id"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="任务名称"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="任务名称">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.name)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.name}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="ipAddress" header-align="center" align="center" label="IP"></el-table-column>
       <el-table-column prop="inDatasourceName" header-align="center" align="center" label="输入数据源"></el-table-column>
       <el-table-column
@@ -67,16 +74,21 @@
         prop="sql"
         header-align="center"
         align="center"
-        show-overflow-tooltip
-        label="SQL"
-      ></el-table-column>
+        label="SQL">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.sql)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.sql}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="enable" header-align="center" align="center" label="是否启用">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.enable === 1" size="small">正常</el-tag>
           <el-tag v-else size="small" type="danger">禁用</el-tag>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button
             type="text"

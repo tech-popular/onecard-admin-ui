@@ -74,6 +74,12 @@
         header-align="center"
         align="center"
         label="角色">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.roleName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.roleName}}</div>
+          </el-tooltip>
+        </template>
       </el-table-column>
       <el-table-column
         prop="createrName"
@@ -89,7 +95,6 @@
         label="创建时间">
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"

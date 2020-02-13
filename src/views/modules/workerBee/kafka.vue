@@ -29,7 +29,14 @@
         prop="bootstrapServers"
         header-align="center"
         align="center"
-        label="kafka地址"/>
+        label="kafka地址">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.bootstrapServers)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.bootstrapServers}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="groupId"
         header-align="center"
@@ -56,7 +63,7 @@
         header-align="center"
         align="center"
         label="备注"/> -->
-      <el-table-column fixed="right" header-align="center" align="center" width="180" label="操作">
+      <el-table-column header-align="center" align="center" width="180" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
