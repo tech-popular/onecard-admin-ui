@@ -230,6 +230,11 @@ export default {
     this.getCaptcha()
     // this.getPhoneCaptcha()
     // this.url = url + '#/resetPassword'
+    this.$message({
+      showClose: true,
+      message: '请使用上网账号登陆使用',
+      duration: 1000 * 10
+    })
   },
   methods: {
     // 提交表单
