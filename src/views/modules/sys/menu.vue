@@ -109,8 +109,8 @@
         <template slot-scope="scope">
           <el-button v-if="isAuth('sys:menu:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.menuId)">修改</el-button>
           <el-button v-if="isAuth('sys:menu:delete')" type="text" size="small" @click="deleteHandle(scope.row.menuId)">删除</el-button>
-          <el-button v-if="scope.row.status === 0 && isAuth('sys:menu:update')" style="color:#67C23A;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">启用</el-button>
-          <el-button v-if="scope.row.status === 1 && isAuth('sys:menu:update')" style="color:#F56C6C;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">禁用</el-button>
+          <el-button v-if="scope.row.status === 0 && isAuth('sys:menu:updateStatus')" style="color:#67C23A;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">启用</el-button>
+          <el-button v-if="scope.row.status === 1 && isAuth('sys:menu:updateStatus')" style="color:#F56C6C;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">禁用</el-button>
         </template>
       </el-table-column>
     </el-table>
