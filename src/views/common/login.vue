@@ -28,7 +28,7 @@
             :model="dataForm"
             :rules="dataRule"
             ref="dataForm"
-            @keyup.enter.native="dataFormSubmit()"
+            @keyup.enter.native="dataFormSubmit('dataForm')"
             status-icon
           >
             <el-form-item prop="username">
@@ -47,7 +47,7 @@
                 </el-col>
               </el-row>
             </el-form-item> -->
-            <!-- <p class="forgetPass" @click="forgetToPass">忘记密码</p> -->
+            <p class="forgetPass">请使用上网账号登陆使用</p>
             <el-form-item>
               <el-button
                 class="login-btn-submit"
@@ -229,12 +229,12 @@ export default {
     // const url = location.href.split('#')[0]
     this.getCaptcha()
     // this.getPhoneCaptcha()
-    // this.url = url + '#/resetPassword'
-    this.$message({
-      showClose: true,
-      message: '请使用上网账号登陆使用',
-      duration: 1000 * 10
-    })
+    // this.url = url + '#/resetPassword'\
+    // this.$message({
+    //   showClose: true,
+    //   message: '请使用上网账号登陆使用',
+    //   duration: 30 * 1000
+    // })
   },
   methods: {
     // 提交表单
@@ -455,7 +455,10 @@ export default {
       left: 0;
     }
     .forgetPass {
-      width: 60px;
+      // width: 60px;
+      margin: 0;
+      text-align: center;
+      font-size: 12px;
       color: #2093f7;
       cursor: pointer;
     }
