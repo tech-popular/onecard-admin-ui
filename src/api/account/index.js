@@ -11,3 +11,5 @@ export const checkUserName = (params) => httpPost('/sys/user/validUserName', par
 export const checkMobile = (params) => httpPost('/sys/user/validMobile', params) // 校验手机号是否已注册过接口
 
 export const checkUrl = (params) => httpPost('/sys/validUrl', params) // 判断链接的有效性
+
+export const ifExistUser = (params) => httpPost('/sys/user/ldap/isExist', params) // 校验用户名是否在ldap已经存在
