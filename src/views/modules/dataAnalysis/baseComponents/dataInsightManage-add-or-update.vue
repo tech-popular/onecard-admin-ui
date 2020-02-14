@@ -47,6 +47,7 @@
 <script>
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
+import { getQueryString } from '@/utils'
 import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -569,6 +570,10 @@ export default {
             url = updateDataInfo
             params.id = this.id
             params.flowId = this.flowId
+          }
+          let sysUuid = getQueryString('system_uuid')
+          if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') {
+            params.username = getQueryString('username') || ''
           }
           url(params).then(({data}) => {
             if (data.status !== '1') {
