@@ -11,13 +11,13 @@
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3>基本信息</h3>
-        <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
+        <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="分群名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="分群类型" prop="userType">
             <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange">
-              <div class="type-radio-item type-radio-one"><el-radio label="index">指标筛选</el-radio></div>
+              <div class="type-radio-item type-radio-one"><el-radio label="indicator">指标筛选</el-radio></div>
               <div class="type-radio-item type-radio-two">
                 <el-radio label="excel">excel文件导入</el-radio>
                 <span v-if="fileData.fileList.length" class="upload-name">{{fileData.fileList[0].name}}</span>
@@ -42,6 +42,11 @@
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
               </div>
             </el-radio-group>
+          </el-form-item>
+          <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'">
+            <el-select v-model="baseForm.channelId">
+              <el-option v-for="(item, index) in channelList" :key="index" :label="item.name" :value="item.value"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="计算类型" prop="type">
             <el-radio-group v-model="baseForm.type" :disabled="baseForm.userType === 'excel'">
@@ -118,8 +123,9 @@ export default {
       templateUrl: templateDownload,
       baseForm: {
         name: '',
-        userType: 'index',
+        userType: 'indicator',
         type: 'static',
+        channelId: '1001',
         desc: ''
       },
       baseRule: { // 基本信息校验规则
@@ -131,6 +137,9 @@ export default {
         ],
         type: [
           { required: true, message: '请选择计算类型', trigger: 'change' }
+        ],
+        channelId: [
+          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -138,7 +147,21 @@ export default {
         'type': 'rules_function',
         'relation': 'and',
         'rules': []
-      }
+      },
+      channelList: [
+        // {
+        //   name: '万卡',
+        //   value: '1000'
+        // },
+        {
+          name: '新商城',
+          value: '1001'
+        } // ,
+        // {
+        //   name: '理财',
+        //   value: '1002'
+        // }
+      ]
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -170,8 +193,9 @@ export default {
     initEmptyData () { // 当数据异常时，初始化数据
       this.baseForm = {
         name: '',
-        userType: 'index',
+        userType: 'indicator',
         type: 'static',
+        channelId: '1001',
         desc: ''
       }
       this.ruleConfig = { // 规则数据
@@ -193,6 +217,18 @@ export default {
             type: 'error'
           })
         } else {
+          this.flowId = data.data.flowId
+          this.baseForm = {
+            name: data.data.name,
+            desc: data.data.desc,
+            userType: data.data.userType,
+            channelId: data.data.channelId,
+            type: data.data.type
+          }
+          if (data.data.userType === 'excel') {
+            this.loading = false
+            return
+          }
           if (!data.data.configJson) {
             this.initEmptyData()
             this.loading = false
@@ -201,12 +237,7 @@ export default {
               type: 'error'
             })
           }
-          this.flowId = data.data.flowId
           let configJson = JSON.parse(data.data.configJson)
-          this.baseForm = {
-            name: configJson.name,
-            desc: configJson.desc
-          }
           this.ruleConfig = configJson.ruleConfig
           this.expression = configJson.expression
           this.expressionTemplate = configJson.expressionTemplate
@@ -226,7 +257,7 @@ export default {
       })
     },
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
-      if (val === 'index') {
+      if (val === 'indicator') {
         this.fileData.fileList = []
       }
     },
@@ -612,8 +643,9 @@ export default {
             data.append('file', this.fileData.fileList[0].raw)
             data.append('name', this.baseForm.name)
             data.append('type', this.baseForm.type)
+            data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
-            data.append('channelId', '1001')
+            data.append('channelId', this.baseForm.channelId)
             console.log('submit', data, this.fileData.fileList[0].raw)
             importExcelFile(data).then(res => {
               console.log(res)
@@ -627,6 +659,11 @@ export default {
                 this.$message({
                   type: 'success',
                   message: res.data.message || '保存成功'
+                })
+                this.visible = false
+                this.$parent.addOrUpdateVisible = false
+                this.$nextTick(() => {
+                  this.$parent.getDataList()
                 })
               }
             })

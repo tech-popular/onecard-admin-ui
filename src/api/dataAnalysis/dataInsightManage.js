@@ -1,8 +1,7 @@
 import { httpGet, httpPost, httpPostFile, httpPut, httpDelete } from '@/api'
+import http from '@/utils/httpRequest'
 let da = '/dataAnalysis/'
 // let da = '/'
-// let baseUrl = process.env.NODE_ENV === 'production' ? '//tech.9fbank.com/canary-admin' : 'http://release-bee.sk.9f.cn/canary-admin'
-let baseUrl = process.env.NODE_ENV === 'production' ? '//tech.9fbank.com/canary-admin' : 'http://192.168.37.132:18085'
 //
 // 元数据管理任务模块
 export const dataInsightManageList = params => httpGet(da + 'data/group/listOnPage', params) // 查询数据API列表并分页
@@ -17,4 +16,4 @@ export const dataPreviewInfo = params => httpPut(da + 'data/group/preview', para
 export const uploadFileInfo = params => httpGet(da + 'data/group/listOnPage', params)
 export const importExcelFile = params => httpPostFile(da + '/data/group/import', params)
 
-export const templateDownload = baseUrl + '/data/group/template/download'
+export const templateDownload = http.adornUrl('/data/group/template/download')
