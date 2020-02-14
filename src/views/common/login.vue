@@ -32,7 +32,7 @@
             status-icon
           >
             <el-form-item prop="username">
-              <el-input v-model="dataForm.username" placeholder="邮箱"></el-input>
+              <el-input v-model="dataForm.username" placeholder="账号"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
