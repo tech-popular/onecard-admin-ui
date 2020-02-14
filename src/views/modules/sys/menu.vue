@@ -69,6 +69,17 @@
         </template>
       </el-table-column>
       <el-table-column
+        prop="status"
+        header-align="center"
+        align="center"
+        width="150"
+        label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 1" size="small" >有效</el-tag>
+          <el-tag v-else size="small" type="danger">无效</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="perms"
         header-align="center"
         align="center"
@@ -98,6 +109,8 @@
         <template slot-scope="scope">
           <el-button v-if="isAuth('sys:menu:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.menuId)">修改</el-button>
           <el-button v-if="isAuth('sys:menu:delete')" type="text" size="small" @click="deleteHandle(scope.row.menuId)">删除</el-button>
+          <el-button v-if="scope.row.status === 0 && isAuth('sys:menu:update')" style="color:#67C23A;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">启用</el-button>
+          <el-button v-if="scope.row.status === 1 && isAuth('sys:menu:update')" style="color:#F56C6C;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">禁用</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -155,6 +168,33 @@
         }).then(() => {
           this.$http({
             url: this.$http.adornUrl(`/sys/menu/delete/${id}`),
+            method: 'post',
+            data: this.$http.adornData()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 启用、禁用
+      enableOrDisableHandle (id, status) {
+        this.$confirm(`确定对 [id=${id}] 进行 [` + (status === 1 ? '禁用' : '启用') + `] 操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl(`/sys/menu/updateStatus/${id}/${(status === 1 ? 0 : 1)}`),
             method: 'post',
             data: this.$http.adornData()
           }).then(({data}) => {
