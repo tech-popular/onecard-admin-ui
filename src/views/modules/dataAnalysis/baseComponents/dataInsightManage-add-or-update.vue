@@ -5,15 +5,74 @@
     :show-close="false"
     :wrapperClosable="false"
     size="1200px"
-    class="api-manage-drawer"
+    class="insight-manage-drawer"
   >
     <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3>基本信息</h3>
-        <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
+        <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="分群名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
+          </el-form-item>
+          <el-form-item label="分群类型" prop="userType">
+            <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange" :disabled="!!id">
+              <div class="type-radio-item type-radio-one"><el-radio label="indicator">指标筛选</el-radio></div>
+              <div class="type-radio-item type-radio-two">
+                <el-radio label="excel">excel文件导入</el-radio>
+                <!-- <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
+                <el-upload
+                  v-if="baseForm.userType === 'excel'"
+                  class="upload-excel"
+                  ref="upload"
+                  action="aaa"
+                  accept=".xlsx, .xls"
+                  :file-list="fileData.fileList"
+                  :on-change="handleChange"
+                  :before-upload="beforeUpload"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                >
+                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+                </el-upload> -->
+                <!-- <div v-if="fileData.fileList.length" class="btn-upload">
+                  <span>文件名：{{fileData.fileList[0].name}}</span>
+                  <el-button size="small" :type="fileData.uploadBtnType" :icon="fileData.uploadBtnIcon" :disabled="fileData.uploadBtnAble" @click="submitUpload">{{fileData.uploadTxt}}</el-button>
+                 </div> -->
+                <!-- <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button> -->
+              </div>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
+            <el-select v-model="baseForm.channelId">
+              <el-option v-for="(item, index) in channelList" :key="index" :label="item.name" :value="item.value"></el-option>
+            </el-select>
+            <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
+                <el-upload
+                  v-if="baseForm.userType === 'excel'"
+                  class="upload-excel"
+                  ref="upload"
+                  action="aaa"
+                  accept=".xlsx, .xls"
+                  :file-list="fileData.fileList"
+                  :on-change="handleChange"
+                  :before-upload="beforeUpload"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                >
+                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+                </el-upload>
+                <!-- <div v-if="fileData.fileList.length" class="btn-upload">
+                  <span>文件名：{{fileData.fileList[0].name}}</span>
+                  <el-button size="small" :type="fileData.uploadBtnType" :icon="fileData.uploadBtnIcon" :disabled="fileData.uploadBtnAble" @click="submitUpload">{{fileData.uploadTxt}}</el-button>
+                 </div> -->
+                <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
+          </el-form-item>
+          <el-form-item label="计算类型" prop="type">
+            <el-radio-group v-model="baseForm.type" :disabled="baseForm.userType === 'excel'">
+              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
+              <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="分群描述">
             <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
@@ -21,7 +80,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="pane-rules">
+      <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
         <h3>满足如下条件的用户</h3>
         <el-form :inline="true">
           <el-form-item label="用户属性与用户交易满足：" >
@@ -35,9 +94,24 @@
           <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
+      <div class="pane-reject" v-if="false">
+        <h3>
+          剔除用户名单
+          <el-tooltip placement="top">
+            <div slot="content">当判断指定用户是否在此分群时，不进行剔除名单过滤</div>
+            <i class="el-icon-warning cursor-pointer"></i>
+          </el-tooltip>
+        </h3>
+        <div>
+          <el-checkbox-group v-model="rejectUserList">
+            <el-checkbox label="反欺诈马甲包"></el-checkbox>
+            <el-checkbox label="UTC马甲包"></el-checkbox>
+          </el-checkbox-group>
+        </div>
+      </div>
     </div>
     <div class="footer">
-      <el-button type="success" @click="saveHandle('preview')" size="small">数据预览</el-button>
+      <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
       <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
@@ -47,7 +121,7 @@
 <script>
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -74,13 +148,31 @@ export default {
       initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
+      fileData: {
+        fileList: []
+      },
+      excelFile: '',
+      templateUrl: templateDownload,
+      rejectUserList: '',
       baseForm: {
         name: '',
+        userType: 'indicator',
+        type: 'static',
+        channelId: '1001',
         desc: ''
       },
       baseRule: { // 基本信息校验规则
         name: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
+        ],
+        userType: [
+          { required: true, message: '请选择分群类型', trigger: 'change' }
+        ],
+        type: [
+          { required: true, message: '请选择计算类型', trigger: 'change' }
+        ],
+        channelId: [
+          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -88,7 +180,13 @@ export default {
         'type': 'rules_function',
         'relation': 'and',
         'rules': []
-      }
+      },
+      channelList: [
+        {
+          name: '新商城',
+          value: '1001'
+        }
+      ]
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -120,6 +218,9 @@ export default {
     initEmptyData () { // 当数据异常时，初始化数据
       this.baseForm = {
         name: '',
+        userType: 'indicator',
+        type: 'static',
+        channelId: '1001',
         desc: ''
       }
       this.ruleConfig = { // 规则数据
@@ -141,6 +242,19 @@ export default {
             type: 'error'
           })
         } else {
+          this.flowId = data.data.flowId
+          this.baseForm = {
+            name: data.data.name,
+            desc: data.data.desc,
+            userType: data.data.userType,
+            channelId: data.data.channelId,
+            type: data.data.type
+          }
+          if (data.data.userType === 'excel') {
+            this.excelFile = data.data.excelFile
+            this.loading = false
+            return
+          }
           if (!data.data.configJson) {
             this.initEmptyData()
             this.loading = false
@@ -149,12 +263,7 @@ export default {
               type: 'error'
             })
           }
-          this.flowId = data.data.flowId
           let configJson = JSON.parse(data.data.configJson)
-          this.baseForm = {
-            name: configJson.name,
-            desc: configJson.desc
-          }
           this.ruleConfig = configJson.ruleConfig
           this.expression = configJson.expression
           this.expressionTemplate = configJson.expressionTemplate
@@ -172,6 +281,32 @@ export default {
           })
         }
       })
+    },
+    radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
+      if (val === 'indicator') {
+        this.fileData.fileList = []
+        this.excelFile = ''
+        // if (!this.initSelectOperateList.length) {
+        //   this.getSelectAllCata()
+        // }
+      }
+    },
+    handleChange (file, fileList) { // 上传文件变化时
+      if (fileList.length > 0) {
+        this.fileData.fileList = [fileList[fileList.length - 1]] // 这一步，是展示最后一次选择的文件
+        this.excelFile = this.fileData.fileList[0].name
+      }
+    },
+    beforeUpload (file) { // 上传文件之前的事件
+      let that = this
+      let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
+      if (fileName != 'xls' && fileName != 'xlsx') {
+        that.$message({
+          type: 'error',
+          message: '文件类型不是.xls文件!'
+        })
+        return false
+      }
     },
     updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
       arr.rules.forEach(item => {
@@ -523,11 +658,54 @@ export default {
     previewHandle () {
       this.isPreviewShow = true
       this.$nextTick(() => {
-        console.log(this.$refs)
         this.$refs.dataPreviewInfo.init()
       })
     },
     saveHandle (type) {
+      console.log(this.baseForm.userType)
+      if (this.baseForm.userType === 'excel') {
+        if (!this.excelFile) {
+          this.$message({
+            type: 'error',
+            message: '请选择要上传的文件'
+          })
+          return
+        }
+        this.$refs.baseForm.validate((valid) => {
+          if (valid) {
+            let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
+            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : null)
+            data.append('name', this.baseForm.name)
+            data.append('type', this.baseForm.type)
+            data.append('userType', this.baseForm.userType)
+            data.append('desc', this.baseForm.desc)
+            data.append('channelId', this.baseForm.channelId)
+            if (this.id) {
+              data.append('id', this.id)
+            }
+            importExcelFile(data).then(res => {
+              if (res.data.status * 1 !== 1) {
+                this.$message({
+                  type: 'error',
+                  message: res.data.message || '保存失败'
+                })
+              } else {
+                this.$message({
+                  type: 'success',
+                  message: res.data.message || '保存成功'
+                })
+                this.visible = false
+                this.$parent.addOrUpdateVisible = false
+                this.$nextTick(() => {
+                  this.$parent.getDataList()
+                })
+              }
+            })
+          }
+        })
+        return
+      }
+      console.log(8989)
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -552,6 +730,7 @@ export default {
             }
           })
         })
+        console.log(12)
         if (!flag) {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
@@ -564,12 +743,14 @@ export default {
             })
             return
           }
+          console.log(222)
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
             params.id = this.id
             params.flowId = this.flowId
           }
+          console.log(params)
           url(params).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
@@ -598,8 +779,8 @@ export default {
   }
 }
 </script>
-<style scoped>
-  .api-manage-drawer .wrap {
+<style>
+  .insight-manage-drawer .wrap {
     padding: 0 20px 20px;
     margin-top: -12px;
     width: 100%;
@@ -608,7 +789,7 @@ export default {
     top: 75px;
     bottom: 55px;
   }
-  .drawer-title {
+  .insight-manage-drawer .drawer-title {
     padding: 15px;
     background: #333;
     color: #fff;
@@ -616,29 +797,26 @@ export default {
     margin: -20px -20px 0 -20px;
     position: relative;
   }
-  .drawer-close {
+  .insight-manage-drawer .drawer-close {
     position: absolute;
     right: 20px;
   }
-  .item-inline {
+  .insight-manage-drawer .item-inline {
     display: inline-block;
   }
-  .item-code {
+  .insight-manage-drawer .item-code {
     margin-left: -70px;
   }
-  .item-code-name {
+  .insight-manage-drawer .item-code-name {
     width: 300px;
   }
-  .item-button {
+  .insight-manage-drawer .item-button {
     margin-left: -60px;
   }
-  .copy-code {
+  .insight-manage-drawer .copy-code {
     margin-left: 15px;
   }
-  .base-pane {
-    border-bottom: 1px dashed #ccc;
-  }
-  .footer {
+  .insight-manage-drawer .footer {
     position: absolute;
     bottom: 0;
     background: #fff;
@@ -649,20 +827,62 @@ export default {
     box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
     z-index: 500;
   }
-  .cursor-pointer {
+  .insight-manage-drawer .cursor-pointer {
     cursor: pointer;
   }
-  .base-pane-item {
+  .insight-manage-drawer .base-pane-item {
     width: 80%;
   }
-  .vue-treeselect {
+  .insight-manage-drawer .vue-treeselect {
     line-height: 24px;
   }
-  .data-description-tips {
+  .insight-manage-drawer .data-description-tips {
     color: #999;
     margin-top: 0
   }
-  .data-description-tips span {
+  .insight-manage-drawer .data-description-tips span {
     color: red
+  }
+  .insight-manage-drawer .type-radio-group {
+    margin-top: 12px;
+  }
+  .insight-manage-drawer .type-radio-two {
+    margin-top: 20px;
+  }
+  .insight-manage-drawer .upload-excel {
+    display: inline-block;
+    margin-left: 20px;
+  }
+  .insight-manage-drawer .btn-upload {
+    display: inline-block;
+    font-size: 14px;
+    padding-left: 15px;
+  }
+  .insight-manage-drawer .upload-name {
+    font-size: 14px;
+    padding-left: 15px;
+  }
+  .insight-manage-drawer .btn-upload button {
+    margin-left: 10px;
+  }
+  .insight-manage-drawer .btn-download {
+    margin-left: 10px;
+  }
+  .insight-manage-drawer .btn-download a {
+    color: #fff;
+  }
+  .insight-manage-drawer .el-list-enter-active,
+  .insight-manage-drawer .el-list-leave-active {
+    transition: none;
+  }
+  .insight-manage-drawer .el-list-enter,
+  .insight-manage-drawer .el-list-leave-active {
+    opacity: 0;
+  }
+  .insight-manage-drawer .pane-rules, .insight-manage-drawer .pane-reject {
+    border-top: 1px dashed #ccc;
+  }
+  .insight-manage-drawer .user-channel {
+    margin-left: 110px;
   }
 </style>
