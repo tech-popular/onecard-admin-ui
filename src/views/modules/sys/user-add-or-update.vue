@@ -7,12 +7,12 @@
       <el-form-item label="用户名" prop="userName">
         <el-input v-model="dataForm.userName" placeholder="登录帐号"></el-input>
       </el-form-item>
-      <el-form-item label="密码" prop="password" :class="{ 'is-required': !dataForm.id }">
+      <!-- <el-form-item label="密码" prop="password" :class="{ 'is-required': !dataForm.id }">
         <el-input v-model="dataForm.password" autocomplete='off' type="password" placeholder="密码" @focus="cleanData()" @blur="midifyflag()"></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="comfirmPassword" :class="{ 'is-required': !dataForm.id }">
         <el-input v-model="dataForm.comfirmPassword" type="password" placeholder="确认密码"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="dataForm.email" placeholder="邮箱"></el-input>
       </el-form-item>
@@ -49,36 +49,36 @@
 
 <script>
   import { isEmail, isMobile } from '@/utils/validate'
-  import { checkUserName, checkMobile } from '@/api/account'
+  import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
   export default {
     data () {
-      var validatePassword = (rule, value, callback) => {
-        let reg = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[._~!@#$^&*])[A-Za-z0-9._~!@#$^&*]{6,16}$/
-        if (!this.dataForm.id && !/\S/.test(value)) {
-          callback(new Error('密码不能为空'))
-        } else if (!reg.test(value) && value != this.checkedPass) {
-          callback(
-          new Error(
-            '密码长度为6到16个字符,设置时使用英文字母、数字和符号的组合'
-          )
-        )
-        } else {
-          callback()
-        }
-      }
-      var validateComfirmPassword = (rule, value, callback) => {
-        if (this.dataForm.password != this.checkedPass) {
-          if (!this.dataForm.id && !/\S/.test(value)) {
-            callback(new Error('确认密码不能为空'))
-          } else if (this.dataForm.password !== value) {
-            callback(new Error('确认密码与密码输入不一致'))
-          } else {
-            callback()
-          }
-        } else {
-          callback()
-        }
-      }
+      // var validatePassword = (rule, value, callback) => {
+      //   let reg = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[._~!@#$^&*])[A-Za-z0-9._~!@#$^&*]{6,16}$/
+      //   if (!this.dataForm.id && !/\S/.test(value)) {
+      //     callback(new Error('密码不能为空'))
+      //   } else if (!reg.test(value) && value != this.checkedPass) {
+      //     callback(
+      //     new Error(
+      //       '密码长度为6到16个字符,设置时使用英文字母、数字和符号的组合'
+      //     )
+      //   )
+      //   } else {
+      //     callback()
+      //   }
+      // }
+      // var validateComfirmPassword = (rule, value, callback) => {
+      //   if (this.dataForm.password != this.checkedPass) {
+      //     if (!this.dataForm.id && !/\S/.test(value)) {
+      //       callback(new Error('确认密码不能为空'))
+      //     } else if (this.dataForm.password !== value) {
+      //       callback(new Error('确认密码与密码输入不一致'))
+      //     } else {
+      //       callback()
+      //     }
+      //   } else {
+      //     callback()
+      //   }
+      // }
       var validateEmail = (rule, value, callback) => {
         const reg = new RegExp(/9fbank|ithro/)
         if (!isEmail(value)) {
@@ -103,6 +103,8 @@
           callback(new Error('用户名不能为空'))
         } else if (!await this.checkIfUsername() && value != this.checkedName) {
           callback(new Error('用户名已经存在'))
+        } else if (!await this.checkIfInIdap()) {
+          callback(new Error('用户名在ldap未注册'))
         } else {
           callback()
         }
@@ -113,8 +115,8 @@
         dataForm: {
           id: 0,
           userName: '',
-          password: '',
-          comfirmPassword: '',
+          // password: '',
+          // comfirmPassword: '',
           ismodifyPasswd: '',
           salt: '',
           email: '',
@@ -129,12 +131,12 @@
           userName: [
             { required: true, validator: validateUserName, trigger: 'blur' }
           ],
-          password: [
-            { validator: validatePassword, trigger: 'blur' }
-          ],
-          comfirmPassword: [
-            { validator: validateComfirmPassword, trigger: 'blur' }
-          ],
+          // password: [
+          //   { validator: validatePassword, trigger: 'blur' }
+          // ],
+          // comfirmPassword: [
+          //   { validator: validateComfirmPassword, trigger: 'blur' }
+          // ],
           email: [
             { required: true, message: '邮箱不能为空', trigger: 'blur' },
             { validator: validateEmail, trigger: 'blur' }
@@ -148,8 +150,8 @@
           ]
         },
         checkedName: '',
-        checkedMobile: '',
-        checkedPass: ''
+        checkedMobile: ''
+        // checkedPass: ''
       }
     },
     methods: {
@@ -196,13 +198,13 @@
                 this.dataForm.mobile = data.user.mobile
                 this.dataForm.remark = data.user.remark
                 this.checkedMobile = data.user.mobile
-                this.dataForm.password = data.user.password
-                this.checkedPass = data.user.password
+                // this.dataForm.password = data.user.password
+                // this.checkedPass = data.user.password
                 this.dataForm.roleIdList = data.user.roleIdList
                 this.dataForm.status = data.user.status
                 this.dataForm.systenandIdList = data.user.systenandIdList
                 this.$refs.dataForm.validateField('userName')
-                this.$refs.dataForm.validateField('password')
+                // this.$refs.dataForm.validateField('password')
               }
             })
           }
@@ -224,7 +226,7 @@
               data: this.$http.adornData({
                 'userId': this.dataForm.id || undefined,
                 'username': this.dataForm.userName,
-                'password': this.dataForm.password,
+                // 'password': this.dataForm.password,
                 'salt': this.dataForm.salt,
                 'email': this.dataForm.email,
                 'mobile': this.dataForm.mobile,
@@ -274,6 +276,21 @@
             mobile: this.dataForm.mobile
           }
           checkMobile(data).then(({data}) => {
+            if (data && data.code == 0) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          })
+        })
+        return res
+      },
+      async checkIfInIdap () {
+        const data = {
+          username: this.dataForm.userName
+        }
+        let res = await new Promise(resolve => {
+          ifExistUser(data).then(({data}) => {
             if (data && data.code == 0) {
               resolve(true)
             } else {
