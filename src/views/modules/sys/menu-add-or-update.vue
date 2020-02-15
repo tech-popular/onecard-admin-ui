@@ -65,6 +65,10 @@
           </el-col>
         </el-row>
       </el-form-item>
+      <el-form-item label="菜单状态:" prop="status">
+        <el-radio v-model="dataForm.status" :label='1'>启用</el-radio>
+        <el-radio v-model="dataForm.status" :label='0'>禁用</el-radio>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -99,7 +103,8 @@
           orderNum: 0,
           mark: '',
           icon: '',
-          iconList: []
+          iconList: [],
+          status: 1
         },
         dataRule: {
           name: [
@@ -156,6 +161,7 @@
               this.dataForm.mark = data.menu.mark
               this.dataForm.orderNum = data.menu.orderNum
               this.dataForm.icon = data.menu.icon
+              this.dataForm.status = data.menu.status
               this.menuListTreeSetCurrentNode()
             })
           }
@@ -191,7 +197,8 @@
                 'perms': this.dataForm.perms,
                 'mark': this.dataForm.mark,
                 'orderNum': this.dataForm.orderNum,
-                'icon': this.dataForm.icon
+                'icon': this.dataForm.icon,
+                'status': this.dataForm.status
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
