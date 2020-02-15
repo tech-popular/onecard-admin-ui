@@ -16,11 +16,38 @@
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="分群类型" prop="userType">
-            <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange">
+            <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange" :disabled="!!id">
               <div class="type-radio-item type-radio-one"><el-radio label="indicator">指标筛选</el-radio></div>
               <div class="type-radio-item type-radio-two">
                 <el-radio label="excel">excel文件导入</el-radio>
-                <span v-if="fileData.fileList.length" class="upload-name">{{fileData.fileList[0].name}}</span>
+                <!-- <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
+                <el-upload
+                  v-if="baseForm.userType === 'excel'"
+                  class="upload-excel"
+                  ref="upload"
+                  action="aaa"
+                  accept=".xlsx, .xls"
+                  :file-list="fileData.fileList"
+                  :on-change="handleChange"
+                  :before-upload="beforeUpload"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                >
+                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+                </el-upload> -->
+                <!-- <div v-if="fileData.fileList.length" class="btn-upload">
+                  <span>文件名：{{fileData.fileList[0].name}}</span>
+                  <el-button size="small" :type="fileData.uploadBtnType" :icon="fileData.uploadBtnIcon" :disabled="fileData.uploadBtnAble" @click="submitUpload">{{fileData.uploadTxt}}</el-button>
+                 </div> -->
+                <!-- <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button> -->
+              </div>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
+            <el-select v-model="baseForm.channelId">
+              <el-option v-for="(item, index) in channelList" :key="index" :label="item.name" :value="item.value"></el-option>
+            </el-select>
+            <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
                 <el-upload
                   v-if="baseForm.userType === 'excel'"
                   class="upload-excel"
@@ -40,13 +67,6 @@
                   <el-button size="small" :type="fileData.uploadBtnType" :icon="fileData.uploadBtnIcon" :disabled="fileData.uploadBtnAble" @click="submitUpload">{{fileData.uploadTxt}}</el-button>
                  </div> -->
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
-              </div>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'">
-            <el-select v-model="baseForm.channelId">
-              <el-option v-for="(item, index) in channelList" :key="index" :label="item.name" :value="item.value"></el-option>
-            </el-select>
           </el-form-item>
           <el-form-item label="计算类型" prop="type">
             <el-radio-group v-model="baseForm.type" :disabled="baseForm.userType === 'excel'">
@@ -72,6 +92,21 @@
         </el-form>
         <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
           <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
+        </div>
+      </div>
+      <div class="pane-reject" v-if="false">
+        <h3>
+          剔除用户名单
+          <el-tooltip placement="top">
+            <div slot="content">当判断指定用户是否在此分群时，不进行剔除名单过滤</div>
+            <i class="el-icon-warning cursor-pointer"></i>
+          </el-tooltip>
+        </h3>
+        <div>
+          <el-checkbox-group v-model="rejectUserList">
+            <el-checkbox label="反欺诈马甲包"></el-checkbox>
+            <el-checkbox label="UTC马甲包"></el-checkbox>
+          </el-checkbox-group>
         </div>
       </div>
     </div>
@@ -115,12 +150,10 @@ export default {
       visible: false,
       fileData: {
         fileList: []
-        // uploadBtnType: 'primary',
-        // uploadTxt: '点击上传',
-        // uploadBtnIcon: 'el-icon-upload',
-        // uploadBtnAble: false
       },
+      excelFile: '',
       templateUrl: templateDownload,
+      rejectUserList: '',
       baseForm: {
         name: '',
         userType: 'indicator',
@@ -149,18 +182,10 @@ export default {
         'rules': []
       },
       channelList: [
-        // {
-        //   name: '万卡',
-        //   value: '1000'
-        // },
         {
           name: '新商城',
           value: '1001'
-        } // ,
-        // {
-        //   name: '理财',
-        //   value: '1002'
-        // }
+        }
       ]
     }
   },
@@ -226,6 +251,7 @@ export default {
             type: data.data.type
           }
           if (data.data.userType === 'excel') {
+            this.excelFile = data.data.excelFile
             this.loading = false
             return
           }
@@ -259,16 +285,17 @@ export default {
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
       if (val === 'indicator') {
         this.fileData.fileList = []
+        this.excelFile = ''
+        // if (!this.initSelectOperateList.length) {
+        //   this.getSelectAllCata()
+        // }
       }
     },
     handleChange (file, fileList) { // 上传文件变化时
       if (fileList.length > 0) {
         this.fileData.fileList = [fileList[fileList.length - 1]] // 这一步，是展示最后一次选择的文件
+        this.excelFile = this.fileData.fileList[0].name
       }
-      // this.fileData.uploadBtnType = 'primary'
-      // this.fileData.uploadTxt = '点击上传'
-      // this.fileData.uploadBtnIcon = 'el-icon-upload'
-      // this.fileData.uploadBtnAble = false
     },
     beforeUpload (file) { // 上传文件之前的事件
       let that = this
@@ -631,31 +658,38 @@ export default {
     previewHandle () {
       this.isPreviewShow = true
       this.$nextTick(() => {
-        console.log(this.$refs)
         this.$refs.dataPreviewInfo.init()
       })
     },
     saveHandle (type) {
+      console.log(this.baseForm.userType)
       if (this.baseForm.userType === 'excel') {
+        if (!this.excelFile) {
+          this.$message({
+            type: 'error',
+            message: '请选择要上传的文件'
+          })
+          return
+        }
         this.$refs.baseForm.validate((valid) => {
           if (valid) {
             let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
-            data.append('file', this.fileData.fileList[0].raw)
+            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : null)
             data.append('name', this.baseForm.name)
             data.append('type', this.baseForm.type)
             data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
-            console.log('submit', data, this.fileData.fileList[0].raw)
+            if (this.id) {
+              data.append('id', this.id)
+            }
             importExcelFile(data).then(res => {
-              console.log(res)
               if (res.data.status * 1 !== 1) {
                 this.$message({
                   type: 'error',
                   message: res.data.message || '保存失败'
                 })
               } else {
-                console.log(345)
                 this.$message({
                   type: 'success',
                   message: res.data.message || '保存成功'
@@ -671,6 +705,7 @@ export default {
         })
         return
       }
+      console.log(8989)
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -695,6 +730,7 @@ export default {
             }
           })
         })
+        console.log(12)
         if (!flag) {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
@@ -707,12 +743,14 @@ export default {
             })
             return
           }
+          console.log(222)
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
             params.id = this.id
             params.flowId = this.flowId
           }
+          console.log(params)
           url(params).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
@@ -778,9 +816,6 @@ export default {
   .insight-manage-drawer .copy-code {
     margin-left: 15px;
   }
-  .insight-manage-drawer .base-pane {
-    border-bottom: 1px dashed #ccc;
-  }
   .insight-manage-drawer .footer {
     position: absolute;
     bottom: 0;
@@ -843,5 +878,11 @@ export default {
   .insight-manage-drawer .el-list-enter,
   .insight-manage-drawer .el-list-leave-active {
     opacity: 0;
+  }
+  .insight-manage-drawer .pane-rules, .insight-manage-drawer .pane-reject {
+    border-top: 1px dashed #ccc;
+  }
+  .insight-manage-drawer .user-channel {
+    margin-left: 110px;
   }
 </style>
