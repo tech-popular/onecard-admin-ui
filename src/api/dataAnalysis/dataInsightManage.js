@@ -1,7 +1,7 @@
 import { httpGet, httpPost, httpPostFile, httpPut, httpDelete } from '@/api'
 import http from '@/utils/httpRequest'
-let da = '/dataAnalysis/'
-// let da = '/'
+// let da = '/dataAnalysis/'
+let da = '/'
 //
 // 元数据管理任务模块
 export const dataInsightManageList = params => httpGet(da + 'data/group/listOnPage', params) // 查询数据API列表并分页
