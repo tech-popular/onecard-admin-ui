@@ -174,6 +174,13 @@ export default {
     //     callback()
     //   }
     // }
+    var validatePass = (rule, value, callback) => {
+      if ((this.dataForm.username + '').toLowerCase() !== 'unifiedaccount' && !value) {
+        callback(new Error('密码不能为空'))
+      } else {
+        callback()
+      }
+    }
     return {
       ifTrueCaptcha: false,
       type: true,
@@ -199,7 +206,7 @@ export default {
           { required: true, trigger: 'blur', message: '账号不能为空' }
         ],
         password: [
-          { required: true, message: '密码不能为空', trigger: 'blur' }
+          { required: true, validator: validatePass, trigger: 'blur' }
         ]
         // captcha: [
         //   { required: true, message: '验证码不能为空', trigger: 'blur' }
