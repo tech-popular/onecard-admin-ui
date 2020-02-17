@@ -34,7 +34,7 @@
             <el-form-item prop="username">
               <el-input v-model="dataForm.username" placeholder="账号"></el-input>
             </el-form-item>
-            <el-form-item prop="password">
+            <el-form-item>
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
             </el-form-item>
             <!-- <el-form-item prop="captcha">
@@ -197,10 +197,10 @@ export default {
         // ],
         username: [
           { required: true, trigger: 'blur', message: '账号不能为空' }
-        ],
-        password: [
-          { required: true, message: '密码不能为空', trigger: 'blur' }
         ]
+        // password: [
+        //   { required: true, message: '密码不能为空', trigger: 'blur' }
+        // ]
         // captcha: [
         //   { required: true, message: '验证码不能为空', trigger: 'blur' }
         // ]
