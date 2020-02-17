@@ -74,7 +74,7 @@ router.beforeEach((to, from, next) => {
     let sysUuid = getQueryString('system_uuid')
     if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') { // 嵌入统一后台的免登陆处理
       http.get(http.adornUrl('/data/login')).then(res => {
-        Vue.cookie.set('isUnifyManage', 1) // isUnifyManage 为1时表示 是嵌入统一后台的页面，0 表示原系统
+        // Vue.cookie.set('isUnifyManage', 1) // isUnifyManage 为1时表示 是嵌入统一后台的页面，0 表示原系统
         Vue.cookie.set('token', res.data.token)
         httpNav(to, from, next)
       })
