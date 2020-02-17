@@ -79,7 +79,7 @@ router.beforeEach((to, from, next) => {
         httpNav(to, from, next)
       })
     } else {
-      Vue.cookie.set('isUnifyManage', 0)
+      // Vue.cookie.set('isUnifyManage', 0)
       httpNav(to, from, next)
     }
   }
