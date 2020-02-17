@@ -71,29 +71,42 @@ router.beforeEach((to, from, next) => {
   if (router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global') {
     next()
   } else {
-    http({
-      url: http.adornUrl('/sys/menu/nav'),
-      method: 'get',
-      params: http.adornParams()
-    }).then(({data}) => {
-      if (data && data.code === 0) {
-        fnAddDynamicMenuRoutes(data.menuList)
-        router.options.isAddDynamicMenuRoutes = true
-        sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
-        sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
-        next({ ...to, replace: true })
-      } else {
-        sessionStorage.setItem('menuList', '[]')
-        sessionStorage.setItem('permissions', '[]')
-        next()
-      }
-    }).catch((e) => {
-      console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-      router.push({ name: 'login' })
-    })
+    let sysUuid = getQueryString('system_uuid')
+    if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') { // 嵌入统一后台的免登陆处理
+      http.get(http.adornUrl('/data/login')).then(res => {
+        Vue.cookie.set('isUnifyManage', 1) // isUnifyManage 为1时表示 是嵌入统一后台的页面，0 表示原系统
+        Vue.cookie.set('token', res.data.token)
+        httpNav(to, from, next)
+      })
+    } else {
+      Vue.cookie.set('isUnifyManage', 0)
+      httpNav(to, from, next)
+    }
   }
 })
 
+function httpNav (to, from, next) {
+  http({
+    url: http.adornUrl('/sys/menu/nav'),
+    method: 'get',
+    params: http.adornParams()
+  }).then(({data}) => {
+    if (data && data.code === 0) {
+      fnAddDynamicMenuRoutes(data.menuList)
+      router.options.isAddDynamicMenuRoutes = true
+      sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
+      sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
+      next({ ...to, replace: true })
+    } else {
+      sessionStorage.setItem('menuList', '[]')
+      sessionStorage.setItem('permissions', '[]')
+      next()
+    }
+  }).catch((e) => {
+    console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
+    router.push({ name: 'login' })
+  })
+}
 /**
  * 判断当前路由类型, global: 全局路由, main: 主入口路由
  * @param {*} route 当前路由

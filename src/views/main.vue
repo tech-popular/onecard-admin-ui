@@ -5,9 +5,9 @@
     v-loading.fullscreen.lock="loading"
     element-loading-text="拼命加载中">
     <template v-if="!loading">
-      <main-navbar />
+      <main-navbar v-if="$cookie.get('isUnifyManage') !== '1'" />
       <main-sidebar />
-      <div class="site-content__wrapper" :style="{ 'min-height': documentClientHeight + 'px' }">
+      <div :class="$cookie.get('isUnifyManage') !== '1' ? 'site-content__wrapper' : ''" :style="{ 'min-height': documentClientHeight + 'px' }">
         <main-content />
       </div>
     </template>
@@ -82,3 +82,11 @@
     }
   }
 </script>
+<style lang="scss">
+.hideWidth {
+  width: 0
+}
+.site-content-noPad {
+  padding: 0
+}
+</style>

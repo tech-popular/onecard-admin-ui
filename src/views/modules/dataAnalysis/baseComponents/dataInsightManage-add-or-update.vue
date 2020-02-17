@@ -122,6 +122,7 @@
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload } from '@/api/dataAnalysis/dataInsightManage'
+import { getQueryString } from '@/utils'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -705,7 +706,6 @@ export default {
         })
         return
       }
-      console.log(8989)
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -730,7 +730,6 @@ export default {
             }
           })
         })
-        console.log(12)
         if (!flag) {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
@@ -743,14 +742,16 @@ export default {
             })
             return
           }
-          console.log(222)
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
             params.id = this.id
             params.flowId = this.flowId
           }
-          console.log(params)
+          let sysUuid = getQueryString('system_uuid')
+          if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') {
+            params.username = getQueryString('username') || ''
+          }
           url(params).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({

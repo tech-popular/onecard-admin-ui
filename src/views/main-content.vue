@@ -1,8 +1,8 @@
 <template>
-  <main class="site-content" :class="{ 'site-content--tabs': $route.meta.isTab }">
+  <main class="site-content" :class="{'site-content--tabs': $route.meta.isTab, 'site-content-noPad': $cookie.get('isUnifyManage') === '1' }">
     <!-- 主入口标签页 s -->
     <el-tabs
-      v-if="$route.meta.isTab"
+      v-if="$route.meta.isTab && $cookie.get('isUnifyManage') !== '1'"
       v-model="mainTabsActiveName"
       :closable="true"
       @tab-click="selectedTabHandle"
