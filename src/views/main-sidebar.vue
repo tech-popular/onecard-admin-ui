@@ -1,5 +1,5 @@
 <template>
-  <aside class="site-sidebar" :class="['site-sidebar--' + sidebarLayoutSkin, $cookie.get('isUnifyManage') === '1' ? 'hideWidth': '']">
+  <aside class="site-sidebar" :class="'site-sidebar--' + sidebarLayoutSkin">
     <div class="site-sidebar__inner">
       <el-menu
         :default-active="menuActiveName || 'home'"
@@ -63,7 +63,6 @@
       $route: 'routeHandle'
     },
     created () {
-      console.log(this.$cookie.get('isUnifyManage'))
       this.menuList = JSON.parse(sessionStorage.getItem('menuList') || '[]')
       this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
       this.routeHandle(this.$route)
