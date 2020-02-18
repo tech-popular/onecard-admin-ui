@@ -5,11 +5,16 @@
       <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
       <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
     </el-form-item>
-    <el-form-item label="任务类型" prop="type">
-        <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()'>
-          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
-        </el-select>
-      </el-form-item>
+    <el-form-item label="任务类型" prop="type" v-if="dataForm.id">
+      <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()' disabled>
+        <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="任务类型" prop="type" v-else>
+      <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()'>
+        <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+      </el-select>
+    </el-form-item>
     <el-form-item label="任务描述" prop="description">
       <el-input v-model="dataForm.description" placeholder="任务"/>
     </el-form-item>
@@ -59,6 +64,10 @@
     <metadata-freemarke
     v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
+    <!-- HBASE 类型8 -->
+    <metadataHbase
+    v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHbase"/>
     </el-form>
    
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
@@ -76,6 +85,7 @@
   import metadataGroovy from './metadataSon/metadata-groovy'
   import metadataAviator from './metadataSon/metadata-aviator'
   import metadataFreemarke from './metadataSon/metadata-freemarke'
+  import metadataHbase from './metadataSon/metadata-hbase'
 
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   import Filter from './filter'
@@ -137,7 +147,9 @@
         fatherData: {
           enable: true,
           enableCache: 1,
-          parsTemplate: false
+          parsTemplate: false,
+          requestFieldType: 0,
+          requestParamTemplateStatus: 0
         }
       }
     },
@@ -148,7 +160,8 @@
       metadataCassandra, // CASSANDRA
       metadataGroovy, // GROOVY
       metadataAviator, // AVIATOR
-      metadataFreemarke // Freemarke
+      metadataFreemarke, // Freemarke
+      metadataHbase // Hbase
     },
     methods: {
       init (id, value) {
@@ -189,7 +202,9 @@
         this.fatherData = {
           enable: true,
           enableCache: 1,
-          parsTemplate: false
+          parsTemplate: false,
+          requestFieldType: 0,
+          requestParamTemplateStatus: 0
         }
       },
       // 校验是否通过
@@ -205,7 +220,9 @@
         this.fatherData = {
           enable: true,
           enableCache: 1,
-          parsTemplate: false
+          parsTemplate: false,
+          requestFieldType: 0,
+          requestParamTemplateStatus: 0
         }
         this.visible = data
       },
@@ -219,7 +236,8 @@
               'cassandra': null,
               'groovy': null,
               'aviator': null,
-              'freemarker': null
+              'freemarker': null,
+              'hbase': null
             }
             if (form) {
               for (let key in data) {

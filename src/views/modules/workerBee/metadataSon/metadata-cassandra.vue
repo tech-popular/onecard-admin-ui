@@ -2,7 +2,10 @@
     <div class="aviator">
       <el-form :model="fatherData" ref="fatherData" label-width="30%">
         <el-form-item label="cql" prop="cql" :rules="dataRule.cql">
-        <el-input v-model="fatherData.cql" placeholder="请输入cql"/>
+        <el-input type="textarea" autosize v-model="fatherData.cql" placeholder="请输入cql"/>
+        </el-form-item>
+        <el-form-item label="数据源id" prop="datasourceId" :rules="dataRule.datasourceId">
+        <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
         </el-form-item>
         <el-form-item label="is_query" prop="isQuery" :rules="dataRule.isQuery">
         <el-input v-model="fatherData.isQuery" placeholder="is_query"/>
@@ -50,8 +53,10 @@
       return {
         dataRule: {
           cql: [
-            { required: true, message: '请输入cql', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请输入cql', trigger: 'blur' }
+          ],
+          datasourceId: [
+            { required: true, message: '请输入数据源id', trigger: 'blur' }
           ],
           isQuery: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
