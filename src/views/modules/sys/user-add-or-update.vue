@@ -103,8 +103,6 @@
           callback(new Error('用户名不能为空'))
         } else if (!await this.checkIfUsername() && value != this.checkedName) {
           callback(new Error('用户名已经存在'))
-        } else if (!await this.checkIfInIdap()) {
-          callback(new Error('用户名在ldap未注册'))
         } else {
           callback()
         }
