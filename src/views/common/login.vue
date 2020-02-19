@@ -32,7 +32,7 @@
             status-icon
           >
             <el-form-item prop="username">
-              <el-input v-model="dataForm.username" placeholder="账号"></el-input>
+              <el-input v-model="dataForm.username" placeholder="用户名"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
@@ -174,6 +174,17 @@ export default {
     //     callback()
     //   }
     // }
+
+    var validateUsername = (rule, value, callback) => {
+      const reg = /^[a-zA-Z]{0,20}$/
+      if (!value) {
+        callback(new Error('用户名不能为空'))
+      } else if (!reg.test(value)) {
+        callback(new Error('请输入20以内英文格式的用户名'))
+      } else {
+        callback()
+      }
+    }
     return {
       ifTrueCaptcha: false,
       type: true,
@@ -196,7 +207,7 @@ export default {
         //   { required: true, trigger: 'blur', validator: validateEmail }
         // ],
         username: [
-          { required: true, trigger: 'blur', message: '账号不能为空' }
+          { required: true, trigger: 'blur', validator: validateUsername, max: 20 }
         ],
         password: [
           { required: true, message: '密码不能为空', trigger: 'blur' }
