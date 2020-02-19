@@ -741,14 +741,12 @@ export default {
             })
             return
           }
-          console.log(222)
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
             params.id = this.id
             params.flowId = this.flowId
           }
-          console.log(params)
           url(params).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
