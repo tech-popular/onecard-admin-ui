@@ -675,7 +675,7 @@ export default {
         this.$refs.baseForm.validate((valid) => {
           if (valid) {
             let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
-            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : null)
+            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
             data.append('name', this.baseForm.name)
             data.append('type', this.baseForm.type)
             data.append('userType', this.baseForm.userType)
