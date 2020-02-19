@@ -674,7 +674,7 @@ export default {
         this.$refs.baseForm.validate((valid) => {
           if (valid) {
             let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
-            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : null)
+            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
             data.append('name', this.baseForm.name)
             data.append('type', this.baseForm.type)
             data.append('userType', this.baseForm.userType)
@@ -705,7 +705,6 @@ export default {
         })
         return
       }
-      console.log(8989)
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -730,7 +729,6 @@ export default {
             }
           })
         })
-        console.log(12)
         if (!flag) {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
