@@ -1,5 +1,5 @@
 <template>
-  <main class="site-content" :class="{ 'site-content--tabs': $route.meta.isTab }">
+  <main class="site-content" :class="{'site-content--tabs': $route.meta.isTab }">
     <!-- 主入口标签页 s -->
     <el-tabs
       v-if="$route.meta.isTab"
