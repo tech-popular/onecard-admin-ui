@@ -174,19 +174,19 @@ export default {
     //     callback()
     //   }
     // }
-    var validatePass = (rule, value, callback) => {
-      if ((this.dataForm.username + '').toLowerCase() !== 'unifiedaccount' && !value) {
-        callback(new Error('密码不能为空'))
+    var validateUsername = (rule, value, callback) => {
+      const reg = /^[a-zA-Z0-9]{0,20}$/
+      if (!value) {
+        callback(new Error('用户名不能为空'))
+      } else if (!reg.test(value)) {
+        callback(new Error('请输入20以内英文数字格式的用户名'))
       } else {
         callback()
       }
     }
-    var validateUsername = (rule, value, callback) => {
-      const reg = /^[a-zA-Z]{0,20}$/
-      if (!value) {
-        callback(new Error('用户名不能为空'))
-      } else if (!reg.test(value)) {
-        callback(new Error('请输入20以内英文格式的用户名'))
+    var validatePass = (rule, value, callback) => {
+      if ((this.dataForm.username + '').toLowerCase() !== 'unifiedaccount' && !value) {
+        callback(new Error('密码不能为空'))
       } else {
         callback()
       }
