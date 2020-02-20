@@ -4,6 +4,9 @@
       <el-form-item label="指标名称">
         <el-input v-model="dataForm.englishName" placeholder="" clearable />
       </el-form-item>
+      <el-form-item label="指标标题">
+        <el-input v-model="dataForm.chineseName" placeholder="" clearable />
+      </el-form-item>
       <el-form-item label="指标类别">
         <Treeselect
               :options="categoryIdList"
@@ -78,7 +81,7 @@
           <el-tag v-else size="small" type="danger">无效</el-tag>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="100" label="操作">
+      <el-table-column header-align="center" align="center" width="100" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
@@ -109,6 +112,7 @@
       return {
         dataForm: {
           englishName: '',
+          chineseName: '',
           categoryId: null,
           enable: ''
         },
@@ -233,6 +237,7 @@
         this.pageNum = 1
         this.dataForm = {
           englishName: '',
+          chineseName: '',
           categoryId: null,
           enable: ''
         }
