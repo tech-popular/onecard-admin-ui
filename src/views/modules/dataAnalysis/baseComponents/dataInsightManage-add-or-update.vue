@@ -528,6 +528,15 @@ export default {
         this.$refs.dataPreviewInfo.init()
       })
     },
+    getQueryParams (name) {
+      let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
+      let params = window.location.search.substr(1) || window.location.href.split('?')[1]
+      let r = params && params.match(reg)
+      if (r != null) {
+        return decodeURI(r[2])
+      }
+      return null
+    },
     saveHandle (type) {
       if (!this.ruleConfig.rules.length) {
         this.$message({
@@ -573,7 +582,7 @@ export default {
           }
           let sysUuid = getQueryString('system_uuid')
           if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') {
-            params.username = getQueryString('username') || ''
+            params.username = this.getQueryParams('username') || ''
           }
           url(params).then(({data}) => {
             if (data.status !== '1') {
