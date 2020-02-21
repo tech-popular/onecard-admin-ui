@@ -69,7 +69,7 @@
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
           <el-form-item label="计算类型" prop="type">
-            <el-radio-group v-model="baseForm.type" :disabled="baseForm.userType === 'excel'">
+            <el-radio-group v-model="baseForm.type" :disabled="!!id">
               <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
             </el-radio-group>
@@ -103,7 +103,7 @@
           </el-tooltip>
         </h3>
         <div>
-          <el-checkbox-group v-model="rejectUserList">
+          <el-checkbox-group v-model="vestPackCode">
             <el-checkbox label="反欺诈马甲包"></el-checkbox>
             <el-checkbox label="UTC马甲包"></el-checkbox>
           </el-checkbox-group>
@@ -153,7 +153,7 @@ export default {
       },
       excelFile: '',
       templateUrl: templateDownload,
-      rejectUserList: '',
+      vestPackCode: '',
       baseForm: {
         name: '',
         userType: 'indicator',
