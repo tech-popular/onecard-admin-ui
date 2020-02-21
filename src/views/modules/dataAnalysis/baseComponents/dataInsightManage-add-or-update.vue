@@ -62,10 +62,6 @@
                 >
                   <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
                 </el-upload>
-                <!-- <div v-if="fileData.fileList.length" class="btn-upload">
-                  <span>文件名：{{fileData.fileList[0].name}}</span>
-                  <el-button size="small" :type="fileData.uploadBtnType" :icon="fileData.uploadBtnIcon" :disabled="fileData.uploadBtnAble" @click="submitUpload">{{fileData.uploadTxt}}</el-button>
-                 </div> -->
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
           <el-form-item label="计算类型" prop="type">
@@ -104,8 +100,7 @@
         </h3>
         <div>
           <el-checkbox-group v-model="vestPackCode">
-            <el-checkbox label="反欺诈马甲包"></el-checkbox>
-            <el-checkbox label="UTC马甲包"></el-checkbox>
+            <el-checkbox v-for="(item, index) in vestPackList" :label="item.value" :key="index">{{item.text}}</el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
@@ -121,7 +116,7 @@
 <script>
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable } from '@/api/dataAnalysis/dataInsightManage'
 import { getQueryString } from '@/utils'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -154,12 +149,13 @@ export default {
       },
       excelFile: '',
       templateUrl: templateDownload,
-      vestPackCode: '',
+      vestPackCode: [],
+      vestPackList: [],
       baseForm: {
         name: '',
         userType: 'indicator',
         type: 'static',
-        channelId: '1001',
+        channelId: '2001',
         desc: ''
       },
       baseRule: { // 基本信息校验规则
@@ -185,7 +181,7 @@ export default {
       channelList: [
         {
           name: '新商城',
-          value: '1001'
+          value: '2001'
         }
       ]
     }
@@ -201,6 +197,7 @@ export default {
       this.loading = true
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
+      this.getVestPackAvailable()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -221,7 +218,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'static',
-        channelId: '1001',
+        channelId: '2001',
         desc: ''
       }
       this.ruleConfig = { // 规则数据
@@ -251,6 +248,7 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
+          // this.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
             this.loading = false
@@ -281,6 +279,18 @@ export default {
             })
           })
         }
+      })
+    },
+    getVestPackAvailable () {
+      vestPackAvailable().then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.vestPackList = []
+          return this.$message({
+            type: 'error',
+            message: res.message || '数据异常'
+          })
+        }
+        this.vestPackList = res.data.data
       })
     },
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
@@ -672,7 +682,7 @@ export default {
       return null
     },
     saveHandle (type) {
-      console.log(this.baseForm.userType)
+      // console.log(this.vestPackCode, this.vestPackCode.length)
       if (this.baseForm.userType === 'excel') {
         if (!this.excelFile) {
           this.$message({
@@ -690,6 +700,7 @@ export default {
             data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
+            // data.append('vestPackCode', this.vestPackCode.join(','))
             if (this.id) {
               data.append('id', this.id)
             }
