@@ -18,17 +18,16 @@
       <el-table-column prop="name" header-align="center" align="center" label="分群名称"></el-table-column>
       <el-table-column prop="desc" header-align="center" align="center" label="分群说明">
         <template slot-scope="scope">
-          <el-tooltip placement="right" v-if="scope.row.desc.length > 10">
-          <div slot="content" style="max-width: 200px;line-height: 1.5">{{scope.row.desc}}</div>
-          <span>{{`${scope.row.desc.substr(0, 10)}...`}}</span>
-        </el-tooltip>
-        <span v-else>{{scope.row.desc}}</span>
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.desc)" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
+            <div class="text-to-long-cut">{{scope.row.desc}}</div>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'update')">编辑</el-button>
           <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button>
