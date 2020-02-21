@@ -90,7 +90,7 @@
           <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
-      <div class="pane-reject">
+      <div class="pane-reject" v-if="false">
         <h3>
           剔除用户名单
           <el-tooltip placement="top">
@@ -154,7 +154,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'static',
-        channelId: '1001',
+        channelId: '2001',
         desc: ''
       },
       baseRule: { // 基本信息校验规则
@@ -180,7 +180,7 @@ export default {
       channelList: [
         {
           name: '新商城',
-          value: '1001'
+          value: '2001'
         }
       ]
     }
@@ -217,7 +217,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'static',
-        channelId: '1001',
+        channelId: '2001',
         desc: ''
       }
       this.ruleConfig = { // 规则数据
@@ -247,7 +247,7 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
-          this.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
+          // this.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
             this.loading = false
@@ -672,7 +672,7 @@ export default {
       })
     },
     saveHandle (type) {
-      console.log(this.vestPackCode, this.vestPackCode.length)
+      // console.log(this.vestPackCode, this.vestPackCode.length)
       if (this.baseForm.userType === 'excel') {
         if (!this.excelFile) {
           this.$message({
@@ -690,7 +690,7 @@ export default {
             data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
-            data.append('vestPackCode', this.vestPackCode.join(','))
+            // data.append('vestPackCode', this.vestPackCode.join(','))
             if (this.id) {
               data.append('id', this.id)
             }
@@ -744,7 +744,7 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, vestPackCode: this.vestPackCode.join(',') }
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig }
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
