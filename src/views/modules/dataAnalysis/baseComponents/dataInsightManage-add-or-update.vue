@@ -20,32 +20,12 @@
               <div class="type-radio-item type-radio-one"><el-radio label="indicator">指标筛选</el-radio></div>
               <div class="type-radio-item type-radio-two">
                 <el-radio label="excel">excel文件导入</el-radio>
-                <!-- <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
-                <el-upload
-                  v-if="baseForm.userType === 'excel'"
-                  class="upload-excel"
-                  ref="upload"
-                  action="aaa"
-                  accept=".xlsx, .xls"
-                  :file-list="fileData.fileList"
-                  :on-change="handleChange"
-                  :before-upload="beforeUpload"
-                  :show-file-list="false"
-                  :auto-upload="false"
-                >
-                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
-                </el-upload> -->
-                <!-- <div v-if="fileData.fileList.length" class="btn-upload">
-                  <span>文件名：{{fileData.fileList[0].name}}</span>
-                  <el-button size="small" :type="fileData.uploadBtnType" :icon="fileData.uploadBtnIcon" :disabled="fileData.uploadBtnAble" @click="submitUpload">{{fileData.uploadTxt}}</el-button>
-                 </div> -->
-                <!-- <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button> -->
               </div>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
             <el-select v-model="baseForm.channelId">
-              <el-option v-for="(item, index) in channelList" :key="index" :label="item.name" :value="item.value"></el-option>
+              <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
             </el-select>
             <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
                 <el-upload
@@ -65,7 +45,7 @@
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
           <el-form-item label="计算类型" prop="type">
-            <el-radio-group v-model="baseForm.type" :disabled="!!id">
+            <el-radio-group v-model="baseForm.type" :disabled="!!id || baseForm.userType === 'excel'">
               <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
             </el-radio-group>
@@ -90,7 +70,7 @@
           <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
-      <div class="pane-reject" v-if="false">
+      <div class="pane-reject">
         <h3>
           剔除用户名单
           <el-tooltip placement="top">
@@ -116,7 +96,7 @@
 <script>
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -177,12 +157,7 @@ export default {
         'relation': 'and',
         'rules': []
       },
-      channelList: [
-        {
-          name: '新商城',
-          value: '2001'
-        }
-      ]
+      channelList: []
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -197,6 +172,7 @@ export default {
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getVestPackAvailable()
+      this.getChannelsList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -247,7 +223,11 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
-          // this.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
+          if (data.data.vestPackCode === null) {
+            this.vestPackCode = []
+          } else {
+            this.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
+          }
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
             this.loading = false
@@ -280,6 +260,15 @@ export default {
         }
       })
     },
+    getChannelsList () {
+      channelsList().then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.channelList = []
+          return
+        }
+        this.channelList = res.data.data
+      })
+    },
     getVestPackAvailable () {
       vestPackAvailable().then(res => {
         if (res.data.status * 1 !== 1) {
@@ -296,9 +285,6 @@ export default {
       if (val === 'indicator') {
         this.fileData.fileList = []
         this.excelFile = ''
-        // if (!this.initSelectOperateList.length) {
-        //   this.getSelectAllCata()
-        // }
       }
     },
     handleChange (file, fileList) { // 上传文件变化时
@@ -690,7 +676,7 @@ export default {
             data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
-            // data.append('vestPackCode', this.vestPackCode.join(','))
+            data.append('vestPackCode', this.vestPackCode.join(','))
             if (this.id) {
               data.append('id', this.id)
             }
@@ -744,7 +730,7 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig }
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, vestPackCode: this.vestPackCode.join(',') }
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {

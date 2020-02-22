@@ -16,6 +16,7 @@ export const deleteDataInfo = id => httpDelete(da + `data/group/${id}`) // 根�
 export const dataPreviewInfo = params => httpPut(da + 'data/group/preview', params) // 数据预览
 export const uploadFileInfo = params => httpGet(da + 'data/group/listOnPage', params)
 export const importExcelFile = params => httpPostFile(da + 'data/group/import', params)
+export const channelsList = () => httpGet(da + 'common/select/channels')
 //  http://vest.sk.9f.cn/canary-admin/vest/pack/select/available
 // export const savaDataInfo = params => httpPostTest('http://vest.sk.9f.cn/canary-admin/data/group/info', params)
 // export const updateDataInfo = params => httpPutTest('http://vest.sk.9f.cn/canary-admin/data/group/info', params)
