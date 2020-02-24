@@ -3,7 +3,7 @@
     <div class="rules-index-relation" v-if="data.rules.length > 1"><span @click="switchSymbol(data.ruleCode)">{{data.relation === 'and' ? '且' : '或'}}</span></div>
     <div style="flex: 1">
       <div v-for="(item, index) in data.rules" :key="index">
-        <el-form :model="item" ref="ruleForm" :inline="true" v-if="!item.rules || !item.rules.length">
+        <el-form :model="item" ref="ruleForm" :inline="true" v-if="!item.rules || !item.rules.length" :disabled="from === 'api'">
           <el-form-item prop="fieldCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
             <Treeselect
               :options="item.indexList"
@@ -17,6 +17,7 @@
               placeholder="请选择"
               @select="node => fieldCodeChange(node, item)"
               class="tree-select"
+              :disabled="from === 'api'"
           />
           </el-form-item>
           <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
@@ -114,14 +115,16 @@
               <div slot="content" v-html="toolTipContent(item)"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
             </el-tooltip>
-            <i class="el-icon-circle-plus cursor-pointer" @click="addChildrenRules(item, index)" v-if="!isChild || isChild && index === data.rules.length-1"></i>
+            <span  v-if="from !== 'api'">
+              <i class="el-icon-circle-plus cursor-pointer" @click="addChildrenRules(item, index)" v-if="!isChild || isChild && index === data.rules.length-1"></i>
+            </span>
           </el-form-item>
-          <el-form-item style="float: right">
+          <el-form-item style="float: right" v-if="from !== 'api'">
             <i class="el-icon-close cursor-pointer" @click="deleteRules(item, index)"></i>
           </el-form-item>
         </el-form>
         <div v-else>
-          <rules-set :data="item" :is-child="true" ref="rulesSet" :is-require="isRequired"></rules-set>
+          <rules-set :data="item" :is-child="true" ref="rulesSet" :is-require="isRequired" :from="from"></rules-set>
         </div>
       </div>
     </div>
@@ -144,6 +147,10 @@ export default {
     isRequire: {
       type: Boolean,
       default: false
+    },
+    from: {
+      type: String,
+      default: ''
     }
   },
   data () {
