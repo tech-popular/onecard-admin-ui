@@ -11,7 +11,7 @@
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3>基本信息</h3>
-        <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
+        <el-form label-width="90px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="API名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="API名称" clearable class="base-pane-item" />
           </el-form-item>
@@ -24,9 +24,6 @@
           <el-form-item prop="apiName" class="item-inline item-code">
             <el-input v-model.trim="baseForm.apiName" placeholder="输入字母和数字的组合" clearable class="item-code-name" :disabled="!!id" />
           </el-form-item>
-          <!-- <el-form-item class="item-inline item-button">
-            <el-button type="success" @click="getApiCode" size="small">确认生成</el-button>
-          </el-form-item> -->
           <el-form-item label="您创建的接口编码是：" label-width="166px">
             {{code}}
             <el-button type="primary" @click="copyCode" size="small" class="copy-code" v-if="isCopyBtn">复制编码</el-button>
@@ -62,11 +59,12 @@
             <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
           </el-form-item>
           <el-form-item label="分群名称" prop="templateIds">
-            <el-select v-model="baseForm.templateIds" filterable multiple placeholder="请选择分群名称" class="base-pane-item">
+            <el-select v-model="baseForm.templateIds" @change="custerNamesChange" filterable multiple placeholder="请选择分群名称" class="base-pane-item">
               <el-option
-                v-for="item in custerNameList"
+                v-for="item in newCusterNameList"
                 :key="item.value"
                 :label="item.text"
+                :disabled="item.disabled"
                 :value="item.value">
               </el-option>
             </el-select>
@@ -79,17 +77,22 @@
           <h3 class="pane-preview-title">分群预览</h3>
           <div class="pane-rules-item" v-for="(item, index) in custerInfoList" :key="index">
             <h3>{{item.name}}</h3>
-            <h3>满足如下条件的用户</h3>
-            <el-form :inline="true">
-              <el-form-item label="用户属性与用户交易满足：" >
-                <el-input v-model="item.expression" disabled style="width: 800px" />
-              </el-form-item>
-              <el-form-item style="float:right" v-if="false">
-                <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
-              </el-form-item>
-            </el-form>
-            <div v-if="item.ruleConfig.rules && item.ruleConfig.rules.length > 0">
-              <rules-set :data="item.ruleConfig" ref="rulesSet" :is-require="isRequired" :from="'api'"></rules-set>
+            <div v-if="item.ruleConfig">
+              <h3>满足如下条件的用户</h3>
+              <el-form :inline="true">
+                <el-form-item label="用户属性与用户交易满足：" >
+                  <el-input v-model="item.expression" disabled style="width: 800px" />
+                </el-form-item>
+                <el-form-item style="float:right" v-if="false">
+                  <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
+                </el-form-item>
+              </el-form>
+              <div v-if="item.ruleConfig.rules && item.ruleConfig.rules.length > 0">
+                <rules-set :data="item.ruleConfig" ref="rulesSet" :is-require="isRequired" :from="'api'"></rules-set>
+              </div>
+            </div>
+            <div v-else>
+              <p>{{item.tips}}</p>
             </div>
           </div>
         </div>
@@ -204,6 +207,9 @@ export default {
         ],
         apiName: [
           { validator: validateApiName, trigger: 'blur' }
+        ],
+        templateIds: [
+          { required: true, message: '请选择分群名称', trigger: 'change' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -214,7 +220,8 @@ export default {
       },
       custerInfoList: [],
       curCusterInfo: {},
-      custerLoading: false
+      custerLoading: false,
+      filterCursterList: [] // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
     }
   },
   components: { rulesSet, Treeselect },
@@ -232,6 +239,12 @@ export default {
         return true
       }
       return false
+    },
+    newCusterNameList () {
+      if (!this.filterCursterList.length) {
+        return this.custerNameList
+      }
+      return this.filterCursterList
     }
   },
   methods: {
@@ -260,24 +273,33 @@ export default {
     // 获取分群名称
     getCusterList () {
       dataTransferManageCuster().then(({data}) => {
-        if (data && data.status === '1') {
-          this.custerNameList = data.data
+        if (data.status !== '1') {
+          this.custerNameList = []
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
         }
+        this.custerNameList = data.data
       })
     },
-    // custerNamesChange (value) { // 选中数据变化时
-    //   if (value.length > this.custerInfoList.length) {
-    //     this.getCusterInfo(value[value.length - 1], (curCusterInfo) => {
-    //       this.custerInfoList.push(curCusterInfo)
-    //     })
-    //   } else if (value.length < this.custerInfoList.length) {
-    //     for (var i = 0; i < this.custerInfoList.length; i++) {
-    //       if (value.indexOf(this.custerInfoList[i].id) === -1) {
-    //         this.custerInfoList.splice(i, 1)
-    //       }
-    //     }
-    //   }
-    // },
+    custerNamesChange (value) { // 选中数据变化时
+      if (value.length === 0) {
+        this.filterCursterList = []
+      }
+      // 当选中数据为1时，更新下拉数据状态
+      let filterFirstObj = []
+      if (value.length === 1) {
+        filterFirstObj = this.custerNameList.filter(item => item.value === value[0]) // 筛选出第一条数据，要获取第一条数据的type
+        let newArr = this.custerNameList.map(item => {
+          if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+            return {...item, disabled: true}
+          }
+          return item
+        })
+        this.filterCursterList = newArr
+      }
+    },
     previewCusterInfo () {
       if (!this.baseForm.templateIds.length) return
       this.custerLoading = true
@@ -331,7 +353,10 @@ export default {
         inParam: '',
         desc: '',
         outParams: [],
-        outType: 'JUDGE'
+        outType: 'JUDGE',
+        department: '',
+        apiName: '',
+        templateIds: []
       }
       this.ruleConfig = { // 规则数据
         'ruleCode': 'rule_all',
@@ -345,18 +370,31 @@ export default {
     getCusterInfo (id, fn) { // 获取分群数据
       viewDataInfo(id).then(({data}) => {
         if (data.status * 1 !== 1) {
-          this.baseForm.templateIds.splice(this.baseForm.templateIds.indexOf(id), 1)
-          return this.$message({
-            message: data.message,
-            type: 'error'
-          })
-        } else {
-          if (!data.data.configJson) {
-            return this.$message({
-              message: '数据异常',
-              type: 'error'
-            })
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            tips: data.message || '此分群预览信息加载异常'
           }
+          fn(this.curCusterInfo)
+          return
+        }
+        if (data.data.userType && data.data.userType === 'excel') {
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            tips: 'Excel导入分群无预览内容'
+          }
+          fn(this.curCusterInfo)
+          return
+        }
+        if (!data.data.configJson) {
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            tips: '此分群预览信息加载异常'
+          }
+          fn(this.curCusterInfo)
+          return
         }
         let configJson = JSON.parse(data.data.configJson)
         this.getSelectAllCata((indexList) => {
@@ -398,6 +436,15 @@ export default {
             out.push(item.onlyId)
           })
           this.baseForm.outParams = out
+          // 分群包
+          let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
+          let newArr = this.custerNameList.map(item => {
+            if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+              return {...item, disabled: true}
+            }
+            return item
+          })
+          this.filterCursterList = newArr
           this.getSelectAllCata((indexList) => {
             // this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
             this.outParamsIndexList = this.updateOutParamsList(indexList)
