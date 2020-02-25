@@ -183,7 +183,8 @@ export default {
         outParams: [],
         department: '',
         apiName: '',
-        templateIds: []
+        templateIds: [],
+        type: ''
       },
       departmentList: [],
       originDepartment: '', // 编辑时保留一份原始数据，以防不正当修改编码
@@ -291,6 +292,7 @@ export default {
       let filterFirstObj = []
       if (value.length === 1) {
         filterFirstObj = this.custerNameList.filter(item => item.value === value[0]) // 筛选出第一条数据，要获取第一条数据的type
+        this.baseForm.type = filterFirstObj[0].type
         let newArr = this.custerNameList.map(item => {
           if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
             return {...item, disabled: true}
@@ -425,7 +427,8 @@ export default {
             department: data.data.code.split('_')[0],
             apiName: data.data.code.split('_')[1],
             outType: data.data.outType,
-            templateIds: data.data.templateIds
+            templateIds: data.data.templateIds,
+            type: data.data.type
           }
           this.originDepartment = data.data.code.split('_')[0]
           this.originApiName = data.data.code.split('_')[1]
