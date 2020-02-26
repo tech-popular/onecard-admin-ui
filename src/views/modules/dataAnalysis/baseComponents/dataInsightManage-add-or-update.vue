@@ -87,7 +87,7 @@
     </div>
     <div class="footer">
       <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
-      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'">保存</el-button>
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo"></data-preview-info>
@@ -692,17 +692,20 @@ export default {
             if (this.id) {
               data.append('id', this.id)
             }
+            this.loading = true
             importExcelFile(data).then(res => {
               if (res.data.status * 1 !== 1) {
                 this.$message({
                   type: 'error',
                   message: res.data.message || '保存失败'
                 })
+                this.loading = false
               } else {
                 this.$message({
                   type: 'success',
                   message: res.data.message || '保存成功'
                 })
+                this.loading = false
                 this.visible = false
                 this.$parent.addOrUpdateVisible = false
                 this.$nextTick(() => {
@@ -760,8 +763,10 @@ export default {
           if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') {
             params.username = this.getQueryParams('username') || ''
           }
+          this.loading = true
           url(params).then(({data}) => {
             if (data.status !== '1') {
+              this.loading = false
               return this.$message({
                 type: 'error',
                 message: data.message
@@ -771,6 +776,7 @@ export default {
                 type: 'success',
                 message: data.message
               })
+              this.loading = false
               this.visible = false
               this.$parent.addOrUpdateVisible = false
               this.$nextTick(() => {
