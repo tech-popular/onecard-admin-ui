@@ -285,6 +285,8 @@ export default {
       if (val === 'indicator') {
         this.fileData.fileList = []
         this.excelFile = ''
+      } else {
+        this.baseForm.type = 'static'
       }
     },
     handleChange (file, fileList) { // 上传文件变化时
