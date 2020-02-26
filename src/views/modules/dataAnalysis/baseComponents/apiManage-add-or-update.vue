@@ -150,9 +150,13 @@ export default {
           title: '手机号（mobile_no）',
           value: 'mobile_no'
         },
+        // {
+        //   title: '用户中心统一编号（UUID）',
+        //   value: 'UUID'
+        // },
         {
-          title: '用户中心统一编号（UUID）',
-          value: 'UUID'
+          title: '新商城用户ID（mall_user_id）',
+          value: 'mall_user_id'
         }
       ],
       id: '',
