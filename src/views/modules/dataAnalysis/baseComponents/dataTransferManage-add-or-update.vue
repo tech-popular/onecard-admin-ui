@@ -233,6 +233,7 @@
         loading: false,
         visible: true,
         baseForm: {
+          id: '',
           transferName: '', // 任务名称
           templateId: '', // 分群ID
           outParams: [],
@@ -588,6 +589,7 @@
       },
 
       init (row, tag) { // 打开抽屉弹窗
+        this.baseForm.id = ''
         this.baseForm.transferName = ''
         this.baseForm.taskDescribtion = ''
         this.baseForm.jobType = 1
@@ -602,7 +604,6 @@
         this.getOutParamsList(row)
         this.$nextTick(() => {
           this.$refs['baseForm'].resetFields()
-  
           if (tag) {
             this.dataDisplay(row)
           }
