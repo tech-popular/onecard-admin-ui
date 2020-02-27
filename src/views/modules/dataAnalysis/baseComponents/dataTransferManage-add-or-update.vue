@@ -17,6 +17,7 @@
           <h3>基本信息</h3>
             <el-form-item label="分群ID" prop="templateId">
               <el-select
+                filterable
                 v-model="baseForm.templateId"
                 placeholder="请选择">
                 <el-option
