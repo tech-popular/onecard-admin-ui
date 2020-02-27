@@ -589,6 +589,7 @@
       },
 
       init (row, tag) { // 打开抽屉弹窗
+        this.baseForm.id = ''
         this.baseForm.transferName = ''
         this.baseForm.taskDescribtion = ''
         this.baseForm.jobType = 1
@@ -603,7 +604,6 @@
         this.getOutParamsList(row)
         this.$nextTick(() => {
           this.$refs['baseForm'].resetFields()
-  
           if (tag) {
             this.dataDisplay(row)
           }
