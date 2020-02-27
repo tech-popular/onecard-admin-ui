@@ -221,6 +221,7 @@
         loading: false,
         visible: true,
         baseForm: {
+          id: '',
           transferName: '', // 任务名称
           templateId: '', // 分群ID
           outParams: [],
