@@ -114,14 +114,14 @@ export default {
       indexList: [],
       expression: '',
       expressionTemplate: '',
-      initFieldType: '',
-      initDataStandar: '',
-      initFieldCode: '',
-      initSourceTable: '',
-      initFieldId: '',
-      initEnumTypeNum: '',
-      initSelectOperateList: [],
-      initEnglishName: '',
+      // initFieldType: '',
+      // initDataStandar: '',
+      // initFieldCode: '',
+      // initSourceTable: '',
+      // initFieldId: '',
+      // initEnumTypeNum: '',
+      // initSelectOperateList: [],
+      // initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
       fileData: {
@@ -327,23 +327,23 @@ export default {
       })
       return arr
     },
-    getInitTypeCode (arr) { // 获取初始选项及id, 为初始化数据做准备
-      arr.forEach((item, index) => {
-        if (index === 0) {
-          if (item.fieldType) {
-            this.initFieldType = item.fieldType // item.fieldType
-            this.initFieldCode = item.id // item.englishName
-            this.initDataStandar = item.dataStandar
-            this.initEnumTypeNum = item.enumTypeNum
-            this.initSourceTable = item.sourceTable
-            this.initFieldId = item.fieldId
-            this.initEnglishName = item.englishName
-          } else {
-            this.getInitTypeCode(item.children)
-          }
-        }
-      })
-    },
+    // getInitTypeCode (arr) { // 获取初始选项及id, 为初始化数据做准备
+    //   arr.forEach((item, index) => {
+    //     if (index === 0) {
+    //       if (item.fieldType) {
+    //         this.initFieldType = item.fieldType // item.fieldType
+    //         this.initFieldCode = item.id // item.englishName
+    //         this.initDataStandar = item.dataStandar
+    //         this.initEnumTypeNum = item.enumTypeNum
+    //         this.initSourceTable = item.sourceTable
+    //         this.initFieldId = item.fieldId
+    //         this.initEnglishName = item.englishName
+    //       } else {
+    //         this.getInitTypeCode(item.children)
+    //       }
+    //     }
+    //   })
+    // },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata().then(({data}) => {
         if (data.status !== '1') {
@@ -351,10 +351,10 @@ export default {
         } else {
           this.indexList = this.filterAllCata(data.data)
         }
-        this.getInitTypeCode(this.indexList)
-        this.getSelectOperateList(this.initFieldType, (selectOperateList) => {
-          this.initSelectOperateList = selectOperateList
-        })
+        // this.getInitTypeCode(this.indexList)
+        // this.getSelectOperateList(this.initFieldType, (selectOperateList) => {
+        //   this.initSelectOperateList = selectOperateList
+        // })
         if (fn) {
           fn(this.indexList)
         }
@@ -398,18 +398,36 @@ export default {
       }
     },
     getRuleTemplateItem (index) { // 条件模板
+      // return {
+      //   'type': 'rule',
+      //   'fieldType': this.initFieldType,
+      //   'fieldCode': this.initFieldCode,
+      //   'format': this.initDataStandar,
+      //   'func': this.initSelectOperateList[0].code,
+      //   'sourceTable': this.initSourceTable,
+      //   'fieldId': this.initFieldId,
+      //   'englishName': this.initEnglishName,
+      //   'indexList': this.indexList, // 指标下拉选
+      //   'enumTypeNum': '',
+      //   'selectOperateList': this.initSelectOperateList, // 操作符下拉选
+      //   'selectEnumsList': [], // 内容下拉选
+      //   'params': [{
+      //     value: '',
+      //     title: ''
+      //   }]
+      // }
       return {
         'type': 'rule',
-        'fieldType': this.initFieldType,
-        'fieldCode': this.initFieldCode,
-        'format': this.initDataStandar,
-        'func': this.initSelectOperateList[0].code,
-        'sourceTable': this.initSourceTable,
-        'fieldId': this.initFieldId,
-        'englishName': this.initEnglishName,
+        'fieldType': '',
+        'fieldCode': null,
+        'format': '',
+        'func': '',
+        'sourceTable': '',
+        'fieldId': '',
+        'englishName': '',
         'indexList': this.indexList, // 指标下拉选
         'enumTypeNum': '',
-        'selectOperateList': this.initSelectOperateList, // 操作符下拉选
+        'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
         'params': [{
           value: '',
