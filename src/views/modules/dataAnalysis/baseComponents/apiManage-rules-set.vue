@@ -14,7 +14,7 @@
               search-nested
               :load-options="loadOptions"
               noChildrenText="暂无数据"
-              placeholder="请选择"
+              placeholder="请选择指标"
               @select="node => fieldCodeChange(node, item)"
               class="tree-select"
           />
