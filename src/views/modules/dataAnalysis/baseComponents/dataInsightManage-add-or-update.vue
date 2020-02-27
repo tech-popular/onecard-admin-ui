@@ -623,6 +623,11 @@ export default {
       this.updateConditionId(this.ruleConfig)
     },
     getSelectOperateList (type, fn) {
+      if (!type) {
+        let selectOperateList = []
+        fn(selectOperateList)
+        return
+      }
       selectOperate(type).then(({data}) => {
         let selectOperateList = []
         if (data.status !== '1') {
