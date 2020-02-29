@@ -44,8 +44,7 @@
       return {
         dataRule: {
           script: [
-            { required: true, message: '请输入表达式', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请输入表达式', trigger: 'blur' }
           ],
           requestFields: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
