@@ -91,7 +91,7 @@
                 <!-- 在&nbsp; -->
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number> -->
-                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
                 </el-form-item>
                 天&nbsp;
               </div>
@@ -99,11 +99,11 @@
               <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input v-model="item.params[0].value" :maxlength="10" class="itemIput-small" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)" :min="1"></el-input>
+                  <el-input v-model="item.params[0].value" :maxlength="10" class="itemIput-small" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)" :min="1"></el-input>
                 </el-form-item>
                 天&nbsp;到&nbsp;过去&nbsp;
                 <el-form-item prop="params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-small" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)" :min="1"></el-input>
+                  <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-small" @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)" :min="1"></el-input>
                 </el-form-item>
                 天&nbsp;之内
               </div>
@@ -111,8 +111,8 @@
           </div>
           <el-form-item class="btn-group">
             <!-- <i class="el-icon-edit cursor-pointer"></i> -->
-            <el-tooltip v-if="item.func === 'relative_time_in'" placement="top">
-              <div slot="content" v-html="toolTipContent(item)"></div>
+            <el-tooltip v-if="item.func === 'relative_time_in' || item.func === 'relative_before' || item.func === 'relative_within'" placement="top">
+              <div slot="content" v-html="tips[item.func]" class="tips-content"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
             </el-tooltip>
             <span  v-if="from !== 'api'">
@@ -156,7 +156,12 @@ export default {
   data () {
     return {
       parent: null,
-      selectOperateList: []
+      selectOperateList: [],
+      tips: {
+        'relative_within': '举例：若当前时间为02-26 12:10，则过去1天内为 [02-25 00:00, 02-25 23:59]，过去0天内为 [02-26 00:00, 02-26 12:10]',
+        'relative_before': '举例：若当前时间为02-26 12:10，则过去1天前为 ( 无穷小时间，02-24 23:59]，过去0天前为 ( 无穷小时间，02-25 23:59]',
+        'relative_time_in': '举例：若当前时间为02-26 12:10，则过去5天到过去1天之内为 [02-21 00:00, 02-25 23:59]，过去5天到过去0天内为 [02-21 00:00, 02-26 12:10]'
+      }
     }
   },
   computed: {
@@ -174,16 +179,16 @@ export default {
   },
   components: { Treeselect },
   methods: {
-    judgeDateTwoInput (rule, value, callback, params) { // 数值介于判断
+    judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {
         callback(new Error('请输入'))
-      } else if (params[0].value * 1 <= params[1].value * 1) {
-        callback(new Error('起始数值应大于终止数值'))
+      } else if (params[0].value * 1 < params[1].value * 1) {
+        callback(new Error('起始数值应大于等于终止数值'))
       } else {
         callback()
       }
     },
-    judgeNumberTwoInput (rule, value, callback, params) { // 数值时间区间判断
+    judgeNumberTwoInput (rule, value, callback, params) { // 数值介于判断
       if (value === '') {
         callback(new Error('请输入'))
       } else if (params[0].value * 1 >= params[1].value * 1) {
@@ -203,6 +208,18 @@ export default {
         val = val.substring(0, val.length - 1)
       }
       val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
+      return val
+    },
+    keyupDateNumberInput (val) { // 日期输入框，输入内容 要求 只能输入 正整数
+      val = val.replace(/^0(0+)|[^\d]+/g, '')
+      return val
+    },
+    blurDateNumberInput (val) { // 日期输入框，失去焦点时判断输入内容是否符合要求
+      let reg = /^([0]|[1-9][0-9]*)$/
+      // console.log(reg.test('00')) // false
+      if (!reg.test(val)) {
+        val = ''
+      }
       return val
     },
     blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
@@ -230,11 +247,11 @@ export default {
     },
     pramasDateBlur (item, val) { // 时间 区间的判断
       let params = item.params
-      if (params[0].value * 1 > params[1].value * 1) {
+      if (params[0].value * 1 >= params[1].value * 1) {
         this.$refs['paramsl' + item.ruleCode][0].clearValidate()
         this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
-      return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
+      return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
@@ -289,11 +306,6 @@ export default {
         return false
       }
     },
-    toolTipContent (citem) {
-      if (citem.func === 'relative_time_in') {
-        return '起始数值应大于终止数值'
-      }
-    },
     isEmpty (item) { // 是否选择了空
       let emptyArr = ['null', 'not_null', 'not_empty', 'empty']
       if (!emptyArr.includes(item.func)) {
@@ -314,7 +326,7 @@ export default {
     display: flex;
   }
   .pane-rules-content .el-form-item {
-    margin-bottom: 10px;
+    margin-bottom: 25px;
   }
   .rules-index-relation {
     left: 0;
@@ -354,7 +366,6 @@ export default {
     user-select: none;
   }
   .tree-select {
-    display: inline-block;
     width: 290px;
     line-height: 38px;
   }
@@ -382,5 +393,10 @@ export default {
   }
   .pane-rules-datetime {
     position: relative;
+  }
+  .tips-content {
+    width: 200px;
+    word-break: break-all;
+    line-height: 1.6;
   }
 </style>
