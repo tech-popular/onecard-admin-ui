@@ -624,8 +624,7 @@ export default {
     },
     getSelectOperateList (type, fn) {
       if (!type) {
-        let selectOperateList = []
-        fn(selectOperateList)
+        fn([])
         return
       }
       selectOperate(type).then(({data}) => {
