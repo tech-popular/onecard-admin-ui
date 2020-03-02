@@ -551,6 +551,7 @@ export default {
         }
       })
       this.ruleConfig = arr
+      console.log(this.ruleConfig)
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
       let selectEnumsList = []
@@ -565,10 +566,14 @@ export default {
     },
     updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
       let params = [{ value: '', title: '' }]
-      if (citem.func === 'between' || citem.func === 'relative_time' || citem.func === 'relative_time_in') {
+      if (citem.func === 'between' || citem.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
       }
-      this.updateRulesArr(data, citem, { params: params })
+      let subSelects = []
+      if (citem.func === 'relative_time') {
+        subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
+      }
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
