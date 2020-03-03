@@ -10,7 +10,7 @@
     <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
-        <h3>基本信息</h3>
+        <h3 ref="baseTitle">基本信息</h3>
         <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="分群名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
@@ -40,7 +40,7 @@
                   :show-file-list="false"
                   :auto-upload="false"
                 >
-                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+                  <el-button slot="trigger" size="small" type="default" icon ="el-icon-document">选择文件</el-button>
                 </el-upload>
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
@@ -752,6 +752,7 @@ export default {
         this.drawerTitle = '新建'
         this.baseForm.name = '复制' + this.baseForm.name
         this.id = ''
+        this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
       })
     },
     saveHandle (type) {
