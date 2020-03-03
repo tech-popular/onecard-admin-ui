@@ -368,6 +368,14 @@ export default {
             }
           })
           item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
+          if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
+            item.subFunc = item.func
+            item.func = 'relative_time'
+            this.getSelectOperateList(item.fieldType, (selectOperateList) => {
+              item.selectOperateList = selectOperateList
+              item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+            })
+          }
         } else {
           this.updateInitRulesConfig(item, indexList)
         }
@@ -565,10 +573,14 @@ export default {
     },
     updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
       let params = [{ value: '', title: '' }]
-      if (citem.func === 'between' || citem.func === 'relative_time' || citem.func === 'relative_time_in') {
+      if (citem.func === 'between' || citem.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
       }
-      this.updateRulesArr(data, citem, { params: params })
+      let subSelects = []
+      if (citem.func === 'relative_time') {
+        subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
+      }
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
