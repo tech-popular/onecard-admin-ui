@@ -221,12 +221,12 @@
                   </el-select>
               </el-form-item>
             </el-col>
-            <!-- <el-col>
+            <el-col>
               <el-form-item label="下发模式" prop="increModel">
                 <el-radio v-model="baseForm.increModel" :label="0" v-bind:disabled="isStatic">全量</el-radio>
                 <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic">增量</el-radio>
               </el-form-item>
-            </el-col> -->
+            </el-col>
           </el-row>
         </div>
       </el-form>
@@ -291,7 +291,7 @@
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
-          // increModel: 1, // 下发模式
+          increModel: 0, // 下发模式
           kafkaServer: '', // kafka数据源地址
           topic: '',
           mysqlServer: ''// sftp数据源地址
@@ -524,15 +524,15 @@
       currentSel (selVal) {
         let obj = {}
         obj = this.templateIdList.find((item) => {
-          // if (item.value === selVal && item.type === 'static') {
-          //   this.isStatic = true
-          //   this.baseForm.increModel = ''
-          // } else {
-          //   this.isStatic = false
-          //   if (this.baseForm.increModel === '') {
-          //     this.baseForm.increModel = 0
-          //   }
-          // }
+          if (item.value === selVal && item.type === 'static') {
+            this.isStatic = true
+            this.baseForm.increModel = ''
+          } else {
+            this.isStatic = false
+            if (this.baseForm.increModel === '') {
+              this.baseForm.increModel = 0
+            }
+          }
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
@@ -593,7 +593,7 @@
           }
           postData.datasourceParams.push(tempServer)
         }
-        // postData.increModel = data.increModel
+        postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
@@ -661,13 +661,13 @@
             this.baseForm.transferName = disData.transferName
             this.baseForm.taskDescribtion = disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
-            // if (disData.increModel === '') {
-            //   this.isStatic = true
-            //   this.baseForm.increModel = ''
-            // } else {
-            //   this.isStatic = false
-            //   this.baseForm.increModel = disData.increModel
-            // }
+            if (disData.increModel === '') {
+              this.isStatic = true
+              this.baseForm.increModel = ''
+            } else {
+              this.isStatic = false
+              this.baseForm.increModel = disData.increModel
+            }
             disData.datasourceParams.forEach((item, index) => {
               if (item.type == 'kafka') {
                 this.baseForm.kafkaServer = item.id
@@ -680,7 +680,7 @@
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONLY_ONE':
                 this.baseForm.jobType = 1
-                if (tempTime.execTime.hasOwnProperty('year') && tempTime.execTime.year != null) {
+                if (tempTime.execTime != null && tempTime.execTime.hasOwnProperty('year')) {
                   this.baseForm.onceRunTime = new Date(parseInt(tempTime.execTime.year), parseInt(tempTime.execTime.month) - 1, parseInt(tempTime.execTime.day), parseInt(tempTime.execTime.hour), parseInt(tempTime.execTime.minute), parseInt(tempTime.execTime.second)).getTime()
                 } else {
                   this.baseForm.onceRunTime = ''
@@ -742,7 +742,8 @@
         this.baseForm.dayOfWeeks = []
         this.baseForm.dayOfMonths = []
         this.baseForm.transferType = []
-        // this.baseForm.increModel = 0
+        this.isStatic = false
+        this.baseForm.increModel = 0
         this.baseForm.kafkaServer = ''
         this.baseForm.topic = ''
         this.baseForm.mysqlServer = ''
