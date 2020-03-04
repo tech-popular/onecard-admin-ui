@@ -173,6 +173,7 @@ export default {
       parent = parent.$parent
     }
     this.parent = parent
+    console.log('mounted', this.data)
   },
   components: { Treeselect },
   methods: {
@@ -279,6 +280,7 @@ export default {
         // if (ruleItem.fieldType === 'enums'){
         //   this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem)
         // }
+        console.log(123)
         this.parent.getSelectOperateList(ruleItem.fieldType, (selectOperateList) => {
           this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, { selectOperateList: selectOperateList })
         })
