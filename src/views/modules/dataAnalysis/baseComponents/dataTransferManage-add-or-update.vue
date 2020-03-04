@@ -299,13 +299,13 @@
           {value: 'MONTH', label: '月'}
         ],
         dayOfWeeksList: [
-          {value: 1, label: '周日'},
-          {value: 2, label: '周一'},
-          {value: 3, label: '周二'},
-          {value: 4, label: '周三'},
-          {value: 5, label: '周四'},
-          {value: 6, label: '周五'},
-          {value: 7, label: '周六'}
+          {value: '1', label: '周日'},
+          {value: '2', label: '周一'},
+          {value: '3', label: '周二'},
+          {value: '4', label: '周三'},
+          {value: '5', label: '周四'},
+          {value: '6', label: '周五'},
+          {value: '7', label: '周六'}
         ],
         dayOfMonthsList: [
         ],
@@ -381,9 +381,9 @@
       dataAssembly () {
         let tempArry = []
         for (let i = 1, j = 32; i < j; i++) {
-          tempArry.push({value: i, label: '每月' + i + '号'})
+          tempArry.push({value: i.toString(), label: '每月' + i + '号'})
         }
-        tempArry.push({value: -1, label: '每月最后一天'})
+        tempArry.push({value: '-1', label: '每月最后一天'})
         this.dayOfMonthsList = tempArry
       },
 
@@ -623,10 +623,11 @@
             postData.taskScheduleConfig.endTime = obgEnd
             postData.taskScheduleConfig.interval = this.baseForm.timeInterval
           }
-          if ((data.runCycle == 'WEEK' || data.runCycle == 'MONTH') && data.runTime !== '') {
+          if ((data.runCycle !== 'WEEK' || data.runCycle !== 'MONTH') && data.runTime !== '') {
             let obgExec = {
               hour: hour,
-              minute: minute
+              minute: minute,
+              second: second
             }
             postData.taskScheduleConfig.execTime = obgExec
           }
@@ -657,7 +658,7 @@
               case 'ONLY_ONE':
                 this.baseForm.jobType = 1
                 if (tempTime.execTime.hasOwnProperty('year') && tempTime.execTime.year != null) {
-                  this.baseForm.onceRunTime = new Date(tempTime.execTime.year, tempTime.execTime.month, tempTime.execTime.day, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second).getTime()
+                  this.baseForm.onceRunTime = new Date(tempTime.execTime.year, tempTime.execTime.month - 1, tempTime.execTime.day, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second).getTime()
                 } else {
                   this.baseForm.onceRunTime = ''
                 }
