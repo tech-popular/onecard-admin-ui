@@ -484,6 +484,7 @@ export default {
         'enumTypeNum': '',
         'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
+        'subFunc': 'relative_before', // 默认取值
         'params': [{
           value: '',
           title: ''
@@ -559,6 +560,7 @@ export default {
         }
       })
       this.ruleConfig = arr
+      console.log(this.ruleConfig)
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
       let selectEnumsList = []
@@ -577,12 +579,10 @@ export default {
         params.push({ value: '', title: '' })
       }
       let subSelects = []
-      let subFunc = ''
       if (citem.func === 'relative_time') {
         subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
-        subFunc = subSelects[0].code // 默认选择“之前”
       }
-      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc })
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
