@@ -219,12 +219,12 @@
                   </el-select>
               </el-form-item>
             </el-col>
-            <el-col>
+            <!-- <el-col>
               <el-form-item label="下发模式" prop="transferMode">
                 <el-radio v-model="baseForm.transferMode" :label="1">全量</el-radio>
                 <el-radio v-model="baseForm.transferMode" :label="2">增量</el-radio>
               </el-form-item>
-            </el-col>
+            </el-col> -->
           </el-row>
         </div>
       </el-form>
@@ -278,7 +278,7 @@
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
-          transferMode: 1, // 下发模式
+          // transferMode: 1, // 下发模式
           kafkaServer: '', // kafka数据源地址
           topic: '',
           mysqlServer: ''// sftp数据源地址
@@ -576,7 +576,7 @@
           }
           postData.datasourceParams.push(tempServer)
         }
-        postData.transferMode = data.transferMode
+        // postData.transferMode = data.transferMode
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
@@ -712,10 +712,18 @@
         this.baseForm.taskDescribtion = ''
         this.baseForm.jobType = 1
         this.baseForm.onceRunTime = ''
+        this.baseForm.runTime = ''
         this.baseForm.runCycle = 'MINUTE'
         this.baseForm.startTime = ''
         this.baseForm.endTime = ''
         this.baseForm.timeInterval = ''
+        this.baseForm.dayOfWeeks = []
+        this.baseForm.dayOfMonths = []
+        this.baseForm.transferType = []
+        // this.baseForm.transferMode = 1
+        this.baseForm.kafkaServer = ''
+        this.baseForm.topic = ''
+        this.baseForm.mysqlServer = ''
         this.baseForm.outParams = []
         this.baseForm.templateId = row ? row.id : ''
         this.tag = tag == 'edit' ? '编辑' : '新建'
