@@ -140,6 +140,7 @@
                 <el-form-item label="开始时间" prop="startTime">
                   <el-time-picker
                     v-model="baseForm.startTime"
+                    :clearable=false
                     value-format="timestamp"
                     format="HH:mm"
                     placeholder="时:分">
@@ -163,6 +164,7 @@
                 <el-form-item label="结束时间" prop="endTime">
                   <el-time-picker
                     v-model="baseForm.endTime"
+                    :clearable=false
                     value-format="timestamp"
                     format="HH:mm"
                     placeholder="时:分">
@@ -220,9 +222,9 @@
               </el-form-item>
             </el-col>
             <!-- <el-col>
-              <el-form-item label="下发模式" prop="transferMode">
-                <el-radio v-model="baseForm.transferMode" :label="1">全量</el-radio>
-                <el-radio v-model="baseForm.transferMode" :label="2">增量</el-radio>
+              <el-form-item label="下发模式" prop="increModel">
+                <el-radio v-model="baseForm.increModel" :label="0" v-bind:disabled="isStatic">全量</el-radio>
+                <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic">增量</el-radio>
               </el-form-item>
             </el-col> -->
           </el-row>
@@ -258,10 +260,21 @@
           callback()
         }
       }
+
+      let validateTime = (rule, value, callback) => {
+        if (Number(this.baseForm.startTime) >= Number(this.baseForm.endTime)) {
+          callback(new Error('开始时间大于结束时间'))
+        } else {
+          this.$refs.baseForm.clearValidate('startTime')
+          this.$refs.baseForm.clearValidate('endTime')
+          callback()
+        }
+      }
   
       return {
         loading: false,
         visible: true,
+        isStatic: false,
         baseForm: {
           id: '',
           transferName: '', // 任务名称
@@ -273,12 +286,12 @@
           runTime: '', // 周期运行具体时间
           runCycle: 'MINUTE', // 调度周期
           timeInterval: '',
-          startTime: '',
-          endTime: '',
+          startTime: '1583251201000',
+          endTime: '1583251201000',
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
-          // transferMode: 1, // 下发模式
+          // increModel: 1, // 下发模式
           kafkaServer: '', // kafka数据源地址
           topic: '',
           mysqlServer: ''// sftp数据源地址
@@ -334,13 +347,15 @@
             {type: 'array', required: true, message: '请选择具体时间', trigger: 'change'}
           ],
           startTime: [
-            {type: 'date', required: true, message: '请选择开始时间', trigger: 'change'}
+            // {type: 'date', required: true, message: '请选择开始时间', trigger: 'change'},
+            { validator: validateTime }
           ],
           timeInterval: [
             {type: 'number', required: true, message: '请选择间隔时间', trigger: 'change'}
           ],
           endTime: [
-            {type: 'date', required: true, message: '请选择结束时间', trigger: 'change'}
+            // {type: 'date', required: true, message: '请选择结束时间', trigger: 'change'},
+            { validator: validateTime }
           ],
           transferType: [
             { type: 'array', required: true, message: '请选择下发数据源', trigger: 'change' }
@@ -376,7 +391,6 @@
           callback()
         }
       },
-
       //  调度周期 月 数据组装
       dataAssembly () {
         let tempArry = []
@@ -386,7 +400,6 @@
         tempArry.push({value: '-1', label: '每月最后一天'})
         this.dayOfMonthsList = tempArry
       },
-
       //  调度 时间间隔 数据切换
       disTimeTurnOff (disType) {
         let tempArry = []
@@ -437,7 +450,6 @@
         }
         return arr
       },
-
       // 获取分群名称
       getCusterList () {
         dataTransferManageCuster().then(({data}) => {
@@ -446,7 +458,6 @@
           }
         })
       },
-
       // 获取分群出参
       getOutParamsList (row) {
         dataTransferManageOutParams().then(({data}) => {
@@ -464,7 +475,6 @@
           }
         })
       },
-
       // 修改，回显时查询分群出参选中
       getOutParamsEditList (id, outList) {
         dataTransferManageOutParamsEdit(id).then(({data}) => {
@@ -483,7 +493,6 @@
           }
         })
       },
-
       // kafka 数据源
       getKafkaServerList () {
         let params = {
@@ -515,12 +524,21 @@
       currentSel (selVal) {
         let obj = {}
         obj = this.templateIdList.find((item) => {
+          // if (item.value === selVal && item.type === 'static') {
+          //   this.isStatic = true
+          //   this.baseForm.increModel = ''
+          // } else {
+          //   this.isStatic = false
+          //   if (this.baseForm.increModel === '') {
+          //     this.baseForm.increModel = 0
+          //   }
+          // }
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
       },
-
-      outParamsSelect (node) { // 选中出参
+      // 选中出参
+      outParamsSelect (node) {
         this.outParams.push({
           value: node.englishName,
           id: node.fieldId,
@@ -530,12 +548,12 @@
           this.$refs.baseForm.clearValidate('outParams')
         }
       },
-
-      outParamsDeselect (node) { // 删除出参
+      // 删除出参
+      outParamsDeselect (node) {
         this.outParams = this.outParams.filter(item => item.id !== node.fieldId)
       },
-
-      updateOutParamsList (indexList) { // 获取出参，默认展开列表
+      // 获取出参，默认展开列表
+      updateOutParamsList (indexList) {
         let indexListArr = deepClone(indexList)
         this.baseForm.outParams.forEach(item => {
           let indexPath = findVueSelectItemIndex(indexListArr, item) + ''
@@ -550,7 +568,6 @@
         })
         return indexListArr
       },
-
       // 提交数据格式化
       formatPostData (data, outParams) {
         let postData = {}
@@ -576,7 +593,7 @@
           }
           postData.datasourceParams.push(tempServer)
         }
-        // postData.transferMode = data.transferMode
+        // postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
@@ -605,10 +622,10 @@
           } else if (data.runCycle == 'MONTH') {
             postData.taskScheduleConfig.jobValue = data.dayOfMonths.join(',')
           } else if (data.runCycle == 'MINUTE' || data.runCycle == 'HOUR') {
-            let startTime = new Date(this.baseForm.startTime)
+            let startTime = new Date(typeof this.baseForm.startTime === 'object' ? this.baseForm.startTime : parseInt(this.baseForm.startTime))
             let startHour = startTime.getHours() < 10 ? '0' + startTime.getHours() : startTime.getHours().toString()
             let startMinute = startTime.getMinutes() < 10 ? '0' + startTime.getMinutes() : startTime.getMinutes().toString()
-            let endTime = new Date(this.baseForm.endTime)
+            let endTime = new Date(typeof this.baseForm.endTime === 'object' ? this.baseForm.endTime : parseInt(this.baseForm.endTime))
             let endHour = endTime.getHours() < 10 ? '0' + endTime.getHours() : endTime.getHours().toString()
             let endMinute = endTime.getMinutes() < 10 ? '0' + endTime.getMinutes() : endTime.getMinutes().toString()
             let obgStart = {
@@ -634,21 +651,27 @@
         }
         return postData
       },
-
       // 数据回显
       dataDisplay (row) {
         infoDataTransferManage(row.id).then(({data}) => {
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
-            this.baseForm.transferName = disData.transferName
             this.baseForm.templateId = disData.templateId
+            this.baseForm.transferName = disData.transferName
             this.baseForm.taskDescribtion = disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
+            // if (disData.increModel === '') {
+            //   this.isStatic = true
+            //   this.baseForm.increModel = ''
+            // } else {
+            //   this.isStatic = false
+            //   this.baseForm.increModel = disData.increModel
+            // }
             disData.datasourceParams.forEach((item, index) => {
               if (item.type == 'kafka') {
                 this.baseForm.kafkaServer = item.id
-                this.baseForm.topic = item.target
+                this.baseForm.topic = item.topic
               } else if (item.type == 'mysql') {
                 this.baseForm.mysqlServer = item.id
               }
@@ -658,7 +681,7 @@
               case 'ONLY_ONE':
                 this.baseForm.jobType = 1
                 if (tempTime.execTime.hasOwnProperty('year') && tempTime.execTime.year != null) {
-                  this.baseForm.onceRunTime = new Date(tempTime.execTime.year, tempTime.execTime.month - 1, tempTime.execTime.day, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second).getTime()
+                  this.baseForm.onceRunTime = new Date(parseInt(tempTime.execTime.year), parseInt(tempTime.execTime.month) - 1, parseInt(tempTime.execTime.day), parseInt(tempTime.execTime.hour), parseInt(tempTime.execTime.minute), parseInt(tempTime.execTime.second)).getTime()
                 } else {
                   this.baseForm.onceRunTime = ''
                 }
@@ -667,46 +690,45 @@
                 this.disTimeTurnOff('MINUTE')
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'MINUTE'
-                this.baseForm.startTime = new Date(2016, 9, 10, tempTime.startTime.hour, tempTime.startTime.minute, 0)
-                this.baseForm.endTime = new Date(2016, 9, 10, tempTime.endTime.hour, tempTime.endTime.minute, 0)
+                this.baseForm.startTime = new Date(2020, 3, 4, parseInt(tempTime.startTime.hour), parseInt(tempTime.startTime.minute), 0)
+                this.baseForm.endTime = new Date(2020, 3, 4, parseInt(tempTime.endTime.hour), parseInt(tempTime.endTime.minute), 0)
                 this.baseForm.timeInterval = tempTime.interval
                 break
               case 'HOUR':
                 this.disTimeTurnOff('HOUR')
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'HOUR'
-                this.baseForm.startTime = new Date(2016, 9, 10, tempTime.startTime.hour, tempTime.startTime.minute, 0)
-                this.baseForm.endTime = new Date(2016, 9, 10, tempTime.endTime.hour, tempTime.endTime.minute, 0)
+                this.baseForm.startTime = new Date(2020, 3, 4, parseInt(tempTime.startTime.hour), parseInt(tempTime.startTime.minute), 0)
+                this.baseForm.endTime = new Date(2020, 3, 4, parseInt(tempTime.endTime.hour), parseInt(tempTime.endTime.minute), 0)
                 this.baseForm.timeInterval = tempTime.interval
                 break
               case 'DAY':
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'DAY'
-                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second)
+                this.baseForm.runTime = new Date(2020, 3, 4, parseInt(tempTime.execTime.hour), parseInt(tempTime.execTime.minute), parseInt(tempTime.execTime.second))
                 break
               case 'WEEK':
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'WEEK'
-                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second)
+                this.baseForm.runTime = new Date(2020, 3, 4, parseInt(tempTime.execTime.hour), parseInt(tempTime.execTime.minute), parseInt(tempTime.execTime.second))
                 this.baseForm.dayOfWeeks = tempTime.jobValue.split(',')
                 break
               case 'MONTH':
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'MONTH'
-                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second)
+                this.baseForm.runTime = new Date(2020, 3, 4, parseInt(tempTime.execTime.hour), parseInt(tempTime.execTime.minute), parseInt(tempTime.execTime.second))
                 this.baseForm.dayOfMonths = tempTime.jobValue.split(',')
                 break
             }
           }
         })
       },
-
       // 分群出参
       changeOption () {
         this.$refs.baseForm.validateField('outParams')
       },
-
-      init (row, tag) { // 打开抽屉弹窗
+      // 打开抽屉弹窗
+      init (row, tag) {
         this.baseForm.id = ''
         this.baseForm.transferName = ''
         this.baseForm.taskDescribtion = ''
@@ -714,18 +736,18 @@
         this.baseForm.onceRunTime = ''
         this.baseForm.runTime = ''
         this.baseForm.runCycle = 'MINUTE'
-        this.baseForm.startTime = ''
-        this.baseForm.endTime = ''
+        this.baseForm.startTime = '1583251201000'
+        this.baseForm.endTime = '1583251201000'
         this.baseForm.timeInterval = ''
         this.baseForm.dayOfWeeks = []
         this.baseForm.dayOfMonths = []
         this.baseForm.transferType = []
-        // this.baseForm.transferMode = 1
+        // this.baseForm.increModel = 0
         this.baseForm.kafkaServer = ''
         this.baseForm.topic = ''
         this.baseForm.mysqlServer = ''
         this.baseForm.outParams = []
-        this.baseForm.templateId = row ? row.id : ''
+        this.baseForm.templateId = ''
         this.tag = tag == 'edit' ? '编辑' : '新建'
         this.visible = true
         this.loading = true
@@ -738,16 +760,17 @@
           }
         })
       },
-
-      drawerClose () { // 关闭抽屉弹窗
+      // 关闭抽屉弹窗
+      drawerClose () {
         this.visible = false
         this.$parent.addOrUpdateVisible = false
       },
-
+      // 保存
       saveHandle () {
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             let params = this.formatPostData(this.baseForm, this.outParams)
+            // console.log(JSON.stringify(params))
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
                 if (data && data.status === '1') {
@@ -784,7 +807,7 @@
           }
         })
       },
-
+      // 关闭
       cancelHandle () {
         this.visible = false
         this.$parent.addOrUpdateVisible = false
