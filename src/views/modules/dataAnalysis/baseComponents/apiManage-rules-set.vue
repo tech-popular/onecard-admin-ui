@@ -92,7 +92,7 @@
                   <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
                 </el-form-item>
                 天&nbsp;
-                <el-form-item>
+                <el-form-item prop="subFunc" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
                   <el-select v-model="item.subFunc" class="subSelect">
                     <el-option v-for="(fitem, findex) in item.subSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
                   </el-select>
