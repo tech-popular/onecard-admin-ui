@@ -577,10 +577,12 @@ export default {
         params.push({ value: '', title: '' })
       }
       let subSelects = []
+      let subFunc = ''
       if (citem.func === 'relative_time') {
         subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
+        subFunc = subSelects[0].code // 默认选择“之前”
       }
-      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects })
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
