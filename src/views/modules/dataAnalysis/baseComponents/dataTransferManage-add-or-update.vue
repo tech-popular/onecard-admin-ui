@@ -10,16 +10,14 @@
   <div slot="title" class="drawer-title">{{tag}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form">
-        <el-form-item v-if="baseForm.transferName" label="任务名称" style="width:50%">
-          <el-input v-model.trim="baseForm.transferName" class="base-pane-item" readonly />
-        </el-form-item>
         <div class="base-pane">
           <h3>基本信息</h3>
-            <el-form-item label="分群ID" prop="templateId">
+            <el-form-item label="分群名称" prop="templateId">
               <el-select
                 filterable
                 v-model="baseForm.templateId"
-                placeholder="请选择">
+                placeholder="请选择"
+                @change="currentSel">
                 <el-option
                   v-for="item in templateIdList"
                   :key="item.value"
@@ -27,6 +25,9 @@
                   :value="item.value">
                 </el-option>
               </el-select>
+            </el-form-item>
+            <el-form-item label="任务名称" prop="transferName" style="width:50%">
+              <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
             </el-form-item>
             <el-form-item label="分群出参" prop="outParams">
               <Treeselect
@@ -82,7 +83,7 @@
             <el-row v-if="baseForm.jobType === 2">
               <el-col :span="7">
                 <el-form-item label="调度周期">
-                  <el-select v-model="baseForm.runCycle" placeholder="请选择" style="width:220px;">
+                  <el-select v-model="baseForm.runCycle" placeholder="请选择" style="width:220px;" @change="disTimeTurnOff (baseForm.runCycle)">
                     <el-option
                       v-for="item in dispatchCycleList"
                       :key="item.value"
@@ -124,12 +125,47 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="7">
+              <el-col :span="7" v-if = "baseForm.runCycle !== 'MINUTE' && baseForm.runCycle !== 'HOUR'">
                 <el-form-item class="label-remove-margin" prop="runTime">
                   <el-time-picker
                     v-model="baseForm.runTime"
                     value-format="timestamp"
                     placeholder="时:分:秒">
+                  </el-time-picker>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-if="baseForm.jobType === 2 && (baseForm.runCycle === 'MINUTE' || baseForm.runCycle === 'HOUR')">
+              <el-col :span="7">
+                <el-form-item label="开始时间" prop="startTime">
+                  <el-time-picker
+                    v-model="baseForm.startTime"
+                    value-format="timestamp"
+                    format="HH:mm"
+                    placeholder="时:分">
+                  </el-time-picker>
+                </el-form-item>
+                </el-col>
+                <el-col :span="7">
+                <el-form-item label="时间间隔" prop="timeInterval">
+                  <el-select v-model="baseForm.timeInterval" placeholder="请选择">
+                    <el-option
+                      v-for="item in timeIntervalList"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                  <span>{{ disIntervalMess }}</span>
+                </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                <el-form-item label="结束时间" prop="endTime">
+                  <el-time-picker
+                    v-model="baseForm.endTime"
+                    value-format="timestamp"
+                    format="HH:mm"
+                    placeholder="时:分">
                   </el-time-picker>
                 </el-form-item>
               </el-col>
@@ -183,6 +219,12 @@
                   </el-select>
               </el-form-item>
             </el-col>
+            <el-col>
+              <el-form-item label="下发模式" prop="transferMode">
+                <el-radio v-model="baseForm.transferMode" :label="1">全量</el-radio>
+                <el-radio v-model="baseForm.transferMode" :label="2">增量</el-radio>
+              </el-form-item>
+            </el-col>
           </el-row>
         </div>
       </el-form>
@@ -223,27 +265,35 @@
         baseForm: {
           id: '',
           transferName: '', // 任务名称
-          templateId: '', // 分群ID
+          templateId: '', // 分群名称
           outParams: [],
           taskDescribtion: '', // 描述
           jobType: 1, // 周期
           onceRunTime: '', // 运行一次运行时间
           runTime: '', // 周期运行具体时间
-          runCycle: 'DAY', // 调度周期
+          runCycle: 'MINUTE', // 调度周期
+          timeInterval: '',
+          startTime: '',
+          endTime: '',
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
+          transferMode: 1, // 下发模式
           kafkaServer: '', // kafka数据源地址
           topic: '',
           mysqlServer: ''// sftp数据源地址
         },
         tag: '新增', // 说明是否是“查看”
         readonly: false, // 不可编辑
+        disIntervalMess: '分钟',
         templateIdList: [],
         outParams: [], // 分群出参提交格式
         outParamsList: [ // 分群出参list
         ],
+        timeIntervalList: [],
         dispatchCycleList: [
+          {value: 'MINUTE', label: '分钟'},
+          {value: 'HOUR', label: '小时'},
           {value: 'DAY', label: '日'},
           {value: 'WEEK', label: '周'},
           {value: 'MONTH', label: '月'}
@@ -263,7 +313,10 @@
         mysqlServerList: [],
         baseRule: {
           templateId: [
-            { required: true, message: '请选择分群ID', trigger: 'change' }
+            { required: true, message: '请选择分群名称', trigger: 'change' }
+          ],
+          transferName: [
+            { required: true, message: '请输入任务名称', trigger: 'blur' }
           ],
           outParams: [
             { required: true, message: '请选择分群出参', trigger: 'input' }
@@ -280,6 +333,15 @@
           dayOfMonths: [
             {type: 'array', required: true, message: '请选择具体时间', trigger: 'change'}
           ],
+          startTime: [
+            {type: 'date', required: true, message: '请选择开始时间', trigger: 'change'}
+          ],
+          timeInterval: [
+            {type: 'number', required: true, message: '请选择间隔时间', trigger: 'change'}
+          ],
+          endTime: [
+            {type: 'date', required: true, message: '请选择结束时间', trigger: 'change'}
+          ],
           transferType: [
             { type: 'array', required: true, message: '请选择下发数据源', trigger: 'change' }
           ],
@@ -295,6 +357,7 @@
 
     mounted () {
       this.dataAssembly()
+      this.disTimeTurnOff('MINUTE')
       this.getCusterList()
       this.getKafkaServerList()
       this.getMysqlServerList()
@@ -324,6 +387,23 @@
         this.dayOfMonthsList = tempArry
       },
 
+      //  调度 时间间隔 数据切换
+      disTimeTurnOff (disType) {
+        let tempArry = []
+        if (disType === 'MINUTE') {
+          for (let i = 5, j = 60; i < j; i += 5) {
+            tempArry.push({value: i, label: i})
+          }
+          this.disIntervalMess = '分钟'
+        } else if (disType === 'HOUR') {
+          for (let i = 1, j = 24; i < j; i++) {
+            tempArry.push({value: i, label: i})
+          }
+          this.disIntervalMess = '小时'
+        }
+        this.baseForm.timeInterval = ''
+        this.timeIntervalList = tempArry
+      },
       // 清洗数据，按selectVue的格式重新组织指标数据
       filterAllCata (tree) {
         let arr = []
@@ -358,7 +438,7 @@
         return arr
       },
 
-      // 获取分群ID
+      // 获取分群名称
       getCusterList () {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
@@ -431,6 +511,14 @@
           }
         })
       },
+      // 分群名称改变任务名称改变
+      currentSel (selVal) {
+        let obj = {}
+        obj = this.templateIdList.find((item) => {
+          return item.value === selVal
+        })
+        this.baseForm.transferName = obj.text + '下发任务'
+      },
 
       outParamsSelect (node) { // 选中出参
         this.outParams.push({
@@ -467,7 +555,7 @@
       formatPostData (data, outParams) {
         let postData = {}
         postData.id = data.id ? data.id : ''
-        postData.transferName = data.transferName ? data.transferName : ''
+        postData.transferName = data.transferName
         postData.templateId = data.templateId
         postData.transferType = data.transferType.join(',')
         postData.taskDescribtion = data.taskDescribtion
@@ -488,6 +576,7 @@
           }
           postData.datasourceParams.push(tempServer)
         }
+        postData.transferMode = data.transferMode
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
@@ -499,24 +588,47 @@
         if (data.jobType == 1) {
           postData.taskScheduleConfig.jobType = 'ONLY_ONE'
           if (data.onceRunTime !== '') {
-            postData.taskScheduleConfig.year = year
-            postData.taskScheduleConfig.month = month
-            postData.taskScheduleConfig.day = day
-            postData.taskScheduleConfig.hour = hour
-            postData.taskScheduleConfig.minute = minute
-            postData.taskScheduleConfig.second = second
+            let obgExec = {
+              year: year,
+              month: month,
+              day: day,
+              hour: hour,
+              minute: minute,
+              second: second
+            }
+            postData.taskScheduleConfig.execTime = obgExec
           }
         } else {
           postData.taskScheduleConfig.jobType = data.runCycle
           if (data.runCycle == 'WEEK') {
-            postData.taskScheduleConfig.dayOfWeeks = data.dayOfWeeks
+            postData.taskScheduleConfig.jobValue = data.dayOfWeeks.join(',')
           } else if (data.runCycle == 'MONTH') {
-            postData.taskScheduleConfig.dayOfMonths = data.dayOfMonths
+            postData.taskScheduleConfig.jobValue = data.dayOfMonths.join(',')
+          } else if (data.runCycle == 'MINUTE' || data.runCycle == 'HOUR') {
+            let startTime = new Date(this.baseForm.startTime)
+            let startHour = startTime.getHours() < 10 ? '0' + startTime.getHours() : startTime.getHours().toString()
+            let startMinute = startTime.getMinutes() < 10 ? '0' + startTime.getMinutes() : startTime.getMinutes().toString()
+            let endTime = new Date(this.baseForm.endTime)
+            let endHour = endTime.getHours() < 10 ? '0' + endTime.getHours() : endTime.getHours().toString()
+            let endMinute = endTime.getMinutes() < 10 ? '0' + endTime.getMinutes() : endTime.getMinutes().toString()
+            let obgStart = {
+              hour: startHour,
+              minute: startMinute
+            }
+            let obgEnd = {
+              hour: endHour,
+              minute: endMinute
+            }
+            postData.taskScheduleConfig.startTime = obgStart
+            postData.taskScheduleConfig.endTime = obgEnd
+            postData.taskScheduleConfig.interval = this.baseForm.timeInterval
           }
-          if (data.runTime !== '') {
-            postData.taskScheduleConfig.hour = hour
-            postData.taskScheduleConfig.minute = minute
-            postData.taskScheduleConfig.second = second
+          if ((data.runCycle == 'WEEK' || data.runCycle == 'MONTH') && data.runTime !== '') {
+            let obgExec = {
+              hour: hour,
+              minute: minute
+            }
+            postData.taskScheduleConfig.execTime = obgExec
           }
         }
         return postData
@@ -544,28 +656,44 @@
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONLY_ONE':
                 this.baseForm.jobType = 1
-                if (tempTime.hasOwnProperty('year') && tempTime.year != null) {
-                  this.baseForm.onceRunTime = new Date(tempTime.year, tempTime.month, tempTime.day, tempTime.hour, tempTime.minute, tempTime.second).getTime()
+                if (tempTime.execTime.hasOwnProperty('year') && tempTime.execTime.year != null) {
+                  this.baseForm.onceRunTime = new Date(tempTime.execTime.year, tempTime.execTime.month, tempTime.execTime.day, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second).getTime()
                 } else {
                   this.baseForm.onceRunTime = ''
                 }
                 break
+              case 'MINUTE':
+                this.disTimeTurnOff('MINUTE')
+                this.baseForm.jobType = 2
+                this.baseForm.runCycle = 'MINUTE'
+                this.baseForm.startTime = new Date(2016, 9, 10, tempTime.startTime.hour, tempTime.startTime.minute, 0)
+                this.baseForm.endTime = new Date(2016, 9, 10, tempTime.endTime.hour, tempTime.endTime.minute, 0)
+                this.baseForm.timeInterval = tempTime.interval
+                break
+              case 'HOUR':
+                this.disTimeTurnOff('HOUR')
+                this.baseForm.jobType = 2
+                this.baseForm.runCycle = 'HOUR'
+                this.baseForm.startTime = new Date(2016, 9, 10, tempTime.startTime.hour, tempTime.startTime.minute, 0)
+                this.baseForm.endTime = new Date(2016, 9, 10, tempTime.endTime.hour, tempTime.endTime.minute, 0)
+                this.baseForm.timeInterval = tempTime.interval
+                break
               case 'DAY':
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'DAY'
-                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.hour, tempTime.minute, tempTime.second)
+                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second)
                 break
               case 'WEEK':
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'WEEK'
-                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.hour, tempTime.minute, tempTime.second)
-                this.baseForm.dayOfWeeks = tempTime.dayOfWeeks
+                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second)
+                this.baseForm.dayOfWeeks = tempTime.jobValue.split(',')
                 break
               case 'MONTH':
                 this.baseForm.jobType = 2
                 this.baseForm.runCycle = 'MONTH'
-                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.hour, tempTime.minute, tempTime.second)
-                this.baseForm.dayOfMonths = tempTime.dayOfMonths
+                this.baseForm.runTime = new Date(2016, 9, 10, tempTime.execTime.hour, tempTime.execTime.minute, tempTime.execTime.second)
+                this.baseForm.dayOfMonths = tempTime.jobValue.split(',')
                 break
             }
           }
@@ -583,7 +711,10 @@
         this.baseForm.taskDescribtion = ''
         this.baseForm.jobType = 1
         this.baseForm.onceRunTime = ''
-        this.baseForm.runCycle = 'DAY'
+        this.baseForm.runCycle = 'MINUTE'
+        this.baseForm.startTime = ''
+        this.baseForm.endTime = ''
+        this.baseForm.timeInterval = ''
         this.baseForm.outParams = []
         this.baseForm.templateId = row ? row.id : ''
         this.tag = tag == 'edit' ? '编辑' : '新建'
