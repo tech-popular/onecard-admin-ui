@@ -437,7 +437,7 @@ export default {
         'enumTypeNum': '',
         'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
-        'subFunc': 'relative_before', // 默认取值
+        'subFunc': '',
         'params': [{
           value: '',
           title: ''
@@ -532,10 +532,16 @@ export default {
         params.push({ value: '', title: '' })
       }
       let subSelects = []
+      let subFunc = ''
       if (citem.func === 'relative_time') {
         subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
+        subFunc = 'relative_before'
       }
-      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects })
+      if (subFunc) {
+        this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc })
+      } else {
+        this.updateRulesArr(data, citem, { params: params, subSelects: subSelects })
+      }
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
