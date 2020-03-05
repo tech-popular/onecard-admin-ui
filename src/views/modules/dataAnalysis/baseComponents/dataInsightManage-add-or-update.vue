@@ -84,7 +84,7 @@
           </el-checkbox-group> -->
           <el-form label-width="80px" :model="rejectForm" ref="baseForm">
             <el-form-item label="分群包：">
-              <el-select v-model="rejectForm.templateIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
+              <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
                 <el-option
                   v-for="item in custerNameList"
                   :key="item.value"
@@ -167,7 +167,7 @@ export default {
         desc: ''
       },
       rejectForm: {
-        templateIds: [],
+        rejectGroupPackageIds: [],
         vestPackCode: []
       },
       baseRule: { // 基本信息校验规则
@@ -257,7 +257,7 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
-          this.rejectForm.templateIds = data.data.templateIds || []
+          this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
           } else {
@@ -775,6 +775,7 @@ export default {
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
             data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
+            data.append('rejectGroupPackageIds', this.rejectForm.rejectGroupPackageIds)
             if (this.id) {
               data.append('id', this.id)
             }

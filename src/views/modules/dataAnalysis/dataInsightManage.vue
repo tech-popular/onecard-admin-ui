@@ -16,6 +16,8 @@
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="分群ID"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="分群名称"></el-table-column>
+      <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
+      <el-table-column prop="lastCalTime" header-align="center" align="center" label="最近计算时间"></el-table-column>
       <el-table-column prop="desc" header-align="center" align="center" label="分群说明">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
