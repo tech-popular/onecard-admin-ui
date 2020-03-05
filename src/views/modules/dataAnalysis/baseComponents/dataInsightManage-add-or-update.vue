@@ -10,7 +10,7 @@
     <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
-        <h3>基本信息</h3>
+        <h3 ref="baseTitle">基本信息</h3>
         <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="分群名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
@@ -40,7 +40,7 @@
                   :show-file-list="false"
                   :auto-upload="false"
                 >
-                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+                  <el-button slot="trigger" size="small" type="default" icon ="el-icon-document">选择文件</el-button>
                 </el-upload>
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
@@ -84,7 +84,7 @@
           </el-checkbox-group> -->
           <el-form label-width="80px" :model="rejectForm" ref="baseForm">
             <el-form-item label="分群包：">
-              <el-select v-model="rejectForm.templateIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
+              <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
                 <el-option
                   v-for="item in custerNameList"
                   :key="item.value"
@@ -167,7 +167,7 @@ export default {
         desc: ''
       },
       rejectForm: {
-        templateIds: [],
+        rejectGroupPackageIds: [],
         vestPackCode: []
       },
       baseRule: { // 基本信息校验规则
@@ -257,7 +257,7 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
-          this.rejectForm.templateIds = data.data.templateIds || []
+          this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
           } else {
@@ -767,6 +767,7 @@ export default {
         this.drawerTitle = '新建'
         this.baseForm.name = '复制' + this.baseForm.name
         this.id = ''
+        this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
       })
     },
     saveHandle (type) {
@@ -789,6 +790,7 @@ export default {
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
             data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
+            data.append('rejectGroupPackageIds', this.rejectForm.rejectGroupPackageIds)
             if (this.id) {
               data.append('id', this.id)
             }

@@ -87,7 +87,7 @@
                 </el-date-picker>
               </el-form-item>
               <!--相对时间-->
-               <div v-if="item.func === 'relative_time'" class="pane-rules-inline">
+              <div v-if="item.func === 'relative_time'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
