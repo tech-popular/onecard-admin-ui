@@ -526,10 +526,10 @@
         obj = this.templateIdList.find((item) => {
           if (item.value === selVal && item.type === 'static') {
             this.isStatic = true
-            this.baseForm.increModel = ''
+            this.baseForm.increModel = -1
           } else {
             this.isStatic = false
-            if (this.baseForm.increModel === '') {
+            if (this.baseForm.increModel === -1) {
               this.baseForm.increModel = 0
             }
           }
@@ -661,9 +661,9 @@
             this.baseForm.transferName = disData.transferName
             this.baseForm.taskDescribtion = disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
-            if (disData.increModel === '') {
+            if (disData.increModel === -1) {
               this.isStatic = true
-              this.baseForm.increModel = ''
+              this.baseForm.increModel = -1
             } else {
               this.isStatic = false
               this.baseForm.increModel = disData.increModel
