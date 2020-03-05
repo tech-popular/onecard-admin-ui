@@ -603,7 +603,7 @@
         let minute = tempTime.getMinutes() < 10 ? '0' + tempTime.getMinutes() : tempTime.getMinutes().toString()
         let second = tempTime.getSeconds() < 10 ? '0' + tempTime.getSeconds() : tempTime.getSeconds().toString()
         if (data.jobType == 1) {
-          postData.taskScheduleConfig.jobType = 'ONLY_ONE'
+          postData.taskScheduleConfig.jobType = 'ONCE_ONLY'
           if (data.onceRunTime !== '') {
             let obgExec = {
               year: year,
@@ -678,7 +678,7 @@
             })
             let tempTime = disData.taskScheduleConfig
             switch (disData.taskScheduleConfig.jobType) {
-              case 'ONLY_ONE':
+              case 'ONCE_ONLY':
                 this.baseForm.jobType = 1
                 if (tempTime.execTime != null && tempTime.execTime.hasOwnProperty('year')) {
                   this.baseForm.onceRunTime = new Date(parseInt(tempTime.execTime.year), parseInt(tempTime.execTime.month) - 1, parseInt(tempTime.execTime.day), parseInt(tempTime.execTime.hour), parseInt(tempTime.execTime.minute), parseInt(tempTime.execTime.second)).getTime()
