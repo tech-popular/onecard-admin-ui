@@ -277,6 +277,7 @@
         isStatic: false,
         baseForm: {
           id: '',
+          taskUniqueFlag: null, // 蜂巢任务ID
           transferName: '', // 任务名称
           templateId: '', // 分群名称
           outParams: [],
@@ -572,6 +573,7 @@
       formatPostData (data, outParams) {
         let postData = {}
         postData.id = data.id ? data.id : ''
+        postData.taskUniqueFlag = data.taskUniqueFlag
         postData.transferName = data.transferName
         postData.templateId = data.templateId
         postData.transferType = data.transferType.join(',')
@@ -657,6 +659,7 @@
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
+            this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.templateId = disData.templateId
             this.baseForm.transferName = disData.transferName
             this.baseForm.taskDescribtion = disData.taskDescribtion
@@ -729,6 +732,7 @@
       },
       // 打开抽屉弹窗
       init (row, tag) {
+        this.baseForm.taskUniqueFlag = null
         this.baseForm.id = ''
         this.baseForm.transferName = ''
         this.baseForm.taskDescribtion = ''
@@ -771,7 +775,7 @@
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             let params = this.formatPostData(this.baseForm, this.outParams)
-            // console.log(JSON.stringify(params))
+            console.log(JSON.stringify(params))
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
                 if (data && data.status === '1') {
