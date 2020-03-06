@@ -11,7 +11,7 @@
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3>基本信息</h3>
-        <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
+        <el-form label-width="90px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="API名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="API名称" clearable class="base-pane-item" />
           </el-form-item>
@@ -24,9 +24,6 @@
           <el-form-item prop="apiName" class="item-inline item-code">
             <el-input v-model.trim="baseForm.apiName" placeholder="输入字母和数字的组合" clearable class="item-code-name" :disabled="!!id" />
           </el-form-item>
-          <!-- <el-form-item class="item-inline item-button">
-            <el-button type="success" @click="getApiCode" size="small">确认生成</el-button>
-          </el-form-item> -->
           <el-form-item label="您创建的接口编码是：" label-width="166px">
             {{code}}
             <el-button type="primary" @click="copyCode" size="small" class="copy-code" v-if="isCopyBtn">复制编码</el-button>
@@ -36,8 +33,8 @@
           </el-form-item>
           <el-form-item label="API模式" prop="outType">
             <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
-              <el-radio label="INDICATOR">选择模式</el-radio>
               <el-radio label="JUDGE">判断模式（返回值为是/否在此分群）</el-radio>
+              <el-radio label="INDICATOR">选择模式（返回值为所选指标）</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="API出参" prop="outParams" v-if="baseForm.outType==='INDICATOR'">
@@ -58,23 +55,46 @@
             />
           </el-form-item>
           <el-form-item label="API描述">
-            <el-input type="textarea"  class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
+            <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
             <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
+          </el-form-item>
+          <el-form-item label="分群名称" prop="templateIds">
+            <el-select v-model="baseForm.templateIds" @change="custerNamesChange" filterable multiple placeholder="请选择分群名称" class="base-pane-item">
+              <el-option
+                v-for="item in newCusterNameList"
+                :key="item.value"
+                :label="item.text"
+                :disabled="item.disabled"
+                :value="item.value">
+              </el-option>
+            </el-select>
+            <el-button type="primary" @click="previewCusterInfo" size="small">预览</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <div class="pane-rules">
-        <h3>满足如下条件的用户</h3>
-        <el-form :inline="true">
-          <el-form-item label="用户属性与用户交易满足：" >
-            <el-input v-model="expression" disabled style="width: 800px" />
-          </el-form-item>
-          <el-form-item style="float:right">
-            <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
-          </el-form-item>
-        </el-form>
-        <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
-          <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
+      <div v-loading="custerLoading">
+        <div class="pane-rules" v-if="custerInfoList.length">
+          <h3 class="pane-preview-title">分群预览</h3>
+          <div class="pane-rules-item" v-for="(item, index) in custerInfoList" :key="index">
+            <h3>{{item.name}}</h3>
+            <div v-if="item.ruleConfig">
+              <h3>满足如下条件的用户</h3>
+              <el-form :inline="true">
+                <el-form-item label="用户属性与用户交易满足：" >
+                  <el-input v-model="item.expression" disabled style="width: 800px" />
+                </el-form-item>
+                <el-form-item style="float:right" v-if="false">
+                  <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
+                </el-form-item>
+              </el-form>
+              <div v-if="item.ruleConfig.rules && item.ruleConfig.rules.length > 0">
+                <rules-set :data="item.ruleConfig" ref="rulesSet" :is-require="isRequired" :from="'api'"></rules-set>
+              </div>
+            </div>
+            <div v-else>
+              <p>{{item.tips}}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -86,7 +106,9 @@
 </template>
 <script>
 import rulesSet from './apiManage-rules-set'
-import { selectOperate, selectAllCata, enumTypeList, savaApiInfo, updateApiInfo, viewApiInfo } from '@/api/dataAnalysis/apiManage'
+import { selectOperate, selectAllCata, enumTypeList, savaApiInfo, updateApiInfo, viewApiInfo, getOutParams } from '@/api/dataAnalysis/apiManage'
+import { viewDataInfo } from '@/api/dataAnalysis/dataInsightManage'
+import { dataTransferManageCuster } from '@/api/dataAnalysis/dataTransferManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -113,20 +135,28 @@ export default {
       loading: false,
       inParamsList: [
         {
-          title: '账户编号',
+          title: '账户编号（account_no）',
           value: 'account_no'
         },
         {
-          title: '客户编号',
+          title: '客户编号（cust_no）',
           value: 'cust_no'
         },
         {
-          title: '身份证号',
+          title: '身份证号（cert_id）',
           value: 'cert_id'
         },
         {
-          title: '手机号',
+          title: '手机号（mobile_no）',
           value: 'mobile_no'
+        },
+        // {
+        //   title: '用户中心统一编号（UUID）',
+        //   value: 'UUID'
+        // },
+        {
+          title: '新商城用户ID（mall_user_id）',
+          value: 'mall_user_id'
         }
       ],
       id: '',
@@ -134,6 +164,7 @@ export default {
       tag: '',
       drawerTitle: '',
       isRequired: false,
+      custerNameList: [],
       indexList: [],
       outParamsIndexList: [],
       expression: '',
@@ -152,10 +183,12 @@ export default {
         name: '',
         inParam: '',
         desc: '',
-        outType: '',
+        outType: 'JUDGE',
         outParams: [],
         department: '',
-        apiName: ''
+        apiName: '',
+        templateIds: [],
+        type: ''
       },
       departmentList: [],
       originDepartment: '', // 编辑时保留一份原始数据，以防不正当修改编码
@@ -179,6 +212,9 @@ export default {
         ],
         apiName: [
           { validator: validateApiName, trigger: 'blur' }
+        ],
+        templateIds: [
+          { required: true, message: '请选择分群名称', trigger: 'change' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -186,7 +222,11 @@ export default {
         'type': 'rules_function',
         'relation': 'and',
         'rules': []
-      }
+      },
+      custerInfoList: [],
+      curCusterInfo: {},
+      custerLoading: false,
+      filterCursterList: [] // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
     }
   },
   components: { rulesSet, Treeselect },
@@ -204,6 +244,12 @@ export default {
         return true
       }
       return false
+    },
+    newCusterNameList () {
+      if (!this.filterCursterList.length) {
+        return this.custerNameList
+      }
+      return this.filterCursterList
     }
   },
   methods: {
@@ -229,6 +275,54 @@ export default {
         }
       })
     },
+    // 获取分群名称
+    getCusterList () {
+      dataTransferManageCuster().then(({data}) => {
+        if (data.status !== '1') {
+          this.custerNameList = []
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+        this.custerNameList = data.data
+      })
+    },
+    custerNamesChange (value) { // 选中数据变化时
+      if (value.length === 0) {
+        this.filterCursterList = []
+      }
+      // 当选中数据为1时，更新下拉数据状态
+      let filterFirstObj = []
+      if (value.length === 1) {
+        filterFirstObj = this.custerNameList.filter(item => item.value === value[0]) // 筛选出第一条数据，要获取第一条数据的type
+        this.baseForm.type = filterFirstObj[0].type
+        let newArr = this.custerNameList.map(item => {
+          if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+            return {...item, disabled: true}
+          }
+          return item
+        })
+        this.filterCursterList = newArr
+      }
+    },
+    previewCusterInfo () {
+      if (!this.baseForm.templateIds.length) return
+      this.custerLoading = true
+      this.custerInfoList = []
+      this.baseForm.templateIds.forEach((item, index) => {
+        this.getCusterInfo(item, (curCusterInfo) => {
+          this.custerInfoList[index] = curCusterInfo // 获取与templateIds顺序对应的数据，这步不会更新视图
+          let newArr = this.custerInfoList.filter(item => item.id)
+          if (newArr.length === this.baseForm.templateIds.length) { // 如果数据已经全部获取完
+            this.custerInfoList.splice(0, 1, this.custerInfoList[0]) // 利用这个更新视图
+            this.$nextTick(() => {
+              this.custerLoading = false
+            })
+          }
+        })
+      })
+    },
     init (row, tag) {
       this.id = ''
       this.tag = ''
@@ -241,6 +335,7 @@ export default {
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getDepartmentList()
+      this.getCusterList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -255,7 +350,7 @@ export default {
       } else {
         this.id = row.id
         this.drawerTitle = tag === 'view' ? '查看' : '编辑'
-        this.getApiInfo(row.id)
+        this.getOutParam(row.id)
       }
     },
     initEmptyData () { // 当数据异常时，初始化数据
@@ -263,7 +358,11 @@ export default {
         name: '',
         inParam: '',
         desc: '',
-        outParams: []
+        outParams: [],
+        outType: 'JUDGE',
+        department: '',
+        apiName: '',
+        templateIds: []
       }
       this.ruleConfig = { // 规则数据
         'ruleCode': 'rule_all',
@@ -274,56 +373,109 @@ export default {
       this.expression = ''
       this.expressionTemplate = ''
     },
-    getApiInfo (id) { // 查看及编辑时请求数据
+    getCusterInfo (id, fn) { // 获取分群数据
+      viewDataInfo(id).then(({data}) => {
+        if (data.status * 1 !== 1) {
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            tips: data.message || '此分群预览信息加载异常'
+          }
+          fn(this.curCusterInfo)
+          return
+        }
+        if (data.data.userType && data.data.userType === 'excel') {
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            tips: 'Excel导入分群无预览内容'
+          }
+          fn(this.curCusterInfo)
+          return
+        }
+        if (!data.data.configJson) {
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            tips: '此分群预览信息加载异常'
+          }
+          fn(this.curCusterInfo)
+          return
+        }
+        let configJson = JSON.parse(data.data.configJson)
+        this.getSelectAllCata((indexList) => {
+          let ruleConfig = this.updateInitRulesConfig(configJson.ruleConfig, indexList)
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            expression: configJson.expression,
+            ruleConfig: ruleConfig
+          }
+          fn(this.curCusterInfo)
+        })
+      })
+    },
+    getApiInfo (id, outParams) { // 查看及编辑时请求数据
       viewApiInfo(id).then(({data}) => {
         if (data.status !== '1') {
-          this.initEmptyData()
           return this.$message({
             message: data.message,
             type: 'error'
           })
         } else {
-          if (!data.data.configJson) {
-            this.initEmptyData()
-            return this.$message({
-              message: '数据异常',
-              type: 'error'
-            })
-          }
           this.flowId = data.data.flowId
-          let configJson = JSON.parse(data.data.configJson)
           this.baseForm = {
-            name: configJson.name,
-            inParam: configJson.inParam,
-            desc: configJson.desc,
-            department: configJson.department,
-            apiName: configJson.apiName,
-            outType: configJson.outType
+            name: data.data.name,
+            inParam: data.data.inParam,
+            desc: data.data.desc,
+            department: data.data.code.split('_')[0],
+            apiName: data.data.code.split('_')[1],
+            outType: data.data.outType,
+            templateIds: data.data.templateIds,
+            type: data.data.type
           }
-          this.originDepartment = configJson.department
-          this.originApiName = configJson.apiName
-          this.outParams = configJson.outParams
+          this.originDepartment = data.data.code.split('_')[0]
+          this.originApiName = data.data.code.split('_')[1]
+          // 出参
+          this.outParams = outParams
           let out = []
-          configJson.outParams.forEach(item => {
+          outParams.forEach(item => {
             out.push(item.onlyId)
           })
           this.baseForm.outParams = out
-          this.ruleConfig = configJson.ruleConfig
-          this.expression = configJson.expression
-          this.expressionTemplate = configJson.expressionTemplate
+          // 分群包
+          let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
+          let newArr = this.custerNameList.map(item => {
+            if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+              return {...item, disabled: true}
+            }
+            return item
+          })
+          this.filterCursterList = newArr
           this.getSelectAllCata((indexList) => {
-            this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
+            // this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
             this.outParamsIndexList = this.updateOutParamsList(indexList)
             this.$nextTick(() => {
               this.loading = false
             })
           })
-          this.$nextTick(() => { // 默认将验证错误信息全部清除
-            let ruleFormArr = this.getRuleForm()
-            ruleFormArr.forEach(item => {
-              item.clearValidate()
-            })
+        }
+      })
+    },
+    getOutParam (id) { // 获取出参数据
+      getOutParams(id).then(res => {
+        if (res.data.status !== '1') {
+          this.getApiInfo(id, [])
+          return this.$message({
+            type: 'error',
+            message: res.data.message
           })
+        }
+        if (res.data.data && res.data.data.length) {
+          let outParams = res.data.data
+          this.getApiInfo(id, outParams)
+        } else {
+          this.getApiInfo(id, [])
         }
       })
     },
@@ -684,7 +836,6 @@ export default {
       if (this.outParams.length) {
         this.$refs.baseForm.clearValidate('outParams')
       }
-      console.log(this.outParams)
     },
     outParamsDeselect (node) { // 删除出参
       this.outParams = this.outParams.filter(item => item.onlyId !== node.id)
@@ -716,67 +867,46 @@ export default {
       return arr
     },
     saveHandle () {
-      console.log(this.baseForm, this.outParams)
-      if (!this.ruleConfig.rules.length) {
-        this.$message({
-          message: '请配置用户规则信息',
-          type: 'error',
-          center: true
-        })
-        return
-      }
-      this.isRequired = true
-      let ruleFormArr = this.getRuleForm()
-      this.$nextTick(() => { // 待页面中的isRequired = true后再执行校验
-        let flag = true
-        this.$refs.baseForm.validate((valid) => {
-          console.log(11, valid)
-          if (!valid) {
-            flag = false
-          }
-        })
-        ruleFormArr.forEach(item => {
-          item.validate((valid) => {
-            if (!valid) {
-              flag = false
-            }
-          })
-        })
-        if (!flag) {
-          this.isRequired = false
-        } else { // 全部校验通过后，可保存数据
-          this.ruleConfig = this.updateRulesConfig(this.ruleConfig) // 过滤数据
-          this.baseForm.code = this.code
-          let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)), expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: this.ruleConfig }
-          let url = savaApiInfo
-          if (this.id) {
-            url = updateApiInfo
-            params.id = this.id
-            params.flowId = this.flowId
-            params.department = this.originDepartment
-            params.apiName = this.originApiName
-            params.code = this.originDepartment + '_' + this.originApiName
-          }
-          url(params).then(({data}) => {
-            if (data.status !== '1') {
-              return this.$message({
-                type: 'error',
-                message: data.message
-              })
-            } else {
-              this.$message({
-                type: 'success',
-                message: data.message
-              })
-              this.visible = false
-              this.$parent.addOrUpdateVisible = false
-              this.$nextTick(() => {
-                this.$parent.getDataList()
-              })
-            }
-          })
+      let flag = true
+      this.$refs.baseForm.validate((valid) => {
+        if (!valid) {
+          flag = false
         }
       })
+      if (flag) {
+        this.loading = true
+        this.baseForm.code = this.code
+        let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)) }
+        params.inParam = params.inParam
+        let url = savaApiInfo
+        if (this.id) {
+          url = updateApiInfo
+          params.id = this.id
+          params.flowId = this.flowId
+          params.department = this.originDepartment
+          params.apiName = this.originApiName
+          params.code = this.originDepartment + '_' + this.originApiName
+        }
+        url(params).then(({data}) => {
+          this.loading = false
+          if (data.status !== '1') {
+            return this.$message({
+              type: 'error',
+              message: data.message || '数据异常'
+            })
+          } else {
+            this.$message({
+              type: 'success',
+              message: data.message
+            })
+            this.visible = false
+            this.$parent.addOrUpdateVisible = false
+            this.$nextTick(() => {
+              this.$parent.getDataList()
+            })
+          }
+        })
+      }
     },
     cancelHandle () {
       this.visible = false
@@ -822,8 +952,16 @@ export default {
   .copy-code {
     margin-left: 15px;
   }
-  .base-pane {
+  .pane-preview-title {
+    text-align: center;
+    border-top: 1px dashed #ccc;
+    padding-top: 20px;
+  }
+  .pane-rules-item {
     border-bottom: 1px dashed #ccc;
+  }
+  .pane-rules-item:last-child{
+    border: 0
   }
   .footer {
     position: absolute;
