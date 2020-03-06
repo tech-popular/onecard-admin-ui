@@ -669,7 +669,7 @@
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.templateId = disData.templateId
             this.baseForm.transferName = disData.transferName
-            this.baseForm.taskDescribtion = disData.taskDescribtion
+            this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
             if (disData.increModel === -1) {
               this.isStatic = true
