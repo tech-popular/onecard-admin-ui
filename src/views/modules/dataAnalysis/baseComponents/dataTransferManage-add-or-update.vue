@@ -284,10 +284,7 @@
         isStatic: false,
         baseForm: {
           id: '',
-<<<<<<< HEAD
-=======
           taskUniqueFlag: null, // 蜂巢任务ID
->>>>>>> feature/dt_disTime_20200228_yxb
           transferName: '', // 任务名称
           templateId: '', // 分群名称
           outParams: [],
@@ -740,14 +737,9 @@
       changeOption () {
         this.$refs.baseForm.validateField('outParams')
       },
-<<<<<<< HEAD
-
-      init (row, tag) { // 打开抽屉弹窗
-=======
       // 打开抽屉弹窗
       init (row, tag) {
         this.baseForm.taskUniqueFlag = null
->>>>>>> feature/dt_disTime_20200228_yxb
         this.baseForm.id = ''
         this.baseForm.transferName = ''
         this.baseForm.taskDescribtion = ''
