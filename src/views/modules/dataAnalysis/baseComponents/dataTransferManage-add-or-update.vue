@@ -262,8 +262,15 @@
       }
 
       let validateTime = (rule, value, callback) => {
-        if (Number(this.baseForm.startTime) >= Number(this.baseForm.endTime)) {
-          callback(new Error('开始时间大于结束时间'))
+        let tempTime1 = new Date(this.baseForm.startTime)
+        let tempTime2 = new Date(this.baseForm.endTime)
+        let hour1 = tempTime1.getHours()
+        let minute1 = tempTime1.getMinutes()
+        let hour2 = tempTime2.getHours()
+        let minute2 = tempTime2.getMinutes()
+        let tempDate = new Date()
+        if (tempDate.setHours(hour1, minute1) >= tempDate.setHours(hour2, minute2)) {
+          callback(new Error('开始时间大于等于结束时间'))
         } else {
           this.$refs.baseForm.clearValidate('startTime')
           this.$refs.baseForm.clearValidate('endTime')
@@ -287,8 +294,8 @@
           runTime: '', // 周期运行具体时间
           runCycle: 'MINUTE', // 调度周期
           timeInterval: '',
-          startTime: '1583251201000',
-          endTime: '1583251201000',
+          startTime: '',
+          endTime: '',
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
@@ -740,8 +747,8 @@
         this.baseForm.onceRunTime = ''
         this.baseForm.runTime = ''
         this.baseForm.runCycle = 'MINUTE'
-        this.baseForm.startTime = '1583251201000'
-        this.baseForm.endTime = '1583251201000'
+        this.baseForm.startTime = ''
+        this.baseForm.endTime = ''
         this.baseForm.timeInterval = ''
         this.baseForm.dayOfWeeks = []
         this.baseForm.dayOfMonths = []
