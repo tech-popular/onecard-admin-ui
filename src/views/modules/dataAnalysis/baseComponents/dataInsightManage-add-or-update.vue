@@ -584,11 +584,7 @@ export default {
         subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
         subFunc = 'relative_before'
       }
-      if (subFunc) {
-        this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc })
-      } else {
-        this.updateRulesArr(data, citem, { params: params, subSelects: subSelects })
-      }
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
@@ -631,7 +627,11 @@ export default {
         let params = {
           selectOperateList: selectOperateList,
           func: selectOperateList[0].code,
+          subFunc: '',
           params: [{ value: '', title: '' }]
+        }
+        if (params.func === 'relative_time') {
+          params.subFunc = 'relative_before'
         }
         Object.keys(obj).forEach(oitem => {
           params[oitem] = obj[oitem]
