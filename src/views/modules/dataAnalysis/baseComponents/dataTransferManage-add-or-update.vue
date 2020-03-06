@@ -93,7 +93,7 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="6" v-if = "baseForm.runCycle === 'WEEK'">
+              <el-col :span="6" v-if="baseForm.runCycle === 'WEEK'">
                 <el-form-item label="具体时间"  prop="dayOfWeeks">
                   <el-select
                     v-model= "baseForm.dayOfWeeks"
@@ -125,7 +125,7 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="7" v-if = "baseForm.runCycle !== 'MINUTE' && baseForm.runCycle !== 'HOUR'">
+              <el-col :span="7" v-if="baseForm.runCycle !== 'MINUTE' && baseForm.runCycle !== 'HOUR'">
                 <el-form-item class="label-remove-margin" prop="runTime">
                   <el-time-picker
                     v-model="baseForm.runTime"
@@ -782,7 +782,6 @@
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             let params = this.formatPostData(this.baseForm, this.outParams)
-            console.log(JSON.stringify(params))
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
                 if (data && data.status === '1') {
