@@ -86,13 +86,17 @@
                 </el-date-picker>
               </el-form-item>
               <!--相对时间-->
-              <div v-if="item.func === 'relative_before' || item.func === 'relative_within'" class="pane-rules-inline">
-                <!-- 在&nbsp; -->
+               <div v-if="item.func === 'relative_time'" class="pane-rules-inline">
+                在&nbsp;过去&nbsp;
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput-small"></el-input-number> -->
                   <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
                 </el-form-item>
                 天&nbsp;
+                <el-form-item prop="subFunc" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+                  <el-select v-model="item.subFunc" class="subSelect">
+                    <el-option v-for="(fitem, findex) in item.subSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
+                  </el-select>
+                </el-form-item>
               </div>
               <!--相对时间点-->
               <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
@@ -110,8 +114,8 @@
           </div>
           <el-form-item class="btn-group">
             <!-- <i class="el-icon-edit cursor-pointer"></i> -->
-            <el-tooltip v-if="item.func === 'relative_time_in' || item.func === 'relative_before' || item.func === 'relative_within'" placement="top">
-              <div slot="content" v-html="tips[item.func]" class="tips-content"></div>
+            <el-tooltip v-if="item.func === 'relative_time_in' || item.func === 'relative_time'" placement="top">
+              <div slot="content" v-html="tipsHtmlCont(item)" class="tips-content"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
             </el-tooltip>
             <i class="el-icon-circle-plus cursor-pointer" @click="addChildrenRules(item, index)" v-if="!isChild || isChild && index === data.rules.length-1"></i>
@@ -169,6 +173,7 @@ export default {
       parent = parent.$parent
     }
     this.parent = parent
+    console.log('mounted', this.data)
   },
   components: { Treeselect },
   methods: {
@@ -275,6 +280,7 @@ export default {
         // if (ruleItem.fieldType === 'enums'){
         //   this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem)
         // }
+        console.log(123)
         this.parent.getSelectOperateList(ruleItem.fieldType, (selectOperateList) => {
           this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, { selectOperateList: selectOperateList })
         })
@@ -297,6 +303,14 @@ export default {
         return true
       } else {
         return false
+      }
+    },
+    tipsHtmlCont (item) {
+      if (item.func === 'relative_time_in') {
+        return this.tips[item.func]
+      }
+      if (item.func === 'relative_time') {
+        return this.tips[item.subFunc]
       }
     },
     isEmpty (item) { // 是否选择了空
@@ -371,6 +385,9 @@ export default {
   }
   .itemIput {
     width: 300px;
+  }
+  .subSelect {
+    width: 140px;
   }
   .itemIput-big {
     width: 372px;
