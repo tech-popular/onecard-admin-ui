@@ -8,6 +8,16 @@ function httpPost (url, params, flag = true) {
     data: http.adornData(params, flag)
   })
 }
+
+// POST 请求
+function httpPostFile (url, params) {
+  return http({
+    method: 'post',
+    url: http.adornUrl(url),
+    data: params
+  })
+}
+
 // PUT 请求
 function httpPut (url, params, flag = true) {
   return http({
@@ -40,6 +50,7 @@ function httpGet (url, data = {}, flag = true) {
 }
 export {
   httpPost,
+  httpPostFile,
   httpGet,
   httpPut,
   httpDelete

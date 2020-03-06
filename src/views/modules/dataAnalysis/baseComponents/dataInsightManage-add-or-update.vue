@@ -5,15 +5,50 @@
     :show-close="false"
     :wrapperClosable="false"
     size="1200px"
-    class="api-manage-drawer"
+    class="insight-manage-drawer"
   >
     <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3>基本信息</h3>
-        <el-form label-width="80px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
+        <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="分群名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
+          </el-form-item>
+          <el-form-item label="分群类型" prop="userType">
+            <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange" :disabled="!!id">
+              <div class="type-radio-item type-radio-one"><el-radio label="indicator">指标筛选</el-radio></div>
+              <div class="type-radio-item type-radio-two">
+                <el-radio label="excel">excel文件导入</el-radio>
+              </div>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
+            <el-select v-model="baseForm.channelId">
+              <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
+            </el-select>
+            <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
+                <el-upload
+                  v-if="baseForm.userType === 'excel'"
+                  class="upload-excel"
+                  ref="upload"
+                  action="aaa"
+                  accept=".xlsx, .xls"
+                  :file-list="fileData.fileList"
+                  :on-change="handleChange"
+                  :before-upload="beforeUpload"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                >
+                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+                </el-upload>
+                <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
+          </el-form-item>
+          <el-form-item label="计算类型" prop="type">
+            <el-radio-group v-model="baseForm.type" :disabled="!!id || baseForm.userType === 'excel'">
+              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
+              <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="分群描述">
             <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
@@ -21,7 +56,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="pane-rules">
+      <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
         <h3>满足如下条件的用户</h3>
         <el-form :inline="true">
           <el-form-item label="用户属性与用户交易满足：" >
@@ -35,10 +70,24 @@
           <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
+      <div class="pane-reject">
+        <h3>
+          剔除用户名单
+          <el-tooltip placement="top">
+            <div slot="content">当判断指定用户是否在此分群时，不进行剔除名单过滤</div>
+            <i class="el-icon-warning cursor-pointer"></i>
+          </el-tooltip>
+        </h3>
+        <div>
+          <el-checkbox-group v-model="vestPackCode">
+            <el-checkbox v-for="(item, index) in vestPackList" :label="item.value" :key="index">{{item.text}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+      </div>
     </div>
     <div class="footer">
-      <el-button type="success" @click="saveHandle('preview')" size="small">数据预览</el-button>
-      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'">保存</el-button>
+      <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo"></data-preview-info>
@@ -48,7 +97,7 @@
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -65,23 +114,42 @@ export default {
       indexList: [],
       expression: '',
       expressionTemplate: '',
-      initFieldType: '',
-      initDataStandar: '',
-      initFieldCode: '',
-      initSourceTable: '',
-      initFieldId: '',
-      initEnumTypeNum: '',
-      initSelectOperateList: [],
-      initEnglishName: '',
+      // initFieldType: '',
+      // initDataStandar: '',
+      // initFieldCode: '',
+      // initSourceTable: '',
+      // initFieldId: '',
+      // initEnumTypeNum: '',
+      // initSelectOperateList: [],
+      // initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
+      fileData: {
+        fileList: []
+      },
+      excelFile: '',
+      templateUrl: templateDownload,
+      vestPackCode: [],
+      vestPackList: [],
       baseForm: {
         name: '',
+        userType: 'indicator',
+        type: 'static',
+        channelId: '2001',
         desc: ''
       },
       baseRule: { // 基本信息校验规则
         name: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
+        ],
+        userType: [
+          { required: true, message: '请选择分群类型', trigger: 'change' }
+        ],
+        type: [
+          { required: true, message: '请选择计算类型', trigger: 'change' }
+        ],
+        channelId: [
+          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -89,7 +157,8 @@ export default {
         'type': 'rules_function',
         'relation': 'and',
         'rules': []
-      }
+      },
+      channelList: []
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -103,6 +172,8 @@ export default {
       this.loading = true
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
+      this.getVestPackAvailable()
+      this.getChannelsList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -121,6 +192,9 @@ export default {
     initEmptyData () { // 当数据异常时，初始化数据
       this.baseForm = {
         name: '',
+        userType: 'indicator',
+        type: 'static',
+        channelId: '2001',
         desc: ''
       }
       this.ruleConfig = { // 规则数据
@@ -142,6 +216,24 @@ export default {
             type: 'error'
           })
         } else {
+          this.flowId = data.data.flowId
+          this.baseForm = {
+            name: data.data.name,
+            desc: data.data.desc,
+            userType: data.data.userType,
+            channelId: data.data.channelId,
+            type: data.data.type
+          }
+          if (data.data.vestPackCode === null) {
+            this.vestPackCode = []
+          } else {
+            this.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
+          }
+          if (data.data.userType === 'excel') {
+            this.excelFile = data.data.excelFile
+            this.loading = false
+            return
+          }
           if (!data.data.configJson) {
             this.initEmptyData()
             this.loading = false
@@ -150,12 +242,7 @@ export default {
               type: 'error'
             })
           }
-          this.flowId = data.data.flowId
           let configJson = JSON.parse(data.data.configJson)
-          this.baseForm = {
-            name: configJson.name,
-            desc: configJson.desc
-          }
           this.ruleConfig = configJson.ruleConfig
           this.expression = configJson.expression
           this.expressionTemplate = configJson.expressionTemplate
@@ -174,6 +261,52 @@ export default {
         }
       })
     },
+    getChannelsList () {
+      channelsList().then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.channelList = []
+          return
+        }
+        this.channelList = res.data.data
+      })
+    },
+    getVestPackAvailable () {
+      vestPackAvailable().then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.vestPackList = []
+          return this.$message({
+            type: 'error',
+            message: res.message || '数据异常'
+          })
+        }
+        this.vestPackList = res.data.data
+      })
+    },
+    radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
+      if (val === 'indicator') {
+        this.fileData.fileList = []
+        this.excelFile = ''
+      } else {
+        this.baseForm.type = 'static'
+      }
+    },
+    handleChange (file, fileList) { // 上传文件变化时
+      if (fileList.length > 0) {
+        this.fileData.fileList = [fileList[fileList.length - 1]] // 这一步，是展示最后一次选择的文件
+        this.excelFile = this.fileData.fileList[0].name
+      }
+    },
+    beforeUpload (file) { // 上传文件之前的事件
+      let that = this
+      let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
+      if (fileName != 'xls' && fileName != 'xlsx') {
+        that.$message({
+          type: 'error',
+          message: '文件类型不是.xls文件!'
+        })
+        return false
+      }
+    },
     updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
       arr.rules.forEach(item => {
         if (!item.rules) {
@@ -188,29 +321,37 @@ export default {
             }
           })
           item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
+          if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
+            item.subFunc = item.func
+            item.func = 'relative_time'
+            this.getSelectOperateList(item.fieldType, (selectOperateList) => {
+              item.selectOperateList = selectOperateList
+              item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+            })
+          }
         } else {
           this.updateInitRulesConfig(item, indexList)
         }
       })
       return arr
     },
-    getInitTypeCode (arr) { // 获取初始选项及id, 为初始化数据做准备
-      arr.forEach((item, index) => {
-        if (index === 0) {
-          if (item.fieldType) {
-            this.initFieldType = item.fieldType // item.fieldType
-            this.initFieldCode = item.id // item.englishName
-            this.initDataStandar = item.dataStandar
-            this.initEnumTypeNum = item.enumTypeNum
-            this.initSourceTable = item.sourceTable
-            this.initFieldId = item.fieldId
-            this.initEnglishName = item.englishName
-          } else {
-            this.getInitTypeCode(item.children)
-          }
-        }
-      })
-    },
+    // getInitTypeCode (arr) { // 获取初始选项及id, 为初始化数据做准备
+    //   arr.forEach((item, index) => {
+    //     if (index === 0) {
+    //       if (item.fieldType) {
+    //         this.initFieldType = item.fieldType // item.fieldType
+    //         this.initFieldCode = item.id // item.englishName
+    //         this.initDataStandar = item.dataStandar
+    //         this.initEnumTypeNum = item.enumTypeNum
+    //         this.initSourceTable = item.sourceTable
+    //         this.initFieldId = item.fieldId
+    //         this.initEnglishName = item.englishName
+    //       } else {
+    //         this.getInitTypeCode(item.children)
+    //       }
+    //     }
+    //   })
+    // },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata().then(({data}) => {
         if (data.status !== '1') {
@@ -218,10 +359,10 @@ export default {
         } else {
           this.indexList = this.filterAllCata(data.data)
         }
-        this.getInitTypeCode(this.indexList)
-        this.getSelectOperateList(this.initFieldType, (selectOperateList) => {
-          this.initSelectOperateList = selectOperateList
-        })
+        // this.getInitTypeCode(this.indexList)
+        // this.getSelectOperateList(this.initFieldType, (selectOperateList) => {
+        //   this.initSelectOperateList = selectOperateList
+        // })
         if (fn) {
           fn(this.indexList)
         }
@@ -265,19 +406,38 @@ export default {
       }
     },
     getRuleTemplateItem (index) { // 条件模板
+      // return {
+      //   'type': 'rule',
+      //   'fieldType': this.initFieldType,
+      //   'fieldCode': this.initFieldCode,
+      //   'format': this.initDataStandar,
+      //   'func': this.initSelectOperateList[0].code,
+      //   'sourceTable': this.initSourceTable,
+      //   'fieldId': this.initFieldId,
+      //   'englishName': this.initEnglishName,
+      //   'indexList': this.indexList, // 指标下拉选
+      //   'enumTypeNum': '',
+      //   'selectOperateList': this.initSelectOperateList, // 操作符下拉选
+      //   'selectEnumsList': [], // 内容下拉选
+      //   'params': [{
+      //     value: '',
+      //     title: ''
+      //   }]
+      // }
       return {
         'type': 'rule',
-        'fieldType': this.initFieldType,
-        'fieldCode': this.initFieldCode,
-        'format': this.initDataStandar,
-        'func': this.initSelectOperateList[0].code,
-        'sourceTable': this.initSourceTable,
-        'fieldId': this.initFieldId,
-        'englishName': this.initEnglishName,
+        'fieldType': '',
+        'fieldCode': null,
+        'format': '',
+        'func': '',
+        'sourceTable': '',
+        'fieldId': '',
+        'englishName': '',
         'indexList': this.indexList, // 指标下拉选
         'enumTypeNum': '',
-        'selectOperateList': this.initSelectOperateList, // 操作符下拉选
+        'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
+        'subFunc': '',
         'params': [{
           value: '',
           title: ''
@@ -353,6 +513,7 @@ export default {
         }
       })
       this.ruleConfig = arr
+      console.log(this.ruleConfig)
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
       let selectEnumsList = []
@@ -367,10 +528,16 @@ export default {
     },
     updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
       let params = [{ value: '', title: '' }]
-      if (citem.func === 'between' || citem.func === 'relative_time' || citem.func === 'relative_time_in') {
+      if (citem.func === 'between' || citem.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
       }
-      this.updateRulesArr(data, citem, { params: params })
+      let subSelects = []
+      let subFunc = ''
+      if (citem.func === 'relative_time') {
+        subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
+        subFunc = 'relative_before'
+      }
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
@@ -413,7 +580,11 @@ export default {
         let params = {
           selectOperateList: selectOperateList,
           func: selectOperateList[0].code,
+          subFunc: '',
           params: [{ value: '', title: '' }]
+        }
+        if (params.func === 'relative_time') {
+          params.subFunc = 'relative_before'
         }
         Object.keys(obj).forEach(oitem => {
           params[oitem] = obj[oitem]
@@ -528,7 +699,6 @@ export default {
     previewHandle () {
       this.isPreviewShow = true
       this.$nextTick(() => {
-        console.log(this.$refs)
         this.$refs.dataPreviewInfo.init()
       })
     },
@@ -542,6 +712,53 @@ export default {
       return null
     },
     saveHandle (type) {
+      // console.log(this.vestPackCode, this.vestPackCode.length)
+      if (this.baseForm.userType === 'excel') {
+        if (!this.excelFile) {
+          this.$message({
+            type: 'error',
+            message: '请选择要上传的文件'
+          })
+          return
+        }
+        this.$refs.baseForm.validate((valid) => {
+          if (valid) {
+            let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
+            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
+            data.append('name', this.baseForm.name)
+            data.append('type', this.baseForm.type)
+            data.append('userType', this.baseForm.userType)
+            data.append('desc', this.baseForm.desc)
+            data.append('channelId', this.baseForm.channelId)
+            data.append('vestPackCode', this.vestPackCode.join(','))
+            if (this.id) {
+              data.append('id', this.id)
+            }
+            this.loading = true
+            importExcelFile(data).then(res => {
+              if (res.data.status * 1 !== 1) {
+                this.$message({
+                  type: 'error',
+                  message: res.data.message || '保存失败'
+                })
+                this.loading = false
+              } else {
+                this.$message({
+                  type: 'success',
+                  message: res.data.message || '保存成功'
+                })
+                this.loading = false
+                this.visible = false
+                this.$parent.addOrUpdateVisible = false
+                this.$nextTick(() => {
+                  this.$parent.getDataList()
+                })
+              }
+            })
+          }
+        })
+        return
+      }
       if (!this.ruleConfig.rules.length) {
         this.$message({
           message: '请配置用户规则信息',
@@ -570,7 +787,7 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig }
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, vestPackCode: this.vestPackCode.join(',') }
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
@@ -588,8 +805,10 @@ export default {
           if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') {
             params.username = this.getQueryParams('username') || ''
           }
+          this.loading = true
           url(params).then(({data}) => {
             if (data.status !== '1') {
+              this.loading = false
               return this.$message({
                 type: 'error',
                 message: data.message
@@ -599,6 +818,7 @@ export default {
                 type: 'success',
                 message: data.message
               })
+              this.loading = false
               this.visible = false
               this.$parent.addOrUpdateVisible = false
               this.$nextTick(() => {
@@ -616,8 +836,8 @@ export default {
   }
 }
 </script>
-<style scoped>
-  .api-manage-drawer .wrap {
+<style>
+  .insight-manage-drawer .wrap {
     padding: 0 20px 20px;
     margin-top: -12px;
     width: 100%;
@@ -626,7 +846,7 @@ export default {
     top: 75px;
     bottom: 55px;
   }
-  .drawer-title {
+  .insight-manage-drawer .drawer-title {
     padding: 15px;
     background: #333;
     color: #fff;
@@ -634,29 +854,26 @@ export default {
     margin: -20px -20px 0 -20px;
     position: relative;
   }
-  .drawer-close {
+  .insight-manage-drawer .drawer-close {
     position: absolute;
     right: 20px;
   }
-  .item-inline {
+  .insight-manage-drawer .item-inline {
     display: inline-block;
   }
-  .item-code {
+  .insight-manage-drawer .item-code {
     margin-left: -70px;
   }
-  .item-code-name {
+  .insight-manage-drawer .item-code-name {
     width: 300px;
   }
-  .item-button {
+  .insight-manage-drawer .item-button {
     margin-left: -60px;
   }
-  .copy-code {
+  .insight-manage-drawer .copy-code {
     margin-left: 15px;
   }
-  .base-pane {
-    border-bottom: 1px dashed #ccc;
-  }
-  .footer {
+  .insight-manage-drawer .footer {
     position: absolute;
     bottom: 0;
     background: #fff;
@@ -667,20 +884,62 @@ export default {
     box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
     z-index: 500;
   }
-  .cursor-pointer {
+  .insight-manage-drawer .cursor-pointer {
     cursor: pointer;
   }
-  .base-pane-item {
+  .insight-manage-drawer .base-pane-item {
     width: 80%;
   }
-  .vue-treeselect {
+  .insight-manage-drawer .vue-treeselect {
     line-height: 24px;
   }
-  .data-description-tips {
+  .insight-manage-drawer .data-description-tips {
     color: #999;
     margin-top: 0
   }
-  .data-description-tips span {
+  .insight-manage-drawer .data-description-tips span {
     color: red
+  }
+  .insight-manage-drawer .type-radio-group {
+    margin-top: 12px;
+  }
+  .insight-manage-drawer .type-radio-two {
+    margin-top: 20px;
+  }
+  .insight-manage-drawer .upload-excel {
+    display: inline-block;
+    margin-left: 20px;
+  }
+  .insight-manage-drawer .btn-upload {
+    display: inline-block;
+    font-size: 14px;
+    padding-left: 15px;
+  }
+  .insight-manage-drawer .upload-name {
+    font-size: 14px;
+    padding-left: 15px;
+  }
+  .insight-manage-drawer .btn-upload button {
+    margin-left: 10px;
+  }
+  .insight-manage-drawer .btn-download {
+    margin-left: 10px;
+  }
+  .insight-manage-drawer .btn-download a {
+    color: #fff;
+  }
+  .insight-manage-drawer .el-list-enter-active,
+  .insight-manage-drawer .el-list-leave-active {
+    transition: none;
+  }
+  .insight-manage-drawer .el-list-enter,
+  .insight-manage-drawer .el-list-leave-active {
+    opacity: 0;
+  }
+  .insight-manage-drawer .pane-rules, .insight-manage-drawer .pane-reject {
+    border-top: 1px dashed #ccc;
+  }
+  .insight-manage-drawer .user-channel {
+    margin-left: 110px;
   }
 </style>
