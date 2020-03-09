@@ -29,7 +29,9 @@
             <el-button type="primary" @click="copyCode" size="small" class="copy-code" v-if="isCopyBtn">复制编码</el-button>
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
-            <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
+            <el-checkbox-group v-model="baseForm.inParam">
+              <el-checkbox :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
           <el-form-item label="API模式" prop="outType">
             <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
@@ -181,7 +183,7 @@ export default {
       visible: false,
       baseForm: {
         name: '',
-        inParam: '',
+        inParam: [],
         desc: '',
         outType: 'JUDGE',
         outParams: [],
@@ -199,7 +201,7 @@ export default {
           { required: true, message: '请输入API名称', trigger: 'blur' }
         ],
         inParam: [
-          { required: true, message: '请选择API入参', trigger: 'change' }
+          { type: 'array', required: true, message: '请选择API入参', trigger: 'change' }
         ],
         outType: [
           { required: true, message: '请选择API模式', trigger: 'change' }
@@ -356,7 +358,7 @@ export default {
     initEmptyData () { // 当数据异常时，初始化数据
       this.baseForm = {
         name: '',
-        inParam: '',
+        inParam: [],
         desc: '',
         outParams: [],
         outType: 'JUDGE',
@@ -426,7 +428,7 @@ export default {
           this.flowId = data.data.flowId
           this.baseForm = {
             name: data.data.name,
-            inParam: data.data.inParam,
+            inParam: data.data.inParam.split(','),
             desc: data.data.desc,
             department: data.data.code.split('_')[0],
             apiName: data.data.code.split('_')[1],
@@ -478,11 +480,6 @@ export default {
           this.getApiInfo(id, [])
         }
       })
-    },
-    inParamChange () { // 消除入参错误提示
-      if (this.baseForm.inParam) {
-        this.$refs.baseForm.clearValidate('inParam')
-      }
     },
     outTypeChange (val) {
       if (val === 'JUDGE') {
@@ -877,7 +874,7 @@ export default {
         this.loading = true
         this.baseForm.code = this.code
         let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)) }
-        params.inParam = params.inParam
+        params.inParam = params.inParam.join(',')
         let url = savaApiInfo
         if (this.id) {
           url = updateApiInfo
