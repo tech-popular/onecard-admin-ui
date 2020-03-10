@@ -791,6 +791,11 @@ export default {
             data.append('channelId', this.baseForm.channelId)
             data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
             data.append('rejectGroupPackageIds', this.rejectForm.rejectGroupPackageIds)
+            let flag = 0
+            if (this.rejectForm.rejectGroupPackageIds.length) {
+              flag = 1
+            }
+            data.append('rejectGroupPackCode', flag)
             if (this.id) {
               data.append('id', this.id)
             }
@@ -847,7 +852,11 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm }
+          let flag = 0
+          if (this.rejectForm.rejectGroupPackageIds.length) {
+            flag = 1
+          }
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm, rejectGroupPackCode: flag }
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
