@@ -6,7 +6,10 @@
     :append-to-body="true"
     class="prevuew-dialog"
   >
-    <div slot="title" class="title">本次用户分群共筛选出 <span>{{totalNum}}</span> 条数据</div>
+    <div slot="title" class="title">
+      本次用户分群共筛选出 <span>{{totalNum}}</span> 条数据
+      <p class="title-tips" v-if="vestPackCode && vestPackCode.length">（提示：因风控包需调用第三方接口存在延时性，故筛选条数为未剔除风控包前的数据）</p>
+    </div>
     <div class="column-filter">
       <el-button class="column-filter-btn" type="success" size="small">字段筛选</el-button>
       <el-select v-model="checkedColumn" multiple placeholder="请选择">
@@ -37,6 +40,7 @@ export default {
       totalNum: 0
     }
   },
+  props: ['vestPackCode'],
   computed: {
     tableColumns () {
       if (this.checkedColumn.length === this.totalTableColumns.length) {
@@ -67,6 +71,7 @@ export default {
       this.loading = true
       this.totalTableColumns = []
       this.checkedColumn = []
+      params.vestPackCode = params.vestPackCode.join(',')
       dataPreviewInfo(params).then(({data}) => {
         if (data.status !== '1') {
           this.totalNum = 0
@@ -135,5 +140,8 @@ export default {
   }
   .prevuew-dialog .el-select-dropdown {
     top: 0 !important
+  }
+  .prevuew-dialog .title-tips {
+    font-size: 12px;
   }
 </style>
