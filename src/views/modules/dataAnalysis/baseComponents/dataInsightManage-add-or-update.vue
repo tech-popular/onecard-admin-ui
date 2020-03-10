@@ -10,7 +10,7 @@
     <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
-        <h3>基本信息</h3>
+        <h3 ref="baseTitle">基本信息</h3>
         <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="分群名称" prop="name">
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
@@ -40,7 +40,7 @@
                   :show-file-list="false"
                   :auto-upload="false"
                 >
-                  <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+                  <el-button slot="trigger" size="small" type="default" icon ="el-icon-document">选择文件</el-button>
                 </el-upload>
                 <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
@@ -73,31 +73,58 @@
       <div class="pane-reject">
         <h3>
           剔除用户名单
-          <el-tooltip placement="top">
+          <!-- <el-tooltip placement="top">
             <div slot="content">当判断指定用户是否在此分群时，不进行剔除名单过滤</div>
             <i class="el-icon-warning cursor-pointer"></i>
-          </el-tooltip>
+          </el-tooltip> -->
         </h3>
         <div>
-          <el-checkbox-group v-model="vestPackCode">
+          <!-- <el-checkbox-group v-model="vestPackCode">
             <el-checkbox v-for="(item, index) in vestPackList" :label="item.value" :key="index">{{item.text}}</el-checkbox>
-          </el-checkbox-group>
+          </el-checkbox-group> -->
+          <el-form label-width="80px" :model="rejectForm" ref="baseForm">
+            <el-form-item label="分群包：">
+              <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
+                <el-option
+                  v-for="item in custerNameList"
+                  :key="item.value"
+                  :label="item.text"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="风控包：">
+              <el-select v-model="rejectForm.vestPackCode" filterable multiple placeholder="请选择风控包" class="reject-pane-item">
+                <el-option
+                  v-for="item in vestPackList"
+                  :key="item.value"
+                  :label="item.text"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+              <el-tooltip placement="top">
+                <div slot="content">因风控包需调用第三方接口，当判断指定用户是否在此分群时，不进行风控包过滤</div>
+                <i class="el-icon-warning cursor-pointer"></i>
+              </el-tooltip>
+            </el-form-item>
+          </el-form>
         </div>
       </div>
     </div>
     <div class="footer">
       <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
+      <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel'">复制创建新分群</el-button>
       <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
-    <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo"></data-preview-info>
+    <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
   </el-drawer>
 </template>
 <script>
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -129,14 +156,19 @@ export default {
       },
       excelFile: '',
       templateUrl: templateDownload,
-      vestPackCode: [],
+      // vestPackCode: [],
       vestPackList: [],
+      custerNameList: [],
       baseForm: {
         name: '',
         userType: 'indicator',
         type: 'static',
         channelId: '2001',
         desc: ''
+      },
+      rejectForm: {
+        rejectGroupPackageIds: [],
+        vestPackCode: []
       },
       baseRule: { // 基本信息校验规则
         name: [
@@ -174,6 +206,7 @@ export default {
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getVestPackAvailable()
       this.getChannelsList()
+      this.getCusterList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -224,10 +257,11 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
-          if (data.data.vestPackCode === null) {
-            this.vestPackCode = []
+          this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
+          if (!data.data.vestPackCode || data.data.vestPackCode === null) {
+            this.rejectForm.vestPackCode = []
           } else {
-            this.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
+            this.rejectForm.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
           }
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
@@ -280,6 +314,19 @@ export default {
           })
         }
         this.vestPackList = res.data.data
+      })
+    },
+    // 获取分群名称
+    getCusterList () {
+      custerAvailable().then(({data}) => {
+        if (data.status !== '1') {
+          this.custerNameList = []
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+        this.custerNameList = data.data
       })
     },
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
@@ -711,6 +758,18 @@ export default {
       }
       return null
     },
+    copyHandle () { // 复制功能
+      this.$confirm('分群已复制，点击“确定”开始编辑新分群', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => { // 确认创建分群时的操作
+        this.drawerTitle = '新建'
+        this.baseForm.name = '复制' + this.baseForm.name
+        this.id = ''
+        this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+      })
+    },
     saveHandle (type) {
       // console.log(this.vestPackCode, this.vestPackCode.length)
       if (this.baseForm.userType === 'excel') {
@@ -730,7 +789,13 @@ export default {
             data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
-            data.append('vestPackCode', this.vestPackCode.join(','))
+            data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
+            data.append('rejectGroupPackageIds', this.rejectForm.rejectGroupPackageIds)
+            let flag = 0
+            if (this.rejectForm.rejectGroupPackageIds.length) {
+              flag = 1
+            }
+            data.append('rejectGroupPackCode', flag)
             if (this.id) {
               data.append('id', this.id)
             }
@@ -787,7 +852,11 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, vestPackCode: this.vestPackCode.join(',') }
+          let flag = 0
+          if (this.rejectForm.rejectGroupPackageIds.length) {
+            flag = 1
+          }
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm, rejectGroupPackCode: flag }
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
@@ -795,6 +864,7 @@ export default {
             })
             return
           }
+          params.vestPackCode = params.vestPackCode.join(',')
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
@@ -941,5 +1011,11 @@ export default {
   }
   .insight-manage-drawer .user-channel {
     margin-left: 110px;
+  }
+  .insight-manage-drawer .pane-reject {
+    margin-top: 20px;
+  }
+  .insight-manage-drawer .reject-pane-item {
+    width:50%
   }
 </style>
