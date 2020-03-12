@@ -16,13 +16,28 @@
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="分群类型" prop="userType">
-            <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange" :disabled="!!id">
-              <div class="type-radio-item type-radio-one"><el-radio label="indicator">指标筛选</el-radio></div>
+            <!-- <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange" :disabled="!!id">
+              <div class="type-radio-item type-radio-one">
+                <el-radio label="indicator">指标筛选</el-radio>
+              </div>
               <div class="type-radio-item type-radio-two">
                 <el-radio label="excel">excel文件导入</el-radio>
               </div>
-            </el-radio-group>
+            </el-radio-group> -->
+            <div class="type-radio-item type-radio-one">
+              <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
+              <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
+                用户所属渠道
+                <el-select v-model="baseForm.channelId">
+                  <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="type-radio-item type-radio-two">
+              <el-radio label="excel" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">excel文件导入</el-radio>
+            </div>
           </el-form-item>
+          
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
             <el-select v-model="baseForm.channelId">
               <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
@@ -1013,6 +1028,10 @@ export default {
   }
   .insight-manage-drawer .user-channel {
     margin-left: 110px;
+  }
+  .insight-manage-drawer .indicator-channel {
+    display: inline-block;
+    margin-left: 20px;
   }
   .insight-manage-drawer .pane-reject {
     margin-top: 20px;
