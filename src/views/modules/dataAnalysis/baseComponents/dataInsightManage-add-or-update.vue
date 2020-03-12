@@ -768,6 +768,8 @@ export default {
         this.baseForm.name = '复制' + this.baseForm.name
         this.id = ''
         this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+      }).catch(() => {
+        console.log('cancel')
       })
     },
     saveHandle (type) {
