@@ -28,7 +28,7 @@
               <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 用户所属渠道
-                <el-select v-model="baseForm.channelId">
+                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable>
                   <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
                 </el-select>
               </div>
@@ -37,7 +37,6 @@
               <el-radio label="excel" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">excel文件导入</el-radio>
             </div>
           </el-form-item>
-          
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
             <el-select v-model="baseForm.channelId">
               <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
@@ -81,7 +80,7 @@
             <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
           </el-form-item>
         </el-form>
-        <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
+        <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0" v-loading="rulesLoading">
           <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
@@ -148,6 +147,7 @@ export default {
     return {
       isPreviewShow: true,
       loading: false,
+      rulesLoading: false,
       id: '',
       flowId: '',
       tag: '',
@@ -156,14 +156,6 @@ export default {
       indexList: [],
       expression: '',
       expressionTemplate: '',
-      // initFieldType: '',
-      // initDataStandar: '',
-      // initFieldCode: '',
-      // initSourceTable: '',
-      // initFieldId: '',
-      // initEnumTypeNum: '',
-      // initSelectOperateList: [],
-      // initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
       fileData: {
@@ -171,7 +163,6 @@ export default {
       },
       excelFile: '',
       templateUrl: templateDownload,
-      // vestPackCode: [],
       vestPackList: [],
       custerNameList: [],
       baseForm: {
@@ -319,6 +310,15 @@ export default {
         this.channelList = res.data.data
       })
     },
+    channelIdChange () { // 用户渠道改变时，重新拉取指标
+      this.rulesLoading = true
+      this.getSelectAllCata((indexList) => {
+        this.setInitRulesConfig(indexList)
+        this.$nextTick(() => {
+          this.rulesLoading = false
+        })
+      })
+    },
     getVestPackAvailable () {
       vestPackAvailable().then(res => {
         if (res.data.status * 1 !== 1) {
@@ -397,23 +397,12 @@ export default {
       })
       return arr
     },
-    // getInitTypeCode (arr) { // 获取初始选项及id, 为初始化数据做准备
-    //   arr.forEach((item, index) => {
-    //     if (index === 0) {
-    //       if (item.fieldType) {
-    //         this.initFieldType = item.fieldType // item.fieldType
-    //         this.initFieldCode = item.id // item.englishName
-    //         this.initDataStandar = item.dataStandar
-    //         this.initEnumTypeNum = item.enumTypeNum
-    //         this.initSourceTable = item.sourceTable
-    //         this.initFieldId = item.fieldId
-    //         this.initEnglishName = item.englishName
-    //       } else {
-    //         this.getInitTypeCode(item.children)
-    //       }
-    //     }
-    //   })
-    // },
+    setInitRulesConfig (indexList) {  // 将规则初始化
+      this.indexList = indexList
+      this.ruleConfig.rules = []
+      this.ruleConfig.rules.push(this.getRuleTemplateItem())
+      this.updateConditionId(this.ruleConfig)
+    },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata().then(({data}) => {
         if (data.status !== '1') {
@@ -421,10 +410,6 @@ export default {
         } else {
           this.indexList = this.filterAllCata(data.data)
         }
-        // this.getInitTypeCode(this.indexList)
-        // this.getSelectOperateList(this.initFieldType, (selectOperateList) => {
-        //   this.initSelectOperateList = selectOperateList
-        // })
         if (fn) {
           fn(this.indexList)
         }
@@ -444,18 +429,21 @@ export default {
             obj.sourceTable = item.sourceTable
             obj.dataStandar = item.dataStandar
             obj.fieldId = item.id
+            obj.channelCode = item.channelCode
           } else {
             obj.id = item.id
             obj.label = item.name
           }
           if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-            obj.children = this.filterAllCata(item.dataCataLogList)
+            obj.children = this.filterAllCata(item.dataCataLogList) // 指标集合
             arr.push(obj)
-          } else {
+          } else { // 指标父级层
             if (!item.fieldType) {
               obj.children = null
             } else {
-              arr.push(obj)
+              if (obj.channelCode && obj.channelCode === this.baseForm.channelId) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+                arr.push(obj) // 每个指标都放在集合中
+              }
             }
           }
         })
@@ -467,25 +455,7 @@ export default {
         callback()
       }
     },
-    getRuleTemplateItem (index) { // 条件模板
-      // return {
-      //   'type': 'rule',
-      //   'fieldType': this.initFieldType,
-      //   'fieldCode': this.initFieldCode,
-      //   'format': this.initDataStandar,
-      //   'func': this.initSelectOperateList[0].code,
-      //   'sourceTable': this.initSourceTable,
-      //   'fieldId': this.initFieldId,
-      //   'englishName': this.initEnglishName,
-      //   'indexList': this.indexList, // 指标下拉选
-      //   'enumTypeNum': '',
-      //   'selectOperateList': this.initSelectOperateList, // 操作符下拉选
-      //   'selectEnumsList': [], // 内容下拉选
-      //   'params': [{
-      //     value: '',
-      //     title: ''
-      //   }]
-      // }
+    getRuleTemplateItem () { // 条件模板
       return {
         'type': 'rule',
         'fieldType': '',
@@ -991,7 +961,7 @@ export default {
     margin-top: 12px;
   }
   .insight-manage-drawer .type-radio-two {
-    margin-top: 20px;
+    margin-top: 10px;
   }
   .insight-manage-drawer .upload-excel {
     display: inline-block;
