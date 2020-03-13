@@ -20,7 +20,7 @@
     <el-form-item label="数据源所属部门" prop="datasourceDepartment" >
       <el-input v-model="dataForm.datasourceDepartment" placeholder="数据源所属部门"></el-input>
     </el-form-item>
-    <el-form-item label="区域" v-if="dataFieldList.includes('driverArea')">
+    <el-form-item label="区域" prop="driver" v-if="dataFieldList.includes('driverArea')">
       <el-select v-model="dataForm.driver" placeholder="请选择">
         <el-option label="中国地区" value=''>中国地区</el-option>
         <el-option label="海外地区" value='overseas'>海外地区</el-option>
@@ -133,6 +133,7 @@
                 this.dataForm.datasourceName = data.honeycombDatasourceConfig.datasourceName
                 this.dataForm.datasourceDepartment = data.honeycombDatasourceConfig.datasourceDepartment
                 this.dataForm.datasourceType = data.honeycombDatasourceConfig.datasourceType
+                this.chageDataSourceType()
                 this.dataForm.driver = data.honeycombDatasourceConfig.driver
                 this.dataForm.user = data.honeycombDatasourceConfig.user
                 this.dataForm.passwd = data.honeycombDatasourceConfig.passwd
