@@ -12,6 +12,18 @@
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form">
         <div class="base-pane">
           <h3>基本信息</h3>
+            <el-form-item label="下发类型" prop="distributeType" style="width:50%">
+              <el-radio v-model="baseForm.distributeType" label="initiative" class="radio-item radio-initiative">主动型</el-radio>
+              <el-tooltip placement="top">
+                <div slot="content">根据调度时间配置进行数据下发</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+              <el-radio v-model="baseForm.distributeType" label="passive" class="radio-item radio-passive">被动型</el-radio>
+              <el-tooltip placement="top">
+                <div slot="content">根据下游接口调用进行数据下发</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+            </el-form-item>
             <el-form-item label="分群名称" prop="templateId">
               <el-select
                 filterable
@@ -52,7 +64,7 @@
               <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.taskDescribtion.length"></span>个字符</p>
             </el-form-item>
         </div>
-        <div class="base-pane">
+        <div class="base-pane" v-if="baseForm.distributeType !== 'passive'">
           <h3>调度时间</h3>
             <el-form-item label="周期">
               <template>
@@ -302,7 +314,8 @@
           increModel: 0, // 下发模式
           kafkaServer: '', // kafka数据源地址
           topic: '',
-          mysqlServer: ''// sftp数据源地址
+          mysqlServer: '', // sftp数据源地址
+          distributeType: 'initiative' // 下发类型，默认主动型
         },
         tag: '新增', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -893,6 +906,12 @@
           margin-left: 0px !important;
         }
       }
+    }
+    & .radio-item {
+      margin-right: 10px;
+    }
+    & .radio-passive {
+      margin-left: 30px
     }
   }
   
