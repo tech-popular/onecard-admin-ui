@@ -198,6 +198,7 @@
                 <el-select
                   v-model= "baseForm.kafkaServer"
                   collapse-tags
+                  filterable
                   @change="kafkaServerChange"
                   style="margin-left: 5px; width:220px;"
                   placeholder="请选择">
@@ -222,6 +223,7 @@
                   <el-select
                     v-model= "baseForm.mysqlServer"
                     collapse-tags
+                    filterable
                     style="margin-left: 5px; width:220px;"
                     placeholder="请选择">
                     <el-option
