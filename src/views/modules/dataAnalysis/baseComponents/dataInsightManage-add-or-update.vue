@@ -162,7 +162,7 @@ export default {
       baseForm: {
         name: '',
         userType: 'indicator',
-        type: 'static',
+        type: 'dynamic',
         channelId: '2001',
         desc: ''
       },
@@ -226,7 +226,7 @@ export default {
       this.baseForm = {
         name: '',
         userType: 'indicator',
-        type: 'static',
+        type: 'dynamic',
         channelId: '2001',
         desc: ''
       }
@@ -333,6 +333,7 @@ export default {
       if (val === 'indicator') {
         this.fileData.fileList = []
         this.excelFile = ''
+        this.baseForm.type = 'dynamic'
       } else {
         this.baseForm.type = 'static'
       }
