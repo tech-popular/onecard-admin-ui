@@ -282,6 +282,8 @@
         loading: false,
         visible: true,
         isStatic: false,
+        channelCode: '',
+        originOutParamsList: [],
         baseForm: {
           id: '',
           taskUniqueFlag: null, // 蜂巢任务ID
@@ -440,6 +442,7 @@
               obj.sourceTable = item.sourceTable
               obj.dataStandar = item.dataStandar
               obj.fieldId = item.id
+              obj.channelCode = item.channelCode
             } else {
               obj.id = item.id
               obj.label = item.name
@@ -451,7 +454,13 @@
               if (!item.fieldType) {
                 obj.children = null
               } else {
-                arr.push(obj)
+                if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
+                  arr.push(obj)
+                } else { // 选择分群时，展示对应的指标
+                  if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+                    arr.push(obj) // 每个指标都放在集合中
+                  }
+                }
               }
             }
           })
@@ -473,6 +482,7 @@
             if (row) {
               this.getOutParamsEditList(row.id, this.filterAllCata(data.data))
             } else {
+              this.originOutParamsList = data.data
               this.outParamsList = this.filterAllCata(data.data)
               this.$nextTick(() => {
                 this.loading = false
@@ -532,6 +542,9 @@
       currentSel (selVal) {
         let obj = {}
         obj = this.templateIdList.find((item) => {
+          if (item.value === selVal) {
+            this.channelCode = item.channelCode
+          }
           if (item.value === selVal && item.type === 'static') {
             this.isStatic = true
             this.baseForm.increModel = -1
@@ -544,6 +557,8 @@
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
+        this.outParamsList = this.filterAllCata(this.originOutParamsList)
+        this.baseForm.outParams = []
       },
       // 选中出参
       outParamsSelect (node) {

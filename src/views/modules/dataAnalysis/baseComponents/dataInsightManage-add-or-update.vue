@@ -80,7 +80,7 @@
             <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
           </el-form-item>
         </el-form>
-        <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0" v-loading="rulesLoading">
+        <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
           <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
         </div>
       </div>
@@ -147,7 +147,6 @@ export default {
     return {
       isPreviewShow: true,
       loading: false,
-      rulesLoading: false,
       id: '',
       flowId: '',
       tag: '',
@@ -196,7 +195,8 @@ export default {
         'relation': 'and',
         'rules': []
       },
-      channelList: []
+      channelList: [],
+      originIndexList: [] // 没有处理过的指标列表数据
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -310,14 +310,8 @@ export default {
         this.channelList = res.data.data
       })
     },
-    channelIdChange () { // 用户渠道改变时，重新拉取指标
-      this.rulesLoading = true
-      this.getSelectAllCata((indexList) => {
-        this.setInitRulesConfig(indexList)
-        this.$nextTick(() => {
-          this.rulesLoading = false
-        })
-      })
+    channelIdChange () { // 用户渠道改变时，重新过滤指标数据
+      this.setInitRulesConfig(this.filterAllCata(this.originIndexList))
     },
     getVestPackAvailable () {
       vestPackAvailable().then(res => {
@@ -399,8 +393,10 @@ export default {
     },
     setInitRulesConfig (indexList) {  // 将规则初始化
       this.indexList = indexList
-      this.ruleConfig.rules = []
-      this.ruleConfig.rules.push(this.getRuleTemplateItem())
+      if (this.ruleConfig.rules.length) {
+        this.ruleConfig.rules = []
+        this.ruleConfig.rules.push(this.getRuleTemplateItem())
+      }
       this.updateConditionId(this.ruleConfig)
     },
     getSelectAllCata (fn) { // 获取所有指标
@@ -408,6 +404,7 @@ export default {
         if (data.status !== '1') {
           this.indexList = []
         } else {
+          this.originIndexList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
         if (fn) {
