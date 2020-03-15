@@ -30,8 +30,9 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="transferType" header-align="center" align="center" label="下发类型"></el-table-column>
-      <!-- <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column> -->
+      <el-table-column prop="workBeeId" header-align="center" align="center" label="工蜂ID"></el-table-column>
+      <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
+      <el-table-column prop="transferType" header-align="center" align="center" label="下发数据源"></el-table-column>
       <el-table-column prop="dispatchFrequency" header-align="center" align="center" :formatter="dispatchFrequencyFormat" label="调度频率"></el-table-column>
       <el-table-column prop="lastCalTime" header-align="center" align="center" width="154" label="最近下发时间"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" width="154" label="创建时间"></el-table-column>
@@ -108,13 +109,16 @@
 
       // 调度频率
       dispatchFrequencyFormat (row, column) {
-        if (row.dispatchFrequency === 'TIME') {
-          return '周期'
-        } else if (row.dispatchFrequency === 'ONCE_ONLY') {
-          return '一次'
+        if (row.triggerMode === 1) {
+          return '被动'
+        } else {
+          if (row.dispatchFrequency === 'TIME') {
+            return '定时'
+          } else if (row.dispatchFrequency === 'ONCE_ONLY') {
+            return '一次'
+          }
         }
       },
-  
       // 状态启用停用
       changeSwitch (status, row) {
         this.$confirm('确认任务名称：' + row.transferName + (status === true ? ' 开启' : ' 关闭') + '?', '提示', {
