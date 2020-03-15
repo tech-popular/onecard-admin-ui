@@ -30,6 +30,9 @@
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
             <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
+            <!-- <el-checkbox-group v-model="baseForm.inParam">
+              <el-checkbox :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-checkbox>
+            </el-checkbox-group> -->
           </el-form-item>
           <el-form-item label="API模式" prop="outType">
             <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
@@ -427,6 +430,7 @@ export default {
           this.baseForm = {
             name: data.data.name,
             inParam: data.data.inParam,
+            // inParam: data.data.inParam.split(','),
             desc: data.data.desc,
             department: data.data.code.split('_')[0],
             apiName: data.data.code.split('_')[1],
@@ -878,6 +882,7 @@ export default {
         this.baseForm.code = this.code
         let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)) }
         params.inParam = params.inParam
+        // params.inParam = params.inParam.join(',')
         let url = savaApiInfo
         if (this.id) {
           url = updateApiInfo
