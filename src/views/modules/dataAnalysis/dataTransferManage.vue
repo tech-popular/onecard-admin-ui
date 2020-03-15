@@ -109,13 +109,16 @@
 
       // 调度频率
       dispatchFrequencyFormat (row, column) {
-        if (row.dispatchFrequency === 'TIME') {
-          return '周期'
-        } else if (row.dispatchFrequency === 'ONCE_ONLY') {
-          return '一次'
+        if (row.triggerMode === 1) {
+          return '被动'
+        } else {
+          if (row.dispatchFrequency === 'TIME') {
+            return '定时'
+          } else if (row.dispatchFrequency === 'ONCE_ONLY') {
+            return '一次'
+          }
         }
       },
-  
       // 状态启用停用
       changeSwitch (status, row) {
         this.$confirm('确认任务名称：' + row.transferName + (status === true ? ' 开启' : ' 关闭') + '?', '提示', {
