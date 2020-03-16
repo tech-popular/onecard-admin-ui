@@ -28,9 +28,14 @@
           <!--条件内容区-->
           <div v-if="isEmpty(item)" class="pane-rules-inline">
             <!--string-->
-            <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.fieldType === 'string' || item.fieldType === ''">
-              <el-input v-model.trim="item.params[0].value" class="itemIput" />
-            </el-form-item>
+            <div v-if="item.fieldType === 'string' || item.fieldType === ''" class="pane-rules-inline">
+              <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.func === 'eq' || item.func === 'neq'">
+                <input-tag v-model="item.params[0].value" :allow-duplicates="true" class="itemIput inputTag"></input-tag>
+              </el-form-item>
+              <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-else>
+                <el-input v-model.trim="item.params[0].value" class="itemIput" />
+              </el-form-item>
+            </div>
             <!--number-->
             <div v-if="item.fieldType === 'number'"  class="pane-rules-inline">
               <div v-if="item.func === 'between'"  class="pane-rules-inline">
@@ -43,10 +48,15 @@
                   <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-number" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasNumBlur(item, item.params[1].value)"></el-input> 之间
                 </el-form-item>
               </div>
-              <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
-                <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput"></el-input-number> -->
-                <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
-              </el-form-item>
+              <div v-else>
+                <!--数值型等于或不等于-->
+                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-if="item.func === 'eq' || item.func === 'neq'">
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
+                </el-form-item>
+                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
+                </el-form-item>
+              </div>
             </div>
             <!--enums-->
             <div v-if="item.fieldType === 'enums'"  class="pane-rules-inline">
@@ -136,6 +146,7 @@
 </template>
 <script>
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+import InputTag from 'vue-input-tag'
 export default {
   name: 'rulesSet',
   props: {
@@ -159,6 +170,8 @@ export default {
   },
   data () {
     return {
+      ttt: [],
+      multipleList: [],
       parent: null,
       selectOperateList: [],
       tips: {
@@ -182,8 +195,11 @@ export default {
     this.parent = parent
     console.log('mounted', this.data)
   },
-  components: { Treeselect },
+  components: { Treeselect, InputTag },
   methods: {
+    test (val) {
+      console.log(val)
+    },
     judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {
         callback(new Error('请输入'))
@@ -276,6 +292,7 @@ export default {
       this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { englishName: node.englishName, fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId, format: node.dataStandar })
     },
     selectOperateChange (val, ruleItem) { // 操作符改变时，数据清空，重新输入
+      console.log(val, ruleItem)
       this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
       if (ruleItem.fieldType === 'date') { // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
         this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
@@ -415,5 +432,11 @@ export default {
     width: 200px;
     word-break: break-all;
     line-height: 1.6;
+  }
+  .inputTag {
+    border-radius: 4px;
+    min-height: 40px;
+    line-height: 22px;
+    border: 1px solid #dcdfe6
   }
 </style>

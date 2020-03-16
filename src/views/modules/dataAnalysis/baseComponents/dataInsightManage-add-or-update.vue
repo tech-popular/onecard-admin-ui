@@ -631,6 +631,9 @@ export default {
           subFunc: '',
           params: [{ value: '', title: '' }]
         }
+        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'eq')) {
+          params.params = [{ value: [], title: '' }]
+        }
         if (params.func === 'relative_time') {
           params.subFunc = 'relative_before'
         }
@@ -1019,4 +1022,35 @@ export default {
   .insight-manage-drawer .reject-pane-item {
     width:50%
   }
+  .vue-input-tag-wrapper .input-tag {
+    border-radius: 4px;
+    background-color: #f4f4f5;
+    border-color: #e9e9eb;
+    color: #909399;
+  }
+  .vue-input-tag-wrapper .input-tag .remove {
+    color: #909399;
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    background: #c0c4cc;
+    vertical-align: middle;
+    position: relative;
+    margin-left: 5px;
+    font-weight: normal
+  }
+  .vue-input-tag-wrapper .input-tag .remove:hover {
+    color: #fff;
+    background: #909399;
+  }
+  .vue-input-tag-wrapper .input-tag .remove:empty:before {
+    content: "+";
+    position: absolute;
+    top: -3px;
+    left: 2.5px;
+    font-size: 16px;
+    transform: rotate(45deg);
+}
 </style>
