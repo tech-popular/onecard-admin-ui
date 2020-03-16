@@ -277,7 +277,7 @@
           callback()
         }
       }
-  
+
       return {
         loading: false,
         visible: true,
@@ -383,13 +383,12 @@
     mounted () {
       this.dataAssembly()
       this.disTimeTurnOff('MINUTE')
-      this.getCusterList()
       this.getKafkaServerList()
       this.getMysqlServerList()
     },
 
     computed: {
-  
+
     },
 
     components: {Treeselect},
@@ -468,18 +467,24 @@
         return arr
       },
       // 获取分群名称
-      getCusterList () {
+      getCusterList (fn) {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
             this.templateIdList = data.data
+          } else {
+            this.templateIdList = []
+          }
+          if (fn) {
+            fn(this.templateIdList)
           }
         })
       },
-      // 获取分群出参
+      // 获取分群出参 指标列表
       getOutParamsList (row) {
         dataTransferManageOutParams().then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
+              this.originOutParamsList = data.data
               this.getOutParamsEditList(row.id, this.filterAllCata(data.data))
             } else {
               this.originOutParamsList = data.data
@@ -488,6 +493,7 @@
                 this.loading = false
               })
             }
+            console.log(this.originOutParamsList)
           } else {
             this.outParamsList = []
           }
@@ -540,6 +546,7 @@
       },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
+        console.log(this.templateIdList)
         let obj = {}
         obj = this.templateIdList.find((item) => {
           if (item.value === selVal) {
@@ -557,8 +564,10 @@
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
-        this.outParamsList = this.filterAllCata(this.originOutParamsList)
         this.baseForm.outParams = []
+        this.outParams = []
+        this.outParamsList = this.filterAllCata(this.originOutParamsList)
+        console.log(this.outParamsList, this.originOutParamsList)
       },
       // 选中出参
       outParamsSelect (node) {
@@ -686,6 +695,10 @@
             this.baseForm.transferName = disData.transferName
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
+            // 要先拿到this.templateIdList
+            this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
+            // 要先拿到this.channelCode,才能去获取对应的出参列表
+            this.getOutParamsList(row)
             if (disData.increModel === -1) {
               this.isStatic = true
               this.baseForm.increModel = -1
@@ -779,13 +792,20 @@
         this.visible = true
         this.loading = true
         this.outParamsList = []
-        this.getOutParamsList(row)
-        this.$nextTick(() => {
-          this.$refs['baseForm'].resetFields()
-          if (tag) {
-            this.dataDisplay(row)
-          }
-        })
+        if (tag) {
+          this.getCusterList((data) => {
+            this.dataDisplay(row) // 选获取到分群列表再去渲染页面
+            this.$nextTick(() => {
+              this.$refs['baseForm'].resetFields()
+            })
+          })
+        } else {
+          this.getCusterList()
+          this.getOutParamsList()
+          this.$nextTick(() => {
+            this.$refs['baseForm'].resetFields()
+          })
+        }
       },
       // 关闭抽屉弹窗
       drawerClose () {
@@ -910,5 +930,5 @@
       }
     }
   }
-  
+
 </style>

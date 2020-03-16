@@ -278,7 +278,7 @@ export default {
       })
     },
     // 获取分群名称
-    getCusterList () {
+    getCusterList (fn) {
       dataTransferManageCuster().then(({data}) => {
         if (data.status !== '1') {
           this.custerNameList = []
@@ -288,6 +288,9 @@ export default {
           })
         }
         this.custerNameList = data.data
+        if (fn) {
+          fn()
+        }
       })
     },
     custerNamesChange (value) { // 选中数据变化时
@@ -314,6 +317,7 @@ export default {
       this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
       // this.custerInfoList = []
       this.baseForm.outParams = []
+      this.outParams = []
       this.outParamsIndexList = this.filterAllCata(this.originCataList)
     },
     previewCusterInfo () {
@@ -345,7 +349,6 @@ export default {
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getDepartmentList()
-      this.getCusterList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -353,6 +356,7 @@ export default {
       if (!tag) {
         this.loading = false
         this.drawerTitle = '新增'
+        this.getCusterList()
         this.getSelectAllCata((indexList) => {
           this.outParamsIndexList = deepClone(indexList)
         })
@@ -360,7 +364,9 @@ export default {
       } else {
         this.id = row.id
         this.drawerTitle = tag === 'view' ? '查看' : '编辑'
-        this.getOutParam(row.id)
+        this.getCusterList(() => { // 先获取到分群列表，出参数据，再回显
+          this.getOutParam(row.id)
+        })
       }
     },
     initEmptyData () { // 当数据异常时，初始化数据
@@ -453,6 +459,13 @@ export default {
             out.push(item.onlyId)
           })
           this.baseForm.outParams = out
+          // 选中的分群channelCode
+          this.allSelectedChannelCode = [] // 获取选中的所有的channelCode
+          let templateIds = data.data.templateIds
+          for (let i = 0; i < templateIds.length; i++) {
+            this.allSelectedChannelCode.push(this.custerNameList.filter(item => item.value === templateIds[i])[0].channelCode)
+          }
+          this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
           // 分群包
           let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
           let newArr = this.custerNameList.map(item => {
@@ -482,8 +495,7 @@ export default {
           })
         }
         if (res.data.data && res.data.data.length) {
-          let outParams = res.data.data
-          this.getApiInfo(id, outParams)
+          this.getApiInfo(id, res.data.data)
         } else {
           this.getApiInfo(id, [])
         }
