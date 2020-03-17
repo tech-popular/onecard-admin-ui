@@ -12,6 +12,18 @@
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form">
         <div class="base-pane">
           <h3>基本信息</h3>
+            <el-form-item label="下发类型" prop="triggerMode" style="width:50%">
+              <el-radio v-model="baseForm.triggerMode" label="0" class="radio-item radio-initiative">主动型</el-radio>
+              <el-tooltip placement="top">
+                <div slot="content">根据调度时间配置进行数据下发</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+              <el-radio v-model="baseForm.triggerMode" label="1" class="radio-item radio-passive">被动型</el-radio>
+              <el-tooltip placement="top">
+                <div slot="content">根据下游接口调用进行数据下发</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+            </el-form-item>
             <el-form-item label="分群名称" prop="templateId">
               <el-select
                 filterable
@@ -52,7 +64,7 @@
               <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.taskDescribtion.length"></span>个字符</p>
             </el-form-item>
         </div>
-        <div class="base-pane">
+        <div class="base-pane" v-if="baseForm.triggerMode !== '1'">
           <h3>调度时间</h3>
             <el-form-item label="周期">
               <template>
@@ -186,6 +198,7 @@
                 <el-select
                   v-model= "baseForm.kafkaServer"
                   collapse-tags
+                  filterable
                   @change="kafkaServerChange"
                   style="margin-left: 5px; width:220px;"
                   placeholder="请选择">
@@ -210,6 +223,7 @@
                   <el-select
                     v-model= "baseForm.mysqlServer"
                     collapse-tags
+                    filterable
                     style="margin-left: 5px; width:220px;"
                     placeholder="请选择">
                     <el-option
@@ -302,7 +316,8 @@
           increModel: 0, // 下发模式
           kafkaServer: '', // kafka数据源地址
           topic: '',
-          mysqlServer: ''// sftp数据源地址
+          mysqlServer: '', // sftp数据源地址
+          triggerMode: '0' // 下发类型，默认0主动型 1被动
         },
         tag: '新增', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -580,6 +595,7 @@
       formatPostData (data, outParams) {
         let postData = {}
         postData.id = data.id ? data.id : ''
+        postData.triggerMode = data.triggerMode
         postData.taskUniqueFlag = data.taskUniqueFlag
         postData.transferName = data.transferName
         postData.templateId = data.templateId
@@ -669,6 +685,7 @@
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.templateId = disData.templateId
             this.baseForm.transferName = disData.transferName
+            this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
             if (disData.increModel === -1) {
@@ -795,7 +812,7 @@
                     }
                   })
                 } else {
-                  this.$message.error(data.message)
+                  this.$message.error(data.message || '数据异常')
                 }
               })
             } else {
@@ -811,7 +828,7 @@
                     }
                   })
                 } else {
-                  this.$message.error(data.message)
+                  this.$message.error(data.message || '数据异常')
                 }
               })
             }
@@ -894,6 +911,11 @@
         }
       }
     }
+    & .radio-item {
+      margin-right: 15px;
+    }
+    & .radio-passive {
+      margin-left: 30px
+    }
   }
-  
 </style>
