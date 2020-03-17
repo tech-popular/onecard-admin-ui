@@ -285,7 +285,7 @@ export default {
             message: data.message
           })
         }
-        this.custerNameList = data.data
+        this.custerNameList = data.data.filter(item => item.type === 'dynamic') // 修改，只展示动态的分群
       })
     },
     custerNamesChange (value) { // 选中数据变化时
@@ -445,13 +445,17 @@ export default {
           this.baseForm.outParams = out
           // 分群包
           let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
-          let newArr = this.custerNameList.map(item => {
-            if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
-              return {...item, disabled: true}
-            }
-            return item
-          })
-          this.filterCursterList = newArr
+          if (filterFirstObj.length) {
+            let newArr = this.custerNameList.map(item => {
+              if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+                return { ...item, disabled: true }
+              }
+              return item
+            })
+            this.filterCursterList = newArr
+          } else {
+            this.filterCursterList = this.custerNameList
+          }
           this.getSelectAllCata((indexList) => {
             // this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
             this.outParamsIndexList = this.updateOutParamsList(indexList)
