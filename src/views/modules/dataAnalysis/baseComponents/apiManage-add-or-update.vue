@@ -378,7 +378,7 @@ export default {
         if (data.status * 1 !== 1) {
           this.curCusterInfo = {
             id: id,
-            name: data.data.name,
+            name: data.data && data.data.name ? data.data.name : `分群id：${id}`,
             tips: data.message || '此分群预览信息加载异常'
           }
           fn(this.curCusterInfo)

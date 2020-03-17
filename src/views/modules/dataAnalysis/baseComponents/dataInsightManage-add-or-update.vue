@@ -323,7 +323,7 @@ export default {
           this.custerNameList = []
           return this.$message({
             type: 'error',
-            message: data.message
+            message: data.message || '数据异常'
           })
         }
         this.custerNameList = data.data
@@ -376,6 +376,13 @@ export default {
               item.selectOperateList = selectOperateList
               item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
             })
+          }
+          // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+          if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
+            // item.params = [{ value: [item.params[0].value], title: item.params[0].title }]
+            if (!item.params[0].selectVal) {
+              item.params[0].selectVal = [ item.params[0].value ]
+            }
           }
         } else {
           this.updateInitRulesConfig(item, indexList)
@@ -631,7 +638,10 @@ export default {
           subFunc: '',
           params: [{ value: '', title: '' }]
         }
-        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'eq')) {
+        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+        }
+        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
           params.params = [{ value: [], title: '' }]
         }
         if (params.func === 'relative_time') {
@@ -775,6 +785,7 @@ export default {
       })
     },
     saveHandle (type) {
+      console.log(this.ruleConfig)
       // console.log(this.vestPackCode, this.vestPackCode.length)
       if (this.baseForm.userType === 'excel') {
         if (!this.excelFile) {
@@ -885,7 +896,7 @@ export default {
               this.loading = false
               return this.$message({
                 type: 'error',
-                message: data.message
+                message: data.message || '数据异常'
               })
             } else {
               this.$message({
@@ -1022,35 +1033,4 @@ export default {
   .insight-manage-drawer .reject-pane-item {
     width:50%
   }
-  .vue-input-tag-wrapper .input-tag {
-    border-radius: 4px;
-    background-color: #f4f4f5;
-    border-color: #e9e9eb;
-    color: #909399;
-  }
-  .vue-input-tag-wrapper .input-tag .remove {
-    color: #909399;
-    cursor: pointer;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    display: inline-block;
-    background: #c0c4cc;
-    vertical-align: middle;
-    position: relative;
-    margin-left: 5px;
-    font-weight: normal
-  }
-  .vue-input-tag-wrapper .input-tag .remove:hover {
-    color: #fff;
-    background: #909399;
-  }
-  .vue-input-tag-wrapper .input-tag .remove:empty:before {
-    content: "+";
-    position: absolute;
-    top: -3px;
-    left: 2.5px;
-    font-size: 16px;
-    transform: rotate(45deg);
-}
 </style>
