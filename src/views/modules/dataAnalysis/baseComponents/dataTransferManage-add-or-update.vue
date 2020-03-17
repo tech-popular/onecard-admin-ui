@@ -912,7 +912,7 @@
       }
     }
     & .radio-item {
-      margin-right: -15px;
+      margin-right: 15px;
     }
     & .radio-passive {
       margin-left: 30px
