@@ -115,7 +115,7 @@
           if (row.dispatchFrequency === 'TIME') {
             return '定时'
           } else if (row.dispatchFrequency === 'ONCE_ONLY') {
-            return '一次'
+            return '单次'
           }
         }
       },
