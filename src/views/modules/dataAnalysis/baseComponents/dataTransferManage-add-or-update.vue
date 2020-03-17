@@ -224,10 +224,10 @@
             <el-col>
               <el-form-item label="下发模式" prop="increModel">
                 <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
-                <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic">增量</el-radio>
-                <el-tooltip placement="top" effect="light" v-if="isStatic">
+                <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
+                <el-tooltip placement="top" v-if="isStatic">
                   <div slot="content">静态分群不支持增量</div>
-                  <i class="el-icon-warning cursor-pointer"></i>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
               </el-form-item>
             </el-col>
@@ -901,10 +901,8 @@
         }
       }
     }
-    & .cursor-pointer {
-      margin-left: 25px;
-      cursor: pointer;
-      color: #409EFF;
+    & .radio-incremodel {
+      margin-right: 15px;
     }
   }
   
