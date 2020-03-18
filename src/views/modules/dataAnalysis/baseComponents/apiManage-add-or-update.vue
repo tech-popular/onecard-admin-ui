@@ -381,7 +381,7 @@ export default {
         if (data.status * 1 !== 1) {
           this.curCusterInfo = {
             id: id,
-            name: data.data.name,
+            name: data.data && data.data.name ? data.data.name : `分群id：${id}`,
             tips: data.message || '此分群预览信息加载异常'
           }
           fn(this.curCusterInfo)
@@ -527,6 +527,12 @@ export default {
             }
           })
           item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
+          // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+          if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
+            if (!item.params[0].selectVal) {
+              item.params[0].selectVal = [ item.params[0].value ]
+            }
+          }
         } else {
           this.updateInitRulesConfig(item, indexList)
         }

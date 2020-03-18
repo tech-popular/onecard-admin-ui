@@ -28,9 +28,15 @@
           <!--条件内容区-->
           <div v-if="isEmpty(item)" class="pane-rules-inline">
             <!--string-->
-            <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.fieldType === 'string' || item.fieldType === ''">
-              <el-input v-model.trim="item.params[0].value" class="itemIput" />
-            </el-form-item>
+            <div v-if="item.fieldType === 'string' || item.fieldType === ''" class="pane-rules-inline">
+              <!--string型等于或不等于可以输入多个-->
+              <el-form-item prop="params[0].selectVal" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.func === 'eq' || item.func === 'neq'">
+                <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item)" :valueType="'string'" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
+              </el-form-item>
+              <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-else>
+                <el-input v-model.trim="item.params[0].value" class="itemIput" placeholder="请输入" />
+              </el-form-item>
+            </div>
             <!--number-->
             <div v-if="item.fieldType === 'number'"  class="pane-rules-inline">
               <div v-if="item.func === 'between'"  class="pane-rules-inline">
@@ -43,10 +49,15 @@
                   <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-number" @input="item.params[1].value = keyupNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasNumBlur(item, item.params[1].value)"></el-input> 之间
                 </el-form-item>
               </div>
-              <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
-                <!-- <el-input-number v-model="item.params[0].value" controls-position="right" class="itemIput"></el-input-number> -->
-                <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
-              </el-form-item>
+              <div v-else>
+                <!--数值型等于或不等于可以输入多个-->
+                <el-form-item prop="params[0].selectVal" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-if="item.func === 'eq' || item.func === 'neq'">
+                  <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item)" :valueType="'number'" :maxlength="10" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
+                </el-form-item>
+                <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
+                  <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
+                </el-form-item>
+              </div>
             </div>
             <!--enums-->
             <div v-if="item.fieldType === 'enums'"  class="pane-rules-inline">
@@ -136,6 +147,7 @@
 </template>
 <script>
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+import InputTag from '../components/InputTag'
 export default {
   name: 'rulesSet',
   props: {
@@ -159,6 +171,8 @@ export default {
   },
   data () {
     return {
+      ttt: [],
+      multipleList: [],
       parent: null,
       selectOperateList: [],
       tips: {
@@ -182,8 +196,11 @@ export default {
     this.parent = parent
     console.log('mounted', this.data)
   },
-  components: { Treeselect },
+  components: { Treeselect, InputTag },
   methods: {
+    test (val) {
+      console.log(val)
+    },
     judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {
         callback(new Error('请输入'))
@@ -213,6 +230,7 @@ export default {
         val = val.substring(0, val.length - 1)
       }
       val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
+      console.log(999444, val)
       return val
     },
     keyupDateNumberInput (val) { // 日期输入框，输入内容 要求 只能输入 正整数
@@ -221,13 +239,13 @@ export default {
     },
     blurDateNumberInput (val) { // 日期输入框，失去焦点时判断输入内容是否符合要求
       let reg = /^([0]|[1-9][0-9]*)$/
-      // console.log(reg.test('00')) // false
       if (!reg.test(val)) {
         val = ''
       }
       return val
     },
     blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
+      console.log(323, val)
       val = val + '' // 数据转为字符串
       if (val[val.length - 1] === '.') { // 最后一位为小数点时，则删除小数点
         val = val.substring(0, val.length - 1)
@@ -284,10 +302,6 @@ export default {
     },
     selectOperateVisible (val, ruleItem) { // 当操作符下拉框打开时，重新下拉请求数据
       if (val) { // 打开下拉框时
-        // if (ruleItem.fieldType === 'enums'){
-        //   this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem)
-        // }
-        console.log(123)
         this.parent.getSelectOperateList(ruleItem.fieldType, (selectOperateList) => {
           this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, { selectOperateList: selectOperateList })
         })
@@ -303,6 +317,9 @@ export default {
     },
     selectDateTimeChange (val, ruleItem) { // 处理一下时间数据
       this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem)
+    },
+    inputTagChange (ruleItem) {
+      this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem)
     },
     isDateSingleShow (item) { // 单时间日期是否显示
       let showSingleArr = ['eq', 'neq', 'gt', 'lt', 'ge', 'le']
@@ -415,5 +432,11 @@ export default {
     width: 200px;
     word-break: break-all;
     line-height: 1.6;
+  }
+  .inputTag {
+    border-radius: 4px;
+    min-height: 40px;
+    line-height: 22px;
+    border: 1px solid #dcdfe6
   }
 </style>
