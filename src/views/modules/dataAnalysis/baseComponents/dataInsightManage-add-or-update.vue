@@ -379,7 +379,6 @@ export default {
           }
           // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
           if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
-            // item.params = [{ value: [item.params[0].value], title: item.params[0].title }]
             if (!item.params[0].selectVal) {
               item.params[0].selectVal = [ item.params[0].value ]
             }

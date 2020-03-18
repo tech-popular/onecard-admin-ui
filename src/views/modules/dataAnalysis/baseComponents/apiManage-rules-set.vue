@@ -29,6 +29,7 @@
           <div v-if="isEmpty(item)" class="pane-rules-inline">
             <!--string-->
             <div v-if="item.fieldType === 'string' || item.fieldType === ''" class="pane-rules-inline">
+              <!--string型等于或不等于可以输入多个-->
               <el-form-item prop="params[0].selectVal" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.func === 'eq' || item.func === 'neq'">
                 <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item)" :valueType="'string'" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
               </el-form-item>
@@ -49,7 +50,7 @@
                 </el-form-item>
               </div>
               <div v-else>
-                <!--数值型等于或不等于-->
+                <!--数值型等于或不等于可以输入多个-->
                 <el-form-item prop="params[0].selectVal" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-if="item.func === 'eq' || item.func === 'neq'">
                   <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item)" :valueType="'number'" :maxlength="10" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
                 </el-form-item>
