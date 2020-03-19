@@ -165,7 +165,8 @@ export default {
         this.newTag = this.blurNumberInput(this.newTag)
       }
 
-      const tag = this.newTag
+      const tag = this.newTag.trim()
+
       if (tag && (this.allowDuplicates || this.innerTags.indexOf(tag) === -1)) {
         this.innerTags.push(tag)
         this.newTag = ''
@@ -191,6 +192,7 @@ export default {
     tagChange () {
       this.$emit('update:tags', this.innerTags)
       this.$emit('input', this.innerTags)
+      this.$emit('change')
     }
   }
 }
