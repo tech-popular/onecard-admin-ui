@@ -444,17 +444,24 @@ export default {
           })
           this.baseForm.outParams = out
           // 分群包
-          let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
-          if (filterFirstObj.length) {
-            let newArr = this.custerNameList.map(item => {
-              if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
-                return { ...item, disabled: true }
-              }
-              return item
-            })
-            this.filterCursterList = newArr
-          } else {
+          if (!this.baseForm.templateIds) {
             this.filterCursterList = this.custerNameList
+            this.$nextTick(() => {
+              this.$refs.baseForm.clearValidate('templateIds')
+            })
+          } else {
+            let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
+            if (filterFirstObj.length) {
+              let newArr = this.custerNameList.map(item => {
+                if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+                  return { ...item, disabled: true }
+                }
+                return item
+              })
+              this.filterCursterList = newArr
+            } else {
+              this.filterCursterList = this.custerNameList
+            }
           }
           this.getSelectAllCata((indexList) => {
             // this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
