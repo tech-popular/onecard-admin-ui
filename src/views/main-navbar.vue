@@ -18,13 +18,13 @@
       <el-menu
         class="site-navbar__menu site-navbar__menu--right"
         mode="horizontal">
-        <el-menu-item index="1" @click="$router.push({ name: 'theme' })">
+        <!-- <el-menu-item index="1" @click="$router.push({ name: 'theme' })">
           <template slot="title">
             <el-badge value="new">
               <icon-svg name="shezhi" class="el-icon-setting"></icon-svg>
             </el-badge>
           </template>
-        </el-menu-item>
+        </el-menu-item> -->
 
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
