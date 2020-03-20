@@ -49,6 +49,10 @@
           this.$store.commit('user/updateName', val)
           watermark.set(this.$store.state.user.name)
         }
+      },
+      createTime: {
+        get () { return this.$store.state.user.datetime },
+        set (val) { this.$store.commit('user/createTime', val) }
       }
     },
     created () {
@@ -72,10 +76,13 @@
           method: 'get',
           params: this.$http.adornParams()
         }).then(({data}) => {
+          console.log(data, 'huoquyonghu')
+  
           if (data && data.code === 0) {
             this.loading = false
             this.userId = data.user.userId
             this.userName = data.user.username
+            this.createTime = data.user.createTime
           }
         })
       }

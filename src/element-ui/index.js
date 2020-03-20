@@ -76,7 +76,8 @@ import {
   MessageBox,
   Message,
   Notification,
-  Drawer
+  Drawer,
+  Calendar
 } from 'element-ui'
 
 Vue.use(Pagination)
@@ -143,6 +144,7 @@ Vue.use(Aside)
 Vue.use(Main)
 Vue.use(Footer)
 Vue.use(Drawer)
+Vue.use(Calendar)
 
 Vue.use(Loading.directive)
 
