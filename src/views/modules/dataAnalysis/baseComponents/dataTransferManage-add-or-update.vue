@@ -237,8 +237,12 @@
             </el-col>
             <el-col>
               <el-form-item label="下发模式" prop="increModel">
-                <el-radio v-model="baseForm.increModel" :label="0" v-bind:disabled="isStatic">全量</el-radio>
-                <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic">增量</el-radio>
+                <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
+                <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
+                <el-tooltip placement="top" v-if="isStatic">
+                  <div slot="content">静态分群不支持增量</div>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+                </el-tooltip>
               </el-form-item>
             </el-col>
           </el-row>
@@ -549,13 +553,10 @@
         obj = this.templateIdList.find((item) => {
           if (item.value === selVal && item.type === 'static') {
             this.isStatic = true
-            this.baseForm.increModel = -1
           } else {
             this.isStatic = false
-            if (this.baseForm.increModel === -1) {
-              this.baseForm.increModel = 0
-            }
           }
+          this.baseForm.increModel = 0
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
@@ -688,13 +689,19 @@
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
-            if (disData.increModel === -1) {
+            let isStaticObj = this.templateIdList.find((item) => {
+              if (item.value === disData.templateId && item.type === 'static') {
+                return true
+              } else if (item.value === disData.templateId) {
+                return false
+              }
+            })
+            if (isStaticObj) {
               this.isStatic = true
-              this.baseForm.increModel = -1
             } else {
               this.isStatic = false
-              this.baseForm.increModel = disData.increModel
             }
+            this.baseForm.increModel = disData.increModel == -1 ? 0 : disData.increModel
             disData.datasourceParams.forEach((item, index) => {
               if (item.type == 'kafka') {
                 this.baseForm.kafkaServer = item.id
@@ -916,6 +923,9 @@
     }
     & .radio-passive {
       margin-left: 30px
+    }
+    & .radio-incremodel {
+      margin-right: 15px;
     }
   }
 </style>
