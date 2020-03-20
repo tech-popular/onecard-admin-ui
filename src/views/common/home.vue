@@ -1,22 +1,164 @@
 <template>
-  <div class="mod-home">
-    <h3>项目介绍</h3>
-    <ul>
-      <li>蜂巢报警信息各级项目、报警信息模板、报警渠道通道的配置</li>
-      <li>报警策略更加丰富</li>
-    </ul>
-    <h3>获取帮助</h3>
-    <ul>
-
-    </ul>
-  </div>
+    <!-- 欢迎使用utc后台管理系统 -->
+     <el-row :gutter="24" class="dash">
+          <el-col :span="8">
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <el-row class="userAdmin">
+                  <el-col :span="24">
+                    <div class="images">
+                      <img src="~@/assets/img/avatar.png" class="imgs" :alt="userName"/>
+                    </div>
+                  </el-col>
+                  <el-col :span="24">{{ userName }}</el-col>
+                   <!-- <el-col :span="24" class="orginName">注册时间: {{ createTime }}</el-col> -->
+                </el-row>
+                <el-row style="border-bottom:1px dashed #ccc;margin: 20px;"/>
+                <div class="bottom clearfix">
+                  <el-row>
+                    <el-col :span="24" class="orginName" style="margin: 5px;">
+                      <time class="time">
+                        <i class="el-icon-time" style="line-height: 25px;">  系统简介</i>
+                      </time>
+                    </el-col>
+                    <el-col :span="24" class="orginName" style="margin: 5px;">
+                      <time class="time">
+                        欢迎使用<span style="color: #2093f7;">数据中台系统，</span>本系统的主要板块：
+                        <p>
+                          <el-tag>用户画像板块</el-tag>
+                          <el-tag type="success">审批板块</el-tag>
+                          <el-tag type="info">搜索推荐板块</el-tag>
+                          <el-tag type="warning">调度板块</el-tag>
+                          <el-tag type="danger">报警板块</el-tag>
+                        </p>
+                      </time>
+                    </el-col>
+                    <el-col :span="24" class="orginName" style="margin: 5px;">
+                      <time class="time">
+                      <el-form>
+                        <i class="el-icon-setting" style="line-height: 25px;">  风格设置  </i>
+                        <el-form-item label="导航条类型">
+                          <el-radio-group v-model="navbarLayoutType" size="mini">
+                            <el-radio label="default" border>默认</el-radio>
+                            <el-radio label="inverse" border size="mini">全色</el-radio>
+                          </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="侧边栏皮肤">
+                          <el-radio-group v-model="sidebarLayoutSkin" size="mini">
+                            <el-radio label="dark" border>默认</el-radio>
+                            <!-- <el-radio label="light" border>白色</el-radio> -->
+                          </el-radio-group>
+                        </el-form-item>
+                      </el-form>
+                      </time>
+                    </el-col>
+                  </el-row>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="16">
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <el-calendar v-model="value"></el-calendar>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
 </template>
 
-<script></script>
-
-<style>
-  .mod-home {
-    line-height: 1.5;
+<script>
+export default {
+  data () {
+    return {
+      value: new Date(),
+      dataHoste: ''
+    }
+  },
+  computed: {
+    navbarLayoutType: {
+      get () { return this.$store.state.common.navbarLayoutType },
+      set (val) { this.$store.commit('common/updateNavbarLayoutType', val) }
+    },
+    sidebarLayoutSkin: {
+      get () { return this.$store.state.common.sidebarLayoutSkin },
+      set (val) { this.$store.commit('common/updateSidebarLayoutSkin', val) }
+    },
+    userName: {
+      get () { return this.$store.state.user.name }
+    },
+    createTime: {
+      get () { return this.$store.state.user.datetime }
+    }
+  },
+  mounted () {
+    var date1 = this.createTime.replace(/-/g, '/') // 开始时间
+    var date2 = new Date() // 结束时间
+    var date3 = date2.getTime() - new Date(date1).getTime() // 时间差的毫秒数
+    // 计算出相差天数
+    var days = Math.floor(date3 / (24 * 3600 * 1000))
+    // 计算出小时数
+    var leave1 = date3 % (24 * 3600 * 1000) // 计算天数后剩余的毫秒数
+    var hours = Math.floor(leave1 / (3600 * 1000))
+    // 计算相差分钟数
+    var leave2 = leave1 % (3600 * 1000) // 计算小时数后剩余的毫秒数
+    var minutes = Math.floor(leave2 / (60 * 1000))
+    // 计算相差秒数
+    var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
+    var seconds = Math.round(leave3 / 1000)
+    this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
   }
-</style>
+}
+</script>
 
+<style rel="stylesheet/scss" lang="scss">
+.el-backtop, .el-calendar-table td.is-today {
+    color: #2093f7 !important;
+}
+.el-form-item--medium .el-form-item__content, .el-form-item--medium .el-form-item__label{
+  font-size: 14px;
+    color: #999;
+}
+.userAdmin{
+  line-height: 40px;
+  text-align: center;
+  color: rgba(0,0,0,.85);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 28px;
+  .images{
+    height: 80px;
+    width: 80px;
+    margin: 0px auto;
+      .imgs{
+      width: 80px;
+      height: 80px;
+      border: 1px solid #ccc;
+      border-radius:50%;
+    }
+  }
+  .userEdit{
+    text-align: right
+  }
+  .orginName{
+    color: #999;
+    font-size: 14px;
+    font-variant: tabular-nums;
+  }
+  .sexMale{
+    color: #17B3A3;
+    font-size: 20px;
+  }
+  .sexFemale{
+    color: palevioletred;
+    font-size: 20px;
+  }
+}
+.time {
+    font-size: 14px;
+    color: #999;
+    .tagText{
+      margin: 5px;
+    }
+}
+</style>
