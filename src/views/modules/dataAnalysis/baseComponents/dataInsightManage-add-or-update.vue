@@ -323,7 +323,7 @@ export default {
           this.custerNameList = []
           return this.$message({
             type: 'error',
-            message: data.message
+            message: data.message || '数据异常'
           })
         }
         this.custerNameList = data.data
@@ -376,6 +376,12 @@ export default {
               item.selectOperateList = selectOperateList
               item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
             })
+          }
+          // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+          if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
+            if (!item.params[0].selectVal) {
+              item.params[0].selectVal = [ item.params[0].value ]
+            }
           }
         } else {
           this.updateInitRulesConfig(item, indexList)
@@ -631,6 +637,12 @@ export default {
           subFunc: '',
           params: [{ value: '', title: '' }]
         }
+        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+        }
+        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+        }
         if (params.func === 'relative_time') {
           params.subFunc = 'relative_before'
         }
@@ -772,6 +784,7 @@ export default {
       })
     },
     saveHandle (type) {
+      console.log(this.ruleConfig)
       // console.log(this.vestPackCode, this.vestPackCode.length)
       if (this.baseForm.userType === 'excel') {
         if (!this.excelFile) {
@@ -882,7 +895,7 @@ export default {
               this.loading = false
               return this.$message({
                 type: 'error',
-                message: data.message
+                message: data.message || '数据异常'
               })
             } else {
               this.$message({
