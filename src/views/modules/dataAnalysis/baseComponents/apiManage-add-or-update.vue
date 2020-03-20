@@ -378,7 +378,7 @@ export default {
         if (data.status * 1 !== 1) {
           this.curCusterInfo = {
             id: id,
-            name: data.data.name,
+            name: data.data && data.data.name ? data.data.name : `分群id：${id}`,
             tips: data.message || '此分群预览信息加载异常'
           }
           fn(this.curCusterInfo)
@@ -444,17 +444,24 @@ export default {
           })
           this.baseForm.outParams = out
           // 分群包
-          let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
-          if (filterFirstObj.length) {
-            let newArr = this.custerNameList.map(item => {
-              if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
-                return { ...item, disabled: true }
-              }
-              return item
-            })
-            this.filterCursterList = newArr
-          } else {
+          if (!this.baseForm.templateIds) {
             this.filterCursterList = this.custerNameList
+            this.$nextTick(() => {
+              this.$refs.baseForm.clearValidate('templateIds')
+            })
+          } else {
+            let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
+            if (filterFirstObj.length) {
+              let newArr = this.custerNameList.map(item => {
+                if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+                  return { ...item, disabled: true }
+                }
+                return item
+              })
+              this.filterCursterList = newArr
+            } else {
+              this.filterCursterList = this.custerNameList
+            }
           }
           this.getSelectAllCata((indexList) => {
             // this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
@@ -523,6 +530,12 @@ export default {
             }
           })
           item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
+          // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+          if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
+            if (!item.params[0].selectVal) {
+              item.params[0].selectVal = [ item.params[0].value ]
+            }
+          }
         } else {
           this.updateInitRulesConfig(item, indexList)
         }
