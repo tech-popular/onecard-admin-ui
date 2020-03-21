@@ -13,6 +13,7 @@
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="API名称"></el-table-column>
+      <el-table-column prop="code" header-align="center" align="center" label="接口编码"></el-table-column>
       <el-table-column prop="desc" header-align="center" align="center" label="API说明">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
