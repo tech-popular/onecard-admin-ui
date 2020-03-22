@@ -174,7 +174,6 @@ export default {
     //     callback()
     //   }
     // }
-
     var validateUsername = (rule, value, callback) => {
       const reg = /^[a-zA-Z0-9]{0,20}$/
       if (!value) {
