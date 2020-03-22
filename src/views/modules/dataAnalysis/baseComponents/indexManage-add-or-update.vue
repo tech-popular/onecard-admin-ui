@@ -238,6 +238,9 @@
           this.$refs['dataForm'].resetFields()
           if (row) {
             this.dataForm = deepClone(row)
+            if (row.remark === null) {
+              this.dataForm.remark = ''
+            }
           }
           this.dataForm.enable = this.dataForm.enable.toString()
           if (tag == 'view') {
