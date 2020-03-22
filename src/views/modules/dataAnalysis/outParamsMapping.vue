@@ -5,7 +5,7 @@
         下发数据源：
       </el-col>
       <el-col :span="7">
-        <el-radio v-model="baseForm.origin">kafka</el-radio>
+        <el-radio v-model="baseForm.origin" class="data-radio">kafka</el-radio>
         <el-select
           v-model= "baseForm.kafka"
           placeholder="请选择"
@@ -20,7 +20,7 @@
         </el-select>
       </el-col>
       <el-col :span="7">
-        <el-radio v-model="baseForm.origin">业务数据库</el-radio>
+        <el-radio v-model="baseForm.origin" class="data-radio">业务数据库</el-radio>
         <el-select
           v-model= "baseForm.database"
           placeholder="请选择"
@@ -35,13 +35,17 @@
         </el-select>
       </el-col>
       <el-col :span="6">
-        <el-button type="primary">编辑出参名称</el-button>
+        <el-button type="primary" @click="editOutParams">编辑出参名称</el-button>
+        <el-button type="primary">定制化出参</el-button>
       </el-col>
     </el-row>
-    <div class="edit-content"></div>
+    <div class="edit-content">
+      <edit-outparams v-if="outParamsFlag"></edit-outparams>
+    </div>
   </div>
 </template>
 <script>
+import editOutparams from './baseComponents/outParamsMapping-edit-outparams'
 export default {
   data () {
     return {
@@ -61,7 +65,16 @@ export default {
           lable: '1',
           value: '1'
         }
-      ]
+      ],
+      outParamsFlag: false
+    }
+  },
+  components: {
+    editOutparams
+  },
+  methods: {
+    editOutParams () {
+      this.outParamsFlag = true
     }
   }
 }
@@ -77,5 +90,8 @@ export default {
     border-top: 1px dashed #ccc;
     margin-top: 20px;
     padding-top: 20px;
+  }
+  .data-radio {
+    margin: 0;
   }
 </style>

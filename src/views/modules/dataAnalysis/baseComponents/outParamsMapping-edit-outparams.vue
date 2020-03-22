@@ -1,0 +1,277 @@
+<template>
+  <div class="index-wrap">
+    <el-form :inline="true" :model="dataForm" ref="dataForm">
+    <el-form-item label="指标ID">
+        <el-input v-model="dataForm.id" placeholder="" clearable />
+      </el-form-item>
+      <el-form-item label="指标名称">
+        <el-input v-model="dataForm.englishName" placeholder="" clearable />
+      </el-form-item>
+      <el-form-item label="指标标题">
+        <el-input v-model="dataForm.chineseName" placeholder="" clearable />
+      </el-form-item>
+      <el-form-item label="用户所属渠道">
+        <el-select v-model="dataForm.channelId" placeholder="指标状态">
+          <el-option label="全部" value=""></el-option>
+          <el-option label="有效" value="true"></el-option>
+          <el-option label="无效" value="false"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="指标状态">
+        <el-select v-model="dataForm.enable" placeholder="指标状态">
+          <el-option label="全部" value=""></el-option>
+          <el-option label="有效" value="true"></el-option>
+          <el-option label="无效" value="false"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="searchHandle()">查询</el-button>
+        <el-button @click="resetHandle()">重置</el-button>
+      </el-form-item>
+    </el-form>
+		<el-row :gutter="20" v-loading="dataListLoading">
+			<el-col :span="16">
+				<el-table :data="dataList" border style="width: 100%;">
+					<el-table-column prop="id" header-align="center" align="center" label="指标ID"></el-table-column>
+					<el-table-column prop="englishName" header-align="center" align="center" label="指标名称"></el-table-column>
+					<el-table-column prop="chineseName" header-align="center" align="center" label="指标标题"></el-table-column>
+					<el-table-column header-align="center" align="center" width="100" label="操作">
+						<template slot-scope="scope">
+							<el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+						</template>
+					</el-table-column>
+				</el-table>
+			</el-col>
+			<el-col :span="2">
+				<el-table :data="dataList" :show-header="false" style="width: 100%;" class="line-arrow">
+					<el-table-column header-align="center" align="center">
+						<template>
+							<el-button type="text" style="color: #666" icon="el-icon-right"></el-button>
+						</template>
+					</el-table-column>
+				</el-table>
+			</el-col>
+			<el-col :span="6">
+				<el-table :data="newDataList" border style="width: 100%;">
+					<el-table-column header-align="center" align="center" label="修改后指标名称">
+						<template slot-scope="scope">
+							<el-input v-model="scope.row.newEnglishName" @blur="blurEnglishNameEvent(scope.row)" placeholder="请输入内容"></el-input>
+						</template>
+					</el-table-column>
+				</el-table>
+			</el-col>
+		</el-row>
+    <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageNum"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalCount"
+      layout="total, sizes, prev, pager, next, jumper"/>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+  </div>
+</template>
+
+<script>
+  import { indexManageList, indexManageTypeList, indexManageMinCataList } from '@/api/dataAnalysis/indexManage'
+  import { nameToLabel, echoDisplay } from '../dataAnalysisUtils/utils'
+  import AddOrUpdate from './indexManage-add-or-update'
+  import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+  export default {
+    data () {
+      return {
+        dataForm: {
+          id: '',
+          englishName: '',
+          chineseName: '',
+          channelId: '',
+          enable: ''
+        },
+        dataList: [],
+        newDataList: [], // 存放新值
+        modifyDataList: [],
+        pageNum: 1, // 当前页
+        pageSize: 10, // 默认每页10条
+        totalCount: 0,
+        dataListLoading: false,
+        addOrUpdateVisible: false,
+        fieldTypeList: [], // 数据类型
+        categoryIdList: [] // 指标类别
+      }
+    },
+    components: {
+      AddOrUpdate,
+      Treeselect
+    },
+    mounted () {
+      this.getCategoryIdList()
+      this.getFieldTypeList()
+      this.getDataList()
+    },
+    methods: {
+      async loadOptions ({ action, parentNode, callback }) {
+        if (action === LOAD_CHILDREN_OPTIONS) {
+          callback()
+        }
+      },
+  
+      // 数据类型
+      fieldTypeFormat (row, column) {
+        for (var i = 0; i < this.fieldTypeList.length; i++) {
+          if (row.fieldType === this.fieldTypeList[i].childrenValue) {
+            return this.fieldTypeList[i].childrenValue
+          }
+        }
+      },
+      // 指标类别
+      categoryIdFormat (row) {
+        return echoDisplay(this.categoryIdList, row.categoryId)
+      },
+
+      // 获取指标类别
+      getCategoryIdList () {
+        indexManageMinCataList().then(({data}) => {
+          if (data && data.status === '1') {
+            this.categoryIdList = nameToLabel(data.data)
+          }
+        })
+      },
+  
+      // 获取数据类型
+      getFieldTypeList () {
+        let params = 6
+        indexManageTypeList(params).then(({data}) => {
+          if (data && data.status === '1') {
+            this.fieldTypeList = data.data
+          }
+        })
+      },
+
+      // 获取数据列表
+      getDataList () {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.dataListLoading = true
+            let params = {
+              ...this.dataForm,
+              'pageNum': this.pageNum,
+              'pageSize': this.pageSize
+            }
+            if (!params.categoryId) {
+              params.categoryId = ''
+            }
+            indexManageList(params, false).then(({data}) => {
+              if (data && data.status === '1') {
+                this.dataList = data.data.list
+                this.totalCount = data.data.total
+                this.newDataList = this.dataList.map(item => {
+                  return {
+                    id: item.id,
+                    englishName: item.englishName,
+                    newEnglishName: item.englishName
+                  }
+                })
+                // 如果有已修改的内容时，将修改后的内容赋值到输入框中
+                if (this.modifyDataList.length) {
+                  this.newDataList.forEach((item, index) => {
+                    this.modifyDataList.forEach((mitem, mindex) => {
+                      if (item.id === mitem.id) {
+                        this.newDataList.splice(index, 1, this.modifyDataList[mindex])
+                      }
+                    })
+                  })
+                }
+                console.log(this.newDataList)
+              } else {
+                this.dataList = []
+                this.totalCount = 0
+              }
+              this.dataListLoading = false
+            })
+          }
+        })
+      },
+
+      // 新增 / 修改
+      addOrUpdateHandle (row, tag) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(row, tag)
+        })
+      },
+      /** 查询 */
+      searchHandle () {
+        this.pageNum = 1
+        this.getDataList()
+        this.modifyDataList = []
+      },
+      /** 重置 */
+      resetHandle () {
+        this.pageNum = 1
+        this.dataForm = {
+          englishName: '',
+          chineseName: '',
+          categoryId: null,
+          enable: ''
+        }
+      },
+      blurEnglishNameEvent (row) { // 输入框失去焦点时，保存数据
+        if (row.englishName !== row.newEnglishName && !this.judgeIsInArray(this.modifyDataList, row.id)) {
+          this.modifyDataList.push(row)
+        }
+        console.log(this.modifyDataList)
+      },
+      judgeIsInArray (arr, id) { // 判断某个参数是否在数据中
+        let flag = false
+        arr.forEach(item => {
+          if (item.id === id) {
+            flag = true
+          }
+        })
+        return flag
+      },
+      // 每页数
+      sizeChangeHandle (page) {
+        this.pageSize = page
+        this.pageNum = 1
+        this.getDataList()
+      },
+      // 当前页
+      currentChangeHandle (page) {
+        this.pageNum = page
+        this.getDataList()
+      }
+    }
+  }
+</script>
+<style lang="scss">
+  .index-wrap{
+    & .vue-treeselect {
+      min-height: 40px;
+      line-height: 40px;
+      max-width: 195px;
+    }
+    & .vue-treeselect__single-value,
+    & .vue-treeselect__placeholder{
+      height: 40px;
+      line-height: 40px;
+    }
+	
+  }
+	.line-arrow {
+		padding-top: 44px;
+	}
+	.line-arrow td, .line-arrow th.is-leaf {
+		border: 0;
+		padding-bottom: 11px;
+	}
+	.line-arrow::before {
+		height: 0;
+	}
+	.line-arrow .el-table__body tr:hover>td{
+    background-color: #fff!important;
+  }
+</style>
