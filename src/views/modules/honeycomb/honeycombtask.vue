@@ -62,7 +62,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="ipAddress" header-align="center" align="center" label="IP"></el-table-column>
-      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="输入数据源"></el-table-column>
+      <!-- <el-table-column prop="inDatasourceName" header-align="center" align="center" label="输入数据源"></el-table-column> -->
       <el-table-column
         prop="cron"
         header-align="center"

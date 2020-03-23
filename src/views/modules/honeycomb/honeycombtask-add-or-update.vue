@@ -340,6 +340,13 @@ export default {
         isHealthcheck: 'false',
         isBusinessDataCheck: 'false',
         isMergeTask: 'false',
+        userType: null,
+        operatorId: null,
+        userDesc: null,
+        increModel: 0,
+        allowRepeatTrigger: 0,
+        startTime: null,
+        endTime: null,
         honeycombOutDatasourceEntitys: [
           {
             outTableName: '',
@@ -543,6 +550,13 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
+              this.dataForm.userType = data.honeycombTask.userType
+              this.dataForm.operatorId = data.honeycombTask.operatorId
+              this.dataForm.userDesc = data.honeycombTask.userDesc
+              this.dataForm.increModel = data.honeycombTask.increModel
+              this.dataForm.allowRepeatTrigger = data.honeycombTask.allowRepeatTrigger
+              this.dataForm.startTime = data.honeycombTask.startTime
+              this.dataForm.endTime = data.honeycombTask.endTime
               this.dataForm.name = data.honeycombTask.name
               this.dataForm.inDatasource = data.honeycombTask.inDatasource
               this.dataForm.computeType =
@@ -670,6 +684,13 @@ export default {
               isHealthcheck: this.dataForm.isHealthcheck,
               isBusinessDataCheck: this.dataForm.isBusinessDataCheck,
               isMergeTask: this.dataForm.isMergeTask,
+              userType: this.dataForm.userType,
+              operatorId: this.dataForm.operatorId,
+              userDesc: this.dataForm.userDesc,
+              increModel: this.dataForm.increModel,
+              allowRepeatTrigger: this.dataForm.allowRepeatTrigger,
+              startTime: this.dataForm.startTime,
+              endTime: this.dataForm.endTime,
               honeycombOutDatasourceEntitys: this.dataForm
                 .honeycombOutDatasourceEntitys
             })
