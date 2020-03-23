@@ -36,7 +36,7 @@
       <el-table-column prop="dispatchFrequency" header-align="center" align="center" :formatter="dispatchFrequencyFormat" label="调度频率"></el-table-column>
       <el-table-column prop="lastCalTime" header-align="center" align="center" width="154" label="最近下发时间"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" width="154" label="创建时间"></el-table-column>
-      <el-table-column prop="modifyTime" header-align="center" align="center" width="154" label="最后修改时间"></el-table-column>
+      <el-table-column prop="updateTime" header-align="center" align="center" width="154" label="最后修改时间"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="enable" header-align="center" align="center" label="任务状态">
         <template slot-scope="scope">
