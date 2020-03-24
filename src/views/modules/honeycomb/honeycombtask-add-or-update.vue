@@ -347,6 +347,9 @@ export default {
         allowRepeatTrigger: 0,
         startTime: null,
         endTime: null,
+        notifyFlag: 0,
+        taskSource: '',
+        targetSql: null,
         honeycombOutDatasourceEntitys: [
           {
             outTableName: '',
@@ -550,6 +553,9 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
+              this.dataForm.notifyFlag = data.honeycombTask.notifyFlag
+              this.dataForm.taskSource = data.honeycombTask.taskSource
+              this.dataForm.targetSql = data.honeycombTask.targetSql
               this.dataForm.userType = data.honeycombTask.userType
               this.dataForm.operatorId = data.honeycombTask.operatorId
               this.dataForm.userDesc = data.honeycombTask.userDesc
@@ -691,6 +697,9 @@ export default {
               allowRepeatTrigger: this.dataForm.allowRepeatTrigger,
               startTime: this.dataForm.startTime,
               endTime: this.dataForm.endTime,
+              notifyFlag: this.dataForm.notifyFlag,
+              taskSource: this.dataForm.taskSource,
+              targetSql: this.dataForm.targetSql,
               honeycombOutDatasourceEntitys: this.dataForm
                 .honeycombOutDatasourceEntitys
             })
