@@ -1,7 +1,8 @@
 <template>
   <div class="index-wrap">
+    <div class="last-modifier">最后修改人：无</div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-    <el-form-item label="指标ID">
+      <el-form-item label="指标ID">
         <el-input v-model="dataForm.id" placeholder="" clearable />
       </el-form-item>
       <el-form-item label="指标名称">
@@ -11,11 +12,9 @@
         <el-input v-model="dataForm.chineseName" placeholder="" clearable />
       </el-form-item>
       <el-form-item label="用户所属渠道">
-        <el-select v-model="dataForm.channelId" placeholder="指标状态">
-          <el-option label="全部" value=""></el-option>
-          <el-option label="有效" value="true"></el-option>
-          <el-option label="无效" value="false"></el-option>
-        </el-select>
+        <el-select v-model="dataForm.channelId">
+            <el-option v-for="(item, index) in channelIdList" :key="index" :label="item.text" :value="item.value"></el-option>
+          </el-select>
       </el-form-item>
       <el-form-item label="指标状态">
         <el-select v-model="dataForm.enable" placeholder="指标状态">
@@ -71,15 +70,17 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <div class="btn-group">
+      <el-button type="primary" @click="submitData">提交</el-button>
+      <el-button type="default" @click="submitCancel">取消</el-button>
+    </div>
   </div>
 </template>
 
 <script>
-  import { indexManageList, indexManageTypeList, indexManageMinCataList } from '@/api/dataAnalysis/indexManage'
-  import { nameToLabel, echoDisplay } from '../dataAnalysisUtils/utils'
+  import { indexManageList, indexManageTypeList } from '@/api/dataAnalysis/indexManage'
+  import { channelsList } from '@/api/dataAnalysis/dataInsightManage'
   import AddOrUpdate from './indexManage-add-or-update'
-  import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
     data () {
       return {
@@ -99,24 +100,18 @@
         dataListLoading: false,
         addOrUpdateVisible: false,
         fieldTypeList: [], // 数据类型
-        categoryIdList: [] // 指标类别
+        channelIdList: []
       }
     },
     components: {
-      AddOrUpdate,
-      Treeselect
+      AddOrUpdate
     },
     mounted () {
-      this.getCategoryIdList()
       this.getFieldTypeList()
+      this.getChannelIdList()
       this.getDataList()
     },
     methods: {
-      async loadOptions ({ action, parentNode, callback }) {
-        if (action === LOAD_CHILDREN_OPTIONS) {
-          callback()
-        }
-      },
   
       // 数据类型
       fieldTypeFormat (row, column) {
@@ -125,19 +120,6 @@
             return this.fieldTypeList[i].childrenValue
           }
         }
-      },
-      // 指标类别
-      categoryIdFormat (row) {
-        return echoDisplay(this.categoryIdList, row.categoryId)
-      },
-
-      // 获取指标类别
-      getCategoryIdList () {
-        indexManageMinCataList().then(({data}) => {
-          if (data && data.status === '1') {
-            this.categoryIdList = nameToLabel(data.data)
-          }
-        })
       },
   
       // 获取数据类型
@@ -150,48 +132,52 @@
         })
       },
 
+      getChannelIdList () {
+        channelsList().then(res => {
+          console.log(res)
+          if (res.data.status * 1 !== 1) {
+            this.channelIdList = []
+            return
+          }
+          this.channelIdList = res.data.data
+        })
+      },
+
       // 获取数据列表
       getDataList () {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.dataListLoading = true
-            let params = {
-              ...this.dataForm,
-              'pageNum': this.pageNum,
-              'pageSize': this.pageSize
-            }
-            if (!params.categoryId) {
-              params.categoryId = ''
-            }
-            indexManageList(params, false).then(({data}) => {
-              if (data && data.status === '1') {
-                this.dataList = data.data.list
-                this.totalCount = data.data.total
-                this.newDataList = this.dataList.map(item => {
-                  return {
-                    id: item.id,
-                    englishName: item.englishName,
-                    newEnglishName: item.englishName
+        this.dataListLoading = true
+        let params = {
+          ...this.dataForm,
+          'pageNum': this.pageNum,
+          'pageSize': this.pageSize
+        }
+        indexManageList(params, false).then(({data}) => {
+          if (data && data.status === '1') {
+            this.dataList = data.data.list
+            this.totalCount = data.data.total
+            this.newDataList = this.dataList.map(item => {
+              return {
+                id: item.id,
+                englishName: item.englishName,
+                newEnglishName: item.englishName
+              }
+            })
+            // 如果有已修改的内容时，将修改后的内容赋值到输入框中
+            if (this.modifyDataList.length) {
+              this.newDataList.forEach((item, index) => {
+                this.modifyDataList.forEach((mitem, mindex) => {
+                  if (item.id === mitem.id) {
+                    this.newDataList.splice(index, 1, this.modifyDataList[mindex])
                   }
                 })
-                // 如果有已修改的内容时，将修改后的内容赋值到输入框中
-                if (this.modifyDataList.length) {
-                  this.newDataList.forEach((item, index) => {
-                    this.modifyDataList.forEach((mitem, mindex) => {
-                      if (item.id === mitem.id) {
-                        this.newDataList.splice(index, 1, this.modifyDataList[mindex])
-                      }
-                    })
-                  })
-                }
-                console.log(this.newDataList)
-              } else {
-                this.dataList = []
-                this.totalCount = 0
-              }
-              this.dataListLoading = false
-            })
+              })
+            }
+            console.log(this.newDataList)
+          } else {
+            this.dataList = []
+            this.totalCount = 0
           }
+          this.dataListLoading = false
         })
       },
 
@@ -206,7 +192,6 @@
       searchHandle () {
         this.pageNum = 1
         this.getDataList()
-        this.modifyDataList = []
       },
       /** 重置 */
       resetHandle () {
@@ -214,7 +199,6 @@
         this.dataForm = {
           englishName: '',
           chineseName: '',
-          categoryId: null,
           enable: ''
         }
       },
@@ -243,35 +227,41 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
+      },
+      submitData () {
+        console.log('submit')
+      },
+      submitCancel () {
+        this.modifyDataList = []
+        this.$emit('cancel')
       }
     }
   }
 </script>
 <style lang="scss">
   .index-wrap{
-    & .vue-treeselect {
-      min-height: 40px;
-      line-height: 40px;
-      max-width: 195px;
+    & .last-modifier {
+      padding: 0 30px 15px 0;
+      text-align: right;
+      font-weight: bold;
     }
-    & .vue-treeselect__single-value,
-    & .vue-treeselect__placeholder{
-      height: 40px;
-      line-height: 40px;
+    & .line-arrow {
+      padding-top: 44px;
     }
-	
-  }
-	.line-arrow {
-		padding-top: 44px;
-	}
-	.line-arrow td, .line-arrow th.is-leaf {
-		border: 0;
-		padding-bottom: 11px;
-	}
-	.line-arrow::before {
-		height: 0;
-	}
-	.line-arrow .el-table__body tr:hover>td{
-    background-color: #fff!important;
+    & .line-arrow::before {
+      height: 0;
+    }
+    & .line-arrow td, & .line-arrow th.is-leaf {
+      border: 0;
+      padding-bottom: 11px;
+    }
+    & .line-arrow .el-table__body tr:hover>td{
+      background-color: #fff!important;
+      cursor: none;
+    }
+    & .btn-group {
+      text-align: center;
+      padding-top: 20px;
+    }
   }
 </style>
