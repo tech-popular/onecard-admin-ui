@@ -40,8 +40,8 @@
       </el-col>
     </el-row>
     <div class="edit-content">
-      <edit-outparams v-if="editOutParamsFlag" @cancel="editOutParamsFlag = false"></edit-outparams>
-      <customized-outparams v-if="customizedOutParamsFlag" @cancel="customizedOutParamsFlag = false"></customized-outparams>
+      <edit-outparams v-if="editOutParamsFlag" ref="editOutParams" @cancel="editOutParamsFlag = false"></edit-outparams>
+      <customized-outparams v-if="customizedOutParamsFlag" ref="customizedOutParams" @cancel="customizedOutParamsFlag = false"></customized-outparams>
     </div>
   </div>
 </template>
@@ -75,12 +75,40 @@ export default {
     // 点击编辑出参名称
     editOutParams () {
       if (!this.baseForm.source) return
-      this.editOutParamsFlag = true
+      if (this.customizedOutParamsFlag === true) {
+        this.$confirm('确定放弃定制化出参，进行编辑出参名称？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.customizedOutParamsFlag = false
+          this.$refs.customizedOutParams.formData.tableData = []
+          this.editOutParamsFlag = true
+        }).catch((e) => {
+          console.log(e)
+        })
+      } else {
+        this.editOutParamsFlag = true
+      }
     },
     // 定制化出参
     customizedOutParams () {
       if (!this.baseForm.source) return
-      this.customizedOutParamsFlag = true
+      if (this.editOutParamsFlag === true) {
+        this.$confirm('确定放弃编辑出参名称，进行定制化出参？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => { // 确认创建分群时的操作
+          this.editOutParamsFlag = false
+          this.$refs.editOutParams.modifyDataList = []
+          this.customizedOutParamsFlag = true
+        }).catch((e) => {
+          console.log(e)
+        })
+      } else {
+        this.customizedOutParamsFlag = true
+      }
     },
     // 下发数据源变化时，把对应的下拉选清空
     dataSourceChange (val) {
