@@ -16,7 +16,7 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
+        <!-- <el-button type="success" @click="addOrUpdateHandle()">新增</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
@@ -65,7 +65,7 @@
         label="钉钉审批流"/>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">审批记录</el-button>
+          <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row.id)">审批记录</el-button>
         </template>
       </el-table-column>
     </el-table>

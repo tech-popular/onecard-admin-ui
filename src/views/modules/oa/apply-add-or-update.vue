@@ -219,16 +219,16 @@
   // import Filter from './filter'
   export default {
     data () {
-      var checkDecisionName = (rule, value, callback) => {
-        const nullValue = /^[^\s]+$/
-        if (!value) {
-          callback(new Error('请输入任务定义名称'))
-        }
-        if (!nullValue.test(value)) {
-          callback(new Error('不能输入含空格的任务定义名称'))
-        }
-        callback()
-      }
+      // var checkDecisionName = (rule, value, callback) => {
+      //   const nullValue = /^[^\s]+$/
+      //   if (!value) {
+      //     callback(new Error('请输入任务定义名称'))
+      //   }
+      //   if (!nullValue.test(value)) {
+      //     callback(new Error('不能输入含空格的任务定义名称'))
+      //   }
+      //   callback()
+      // }
       return {
         visible: false,
         dataForm: {
@@ -244,9 +244,6 @@
           ownerApp: '', // 所属系统
           remark: '' // 备注
         },
-        staffTemp: {
-  
-        },
         tags: [
           { name: '标签一', type: '' },
           { name: '标签二', type: 'success' },
@@ -256,26 +253,6 @@
         ],
         dataFormValue: '',
         ruleTypeList: [],
-        dataRule: {
-          name: [
-            { required: true, validator: checkDecisionName, trigger: 'change' }
-          ],
-          type: [
-            { required: true, message: '请选择任务类型', trigger: 'change' }
-          ],
-          description: [
-          ],
-          owner: [
-          ],
-          user: [
-          ],
-          inputParams: [
-          ],
-          outputParams: [
-          ],
-          ownerApp: [
-          ]
-        },
         fatherData: {
           enable: true,
           enableCache: 1,
@@ -415,12 +392,12 @@
       },
       // 穿梭狂部分
       getStaffList () {
-        fetchStaffList(this.staffTemp).then(res => {
-          if (res.value.staff.length === 0) {
-            alert('查无此人')
-          }
-          this.staffList = res.value.staff
-        })
+        // fetchStaffList(this.staffTemp).then(res => {
+        //   if (res.value.staff.length === 0) {
+        //     alert('查无此人')
+        //   }
+        //   this.staffList = res.value.staff
+        // })
       },
     // 将左边表格选择项存入staffData中
       handleStaffChange (rows) {
