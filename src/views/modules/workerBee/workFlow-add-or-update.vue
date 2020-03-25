@@ -19,7 +19,7 @@
     <el-form-item v-show="!dataForm.id ? false : true" label="工作流编码">
       <el-input v-model="dataForm.flowCode" :disabled="true"  placeholder="只能输入英文 数字 和下划线"/>
     </el-form-item>
-    <el-form-item label="返回结果">
+    <el-form-item label="返回结果" prop="outputParameters">
       <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
     </el-form-item>
      <el-form-item label="版本" prop="version">
@@ -89,10 +89,10 @@
           //   { required: true, message: '工作流入参不能为空', trigger: 'blur' },
           //   { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           // ],
-          // outputParameters: [
-          //   { required: true, message: '返回结果不能为空', trigger: 'blur' },
-          //   { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-          // ],
+          outputParameters: [
+            { required: true, message: '返回结果不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
           version: [
             { required: true, message: '版本不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
