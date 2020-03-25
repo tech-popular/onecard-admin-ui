@@ -6,70 +6,35 @@
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
           <el-form-item label="标题" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+            <el-input v-model="dataForm.name" placeholder="标题"/>
           </el-form-item>
           <el-form-item label="申请系统" prop="system">
             <el-radio-group v-model="dataForm.system">
-              <el-radio label="数据中台"></el-radio>
-              <el-radio label="BI系统"></el-radio>
-              <el-radio label="tableau"></el-radio>
+              <el-radio :label="item.id" :key="item.id" v-for="(item) in systemList">{{item.name}}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="申请模块" prop="model">
-            <el-select v-model="dataForm.model" placeholder="请选择活动区域">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="子模块" prop="chileModel">
-            <el-select v-model="dataForm.chileModel" placeholder="请选择活动区域">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="已选模块">
-            <el-tag
-              style="margin-left:10px;"
-              v-for="tag in tags"
-              :key="tag.name"
-              closable
-              :type="tag.type">
-              {{tag.name}}
-            </el-tag>
+            <el-cascader :props="props" v-model="dataForm.model" clearable :options="moduleList" @change="handleChange" ref="all"></el-cascader>
           </el-form-item>
           <el-form-item label="申请权限" prop="jurisdiction">
             <el-checkbox-group v-model="dataForm.jurisdiction">
-              <el-checkbox label="新增" name="type"></el-checkbox>
-              <el-checkbox label="修改" name="type"></el-checkbox>
-              <el-checkbox label="删除" name="type"></el-checkbox>
-              <el-checkbox label="查看" name="type"></el-checkbox>
+              <el-checkbox v-for="(item, index) in applyAuthList" :label="item.id" :key="index">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           <el-form-item label="申请人姓名" prop="userName">
-            <el-input v-model="dataForm.userName" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.userName" v-else disabled placeholder="任务"/>
+            <el-input v-model="dataForm.userName" placeholder="申请人姓名"/>
           </el-form-item>
           <el-form-item label="默认所属部门">
-            <el-input v-model="dataForm.defaultDepartment" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.defaultDepartment" v-else disabled placeholder="任务"/>
+            <span>{{department}}</span>
           </el-form-item>
-          <!-- <el-form-item label="申请人手机" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item> -->
           <el-form-item label="申请人邮箱" prop="email">
-            <el-input v-model="dataForm.email" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.email" v-else disabled placeholder="任务"/>
+            <el-input v-model="dataForm.email" placeholder="申请人邮箱"/>
           </el-form-item>
           <el-form-item label="本次申请默认审批人" prop="approvalPeop">
-            <el-input v-model="dataForm.approvalPeop" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.approvalPeop" v-else disabled placeholder="任务"/>
+           <el-tag style="margin-left:10px;" v-for="tag in defaultApproverList" :key="tag.name" :type="tag.name">
+              {{tag.name}}
+            </el-tag>
           </el-form-item>
-          <!-- <el-form-item label="抄送人" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item> -->
           <el-form-item label="申请理由" prop="reason">
             <el-input type="textarea" v-model="dataForm.reason"></el-input>
           </el-form-item>
@@ -218,12 +183,32 @@
 </template>
 
 <script>
-  import { accoutAuthInitInfo, infoBeeTask, beeTask } from '@/api/oa/apply'
+  import { accoutAuthInitInfo } from '@/api/oa/apply'
   import Filter from './filter'
   export default {
     data () {
       return {
         visible: false,
+        systemList: [],
+        applyAuthList: [],
+        props: { multiple: true },
+        moduleList: [{
+          value: 'zhinan',
+          label: '指南',
+          children: [{
+            value: 'shejiyuanze',
+            label: '设计原则'
+          }]
+        }, {
+          value: 'shijian',
+          label: '时间',
+          children: [{
+            value: 'shijiandian',
+            label: '时间点'
+          }]
+        }],
+        defaultApproverList: [],
+        department: '',
         dataForm: { // 账号权限form
           name: '', // 账号权限标题
           system: '',
@@ -237,35 +222,28 @@
         },
         dataRule: {
           name: [
-            { required: true, message: '标题不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '标题不能为空', trigger: 'blur' }
           ],
           system: [
-            { required: true, message: '请选择申请系统', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择申请系统', trigger: 'blur' }
           ],
           model: [
-            { required: true, message: '请选择模块', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择模块', trigger: 'blur' }
           ],
           chileModel: [
-            { required: true, message: '请选择子模块', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择子模块', trigger: 'blur' }
           ],
           jurisdiction: [
-            { required: true, message: '请选择申请权限', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择申请权限', trigger: 'blur' }
           ],
           userName: [
-            { required: true, message: '申请人姓名不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
           ],
           email: [
             { required: true, message: '申请人邮箱不能为空', trigger: 'blur' }
           ],
           reason: [
-            { required: true, message: '申请理由不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '申请理由不能为空', trigger: 'blur' }
           ]
         },
         severDataForm: { // 账号权限form
@@ -279,13 +257,19 @@
           approvalPeop: '',
           reason: ''
         },
-        tags: [
-          { name: '标签一', type: '' },
-          { name: '标签二', type: 'success' },
-          { name: '标签三', type: 'info' },
-          { name: '标签四', type: 'warning' },
-          { name: '标签五', type: 'danger' }
-        ],
+        severDataRule: {
+          name: [
+            { required: true, message: '标题不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ]
+        },
+        // tags: [
+        //   { name: '标签一', type: '' },
+        //   { name: '标签二', type: 'success' },
+        //   { name: '标签三', type: 'info' },
+        //   { name: '标签四', type: 'warning' },
+        //   { name: '标签五', type: 'danger' }
+        // ],
         dataFormValue: '',
         ruleTypeList: [],
         fatherData: {
@@ -315,9 +299,6 @@
     },
     components: {
     },
-    mounted () {
-      this.account()
-    },
     methods: {
       init (id, value) {
         this.dataForm.id = id || ''
@@ -325,38 +306,18 @@
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-          // accoutAuthInitInfo().then(({data}) => {
-          //   if (data && data.status === 0) {
-          //     this.ruleTypeList = data.data
-          //   }
-          // })
-          if (id) {
-            // const dataBody = {
-            //   utcParam: [id]
-            // }
-            // infoBeeTask(dataBody).then(({data}) => {
-            //   if (data && data.status === 0) {
-            //     this.dataForm.id = data.beeTaskDef.id
-            //     this.dataForm.name = data.beeTaskDef.name
-            //     this.dataForm.type = data.beeTaskDef.type
-            //     this.dataForm.description = data.beeTaskDef.description
-            //     this.dataForm.owner = data.beeTaskDef.owner
-            //     this.dataForm.user = data.beeTaskDef.user
-            //     this.dataForm.inputParams = data.beeTaskDef.inputParams
-            //     this.dataForm.outputParams = data.beeTaskDef.outputParams
-            //     this.dataForm.ownerApp = data.beeTaskDef.ownerApp
-            //     this.dataForm.remark = data.beeTaskDef.remark
-            //     this.fatherData = data[this.dataForm.type.toLowerCase()]
-            //   }
-            // })
-          }
+          accoutAuthInitInfo().then(({data}) => {
+            this.systemList = data.data.systemList
+            this.applyAuthList = data.data.applyAuthList
+            // this.moduleList = data.data.moduleList
+            this.defaultApproverList = data.data.defaultApproverList
+            this.department = data.data.department
+          })
         })
       },
-      // 获取账号初始化数据
-      account () {
-        accoutAuthInitInfo().then(({data}) => {
-          console.log(data, '获取初始化')
-        })
+      // 模块选择
+      handleChange (value) {
+        console.log(value)
       },
       // 任务类型
       clickType () {
@@ -390,6 +351,7 @@
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            console.log('准备提交了')
             // let newData = {
             //   'beeTaskDef': this.dataForm,
             //   ...data
