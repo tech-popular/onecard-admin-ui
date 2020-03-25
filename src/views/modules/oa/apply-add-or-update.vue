@@ -2,28 +2,28 @@
   <el-dialog :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-divider>请选择申请类别</el-divider>
     <el-tabs type="border-card">
-      <el-tab-pane label="用户管理">
+      <el-tab-pane label="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
           <el-form-item label="标题" prop="name">
             <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
             <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
           </el-form-item>
-          <el-form-item label="申请系统">
-            <el-radio-group v-model="dataForm.resource">
+          <el-form-item label="申请系统" prop="system">
+            <el-radio-group v-model="dataForm.system">
               <el-radio label="数据中台"></el-radio>
               <el-radio label="BI系统"></el-radio>
               <el-radio label="tableau"></el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="申请模块">
-            <el-select v-model="dataForm.region" placeholder="请选择活动区域">
+          <el-form-item label="申请模块" prop="model">
+            <el-select v-model="dataForm.model" placeholder="请选择活动区域">
               <el-option label="区域一" value="shanghai"></el-option>
               <el-option label="区域二" value="beijing"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="子模块">
-            <el-select v-model="dataForm.region" placeholder="请选择活动区域">
+          <el-form-item label="子模块" prop="chileModel">
+            <el-select v-model="dataForm.chileModel" placeholder="请选择活动区域">
               <el-option label="区域一" value="shanghai"></el-option>
               <el-option label="区域二" value="beijing"></el-option>
             </el-select>
@@ -38,48 +38,52 @@
               {{tag.name}}
             </el-tag>
           </el-form-item>
-          <el-form-item label="申请权限">
-            <el-checkbox-group v-model="dataForm.type">
+          <el-form-item label="申请权限" prop="jurisdiction">
+            <el-checkbox-group v-model="dataForm.jurisdiction">
               <el-checkbox label="新增" name="type"></el-checkbox>
               <el-checkbox label="修改" name="type"></el-checkbox>
               <el-checkbox label="删除" name="type"></el-checkbox>
               <el-checkbox label="查看" name="type"></el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="申请人姓名" prop="name">
+          <el-form-item label="申请人姓名" prop="userName">
+            <el-input v-model="dataForm.userName" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="dataForm.userName" v-else disabled placeholder="任务"/>
+          </el-form-item>
+          <el-form-item label="默认所属部门">
+            <el-input v-model="dataForm.defaultDepartment" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="dataForm.defaultDepartment" v-else disabled placeholder="任务"/>
+          </el-form-item>
+          <!-- <el-form-item label="申请人手机" prop="name">
             <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
             <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+          </el-form-item> -->
+          <el-form-item label="申请人邮箱" prop="email">
+            <el-input v-model="dataForm.email" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="dataForm.email" v-else disabled placeholder="任务"/>
           </el-form-item>
-          <el-form-item label="默认所属部门" prop="name">
+          <el-form-item label="本次申请默认审批人" prop="approvalPeop">
+            <el-input v-model="dataForm.approvalPeop" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="dataForm.approvalPeop" v-else disabled placeholder="任务"/>
+          </el-form-item>
+          <!-- <el-form-item label="抄送人" prop="name">
             <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
             <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
-          <el-form-item label="申请人手机" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
-          <el-form-item label="申请人邮箱" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
-          <el-form-item label="本次申请默认审批人" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
-          <el-form-item label="抄送人" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
-          <el-form-item label="申请理由">
-            <el-input type="textarea" v-model="dataForm.desc"></el-input>
+          </el-form-item> -->
+          <el-form-item label="申请理由" prop="reason">
+            <el-input type="textarea" v-model="dataForm.reason"></el-input>
           </el-form-item>
         </el-form>
+        <div class="foot">
+          <el-button @click="visible = false">取消</el-button>
+          <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+        </div>
       </el-tab-pane>
-      <el-tab-pane label="配置管理">
-         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+      <el-tab-pane label="库表授权">
+         <el-form :model="severDataForm" :rules="severDataRule" ref="severDataForm" label-width="20%">
           <el-form-item label="标题" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+            <el-input v-model="severDataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务"/>
           </el-form-item>
           <el-form-item label="">
           <p>选择要授权的库/表/字段</p>
@@ -169,7 +173,7 @@
           </el-row>
           </el-form-item>
           <el-form-item label="申请权限">
-            <el-checkbox-group v-model="dataForm.type">
+            <el-checkbox-group v-model="severDataForm.type">
               <el-checkbox label="新增" name="type"></el-checkbox>
               <el-checkbox label="修改" name="type"></el-checkbox>
               <el-checkbox label="删除" name="type"></el-checkbox>
@@ -177,72 +181,103 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item label="申请人姓名" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+            <el-input v-model="severDataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务"/>
           </el-form-item>
           <el-form-item label="默认所属部门" prop="name">
+            <el-input v-model="severDataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务"/>
+          </el-form-item>
+          <!-- <el-form-item label="申请人手机" prop="name">
             <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
             <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
-          <el-form-item label="申请人手机" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="申请人邮箱" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+            <el-input v-model="severDataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务"/>
           </el-form-item>
           <el-form-item label="本次申请默认审批人" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+            <el-input v-model="severDataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务"/>
           </el-form-item>
-          <el-form-item label="抄送人" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>
+          <!-- <el-form-item label="抄送人" prop="name">
+            <el-input v-model="severDataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务"/>
+          </el-form-item> -->
           <el-form-item label="申请理由">
-            <el-input type="textarea" v-model="dataForm.desc"></el-input>
+            <el-input type="textarea" v-model="severDataForm.desc"></el-input>
           </el-form-item>
         </el-form>
+        <!-- <div class="foot">
+          <el-button @click="visible = false">取消</el-button>
+          <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+        </div> -->
       </el-tab-pane>
     </el-tabs>
-   
-    <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-    </div>
-  </el-dialog>
+   </el-dialog>
 </template>
 
 <script>
-  // import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
-  // import Filter from './filter'
+  import { accoutAuthInitInfo, infoBeeTask, beeTask } from '@/api/oa/apply'
+  import Filter from './filter'
   export default {
     data () {
-      // var checkDecisionName = (rule, value, callback) => {
-      //   const nullValue = /^[^\s]+$/
-      //   if (!value) {
-      //     callback(new Error('请输入任务定义名称'))
-      //   }
-      //   if (!nullValue.test(value)) {
-      //     callback(new Error('不能输入含空格的任务定义名称'))
-      //   }
-      //   callback()
-      // }
       return {
         visible: false,
-        dataForm: {
-          id: '',
-          name: '', // 任务定义名称
-          region: '', // 模块
-          type: '', // 任务类型
-          description: '', // 任务描述
-          owner: '', // 任务归属
-          user: '', // 任务使用者
-          inputParams: '', // 入参数据的key的ID集合
-          outputParams: '', // 出参数据的key的ID集合
-          ownerApp: '', // 所属系统
-          remark: '' // 备注
+        dataForm: { // 账号权限form
+          name: '', // 账号权限标题
+          system: '',
+          model: '',
+          chileModel: '',
+          jurisdiction: '',
+          userName: '',
+          email: '',
+          approvalPeop: '',
+          reason: ''
+        },
+        dataRule: {
+          name: [
+            { required: true, message: '标题不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          system: [
+            { required: true, message: '请选择申请系统', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          model: [
+            { required: true, message: '请选择模块', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          chileModel: [
+            { required: true, message: '请选择子模块', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          jurisdiction: [
+            { required: true, message: '请选择申请权限', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          userName: [
+            { required: true, message: '申请人姓名不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          email: [
+            { required: true, message: '申请人邮箱不能为空', trigger: 'blur' }
+          ],
+          reason: [
+            { required: true, message: '申请理由不能为空', trigger: 'blur' },
+            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ]
+        },
+        severDataForm: { // 账号权限form
+          name: '', // 账号权限标题
+          system: '',
+          model: '',
+          chileModel: '',
+          jurisdiction: '',
+          userName: '',
+          email: '',
+          approvalPeop: '',
+          reason: ''
         },
         tags: [
           { name: '标签一', type: '' },
@@ -346,27 +381,6 @@
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            let data = {
-              'http': null,
-              'jdbc': null,
-              'kafka': null,
-              'cassandra': null,
-              'groovy': null,
-              'aviator': null,
-              'freemarker': null,
-              'hbase': null
-            }
-            if (form) {
-              for (let key in data) {
-                if (this.dataForm.type.toLowerCase() == key) {
-                  data[key] = form
-                }
-              }
-            }
-            this.dataForm = {
-              ...this.dataForm,
-              id: Number(this.dataForm.id)
-            }
             // let newData = {
             //   'beeTaskDef': this.dataForm,
             //   ...data
@@ -497,4 +511,7 @@
   }
 </script>
 <style scoped>
+.foot{
+  text-align: right;
+}
 </style>>
