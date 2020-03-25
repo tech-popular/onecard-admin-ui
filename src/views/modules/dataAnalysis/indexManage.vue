@@ -1,6 +1,9 @@
 <template>
   <div class="index-wrap">
     <el-form :inline="true" :model="dataForm" ref="dataForm">
+      <el-form-item label="指标ID">
+        <el-input v-model="dataForm.id" placeholder="" clearable />
+      </el-form-item>
       <el-form-item label="指标名称">
         <el-input v-model="dataForm.englishName" placeholder="" clearable />
       </el-form-item>
@@ -111,6 +114,7 @@
     data () {
       return {
         dataForm: {
+          id: '',
           englishName: '',
           chineseName: '',
           categoryId: null,
@@ -236,6 +240,7 @@
       resetHandle () {
         this.pageNum = 1
         this.dataForm = {
+          id: '',
           englishName: '',
           chineseName: '',
           categoryId: null,
