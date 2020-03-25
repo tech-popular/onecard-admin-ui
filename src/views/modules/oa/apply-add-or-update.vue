@@ -315,6 +315,9 @@
     },
     components: {
     },
+    mounted () {
+      this.account()
+    },
     methods: {
       init (id, value) {
         this.dataForm.id = id || ''
@@ -322,7 +325,7 @@
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-          // getBeeTaskTypeList().then(({data}) => {
+          // accoutAuthInitInfo().then(({data}) => {
           //   if (data && data.status === 0) {
           //     this.ruleTypeList = data.data
           //   }
@@ -347,6 +350,12 @@
             //   }
             // })
           }
+        })
+      },
+      // 获取账号初始化数据
+      account () {
+        accoutAuthInitInfo().then(({data}) => {
+          console.log(data, '获取初始化')
         })
       },
       // 任务类型
