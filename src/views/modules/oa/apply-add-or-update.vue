@@ -80,7 +80,7 @@
                     <el-col :span="10" style="padding:0;">
                       <el-form-item prop="selectDbName" style="margin: 0;">
                         <el-select v-model="staffTemp.project" placeholder="请选择数据库">
-                          <el-option>test_onecard</el-option>
+                          <el-option value="test_onecard" label="test_onecard">test_onecard</el-option>
                         </el-select>
                       </el-form-item>
                     </el-col>
