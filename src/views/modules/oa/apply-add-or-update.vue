@@ -361,16 +361,19 @@ export default {
       },
       staffList: [
         {
+          id: 1,
           db: '1',
           tableName: '1',
           keyName: '1'
         },
         {
+          id: 2,
           db: '2',
           tableName: '2',
           keyName: '2'
         },
         {
+          id: 3,
           db: '3',
           tableName: '3',
           keyName: '3'
@@ -475,14 +478,14 @@ export default {
     },
     // 将左边表格选择项存入staffData中
     handleStaffChange (rows) {
-      this.staffData = []
-      if (rows) {
-        rows.forEach(row => {
-          if (row) {
-            this.staffData.push(row)
-          }
-        })
-      }
+      this.staffData = rows
+      // if (rows) {
+      //   rows.forEach(row => {
+      //     if (row) {
+      //       this.staffData.push(row)
+      //     }
+      //   })
+      // }
     },
     // 左边表格选择项移到右边
     addStaff () {
@@ -491,27 +494,19 @@ export default {
         this.$refs['selectedStaffTable'].clearSelection()
       }, 0)
       let repeat = false
-      this.selectedStaffList.forEach(item => {
-        if (this.staffData[0] && item.phone === this.staffData[0].phone) {
-          repeat = true
-          alert('此员工已添加')
-        }
-      })
+      // this.selectedStaffList.forEach(item => {
+      //   if (this.staffData[0] && item.phone === this.staffData[0].phone) {
+      //     repeat = true
+      //     alert('此员工已添加')
+      //   }
+      // })
       if (repeat === false) {
-        this.staffData.forEach(item => {
-          this.selectedStaffList.push(item)
+        this.selectedStaffList = [...this.selectedStaffList, ...this.staffData]
+        this.staffList = this.staffList.filter((item) => {
+          let list = this.staffData.map(v => v.id)
+          return !list.includes(item.id)
         })
-        for (let i = 0; i < this.staffList.length; i++) {
-          for (let j = 0; j < this.staffData.length; j++) {
-            if (
-              this.staffList[i] &&
-              this.staffData[j] &&
-              this.staffList[i].phone === this.staffData[j].phone
-            ) {
-              this.staffList.splice(i, 1)
-            }
-          }
-        }
+        this.staffData = []
       }
     },
     // 右边表格选择项移到左边
@@ -520,31 +515,24 @@ export default {
         this.$refs['staffTable'].clearSelection()
         this.$refs['selectedStaffTable'].clearSelection()
       }, 0)
-      this.selectedStaffData.forEach(item => {
-        this.staffList.push(item)
+      this.staffList = [...this.staffList, ...this.selectedStaffData]
+      this.selectedStaffList = this.selectedStaffList.filter((item) => {
+        let list = this.selectedStaffData.map(v => v.id)
+        return !list.includes(item.id)
       })
-      for (let i = 0; i < this.selectedStaffList.length; i++) {
-        for (let j = 0; j < this.selectedStaffData.length; j++) {
-          if (
-            this.selectedStaffList[i] &&
-            this.selectedStaffData[j] &&
-            this.selectedStaffList[i].phone === this.selectedStaffData[j].phone
-          ) {
-            this.selectedStaffList.splice(i, 1)
-          }
-        }
-      }
+      this.selectedStaffData = []
     },
     // 将右边表格选择项存入selectedStaffData中
     handleSelectedStaffChange (rows) {
-      this.selectedStaffData = []
-      if (rows) {
-        rows.forEach(row => {
-          if (row) {
-            this.selectedStaffData.push(row)
-          }
-        })
-      }
+      this.selectedStaffData = rows
+      // this.selectedStaffData = []
+      // if (rows) {
+      //   rows.forEach(row => {
+      //     if (row) {
+      //       this.selectedStaffData.push(row)
+      //     }
+      //   })
+      // }
     },
     // 提交
     modifyStaff () {
