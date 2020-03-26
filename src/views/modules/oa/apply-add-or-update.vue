@@ -219,17 +219,17 @@ export default {
       totalPage: 0,
       visible: false,
       // 账号权限开始
-      systemList: [],
-      applyAuthList: [],
+      systemList: [], // 申请系统数据载体
+      applyAuthList: [], // 申请权限数据载体
       props: {
         multiple: true,
         value: 'id',
         label: 'name',
         children: 'children'
-      },
-      moduleList: [],
-      defaultApproverList: [],
-      department: '',
+      }, // 可多选申请模块
+      moduleList: [], // 申请模块数据载体
+      defaultApproverList: [], // 本次申请默认审批人数据载体
+      department: '', // 默认部门数据载体
       dataForm: {
         name: '', // 标题
         system: '',  // 申请系统
@@ -290,12 +290,12 @@ export default {
         reason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ]
-      },
+      }, // 库表权限表单校验
       dataFormValue: '',
       ruleTypeList: [],
-      severApplyAuthList: [],
-      severdefaultApproverList: [],
-      severdepartment: '',
+      severApplyAuthList: [], // 申请权限数据载体
+      severdefaultApproverList: [], // 本次申请默认审批人数据载体
+      severdepartment: '', // 默认部门数据载体
       fatherData: {
         enable: true,
         enableCache: 1,
@@ -303,6 +303,7 @@ export default {
         requestFieldType: 0,
         requestParamTemplateStatus: 0
       }, // 任务类型
+
       // 库表授权结束
       listLoading: false,
       staffTemp: {
