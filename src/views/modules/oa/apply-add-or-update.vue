@@ -28,6 +28,7 @@
               :options="moduleList"
               @change="handleChange"
               ref="all"
+
             ></el-cascader>
           </el-form-item>
           <el-form-item label="申请权限" prop="jurisdiction">
@@ -255,7 +256,12 @@ export default {
       visible: false,
       systemList: [],
       applyAuthList: [],
-      props: { multiple: true },
+      props: {
+        multiple: true,
+        value: 'id',
+        label: 'name',
+        children: 'children'
+      },
       moduleList: [
         {
           value: 'zhinan',
@@ -399,9 +405,11 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         accoutAuthInitInfo().then(({ data }) => {
+          console.log(data.data.moduleList, 'mokuai')
+
           this.systemList = data.data.systemList
           this.applyAuthList = data.data.applyAuthList
-          // this.moduleList = data.data.moduleList
+          this.moduleList = data.data.moduleList
           this.defaultApproverList = data.data.defaultApproverList
           this.department = data.data.department
         })
