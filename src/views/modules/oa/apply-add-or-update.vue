@@ -98,8 +98,8 @@
                 <el-button type="primary" @click="getStaffList">查找</el-button>
               </el-form-item>
             </el-form>
-            <el-row :gutter="20">
-              <el-col :span="8">
+            <el-row :gutter="24">
+              <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
                 <el-table
                   ref="staffTable"
                   v-loading="listLoading"
@@ -135,14 +135,14 @@
                   :page-sizes="[5, 10, 15, 20]"
                   :page-size="pageSize"
                   :total="totalPage"
-                  layout="total, sizes, prev, pager, next, jumper"
+                  layout="total, prev, pager, next, jumper"
                 />
               </el-col>
               <el-col :span="2" style="text-align:center;padding-top:10%">
                 <el-button @click="addStaff" type="primary" size="mini" style="padding: 5px;">添加<i class="el-icon-arrow-right"></i></el-button>
                 <el-button @click="removeStaff" type="danger" size="mini" style="padding: 5px;margin-left: 0;margin-top: 10px;"><i class="el-icon-arrow-left"></i>删除</el-button>
               </el-col>
-              <el-col :span="8">
+              <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
                 <el-table
                   ref="selectedStaffTable"
                   v-loading="listLoading"
