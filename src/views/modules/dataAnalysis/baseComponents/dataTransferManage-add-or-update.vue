@@ -512,7 +512,7 @@
               out.push(item.fieldCode + '-' + item.fieldId)
               this.outParams.push({value: item.fieldCode, id: item.fieldId, sourceTable: item.sourceTable})
             })
-            this.baseForm.outParams = out
+            this.baseForm.outParams = Array.from(new Set(out))
             this.outParamsList = this.updateOutParamsList(outList)
             this.$nextTick(() => {
               this.loading = false
@@ -604,7 +604,7 @@
         postData.taskDescribtion = data.taskDescribtion
         postData.outParams = outParams
         postData.datasourceParams = []
-        if (data.kafkaServer != '') {
+        if (data.kafkaServer != '' && data.transferType.includes('kafka')) {
           let tempServer = {
             type: 'kafka',
             id: data.kafkaServer,
@@ -612,7 +612,7 @@
           }
           postData.datasourceParams.push(tempServer)
         }
-        if (data.mysqlServer != '') {
+        if (data.mysqlServer != '' && data.transferType.includes('mysql')) {
           let tempServer = {
             type: 'mysql',
             id: data.mysqlServer

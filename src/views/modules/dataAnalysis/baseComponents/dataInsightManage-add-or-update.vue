@@ -73,16 +73,9 @@
       <div class="pane-reject">
         <h3>
           剔除用户名单
-          <!-- <el-tooltip placement="top">
-            <div slot="content">当判断指定用户是否在此分群时，不进行剔除名单过滤</div>
-            <i class="el-icon-warning cursor-pointer"></i>
-          </el-tooltip> -->
         </h3>
         <div>
-          <!-- <el-checkbox-group v-model="vestPackCode">
-            <el-checkbox v-for="(item, index) in vestPackList" :label="item.value" :key="index">{{item.text}}</el-checkbox>
-          </el-checkbox-group> -->
-          <el-form label-width="80px" :model="rejectForm" ref="baseForm">
+          <el-form label-width="80px" :model="rejectForm">
             <el-form-item label="分群包：">
               <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
                 <el-option
@@ -141,14 +134,6 @@ export default {
       indexList: [],
       expression: '',
       expressionTemplate: '',
-      // initFieldType: '',
-      // initDataStandar: '',
-      // initFieldCode: '',
-      // initSourceTable: '',
-      // initFieldId: '',
-      // initEnumTypeNum: '',
-      // initSelectOperateList: [],
-      // initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
       fileData: {
@@ -156,7 +141,6 @@ export default {
       },
       excelFile: '',
       templateUrl: templateDownload,
-      // vestPackCode: [],
       vestPackList: [],
       custerNameList: [],
       baseForm: {
@@ -389,23 +373,6 @@ export default {
       })
       return arr
     },
-    // getInitTypeCode (arr) { // 获取初始选项及id, 为初始化数据做准备
-    //   arr.forEach((item, index) => {
-    //     if (index === 0) {
-    //       if (item.fieldType) {
-    //         this.initFieldType = item.fieldType // item.fieldType
-    //         this.initFieldCode = item.id // item.englishName
-    //         this.initDataStandar = item.dataStandar
-    //         this.initEnumTypeNum = item.enumTypeNum
-    //         this.initSourceTable = item.sourceTable
-    //         this.initFieldId = item.fieldId
-    //         this.initEnglishName = item.englishName
-    //       } else {
-    //         this.getInitTypeCode(item.children)
-    //       }
-    //     }
-    //   })
-    // },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata().then(({data}) => {
         if (data.status !== '1') {
@@ -413,10 +380,6 @@ export default {
         } else {
           this.indexList = this.filterAllCata(data.data)
         }
-        // this.getInitTypeCode(this.indexList)
-        // this.getSelectOperateList(this.initFieldType, (selectOperateList) => {
-        //   this.initSelectOperateList = selectOperateList
-        // })
         if (fn) {
           fn(this.indexList)
         }
@@ -460,24 +423,6 @@ export default {
       }
     },
     getRuleTemplateItem (index) { // 条件模板
-      // return {
-      //   'type': 'rule',
-      //   'fieldType': this.initFieldType,
-      //   'fieldCode': this.initFieldCode,
-      //   'format': this.initDataStandar,
-      //   'func': this.initSelectOperateList[0].code,
-      //   'sourceTable': this.initSourceTable,
-      //   'fieldId': this.initFieldId,
-      //   'englishName': this.initEnglishName,
-      //   'indexList': this.indexList, // 指标下拉选
-      //   'enumTypeNum': '',
-      //   'selectOperateList': this.initSelectOperateList, // 操作符下拉选
-      //   'selectEnumsList': [], // 内容下拉选
-      //   'params': [{
-      //     value: '',
-      //     title: ''
-      //   }]
-      // }
       return {
         'type': 'rule',
         'fieldType': '',
@@ -781,11 +726,11 @@ export default {
         this.baseForm.name = '复制' + this.baseForm.name
         this.id = ''
         this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+      }).catch(() => {
+        console.log('取消')
       })
     },
     saveHandle (type) {
-      console.log(this.ruleConfig)
-      // console.log(this.vestPackCode, this.vestPackCode.length)
       if (this.baseForm.userType === 'excel') {
         if (!this.excelFile) {
           this.$message({
@@ -866,11 +811,11 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
-          let flag = 0
+          let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
-            flag = 1
+            code = 1
           }
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm, rejectGroupPackCode: flag }
+          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm, rejectGroupPackCode: code }
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
