@@ -151,6 +151,7 @@
                 <el-button @click="removeStaff" type="danger" size="mini" style="padding: 5px;margin-left: 0;margin-top: 10px;"><i class="el-icon-arrow-left"></i>删除</el-button>
               </el-col>
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
+                <p>已确认选择要授权的库/表/字段</p>
                 <el-table
                   ref="selectedStaffTable"
                   v-loading="listLoading"
