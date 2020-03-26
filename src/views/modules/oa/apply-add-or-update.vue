@@ -90,15 +90,14 @@
                   <el-row :gutter="24" style="padding:5px;">
                     <el-col :span="10" style="padding:0;">
                       <el-form-item prop="selectDbName" style="margin: 0;">
-                        <el-select v-model="staffTemp.selectDbName" placeholder="请选择数据库">
-                          <el-option>db</el-option>
-                          <el-option>redis</el-option>
+                        <el-select v-model="staffTemp.project" placeholder="请选择数据库">
+                          <el-option>test_onecard</el-option>
                         </el-select>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" style="padding:0;">
                       <el-form-item style="margin: 0;">
-                        <el-input v-model="staffTemp.inputDbName" placeholder="请输入名称"></el-input>
+                        <el-input v-model="staffTemp.name" placeholder="请输入名称"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="2" style="padding:0;">
@@ -121,17 +120,17 @@
                   <el-table-column type="selection" :reserve-selection="true" width="55"></el-table-column>
                   <el-table-column label="数据库" align="center">
                     <template slot-scope="{row}">
-                      <span>{{ row.db }}</span>
+                      <span>{{ row.project }}</span>
                     </template>
                   </el-table-column>
                   <el-table-column label="表名称" align="center">
                     <template slot-scope="{row}">
-                      <span>{{ row.tableName }}</span>
+                      <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
                   <el-table-column label="字段名称" align="center">
                     <template slot-scope="{row}">
-                      <span>{{ row.keyName }}</span>
+                      <span>{{ row.owner }}</span>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -139,11 +138,12 @@
                 <el-pagination
                   @size-change="sizeChangeHandle"
                   @current-change="currentChangeHandle"
-                  :current-page="pageNum"
+                  :current-page="staffTemp.pageNum"
                   :page-sizes="[5, 10, 15, 20]"
-                  :page-size="pageSize"
+                  :page-size="staffTemp.pageSize"
                   :total="totalPage"
-                  layout="total, prev, pager, next, jumper"
+                  :small="true"
+                  layout="total, prev, pager, next"
                 />
               </el-col>
               <el-col :span="2" style="text-align:center;padding-top:10%">
@@ -164,18 +164,18 @@
                   <el-table-column type="selection" :reserve-selection="true" width="55"></el-table-column>
                   <el-table-column label="数据库" align="center">
                     <template slot-scope="{row}">
-                      <span>{{ row.db }}</span>
+                      <span>{{ row.project }}</span>
                     </template>
                   </el-table-column>
 
                   <el-table-column label="表名称" align="center">
                     <template slot-scope="{row}">
-                      <span>{{ row.tableName }}</span>
+                      <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
                   <el-table-column label="字段名称" align="center">
                     <template slot-scope="{row}">
-                      <span>{{ row.keyName }}</span>
+                      <span>{{ row.owner }}</span>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -183,7 +183,7 @@
             </el-row>
           </el-form-item>
           <el-form-item label="申请权限">
-            <el-checkbox-group v-model="severDataForm.type">
+            <el-checkbox-group v-model="severDataForm.jurisdiction">
               <el-checkbox label="新增" name="type"></el-checkbox>
               <el-checkbox label="修改" name="type"></el-checkbox>
               <el-checkbox label="删除" name="type"></el-checkbox>
@@ -192,42 +192,42 @@
           </el-form-item>
           <el-form-item label="申请人姓名" prop="name">
             <el-input
-              v-model="severDataForm.name"
+              v-model="severDataForm.userName"
               onkeyup="this.value=this.value.replace(/\s+/g,'')"
               v-if="!dataFormValue"
-              placeholder="任务"
+              placeholder="申请人姓名"
             />
-            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
+            <el-input v-model="severDataForm.userName" v-else disabled placeholder="申请人姓名" />
           </el-form-item>
           <el-form-item label="默认所属部门" prop="name">
             <el-input
-              v-model="severDataForm.name"
+              v-model="severDataForm.department"
               onkeyup="this.value=this.value.replace(/\s+/g,'')"
               v-if="!dataFormValue"
-              placeholder="任务"
+              placeholder="默认所属部门"
             />
-            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
+            <el-input v-model="severDataForm.department" v-else disabled placeholder="默认所属部门" />
           </el-form-item>
           <el-form-item label="申请人邮箱" prop="name">
             <el-input
-              v-model="severDataForm.name"
+              v-model="severDataForm.email"
               onkeyup="this.value=this.value.replace(/\s+/g,'')"
               v-if="!dataFormValue"
-              placeholder="任务"
+              placeholder="申请人邮箱"
             />
-            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
+            <el-input v-model="severDataForm.email" v-else disabled placeholder="申请人邮箱" />
           </el-form-item>
           <el-form-item label="本次申请默认审批人" prop="name">
             <el-input
-              v-model="severDataForm.name"
+              v-model="severDataForm.approvalPeop"
               onkeyup="this.value=this.value.replace(/\s+/g,'')"
               v-if="!dataFormValue"
-              placeholder="任务"
+              placeholder="本次申请默认审批人"
             />
-            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
+            <el-input v-model="severDataForm.approvalPeop" v-else disabled placeholder="本次申请默认审批人" />
           </el-form-item>
           <el-form-item label="申请理由">
-            <el-input type="textarea" v-model="severDataForm.desc"></el-input>
+            <el-input type="textarea" v-model="severDataForm.reason"></el-input>
           </el-form-item>
         </el-form>
         <div class="foot">
@@ -240,13 +240,11 @@
 </template>
 
 <script>
-import { accoutAuthInitInfo } from '@/api/oa/apply'
+import { accoutAuthInitInfo, getListOnPage } from '@/api/oa/apply'
 // import Filter from './filter'
 export default {
   data () {
     return {
-      pageNum: 1, // 当前页
-      pageSize: 5, // 默认每页10条
       totalPage: 0,
 
       visible: false,
@@ -347,31 +345,12 @@ export default {
       },
       listLoading: false,
       staffTemp: {
-        phone: '',
-        staffTypeId: '',
-        selectDbName: '',
-        inputDbName: ''
+        project: 'test_onecard',
+        pageSize: 5,
+        pageNum: 1,
+        name: ''
       },
-      staffList: [
-        {
-          id: 1,
-          db: '1',
-          tableName: '1',
-          keyName: '1'
-        },
-        {
-          id: 2,
-          db: '2',
-          tableName: '2',
-          keyName: '2'
-        },
-        {
-          id: 3,
-          db: '3',
-          tableName: '3',
-          keyName: '3'
-        }
-      ],
+      staffList: [],
       selectedStaffList: [],
       staffData: [],
       selectedStaffData: [],
@@ -384,6 +363,9 @@ export default {
     }
   },
   components: {},
+  mounted () {
+    this.getStaffList()
+  },
   methods: {
     init (id, value) {
       this.dataForm.id = id || ''
@@ -491,23 +473,16 @@ export default {
     },
     // 穿梭狂部分
     getStaffList () {
-      // fetchStaffList(this.staffTemp).then(res => {
-      //   if (res.value.staff.length === 0) {
-      //     alert('查无此人')
-      //   }
-      //   this.staffList = res.value.staff
-      // })
+      getListOnPage(this.staffTemp).then(({data}) => {
+        if (data.status == '1') {
+          this.totalPage = data.data.total
+          this.staffList = data.data.rows
+        }
+      })
     },
     // 将左边表格选择项存入staffData中
     handleStaffChange (rows) {
       this.staffData = rows
-      // if (rows) {
-      //   rows.forEach(row => {
-      //     if (row) {
-      //       this.staffData.push(row)
-      //     }
-      //   })
-      // }
     },
     // 左边表格选择项移到右边
     addStaff () {
@@ -525,8 +500,8 @@ export default {
       if (repeat === false) {
         this.selectedStaffList = [...this.selectedStaffList, ...this.staffData]
         this.staffList = this.staffList.filter((item) => {
-          let list = this.staffData.map(v => v.id)
-          return !list.includes(item.id)
+          let list = this.staffData.map(v => v.owner)
+          return !list.includes(item.owner)
         })
         this.staffData = []
       }
@@ -539,22 +514,14 @@ export default {
       }, 0)
       this.staffList = [...this.staffList, ...this.selectedStaffData]
       this.selectedStaffList = this.selectedStaffList.filter((item) => {
-        let list = this.selectedStaffData.map(v => v.id)
-        return !list.includes(item.id)
+        let list = this.selectedStaffData.map(v => v.owner)
+        return !list.includes(item.owner)
       })
       this.selectedStaffData = []
     },
     // 将右边表格选择项存入selectedStaffData中
     handleSelectedStaffChange (rows) {
       this.selectedStaffData = rows
-      // this.selectedStaffData = []
-      // if (rows) {
-      //   rows.forEach(row => {
-      //     if (row) {
-      //       this.selectedStaffData.push(row)
-      //     }
-      //   })
-      // }
     },
     // 提交
     modifyStaff () {
@@ -578,13 +545,13 @@ export default {
       }
     },
     sizeChangeHandle (val) {
-      this.pageSize = val
-      this.pageNum = 1
+      this.staffTemp.pageSize = val
+      this.staffTemp.pageNum = 1
       this.getStaffList()
     },
       // 当前页
     currentChangeHandle (val) {
-      this.pageNum = val
+      this.staffTemp.pageNum = val
       this.getStaffList()
     }
   }
