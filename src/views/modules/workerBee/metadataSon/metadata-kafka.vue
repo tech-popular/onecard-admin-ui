@@ -36,6 +36,7 @@
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           requestFields: [
+            { required: true, message: '请输入请求参数的fieldId数组', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         }
