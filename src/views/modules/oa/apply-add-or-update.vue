@@ -82,10 +82,10 @@
             />
             <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
           </el-form-item>
-          <el-form-item label='选择要授权的库/表/字段'>
+          <el-form-item label='选择要授权的库/表/字段' prop="selectDbName">
             <!-- <p>选择要授权的库/表/字段</p> -->
             <el-form :inline="true" :model="staffTemp" size="mini">
-              <el-form-item>
+              <el-form-item prop="selectDbName">
                 <el-select v-model="staffTemp.selectDbName" placeholder="请选择数据库">
                   <el-option>db</el-option>
                   <el-option>redis</el-option>
@@ -199,10 +199,6 @@
             />
             <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
           </el-form-item>
-          <!-- <el-form-item label="申请人手机" prop="name">
-            <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>-->
           <el-form-item label="申请人邮箱" prop="name">
             <el-input
               v-model="severDataForm.name"
@@ -221,18 +217,14 @@
             />
             <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
           </el-form-item>
-          <!-- <el-form-item label="抄送人" prop="name">
-            <el-input v-model="severDataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务"/>
-          </el-form-item>-->
           <el-form-item label="申请理由">
             <el-input type="textarea" v-model="severDataForm.desc"></el-input>
           </el-form-item>
         </el-form>
-        <!-- <div class="foot">
+        <div class="foot">
           <el-button @click="visible = false">取消</el-button>
-          <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-        </div>-->
+          <el-button type="primary" @click="severDataFormSubmit()">确定</el-button>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </el-dialog>
@@ -240,7 +232,7 @@
 
 <script>
 import { accoutAuthInitInfo } from '@/api/oa/apply'
-import Filter from './filter'
+// import Filter from './filter'
 export default {
   data () {
     return {
@@ -315,9 +307,9 @@ export default {
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ]
       },
-      severDataForm: {
-        // 账号权限form
-        name: '', // 账号权限标题
+      severDataForm: { // 库表权限form
+        name: '', // 库表权限标题
+        selectDbName: '',
         system: '',
         model: '',
         chileModel: '',
@@ -329,21 +321,12 @@ export default {
       },
       severDataRule: {
         name: [
-          { required: true, message: '标题不能为空', trigger: 'blur' },
-          {
-            required: true,
-            validator: Filter.NullKongGeRule,
-            trigger: 'change'
-          }
+          { required: true, message: '标题不能为空', trigger: 'blur' }
+        ],
+        selectDbName: [
+          { required: true, message: '请选择库表', trigger: 'blur' }
         ]
       },
-      // tags: [
-      //   { name: '标签一', type: '' },
-      //   { name: '标签二', type: 'success' },
-      //   { name: '标签三', type: 'info' },
-      //   { name: '标签四', type: 'warning' },
-      //   { name: '标签五', type: 'danger' }
-      // ],
       dataFormValue: '',
       ruleTypeList: [],
       fatherData: {
@@ -443,8 +426,35 @@ export default {
       }
       this.visible = data
     },
-    dataFormSubmit (form) {
+    dataFormSubmit (form) {  // 账号权限提交
       this.$refs['dataForm'].validate(valid => {
+        if (valid) {
+          console.log('准备提交了')
+          // let newData = {
+          //   'beeTaskDef': this.dataForm,
+          //   ...data
+          // }
+          // beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
+          //   if (data && data.status === 0) {
+          //     this.$message({
+          //       message: '操作成功',
+          //       type: 'success',
+          //       duration: 1500,
+          //       onClose: () => {
+          //         this.visible = false
+          //         this.$emit('refreshDataList')
+          //         this.$refs['dataForm'].resetFields()
+          //       }
+          //     })
+          //   } else {
+          //     this.$message.error(data.msg)
+          //   }
+          // })
+        }
+      })
+    },
+    severDataFormSubmit (form) {  // 库表授权提交
+      this.$refs['severDataForm'].validate(valid => {
         if (valid) {
           console.log('准备提交了')
           // let newData = {
