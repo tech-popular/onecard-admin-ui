@@ -67,20 +67,9 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="库表授权">
-        <el-form
-          :model="severDataForm"
-          :rules="severDataRule"
-          ref="severDataForm"
-          label-width="160px"
-        >
+        <el-form :model="severDataForm" :rules="severDataRule" ref="severDataForm" label-width="160px">
           <el-form-item label="标题" prop="name">
-            <el-input
-              v-model="severDataForm.name"
-              onkeyup="this.value=this.value.replace(/\s+/g,'')"
-              v-if="!dataFormValue"
-              placeholder="任务"
-            />
-            <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
+            <el-input v-model="severDataForm.name" placeholder="标题" />
           </el-form-item>
           <el-form-item label='选择要授权的库/表/字段'>
             <!-- <p>选择要授权的库/表/字段</p> -->
@@ -182,51 +171,33 @@
               </el-col>
             </el-row>
           </el-form-item>
-          <el-form-item label="申请权限">
+          <el-form-item label="申请权限" prop="jurisdiction">
             <el-checkbox-group v-model="severDataForm.jurisdiction">
-              <el-checkbox label="新增" name="type"></el-checkbox>
-              <el-checkbox label="修改" name="type"></el-checkbox>
-              <el-checkbox label="删除" name="type"></el-checkbox>
-              <el-checkbox label="查看" name="type"></el-checkbox>
+              <el-checkbox
+                v-for="(item, index) in severApplyAuthList"
+                :label="item.id"
+                :key="index"
+              >{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="申请人姓名" prop="name">
-            <el-input
-              v-model="severDataForm.userName"
-              onkeyup="this.value=this.value.replace(/\s+/g,'')"
-              v-if="!dataFormValue"
-              placeholder="申请人姓名"
-            />
-            <el-input v-model="severDataForm.userName" v-else disabled placeholder="申请人姓名" />
+          <el-form-item label="申请人姓名" prop="userName">
+            <el-input v-model="severDataForm.userName" placeholder="申请人姓名" />
           </el-form-item>
-          <el-form-item label="默认所属部门" prop="name">
-            <el-input
-              v-model="severDataForm.department"
-              onkeyup="this.value=this.value.replace(/\s+/g,'')"
-              v-if="!dataFormValue"
-              placeholder="默认所属部门"
-            />
-            <el-input v-model="severDataForm.department" v-else disabled placeholder="默认所属部门" />
+          <el-form-item label="默认所属部门">
+            <span>{{department}}</span>
           </el-form-item>
-          <el-form-item label="申请人邮箱" prop="name">
-            <el-input
-              v-model="severDataForm.email"
-              onkeyup="this.value=this.value.replace(/\s+/g,'')"
-              v-if="!dataFormValue"
-              placeholder="申请人邮箱"
-            />
-            <el-input v-model="severDataForm.email" v-else disabled placeholder="申请人邮箱" />
+          <el-form-item label="申请人邮箱" prop="email">
+            <el-input v-model="severDataForm.email" placeholder="申请人邮箱" />
           </el-form-item>
-          <el-form-item label="本次申请默认审批人" prop="name">
-            <el-input
-              v-model="severDataForm.approvalPeop"
-              onkeyup="this.value=this.value.replace(/\s+/g,'')"
-              v-if="!dataFormValue"
-              placeholder="本次申请默认审批人"
-            />
-            <el-input v-model="severDataForm.approvalPeop" v-else disabled placeholder="本次申请默认审批人" />
+          <el-form-item label="本次申请默认审批人">
+            <el-tag
+              style="margin-left:10px;"
+              v-for="tag in severdefaultApproverList"
+              :key="tag.name"
+              :type="tag.name"
+            >{{tag.name}}</el-tag>
           </el-form-item>
-          <el-form-item label="申请理由">
+          <el-form-item label="申请理由" prop="reason">
             <el-input type="textarea" v-model="severDataForm.reason"></el-input>
           </el-form-item>
         </el-form>
@@ -240,14 +211,14 @@
 </template>
 
 <script>
-import { accoutAuthInitInfo, getListOnPage } from '@/api/oa/apply'
+import { accoutAuthInitInfo, getListOnPage, databaseInitInfo } from '@/api/oa/apply'
 // import Filter from './filter'
 export default {
   data () {
     return {
       totalPage: 0,
-
       visible: false,
+      // 账号权限开始
       systemList: [],
       applyAuthList: [],
       props: {
@@ -256,50 +227,56 @@ export default {
         label: 'name',
         children: 'children'
       },
-      moduleList: [
-        {
-          value: 'zhinan',
-          label: '指南',
-          children: [
-            {
-              value: 'shejiyuanze',
-              label: '设计原则'
-            }
-          ]
-        },
-        {
-          value: 'shijian',
-          label: '时间',
-          children: [
-            {
-              value: 'shijiandian',
-              label: '时间点'
-            }
-          ]
-        }
-      ],
+      moduleList: [],
       defaultApproverList: [],
       department: '',
       dataForm: {
-        // 账号权限form
-        name: '', // 账号权限标题
-        system: '',
-        model: '',
-        chileModel: '',
-        jurisdiction: '',
-        userName: '',
-        email: '',
-        approvalPeop: '',
-        reason: ''
-      },
+        name: '', // 标题
+        system: '',  // 申请系统
+        model: '', // 申请模块
+        jurisdiction: '', // 申请权限
+        userName: '', // 申请人姓名
+        email: '', // 申请人邮箱
+        approvalPeop: '', // 本次申请默认审批人
+        reason: '' // 申请理由
+      }, // 账号权限form
       dataRule: {
         name: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
         system: [
           { required: true, message: '请选择申请系统', trigger: 'blur' }
         ],
         model: [{ required: true, message: '请选择模块', trigger: 'blur' }],
-        chileModel: [
-          { required: true, message: '请选择子模块', trigger: 'blur' }
+        jurisdiction: [
+          { required: true, message: '请选择申请权限', trigger: 'blur' }
+        ],
+        userName: [
+          { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '申请人邮箱不能为空', trigger: 'blur' }
+        ],
+        reason: [
+          { required: true, message: '申请理由不能为空', trigger: 'blur' }
+        ]
+      }, // 账号权限form 表单校验
+      // 账号权限结束
+
+      // 库表授权开始
+      severDataForm: {
+        name: '', // 库表权限标题
+        selectDbName: '', // 请选择数据库
+        jurisdiction: '', // 申请权限
+        userName: '', // 申请人姓名
+        email: '', // 申请人邮箱
+        approvalPeop: '', // 默认审批人
+        reason: '' // 申请理由
+      },
+      severDataRule: {
+        name: [
+          { required: true, message: '标题不能为空', trigger: 'blur' }
+        ],
+        selectDbName: [
+          { required: true, message: '请选择库表', trigger: 'blur' }
         ],
         jurisdiction: [
           { required: true, message: '请选择申请权限', trigger: 'blur' }
@@ -314,35 +291,19 @@ export default {
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ]
       },
-      severDataForm: { // 库表权限form
-        name: '', // 库表权限标题
-        selectDbName: '',
-        system: '',
-        model: '',
-        chileModel: '',
-        jurisdiction: '',
-        userName: '',
-        email: '',
-        approvalPeop: '',
-        reason: ''
-      },
-      severDataRule: {
-        name: [
-          { required: true, message: '标题不能为空', trigger: 'blur' }
-        ],
-        selectDbName: [
-          { required: true, message: '请选择库表', trigger: 'blur' }
-        ]
-      },
       dataFormValue: '',
       ruleTypeList: [],
+      severApplyAuthList: [],
+      severdefaultApproverList: [],
+      severdepartment: '',
       fatherData: {
         enable: true,
         enableCache: 1,
         parsTemplate: false,
         requestFieldType: 0,
         requestParamTemplateStatus: 0
-      },
+      }, // 任务类型
+      // 库表授权结束
       listLoading: false,
       staffTemp: {
         project: 'test_onecard',
@@ -374,13 +335,18 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         accoutAuthInitInfo().then(({ data }) => {
-          console.log(data.data.moduleList, 'mokuai')
-
+          console.log(data, 'zhanghao')
           this.systemList = data.data.systemList
           this.applyAuthList = data.data.applyAuthList
           this.moduleList = data.data.moduleList
           this.defaultApproverList = data.data.defaultApproverList
           this.department = data.data.department
+        })
+        databaseInitInfo().then(({data}) => {
+          console.log(data, 'ku')
+          this.severApplyAuthList = data.data.applyAuthList
+          this.severdefaultApproverList = data.data.defaultApproverList
+          this.severdepartment = data.data.department
         })
       })
     },
