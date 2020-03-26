@@ -82,24 +82,32 @@
             />
             <el-input v-model="severDataForm.name" v-else disabled placeholder="任务" />
           </el-form-item>
-          <el-form-item label='选择要授权的库/表/字段' prop="selectDbName">
+          <el-form-item label='选择要授权的库/表/字段'>
             <!-- <p>选择要授权的库/表/字段</p> -->
-            <el-form :inline="true" :model="staffTemp" size="mini">
-              <el-form-item prop="selectDbName">
-                <el-select v-model="staffTemp.selectDbName" placeholder="请选择数据库">
-                  <el-option>db</el-option>
-                  <el-option>redis</el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item>
-                <el-input v-model="staffTemp.inputDbName" placeholder="请输入名称"></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="getStaffList">查找</el-button>
-              </el-form-item>
-            </el-form>
             <el-row :gutter="24">
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
+                <el-form :inline="true" :model="staffTemp" size="mini">
+                  <el-row :gutter="24" style="padding:5px;">
+                    <el-col :span="10" style="padding:0;">
+                      <el-form-item prop="selectDbName" style="margin: 0;">
+                        <el-select v-model="staffTemp.selectDbName" placeholder="请选择数据库">
+                          <el-option>db</el-option>
+                          <el-option>redis</el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="10" style="padding:0;">
+                      <el-form-item style="margin: 0;">
+                        <el-input v-model="staffTemp.inputDbName" placeholder="请输入名称"></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="2" style="padding:0;">
+                      <el-form-item style="margin: 0;">
+                        <el-button type="primary" @click="getStaffList">查找</el-button>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                </el-form>
                 <el-table
                   ref="staffTable"
                   v-loading="listLoading"
