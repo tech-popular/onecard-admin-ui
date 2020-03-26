@@ -99,7 +99,7 @@
               </el-form-item>
             </el-form>
             <el-row :gutter="20">
-              <el-col :span="11">
+              <el-col :span="8">
                 <el-table
                   ref="staffTable"
                   v-loading="listLoading"
@@ -108,6 +108,7 @@
                   fit
                   highlight-current-row
                   @selection-change="handleStaffChange"
+                  style="min-height:300px"
                 >
                   <el-table-column type="selection" :reserve-selection="true" width="55"></el-table-column>
                   <el-table-column label="数据库" align="center">
@@ -115,7 +116,6 @@
                       <span>{{ row.db }}</span>
                     </template>
                   </el-table-column>
-
                   <el-table-column label="表名称" align="center">
                     <template slot-scope="{row}">
                       <span>{{ row.tableName }}</span>
@@ -138,16 +138,11 @@
                   layout="total, sizes, prev, pager, next, jumper"
                 />
               </el-col>
-              <el-col :span="2" style="text-align:center;">
-                <el-button @click="addStaff" type="primary" size="mini">添加</el-button>
-                <el-button
-                  @click="removeStaff"
-                  type="danger"
-                  size="mini"
-                  style="margin-left: 0;margin-top: 10px;"
-                >删除</el-button>
+              <el-col :span="2" style="text-align:center;padding-top:10%">
+                <el-button @click="addStaff" type="primary" size="mini" style="padding: 5px;">添加<i class="el-icon-arrow-right"></i></el-button>
+                <el-button @click="removeStaff" type="danger" size="mini" style="padding: 5px;margin-left: 0;margin-top: 10px;"><i class="el-icon-arrow-left"></i>删除</el-button>
               </el-col>
-              <el-col :span="11">
+              <el-col :span="8">
                 <el-table
                   ref="selectedStaffTable"
                   v-loading="listLoading"
