@@ -42,8 +42,8 @@ export default {
   data () {
     const generateData = _ => {
       const data = []
-      const cities = ['上海', '北京', '广州', '深圳', '南京', '西安', '成都', '南京', '西安', '成都']
-      const pinyin = ['shanghai', 'beijing', 'guangzhou', 'shenzhen', 'nanjing', 'xian', 'chengdu', 'nanjing', 'xian', 'chengdu']
+      const cities = ['上海', '北京', '广州']
+      const pinyin = ['shanghai', 'beijing', 'guangzhou']
       cities.forEach((city, index) => {
         data.push({
           label: city,

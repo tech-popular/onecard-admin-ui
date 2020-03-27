@@ -9,6 +9,7 @@
       :default-checked="leftDefaultChecked"
       :title-flag="leftTitleFlag"
       :filterable="leftFilter"
+      :isLeft="true"
       :isCheckList="isLeftCheckList"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
       @checked-change="onSourceCheckedChange">
@@ -212,8 +213,8 @@
       },
       manualInput (val) {
         console.log(this.leftChecked, this.data)
-        if (!this.leftChecked.includes('m')) {
-          this.leftChecked.push('m')
+        if (!this.leftChecked.includes('manual_' + val)) {
+          this.leftChecked.push('manual_' + val)
         }
       }
     },
@@ -228,12 +229,14 @@
       },
 
       onSourceCheckedChange (val, movedKeys) {
+        console.log(888, val, movedKeys)
         this.leftChecked = val
         if (movedKeys === undefined) return
         this.$emit('left-check-change', val, movedKeys)
       },
 
       onTargetCheckedChange (val, movedKeys) {
+        console.log('88800', val)
         this.rightChecked = val
         if (movedKeys === undefined) return
         this.$emit('right-check-change', val, movedKeys)
@@ -241,6 +244,7 @@
 
       addToLeft () {
         let currentValue = this.value.slice()
+        console.log(this.rightChecked)
         this.rightChecked.forEach(item => {
           const index = currentValue.indexOf(item)
           if (index > -1) {
@@ -255,6 +259,17 @@
         let currentValue = this.value.slice()
         const itemsToBeMoved = []
         const key = this.props.key
+        console.log(9999, key, this.data, this.value)
+        if (this.manualInput) {
+          let arr = this.data.filter(item => item.key === 'manual_' + this.manualInput)
+          if (!arr.length) {
+            this.data.push({
+              key: 'manual_' + this.manualInput,
+              label: this.manualInput,
+              pinyin: 'manual'
+            })
+          }
+        }
         this.data.forEach(item => {
           const itemKey = item[key]
           if (
@@ -267,17 +282,6 @@
         currentValue = this.targetOrder === 'unshift'
           ? itemsToBeMoved.concat(currentValue)
           : currentValue.concat(itemsToBeMoved)
-        console.log(currentValue)
-        if (this.manualInput) {
-          let manual = this.dataObj([{
-            key: 'm',
-            label: this.manualInput,
-            pinyin: 'manual'
-          }])
-          console.log(manual)
-          // this.targetData.push()
-        }
-        console.log(this.targetData)
         this.$emit('clearManual')
         this.$emit('input', currentValue)
         this.$emit('change', currentValue, 'right', this.leftChecked)

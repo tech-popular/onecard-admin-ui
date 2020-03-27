@@ -34,18 +34,21 @@
         v-show="isCheckList && !hasNoMatch && data.length > 0"
         :class="{ 'is-filterable': filterable }"
         class="el-transfer-panel__list">
-        <el-checkbox
-          class="el-transfer-panel__item"
-          :label="item[keyProp]"
-          :disabled="item[disabledProp]"
-          :key="item[keyProp]"
-          v-for="item in filteredData">
-          <option-content :option="item"></option-content>
-        </el-checkbox>
+        <div>
+          <el-checkbox
+            class="el-transfer-panel__item"
+            :label="item[keyProp]"
+            :disabled="item[disabledProp]"
+            :key="item[keyProp]"
+            :style="{display: isLeft && (item[keyProp] + '').indexOf('manual_') > -1 ? 'none !important' : 'block'}"
+            v-for="item in filteredData">
+            <option-content :option="item"></option-content>
+          </el-checkbox>
+        </div>
       </el-checkbox-group>
-      <el-table :data="tableData" @selection-change="handleSelectionChange" border class="el-transfer-panel_table" v-if="!isCheckList">
+      <el-table :data="tableData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" v-if="!isCheckList">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="key" label="序号" width="80"></el-table-column>
+        <el-table-column prop="index" label="序号" width="80"></el-table-column>
         <el-table-column prop="label" label="Query" ></el-table-column>
       </el-table>
       <p
@@ -113,7 +116,8 @@
       defaultChecked: Array,
       props: Object,
       titleFlag: Boolean,
-      isCheckList: Boolean
+      isCheckList: Boolean,
+      isLeft: Boolean
     },
 
     data () {
@@ -132,8 +136,10 @@
         if (this.checkChangeByUser) {
           const movedKeys = val.concat(oldVal)
             .filter(v => val.indexOf(v) === -1 || oldVal.indexOf(v) === -1)
+          console.log(val, movedKeys)
           this.$emit('checked-change', val, movedKeys)
         } else {
+          console.log(val)
           this.$emit('checked-change', val)
           this.checkChangeByUser = true
         }
@@ -186,17 +192,14 @@
       },
 
       tableData () {
-        let arr = []
-        this.filteredData.forEach((item, index) => {
-          arr.push({
-            key: index + 1,
-            label: item.label
-          })
+        let arr = this.filteredData.map((item, index) => {
+          return { ...item, index: index + 1 }
         })
         return arr
       },
 
       checkableData () {
+        console.log(this.filteredData.filter(item => !item[this.disabledProp]))
         return this.filteredData.filter(item => !item[this.disabledProp])
       },
 
@@ -257,12 +260,12 @@
       },
 
       handleAllCheckedChange (value) {
-        this.checked = value
+        this.checked = value.length
           ? this.checkableData.map(item => item[this.keyProp])
           : []
       },
       handleSelectionChange (value) {
-        this.checked = value ? this.checkableData.map(item => item[this.keyProp])
+        this.checked = value.length ? value.map(item => item[this.keyProp])
           : []
       },
       clearQuery () {
