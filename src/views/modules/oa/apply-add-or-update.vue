@@ -467,8 +467,8 @@ export default {
       if (repeat === false) {
         this.selectedStaffList = [...this.selectedStaffList, ...this.staffData]
         this.staffList = this.staffList.filter((item) => {
-          let list = this.staffData.map(v => v.owner)
-          return !list.includes(item.owner)
+          let list = this.staffData.map(v => v.name)
+          return !list.includes(item.name)
         })
         this.staffData = []
       }
@@ -481,8 +481,8 @@ export default {
       }, 0)
       this.staffList = [...this.staffList, ...this.selectedStaffData]
       this.selectedStaffList = this.selectedStaffList.filter((item) => {
-        let list = this.selectedStaffData.map(v => v.owner)
-        return !list.includes(item.owner)
+        let list = this.selectedStaffData.map(v => v.name)
+        return !list.includes(item.name)
       })
       this.selectedStaffData = []
     },
