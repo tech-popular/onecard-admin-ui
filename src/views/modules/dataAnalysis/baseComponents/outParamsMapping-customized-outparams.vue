@@ -104,7 +104,7 @@
             this.formData.tableData = []
             return
           }
-          this.formData.tableData = data.list
+          this.formData.tableData = data.data
         })
       },
       // 获取数据类型
@@ -157,6 +157,7 @@
                 message: data.message || '提交成功',
                 type: 'success'
               })
+              this.formData.tableData = []
               this.$emit('cancel')
             })
           }
