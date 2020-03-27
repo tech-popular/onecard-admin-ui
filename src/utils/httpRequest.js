@@ -52,9 +52,9 @@ http.adornUrl = (actionName) => {
   if (actionName.indexOf('gongFeng') !== -1) {
     actionName = actionName.replace(/gongFeng\//, '')
     return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/gongFeng' : window.SITE_CONFIG.baseUrl) + actionName
-  // } else if (actionName.indexOf('dataAnalysis') !== -1) {
-  //   actionName = actionName.replace(/dataAnalysis\//, '')
-  //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://192.168.37.132:18085' : window.SITE_CONFIG.baseUrl) + actionName
+  } else if (actionName.indexOf('dataAnalysis') !== -1) {
+    actionName = actionName.replace(/dataAnalysis\//, '')
+    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://dataanalysis.sk.9f.cn' : window.SITE_CONFIG.baseUrl) + actionName
   } else {
     return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
   }

@@ -50,8 +50,8 @@
     </el-row>
     </el-form>
     <div class="edit-content">
-      <edit-outparams v-if="editOutParamsFlag" ref="editOutParams" @cancel="editOutParamsFlag = false"></edit-outparams>
-      <customized-outparams v-if="customizedOutParamsFlag" ref="customizedOutParams" @cancel="customizedOutParamsFlag = false"></customized-outparams>
+      <edit-outparams v-if="editOutParamsFlag" ref="editOutParams" :transfer-id="transferDataId" @cancel="editOutParamsFlag = false"></edit-outparams>
+      <customized-outparams v-if="customizedOutParamsFlag" ref="customizedOutParams" :transfer-id="transferDataId" @cancel="customizedOutParamsFlag = false"></customized-outparams>
     </div>
   </div>
 </template>
@@ -106,9 +106,8 @@ export default {
       mysqlServerList: [],
       editOutParamsFlag: false,
       customizedOutParamsFlag: false,
-      prevData: {
-
-      }
+      transferDataId: '',
+      prevData: {}
     }
   },
   components: {
@@ -124,10 +123,13 @@ export default {
     editOutParams () {
       this.$refs.baseForm.validate((valid) => {
         if (valid) {
+          this.transferDataId = this.baseForm.kafka ? this.baseForm.kafka : this.baseForm.database
           if (this.prevData.source && this.judgeObjParams()) { // 下发数据源一样的情况下
             if (this.editOutParamsFlag === true) return // 如果是编辑出参状态下，再次点击编辑出参按钮无效
             if (this.customizedOutParamsFlag === true) { // 如果是定制化出参状态下，可进行切换
               this.confirmDialog('确定放弃定制化出参，进行编辑出参名称？', 1)
+            } else {
+              this.editOutParamsFlag = true
             }
           } else { // 改变下发数据源的情况下
             if (this.editOutParamsFlag === true) { // 再次点击编辑化出参
@@ -146,10 +148,13 @@ export default {
     customizedOutParams () {
       this.$refs.baseForm.validate((valid) => {
         if (valid) {
+          this.transferDataId = this.baseForm.kafka ? this.baseForm.kafka : this.baseForm.database
           if (this.prevData.source && this.judgeObjParams()) { // 下发数据源一样的情况下
             if (this.customizedOutParamsFlag === true) return // 如果是定制化出参状态下，再次点击定制化出参按钮无效
             if (this.editOutParamsFlag === true) { // 如果是编辑出参状态下，可进行切换
               this.confirmDialog('确定放弃编辑出参名称，进行定制化出参？', 3)
+            } else {
+              this.customizedOutParamsFlag = true
             }
           } else {
             if (this.customizedOutParamsFlag === true) { // 再次点击定制化出参

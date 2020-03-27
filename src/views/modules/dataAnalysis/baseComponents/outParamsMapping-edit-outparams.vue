@@ -51,10 +51,10 @@
 				</el-table>
 			</el-col>
 			<el-col :span="6">
-				<el-table :data="newDataList" border style="width: 100%;">
+				<el-table :data="dataList" border style="width: 100%;">
 					<el-table-column header-align="center" align="center" label="修改后指标名称">
 						<template slot-scope="scope">
-							<el-input v-model="scope.row.newEnglishName" @blur="blurEnglishNameEvent(scope.row)" placeholder="请输入内容"></el-input>
+							<el-input v-model="scope.row.indexAlias" @blur="blurEnglishNameEvent(scope.row)" placeholder="请输入内容"></el-input>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -80,6 +80,7 @@
 <script>
   import { indexManageList, indexManageTypeList } from '@/api/dataAnalysis/indexManage'
   import { channelsList } from '@/api/dataAnalysis/dataInsightManage'
+  import { dataIndexAliasList, dataIndexAliasUpdate } from '@/api/dataAnalysis/outParamsMapping'
   import AddOrUpdate from './indexManage-add-or-update'
   export default {
     data () {
@@ -92,7 +93,6 @@
           enable: ''
         },
         dataList: [],
-        newDataList: [], // 存放新值
         modifyDataList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
@@ -100,7 +100,8 @@
         dataListLoading: false,
         addOrUpdateVisible: false,
         fieldTypeList: [], // 数据类型
-        channelIdList: []
+        channelIdList: [],
+        isSearch: false
       }
     },
     components: {
@@ -109,7 +110,15 @@
     mounted () {
       this.getFieldTypeList()
       this.getChannelIdList()
-      this.getDataList()
+      this.getdDataIndexAliasList()
+    },
+    props: {
+      transferId: Number
+    },
+    computed: {
+      userName: {
+        get () { return this.$store.state.user.name }
+      }
     },
     methods: {
   
@@ -142,8 +151,32 @@
           this.channelIdList = res.data.data
         })
       },
-
-      // 获取数据列表
+      getdDataIndexAliasList () { // 点击出参编辑时
+        this.dataListLoading = true
+        dataIndexAliasList(this.transferId, {
+          'pageNum': this.pageNum,
+          'pageSize': this.pageSize
+        }).then(({data}) => {
+          if (data && data.status === '1') {
+            this.dataList = data.data.list
+            this.totalCount = data.data.total
+            if (this.modifyDataList.length) {
+              this.dataList.forEach((item, index) => {
+                this.modifyDataList.forEach((mitem, mindex) => {
+                  if (item.id === mitem.id) {
+                    this.dataList.splice(index, 1, this.modifyDataList[mindex])
+                  }
+                })
+              })
+            }
+          } else {
+            this.dataList = []
+            this.totalCount = 0
+          }
+          this.dataListLoading = false
+        })
+      },
+      // 获取数据列表 搜索时调用
       getDataList () {
         this.dataListLoading = true
         let params = {
@@ -153,26 +186,21 @@
         }
         indexManageList(params, false).then(({data}) => {
           if (data && data.status === '1') {
-            this.dataList = data.data.list
-            this.totalCount = data.data.total
-            this.newDataList = this.dataList.map(item => {
-              return {
-                id: item.id,
-                englishName: item.englishName,
-                newEnglishName: item.englishName
-              }
+            this.dataList = data.data.list.map(item => {
+              return { ...item, indexAlias: item.indexAlias || item.englishName }
             })
+            this.totalCount = data.data.total
             // 如果有已修改的内容时，将修改后的内容赋值到输入框中
             if (this.modifyDataList.length) {
-              this.newDataList.forEach((item, index) => {
+              this.dataList.forEach((item, index) => {
                 this.modifyDataList.forEach((mitem, mindex) => {
                   if (item.id === mitem.id) {
-                    this.newDataList.splice(index, 1, this.modifyDataList[mindex])
+                    this.dataList.splice(index, 1, this.modifyDataList[mindex])
                   }
                 })
               })
             }
-            console.log(this.newDataList)
+            console.log(this.dataList)
           } else {
             this.dataList = []
             this.totalCount = 0
@@ -191,6 +219,7 @@
       /** 查询 */
       searchHandle () {
         this.pageNum = 1
+        this.isSearch = true
         this.getDataList()
       },
       /** 重置 */
@@ -221,15 +250,38 @@
       sizeChangeHandle (page) {
         this.pageSize = page
         this.pageNum = 1
-        this.getDataList()
+        if (this.isSearch) {
+          this.getDataList()
+        } else {
+          this.getdDataIndexAliasList()
+        }
       },
       // 当前页
       currentChangeHandle (page) {
         this.pageNum = page
-        this.getDataList()
+        if (this.isSearch) {
+          this.getDataList()
+        } else {
+          this.getdDataIndexAliasList()
+        }
       },
       submitData () {
         console.log('submit')
+        console.log(this.modifyDataList)
+        dataIndexAliasUpdate(this.transferId, this.userName, this.modifyDataList).then(({data}) => {
+          if (data && data.status !== '1') {
+            return this.$message({
+              message: data.message || '提交出错',
+              type: 'error'
+            })
+          }
+          this.$message({
+            message: data.message || '提交成功',
+            type: 'success'
+          })
+          this.modifyDataList = []
+          this.$emit('cancel')
+        })
       },
       submitCancel () {
         this.modifyDataList = []

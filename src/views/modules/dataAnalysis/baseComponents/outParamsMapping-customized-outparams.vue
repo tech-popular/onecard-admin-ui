@@ -22,11 +22,17 @@
 					<template slot-scope="scope">
 						<el-form-item :prop="'tableData.' + scope.$index + '.fieldType'" :rules='rules.fieldType'>
 							<el-select v-model="scope.row.fieldType" placeholder="请选择">
-								<el-option label="男" value="1">男</el-option>
-								<el-option label="女" value="2">女</el-option>
+								<el-option v-for="(item, index) in fieldTypeList" :value="item.childrenValue" :key="index" :label="item.childrenValue"></el-option>
 							</el-select>
 						</el-form-item>
 					</template>
+				</el-table-column>
+        <el-table-column prop="indexAlias" header-align="center" align="center" label="字段值">
+					<template slot-scope="scope">
+            <el-form-item :prop="'tableData.' + scope.$index + '.indexAlias'" :rules='rules.indexAlias'>
+              <el-input v-model="scope.row.indexAlias" placeholder="字段名称"></el-input>
+            </el-form-item>
+          </template>
 				</el-table-column>
         <el-table-column header-align="center" align="center">
           <template slot="header">
@@ -49,6 +55,8 @@
 </template>
 
 <script>
+  import { indexManageTypeList } from '@/api/dataAnalysis/indexManage'
+  import { dataIndexAliasAdd, dataIndexAliasCustomList } from '@/api/dataAnalysis/outParamsMapping'
   export default {
     data () {
       return {
@@ -58,22 +66,58 @@
         rules: {
           englishName: {
             required: true,
-            message: '请输入名字'
+            message: '请输入字段名称'
           },
           chineseName: {
             required: true,
-            message: '请选择性别'
+            message: '请输入字段标题'
           },
           fieldType: {
             required: true,
-            message: '请选择性别'
+            message: '请选择字段类型'
+          },
+          indexAlias: {
+            required: true,
+            message: '请输入字段值'
           }
-        }
+        },
+        fieldTypeList: []
       }
     },
     mounted () {
+      this.getFieldTypeList()
+      this.getDataIndexAliasCustomList()
+    },
+    props: {
+      transferId: Number
+    },
+    computed: {
+      userName: {
+        get () { return this.$store.state.user.name }
+      }
     },
     methods: {
+      // 获取列表数据
+      getDataIndexAliasCustomList () {
+        dataIndexAliasCustomList(this.transferId).then(({data}) => {
+          if (data && data.status !== '1') {
+            this.formData.tableData = []
+            return
+          }
+          this.formData.tableData = data.list
+        })
+      },
+      // 获取数据类型
+      getFieldTypeList () {
+        let params = 6
+        indexManageTypeList(params).then(({data}) => {
+          if (data && data.status === '1') {
+            this.fieldTypeList = data.data
+          } else {
+            this.fieldTypeList = []
+          }
+        })
+      },
       // 添加字段
       addField () {
         let initId = 1
@@ -99,16 +143,27 @@
         })
       },
       submitData () {
-        console.log('submit', this.formData.tableData)
         this.$refs.formData.validate((valid) => {
           if (valid) {
             let data = this.formData.tableData
-            alert(JSON.stringify(data))
+            dataIndexAliasAdd(this.transferId, this.userName, data).then(({data}) => {
+              if (data && data.status !== '1') {
+                return this.$message({
+                  message: data.message || '提交出错',
+                  type: 'error'
+                })
+              }
+              this.$message({
+                message: data.message || '提交成功',
+                type: 'success'
+              })
+              this.$emit('cancel')
+            })
           }
         })
       },
       submitCancel () {
-        this.modifyDataList = []
+        this.formData.tableData = []
         this.$emit('cancel')
       }
     }
