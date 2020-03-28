@@ -197,7 +197,7 @@
       },
   
       sourceData () {
-        console.log(this.data)
+        console.log(434343, this.data)
         return this.data
         // return this.data.filter(item => this.value.indexOf(item[this.props.key]) === -1)
       },
@@ -243,14 +243,17 @@
       },
 
       onSourceCheckedChange (val, movedKeys) {
+        console.log(val, movedKeys)
         this.leftChecked = val
+        console.log(this.leftChecked)
         if (movedKeys === undefined) return
-        console.log(val)
         this.$emit('left-check-change', val, movedKeys)
       },
 
       onTargetCheckedChange (val, movedKeys) {
         this.rightChecked = val
+        this.leftChecked = []
+        console.log(this.rightChecked, this.leftChecked)
         if (movedKeys === undefined) return
         this.$emit('right-check-change', val, movedKeys)
       },

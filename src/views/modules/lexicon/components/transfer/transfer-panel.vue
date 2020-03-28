@@ -46,8 +46,9 @@
           </el-checkbox>
         </div>
       </el-checkbox-group>
-      <el-table :data="filteredData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" :class="{'table-has-footer': hasFooter || hasTotal}" v-if="!isCheckList">
-        <el-table-column type="selection" header-align="center" align="center" width="55"></el-table-column>
+      <el-table :data="filteredData" border class="el-transfer-panel_table" :class="{'table-has-footer': hasFooter || hasTotal}" v-if="!isCheckList">
+      <!-- <el-table :data="filteredData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" :class="{'table-has-footer': hasFooter || hasTotal}" v-if="!isCheckList"> -->
+        <!-- <el-table-column type="selection" header-align="center" align="center" width="55"></el-table-column> -->
         <el-table-column label="排序" header-align="center" align="center" width="60">
           <template slot-scope="scope">
             {{scope.$index+1}}
@@ -73,7 +74,7 @@
       <slot></slot>
     </p>
     <p class="el-transfer-panel__footer el-transfer-panel__total" v-if="hasTotal">
-      目前已选中{{this.data.length}}条
+      目前已选中<span> {{this.data.length}} </span>条
     </p>
   </div>
 </template>
@@ -153,15 +154,17 @@
 
     watch: {
       checked (val, oldVal) {
-        console.log(val)
+        console.log(val, this.checkChangeByUser)
         this.updateAllChecked()
         if (this.checkChangeByUser) {
           const movedKeys = val.concat(oldVal)
             .filter(v => val.indexOf(v) === -1 || oldVal.indexOf(v) === -1)
           this.$emit('checked-change', val, movedKeys)
         } else {
+          console.log(123)
           this.$emit('checked-change', val)
           this.checkChangeByUser = true
+          console.log(999)
         }
       },
 
@@ -388,5 +391,8 @@
 .el-transfer-panel .el-transfer-panel__total {
   text-align: right;
   padding-right: 10px;
+}
+.el-transfer-panel .el-transfer-panel__total span {
+  color: red
 }
 </style>
