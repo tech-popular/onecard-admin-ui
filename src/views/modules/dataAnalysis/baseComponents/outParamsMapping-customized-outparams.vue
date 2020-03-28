@@ -3,7 +3,7 @@
     <div class="last-modifier">最后修改人：无</div>
 		<el-form :model="formData" ref="formData">
 			<el-table :data="formData.tableData" border style="width: 100%;">
-        <el-table-column prop="id" header-align="center" align="center" label="字段ID"></el-table-column>
+        <el-table-column prop="index" header-align="center" align="center" label="序号"></el-table-column>
         <el-table-column prop="englishName" header-align="center" align="center" label="字段名称">
             <template slot-scope="scope">
               <el-form-item :prop="'tableData.' + scope.$index + '.englishName'" :rules='rules.englishName'>
@@ -100,11 +100,12 @@
       // 获取列表数据
       getDataIndexAliasCustomList () {
         dataIndexAliasCustomList(this.transferId).then(({data}) => {
-          if (data && data.status !== '1') {
+          if (!data || data.status !== '1' || (data && !data.data)) {
             this.formData.tableData = []
             return
           }
           this.formData.tableData = data.data
+          this.updateDataIndex()
         })
       },
       // 获取数据类型
@@ -120,12 +121,12 @@
       },
       // 添加字段
       addField () {
-        let initId = 1
+        let initIndex = 1
         if (this.formData.tableData.length) {
-          initId = this.formData.tableData[this.formData.tableData.length - 1].id + 1
+          initIndex = this.formData.tableData[this.formData.tableData.length - 1].index + 1
         }
         this.formData.tableData.push({
-          id: initId,
+          index: initIndex,
           englishName: '',
           chineseName: '',
           fieldType: ''
@@ -134,12 +135,12 @@
       // 删除字段
       removeField (index) {
         this.formData.tableData.splice(index, 1)
-        this.updateDataId()
+        this.updateDataIndex()
       },
       // 自动更新id
-      updateDataId () {
+      updateDataIndex () {
         this.formData.tableData.forEach((item, index) => {
-          item.id = index + 1
+          item.index = index + 1
         })
       },
       submitData () {
