@@ -48,17 +48,17 @@
       </el-checkbox-group>
       <el-table :data="filteredData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" :class="{'table-has-footer': hasFooter || hasTotal}" v-if="!isCheckList">
         <el-table-column type="selection" header-align="center" align="center" width="55"></el-table-column>
-        <el-table-column prop="index" label="序号" header-align="center" align="center" width="60"></el-table-column>
-        <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
         <el-table-column label="排序" header-align="center" align="center" width="60">
           <template slot-scope="scope">
             {{scope.$index+1}}
           </template>
         </el-table-column>
-        <el-table-column prop="label" label="排序(上移/下移)" header-align="center" align="center" v-if="hasTableSort">
+        <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="label" label="操作" header-align="center" align="center" v-if="hasTableSort">
           <template slot-scope="scope">
-            <i class="el-icon-top icon-move" style="color: green" @click="moveUp(scope.$index)"></i>
-            <i class="el-icon-bottom icon-move" style="color: red" @click="moveDown(scope.$index)"></i>
+            <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)"></i>
+            <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)"></i>
+            <i class="el-icon-delete icon-move" style="color: red" @click="remove(scope.$index)"></i>
           </template>
         </el-table-column>
       </el-table>
@@ -200,7 +200,6 @@
 
     computed: {
       filteredData () {
-        console.log(this.preFilteredData, this.data)
         const arr = this.data.filter(item => {
           if (typeof this.filterMethod === 'function') {
             return this.filterMethod(this.query, item)
@@ -209,38 +208,39 @@
             return label.toLowerCase().indexOf(this.query.toLowerCase()) > -1
           }
         })
-        if (!this.isRight) {
-          this.preFilteredData = arr
-          console.log('left', this.preFilteredData, arr)
-          return arr
-        }
-        console.log(this.preFilteredData, arr, this.isRight)
-        let newData = []
-        if (!this.preFilteredData.length) {
-          newData = arr.map((item, index) => {
-            return { ...item, index: index + 1 }
-          })
-          console.log(newData)
-          this.preFilteredData = newData
-          return newData
-        } else {
-          if (this.preFilteredData.length < arr.length) {
-            newData = this.getDifferenceSetB(arr, this.preFilteredData, 'key')
-            let newArr = newData.map((item, index) => {
-              return { ...item, index: this.preFilteredData.length + index + 1 }
-            })
-            this.preFilteredData = this.preFilteredData.concat(newArr)
-            console.log(1, this.preFilteredData)
-            return this.preFilteredData
-          } else {
-            newData = this.getDifferenceSetB(this.preFilteredData, arr, 'key')
-            newData.forEach((item, index) => {
-              this.preFilteredData.splice(item.index - 1, 1)
-            })
-            console.log(2, this.preFilteredData)
-            return this.preFilteredData
-          }
-        }
+        return arr
+        // if (!this.isRight) {
+        //   this.preFilteredData = arr
+        //   console.log('left', this.preFilteredData, arr)
+        //   return arr
+        // }
+        // console.log(this.preFilteredData, arr, this.isRight)
+        // let newData = []
+        // if (!this.preFilteredData.length) {
+        //   newData = arr.map((item, index) => {
+        //     return { ...item, index: index + 1 }
+        //   })
+        //   console.log(newData)
+        //   this.preFilteredData = newData
+        //   return newData
+        // } else {
+        //   if (this.preFilteredData.length < arr.length) {
+        //     newData = this.getDifferenceSetB(arr, this.preFilteredData, 'key')
+        //     let newArr = newData.map((item, index) => {
+        //       return { ...item, index: this.preFilteredData.length + index + 1 }
+        //     })
+        //     this.preFilteredData = this.preFilteredData.concat(newArr)
+        //     console.log(1, this.preFilteredData)
+        //     return this.preFilteredData
+        //   } else {
+        //     newData = this.getDifferenceSetB(this.preFilteredData, arr, 'key')
+        //     newData.forEach((item, index) => {
+        //       this.preFilteredData.splice(item.index - 1, 1)
+        //     })
+        //     console.log(2, this.preFilteredData)
+        //     return this.preFilteredData
+        //   }
+        // }
       },
 
       checkableData () {
@@ -347,6 +347,9 @@
         data.splice(index + 2, 0, (data[index]))
         // 删除前一项
         data.splice(index, 1)
+      },
+      remove (index) {
+        this.filteredData.splice(index, 1)
       }
     }
   }

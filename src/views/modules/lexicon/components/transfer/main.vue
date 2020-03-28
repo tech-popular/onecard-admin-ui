@@ -19,14 +19,14 @@
       <slot name="left-footer"></slot>
     </transfer-panel>
     <div class="el-transfer__buttons">
-      <el-button
+      <!-- <el-button
         type="primary"
         :class="['el-transfer__button', hasButtonTexts ? 'is-with-texts' : '']"
         @click.native="addToLeft"
         :disabled="rightChecked.length === 0">
         <i class="el-icon-arrow-left"></i>
         <span v-if="buttonTexts[0] !== undefined">{{ buttonTexts[0] }}</span>
-      </el-button>
+      </el-button> -->
       <el-button
         type="primary"
         :class="['el-transfer__button', hasButtonTexts ? 'is-with-texts' : '']"
@@ -197,7 +197,8 @@
       },
   
       sourceData () {
-        return this.data.filter(item => this.value.indexOf(item[this.props.key]) === -1)
+        return this.data
+        // return this.data.filter(item => this.value.indexOf(item[this.props.key]) === -1)
       },
 
       targetData () {
@@ -243,31 +244,31 @@
       onSourceCheckedChange (val, movedKeys) {
         this.leftChecked = val
         if (movedKeys === undefined) return
+        console.log(val)
         this.$emit('left-check-change', val, movedKeys)
       },
 
       onTargetCheckedChange (val, movedKeys) {
         this.rightChecked = val
-        console.log(999, val, movedKeys)
         if (movedKeys === undefined) return
         this.$emit('right-check-change', val, movedKeys)
       },
 
-      addToLeft () {
-        let currentValue = this.value.slice()
-        console.log('------', this.rightChecked, currentValue)
-        this.rightChecked.forEach(item => {
-          const index = currentValue.indexOf(item)
-          console.log(index)
-          if (index > -1) {
-            currentValue.splice(index, 1)
-            console.log('555666', currentValue)
-          }
-        })
-        console.log(this.rightChecked)
-        this.$emit('input', currentValue)
-        this.$emit('change', currentValue, 'left', this.rightChecked)
-      },
+      // addToLeft () {
+      //   let currentValue = this.value.slice()
+      //   console.log('------', this.rightChecked, currentValue)
+      //   this.rightChecked.forEach(item => {
+      //     const index = currentValue.indexOf(item)
+      //     console.log(index)
+      //     if (index > -1) {
+      //       currentValue.splice(index, 1)
+      //       console.log('555666', currentValue)
+      //     }
+      //   })
+      //   console.log(this.rightChecked)
+      //   this.$emit('input', currentValue)
+      //   this.$emit('change', currentValue, 'left', this.rightChecked)
+      // },
 
       addToRight () {
         let currentValue = this.value.slice()
@@ -296,6 +297,8 @@
           ? itemsToBeMoved.concat(currentValue)
           : currentValue.concat(itemsToBeMoved)
         if (this.manualInput) { this.$emit('clearManual') }
+        console.log(this.leftChecked)
+        this.leftChecked = []
         this.$emit('input', currentValue)
         this.$emit('change', currentValue, 'right', this.leftChecked)
       },
