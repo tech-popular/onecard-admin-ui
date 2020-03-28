@@ -139,7 +139,7 @@
           this.formData.tableData.splice(scope.$index, 1)
           this.updateDataIndex()
         } else {
-          dataIndexAliasDelete(row.id).then(({data}) => {
+          dataIndexAliasDelete(this.transferId, row.id).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
                 type: 'error',
