@@ -59,7 +59,7 @@
           <template slot-scope="scope">
             <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)"></i>
             <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)"></i>
-            <i class="el-icon-delete icon-move" style="color: red" @click="remove(scope.$index)"></i>
+            <i class="el-icon-delete icon-move" style="color: red" @click="remove(scope)"></i>
           </template>
         </el-table-column>
       </el-table>
@@ -356,8 +356,9 @@
         // 删除前一项
         data.splice(index, 1)
       },
-      remove (index) {
-        this.filteredData.splice(index, 1)
+      remove (scope) {
+        this.filteredData.splice(scope.$index, 1)
+        this.$emit('remove-change', scope.row.key)
       }
     }
   }

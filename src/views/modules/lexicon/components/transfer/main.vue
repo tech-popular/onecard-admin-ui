@@ -14,6 +14,7 @@
       :isCheckList="isLeftCheckList"
       :hasTotal="hasLeftTotal"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
+      @remove-change="onTargetRemoveChange"
       @checked-change="onSourceCheckedChange">
       <div slot="left-header"> <slot name="left-header"></slot></div>
       <slot name="left-footer"></slot>
@@ -49,6 +50,7 @@
       :isCheckList="isRightCheckList"
       :hasTotal="hasRightTotal"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
+      @remove-change="onTargetRemoveChange"
       @checked-change="onTargetCheckedChange">
       <div slot="right-header"><slot name="right-header"></slot></div>
       <slot name="right-footer"></slot>
@@ -196,10 +198,26 @@
         return this.data.reduce((o, cur) => (o[cur[key]] = cur) && o, {})
       },
   
-      sourceData () {
-        console.log(434343, this.data)
-        return this.data
-        // return this.data.filter(item => this.value.indexOf(item[this.props.key]) === -1)
+      sourceData: {
+        get () {
+          console.log(434343, this.data)
+          console.log(this.data.filter(item => this.value.indexOf(item[this.props.key]) === -1))
+          // return this.data
+          let arr = this.data.map(item => {
+            if (this.value.indexOf(item[this.props.key]) !== -1) {
+              return { ...item, disabled: true }
+            } else {
+              return item
+            }
+          })
+          // return this.data.filter(item => this.value.indexOf(item[this.props.key]) === -1)
+          return arr
+        },
+        set (val) {
+          console.log(val)
+          // this.sourceData = val
+        }
+        
       },
 
       targetData () {
@@ -252,12 +270,25 @@
 
       onTargetCheckedChange (val, movedKeys) {
         this.rightChecked = val
-        this.leftChecked = []
+        this.leftChecked = val
         console.log(this.rightChecked, this.leftChecked)
         if (movedKeys === undefined) return
         this.$emit('right-check-change', val, movedKeys)
       },
-
+      onTargetRemoveChange (key) {
+        this.sourceData = this.sourceData.map(item => {
+          if (item.key === key) {
+            return {
+              key: item.key,
+              label: item.label,
+              pinyin: item.pinyin
+            }
+          } else {
+            return item
+          }
+        })
+        console.log(this.sourceData)
+      },
       // addToLeft () {
       //   let currentValue = this.value.slice()
       //   console.log('------', this.rightChecked, currentValue)
@@ -276,6 +307,7 @@
 
       addToRight () {
         let currentValue = this.value.slice()
+        console.log(currentValue)
         const itemsToBeMoved = []
         const key = this.props.key
         if (this.manualInput) {
@@ -297,6 +329,7 @@
             itemsToBeMoved.push(itemKey)
           }
         })
+        console.log(itemsToBeMoved, this.leftChecked)
         currentValue = this.targetOrder === 'unshift'
           ? itemsToBeMoved.concat(currentValue)
           : currentValue.concat(itemsToBeMoved)
