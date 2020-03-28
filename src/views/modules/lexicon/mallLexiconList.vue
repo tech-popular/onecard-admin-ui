@@ -17,8 +17,8 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
         <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button type="primary" @click="importFile()" plain>导入</el-button>
-        <el-button type="success" @click="exportFile()" plain>导出</el-button>
+        <!-- <el-button type="primary" @click="importFile()" plain>导入</el-button>
+        <el-button type="success" @click="exportFile()" plain>导出</el-button> -->
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -127,12 +127,6 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
-      },
-      importFile () {
-        console.log('im')
-      },
-      exportFile () {
-        console.log('ex')
       }
     }
   }

@@ -46,10 +46,26 @@
           </el-checkbox>
         </div>
       </el-checkbox-group>
-      <el-table :data="tableData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" v-if="!isCheckList">
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="index" label="序号" width="80"></el-table-column>
-        <el-table-column prop="label" label="Query" ></el-table-column>
+      <el-table :data="filteredData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" v-if="!isCheckList">
+        <el-table-column type="selection" header-align="center" align="center" width="55"></el-table-column>
+        <el-table-column label="序号" header-align="center" align="center" width="80">
+          <template slot-scope="scope">
+            {{scope.$index+1}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="label" label="排序(上移/下移)" header-align="center" align="center" v-if="hasTableSort">
+          <template slot-scope="scope">
+            <i class="el-icon-top icon-move" style="color: green" @click="moveUp(scope.$index)"></i>
+            <i class="el-icon-bottom icon-move" style="color: red" @click="moveDown(scope.$index)"></i>
+            <!-- <el-tooltip class="item" effect="dark" content="上移" placement="top">
+              <i class="el-icon-top icon-move" style="color: green" @click="moveUp(scope.$index)"></i>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="下移" placement="top">
+              <i class="el-icon-bottom icon-move" style="color: red" @click="moveDown(scope.$index)"></i>
+            </el-tooltip> -->
+          </template>
+        </el-table-column>
       </el-table>
       <p
         class="el-transfer-panel__empty"
@@ -117,7 +133,8 @@
       props: Object,
       titleFlag: Boolean,
       isCheckList: Boolean,
-      isLeft: Boolean
+      isLeft: Boolean,
+      hasTableSort: Boolean
     },
 
     data () {
@@ -146,6 +163,7 @@
       },
 
       data () {
+        console.log(8989)
         const checked = []
         const filteredDataKeys = this.filteredData.map(item => item[this.keyProp])
         this.checked.forEach(item => {
@@ -191,15 +209,7 @@
         })
       },
 
-      tableData () {
-        let arr = this.filteredData.map((item, index) => {
-          return { ...item, index: index + 1 }
-        })
-        return arr
-      },
-
       checkableData () {
-        console.log(this.filteredData.filter(item => !item[this.disabledProp]))
         return this.filteredData.filter(item => !item[this.disabledProp])
       },
 
@@ -272,6 +282,27 @@
         if (this.inputIcon === 'circle-close') {
           this.query = ''
         }
+      },
+      // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
+      moveUp (index) {
+        console.log(1, index)
+        let data = this.filteredData
+        if (index === 0) return
+        // 在上一项插入该项
+        data.splice(index - 1, 0, (data[index]))
+        // 删除后一项
+        data.splice(index + 1, 1)
+        console.log(this.filteredData)
+      },
+      // 下移 将当前数组index索引与前面一个元素互换位置，向数组前面移动一位
+      moveDown (index) {
+        console.log(2, index)
+        let data = this.filteredData
+        if (index === (data.length - 1)) return
+        // 在下一项插入该项
+        data.splice(index + 2, 0, (data[index]))
+        // 删除前一项
+        data.splice(index, 1)
       }
     }
   }
@@ -282,6 +313,7 @@
 }
 .el-transfer-new .el-transfer-panel__list.is-filterable {
   padding-bottom: 40px;
+  height: 354px;
 }
 .el-transfer-panel_table {
   width: 90%;
@@ -289,7 +321,13 @@
   text-align:center;
 }
 .el-transfer-panel_table .el-table__body-wrapper {
-  height: 190px;
+  height: 343px;
   overflow: auto;
+}
+.el-transfer-new  .el-transfer-panel__body {
+  height: 400px;
+}
+.icon-move {
+  cursor: pointer;
 }
 </style>

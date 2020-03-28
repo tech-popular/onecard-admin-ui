@@ -5,16 +5,16 @@
       :filter-method="filterMethod"
       filter-placeholder="请输入搜索Query"
       v-model="value"
-      @clearManual="clearManualInput"
       :widths="['350px', '350px']"
+      :titles="['', '已选择']"
       :left-filter="true"
       :right-filter="false"
       :left-title-flag="false"
-      :right-title-flag="false"
+      :right-title-flag="true"
       :is-left-check-list="true"
       :is-right-check-list="false"
+      :has-table-sort="true"
       :target-order="'push'"
-      :manual-input="manualQuery"
       :data="dataList">
       <div class="transfer-header" slot="left-header">
         <el-form inline :model="dataForm" :rules="dataRules" class="transfer-form">
@@ -29,9 +29,6 @@
       </div>
       <div class="transfer-header" slot="right-header">
         已选择
-      </div>
-      <div class="transfer-footer" slot="left-footer">
-          手动添加：<el-input v-model="dataForm.name" placeholder="请输入Query名" size="mini" style="width:200px;display:inline-block"/>
       </div>
       </new-transfer>
     </div>
@@ -61,8 +58,7 @@ export default {
       dataList: generateData(),
       value: [],
       dataForm: {
-        query: '',
-        name: ''
+        query: ''
       },
       dataRules: {
         query: [
@@ -72,23 +68,9 @@ export default {
     }
   },
   components: { NewTransfer },
-  computed: {
-    manualQuery: {
-      get () {
-        return this.dataForm.name
-      },
-      set (newVal) {
-        this.dataForm.name = newVal
-      }
-    }
-  },
   methods: {
     filterMethod (query, item) {
       return item.pinyin.indexOf(query) > -1
-    },
-    clearManualInput () {
-      this.dataForm.name = ''
-      this.manualQuery = ''
     }
   }
 }

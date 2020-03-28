@@ -10,6 +10,7 @@
       :title-flag="leftTitleFlag"
       :filterable="leftFilter"
       :isLeft="true"
+      :hasTableSort="hasTableSort"
       :isCheckList="isLeftCheckList"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
       @checked-change="onSourceCheckedChange">
@@ -164,6 +165,10 @@
       manualInput: {
         type: String,
         default: ''
+      },
+      hasTableSort: {
+        type: Boolean,
+        default: false
       }
     },
 
@@ -177,7 +182,6 @@
     computed: {
       dataObj () {
         const key = this.props.key
-        console.log(this.data.reduce((o, cur) => (o[cur[key]] = cur) && o, {}))
         return this.data.reduce((o, cur) => (o[cur[key]] = cur) && o, {})
       },
   
@@ -186,14 +190,12 @@
       },
 
       targetData () {
-        if (this.targetOrder !== 'original') {
+        if (this.targetOrder === 'original') {
           let arr = this.data.filter(item => this.value.indexOf(item[this.props.key]) > -1)
           return arr
         } else {
           return this.value.reduce((arr, cur) => {
-            console.log(cur)
             const val = this.dataObj[cur]
-            console.log(val)
             if (val) {
               arr.push(val)
             }
@@ -212,7 +214,6 @@
         this.dispatch('ElFormItem', 'el.form.change', val)
       },
       manualInput (val) {
-        console.log(this.leftChecked, this.data)
         if (!this.leftChecked.includes('manual_' + val)) {
           this.leftChecked.push('manual_' + val)
         }
@@ -229,14 +230,12 @@
       },
 
       onSourceCheckedChange (val, movedKeys) {
-        console.log(888, val, movedKeys)
         this.leftChecked = val
         if (movedKeys === undefined) return
         this.$emit('left-check-change', val, movedKeys)
       },
 
       onTargetCheckedChange (val, movedKeys) {
-        console.log('88800', val)
         this.rightChecked = val
         if (movedKeys === undefined) return
         this.$emit('right-check-change', val, movedKeys)
@@ -244,7 +243,6 @@
 
       addToLeft () {
         let currentValue = this.value.slice()
-        console.log(this.rightChecked)
         this.rightChecked.forEach(item => {
           const index = currentValue.indexOf(item)
           if (index > -1) {
@@ -259,7 +257,6 @@
         let currentValue = this.value.slice()
         const itemsToBeMoved = []
         const key = this.props.key
-        console.log(9999, key, this.data, this.value)
         if (this.manualInput) {
           let arr = this.data.filter(item => item.key === 'manual_' + this.manualInput)
           if (!arr.length) {
@@ -282,7 +279,7 @@
         currentValue = this.targetOrder === 'unshift'
           ? itemsToBeMoved.concat(currentValue)
           : currentValue.concat(itemsToBeMoved)
-        this.$emit('clearManual')
+        if (this.manualInput) { this.$emit('clearManual') }
         this.$emit('input', currentValue)
         this.$emit('change', currentValue, 'right', this.leftChecked)
       },
