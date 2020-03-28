@@ -80,7 +80,7 @@
 <script>
   import { indexManageTypeList } from '@/api/dataAnalysis/indexManage'
   import { channelsList } from '@/api/dataAnalysis/dataInsightManage'
-  import { dataIndexAliasList, dataIndexAliasUpdate } from '@/api/dataAnalysis/outParamsMapping'
+  import { dataIndexAliasList, dataIndexAliasUpdate, dataAnalysisGetUpdator } from '@/api/dataAnalysis/outParamsMapping'
   import AddOrUpdate from './indexManage-add-or-update'
   export default {
     data () {
@@ -112,6 +112,7 @@
       this.getFieldTypeList()
       this.getChannelIdList()
       this.getdDataIndexAliasList()
+      this.getUpdator()
     },
     props: {
       transferId: Number
@@ -152,6 +153,15 @@
           this.channelIdList = res.data.data
         })
       },
+      getUpdator () {
+        dataAnalysisGetUpdator(this.transferId).then(({data}) => {
+          if (data.status !== '1') {
+            this.updator = '无'
+          } else {
+            this.updator = data.data || '无'
+          }
+        })
+      },
       getdDataIndexAliasList () { // 点击出参编辑时
         this.dataListLoading = true
         let params = {
@@ -165,7 +175,6 @@
               return { ...item, indexAlias: item.indexAlias || item.englishName }
             })
             this.totalCount = data.data.total
-            this.updator = this.dataList[this.dataList.length - 1].updater || '无'
             if (this.modifyDataList.length) {
               this.dataList.forEach((item, index) => {
                 this.modifyDataList.forEach((mitem, mindex) => {
