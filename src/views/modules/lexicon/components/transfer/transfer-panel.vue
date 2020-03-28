@@ -46,24 +46,19 @@
           </el-checkbox>
         </div>
       </el-checkbox-group>
-      <el-table :data="filteredData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" v-if="!isCheckList">
+      <el-table :data="filteredData" @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border class="el-transfer-panel_table" :class="{'table-has-footer': hasFooter || hasTotal}" v-if="!isCheckList">
         <el-table-column type="selection" header-align="center" align="center" width="55"></el-table-column>
-        <el-table-column label="序号" header-align="center" align="center" width="80">
+        <el-table-column prop="index" label="序号" header-align="center" align="center" width="60"></el-table-column>
+        <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
+        <el-table-column label="排序" header-align="center" align="center" width="60">
           <template slot-scope="scope">
             {{scope.$index+1}}
           </template>
         </el-table-column>
-        <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
         <el-table-column prop="label" label="排序(上移/下移)" header-align="center" align="center" v-if="hasTableSort">
           <template slot-scope="scope">
             <i class="el-icon-top icon-move" style="color: green" @click="moveUp(scope.$index)"></i>
             <i class="el-icon-bottom icon-move" style="color: red" @click="moveDown(scope.$index)"></i>
-            <!-- <el-tooltip class="item" effect="dark" content="上移" placement="top">
-              <i class="el-icon-top icon-move" style="color: green" @click="moveUp(scope.$index)"></i>
-            </el-tooltip>
-            <el-tooltip class="item" effect="dark" content="下移" placement="top">
-              <i class="el-icon-bottom icon-move" style="color: red" @click="moveDown(scope.$index)"></i>
-            </el-tooltip> -->
           </template>
         </el-table-column>
       </el-table>
@@ -76,6 +71,9 @@
     </div>
     <p class="el-transfer-panel__footer" v-if="hasFooter">
       <slot></slot>
+    </p>
+    <p class="el-transfer-panel__footer el-transfer-panel__total" v-if="hasTotal">
+      目前已选中{{this.data.length}}条
     </p>
   </div>
 </template>
@@ -134,7 +132,12 @@
       titleFlag: Boolean,
       isCheckList: Boolean,
       isLeft: Boolean,
-      hasTableSort: Boolean
+      hasTableSort: Boolean,
+      hasTotal: Boolean,
+      isRight: {
+        type: Boolean,
+        default: false
+      }
     },
 
     data () {
@@ -143,7 +146,8 @@
         allChecked: false,
         query: '',
         inputHover: false,
-        checkChangeByUser: true
+        checkChangeByUser: true,
+        preFilteredData: []
       }
     },
 
@@ -153,17 +157,14 @@
         if (this.checkChangeByUser) {
           const movedKeys = val.concat(oldVal)
             .filter(v => val.indexOf(v) === -1 || oldVal.indexOf(v) === -1)
-          console.log(val, movedKeys)
           this.$emit('checked-change', val, movedKeys)
         } else {
-          console.log(val)
           this.$emit('checked-change', val)
           this.checkChangeByUser = true
         }
       },
 
       data () {
-        console.log(8989)
         const checked = []
         const filteredDataKeys = this.filteredData.map(item => item[this.keyProp])
         this.checked.forEach(item => {
@@ -199,7 +200,8 @@
 
     computed: {
       filteredData () {
-        return this.data.filter(item => {
+        console.log(this.preFilteredData, this.data)
+        const arr = this.data.filter(item => {
           if (typeof this.filterMethod === 'function') {
             return this.filterMethod(this.query, item)
           } else {
@@ -207,6 +209,38 @@
             return label.toLowerCase().indexOf(this.query.toLowerCase()) > -1
           }
         })
+        if (!this.isRight) {
+          this.preFilteredData = arr
+          console.log('left', this.preFilteredData, arr)
+          return arr
+        }
+        console.log(this.preFilteredData, arr, this.isRight)
+        let newData = []
+        if (!this.preFilteredData.length) {
+          newData = arr.map((item, index) => {
+            return { ...item, index: index + 1 }
+          })
+          console.log(newData)
+          this.preFilteredData = newData
+          return newData
+        } else {
+          if (this.preFilteredData.length < arr.length) {
+            newData = this.getDifferenceSetB(arr, this.preFilteredData, 'key')
+            let newArr = newData.map((item, index) => {
+              return { ...item, index: this.preFilteredData.length + index + 1 }
+            })
+            this.preFilteredData = this.preFilteredData.concat(newArr)
+            console.log(1, this.preFilteredData)
+            return this.preFilteredData
+          } else {
+            newData = this.getDifferenceSetB(this.preFilteredData, arr, 'key')
+            newData.forEach((item, index) => {
+              this.preFilteredData.splice(item.index - 1, 1)
+            })
+            console.log(2, this.preFilteredData)
+            return this.preFilteredData
+          }
+        }
       },
 
       checkableData () {
@@ -263,6 +297,16 @@
     },
 
     methods: {
+      getDifferenceSetB (arr1, arr2, typeName) {
+        return Object.values(arr1.concat(arr2).reduce((acc, cur) => {
+          if (acc[cur[typeName]] && acc[cur[typeName]][typeName] === cur[typeName]) {
+            delete acc[cur[typeName]]
+          } else {
+            acc[cur[typeName]] = cur
+          }
+          return acc
+        }, {}))
+      },
       updateAllChecked () {
         const checkableDataKeys = this.checkableData.map(item => item[this.keyProp])
         this.allChecked = checkableDataKeys.length > 0 &&
@@ -321,13 +365,20 @@
   text-align:center;
 }
 .el-transfer-panel_table .el-table__body-wrapper {
-  height: 343px;
+  max-height: 343px;
   overflow: auto;
+}
+.table-has-footer .el-table__body-wrapper {
+  max-height: 284px;
 }
 .el-transfer-new  .el-transfer-panel__body {
   height: 400px;
 }
 .icon-move {
   cursor: pointer;
+}
+.el-transfer-panel .el-transfer-panel__total {
+  text-align: right;
+  padding-right: 10px;
 }
 </style>

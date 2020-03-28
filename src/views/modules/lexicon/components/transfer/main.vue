@@ -12,6 +12,7 @@
       :isLeft="true"
       :hasTableSort="hasTableSort"
       :isCheckList="isLeftCheckList"
+      :hasTotal="hasLeftTotal"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
       @checked-change="onSourceCheckedChange">
       <div slot="left-header"> <slot name="left-header"></slot></div>
@@ -40,11 +41,13 @@
       v-bind="$props"
       ref="rightPanel"
       :data="targetData"
+      :isRight="true"
       :title="titles[1] || t('el.transfer.titles.1')"
       :default-checked="rightDefaultChecked"
       :title-flag="rightTitleFlag"
       :filterable="rightFilter"
       :isCheckList="isRightCheckList"
+      :hasTotal="hasRightTotal"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
       @checked-change="onTargetCheckedChange">
       <div slot="right-header"><slot name="right-header"></slot></div>
@@ -76,6 +79,14 @@
       isLeftCheckList: {
         type: Boolean,
         default: true
+      },
+      hasLeftTotal: {
+        type: Boolean,
+        default: false
+      },
+      hasRightTotal: {
+        type: Boolean,
+        default: false
       },
       data: {
         type: Array,
@@ -237,18 +248,23 @@
 
       onTargetCheckedChange (val, movedKeys) {
         this.rightChecked = val
+        console.log(999, val, movedKeys)
         if (movedKeys === undefined) return
         this.$emit('right-check-change', val, movedKeys)
       },
 
       addToLeft () {
         let currentValue = this.value.slice()
+        console.log('------', this.rightChecked, currentValue)
         this.rightChecked.forEach(item => {
           const index = currentValue.indexOf(item)
+          console.log(index)
           if (index > -1) {
             currentValue.splice(index, 1)
+            console.log('555666', currentValue)
           }
         })
+        console.log(this.rightChecked)
         this.$emit('input', currentValue)
         this.$emit('change', currentValue, 'left', this.rightChecked)
       },

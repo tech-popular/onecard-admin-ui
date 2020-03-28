@@ -6,14 +6,14 @@
       filter-placeholder="请输入搜索Query"
       v-model="value"
       :widths="['350px', '350px']"
-      :titles="['', '已选择']"
       :left-filter="true"
       :right-filter="false"
       :left-title-flag="false"
-      :right-title-flag="true"
+      :right-title-flag="false"
       :is-left-check-list="true"
       :is-right-check-list="false"
       :has-table-sort="true"
+      :has-right-total="true"
       :target-order="'push'"
       :data="dataList">
       <div class="transfer-header" slot="left-header">
@@ -48,7 +48,7 @@ export default {
       cities.forEach((city, index) => {
         data.push({
           label: city,
-          key: index,
+          key: pinyin[index],
           pinyin: pinyin[index]
         })
       })
