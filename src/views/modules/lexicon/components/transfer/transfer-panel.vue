@@ -185,6 +185,7 @@
       defaultChecked: {
         immediate: true,
         handler (val, oldVal) {
+          console.log(val)
           if (oldVal && val.length === oldVal.length &&
             val.every(item => oldVal.indexOf(item) > -1)) return
           const checked = []
@@ -211,6 +212,7 @@
             return label.toLowerCase().indexOf(this.query.toLowerCase()) > -1
           }
         })
+        console.log(arr)
         return arr
         // if (!this.isRight) {
         //   this.preFilteredData = arr
