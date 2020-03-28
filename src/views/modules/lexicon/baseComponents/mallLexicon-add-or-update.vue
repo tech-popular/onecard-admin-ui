@@ -18,6 +18,8 @@
     <near-synonym v-if="dataForm.type === '近义词' || dataForm.type === '同义词'"></near-synonym>
     <!--热门词-->
     <hot-synonym v-if="dataForm.type ==='热门词'"></hot-synonym>
+    <!--敏感词和停用词-->
+    <stop-synonym v-if="dataForm.type ==='敏感词' || dataForm.type ==='停用词'"></stop-synonym>
     <div slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -27,6 +29,7 @@
 <script>
 import nearSynonym from './mallLexicon-near-synonym'
 import hotSynonym from './mallLexicon-hot-synonym'
+import stopSynonym from './mallLexicon-stop-synonym'
 export default {
   data () {
     return {
@@ -45,7 +48,7 @@ export default {
       }
     }
   },
-  components: { nearSynonym, hotSynonym },
+  components: { nearSynonym, hotSynonym, stopSynonym },
   methods: {
     init (row) {
       this.visible = true
