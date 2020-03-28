@@ -55,10 +55,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="label" label="操作" header-align="center" align="center" v-if="hasTableSort">
+        <el-table-column prop="label" label="操作" header-align="center" align="center">
           <template slot-scope="scope">
-            <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)"></i>
-            <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)"></i>
+            <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)" v-if="hasTableSort"></i>
+            <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)" v-if="hasTableSort"></i>
             <i class="el-icon-delete icon-move" style="color: red" @click="remove(scope)"></i>
           </template>
         </el-table-column>
@@ -74,7 +74,7 @@
       <slot></slot>
     </p>
     <p class="el-transfer-panel__footer el-transfer-panel__total" v-if="hasTotal">
-      目前已选中<span> {{this.data.length}} </span>条
+      目前已选中<span> {{rightDataLength}} </span>条
     </p>
   </div>
 </template>
@@ -148,7 +148,8 @@
         query: '',
         inputHover: false,
         checkChangeByUser: true,
-        preFilteredData: []
+        preFilteredData: [],
+        rightDataLength: 0 // 统计长度
       }
     },
 
@@ -215,42 +216,9 @@
             return label.toLowerCase().indexOf(this.query.toLowerCase()) > -1
           }
         })
-        console.log(arr)
+        this.rightDataLength = arr.length
         return arr
-        // if (!this.isRight) {
-        //   this.preFilteredData = arr
-        //   console.log('left', this.preFilteredData, arr)
-        //   return arr
-        // }
-        // console.log(this.preFilteredData, arr, this.isRight)
-        // let newData = []
-        // if (!this.preFilteredData.length) {
-        //   newData = arr.map((item, index) => {
-        //     return { ...item, index: index + 1 }
-        //   })
-        //   console.log(newData)
-        //   this.preFilteredData = newData
-        //   return newData
-        // } else {
-        //   if (this.preFilteredData.length < arr.length) {
-        //     newData = this.getDifferenceSetB(arr, this.preFilteredData, 'key')
-        //     let newArr = newData.map((item, index) => {
-        //       return { ...item, index: this.preFilteredData.length + index + 1 }
-        //     })
-        //     this.preFilteredData = this.preFilteredData.concat(newArr)
-        //     console.log(1, this.preFilteredData)
-        //     return this.preFilteredData
-        //   } else {
-        //     newData = this.getDifferenceSetB(this.preFilteredData, arr, 'key')
-        //     newData.forEach((item, index) => {
-        //       this.preFilteredData.splice(item.index - 1, 1)
-        //     })
-        //     console.log(2, this.preFilteredData)
-        //     return this.preFilteredData
-        //   }
-        // }
       },
-
       checkableData () {
         return this.filteredData.filter(item => !item[this.disabledProp])
       },
@@ -337,18 +305,15 @@
       },
       // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
       moveUp (index) {
-        console.log(1, index)
         let data = this.filteredData
         if (index === 0) return
         // 在上一项插入该项
         data.splice(index - 1, 0, (data[index]))
         // 删除后一项
         data.splice(index + 1, 1)
-        console.log(this.filteredData)
       },
       // 下移 将当前数组index索引与前面一个元素互换位置，向数组前面移动一位
       moveDown (index) {
-        console.log(2, index)
         let data = this.filteredData
         if (index === (data.length - 1)) return
         // 在下一项插入该项
@@ -358,7 +323,7 @@
       },
       remove (scope) {
         this.filteredData.splice(scope.$index, 1)
-        this.$emit('remove-change', scope.row.key)
+        this.rightDataLength = this.filteredData.length
       }
     }
   }

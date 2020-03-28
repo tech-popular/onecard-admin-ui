@@ -13,6 +13,7 @@
       :right-title-flag="false"
       :is-left-check-list="true"
       :is-right-check-list="false"
+      :has-right-total="true"
       :target-order="'push'"
       :manual-input="manualQuery"
       :data="dataList">
