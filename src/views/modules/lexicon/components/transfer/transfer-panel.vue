@@ -153,6 +153,7 @@
 
     watch: {
       checked (val, oldVal) {
+        console.log(val)
         this.updateAllChecked()
         if (this.checkChangeByUser) {
           const movedKeys = val.concat(oldVal)
@@ -174,6 +175,7 @@
         })
         this.checkChangeByUser = false
         this.checked = checked
+        console.log(this.isRight, this.checked)
       },
 
       checkableData () {
@@ -194,6 +196,7 @@
           })
           this.checkChangeByUser = false
           this.checked = checked
+          console.log(this.isRight, this.checked)
         }
       }
     },

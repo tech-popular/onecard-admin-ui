@@ -197,6 +197,7 @@
       },
   
       sourceData () {
+        console.log(this.data)
         return this.data
         // return this.data.filter(item => this.value.indexOf(item[this.props.key]) === -1)
       },
@@ -297,8 +298,6 @@
           ? itemsToBeMoved.concat(currentValue)
           : currentValue.concat(itemsToBeMoved)
         if (this.manualInput) { this.$emit('clearManual') }
-        console.log(this.leftChecked)
-        this.leftChecked = []
         this.$emit('input', currentValue)
         this.$emit('change', currentValue, 'right', this.leftChecked)
       },
