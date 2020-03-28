@@ -69,7 +69,7 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getdDataIndexAliasList"/>
     <div class="btn-group">
       <el-button type="primary" @click="submitData">提交</el-button>
       <el-button type="default" @click="submitCancel">取消</el-button>
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-  import { indexManageList, indexManageTypeList } from '@/api/dataAnalysis/indexManage'
+  import { indexManageTypeList } from '@/api/dataAnalysis/indexManage'
   import { channelsList } from '@/api/dataAnalysis/dataInsightManage'
   import { dataIndexAliasList, dataIndexAliasUpdate } from '@/api/dataAnalysis/outParamsMapping'
   import AddOrUpdate from './indexManage-add-or-update'
@@ -153,44 +153,17 @@
       },
       getdDataIndexAliasList () { // 点击出参编辑时
         this.dataListLoading = true
-        dataIndexAliasList(this.transferId, {
-          'pageNum': this.pageNum,
-          'pageSize': this.pageSize
-        }).then(({data}) => {
-          if (data && data.status === '1') {
-            this.dataList = data.data.list
-            this.totalCount = data.data.total
-            if (this.modifyDataList.length) {
-              this.dataList.forEach((item, index) => {
-                this.modifyDataList.forEach((mitem, mindex) => {
-                  if (item.id === mitem.id) {
-                    this.dataList.splice(index, 1, this.modifyDataList[mindex])
-                  }
-                })
-              })
-            }
-          } else {
-            this.dataList = []
-            this.totalCount = 0
-          }
-          this.dataListLoading = false
-        })
-      },
-      // 获取数据列表 搜索时调用
-      getDataList () {
-        this.dataListLoading = true
         let params = {
           ...this.dataForm,
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
-        indexManageList(params, false).then(({data}) => {
+        dataIndexAliasList(this.transferId, params).then(({data}) => {
           if (data && data.status === '1') {
             this.dataList = data.data.list.map(item => {
               return { ...item, indexAlias: item.indexAlias || item.englishName }
             })
             this.totalCount = data.data.total
-            // 如果有已修改的内容时，将修改后的内容赋值到输入框中
             if (this.modifyDataList.length) {
               this.dataList.forEach((item, index) => {
                 this.modifyDataList.forEach((mitem, mindex) => {
@@ -200,7 +173,6 @@
                 })
               })
             }
-            console.log(this.dataList)
           } else {
             this.dataList = []
             this.totalCount = 0
@@ -208,7 +180,6 @@
           this.dataListLoading = false
         })
       },
-
       // 新增 / 修改
       addOrUpdateHandle (row, tag) {
         this.addOrUpdateVisible = true
@@ -219,8 +190,8 @@
       /** 查询 */
       searchHandle () {
         this.pageNum = 1
-        this.isSearch = true
-        this.getDataList()
+        // this.isSearch = true
+        this.getdDataIndexAliasList()
       },
       /** 重置 */
       resetHandle () {
@@ -250,20 +221,12 @@
       sizeChangeHandle (page) {
         this.pageSize = page
         this.pageNum = 1
-        if (this.isSearch) {
-          this.getDataList()
-        } else {
-          this.getdDataIndexAliasList()
-        }
+        this.getdDataIndexAliasList()
       },
       // 当前页
       currentChangeHandle (page) {
         this.pageNum = page
-        if (this.isSearch) {
-          this.getDataList()
-        } else {
-          this.getdDataIndexAliasList()
-        }
+        this.getdDataIndexAliasList()
       },
       submitData () {
         console.log('submit')
