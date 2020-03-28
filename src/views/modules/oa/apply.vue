@@ -2,10 +2,14 @@
   <div>
     <el-form :inline="true">
       <el-form-item label="申请类别">
-        <el-input v-model.trim="name" placeholder="" clearable />
+        <el-select v-model="applyTypeValue" placeholder="请选择" @change='clickApplyType'>
+          <el-option v-for="item in applyType" :value="item.id" :key="item.id" :label="item.name"/>
+        </el-select>
       </el-form-item>
       <el-form-item label="审批状态">
-        <el-input v-model.trim="state" placeholder="" clearable />
+        <el-select placeholder="请选择" v-model="approvalStatusValeu"  @change='clickApprovalStatus'>
+          <el-option v-for="item in approvalStatus" :value="item.id" :key="item.id" :label="item.name"/>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -18,49 +22,34 @@
       v-loading="dataListLoading"
       style="width: 100%;">
       <el-table-column
-        prop="id"
+        prop="title"
         header-align="center"
         align="center"
         label="标题"/>
       <el-table-column
-        prop="name"
+        prop="applyType"
         header-align="center"
         align="center"
-        label="申请类别"
-        width="150px">
-        <template slot-scope="scope">
-          <el-tooltip effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.name)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.name}}</div>
-          </el-tooltip>
-        </template>
-      </el-table-column>
+        label="申请类别"/>
       <el-table-column
-        prop="type"
+        prop="createTime"
         header-align="center"
         align="center"
         label="发起审批时间"/>
       <el-table-column
-        prop="description"
+        prop="approvalStatus"
         header-align="center"
         align="center"
-        label="钉钉审批状态">
-        <template slot-scope="scope">
-          <el-tooltip effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.description)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.description}}</div>
-          </el-tooltip>
-        </template>
-      </el-table-column>
+        label="钉钉审批状态"/>
       <el-table-column
-        prop="owner"
+        prop="flow"
         header-align="center"
         align="center"
         label="钉钉审批流"/>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">查看</el-button>
+          <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -74,22 +63,42 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <!-- 查看弹出框 -->
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      width="60%"
+      :before-close="handleClose">
+      <span>这是一段信息</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 import AddOrUpdate from './apply-add-or-update'
+import { myAccoutList, myAccoutSelect } from '@/api/oa/apply'
 
 export default {
   data () {
     return {
       name: '',
+      applyType: [],
+      applyTypeId: '',
+      applyTypeValue: '',
+      approvalStatus: [],
+      approvalStatusId: '',
+      approvalStatusValeu: '',
       dataList: [],
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
-      newList: []
+      newList: [],
+      dialogVisible: false
     }
   },
   components: {
@@ -99,31 +108,49 @@ export default {
     this.getDataList()
   },
   methods: {
-      // 获取数据列表
+    // 获取数据列表
     getDataList () {
       this.dataListLoading = true
-      // const dataBody = {
-      //   'name': this.name,
-      //   'pageNum': this.pageNum,
-      //   'pageSize': this.pageSize
-      // }
-      // beeTaskList(dataBody).then(({data}) => {
-      //   if (data && data.status === 0) {
-      //     this.newList = []
-      //     this.dataList = data.list
-      //     this.totalPage = data.totalCount
-      //     var arrList = []
-      //     for (let i = 0, length = this.dataList.length; i < length; i++) {
-      //       arrList.push(this.dataList[i].beeTaskDef)
-      //       this.newList = arrList
-      //     }
-      //   } else {
-      //     this.dataList = []
-      //     this.newList = []
-      //     this.totalPage = 0
-      //   }
-      //   this.dataListLoading = false
-      // })
+      // 条件查询初始化
+      myAccoutSelect().then(({data}) => {
+        this.applyType = data.data.applyTypeList
+        this.approvalStatus = data.data.approvalStatusList
+      })
+      const dataBody = {
+        'applyType': {
+          id: this.applyTypeId,
+          name: this.applyTypeValue
+        },
+        'approvalStatus': {
+          id: this.approvalStatusId,
+          name: this.approvalStatusValeu
+        },
+        'pageNum': this.pageNum,
+        'pageSize': this.pageSize
+      }
+      myAccoutList(dataBody).then(({data}) => {
+        console.log(data.data, 'liebioa')
+        this.totalPage = data.data.total
+        this.newList = data.data.rows
+        this.dataListLoading = false
+      })
+    },
+    // 条件查询change
+    clickApplyType (id) {
+      let obj = {}
+      obj = this.applyType.find((item) => {
+        return item.id === id // 筛选出匹配数据
+      })
+      this.applyTypeId = obj.id
+      this.applyTypeValue = obj.name
+    },
+    clickApprovalStatus (id) {
+      let obj = {}
+      obj = this.approvalStatus.find((item) => {
+        return item.id === id // 筛选出匹配数据
+      })
+      this.approvalStatusId = obj.id
+      this.approvalStatusValeu = obj.name
     },
       // 每页数
     sizeChangeHandle (val) {
@@ -144,41 +171,26 @@ export default {
       /** 重置 */
     resetHandle () {
       this.pageNum = 1
-      this.name = ''
+      this.applyTypeId = ''
+      this.applyTypeValue = ''
+      this.approvalStatusId = ''
+      this.approvalStatusValeu = ''
     },
-      // 新增 / 修改
+      // 新增 / 修改 / 查看
     addOrUpdateHandle (id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })
-    },
-      // 删除
-    deleteHandle (id) {
-      this.$confirm(`确定删除操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        // const dataBody = {
-        //   utcParam: [id]
-        // }
-        // deleteBeeTask(dataBody).then(({data}) => {
-        //   if (data && data.status === 0) {
-        //     this.$message({
-        //       message: '操作成功',
-        //       type: 'success',
-        //       duration: 1500,
-        //       onClose: () => {
-        //         this.getDataList()
-        //       }
-        //     })
-        //   } else {
-        //     this.$message.error(data.msg)
-        //   }
-        // })
-      })
     }
+     // 查看
+    // lookHandle (id) {
+    //   console.log(id, 'chakan')
+    //   this.dialogVisible = true
+    //   lookAccout(id).then(({data}) => {
+
+    //   })
+    // }
   }
 }
 </script>
