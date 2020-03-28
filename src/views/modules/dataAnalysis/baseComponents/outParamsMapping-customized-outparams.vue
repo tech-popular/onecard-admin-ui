@@ -41,7 +41,7 @@
           <template slot-scope="scope">
             <el-form-item>
               <i class="el-icon-circle-plus-outline icon-add-row" @click="addField"></i>
-              <i class="el-icon-circle-close icon-remove" @click="removeField(scope.$index)"></i>
+              <i class="el-icon-circle-close icon-remove" @click="removeField(scope)"></i>
             </el-form-item>
           </template>
         </el-table-column>
@@ -56,7 +56,7 @@
 
 <script>
   import { indexManageTypeList } from '@/api/dataAnalysis/indexManage'
-  import { dataIndexAliasAdd, dataIndexAliasCustomList } from '@/api/dataAnalysis/outParamsMapping'
+  import { dataIndexAliasAdd, dataIndexAliasCustomList, dataIndexAliasDelete } from '@/api/dataAnalysis/outParamsMapping'
   export default {
     data () {
       return {
@@ -133,9 +133,23 @@
         })
       },
       // 删除字段
-      removeField (index) {
-        this.formData.tableData.splice(index, 1)
-        this.updateDataIndex()
+      removeField (scope) {
+        let row = scope.row
+        if (!row.id) {
+          this.formData.tableData.splice(scope.$index, 1)
+          this.updateDataIndex()
+        } else {
+          dataIndexAliasDelete(row.id).then(({data}) => {
+            if (data.status !== '1') {
+              return this.$message({
+                type: 'error',
+                message: data.message || '删除失败'
+              })
+            }
+            this.formData.tableData.splice(scope.$index, 1)
+            this.updateDataIndex()
+          })
+        }
       },
       // 自动更新id
       updateDataIndex () {
