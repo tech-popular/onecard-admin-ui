@@ -1,6 +1,6 @@
 <template>
   <div class="index-wrap">
-    <div class="last-modifier">最后修改人：无</div>
+    <div class="last-modifier">最后修改人：{{updator}}</div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="指标ID">
         <el-input v-model="dataForm.id" placeholder="" clearable />
@@ -101,7 +101,8 @@
         addOrUpdateVisible: false,
         fieldTypeList: [], // 数据类型
         channelIdList: [],
-        isSearch: false
+        isSearch: false,
+        updator: '无'
       }
     },
     components: {
@@ -164,6 +165,7 @@
               return { ...item, indexAlias: item.indexAlias || item.englishName }
             })
             this.totalCount = data.data.total
+            this.updator = this.dataList[this.dataList.length - 1].updater || '无'
             if (this.modifyDataList.length) {
               this.dataList.forEach((item, index) => {
                 this.modifyDataList.forEach((mitem, mindex) => {

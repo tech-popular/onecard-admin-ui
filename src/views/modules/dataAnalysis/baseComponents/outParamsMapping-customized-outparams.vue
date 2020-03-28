@@ -1,6 +1,6 @@
 <template>
   <div class="customized-wrap">
-    <div class="last-modifier">最后修改人：无</div>
+    <div class="last-modifier">最后修改人：{{updator}}</div>
 		<el-form :model="formData" ref="formData">
 			<el-table :data="formData.tableData" border style="width: 100%;">
         <el-table-column prop="index" header-align="center" align="center" label="序号"></el-table-column>
@@ -81,7 +81,8 @@
             message: '请输入字段值'
           }
         },
-        fieldTypeList: []
+        fieldTypeList: [],
+        updator: '无'
       }
     },
     mounted () {
@@ -105,6 +106,7 @@
             return
           }
           this.formData.tableData = data.data
+          this.updator = data.data[data.data.length - 1].updater || '无'
           this.updateDataIndex()
         })
       },
