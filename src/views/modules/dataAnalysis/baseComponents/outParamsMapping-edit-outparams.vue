@@ -44,7 +44,7 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" label="修改后指标名称">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.indexAlias" @blur="blurEnglishNameEvent(scope.row)" placeholder="请输入内容"></el-input>
+          <el-input v-model="scope.row.indexAlias" @blur="blurIndexAliasEvent(scope.row)" placeholder="请输入内容"></el-input>
         </template>
       </el-table-column>
     </el-table>
@@ -70,6 +70,7 @@
   import { channelsList } from '@/api/dataAnalysis/dataInsightManage'
   import { dataIndexAliasList, dataIndexAliasUpdate, dataAnalysisGetUpdator } from '@/api/dataAnalysis/outParamsMapping'
   import AddOrUpdate from './indexManage-add-or-update'
+  import { deepClone } from '../dataAnalysisUtils/utils'
   export default {
     data () {
       return {
@@ -90,7 +91,8 @@
         fieldTypeList: [], // 数据类型
         channelIdList: [],
         isSearch: false,
-        updator: '无'
+        updator: '无',
+        originTableData: {} // 保留一份原始数据
       }
     },
     components: {
@@ -111,7 +113,7 @@
       }
     },
     methods: {
-  
+
       // 数据类型
       fieldTypeFormat (row, column) {
         for (var i = 0; i < this.fieldTypeList.length; i++) {
@@ -162,6 +164,7 @@
             this.dataList = data.data.list.map(item => {
               return { ...item, indexAlias: item.indexAlias || item.englishName }
             })
+            this.originTableData = deepClone(this.dataList)
             this.totalCount = data.data.total
             if (this.modifyDataList.length) {
               this.dataList.forEach((item, index) => {
@@ -201,17 +204,26 @@
           enable: ''
         }
       },
-      blurEnglishNameEvent (row) { // 输入框失去焦点时，保存数据
-        if (row.englishName !== row.newEnglishName && !this.judgeIsInArray(this.modifyDataList, row.id)) {
+      blurIndexAliasEvent (row) { // 输入框失去焦点时，保存数据
+        let isModify = true
+        // 用当前数据和原始数据作比较
+        let originRow = this.originTableData.filter(item => item.id === row.id)[0]
+        if (row.indexAlias === originRow.indexAlias) { // 等于说明没有修改
+          isModify = false
+          if (this.judgeIsInArray(this.modifyDataList, row.id) !== -1) { // 若之前修改过又修改回来了，则在modifyData去掉这个数据
+            let index = this.judgeIsInArray(this.modifyDataList, row.id)
+            this.modifyDataList.splice(index, 1)
+          }
+        }
+        if (isModify && this.judgeIsInArray(this.modifyDataList, row.id) === -1) {
           this.modifyDataList.push(row)
         }
-        console.log(this.modifyDataList)
       },
       judgeIsInArray (arr, id) { // 判断某个参数是否在数据中
-        let flag = false
-        arr.forEach(item => {
+        let flag = -1
+        arr.forEach((item, index) => {
           if (item.id === id) {
-            flag = true
+            flag = index
           }
         })
         return flag
@@ -228,8 +240,19 @@
         this.getdDataIndexAliasList()
       },
       submitData () {
-        console.log('submit')
         console.log(this.modifyDataList)
+        if (this.modifyDataList.length === 0) {
+          this.$confirm('当前出参名称无修改，确定提交？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.$emit('cancel')
+          }).catch((e) => {
+            console.log(e)
+          })
+          return
+        }
         dataIndexAliasUpdate(this.transferId, this.userName, this.modifyDataList).then(({data}) => {
           if (data && data.status !== '1') {
             return this.$message({
