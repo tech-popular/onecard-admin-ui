@@ -14,6 +14,7 @@
             v-model= "baseForm.kafka"
             placeholder="请选择"
             class="data-select"
+            filterable
           >
             <el-option
               v-for="item in kafkaServerList"
@@ -33,6 +34,7 @@
             v-model= "baseForm.database"
             placeholder="请选择"
             class="data-select"
+            filterable
           >
             <el-option
               v-for="item in mysqlServerList"
