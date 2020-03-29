@@ -3,16 +3,16 @@
     <div class="last-modifier">最后修改人：{{updator}}</div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="指标ID">
-        <el-input v-model="dataForm.id" placeholder="" clearable />
+        <el-input v-model="dataForm.id" placeholder="请输入指标ID" clearable />
       </el-form-item>
       <el-form-item label="指标名称">
-        <el-input v-model="dataForm.englishName" placeholder="" clearable />
+        <el-input v-model="dataForm.englishName" placeholder="请输入指标名称" clearable />
       </el-form-item>
       <el-form-item label="指标标题">
-        <el-input v-model="dataForm.chineseName" placeholder="" clearable />
+        <el-input v-model="dataForm.chineseName" placeholder="请输入指标标题" clearable />
       </el-form-item>
       <el-form-item label="用户所属渠道">
-        <el-select v-model="dataForm.channelId">
+        <el-select v-model="dataForm.channelId" filterable placeholder="请选择">
             <el-option v-for="(item, index) in channelIdList" :key="index" :label="item.text" :value="item.value"></el-option>
           </el-select>
       </el-form-item>
@@ -28,38 +28,26 @@
         <el-button @click="resetHandle()">重置</el-button>
       </el-form-item>
     </el-form>
-		<el-row :gutter="20" v-loading="dataListLoading">
-			<el-col :span="16">
-				<el-table :data="dataList" border style="width: 100%;">
-					<el-table-column prop="id" header-align="center" align="center" label="指标ID"></el-table-column>
-					<el-table-column prop="englishName" header-align="center" align="center" label="指标名称"></el-table-column>
-					<el-table-column prop="chineseName" header-align="center" align="center" label="指标标题"></el-table-column>
-					<el-table-column header-align="center" align="center" width="100" label="操作">
-						<template slot-scope="scope">
-							<el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
-						</template>
-					</el-table-column>
-				</el-table>
-			</el-col>
-			<el-col :span="2">
-				<el-table :data="dataList" :show-header="false" style="width: 100%;" class="line-arrow">
-					<el-table-column header-align="center" align="center">
-						<template>
-							<el-button type="text" style="color: #666" icon="el-icon-right"></el-button>
-						</template>
-					</el-table-column>
-				</el-table>
-			</el-col>
-			<el-col :span="6">
-				<el-table :data="dataList" border style="width: 100%;">
-					<el-table-column header-align="center" align="center" label="修改后指标名称">
-						<template slot-scope="scope">
-							<el-input v-model="scope.row.indexAlias" @blur="blurEnglishNameEvent(scope.row)" placeholder="请输入内容"></el-input>
-						</template>
-					</el-table-column>
-				</el-table>
-			</el-col>
-		</el-row>
+    <el-table :data="dataList" border style="width: 100%;" class="table-content">
+      <el-table-column prop="id" header-align="center" align="center" width="80" label="指标ID"></el-table-column>
+      <el-table-column prop="englishName" header-align="center" align="center" label="指标名称"></el-table-column>
+      <el-table-column prop="chineseName" header-align="center" align="center" label="指标标题"></el-table-column>
+      <el-table-column header-align="center" align="center" width="100" label="操作">
+        <template slot-scope="scope">
+          <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" width="150">
+        <template>
+          <el-button type="text" style="color: #888">-></el-button>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" label="修改后指标名称">
+        <template slot-scope="scope">
+          <el-input v-model="scope.row.indexAlias" @blur="blurEnglishNameEvent(scope.row)" placeholder="请输入内容"></el-input>
+        </template>
+      </el-table-column>
+    </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -277,17 +265,36 @@
     & .line-arrow::before {
       height: 0;
     }
-    & .line-arrow td, & .line-arrow th.is-leaf {
-      border: 0;
-      padding-bottom: 11px;
-    }
-    & .line-arrow .el-table__body tr:hover>td{
-      background-color: #fff!important;
-      cursor: none;
-    }
+    // & .line-arrow td, & .line-arrow th.is-leaf {
+    //   border: 0;
+    //   padding-bottom: 11px;
+    // }
+    // & .line-arrow .el-table__body tr:hover>td{
+    //   background-color: #fff!important;
+    //   cursor: none;
+    // }
     & .btn-group {
       text-align: center;
       padding-top: 20px;
+    }
+    & .table-content {
+      border-top: 0;
+    }
+    & .table-content::before {
+      height: 0;
+    }
+    & .table-content th {
+      border-top: 1px solid #ebeef5;
+    }
+    
+    & .table-content th:nth-child(5){
+      border-top: 0;
+    }
+    & .table-content tr:last-child td:nth-child(5) {
+      border-bottom: 0;;
+    }
+    & .table-content tr td:nth-child(5), & .table-content tr th:nth-child(5){
+      border-bottom: 0;
     }
   }
 </style>
