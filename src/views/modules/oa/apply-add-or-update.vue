@@ -28,7 +28,6 @@
               :options="moduleList"
               @change="handleChange"
               ref="all"
-
             ></el-cascader>
           </el-form-item>
           <el-form-item label="申请权限" prop="jurisdiction">
@@ -67,11 +66,16 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="库表授权">
-        <el-form :model="severDataForm" :rules="severDataRule" ref="severDataForm" label-width="160px">
-          <el-form-item label="标题" prop="name">
-            <el-input v-model="severDataForm.name" placeholder="标题" />
+        <el-form
+          :model="severDataForm"
+          :rules="severDataRule"
+          ref="severDataForm"
+          label-width="160px"
+        >
+          <el-form-item label="标题" prop="title">
+            <el-input v-model="severDataForm.title" placeholder="标题" />
           </el-form-item>
-          <el-form-item label='选择要授权的库/表/字段'>
+          <el-form-item label="选择要授权的库/表/字段">
             <!-- <p>选择要授权的库/表/字段</p> -->
             <el-row :gutter="24">
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
@@ -136,8 +140,18 @@
                 />
               </el-col>
               <el-col :span="2" style="text-align:center;padding-top:10%">
-                <el-button @click="addStaff" type="primary" size="mini" style="padding: 5px;">添加<i class="el-icon-arrow-right"></i></el-button>
-                <el-button @click="removeStaff" type="danger" size="mini" style="padding: 5px;margin-left: 0;margin-top: 10px;"><i class="el-icon-arrow-left"></i>删除</el-button>
+                <el-button @click="addStaff" type="primary" size="mini" style="padding: 5px;">
+                  添加
+                  <i class="el-icon-arrow-right"></i>
+                </el-button>
+                <el-button
+                  @click="removeStaff"
+                  type="danger"
+                  size="mini"
+                  style="padding: 5px;margin-left: 0;margin-top: 10px;"
+                >
+                  <i class="el-icon-arrow-left"></i>删除
+                </el-button>
               </el-col>
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
                 <p>已确认选择要授权的库/表/字段</p>
@@ -171,23 +185,29 @@
               </el-col>
             </el-row>
           </el-form-item>
-          <el-form-item label="申请权限" prop="jurisdiction">
-            <el-checkbox-group v-model="severDataForm.jurisdiction">
+          <el-form-item label="申请权限" prop="applyAuthTypeList">
+            <el-checkbox-group v-model="severDataForm.applyAuthTypeList" @change="changeAuthType">
               <el-checkbox
                 v-for="(item, index) in severApplyAuthList"
-                :label="item.id"
+                :label="item"
                 :key="index"
               >{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="申请人姓名" prop="userName">
-            <el-input v-model="severDataForm.userName" placeholder="申请人姓名" />
+          <el-form-item label="maxcomputer账号" prop="account">
+            <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
+          </el-form-item>
+          <el-form-item label="申请人姓名" prop="applicantName">
+            <el-input v-model="severDataForm.applicantName" placeholder="申请人姓名" />
           </el-form-item>
           <el-form-item label="默认所属部门">
             <span>{{department}}</span>
           </el-form-item>
-          <el-form-item label="申请人邮箱" prop="email">
-            <el-input v-model="severDataForm.email" placeholder="申请人邮箱" />
+          <el-form-item label="申请人邮箱" prop="applicantEmail">
+            <el-input v-model="severDataForm.applicantEmail" placeholder="申请人邮箱" />
+          </el-form-item>
+          <el-form-item label="手机号" prop="applicantTel">
+            <el-input v-model="severDataForm.applicantTel" placeholder="手机号" />
           </el-form-item>
           <el-form-item label="本次申请默认审批人">
             <el-tag
@@ -197,8 +217,8 @@
               :type="tag.name"
             >{{tag.name}}</el-tag>
           </el-form-item>
-          <el-form-item label="申请理由" prop="reason">
-            <el-input type="textarea" v-model="severDataForm.reason"></el-input>
+          <el-form-item label="申请理由" prop="applyReason">
+            <el-input type="textarea" v-model="severDataForm.applyReason"></el-input>
           </el-form-item>
         </el-form>
         <div class="foot">
@@ -211,7 +231,12 @@
 </template>
 
 <script>
-import { accoutAuthInitInfo, getListOnPage, databaseInitInfo } from '@/api/oa/apply'
+import {
+  accoutAuthInitInfo,
+  getListOnPage,
+  databaseInitInfo,
+  saveDatabaseAuthApply
+} from '@/api/oa/apply'
 // import Filter from './filter'
 export default {
   data () {
@@ -232,7 +257,7 @@ export default {
       department: '', // 默认部门数据载体
       dataForm: {
         name: '', // 标题
-        system: '',  // 申请系统
+        system: '', // 申请系统
         model: '', // 申请模块
         jurisdiction: '', // 申请权限
         userName: '', // 申请人姓名
@@ -260,35 +285,38 @@ export default {
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
-
       // 库表授权开始
       severDataForm: {
-        name: '', // 库表权限标题
-        selectDbName: '', // 请选择数据库
-        jurisdiction: '', // 申请权限
-        userName: '', // 申请人姓名
-        email: '', // 申请人邮箱
+        title: '', // 库表权限标题
+        applyAuthTypeList: [], // 申请权限
+        applicantName: '', // 申请人姓名
+        applicantEmail: '', // 申请人邮箱
+        applicantTel: '', // 申请人手机号
         approvalPeop: '', // 默认审批人
-        reason: '' // 申请理由
+        account: '', // maxcomputer账号
+        applyReason: '' // 申请理由
       },
       severDataRule: {
-        name: [
-          { required: true, message: '标题不能为空', trigger: 'blur' }
+        title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
+        applyAuthTypeList: [
+          { required: true, message: '请选择申请权限', trigger: 'change' }
         ],
-        selectDbName: [
-          { required: true, message: '请选择库表', trigger: 'blur' }
-        ],
-        jurisdiction: [
-          { required: true, message: '请选择申请权限', trigger: 'blur' }
-        ],
-        userName: [
+        applicantName: [
           { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
         ],
-        email: [
+        applicantEmail: [
           { required: true, message: '申请人邮箱不能为空', trigger: 'blur' }
         ],
-        reason: [
+        applicantTel: [
+          {
+            required: true, message: '申请人手机号不能为空', trigger: 'blur'
+          }
+        ],
+        applyReason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
+        ],
+        account: [
+          {required: true, message: 'maxcomputer不能为空', trigger: 'blur'}
         ]
       }, // 库表权限表单校验
       dataFormValue: '',
@@ -303,7 +331,6 @@ export default {
         requestFieldType: 0,
         requestParamTemplateStatus: 0
       }, // 任务类型
-
       // 库表授权结束
       listLoading: false,
       staffTemp: {
@@ -336,15 +363,13 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         accoutAuthInitInfo().then(({ data }) => {
-          console.log(data, 'zhanghao')
           this.systemList = data.data.systemList
           this.applyAuthList = data.data.applyAuthList
           this.moduleList = data.data.moduleList
           this.defaultApproverList = data.data.defaultApproverList
           this.department = data.data.department
         })
-        databaseInitInfo().then(({data}) => {
-          console.log(data, 'ku')
+        databaseInitInfo().then(({ data }) => {
           this.severApplyAuthList = data.data.applyAuthList
           this.severdefaultApproverList = data.data.defaultApproverList
           this.severdepartment = data.data.department
@@ -384,63 +409,75 @@ export default {
       }
       this.visible = data
     },
-    dataFormSubmit (form) {  // 账号权限提交
+    dataFormSubmit (form) {
+      // 账号权限提交
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          console.log('准备提交了')
-          // let newData = {
-          //   'beeTaskDef': this.dataForm,
-          //   ...data
-          // }
-          // beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
-          //   if (data && data.status === 0) {
-          //     this.$message({
-          //       message: '操作成功',
-          //       type: 'success',
-          //       duration: 1500,
-          //       onClose: () => {
-          //         this.visible = false
-          //         this.$emit('refreshDataList')
-          //         this.$refs['dataForm'].resetFields()
-          //       }
-          //     })
-          //   } else {
-          //     this.$message.error(data.msg)
-          //   }
-          // })
+          let newData = {
+            title: '',
+            applicantName: '',
+            applicantEmail: '',
+            applyReason: '',
+            info: {},
+            applyAuthTypeList: []
+          }
+          saveDatabaseAuthApply(newData).then(({ data }) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                  this.$refs['dataForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
         }
       })
     },
-    severDataFormSubmit (form) {  // 库表授权提交
+    severDataFormSubmit (form) {
+      // 库表授权提交
       this.$refs['severDataForm'].validate(valid => {
         if (valid) {
-          console.log('准备提交了')
-          // let newData = {
-          //   'beeTaskDef': this.dataForm,
-          //   ...data
-          // }
-          // beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
-          //   if (data && data.status === 0) {
-          //     this.$message({
-          //       message: '操作成功',
-          //       type: 'success',
-          //       duration: 1500,
-          //       onClose: () => {
-          //         this.visible = false
-          //         this.$emit('refreshDataList')
-          //         this.$refs['dataForm'].resetFields()
-          //       }
-          //     })
-          //   } else {
-          //     this.$message.error(data.msg)
-          //   }
-          // })
+          let newData = {
+            title: this.severDataForm.title,
+            applicantName: this.severDataForm.applicantName,
+            applicantEmail: this.severDataForm.applicantEmail,
+            applicantTel: this.severDataForm.applicantTel,
+            applyReason: this.severDataForm.applyReason,
+            info: {
+              account: this.severDataForm.account,
+              tables: this.selectedStaffList
+            },
+            applyAuthTypeList: this.severDataForm.applyAuthTypeList
+          }
+          saveDatabaseAuthApply(newData).then(({ data }) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                  this.$refs['severDataForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
         }
       })
     },
     // 穿梭狂部分
     getStaffList () {
-      getListOnPage(this.staffTemp).then(({data}) => {
+      getListOnPage(this.staffTemp).then(({ data }) => {
         if (data.status == '1') {
           this.totalPage = data.data.total
           this.staffList = data.data.rows
@@ -466,7 +503,7 @@ export default {
       // })
       if (repeat === false) {
         this.selectedStaffList = [...this.selectedStaffList, ...this.staffData]
-        this.staffList = this.staffList.filter((item) => {
+        this.staffList = this.staffList.filter(item => {
           let list = this.staffData.map(v => v.name)
           return !list.includes(item.name)
         })
@@ -480,7 +517,7 @@ export default {
         this.$refs['selectedStaffTable'].clearSelection()
       }, 0)
       this.staffList = [...this.staffList, ...this.selectedStaffData]
-      this.selectedStaffList = this.selectedStaffList.filter((item) => {
+      this.selectedStaffList = this.selectedStaffList.filter(item => {
         let list = this.selectedStaffData.map(v => v.name)
         return !list.includes(item.name)
       })
@@ -516,10 +553,13 @@ export default {
       this.staffTemp.pageNum = 1
       this.getStaffList()
     },
-      // 当前页
+    // 当前页
     currentChangeHandle (val) {
       this.staffTemp.pageNum = val
       this.getStaffList()
+    },
+    changeAuthType () {
+      console.log(this.severDataForm.applyAuthTypeList)
     }
   }
 }
