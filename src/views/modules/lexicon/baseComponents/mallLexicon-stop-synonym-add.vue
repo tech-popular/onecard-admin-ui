@@ -32,12 +32,13 @@
       </div>
     </div>
     <div class="footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="parent.cancel()">取消</el-button>
       <el-button type="primary" @click="dataSubmit()">确定</el-button>
     </div>
   </div>
 </template>
 <script>
+import { findParent } from '../assets/js/utils'
 export default {
   data () {
     return {
@@ -46,6 +47,9 @@ export default {
       },
       dynamicQuery: []
     }
+  },
+  mounted () {
+    this.parent = findParent(this.$parent)
   },
   methods: {
     handleClose (tag) {

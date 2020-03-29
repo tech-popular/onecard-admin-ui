@@ -4,7 +4,6 @@
       <div class="query-title"><span style="color:red">*</span>选择及添加词组里的Query</div>
       <div class="el-transfer" style="text-align: center">
         <div class="el-transfer-panel el-transfer-panel-new el-transfer-left">
-          
           <left-transfer
             :placeholder="'请输入内容'"
             :filterable='true'
@@ -49,7 +48,7 @@
       </div>
     </div>
     <div class="footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="parent.cancel()">取消</el-button>
       <el-button type="primary" @click="dataSubmit()">确定</el-button>
     </div>
   </div>
@@ -57,6 +56,7 @@
 <script>
 import leftTransfer from '../components/leftTransfer'
 import rightTransfer from '../components/rightTransfer'
+import { findParent } from '../assets/js/utils'
 export default {
   data () {
     const generateData = _ => {
@@ -88,6 +88,9 @@ export default {
     }
   },
   components: { leftTransfer, rightTransfer },
+  mounted () {
+    this.parent = findParent(this.$parent)
+  },
   methods: {
     filterMethod (query, item) {
       return item.pinyin.indexOf(query) > -1

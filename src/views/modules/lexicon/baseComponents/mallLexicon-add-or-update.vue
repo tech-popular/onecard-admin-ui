@@ -42,6 +42,7 @@ import stopSynonymUpdate from './mallLexicon-stop-synonym-update'
 export default {
   data () {
     return {
+      isTreeRoot: true,
       id: '',
       visible: false,
       dataForm: {
@@ -70,6 +71,13 @@ export default {
     init (row) {
       this.visible = true
       this.id = row ? row.id : ''
+      this.dataForm = { // 初始化
+        name: '',
+        type: '近义词'
+      }
+    },
+    cancel () {
+      this.visible = false
     }
   }
 }
