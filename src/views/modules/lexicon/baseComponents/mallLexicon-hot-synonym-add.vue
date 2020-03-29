@@ -1,0 +1,134 @@
+<template>
+  <div>
+    <div class="add-wrap">
+      <div class="query-title"><span style="color:red">*</span>选择及添加词组里的Query</div>
+      <div class="el-transfer" style="text-align: center">
+        <div class="el-transfer-panel el-transfer-panel-new el-transfer-left">
+          
+          <left-transfer
+            :placeholder="'请输入内容'"
+            :filterable='true'
+            :filter-method="filterMethod"
+            :has-footer="false"
+            :data="leftData"
+            @checkChange="leftCheckChange"
+          >
+          <div slot="header">
+            <el-form inline :model="dataForm" :rules="dataRules" class="transfer-form">
+              <el-form-item label="选择:" prop="query">
+                <el-radio-group v-model="dataForm.query" size="mini">
+                  <el-radio-button label="商品名称" ></el-radio-button>
+                  <el-radio-button label="商品分类"></el-radio-button>
+                  <el-radio-button label="商品品牌"></el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-form>  
+          </div>
+          </left-transfer>
+        </div>
+        <div class="el-transfer__buttons">
+          <el-button type="primary" class="el-transfer__button" @click.native="addToRight">
+            <i class="el-icon-arrow-right"></i>
+          </el-button>
+        </div>
+        <div class="el-transfer-panel el-transfer-panel-new el-transfer-right">
+          <right-transfer
+            :has-table-sort="true"
+            :has-footer="true"
+            :data="rightData"
+            @removeItem="rightRemoveItem"
+          >
+            <div slot="header">
+              已选择
+            </div>
+            <p class="right-footer" slot="footer">
+              目前已选中<span> {{this.rightData.length}} </span>条
+            </p>
+          </right-transfer>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" @click="dataSubmit()">确定</el-button>
+    </div>
+  </div>
+</template>
+<script>
+import leftTransfer from '../components/leftTransfer'
+import rightTransfer from '../components/rightTransfer'
+export default {
+  data () {
+    const generateData = _ => {
+      const data = []
+      const cities = ['上海', '北京', '广州', '上海1', '北京1', '广州1', '上海2', '北京2', '广州2']
+      const pinyin = ['shanghai', 'beijing', 'guangzhou', 'shanghai1', 'beijing1', 'guangzhou1', 'shanghai2', 'beijing2', 'guangzhou2']
+      cities.forEach((city, index) => {
+        data.push({
+          label: city,
+          index: index,
+          id: pinyin[index],
+          pinyin: pinyin[index]
+        })
+      })
+      return data
+    }
+    return {
+      leftData: generateData(),
+      rightData: [],
+      dataForm: {
+        query: ''
+      },
+      dataRules: {
+        query: [
+          { required: true, message: '请选择', trigger: 'change' }
+        ]
+      },
+      leftChecked: []
+    }
+  },
+  components: { leftTransfer, rightTransfer },
+  methods: {
+    filterMethod (query, item) {
+      return item.pinyin.indexOf(query) > -1
+    },
+    leftCheckChange (val) { // 左侧选中状态改变时
+      console.log(val)
+      this.leftChecked = val
+    },
+    rightRemoveItem (id) { // 右侧删除的数据,左侧对应数据解冻
+      this.leftData = this.leftData.map(item => {
+        if (item.id === id) {
+          return { ...item, disabled: false, checked: false }
+        } else {
+          return item
+        }
+      })
+    },
+    addToRight () {
+      console.log(999, this.leftData.filter(item => this.leftChecked.includes(item.id)))
+      let leftCheckedArr = this.leftData.filter(item => this.leftChecked.includes(item.id))
+      leftCheckedArr.forEach(item => {
+        if (!item.disabled) {
+          this.rightData.push(item)
+        }
+      })
+      this.leftData = this.leftData.map(item => {
+        let isOnRight = this.rightData.filter(ritem => ritem.id === item.id).length
+        if (isOnRight) {
+          return { ...item, disabled: true }
+        } else {
+          return item
+        }
+      })
+      console.log('left', this.leftData, this.leftChecked)
+    },
+    dataSubmit () {
+      console.log(1)
+    }
+  }
+}
+</script>
+<style>
+  @import '../assets/style/add-base.css';
+</style>

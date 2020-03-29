@@ -1,0 +1,147 @@
+<template>
+  <div>
+    <div class="add-wrap">
+      <div class="query-title"><span style="color:red">*</span>目前词组里的Query</div>
+      <el-card shadow="never" class="query-card-content">
+        <el-form :model="dataForm" inline ref="dataForm">
+          <el-form-item>
+            <el-select v-model="dataForm.query" placeholder="请选择" style="width: 400px">
+              <el-option
+                v-for="item in queryList"
+                :key="item.id"
+                :label="item.label"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="addQuery" size="small">确定</el-button>
+          </el-form-item>
+        </el-form>
+        <div class="query-tag-content">
+          <el-tag
+            :key="tag"
+            v-for="tag in dynamicQuery"
+            closable
+            :disable-transitions="false"
+            @close="handleClose(tag)"
+            class="tag-item"
+          >
+          {{tag}}
+        </el-tag>
+        <p v-if="dynamicQuery.length === 0">暂无内容</p>
+        </div>
+        <div class="query-tag-total">
+          <el-button type="primary" size="mini" style="float: left" @click="multiAddClick">批量新增至以下词组中</el-button>
+          <b>目前已添加 <span>{{dynamicQuery.length}}</span> 条</b>
+        </div>
+      </el-card>
+      <div class="table-content">
+        <div class="btn-group">
+          <span style="float: left">目前词组中的Query</span>
+          <el-button type="danger" size="small" @click="multiRemoveClick">批量删除选中Query</el-button>
+        </div>
+        <el-table :data="tableData" border @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange">
+          <el-table-column type="selection" header-align="center" align="center" width="100"></el-table-column>
+          <el-table-column label="序号" header-align="center" align="center" width="100">
+            <template slot-scope="scope">
+            {{scope.$index+1}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
+          <el-table-column prop="label" label="操作" header-align="center" align="center">
+            <template slot-scope="scope">
+              <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)"></i>
+              <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)"></i>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="query-tag-total">目前已选中 <span>{{tableDataChecked.length}}</span> 条 / 共 {{tableData.length}} 条</div>
+      </div>
+    </div>
+    <div class="footer">
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" @click="dataSubmit()">确定</el-button>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  data () {
+    return {
+      dataForm: {
+        query: ''
+      },
+      queryList: [
+        {
+          id: 'op',
+          lable: '中文'
+        },
+        {
+          id: 'op1',
+          lable: '中文1'
+        }
+      ],
+      dynamicQuery: [],
+      tableData: [{
+        label: '123'
+      },
+      {
+        label: '444'
+      }],
+      tableDataChecked: []
+    }
+  },
+  methods: {
+    handleClose (tag) { // 删除标签
+      this.dynamicQuery.splice(this.dynamicQuery.indexOf(tag), 1)
+    },
+    addQuery () { // 手动添加query
+      let query = this.dataForm.query
+      if (query !== '' && !this.dynamicQuery.includes(query)) {
+        this.dynamicQuery.push(query)
+        this.dataForm.query = ''
+      }
+    },
+    multiAddClick () { // 批量新增至以下词组中
+      console.log('批量新增')
+    },
+    multiRemoveClick () { // 批量删除
+      console.log('批量删除')
+    },
+    handleSelectionChange (val) { // 表格选中内容
+      console.log(val)
+      this.tableDataChecked = val
+    },
+    handleAllCheckedChange (val) { // 表格全选时内容
+      console.log(val)
+      this.tableDataChecked = val
+    },
+    // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
+    moveUp (index) {
+      let data = this.tableData
+      if (index === 0) return
+      // 在上一项插入该项
+      data.splice(index - 1, 0, (data[index]))
+      // 删除后一项
+      data.splice(index + 1, 1)
+    },
+    // 下移 将当前数组index索引与前面一个元素互换位置，向数组前面移动一位
+    moveDown (index) {
+      let data = this.tableData
+      if (index === (data.length - 1)) return
+      // 在下一项插入该项
+      data.splice(index + 2, 0, (data[index]))
+      // 删除前一项
+      data.splice(index, 1)
+    },
+    dataSubmit () {
+      console.log(1)
+    }
+  }
+}
+</script>
+<style scoped>
+  @import "../assets/style/update-base.css";
+</style>

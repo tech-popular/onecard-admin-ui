@@ -53,7 +53,6 @@
 <script>
   import { apiManageList } from '@/api/dataAnalysis/apiManage'
   import AddOrUpdate from './baseComponents/mallLexicon-add-or-update'
-  import './components/transfer'
   export default {
     data () {
       return {
