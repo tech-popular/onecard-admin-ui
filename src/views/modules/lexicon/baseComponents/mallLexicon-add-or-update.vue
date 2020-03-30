@@ -16,19 +16,23 @@
     </el-form>
     <!--近义词 or 同义词新增-->
     <div v-if="!id">
-      <near-synonym-add v-if="dataForm.type === '近义词' || dataForm.type === '同义词'"></near-synonym-add>
+      <near-synonym-add v-if="dataForm.type === '近义词' || dataForm.type === '同义词'" ref="addSynonym"></near-synonym-add>
       <!--热门词新增-->
-      <hot-synonym-add v-if="dataForm.type ==='热门词'"></hot-synonym-add>
+      <hot-synonym-add v-if="dataForm.type ==='热门词'" ref="addSynonym"></hot-synonym-add>
       <!--敏感词和停用词新增-->
-      <stop-synonym-add v-if="dataForm.type ==='敏感词' || dataForm.type ==='停用词'"></stop-synonym-add>
+      <stop-synonym-add v-if="dataForm.type ==='敏感词' || dataForm.type ==='停用词'" ref="addSynonym"></stop-synonym-add>
     </div>
     <div v-else>
       <!--近义词 or 同义词修改-->
-      <near-synonym-update v-if="dataForm.type === '近义词' || dataForm.type === '同义词'"></near-synonym-update>
+      <near-synonym-update v-if="dataForm.type === '近义词' || dataForm.type === '同义词'" ref="updateSynonym"></near-synonym-update>
       <!-- 热门词修改 -->
-      <hot-synonym-update v-if="dataForm.type ==='热门词'"></hot-synonym-update>
+      <hot-synonym-update v-if="dataForm.type ==='热门词'" ref="updateSynonym"></hot-synonym-update>
       <!--敏感词和停用词修改-->
-      <stop-synonym-update v-if="dataForm.type ==='敏感词' || dataForm.type ==='停用词'"></stop-synonym-update>
+      <stop-synonym-update v-if="dataForm.type ==='敏感词' || dataForm.type ==='停用词'" ref="updateSynonym"></stop-synonym-update>
+    </div>
+    <div slot="footer">
+      <el-button @click="cancel">取消</el-button>
+      <el-button type="primary" @click="dataSubmit">确定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -67,6 +71,11 @@ export default {
     hotSynonymUpdate,
     stopSynonymUpdate
   },
+  computed: {
+    userName: {
+      get () { return this.$store.state.user.name }
+    }
+  },
   methods: {
     init (row) {
       this.visible = true
@@ -78,6 +87,9 @@ export default {
     },
     cancel () {
       this.visible = false
+    },
+    dataSubmit () {
+      console.log(this.$refs.addSynonym)
     }
   }
 }

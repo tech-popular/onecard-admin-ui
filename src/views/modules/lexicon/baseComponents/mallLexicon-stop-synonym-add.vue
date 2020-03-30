@@ -28,14 +28,6 @@
         </div>
         <div class="query-tag-total">共选择 <span>{{dynamicQuery.length}}</span> 条</div>
       </el-card>
-      <!-- <div class="btn-group">
-        <el-button size="small">文件导入</el-button>
-        <el-button type="primary" size="small">下载模板</el-button>
-      </div> -->
-    </div>
-    <div class="footer">
-      <el-button @click="parent.cancel()">取消</el-button>
-      <el-button type="primary" @click="dataSubmit()">确定</el-button>
     </div>
   </div>
 </template>
@@ -63,9 +55,6 @@ export default {
         this.dynamicQuery.push(query)
         this.dataForm.query = ''
       }
-    },
-    dataSubmit () {
-      console.log(1)
     }
   }
 }

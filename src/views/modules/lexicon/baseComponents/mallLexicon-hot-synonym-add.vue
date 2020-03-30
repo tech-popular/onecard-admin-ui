@@ -16,7 +16,7 @@
             <el-form inline :model="dataForm" :rules="dataRules" class="transfer-form">
               <el-form-item label="选择:" prop="query">
                 <el-radio-group v-model="dataForm.query" size="mini">
-                  <el-radio-button label="商品名称" ></el-radio-button>
+                  <!-- <el-radio-button label="商品关键词" ></el-radio-button> -->
                   <el-radio-button label="商品分类"></el-radio-button>
                   <el-radio-button label="商品品牌"></el-radio-button>
                 </el-radio-group>
@@ -46,10 +46,6 @@
           </right-transfer>
         </div>
       </div>
-    </div>
-    <div class="footer">
-      <el-button @click="parent.cancel()">取消</el-button>
-      <el-button type="primary" @click="dataSubmit()">确定</el-button>
     </div>
   </div>
 </template>
@@ -125,9 +121,6 @@ export default {
         }
       })
       console.log('left', this.leftData, this.leftChecked)
-    },
-    dataSubmit () {
-      console.log(1)
     }
   }
 }
