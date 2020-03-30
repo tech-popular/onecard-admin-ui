@@ -5,23 +5,21 @@
         <el-input v-model="dataForm.id" placeholder="请输入词组ID" clearable />
       </el-form-item>
       <el-form-item label="词组名称">
-        <el-input v-model="dataForm.name" placeholder="请输入词组名称" clearable />
+        <el-input v-model="dataForm.wordName" placeholder="请输入词组名称" clearable />
       </el-form-item>
 			<el-form-item label="词组类型">
-        <el-select v-model="dataForm.type" filterable placeholder="请选择">
-          <el-option label="全部" value="-1"></el-option>
+        <el-select v-model="dataForm.wordType" filterable placeholder="请选择">
           <el-option
             v-for="item in queryTypeList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
+            :key="item"
+            :label="item"
+            :value="item"
           >
           </el-option>
         </el-select>
       </el-form-item>
 			<el-form-item label="词组状态">
         <el-select v-model="dataForm.status" filterable placeholder="请选择">
-          <el-option label="全部" value="-1"></el-option>
           <el-option label="启用" value="1"></el-option>
           <el-option label="停用" value="0"></el-option>
         </el-select>
@@ -36,16 +34,20 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="词组名称"></el-table-column>
-      <el-table-column prop="code" header-align="center" align="center" label="词组类型"></el-table-column>
+      <el-table-column prop="wordName" header-align="center" align="center" label="词组名称"></el-table-column>
+      <el-table-column prop="wordtype" header-align="center" align="center" label="词组类型"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="词组状态"></el-table-column>
+      <el-table-column prop="status" header-align="center" align="center" label="词组状态">
+        <template slot-scope="scope">
+          {{scope.row.status === 1 ? '启用' : '停用'}}
+        </template>
+      </el-table-column>
       <el-table-column header-align="center" width="260" align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="success" plain size="mini" @click="startUsing(scope.row)" v-if="scope.row.flowId">启用</el-button>
-          <el-button type="danger" plain size="mini" @click="stopUsing(scope.row)" v-else>停用</el-button>
+          <el-button type="success" plain size="mini" @click="changeStatus(scope.row)" v-if="scope.row.flowId">启用</el-button>
+          <el-button type="danger" plain size="mini" @click="changeStatus(scope.row)" v-else>停用</el-button>
           <el-button type="primary" plain size="mini" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
           <el-button type="warning" plain size="mini" @click="deleteHandle(scope.row)">删除</el-button>
         </template>
@@ -54,7 +56,7 @@
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
-      :current-page="pageNum"
+      :current-page="pageNo"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
       :total="totalCount"
@@ -64,33 +66,20 @@
 </template>
 
 <script>
-  import { apiManageList } from '@/api/dataAnalysis/apiManage'
+  import { wordList, wordTypeList, deleteWordsInfo, changeWordsInfoStatus } from '@/api/lexicon/mallLexiconList'
   import AddOrUpdate from './baseComponents/mallLexicon-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
           id: '',
-          name: '',
-          type: '-1',
-          status: '-1'
+          wordName: '',
+          wordType: '',
+          status: ''
         },
-        queryTypeList: [
-          {
-            name: '近义词',
-            id: '1'
-          },
-          {
-            name: '同义词',
-            id: '2'
-          },
-          {
-            name: '热门词',
-            id: '3'
-          }
-        ],
+        queryTypeList: [],
         dataList: [],
-        pageNum: 1, // 当前页
+        pageNo: 1, // 当前页
         pageSize: 10, // 默认每页10条
         totalCount: 0,
         dataListLoading: false,
@@ -102,6 +91,7 @@
     },
     mounted () {
       this.getDataList()
+      this.getWordTypeList()
     },
     methods: {
       // 获取数据列表
@@ -109,18 +99,57 @@
         this.dataListLoading = true
         let params = {
           ...this.dataForm,
-          'pageNum': this.pageNum,
+          'pageNo': this.pageNo,
           'pageSize': this.pageSize
         }
-        apiManageList(params).then(({data}) => {
+        wordList(params).then(({data}) => {
           this.dataListLoading = false
-          if (data.status !== '1' || !data.data || !data.data.list.length) {
+          if (data.code !== 0 || !data.data || !data.data.list.length) {
             this.dataList = []
             this.totalCount = 0
             return
           }
           this.dataList = data.data.list
-          this.totalCount = data.data.total
+          this.totalCount = data.data.totalCount
+        })
+      },
+      getWordTypeList () { // 词组类型
+        wordTypeList().then(({data}) => {
+          if (data.code !== 0) {
+            this.queryTypeList = []
+          } else {
+            this.queryTypeList = data.data
+          }
+        })
+      },
+      deleteHandle (row) { // 删除
+        deleteWordsInfo(row.id).then(({data}) => {
+          if (data.code !== 0) {
+            return this.$message({
+              type: 'error',
+              message: data.msg || '删除失败'
+            })
+          }
+          this.$message({
+            type: 'success',
+            message: data.msg || '删除成功'
+          })
+          this.getDataList()
+        })
+      },
+      changeStatus (row) { // 改变状态
+        changeWordsInfoStatus(row.id, row.status).then(({data}) => {
+          if (data.code !== 0) {
+            return this.$message({
+              type: 'error',
+              message: data.msg
+            })
+          }
+          this.$message({
+            type: 'success',
+            message: data.msg
+          })
+          this.getDataList()
         })
       },
       // 新增 / 修改
@@ -132,12 +161,12 @@
       },
       /** 查询 */
       searchHandle () {
-        this.pageNum = 1
+        this.pageNo = 1
         this.getDataList()
       },
       /** 重置 */
       resetHandle () {
-        this.pageNum = 1
+        this.pageNo = 1
         this.dataForm = {
           name: ''
         }
@@ -146,12 +175,12 @@
       // 每页数
       sizeChangeHandle (page) {
         this.pageSize = page
-        this.pageNum = 1
+        this.pageNo = 1
         this.getDataList()
       },
       // 当前页
       currentChangeHandle (page) {
-        this.pageNum = page
+        this.pageNo = page
         this.getDataList()
       }
     }

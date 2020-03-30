@@ -38,7 +38,6 @@
           </el-button>
         </div>
         <div class="el-transfer-panel el-transfer-panel-new el-transfer-right">
-          
           <right-transfer
             :has-table-sort="false"
             :has-footer="true"
