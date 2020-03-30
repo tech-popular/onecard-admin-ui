@@ -118,8 +118,8 @@ export default {
           id: this.approvalStatusId,
           name: this.approvalStatusValeu
         },
-        'allApplyName': this.allApplyName,
-        'allApplyEmail': this.allApplyEmail,
+        'applyName': this.allApplyName,
+        'applyEmail': this.allApplyEmail,
         'pageNum': this.pageNum,
         'pageSize': this.pageSize
       }
@@ -152,6 +152,8 @@ export default {
       this.applyTypeValue = ''
       this.approvalStatusId = ''
       this.approvalStatusValeu = ''
+      this.allApplyName = ''
+      this.allApplyEmail = ''
       this.getDataList()
     },
     // 条件查询change
