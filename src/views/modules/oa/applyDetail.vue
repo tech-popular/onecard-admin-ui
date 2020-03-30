@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-      title="审批记录"
+      title="查看"
       :visible.sync="dialogVisible"
       width="60%"
       :before-close="handleClose">
@@ -78,8 +78,7 @@ export default {
       checkedCities: []
     }
   },
-  components: {
-  },
+  components: {},
   methods: {
     init (val) {
       this.dialogVisible = true
@@ -99,4 +98,7 @@ export default {
 }
 </script>
 <style scoped>
+.foot {
+  text-align: right;
+}
 </style>>

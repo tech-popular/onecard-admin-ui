@@ -49,7 +49,7 @@
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">查看</el-button>
+          <el-button type="text" size="small" @click="lookHandle(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -64,21 +64,12 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
     <!-- 查看弹出框 -->
-    <el-dialog
-      title="提示"
-      :visible.sync="dialogVisible"
-      width="60%"
-      :before-close="handleClose">
-      <span>这是一段信息</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
+    <ApplyDetail v-if="applyDetailVisible" ref="applyDetail"/>
   </div>
 </template>
 <script>
 import AddOrUpdate from './apply-add-or-update'
+import ApplyDetail from './applyDetail'
 import { myAccoutList, myAccoutSelect } from '@/api/oa/apply'
 
 export default {
@@ -98,11 +89,13 @@ export default {
       dataListLoading: false,
       addOrUpdateVisible: false,
       newList: [],
-      dialogVisible: false
+      dialogVisible: false,
+      applyDetailVisible: false
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    ApplyDetail
   },
   activated () {
     this.getDataList()
@@ -174,8 +167,9 @@ export default {
       this.applyTypeValue = ''
       this.approvalStatusId = ''
       this.approvalStatusValeu = ''
+      this.getDataList()
     },
-      // 新增 / 修改 / 查看
+      // 新增 / 修改
     addOrUpdateHandle (id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
@@ -183,14 +177,13 @@ export default {
       })
     },
      // 查看
-    // lookHandle (id) {
-    //   this.dialogVisible = true
-    //   lookAccout(id).then(({data}) => {
+    lookHandle (val) {
+      console.log(val)
 
-    //   })
-    // }
-    handleClose () {
-
+      this.applyDetailVisible = true
+      this.$nextTick(() => {
+        this.$refs.applyDetail.init(val)
+      })
     }
   }
 }

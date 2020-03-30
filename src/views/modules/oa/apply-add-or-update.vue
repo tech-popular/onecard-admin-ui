@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增'"
+    title="新增"
     :modal-append-to-body="false"
     :append-to-body="true"
     :close-on-click-modal="false"
@@ -9,7 +9,7 @@
   >
     <el-divider>请选择申请类别</el-divider>
     <el-tabs type="border-card">
-      <el-tab-pane label="账号权限">
+      <!-- <el-tab-pane label="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
           <el-form-item label="标题" prop="name">
@@ -64,7 +64,7 @@
           <el-button @click="visible = false">取消</el-button>
           <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <el-tab-pane label="库表授权">
         <el-form
           :model="severDataForm"
@@ -318,7 +318,6 @@ export default {
           {required: true, message: 'maxcomputer不能为空', trigger: 'blur'}
         ]
       }, // 库表权限表单校验
-      dataFormValue: '',
       ruleTypeList: [],
       severApplyAuthList: [], // 申请权限数据载体
       severdefaultApproverList: [], // 本次申请默认审批人数据载体
@@ -353,8 +352,6 @@ export default {
   components: {},
   methods: {
     init (id, value) {
-      this.dataForm.id = id || ''
-      this.dataFormValue = value
       this.visible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
