@@ -357,7 +357,7 @@ export default {
       this.dataFormValue = value
       this.visible = true
       this.$nextTick(() => {
-        this.$refs['dataForm'].resetFields()
+        this.$refs['severDataForm'].resetFields()
         this.getStaffList()
         // accoutAuthInitInfo().then(({ data }) => {
         //   this.systemList = data.data.systemList
