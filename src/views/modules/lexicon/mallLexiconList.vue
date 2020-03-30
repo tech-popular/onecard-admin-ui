@@ -8,10 +8,23 @@
         <el-input v-model="dataForm.name" placeholder="请输入词组名称" clearable />
       </el-form-item>
 			<el-form-item label="词组类型">
-        <el-input v-model="dataForm.type" placeholder="请输入词组类型" clearable />
+        <el-select v-model="dataForm.type" filterable placeholder="请选择">
+          <el-option label="全部" value="-1"></el-option>
+          <el-option
+            v-for="item in queryTypeList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
 			<el-form-item label="词组状态">
-        <el-input v-model="dataForm.status" placeholder="请输入词组状态" clearable />
+        <el-select v-model="dataForm.status" filterable placeholder="请选择">
+          <el-option label="全部" value="-1"></el-option>
+          <el-option label="启用" value="1"></el-option>
+          <el-option label="停用" value="0"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -59,9 +72,23 @@
         dataForm: {
           id: '',
           name: '',
-          type: '',
-          status: ''
+          type: '-1',
+          status: '-1'
         },
+        queryTypeList: [
+          {
+            name: '近义词',
+            id: '1'
+          },
+          {
+            name: '同义词',
+            id: '2'
+          },
+          {
+            name: '热门词',
+            id: '3'
+          }
+        ],
         dataList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
