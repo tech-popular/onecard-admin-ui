@@ -9,6 +9,8 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
+            <el-button size="small">文件导入</el-button>
+            <el-button type="success" size="small">下载模板</el-button>
           </el-form-item>
         </el-form>
         <div class="query-tag-content">
@@ -26,10 +28,10 @@
         </div>
         <div class="query-tag-total">共选择 <span>{{dynamicQuery.length}}</span> 条</div>
       </el-card>
-      <div class="btn-group">
+      <!-- <div class="btn-group">
         <el-button size="small">文件导入</el-button>
         <el-button type="primary" size="small">下载模板</el-button>
-      </div>
+      </div> -->
     </div>
     <div class="footer">
       <el-button @click="parent.cancel()">取消</el-button>

@@ -2,7 +2,7 @@
   <el-dialog :title="id ? '查看/编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="900px">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
       <el-form-item label="词组名称:" prop="name">
-        <el-input v-model="dataForm.name" placeholder="" />
+        <el-input v-model="dataForm.name" placeholder="" :disabled="!!id" />
       </el-form-item>
       <el-form-item label="所属词组类型:" prop="type">
         <el-radio-group v-model="dataForm.type">

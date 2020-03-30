@@ -24,12 +24,15 @@
         </el-tag>
         <p v-if="dynamicQuery.length === 0">暂无内容</p>
         </div>
-        <div class="query-tag-total">目前已添加 <span>{{dynamicQuery.length}}</span> 条</div>
+        <div class="query-tag-total">
+          <el-button type="primary" size="mini" style="float: left" @click="multiAddClick">批量新增至以下词组中</el-button>
+          <b>目前已添加 <span>{{dynamicQuery.length}}</span> 条</b>
+        </div>
       </el-card>
       <div class="table-content">
         <div class="btn-group">
-          <el-button type="primary" size="small" @click="multiAddClick">批量新增</el-button>
-          <el-button type="danger" size="small" @click="multiRemoveClick">批量删除</el-button>
+          <span style="float: left">目前词组中的Query</span>
+          <el-button type="danger" size="small" @click="multiRemoveClick">批量删除选中Query</el-button>
         </div>
         <el-table :data="tableData" border @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange">
           <el-table-column type="selection" header-align="center" align="center" width="100"></el-table-column>
@@ -57,6 +60,16 @@ export default {
       dataForm: {
         query: ''
       },
+      queryList: [
+        {
+          id: 'op',
+          lable: '中文'
+        },
+        {
+          id: 'op1',
+          lable: '中文1'
+        }
+      ],
       dynamicQuery: [],
       tableData: [{
         label: '123'
@@ -81,7 +94,7 @@ export default {
         this.dataForm.query = ''
       }
     },
-    multiAddClick () { // 批量新增
+    multiAddClick () { // 批量新增至以下词组中
       console.log('批量新增')
     },
     multiRemoveClick () { // 批量删除

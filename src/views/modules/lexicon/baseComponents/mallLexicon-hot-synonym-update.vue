@@ -5,7 +5,7 @@
       <el-card shadow="never" class="query-card-content">
         <el-form :model="dataForm" inline ref="dataForm">
           <el-form-item>
-            <el-select v-model="dataForm.query" placeholder="请选择" style="width: 400px">
+            <el-select v-model="dataForm.query" filterable placeholder="请选择" style="width: 400px">
               <el-option
                 v-for="item in queryList"
                 :key="item.id"
