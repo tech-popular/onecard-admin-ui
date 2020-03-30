@@ -114,10 +114,23 @@
         <el-row :gutter="24">
           <el-col :span="2">
             <div class="grid-content bg-purple">
+              邮箱
+            </div>
+          </el-col>
+          <el-col :span="4">
+            <div class="grid-content bg-purple">
+              <el-select v-model="outdata.email" placeholder="请选择">
+                <el-option label="报警邮件" value="onecard-warn@9fgroup.com">报警邮件</el-option>
+                <el-option label="数据服务" value="data_service@9fbank.cc">数据服务</el-option>
+              </el-select>
+            </div>
+          </el-col>
+          <el-col :span="2">
+            <div class="grid-content bg-purple">
               模板
             </div>
           </el-col>
-          <el-col :span="7">
+          <el-col :span="5">
             <div class="grid-content bg-purple">
               <el-select v-model="outdata.templateId" placeholder="请选择">
                 <el-option
@@ -134,7 +147,7 @@
               通道
             </div>
           </el-col>
-          <el-col :span="7" >
+          <el-col :span="5" >
             <div class="grid-content bg-purple">
               <el-select v-model="outdata.pipeLineId" placeholder="请选择">
                 <el-option
@@ -147,7 +160,7 @@
             </div>
           </el-col>
 
-          <el-col :span="4">
+          <el-col :span="3">
             <div class="grid-content bg-purple">
             <el-button @click.prevent="removeDomain(outdata)">删除</el-button>
           </div>
@@ -231,7 +244,7 @@
         this.dataListLoading = true
         this.getListData()
         this.dataListLoading = false
-      },
+      },  
       getListData () {
         this.$http({
           url: this.$http.adornUrl('/canary/canarybasetask/threshold/list'),
