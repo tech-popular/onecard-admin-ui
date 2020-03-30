@@ -244,7 +244,7 @@
         this.dataListLoading = true
         this.getListData()
         this.dataListLoading = false
-      },  
+      },
       getListData () {
         this.$http({
           url: this.$http.adornUrl('/canary/canarybasetask/threshold/list'),
