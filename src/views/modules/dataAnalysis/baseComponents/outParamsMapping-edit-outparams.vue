@@ -160,24 +160,25 @@
           'pageSize': this.pageSize
         }
         dataIndexAliasList(this.transferId, params).then(({data}) => {
-          if (data && data.status === '1') {
-            this.dataList = data.data.list.map(item => {
-              return { ...item, indexAlias: item.indexAlias || item.englishName }
-            })
-            this.originTableData = deepClone(this.dataList)
-            this.totalCount = data.data.total
-            if (this.modifyDataList.length) {
-              this.dataList.forEach((item, index) => {
-                this.modifyDataList.forEach((mitem, mindex) => {
-                  if (item.id === mitem.id) {
-                    this.dataList.splice(index, 1, this.modifyDataList[mindex])
-                  }
-                })
-              })
-            }
-          } else {
+          if (data && (data.status !== '1' || !data.data)) {
             this.dataList = []
             this.totalCount = 0
+            this.dataListLoading = false
+            return
+          }
+          this.dataList = data.data.list.map(item => {
+            return { ...item, indexAlias: item.indexAlias || item.englishName }
+          })
+          this.originTableData = deepClone(this.dataList)
+          this.totalCount = data.data.total
+          if (this.modifyDataList.length) {
+            this.dataList.forEach((item, index) => {
+              this.modifyDataList.forEach((mitem, mindex) => {
+                if (item.id === mitem.id) {
+                  this.dataList.splice(index, 1, this.modifyDataList[mindex])
+                }
+              })
+            })
           }
           this.dataListLoading = false
         })
@@ -318,6 +319,9 @@
     }
     & .table-content tr td:nth-child(5), & .table-content tr th:nth-child(5){
       border-bottom: 0;
+    }
+    & .el-table__empty-block {
+      border-bottom: 1px solid #ebeef5;
     }
   }
 </style>
