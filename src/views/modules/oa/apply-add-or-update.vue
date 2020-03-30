@@ -318,6 +318,7 @@ export default {
           {required: true, message: 'maxcomputer不能为空', trigger: 'blur'}
         ]
       }, // 库表权限表单校验
+      dataFormValue: '',
       ruleTypeList: [],
       severApplyAuthList: [], // 申请权限数据载体
       severdefaultApproverList: [], // 本次申请默认审批人数据载体
@@ -352,9 +353,11 @@ export default {
   components: {},
   methods: {
     init (id, value) {
+      this.dataForm.id = id || ''
+      this.dataFormValue = value
       this.visible = true
       this.$nextTick(() => {
-        this.$refs['dataForm'].resetFields()
+        this.$refs['severDataForm'].resetFields()
         this.getStaffList()
         // accoutAuthInitInfo().then(({ data }) => {
         //   this.systemList = data.data.systemList
