@@ -103,8 +103,8 @@
                 <el-table
                   ref="staffTable"
                   v-loading="listLoading"
-                  :key="tableKey"
                   :data="staffList"
+                  :row-key="getRowKey" 
                   fit
                   highlight-current-row
                   @selection-change="handleStaffChange"
@@ -158,9 +158,9 @@
                 <el-table
                   ref="selectedStaffTable"
                   v-loading="listLoading"
-                  :key="tableKey"
                   :data="selectedStaffList"
                   fit
+                  :row-key="getRowKey" 
                   highlight-current-row
                   @selection-change="handleSelectedStaffChange"
                 >
@@ -232,7 +232,6 @@
 
 <script>
 import {
-  accoutAuthInitInfo,
   getListOnPage,
   databaseInitInfo,
   saveDatabaseAuthApply
@@ -352,9 +351,6 @@ export default {
     }
   },
   components: {},
-  mounted () {
-    this.getStaffList()
-  },
   methods: {
     init (id, value) {
       this.dataForm.id = id || ''
@@ -362,13 +358,14 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
-        accoutAuthInitInfo().then(({ data }) => {
-          this.systemList = data.data.systemList
-          this.applyAuthList = data.data.applyAuthList
-          this.moduleList = data.data.moduleList
-          this.defaultApproverList = data.data.defaultApproverList
-          this.department = data.data.department
-        })
+        this.getStaffList()
+        // accoutAuthInitInfo().then(({ data }) => {
+        //   this.systemList = data.data.systemList
+        //   this.applyAuthList = data.data.applyAuthList
+        //   this.moduleList = data.data.moduleList
+        //   this.defaultApproverList = data.data.defaultApproverList
+        //   this.department = data.data.department
+        // })
         databaseInitInfo().then(({ data }) => {
           this.severApplyAuthList = data.data.applyAuthList
           this.severdefaultApproverList = data.data.defaultApproverList
@@ -560,6 +557,9 @@ export default {
     },
     changeAuthType () {
       console.log(this.severDataForm.applyAuthTypeList)
+    },
+    getRowKey (row) {
+      return row.id
     }
   }
 }

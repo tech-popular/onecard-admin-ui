@@ -129,7 +129,6 @@ export default {
         'pageSize': this.pageSize
       }
       myAccoutList(dataBody).then(({data}) => {
-        console.log(data.data, 'liebioa')
         this.totalPage = data.data.total
         this.newList = data.data.rows
         this.dataListLoading = false
@@ -182,15 +181,17 @@ export default {
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })
-    }
+    },
      // 查看
     // lookHandle (id) {
-    //   console.log(id, 'chakan')
     //   this.dialogVisible = true
     //   lookAccout(id).then(({data}) => {
 
     //   })
     // }
+    handleClose () {
+
+    }
   }
 }
 </script>
