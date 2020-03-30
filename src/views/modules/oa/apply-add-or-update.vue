@@ -201,7 +201,7 @@
             <el-input v-model="severDataForm.applicantName" placeholder="申请人姓名" />
           </el-form-item>
           <el-form-item label="默认所属部门">
-            <span>{{department}}</span>
+            <span>{{severdepartment}}</span>
           </el-form-item>
           <el-form-item label="申请人邮箱" prop="applicantEmail">
             <el-input v-model="severDataForm.applicantEmail" placeholder="申请人邮箱" />
@@ -236,9 +236,34 @@ import {
   databaseInitInfo,
   saveDatabaseAuthApply
 } from '@/api/oa/apply'
-// import Filter from './filter'
 export default {
   data () {
+    var checkPhone = (rule, value, callback) => {
+      const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
+      if (!value) {
+        return callback(new Error('申请人不能为空'))
+      }
+      setTimeout(() => {
+        if (phoneReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('电话号码格式不正确'))
+        }
+      }, 100)
+    }
+    var checkemail = (rule, value, callback) => {
+      const emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
+      if (!value) {
+        return callback(new Error('申请人邮箱不能为空'))
+      }
+      setTimeout(() => {
+        if (emailReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('邮箱格式不正确'))
+        }
+      }, 100)
+    }
     return {
       totalPage: 0,
       visible: false,
@@ -304,12 +329,10 @@ export default {
           { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
         ],
         applicantEmail: [
-          { required: true, message: '申请人邮箱不能为空', trigger: 'blur' }
+          { required: true, validator: checkemail, trigger: 'blur' }
         ],
         applicantTel: [
-          {
-            required: true, message: '申请人手机号不能为空', trigger: 'blur'
-          }
+          { required: true, validator: checkPhone, trigger: 'blur' }
         ],
         applyReason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
@@ -454,7 +477,7 @@ export default {
             applyAuthTypeList: this.severDataForm.applyAuthTypeList
           }
           saveDatabaseAuthApply(newData).then(({ data }) => {
-            if (data && data.status === 0) {
+            if (data && data.status === '1') {
               this.$message({
                 message: '操作成功',
                 type: 'success',
