@@ -21,7 +21,7 @@
                   <el-radio-button label="商品品牌"></el-radio-button>
                 </el-radio-group>
               </el-form-item>
-            </el-form>  
+            </el-form>
           </div>
           </left-transfer>
         </div>
