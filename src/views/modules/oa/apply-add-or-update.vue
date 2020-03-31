@@ -241,7 +241,7 @@ export default {
     var checkPhone = (rule, value, callback) => {
       const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
       if (!value) {
-        return callback(new Error('申请人不能为空'))
+        return callback(new Error('申请人手机号不能为空'))
       }
       setTimeout(() => {
         if (phoneReg.test(value)) {
