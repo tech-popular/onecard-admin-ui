@@ -9,6 +9,7 @@
       </el-form-item>
 			<el-form-item label="词组类型">
         <el-select v-model="dataForm.wordType" filterable placeholder="请选择">
+          <el-option label="全部" value=""></el-option>
           <el-option
             v-for="item in queryTypeList"
             :key="item"
@@ -20,6 +21,7 @@
       </el-form-item>
 			<el-form-item label="词组状态">
         <el-select v-model="dataForm.status" filterable placeholder="请选择">
+          <el-option label="全部" value=""></el-option>
           <el-option label="启用" value="1"></el-option>
           <el-option label="停用" value="0"></el-option>
         </el-select>
@@ -35,7 +37,7 @@
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
       <el-table-column prop="wordName" header-align="center" align="center" label="词组名称"></el-table-column>
-      <el-table-column prop="wordtype" header-align="center" align="center" label="词组类型"></el-table-column>
+      <el-table-column prop="wordType" header-align="center" align="center" label="词组类型"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
@@ -46,7 +48,7 @@
       </el-table-column>
       <el-table-column header-align="center" width="260" align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="success" plain size="mini" @click="changeStatus(scope.row)" v-if="scope.row.flowId">启用</el-button>
+          <el-button type="success" plain size="mini" @click="changeStatus(scope.row)" v-if="scope.row.status === 0">启用</el-button>
           <el-button type="danger" plain size="mini" @click="changeStatus(scope.row)" v-else>停用</el-button>
           <el-button type="primary" plain size="mini" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
           <el-button type="warning" plain size="mini" @click="deleteHandle(scope.row)">删除</el-button>
@@ -138,7 +140,8 @@
         })
       },
       changeStatus (row) { // 改变状态
-        changeWordsInfoStatus(row.id, row.status).then(({data}) => {
+        let status = row.status === 1 ? 0 : 1
+        changeWordsInfoStatus(row.id, status).then(({data}) => {
           if (data.code !== 0) {
             return this.$message({
               type: 'error',
