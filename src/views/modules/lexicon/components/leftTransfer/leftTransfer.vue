@@ -6,7 +6,7 @@
   <div :class="['el-transfer-left el-transfer-panel__body', hasFooter ? 'is-with-footer' : '']">
     <el-input
     class="el-transfer-panel__filter"
-    v-model="query"
+    v-model="nameWord"
     size="small"
     :placeholder="placeholder"
     @mouseenter.native="inputHover = true"
@@ -44,7 +44,7 @@
 export default {
   data () {
     return {
-      query: '',
+      nameWord: '',
       inputHover: false,
       checked: []
     }
@@ -63,20 +63,24 @@ export default {
     hasFooter: {
       type: Boolean,
       default: false
+    },
+    selectedType: { // needProductName商品名称 needBrandName商品品牌 needCategoryName商品分类
+      type: String,
+      default: ''
     }
   },
   computed: {
     inputIcon () {
-      return this.query.length > 0 && this.inputHover
+      return this.nameWord.length > 0 && this.inputHover
         ? 'circle-close'
         : 'search'
     },
     filteredData () {
       const arr = this.data.filter(item => {
         if (typeof this.filterMethod === 'function') {
-          return this.filterMethod(this.query, item)
+          return this.filterMethod(this.nameWord, item)
         } else {
-          return item.label.toLowerCase().indexOf(this.query.toLowerCase()) > -1
+          return item.label.toLowerCase().indexOf(this.nameWord.toLowerCase()) > -1
         }
       })
       return arr
@@ -85,7 +89,7 @@ export default {
   methods: {
     clearQuery () {
       if (this.inputIcon === 'circle-close') {
-        this.query = ''
+        this.nameWord = ''
       }
     },
     checkedChange (val) {

@@ -10,18 +10,19 @@
             :filter-method="filterMethod"
             :has-footer="true"
             :data="leftData"
+            :selected-type="dataForm.query"
             @checkChange="leftCheckChange"
           >
             <div slot="header">
               <el-form inline :model="dataForm" :rules="dataRules" class="transfer-form">
-                <el-form-item label="选择:" prop="query">
-                  <el-radio-group v-model="dataForm.query" size="mini">
-                    <!-- <el-radio-button label="商品关键词" ></el-radio-button> -->
-                    <el-radio-button label="商品分类"></el-radio-button>
-                    <el-radio-button label="商品品牌"></el-radio-button>
-                  </el-radio-group>
-                </el-form-item>
-              </el-form>  
+              <el-form-item label="选择:" prop="query">
+                <el-radio-group v-model="dataForm.query" size="mini">
+                  <!-- <el-radio-button label="needProductName">商品名称</el-radio-button> -->
+                  <el-radio-button label="needCategoryName">商品分类</el-radio-button>
+                  <el-radio-button label="needBrandName">商品品牌</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-form>
             </div>
             <div class="left-footer" slot="footer">
               手动添加：<el-input v-model="dataForm.name" placeholder="请输入Query名" size="mini" style="width:200px;display:inline-block"/>
