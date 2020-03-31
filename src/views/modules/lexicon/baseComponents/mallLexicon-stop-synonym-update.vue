@@ -10,7 +10,7 @@
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
             <el-button @click="importFileClick" size="small">文件导入</el-button>
-            <el-button type="success" @click="downloadFileClick" size="small">下载模板</el-button>
+            <el-button type="success" size="small"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
         </el-form>
         <query-tag-list :data="dynamicQuery" @tagChange="tagChangeEvent" @multiAdd="multiAddClick"></query-tag-list>
@@ -23,9 +23,11 @@
 import { findParent } from '../assets/js/utils'
 import queryTagList from '../components/queryTagList'
 import queryTableList from '../components/queryTableList'
+import { downloadTemplate } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
+      templateUrl: downloadTemplate,
       dataForm: {
         query: ''
       },
@@ -66,8 +68,9 @@ export default {
     importFileClick () { // 导入文件
       console.log('导入')
     },
-    downloadFileClick () { // 下载文件
+    downloadFileClick () { // 下载模板，统一放在父级
       console.log('下载')
+      this.parent.downloadTemplate()
     },
     multiAddClick () { // 批量新增至以下词组中
       console.log('批量新增')

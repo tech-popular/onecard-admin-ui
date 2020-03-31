@@ -61,7 +61,7 @@
       :page-size="pageSize"
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper" />
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" :type-list="queryTypeList" @refreshDataList="getDataList"/>
   </div>
 </template>
 

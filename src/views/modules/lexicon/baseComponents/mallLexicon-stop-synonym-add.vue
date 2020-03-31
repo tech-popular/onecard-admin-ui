@@ -10,7 +10,7 @@
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
             <el-button size="small">文件导入</el-button>
-            <el-button type="success" size="small">下载模板</el-button>
+            <el-button type="success" size="small"><a :href="templateUrl">下载模板</a></el-button>
           </el-form-item>
         </el-form>
         <div class="query-tag-content">
@@ -33,9 +33,11 @@
 </template>
 <script>
 import { findParent } from '../assets/js/utils'
+import { downloadTemplate } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
+      templateUrl: downloadTemplate,
       dataForm: {
         query: ''
       },
