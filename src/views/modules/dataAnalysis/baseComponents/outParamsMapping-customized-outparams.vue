@@ -56,7 +56,7 @@
 
 <script>
   import { indexManageTypeList } from '@/api/dataAnalysis/indexManage'
-  import { dataIndexAliasAdd, dataIndexAliasCustomList, dataIndexAliasDelete } from '@/api/dataAnalysis/outParamsMapping'
+  import { dataCustomisedAdd, dataCustomisedList, dataCustomisedDel, dataCustomisedLastModifier } from '@/api/dataAnalysis/outParamsMapping'
   export default {
     data () {
       return {
@@ -88,6 +88,7 @@
     mounted () {
       this.getFieldTypeList()
       this.getDataIndexAliasCustomList()
+      this.getUpdator()
     },
     props: {
       transferId: Number
@@ -100,14 +101,23 @@
     methods: {
       // 获取列表数据
       getDataIndexAliasCustomList () {
-        dataIndexAliasCustomList(this.transferId).then(({data}) => {
+        dataCustomisedList(this.transferId).then(({data}) => {
           if (!data || data.status !== '1' || (data && !data.data)) {
             this.formData.tableData = []
             return
           }
           this.formData.tableData = data.data
-          this.updator = data.data[data.data.length - 1].updater || '无'
           this.updateDataIndex()
+        })
+      },
+      getUpdator () {
+        console.log(this.transferId)
+        dataCustomisedLastModifier(this.transferId).then(({data}) => {
+          if (data.status !== '1') {
+            this.updator = '无'
+          } else {
+            this.updator = data.data || '无'
+          }
         })
       },
       // 获取数据类型
@@ -131,7 +141,9 @@
           index: initIndex,
           fieldName: '',
           fieldTitle: '',
-          fieldType: ''
+          fieldType: '',
+          fieldValue: '',
+          transferConfigDsId: this.transferId
         })
       },
       // 删除字段
@@ -141,7 +153,7 @@
           this.formData.tableData.splice(scope.$index, 1)
           this.updateDataIndex()
         } else {
-          dataIndexAliasDelete(this.transferId, row.id).then(({data}) => {
+          dataCustomisedDel(row.id).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
                 type: 'error',
@@ -163,7 +175,7 @@
         this.$refs.formData.validate((valid) => {
           if (valid) {
             let data = this.formData.tableData
-            dataIndexAliasAdd(this.transferId, this.userName, data).then(({data}) => {
+            dataCustomisedAdd(this.userName, data).then(({data}) => {
               if (data && data.status !== '1') {
                 return this.$message({
                   message: data.message || '提交出错',
