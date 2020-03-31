@@ -7,16 +7,16 @@
           <left-transfer
             :placeholder="'请输入内容'"
             :filterable='true'
-            :filter-method="filterMethod"
             :has-footer="true"
             :data="leftData"
             :selected-type="dataForm.query"
             @checkChange="leftCheckChange"
+            @searchName="searchNameChange"
           >
             <div slot="header">
               <el-form inline :model="dataForm" :rules="dataRules" class="transfer-form">
               <el-form-item label="选择:" prop="query">
-                <el-radio-group v-model="dataForm.query" size="mini">
+                <el-radio-group v-model="dataForm.query" size="mini" @change="queryTypeChange">
                   <!-- <el-radio-button label="needProductName">商品名称</el-radio-button> -->
                   <el-radio-button label="needCategoryName">商品分类</el-radio-button>
                   <el-radio-button label="needBrandName">商品品牌</el-radio-button>
@@ -61,24 +61,11 @@
 import leftTransfer from '../components/leftTransfer'
 import rightTransfer from '../components/rightTransfer'
 import { findParent } from '../assets/js/utils'
+import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
-    const generateData = _ => {
-      const data = []
-      const cities = ['上海', '北京', '广州', '上海1', '北京1', '广州1', '上海2', '北京2', '广州2']
-      const pinyin = ['shanghai', 'beijing', 'guangzhou', 'shanghai1', 'beijing1', 'guangzhou1', 'shanghai2', 'beijing2', 'guangzhou2']
-      cities.forEach((city, index) => {
-        data.push({
-          label: city,
-          index: index,
-          id: pinyin[index],
-          pinyin: pinyin[index]
-        })
-      })
-      return data
-    }
     return {
-      leftData: generateData(),
+      leftData: [],
       rightData: [],
       dataForm: {
         query: '',
@@ -89,14 +76,71 @@ export default {
           { required: true, message: '请选择', trigger: 'change' }
         ]
       },
-      leftChecked: []
+      leftChecked: [],
+      nameWord: '',
+      needType: {
+        needProductName: 1,
+        needBrandName: 1,
+        needCategoryName: 1
+      }
     }
   },
   components: { leftTransfer, rightTransfer },
   mounted () {
     this.parent = findParent(this.$parent)
+    this.getNamesList()
   },
   methods: {
+    getNamesList () {
+      if (this.dataForm.query) {
+        this.needType[this.dataForm.query] = 1
+      } else {
+        this.needType = {
+          needProductName: 1,
+          needBrandName: 1,
+          needCategoryName: 1
+        }
+      }
+      let params = {
+        nameWord: this.nameWord,
+        ...this.needType
+      }
+      getBrandNamesAndCategoryNames(params).then(({data}) => {
+        if (data.code !== 0) {
+          this.leftData = []
+        } else {
+          let arr = []
+          for (var item in data.data) {
+            if (data.data[item] !== null) {
+              arr.push({
+                type: item,
+                list: data.data[item]
+              })
+            }
+          }
+          console.log(arr)
+          this.leftData = arr
+        }
+      })
+    },
+    searchNameChange (name) {
+      console.log(12)
+      this.nameWord = name
+      this.getNamesList()
+    },
+    queryTypeChange (label) {
+      console.log(1)
+      if (this.dataForm.query) {
+        this.needType[this.dataForm.query] = 1
+      } else {
+        this.needType = {
+          needProductName: 1,
+          needBrandName: 1,
+          needCategoryName: 1
+        }
+      }
+      this.getNamesList()
+    },
     filterMethod (query, item) {
       return item.pinyin.indexOf(query) > -1
     },

@@ -68,7 +68,7 @@ export default {
   },
   props: {
     typeList: {
-      type: Boolean,
+      type: Array,
       default: []
     }
   },
@@ -91,7 +91,7 @@ export default {
         wordName: '',
         wordType: '近义词'
       }
-      if (row.id) {
+      if (row && row.id) {
         this.id = row.id
         showWordsInfo(row.id).then(({data}) => { // 查看详情信息
           if (data.code !== 0) {

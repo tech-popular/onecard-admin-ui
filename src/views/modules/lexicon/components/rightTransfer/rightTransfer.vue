@@ -81,7 +81,7 @@ export default {
 </script>
 <style>
 .el-transfer-panel_table {
-  width: 90%;
+  width: 89%;
   margin:10px 5% 0;
   text-align:center;
 }
