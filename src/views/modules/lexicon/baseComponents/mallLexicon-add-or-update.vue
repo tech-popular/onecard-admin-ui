@@ -117,7 +117,7 @@ export default {
       this.visible = false
     },
     dataSubmit () {
-      console.log(this.$refs.addSynonym)
+      console.log(this.$refs.addSynonym.rightData)
       let url = addWordsInfo
       if (this.id) {
         url = updateWordsInfo

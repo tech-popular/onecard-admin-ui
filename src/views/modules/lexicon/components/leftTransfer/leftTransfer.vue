@@ -11,7 +11,7 @@
     :placeholder="placeholder"
     @mouseenter.native="inputHover = true"
     @mouseleave.native="inputHover = false"
-    @input="inputChange"
+    @keyup.native="inputChange"
     v-if="filterable">
     <i slot="prefix"
         :class="['el-input__icon', 'el-icon-' + inputIcon]"
@@ -25,24 +25,22 @@
           <el-checkbox-group
             v-model="checked"
             @change="checkedChange"
-            :class="{ 'is-filterable': filterable }"
-            class="el-transfer-panel__list"
           >
+
             <el-checkbox
               class="el-transfer-panel__item"
-              :label="citem"
-              :disabled="citem.disabled"
+              :label="citem.id"
               :key="cindex"
               v-for="(citem, cindex) in item.list"
             >
-              {{citem}}
+              {{citem.name}}
             </el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
+      <p class="el-transfer-panel__empty" v-show="nameWord && data.length === 0">暂无数据</p>
+      <p class="el-transfer-panel__empty" v-if="!nameWord && data.length === 0">请输入搜索内容查询数据</p>
     </div>
-    <!-- <p class="el-transfer-panel__empty" v-show="nameWord && data.length === 0">暂无数据</p>
-    <p class="el-transfer-panel__empty" v-if="!nameWord && data.length === 0">请输入搜索内容查询数据</p> -->
     <p class="el-transfer-panel__footer" v-if="hasFooter">
       <slot name="footer"></slot>
     </p>
@@ -85,9 +83,6 @@ export default {
       return this.nameWord.length > 0 && this.inputHover
         ? 'circle-close'
         : 'search'
-    },
-    inputChange () {
-      this.$emit('searchName', this.nameWord)
     }
   },
   methods: {
@@ -107,7 +102,25 @@ export default {
     },
     checkedChange (val) {
       this.$emit('checkChange', val)
+    },
+    inputChange () {
+      this.$emit('searchName', this.nameWord)
     }
   }
 }
 </script>
+<style scoped>
+  .data-list {
+    height: 354px;
+    padding-bottom: 40px;
+    overflow: auto;
+  }
+  .data-list h3 {
+    margin: 0;
+    padding-left: 10px;
+    font-size: 12px;
+  }
+  .el-checkbox-group {
+    padding-left: 20px;
+  }
+</style>

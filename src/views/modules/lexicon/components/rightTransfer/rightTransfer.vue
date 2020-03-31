@@ -10,8 +10,8 @@
           {{scope.$index+1}}
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
-      <el-table-column prop="label" label="操作" header-align="center" align="center">
+      <el-table-column prop="name" label="Query" header-align="center" align="center"></el-table-column>
+      <el-table-column label="操作" header-align="center" align="center">
         <template slot-scope="scope">
           <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)" v-if="hasTableSort"></i>
           <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)" v-if="hasTableSort"></i>
@@ -50,8 +50,12 @@ export default {
   },
   computed: {
     filteredData () {
+      console.log(111, this.data)
       return this.data
     }
+  },
+  mounted () {
+    console.log(444, this.data)
   },
   methods: {
     // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
