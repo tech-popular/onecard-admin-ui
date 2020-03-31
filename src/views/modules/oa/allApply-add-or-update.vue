@@ -2,12 +2,24 @@
   <el-dialog
       title="审批记录"
       :visible.sync="dialogVisible"
-      width="60%"
+      width="30%"
       :before-close="handleClose">
-      <el-form label-width="160px">
+      <el-form label-width="100px">
         <el-form-item label="标题">
           <span>{{detalList.title}}</span>
         </el-form-item>
+        <el-form-item label="申请人姓名">
+          <span>{{detalList.applicantName}}</span>
+        </el-form-item>
+        <el-form-item label="默认所属部门">
+          <span>{{detalList.department}}</span>
+        </el-form-item>
+        <!-- <el-form-item label="申请系统">
+          <span>{{detalList.department}}</span>
+        </el-form-item>
+        <el-form-item label="申请模块">
+          <span>{{detalList.department}}</span>
+        </el-form-item> -->
         <el-form-item label="申请库表字段">
           <el-table
             :data="detalList.tables"
@@ -38,22 +50,10 @@
             >{{item.name}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="maxcomputer账号">
-          <span>{{detalList.account}}</span>
+        <el-form-item label="申请事由">
+          <span>{{detalList.applyReason}}</span>
         </el-form-item>
-        <el-form-item label="申请人姓名">
-          <span>{{detalList.applicantName}}</span>
-        </el-form-item>
-        <el-form-item label="默认所属部门">
-          <span>{{detalList.department}}</span>
-        </el-form-item>
-        <el-form-item label="申请人手机号">
-          <span>{{detalList.applicantTel}}</span>
-        </el-form-item>
-        <el-form-item label="申请人邮箱">
-          <span>{{detalList.applicantEmail}}</span>
-        </el-form-item>
-        <el-form-item label="本次申请默认审批人">
+        <el-form-item label="审批流">
           <el-tag
             style="margin-left:10px;"
             v-for="tag in detalList.defaultApproverList"
@@ -61,8 +61,8 @@
             :type="tag.name"
           >{{tag.name}}</el-tag>
         </el-form-item>
-        <el-form-item label="申请理由">
-          <span>{{detalList.applyReason}}</span>
+        <el-form-item label="驳回理由">
+          <span>{{detalList.refuseReason}}</span>
         </el-form-item>
       </el-form>
     </el-dialog>
