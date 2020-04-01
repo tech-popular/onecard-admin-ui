@@ -1,6 +1,6 @@
 import { httpGet, httpPost, httpPut, httpDelete } from '@/api'
-let da = '/dataAnalysis/'
-// let da = '/'
+// let da = '/dataAnalysis/'
+let da = '/'
 //
 // 出参映射
 export const dataIndexAliasList = (id, params) => httpPost(da + `dataIndexAlias/list/${id}`, params)
