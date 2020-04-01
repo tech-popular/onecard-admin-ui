@@ -200,9 +200,9 @@
           <el-form-item label="申请人姓名" prop="applicantName">
             <el-input v-model="severDataForm.applicantName" placeholder="申请人姓名" />
           </el-form-item>
-          <el-form-item label="默认所属部门">
+          <!-- <el-form-item label="默认所属部门">
             <span>{{severdepartment}}</span>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="申请人邮箱" prop="applicantEmail">
             <el-input v-model="severDataForm.applicantEmail" placeholder="申请人邮箱" />
           </el-form-item>
@@ -218,7 +218,7 @@
             >{{tag.name}}</el-tag>
           </el-form-item>
           <el-form-item label="申请理由" prop="applyReason">
-            <el-input type="textarea" v-model="severDataForm.applyReason"></el-input>
+            <el-input type="textarea" v-model="severDataForm.applyReason" placeholder="申请理由"></el-input>
           </el-form-item>
         </el-form>
         <div class="foot">
