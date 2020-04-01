@@ -9,9 +9,19 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
-            <el-button @click="importFileClick" size="small">文件导入</el-button>
-            <el-button type="success" size="small"><a :href="templateUrl">下载模板</a></el-button>
+            <el-upload
+              class="upload-file"
+              ref="upload"
+              :action="uploadWords"
+              accept=".xlsx, .xls"
+              :show-file-list="false"
+              :on-success="uploadSuccess"
+            >
+              <el-button size="small">文件导入</el-button>
+            </el-upload>
+            <el-button type="success" size="small"><a :href="templateUrl" style="color:#fff;text-decoration: none;">下载模板</a></el-button>
           </el-form-item>
+          <div class="upload-name"><span v-if="excelFile">上传文件名：{{excelFile}}</span></div>
         </el-form>
         <query-tag-list :data="dynamicQuery" @tagChange="tagChangeEvent" @multiAdd="multiAddClick"></query-tag-list>
       </el-card>
@@ -23,36 +33,55 @@
 import { findParent } from '../assets/js/utils'
 import queryTagList from '../components/queryTagList'
 import queryTableList from '../components/queryTableList'
-import { downloadTemplate } from '@/api/lexicon/mallLexiconList'
+import { downloadTemplate, uploadWords } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
       templateUrl: downloadTemplate,
+      uploadWords: uploadWords,
+      excelFile: '',
       dataForm: {
         query: ''
       },
-      queryList: [
-        {
-          id: 'op',
-          lable: '中文'
-        },
-        {
-          id: 'op1',
-          lable: '中文1'
-        }
-      ],
       dynamicQuery: [],
-      tableData: [{
-        label: '123'
-      },
-      {
-        label: '444'
-      }]
+      tableData: []
     }
   },
   components: { queryTagList, queryTableList },
+  created () {
+    this.data.forEach(item => {
+      this.tableData.push({
+        name: item
+      })
+    })
+  },
   mounted () {
     this.parent = findParent(this.$parent)
+  },
+  props: {
+    data: {
+      type: Array,
+      default: []
+    }
+  },
+  computed: {
+    searchWords () {
+      if (!this.tableData.length) {
+        return {
+          checkedLen: 0,
+          msg: '搜索词不能为空！',
+          list: []
+        }
+      }
+      let arr = []
+      this.tableData.forEach(item => {
+        arr.push(item.name)
+      })
+      return {
+        checkedLen: arr.length,
+        list: arr
+      }
+    }
   },
   methods: {
     tagChangeEvent (data) {
@@ -65,21 +94,28 @@ export default {
         this.dataForm.query = ''
       }
     },
-    importFileClick () { // 导入文件
-      console.log('导入')
-    },
-    downloadFileClick () { // 下载模板，统一放在父级
-      console.log('下载')
-      this.parent.downloadTemplate()
+    uploadSuccess (response, file) { // 上传成功时
+      if (response.code !== 0) {
+        return this.$message({
+          type: 'error',
+          message: response.msg
+        })
+      }
+      this.excelFile = file.name
+      response.data.forEach(item => {
+        if (!this.dynamicQuery.includes(item)) {
+          this.dynamicQuery.push(item)
+        }
+      })
     },
     multiAddClick () { // 批量新增至以下词组中
       console.log('批量新增')
       this.dynamicQuery.forEach(item => {
         // 判断上面手动添加的数据是否已经存在于表格中，不存在时再添加至表格，已存在则不添加
-        let isInArray = this.tableData.filter(ritem => ritem.label === item).length
+        let isInArray = this.tableData.filter(ritem => ritem.name === item).length
         if (isInArray === 0) { // 不存在
           this.tableData.push({
-            label: item
+            name: item
           })
         }
       })

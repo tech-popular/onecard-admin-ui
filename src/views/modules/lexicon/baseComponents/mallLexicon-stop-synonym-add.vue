@@ -9,9 +9,19 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
-            <el-button size="small">文件导入</el-button>
-            <el-button type="success" size="small"><a :href="templateUrl">下载模板</a></el-button>
+            <el-upload
+              class="upload-file"
+              ref="upload"
+              :action="uploadWords"
+              accept=".xlsx, .xls"
+              :show-file-list="false"
+              :on-success="uploadSuccess"
+            >
+              <el-button size="small">文件导入</el-button>
+            </el-upload>
+            <el-button type="success" size="small"><a :href="templateUrl" style="color:#fff;text-decoration: none;">下载模板</a></el-button>
           </el-form-item>
+          <div class="upload-name"><span v-if="excelFile">上传文件名：{{excelFile}}</span></div>
         </el-form>
         <div class="query-tag-content">
           <el-tag
@@ -33,7 +43,7 @@
 </template>
 <script>
 import { findParent } from '../assets/js/utils'
-import { downloadTemplate } from '@/api/lexicon/mallLexiconList'
+import { downloadTemplate, uploadWords } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
@@ -41,11 +51,28 @@ export default {
       dataForm: {
         query: ''
       },
-      dynamicQuery: []
+      dynamicQuery: [],
+      uploadWords: uploadWords,
+      excelFile: ''
     }
   },
   mounted () {
     this.parent = findParent(this.$parent)
+  },
+  computed: {
+    searchWords () {
+      if (!this.dynamicQuery.length) {
+        return {
+          checkedLen: 0,
+          msg: '请至少填入一个Query!',
+          list: []
+        }
+      }
+      return {
+        checkedLen: this.dynamicQuery.length,
+        list: this.dynamicQuery
+      }
+    }
   },
   methods: {
     handleClose (tag) {
@@ -57,40 +84,29 @@ export default {
         this.dynamicQuery.push(query)
         this.dataForm.query = ''
       }
+    },
+    uploadSuccess (response, file) { // 上传成功时
+      if (response.code !== 0) {
+        return this.$message({
+          type: 'error',
+          message: response.msg
+        })
+      }
+      this.excelFile = file.name
+      response.data.forEach(item => {
+        if (!this.dynamicQuery.includes(item)) {
+          this.dynamicQuery.push(item)
+        }
+      })
+    },
+    initData () {
+      this.dynamicQuery = []
+      this.dataForm.query = ''
+      this.excelFile = ''
     }
   }
 }
 </script>
 <style scoped>
-  .query-card-content {
-    background: #eff0f3;
-  }
-  .query-tag-content {
-    padding: 10px;
-    background: #fff;
-    min-height: 150px;
-    max-height: 300px;
-    overflow: auto;
-  }
-  .query-tag-content .tag-item {
-    margin: 10px 10px 0 0;
-  }
-  .query-tag-content p {
-    margin: 0;
-    color: #dcdfe6;
-  }
-  .query-tag-total {
-    text-align: right;
-    padding-top: 10px;
-  }
-  .query-tag-total span {
-    color: red;
-  }
-  .btn-group {
-    padding-top: 10px;
-  }
-  .footer {
-    text-align: right;
-    margin-top: 20px;
-  }
+  @import '../assets/style/add-base.css';
 </style>

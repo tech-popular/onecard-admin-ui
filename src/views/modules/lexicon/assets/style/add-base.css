@@ -36,3 +36,34 @@
   text-align: right;
   margin-top: 20px;
 }
+.query-card-content {
+  background: #eff0f3;
+}
+.query-tag-content {
+  padding: 10px;
+  background: #fff;
+  min-height: 150px;
+  max-height: 300px;
+  overflow: auto;
+}
+.query-tag-content .tag-item {
+  margin: 0 10px 10px 0;
+}
+.query-tag-content p {
+  margin: 0;
+  color: #dcdfe6;
+}
+.query-tag-total {
+  text-align: right;
+  padding-top: 10px;
+}
+.query-tag-total span {
+  color: red;
+}
+.upload-file {
+  display: inline-block
+}
+.upload-name {
+  margin: -20px 0 15px 3px;
+  font-size: 12px;
+}

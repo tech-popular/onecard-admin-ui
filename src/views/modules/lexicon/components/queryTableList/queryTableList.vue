@@ -8,11 +8,11 @@
       <el-table-column type="selection" header-align="center" align="center" width="100"></el-table-column>
       <el-table-column label="序号" header-align="center" align="center" width="100">
         <template slot-scope="scope">
-        {{scope.$index+1}}
+          {{scope.$index + 1}}
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="Query" header-align="center" align="center"></el-table-column>
-      <el-table-column prop="label" label="操作" header-align="center" align="center" v-if="isSort">
+      <el-table-column prop="name" label="Query" header-align="center" align="center"></el-table-column>
+      <el-table-column label="操作" header-align="center" align="center" v-if="isSort">
         <template slot-scope="scope">
           <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)"></i>
           <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)"></i>
@@ -39,6 +39,9 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  mounted () {
+    console.log(66666, this.data)
   },
   methods: {
     handleSelectionChange (val) {
@@ -71,7 +74,7 @@ export default {
       } else {
         this.tableDataChecked.forEach(item => {
           data.forEach((ditem, dindex) => {
-            if (item.label === ditem.label) {
+            if (item.name === ditem.name) {
               data.splice(dindex, 1)
             }
           })

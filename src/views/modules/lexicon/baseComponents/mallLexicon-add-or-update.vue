@@ -25,11 +25,11 @@
     </div>
     <div v-else>
       <!--近义词 or 同义词修改-->
-      <near-synonym-update v-if="dataForm.wordType === '近义词' || dataForm.wordType === '同义词'" ref="updateSynonym"></near-synonym-update>
+      <near-synonym-update v-if="dataForm.wordType === '近义词' || dataForm.wordType === '同义词'" ref="updateSynonym" :data="searchWords"></near-synonym-update>
       <!-- 热门词修改 -->
-      <hot-synonym-update v-if="dataForm.wordType ==='热门词'" ref="updateSynonym"></hot-synonym-update>
+      <hot-synonym-update v-if="dataForm.wordType ==='热门词'" ref="updateSynonym" :data="searchWords"></hot-synonym-update>
       <!--敏感词和停用词修改-->
-      <stop-synonym-update v-if="dataForm.wordType ==='敏感词' || dataForm.wordType ==='停用词'" ref="updateSynonym"></stop-synonym-update>
+      <stop-synonym-update v-if="dataForm.wordType ==='敏感词' || dataForm.wordType ==='停用词'" ref="updateSynonym" :data="searchWords"></stop-synonym-update>
     </div>
     <div slot="footer">
       <el-button @click="cancel">取消</el-button>
@@ -63,7 +63,7 @@ export default {
           { required: true, message: '请选择所属词组类型', trigger: 'change' }
         ]
       },
-      data: [] // 编辑时的查看数据，数组
+      searchWords: [] // 编辑时的查看数据，数组
     }
   },
   props: {
@@ -87,6 +87,7 @@ export default {
   },
   methods: {
     init (row) {
+      this.id = ''
       this.dataForm = { // 初始化
         wordName: '',
         wordType: '近义词'
@@ -101,28 +102,67 @@ export default {
             })
           }
           this.dataForm = {
-            wordName: data.data.wordName,
-            wordType: data.data.wordType
+            wordName: data.data.wordsName,
+            wordType: data.data.wordsType
           }
-          this.data = data.data.searchWords
+          this.searchWords = data.data.searchWords
+          console.log(1234, this.searchWords)
           this.$nextTick(() => {
             this.visible = true
           })
         })
       } else {
         this.visible = true
+        this.$nextTick(() => {
+          this.$refs.addSynonym.initData()
+        })
       }
     },
     cancel () {
       this.visible = false
     },
     dataSubmit () {
-      console.log(this.$refs.addSynonym.rightData)
-      let url = addWordsInfo
-      if (this.id) {
-        url = updateWordsInfo
-      }
-      console.log(url)
+      this.$refs.dataForm.validate((valid) => {
+        if (valid) {
+          let url = addWordsInfo
+          let params = {}
+          let searchWords = {}
+          if (this.id) {
+            url = updateWordsInfo
+            searchWords = this.$refs.updateSynonym.searchWords
+          } else {
+            searchWords = this.$refs.addSynonym.searchWords
+          }
+          if (searchWords.checkedLen === 0) {
+            return this.$message({
+              type: 'error',
+              message: searchWords.msg
+            })
+          }
+          params = {
+            ...this.dataForm,
+            creator: this.userName,
+            searchWords: searchWords.list
+          }
+          this.postAjax(url, params)
+        }
+      })
+    },
+    postAjax (url, params) {
+      url(params).then(({data}) => {
+        if (data.code !== 0) {
+          return this.$message({
+            type: 'error',
+            message: data.msg
+          })
+        }
+        this.$message({
+          type: 'success',
+          message: data.msg
+        })
+        this.visible = false
+        this.$emit('refreshDataList')
+      })
     }
   }
 }

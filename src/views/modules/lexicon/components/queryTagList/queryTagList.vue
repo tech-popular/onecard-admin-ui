@@ -15,7 +15,7 @@
     </div>
     <div class="query-tag-total">
       <el-button type="primary" size="mini" style="float: left" @click="multiAddClick">批量新增至以下词组中</el-button>
-      <b>目前已添加 <span>{{data.length}}</span> 条</b>
+      <b>目前已添加 <i>{{data.length}}</i> 条</b>
     </div>
   </div>
 </template>

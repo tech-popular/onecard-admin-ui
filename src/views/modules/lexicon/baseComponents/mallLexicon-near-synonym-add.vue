@@ -44,7 +44,6 @@
             :has-table-sort="false"
             :has-footer="true"
             :data="rightData"
-            @removeItem="rightRemoveItem"
           >
             <div slot="header">
               已选择
@@ -61,7 +60,6 @@
 <script>
 import leftTransfer from '../components/leftTransfer'
 import rightTransfer from '../components/rightTransfer'
-import { findParent } from '../assets/js/utils'
 import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
@@ -87,9 +85,26 @@ export default {
     }
   },
   components: { leftTransfer, rightTransfer },
-  mounted () {
-    this.parent = findParent(this.$parent)
-    // this.getNamesList()
+  computed: {
+    searchWords () {
+      if (!this.rightData.length) {
+        return {
+          checkedLen: 0,
+          msg: '请至少从左侧选择一个Query!',
+          list: []
+        }
+      }
+      let checkedArr = this.rightData.filter(item => item.id.split('*')[0] !== 'manual')
+      let allArr = []
+      this.rightData.forEach(item => {
+        allArr.push(item.name)
+      })
+      return {
+        checkedLen: checkedArr.length,
+        msg: '请至少从左侧选择一个Query!',
+        list: allArr
+      }
+    }
   },
   methods: {
     getNamesList () {
@@ -150,17 +165,7 @@ export default {
     leftCheckChange (val) { // 左侧选中状态改变时
       this.leftChecked = val
     },
-    rightRemoveItem (id) { // 右侧删除的数据,左侧对应数据解冻
-      this.leftData = this.leftData.map(item => {
-        if (item.id === id) {
-          return { ...item, disabled: false, checked: false }
-        } else {
-          return item
-        }
-      })
-    },
     addToRight () {
-      console.log(999, this.leftChecked)
       let leftCheckedArr = this.leftChecked.map(item => {
         return {
           name: item.split('*')[1],
@@ -175,7 +180,7 @@ export default {
       })
       if (this.dataForm.name) {
         let param = {
-          id: 'manual_' + this.dataForm.name,
+          id: 'manual*' + this.dataForm.name,
           name: this.dataForm.name
         }
         if (this.rightData.filter(item => item.name === param.name).length) return
@@ -183,7 +188,12 @@ export default {
         this.dataForm.name = ''
       }
       this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
-      this.leftData = this.leftData.splice(0, 1, this.leftData[0])
+    },
+    initData () {
+      this.$refs.leftTransfer.nameWord = ''
+      this.leftData = []
+      this.rightData = []
+      this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
     }
   }
 }

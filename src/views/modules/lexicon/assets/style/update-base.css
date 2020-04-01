@@ -25,8 +25,9 @@
 .query-tag-total b {
   font-weight: normal;
 }
-.query-tag-total span {
+.query-tag-total i {
   color: red;
+  font-style: normal;
 }
 .btn-group {
   text-align: right;
@@ -40,4 +41,11 @@
 .footer {
   text-align: right;
   margin-top: 20px;
+}
+.upload-file {
+  display: inline-block
+}
+.upload-name {
+  margin: -20px 0 15px 3px;
+  font-size: 12px;
 }

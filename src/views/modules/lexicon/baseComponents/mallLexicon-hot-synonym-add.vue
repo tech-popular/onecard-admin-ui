@@ -5,20 +5,21 @@
       <div class="el-transfer" style="text-align: center">
         <div class="el-transfer-panel el-transfer-panel-new el-transfer-left">
           <left-transfer
+            ref="leftTransfer"
             :placeholder="'请输入内容'"
             :filterable='true'
-            :filter-method="filterMethod"
-            :has-footer="false"
             :data="leftData"
+            :selected-type="dataForm.query"
             @checkChange="leftCheckChange"
+            @searchName="searchNameChange"
           >
           <div slot="header">
             <el-form inline :model="dataForm" :rules="dataRules" class="transfer-form">
               <el-form-item label="选择:" prop="query">
-                <el-radio-group v-model="dataForm.query" size="mini">
-                  <!-- <el-radio-button label="商品关键词" ></el-radio-button> -->
-                  <el-radio-button label="商品分类"></el-radio-button>
-                  <el-radio-button label="商品品牌"></el-radio-button>
+                <el-radio-group v-model="dataForm.query" size="mini" @change="queryTypeChange">
+                  <!-- <el-radio-button label="needProductName">商品名称</el-radio-button> -->
+                  <el-radio-button label="needCategoryName">商品分类</el-radio-button>
+                  <el-radio-button label="needBrandName">商品品牌</el-radio-button>
                 </el-radio-group>
               </el-form-item>
             </el-form>
@@ -35,7 +36,6 @@
             :has-table-sort="true"
             :has-footer="true"
             :data="rightData"
-            @removeItem="rightRemoveItem"
           >
             <div slot="header">
               已选择
@@ -52,25 +52,11 @@
 <script>
 import leftTransfer from '../components/leftTransfer'
 import rightTransfer from '../components/rightTransfer'
-import { findParent } from '../assets/js/utils'
+import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
-    const generateData = _ => {
-      const data = []
-      const cities = ['上海', '北京', '广州', '上海1', '北京1', '广州1', '上海2', '北京2', '广州2']
-      const pinyin = ['shanghai', 'beijing', 'guangzhou', 'shanghai1', 'beijing1', 'guangzhou1', 'shanghai2', 'beijing2', 'guangzhou2']
-      cities.forEach((city, index) => {
-        data.push({
-          label: city,
-          index: index,
-          id: pinyin[index],
-          pinyin: pinyin[index]
-        })
-      })
-      return data
-    }
     return {
-      leftData: generateData(),
+      leftData: [],
       rightData: [],
       dataForm: {
         query: ''
@@ -80,47 +66,126 @@ export default {
           { required: true, message: '请选择', trigger: 'change' }
         ]
       },
-      leftChecked: []
+      leftChecked: [],
+      nameWord: '',
+      needType: {
+        needProductName: 1,
+        needBrandName: 1,
+        needCategoryName: 1
+      }
     }
   },
   components: { leftTransfer, rightTransfer },
-  mounted () {
-    this.parent = findParent(this.$parent)
+  computed: {
+    searchWords () {
+      if (!this.rightData.length) {
+        return {
+          checkedLen: 0,
+          msg: '请至少从左侧选择一个Query!',
+          list: []
+        }
+      }
+      let checkedArr = this.rightData.filter(item => item.id.split('*')[0] !== 'manual')
+      let allArr = []
+      this.rightData.forEach(item => {
+        allArr.push(item.name)
+      })
+      return {
+        checkedLen: checkedArr.length,
+        msg: '请至少从左侧选择一个Query!',
+        list: allArr
+      }
+    }
   },
   methods: {
-    filterMethod (query, item) {
-      return item.pinyin.indexOf(query) > -1
+    getNamesList () {
+      if (this.dataForm.query) {
+        this.needType[this.dataForm.query] = 1
+      } else {
+        this.needType = {
+          needProductName: 1,
+          needBrandName: 1,
+          needCategoryName: 1
+        }
+      }
+      let params = {
+        nameWord: this.nameWord,
+        ...this.needType
+      }
+      getBrandNamesAndCategoryNames(params).then(({data}) => {
+        this.leftData = []
+        if (data.code !== 0) {
+          this.leftData = []
+        } else {
+          let arr = []
+          for (let item in data.data) {
+            if (data.data[item] !== null) {
+              let list = Array.from(new Set(data.data[item])).map(citem => {
+                return {
+                  name: citem,
+                  id: item + '*' + citem
+                }
+              })
+              arr.push({
+                type: item,
+                list: list
+              })
+            }
+          }
+          console.log(arr)
+          this.leftData = arr
+        }
+      })
+    },
+    searchNameChange (name) {
+      this.nameWord = name
+      this.getNamesList()
+    },
+    queryTypeChange (label) {
+      this.needType = {
+        needProductName: 0,
+        needBrandName: 0,
+        needCategoryName: 0
+      }
+      console.log(label)
+      if (this.dataForm.query) {
+        this.needType[this.dataForm.query] = 1
+      }
+      this.getNamesList()
     },
     leftCheckChange (val) { // 左侧选中状态改变时
       console.log(val)
       this.leftChecked = val
     },
-    rightRemoveItem (id) { // 右侧删除的数据,左侧对应数据解冻
-      this.leftData = this.leftData.map(item => {
-        if (item.id === id) {
-          return { ...item, disabled: false, checked: false }
-        } else {
-          return item
+    addToRight () {
+      let leftCheckedArr = this.leftChecked.map(item => {
+        return {
+          name: item.split('*')[1],
+          id: item
         }
       })
-    },
-    addToRight () {
-      console.log(999, this.leftData.filter(item => this.leftChecked.includes(item.id)))
-      let leftCheckedArr = this.leftData.filter(item => this.leftChecked.includes(item.id))
       leftCheckedArr.forEach(item => {
-        if (!item.disabled) {
+        let isOnRight = this.rightData.filter(ritem => ritem.id === item.id).length
+        if (!isOnRight) {
           this.rightData.push(item)
         }
       })
-      this.leftData = this.leftData.map(item => {
-        let isOnRight = this.rightData.filter(ritem => ritem.id === item.id).length
-        if (isOnRight) {
-          return { ...item, disabled: true }
-        } else {
-          return item
+      if (this.dataForm.name) {
+        let param = {
+          id: 'manual*' + this.dataForm.name,
+          name: this.dataForm.name
         }
-      })
-      console.log('left', this.leftData, this.leftChecked)
+        if (this.rightData.filter(item => item.name === param.name).length) return
+        this.rightData.push(param)
+        this.dataForm.name = ''
+      }
+      this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
+    },
+    initData () {
+      this.$refs.leftTransfer.nameWord = ''
+      this.leftData = []
+      this.rightData = []
+      this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
     }
   }
 }

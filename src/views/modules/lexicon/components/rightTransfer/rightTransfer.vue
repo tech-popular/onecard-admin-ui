@@ -78,7 +78,6 @@ export default {
     },
     remove (scope) {
       this.filteredData.splice(scope.$index, 1)
-      this.$emit('removeItem', scope.row.id)
     }
   }
 }
