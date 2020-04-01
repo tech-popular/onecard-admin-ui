@@ -515,14 +515,15 @@ export default {
         this.$refs['selectedStaffTable'].clearSelection()
       }, 0)
       let repeat = false
-      // this.selectedStaffList.forEach(item => {
-      //   if (this.staffData[0] && item.phone === this.staffData[0].phone) {
-      //     repeat = true
-      //     alert('此员工已添加')
-      //   }
-      // })
       if (repeat === false) {
-        this.selectedStaffList = [...this.selectedStaffList, ...this.staffData]
+        var arr = [...this.selectedStaffList, ...this.staffData]
+        var hash = {}
+        arr = arr.reduce(function (item, next) {
+          // eslint-disable-next-line no-unused-expressions
+          hash[next.name] ? '' : hash[next.name] = true && item.push(next)
+          return item
+        }, [])
+        this.selectedStaffList = arr
         this.staffList = this.staffList.filter(item => {
           let list = this.staffData.map(v => v.name)
           return !list.includes(item.name)
@@ -546,27 +547,6 @@ export default {
     // 将右边表格选择项存入selectedStaffData中
     handleSelectedStaffChange (rows) {
       this.selectedStaffData = rows
-    },
-    // 提交
-    modifyStaff () {
-      let isEmpty = false
-      this.selectedStaffList.forEach(item => {
-        if (!item.staffTypeId) {
-          alert('请选择类型')
-          isEmpty = true
-        }
-      })
-      if (isEmpty === false) {
-        // editStaff(this.selectedStaffList, this.deviceQuery.id).then(res => {
-        //   this.staffListVisible = false
-        //   this.$notify({
-        //     title: '成功',
-        //     message: '修改成功',
-        //     type: 'success',
-        //     duration: 2000
-        //   })
-        // })
-      }
     },
     sizeChangeHandle (val) {
       this.staffTemp.pageSize = val
