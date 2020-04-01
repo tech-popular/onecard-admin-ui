@@ -4,17 +4,17 @@
 		<el-form :model="formData" ref="formData">
 			<el-table :data="formData.tableData" border style="width: 100%;">
         <el-table-column prop="index" header-align="center" align="center" label="序号"></el-table-column>
-        <el-table-column prop="englishName" header-align="center" align="center" label="字段名称">
+        <el-table-column prop="fieldName" header-align="center" align="center" label="字段名称">
             <template slot-scope="scope">
-              <el-form-item :prop="'tableData.' + scope.$index + '.englishName'" :rules='rules.englishName'>
-                <el-input v-model="scope.row.englishName" placeholder="字段名称"></el-input>
+              <el-form-item :prop="'tableData.' + scope.$index + '.fieldName'" :rules='rules.fieldName'>
+                <el-input v-model="scope.row.fieldName" placeholder="字段名称"></el-input>
               </el-form-item>
             </template>
         </el-table-column>
-        <el-table-column prop="chineseName" header-align="center" align="center" label="字段标题">
+        <el-table-column prop="fieldTitle" header-align="center" align="center" label="字段标题">
 					<template slot-scope="scope">
-            <el-form-item :prop="'tableData.' + scope.$index + '.chineseName'" :rules='rules.chineseName'>
-              <el-input v-model="scope.row.chineseName" placeholder="字段名称"></el-input>
+            <el-form-item :prop="'tableData.' + scope.$index + '.fieldTitle'" :rules='rules.fieldTitle'>
+              <el-input v-model="scope.row.fieldTitle" placeholder="字段名称"></el-input>
             </el-form-item>
           </template>
 				</el-table-column>
@@ -27,10 +27,10 @@
 						</el-form-item>
 					</template>
 				</el-table-column>
-        <el-table-column prop="indexAlias" header-align="center" align="center" label="字段值">
+        <el-table-column prop="fieldValue" header-align="center" align="center" label="字段值">
 					<template slot-scope="scope">
-            <el-form-item :prop="'tableData.' + scope.$index + '.indexAlias'" :rules='rules.indexAlias'>
-              <el-input v-model="scope.row.indexAlias" placeholder="字段名称"></el-input>
+            <el-form-item :prop="'tableData.' + scope.$index + '.fieldValue'" :rules='rules.fieldValue'>
+              <el-input v-model="scope.row.fieldValue" placeholder="字段名称"></el-input>
             </el-form-item>
           </template>
 				</el-table-column>
@@ -56,7 +56,7 @@
 
 <script>
   import { indexManageTypeList } from '@/api/dataAnalysis/indexManage'
-  import { dataIndexAliasAdd, dataIndexAliasCustomList, dataIndexAliasDelete } from '@/api/dataAnalysis/outParamsMapping'
+  import { dataCustomisedAdd, dataCustomisedList, dataCustomisedDel, dataCustomisedLastModifier } from '@/api/dataAnalysis/outParamsMapping'
   export default {
     data () {
       return {
@@ -64,11 +64,11 @@
           tableData: []
         },
         rules: {
-          englishName: {
+          fieldName: {
             required: true,
             message: '请输入字段名称'
           },
-          chineseName: {
+          fieldTitle: {
             required: true,
             message: '请输入字段标题'
           },
@@ -76,7 +76,7 @@
             required: true,
             message: '请选择字段类型'
           },
-          indexAlias: {
+          fieldValue: {
             required: true,
             message: '请输入字段值'
           }
@@ -88,6 +88,7 @@
     mounted () {
       this.getFieldTypeList()
       this.getDataIndexAliasCustomList()
+      this.getUpdator()
     },
     props: {
       transferId: Number
@@ -100,14 +101,23 @@
     methods: {
       // 获取列表数据
       getDataIndexAliasCustomList () {
-        dataIndexAliasCustomList(this.transferId).then(({data}) => {
+        dataCustomisedList(this.transferId).then(({data}) => {
           if (!data || data.status !== '1' || (data && !data.data)) {
             this.formData.tableData = []
             return
           }
           this.formData.tableData = data.data
-          this.updator = data.data[data.data.length - 1].updater || '无'
           this.updateDataIndex()
+        })
+      },
+      getUpdator () {
+        console.log(this.transferId)
+        dataCustomisedLastModifier(this.transferId).then(({data}) => {
+          if (data.status !== '1') {
+            this.updator = '无'
+          } else {
+            this.updator = data.data || '无'
+          }
         })
       },
       // 获取数据类型
@@ -129,9 +139,11 @@
         }
         this.formData.tableData.push({
           index: initIndex,
-          englishName: '',
-          chineseName: '',
-          fieldType: ''
+          fieldName: '',
+          fieldTitle: '',
+          fieldType: '',
+          fieldValue: '',
+          transferConfigDsId: this.transferId
         })
       },
       // 删除字段
@@ -141,7 +153,7 @@
           this.formData.tableData.splice(scope.$index, 1)
           this.updateDataIndex()
         } else {
-          dataIndexAliasDelete(this.transferId, row.id).then(({data}) => {
+          dataCustomisedDel(row.id).then(({data}) => {
             if (data.status !== '1') {
               return this.$message({
                 type: 'error',
@@ -163,7 +175,7 @@
         this.$refs.formData.validate((valid) => {
           if (valid) {
             let data = this.formData.tableData
-            dataIndexAliasAdd(this.transferId, this.userName, data).then(({data}) => {
+            dataCustomisedAdd(this.userName, data).then(({data}) => {
               if (data && data.status !== '1') {
                 return this.$message({
                   message: data.message || '提交出错',

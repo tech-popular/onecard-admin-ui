@@ -12,7 +12,7 @@
         <el-input v-model="dataForm.chineseName" placeholder="请输入指标标题" clearable />
       </el-form-item>
       <el-form-item label="用户所属渠道">
-        <el-select v-model="dataForm.channelId" filterable clearable placeholder="请选择">
+        <el-select v-model="dataForm.channelCode" filterable clearable placeholder="请选择">
             <el-option v-for="(item, index) in channelIdList" :key="index" :label="item.text" :value="item.value"></el-option>
           </el-select>
       </el-form-item>
@@ -78,7 +78,7 @@
           id: '',
           englishName: '',
           chineseName: '',
-          channelId: '',
+          channelCode: null,
           enable: ''
         },
         dataList: [],
