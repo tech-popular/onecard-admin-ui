@@ -121,11 +121,11 @@
                       <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column label="字段名称" align="center">
+                  <!-- <el-table-column label="字段名称" align="center">
                     <template slot-scope="{row}">
                       <span>{{ row.owner }}</span>
                     </template>
-                  </el-table-column>
+                  </el-table-column> -->
                 </el-table>
                 <!-- 分页 -->
                 <el-pagination
@@ -176,11 +176,11 @@
                       <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column label="字段名称" align="center">
+                  <!-- <el-table-column label="字段名称" align="center">
                     <template slot-scope="{row}">
                       <span>{{ row.owner }}</span>
                     </template>
-                  </el-table-column>
+                  </el-table-column> -->
                 </el-table>
               </el-col>
             </el-row>
