@@ -7,14 +7,14 @@
         <el-table-column prop="fieldName" header-align="center" align="center" label="字段名称">
             <template slot-scope="scope">
               <el-form-item :prop="'tableData.' + scope.$index + '.fieldName'" :rules='rules.fieldName'>
-                <el-input v-model="scope.row.fieldName" placeholder="字段名称"></el-input>
+                <el-input v-model.trim="scope.row.fieldName" placeholder="字段名称"></el-input>
               </el-form-item>
             </template>
         </el-table-column>
         <el-table-column prop="fieldTitle" header-align="center" align="center" label="字段标题">
 					<template slot-scope="scope">
             <el-form-item :prop="'tableData.' + scope.$index + '.fieldTitle'" :rules='rules.fieldTitle'>
-              <el-input v-model="scope.row.fieldTitle" placeholder="字段名称"></el-input>
+              <el-input v-model.trim="scope.row.fieldTitle" placeholder="字段标题"></el-input>
             </el-form-item>
           </template>
 				</el-table-column>
@@ -30,7 +30,7 @@
         <el-table-column prop="fieldValue" header-align="center" align="center" label="字段值">
 					<template slot-scope="scope">
             <el-form-item :prop="'tableData.' + scope.$index + '.fieldValue'" :rules='rules.fieldValue'>
-              <el-input v-model="scope.row.fieldValue" placeholder="字段名称"></el-input>
+              <el-input v-model.trim="scope.row.fieldValue" placeholder="字段值"></el-input>
             </el-form-item>
           </template>
 				</el-table-column>

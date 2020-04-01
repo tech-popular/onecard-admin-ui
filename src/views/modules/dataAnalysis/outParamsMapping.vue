@@ -125,7 +125,7 @@ export default {
     editOutParams () {
       this.$refs.baseForm.validate((valid) => {
         if (valid) {
-          this.transferDataId = this.baseForm.kafka ? this.baseForm.kafka : this.baseForm.database
+          this.transferDataId = this.baseForm.source === 'kafka' ? this.baseForm.kafka : this.baseForm.database
           if (this.prevData.source && this.judgeObjParams()) { // 下发数据源一样的情况下
             if (this.editOutParamsFlag === true) return // 如果是编辑出参状态下，再次点击编辑出参按钮无效
             if (this.customizedOutParamsFlag === true) { // 如果是定制化出参状态下，可进行切换
@@ -150,7 +150,7 @@ export default {
     customizedOutParams () {
       this.$refs.baseForm.validate((valid) => {
         if (valid) {
-          this.transferDataId = this.baseForm.kafka ? this.baseForm.kafka : this.baseForm.database
+          this.transferDataId = this.baseForm.source === 'kafka' ? this.baseForm.kafka : this.baseForm.database
           if (this.prevData.source && this.judgeObjParams()) { // 下发数据源一样的情况下
             if (this.customizedOutParamsFlag === true) return // 如果是定制化出参状态下，再次点击定制化出参按钮无效
             if (this.editOutParamsFlag === true) { // 如果是编辑出参状态下，可进行切换
@@ -204,11 +204,14 @@ export default {
       })
     },
     judgeObjParams () { // 判断prevdata 和 baseform 数据是否一致，一致时再次点击相同按钮无效
-      if (this.prevData.source === this.baseForm.source &&
-        this.prevData.kafka === this.baseForm.kafka &&
-        this.prevData.database === this.baseForm.database
-      ) {
-        return true
+      if (this.prevData.source === this.baseForm.source) {
+        if (this.baseForm.source === 'kafka' && this.prevData.kafka === this.baseForm.kafka) {
+          return true
+        } else if (this.baseForm.source === 'database' && this.prevData.database === this.baseForm.database) {
+          return true
+        } else {
+          return false
+        }
       } else {
         return false
       }

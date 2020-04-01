@@ -44,7 +44,7 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" label="修改后指标名称">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.indexAlias" @blur="blurIndexAliasEvent(scope.row)" placeholder="请输入内容"></el-input>
+          <el-input v-model.trim="scope.row.indexAlias" @blur="blurIndexAliasEvent(scope.row)" placeholder="请输入内容"></el-input>
         </template>
       </el-table-column>
     </el-table>
@@ -122,7 +122,7 @@
           }
         }
       },
-  
+
       // 获取数据类型
       getFieldTypeList () {
         let params = 6
@@ -156,6 +156,7 @@
         this.dataListLoading = true
         let params = {
           ...this.dataForm,
+          channelCode: this.dataForm.channelCode === '' ? null : this.dataForm.channelCode,
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
@@ -241,7 +242,6 @@
         this.getdDataIndexAliasList()
       },
       submitData () {
-        console.log(this.modifyDataList)
         if (this.modifyDataList.length === 0) {
           this.$confirm('当前出参名称无修改，确定提交？', '提示', {
             confirmButtonText: '确定',
@@ -310,7 +310,7 @@
     & .table-content th {
       border-top: 1px solid #ebeef5;
     }
-    
+
     & .table-content th:nth-child(5){
       border-top: 0;
     }
