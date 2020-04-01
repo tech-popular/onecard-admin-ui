@@ -11,9 +11,9 @@
         <el-form-item label="申请人姓名">
           <span>{{detalList.applicantName}}</span>
         </el-form-item>
-        <el-form-item label="默认所属部门">
+        <!-- <el-form-item label="默认所属部门">
           <span>{{detalList.department}}</span>
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item label="申请系统">
           <span>{{detalList.department}}</span>
         </el-form-item>
