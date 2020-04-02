@@ -28,7 +28,7 @@
         <el-button @click="resetHandle()">重置</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border style="width: 100%;" class="table-content">
+    <el-table :data="dataList" border style="width: 100%;" class="table-content" ref="dataTable">
       <el-table-column prop="id" header-align="center" align="center" width="80" label="指标ID"></el-table-column>
       <el-table-column prop="englishName" header-align="center" align="center" label="指标名称"></el-table-column>
       <el-table-column prop="chineseName" header-align="center" align="center" label="指标标题"></el-table-column>
@@ -44,7 +44,7 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" label="修改后指标名称">
         <template slot-scope="scope">
-          <el-input v-model.trim="scope.row.indexAlias" @blur="blurIndexAliasEvent(scope.row)" placeholder="请输入内容"></el-input>
+            <el-input v-model.trim="scope.row.indexAlias" @blur="blurIndexAliasEvent(scope.row)" placeholder="请输入内容"></el-input>
         </template>
       </el-table-column>
     </el-table>
@@ -242,6 +242,13 @@
         this.getdDataIndexAliasList()
       },
       submitData () {
+        let emptyLen = this.modifyDataList.filter(item => item.indexAlias === '').length
+        if (emptyLen > 0) {
+          return this.$message({
+            type: 'error',
+            message: '修改后的指标名称不可为空，请重新编辑再提交！'
+          })
+        }
         if (this.modifyDataList.length === 0) {
           this.$confirm('当前出参名称无修改，确定提交？', '提示', {
             confirmButtonText: '确定',
