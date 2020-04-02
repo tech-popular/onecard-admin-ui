@@ -2,7 +2,7 @@
   <el-dialog
       title="审批记录"
       :visible.sync="dialogVisible"
-      width="30%"
+      width="50%"
       :before-close="handleClose">
       <el-form label-width="100px">
         <el-form-item label="标题">
