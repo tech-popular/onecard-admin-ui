@@ -485,6 +485,7 @@ export default {
                   this.visible = false
                   this.$emit('refreshDataList')
                   this.$refs['severDataForm'].resetFields()
+                  this.staffTemp.pageNum = 1
                   this.selectedStaffList = []
                 }
               })
@@ -563,6 +564,7 @@ export default {
     // 取消
     severDataFormCancel () {
       this.visible = false
+      this.staffTemp.pageNum = 1
       this.selectedStaffList = []
     },
     // 当前页
