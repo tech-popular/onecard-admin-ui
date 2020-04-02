@@ -104,6 +104,9 @@ export default {
         this.$emit('searchName', this.nameWord)
       }
     },
+    inputChange () {
+      this.$emit('searchName', this.nameWord)
+    },
     checkedChange (val, index, item) {
       // 将选中的数据按分类保存一下
       let obj = {}
@@ -123,9 +126,6 @@ export default {
         this.checkedAll.splice(index, 1, false)
       }
       this.$emit('checkChange', val)
-    },
-    inputChange () {
-      this.$emit('searchName', this.nameWord)
     },
     handleCheckAllChange (val, index, item) { // 点击全选框按钮时
       if (val) { // 全选的话，将子数据全部放到被选中中

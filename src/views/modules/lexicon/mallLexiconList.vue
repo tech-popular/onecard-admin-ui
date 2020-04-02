@@ -125,34 +125,51 @@
         })
       },
       deleteHandle (row) { // 删除
-        deleteWordsInfo(row.id).then(({data}) => {
-          if (data.code !== 0) {
-            return this.$message({
-              type: 'error',
-              message: data.msg || '删除失败'
+        this.$confirm(`确定删除名称为【${row.wordName}】的词组吗？`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteWordsInfo(row.id).then(({data}) => {
+            if (data.code !== 0) {
+              return this.$message({
+                type: 'error',
+                message: data.msg || '删除失败'
+              })
+            }
+            this.$message({
+              type: 'success',
+              message: data.msg || '删除成功'
             })
-          }
-          this.$message({
-            type: 'success',
-            message: data.msg || '删除成功'
+            this.getDataList()
           })
-          this.getDataList()
+        }).catch(() => {
+          console.log('取消')
         })
       },
       changeStatus (row) { // 改变状态
         let status = row.status === 1 ? 0 : 1
-        changeWordsInfoStatus(row.id, status).then(({data}) => {
-          if (data.code !== 0) {
-            return this.$message({
-              type: 'error',
+        let content = row.status === 1 ? `确定停用名称为【${row.wordName}】的词组吗？` : `确定启用名称为【${row.wordName}】的词组吗？`
+        this.$confirm(content, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => { // 确认创建分群时的操作
+          changeWordsInfoStatus(row.id, status).then(({data}) => {
+            if (data.code !== 0) {
+              return this.$message({
+                type: 'error',
+                message: data.msg
+              })
+            }
+            this.$message({
+              type: 'success',
               message: data.msg
             })
-          }
-          this.$message({
-            type: 'success',
-            message: data.msg
+            this.getDataList()
           })
-          this.getDataList()
+        }).catch(() => {
+          console.log('取消')
         })
       },
       // 新增 / 修改

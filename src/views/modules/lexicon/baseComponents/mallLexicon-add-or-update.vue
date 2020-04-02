@@ -148,7 +148,19 @@ export default {
             creator: this.userName,
             searchWords: searchWords.list
           }
-          this.postAjax(url, params)
+          if (this.id) {
+            this.$confirm('确定提交已修改数据？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => { // 确认创建分群时的操作
+              this.postAjax(url, params)
+            }).catch(() => {
+              console.log('取消')
+            })
+          } else {
+            this.postAjax(url, params)
+          }
         }
       })
     },
