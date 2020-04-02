@@ -485,6 +485,7 @@ export default {
                   this.visible = false
                   this.$emit('refreshDataList')
                   this.$refs['severDataForm'].resetFields()
+                  this.selectedStaffList = []
                 }
               })
             } else {
