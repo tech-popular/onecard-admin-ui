@@ -537,7 +537,14 @@ export default {
         this.$refs['staffTable'].clearSelection()
         this.$refs['selectedStaffTable'].clearSelection()
       }, 0)
-      this.staffList = [...this.staffList, ...this.selectedStaffData]
+      var arr = [...this.staffList, ...this.selectedStaffData]
+      var hash = {}
+      arr = arr.reduce(function (item, next) {
+          // eslint-disable-next-line no-unused-expressions
+        hash[next.name] ? '' : hash[next.name] = true && item.push(next)
+        return item
+      }, [])
+      this.staffList = arr
       this.selectedStaffList = this.selectedStaffList.filter(item => {
         let list = this.selectedStaffData.map(v => v.name)
         return !list.includes(item.name)
