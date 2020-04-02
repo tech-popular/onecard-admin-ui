@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.wordName" placeholder="" :disabled="!!id" />
       </el-form-item>
       <el-form-item label="所属词组类型:" prop="wordType">
-        <el-radio-group v-model="dataForm.wordType">
+        <el-radio-group v-model="dataForm.wordType" @change="wordTypeChange">
           <el-radio
             v-for="item in typeList"
             :key="item"
@@ -106,7 +106,6 @@ export default {
             wordType: data.data.wordsType
           }
           this.searchWords = data.data.searchWords
-          console.log(1234, this.searchWords)
           this.$nextTick(() => {
             this.visible = true
           })
@@ -116,6 +115,11 @@ export default {
         this.$nextTick(() => {
           this.$refs.addSynonym.initData()
         })
+      }
+    },
+    wordTypeChange () {
+      if (!this.id) {
+        this.$refs.addSynonym.initData()
       }
     },
     cancel () {

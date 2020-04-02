@@ -31,12 +31,8 @@
           </left-transfer>
         </div>
         <div class="el-transfer__buttons">
-          <el-button
-            type="primary"
-            class="el-transfer__button"
-            @click.native="addToRight"
-          >
-            <i class="el-icon-arrow-right"></i>
+          <el-button type="primary" @click.native="addToRight" size="mini">
+            添加至>
           </el-button>
         </div>
         <div class="el-transfer-panel el-transfer-panel-new el-transfer-right">
@@ -44,10 +40,8 @@
             :has-table-sort="false"
             :has-footer="true"
             :data="rightData"
+            @dataChange="tableDataChange"
           >
-            <div slot="header">
-              已选择
-            </div>
             <p class="right-footer" slot="footer">
               目前已选中<span> {{this.rightData.length}} </span>条
             </p>
@@ -107,7 +101,7 @@ export default {
     }
   },
   methods: {
-    getNamesList () {
+    getNamesList () { // 获取下拉列表
       if (this.dataForm.query) {
         this.needType[this.dataForm.query] = 1
       } else {
@@ -146,11 +140,11 @@ export default {
         }
       })
     },
-    searchNameChange (name) {
+    searchNameChange (name) { // 搜索词改变时
       this.nameWord = name
       this.getNamesList()
     },
-    queryTypeChange (label) {
+    queryTypeChange (label) { // 商品选择改变时
       this.needType = {
         needProductName: 0,
         needBrandName: 0,
@@ -165,7 +159,7 @@ export default {
     leftCheckChange (val) { // 左侧选中状态改变时
       this.leftChecked = val
     },
-    addToRight () {
+    addToRight () { // 添加到右侧
       let leftCheckedArr = this.leftChecked.map(item => {
         return {
           name: item.split('*')[1],
@@ -173,7 +167,7 @@ export default {
         }
       })
       leftCheckedArr.forEach(item => {
-        let isOnRight = this.rightData.filter(ritem => ritem.id === item.id).length
+        let isOnRight = this.rightData.filter(ritem => ritem.name === item.name).length
         if (!isOnRight) {
           this.rightData.push(item)
         }
@@ -183,17 +177,35 @@ export default {
           id: 'manual*' + this.dataForm.name,
           name: this.dataForm.name
         }
-        if (this.rightData.filter(item => item.name === param.name).length) return
+        if (this.rightData.filter(item => item.name === param.name).length) {
+          return this.$message({
+            type: 'error',
+            message: '右侧已存在该搜索词，请重新输入添加'
+          })
+        }
         this.rightData.push(param)
         this.dataForm.name = ''
       }
       this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
+      this.$refs.leftTransfer.checkedAll.forEach((item, index) => {
+        if (item) {
+          this.$refs.leftTransfer.checkedAll.splice(index, 1, false)
+        }
+      })
     },
-    initData () {
+    tableDataChange (data) { // 右侧数据改变时，同步数据
+      this.rightData = data
+    },
+    initData () { // 初始化数据
       this.$refs.leftTransfer.nameWord = ''
       this.leftData = []
       this.rightData = []
       this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
+      this.$refs.leftTransfer.checkedAll.forEach((item, index) => {
+        if (item) {
+          this.$refs.leftTransfer.checkedAll.splice(index, 1, false)
+        }
+      })
     }
   }
 }

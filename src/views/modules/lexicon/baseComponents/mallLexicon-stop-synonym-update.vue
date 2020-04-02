@@ -25,7 +25,7 @@
         </el-form>
         <query-tag-list :data="dynamicQuery" @tagChange="tagChangeEvent" @multiAdd="multiAddClick"></query-tag-list>
       </el-card>
-      <query-table-list :data="tableData" @multiRemove="multiRemoveClick"></query-table-list>
+      <query-table-list :data="tableData" @dataChange="tableDataChangeClick"></query-table-list>
     </div>
   </div>
 </template>
@@ -121,7 +121,7 @@ export default {
       })
       this.dynamicQuery = []
     },
-    multiRemoveClick (data) { // 批量删除
+    tableDataChangeClick (data) { // 批量删除
       console.log('批量删除', data)
       this.tableData = data
     }

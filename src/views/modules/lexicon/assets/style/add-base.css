@@ -57,8 +57,9 @@
   text-align: right;
   padding-top: 10px;
 }
-.query-tag-total span {
+.query-tag-total i {
   color: red;
+  font-style: normal;
 }
 .upload-file {
   display: inline-block

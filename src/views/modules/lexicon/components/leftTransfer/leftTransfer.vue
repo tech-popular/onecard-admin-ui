@@ -21,12 +21,12 @@
     <div class="data-list">
       <div class="data-list-item" v-for="(item, index) in data" :key="index">
         <div v-if="item.list.length > 0">
-          <h3 v-text="getTitle(item.type)"></h3>
+          <!-- <h3 v-text="queryTitleList[item.type]"></h3> -->
+          <el-checkbox v-model="checkedAll[index]" @change="data => handleCheckAllChange(data, index, item)">{{queryTitleList[item.type]}}</el-checkbox>
           <el-checkbox-group
             v-model="checked"
-            @change="checkedChange"
+            @change="data => checkedChange(data, index, item)"
           >
-
             <el-checkbox
               class="el-transfer-panel__item"
               :label="citem.id"
@@ -38,7 +38,7 @@
           </el-checkbox-group>
         </div>
       </div>
-      <p class="el-transfer-panel__empty" v-show="nameWord && data.length === 0">暂无数据</p>
+      <p class="el-transfer-panel__empty" v-if="isNoData()">暂无数据</p>
       <p class="el-transfer-panel__empty" v-if="!nameWord && data.length === 0">请输入搜索内容查询数据</p>
     </div>
     <p class="el-transfer-panel__footer" v-if="hasFooter">
@@ -53,11 +53,14 @@ export default {
     return {
       nameWord: '',
       inputHover: false,
-      checked: []
+      checked: [],
+      queryTitleList: {
+        bandNames: '商品品牌',
+        categoryNames: '商品分类',
+        productNames: '商品名称'
+      },
+      checkedAll: []
     }
-  },
-  mounted () {
-    console.log(this.data)
   },
   props: {
     data: {
@@ -85,26 +88,70 @@ export default {
         : 'search'
     }
   },
+  watch: {
+    data () {
+      console.log(this.data)
+      this.checkedAll = []
+      this.data.forEach(item => {
+        this.checkedAll.push(false)
+      })
+    }
+  },
   methods: {
-    getTitle (type) {
-      if (type === 'bandNames') {
-        return '商品品牌'
-      } else if (type === 'categoryNames') {
-        return '商品分类'
-      } else {
-        return '商品名称'
-      }
-    },
     clearQuery () {
       if (this.inputIcon === 'circle-close') {
         this.nameWord = ''
+        this.$emit('searchName', this.nameWord)
       }
     },
-    checkedChange (val) {
+    checkedChange (val, index, item) {
+      // 将选中的数据按分类保存一下
+      let obj = {}
+      val.forEach(citem => {
+        let name = citem.split('*')[0]
+        if (!obj[name]) {
+          obj[name] = []
+          obj[name].push(citem)
+        } else if (obj[name]) {
+          obj[name].push(citem)
+        }
+      })
+      // 根据选中的数据和原始数据做对比，进行全选的操作
+      if (obj[item.type] && obj[item.type].length === item.list.length) { // 全选
+        this.checkedAll.splice(index, 1, true)
+      } else if (!obj[item.type] || (obj[item.type] && obj[item.type].length < item.list.length)) { // 不全选时，取消全选状态
+        this.checkedAll.splice(index, 1, false)
+      }
       this.$emit('checkChange', val)
     },
     inputChange () {
       this.$emit('searchName', this.nameWord)
+    },
+    handleCheckAllChange (val, index, item) { // 点击全选框按钮时
+      if (val) { // 全选的话，将子数据全部放到被选中中
+        item.list.map(citem => {
+          if (!this.checked.includes(citem.id)) {
+            this.checked.push(citem.id)
+          }
+        })
+      } else { // 全不选时，将其子数据全部从选中数组中剔除
+        item.list.map(citem => {
+          if (this.checked.includes(citem.id)) {
+            this.checked.splice(this.checked.indexOf(citem.id), 1)
+          }
+        })
+      }
+      this.$emit('checkChange', this.checked)
+    },
+    isNoData () {
+      let flag = true
+      this.data.forEach(item => {
+        if (item.list.length > 0) {
+          flag = false
+        }
+      })
+      if (this.nameWord && flag) return true
+      return false
     }
   }
 }
@@ -113,6 +160,7 @@ export default {
   .data-list {
     height: 354px;
     padding-bottom: 40px;
+    padding-left: 20px;
     overflow: auto;
   }
   .data-list h3 {

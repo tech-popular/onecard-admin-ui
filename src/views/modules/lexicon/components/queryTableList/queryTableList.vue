@@ -56,7 +56,7 @@ export default {
       if (index === 0) return
       data.splice(index - 1, 0, (data[index])) // 在上一项插入该项
       data.splice(index + 1, 1) // 删除后一项
-      this.$emit('changeSort', data)
+      this.$emit('dataChange', data)
     },
     // 下移 将当前数组index索引与前面一个元素互换位置，向数组前面移动一位
     moveDown (index) {
@@ -64,7 +64,7 @@ export default {
       if (index === (data.length - 1)) return
       data.splice(index + 2, 0, (data[index])) // 在下一项插入该项
       data.splice(index, 1) // 删除前一项
-      this.$emit('changeSort', data)
+      this.$emit('dataChange', data)
     },
     multiRemoveClick () { // 批量删除
       console.log(this.tableDataChecked)
@@ -80,7 +80,7 @@ export default {
           })
         })
       }
-      this.$emit('multiRemove', data)
+      this.$emit('dataChange', data)
     }
   }
 }
