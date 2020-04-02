@@ -1,10 +1,9 @@
 <template>
   <el-dialog
     title="新增"
-    :modal-append-to-body="false"
     :append-to-body="true"
-    :close-on-click-modal="false"
     :visible.sync="visible"
+    :show-close="false"
     width="1000px"
   >
     <el-divider>请选择申请类别</el-divider>
@@ -222,7 +221,7 @@
           </el-form-item>
         </el-form>
         <div class="foot">
-          <el-button @click="visible = false">取消</el-button>
+          <el-button @click="severDataFormCancel()">取消</el-button>
           <el-button type="primary" @click="severDataFormSubmit()">确定</el-button>
         </div>
       </el-tab-pane>
@@ -552,6 +551,11 @@ export default {
       this.staffTemp.pageSize = val
       this.staffTemp.pageNum = 1
       this.getStaffList()
+    },
+    // 取消
+    severDataFormCancel () {
+      this.visible = false
+      this.selectedStaffList = []
     },
     // 当前页
     currentChangeHandle (val) {
