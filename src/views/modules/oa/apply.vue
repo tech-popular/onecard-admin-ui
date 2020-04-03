@@ -36,11 +36,17 @@
         header-align="center"
         align="center"
         label="发起审批时间"/>
-      <el-table-column
+       <el-table-column
         prop="approvalStatus"
         header-align="center"
         align="center"
-        label="钉钉审批状态"/>
+        label="钉钉审批状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.approvalStatus === '审批通过'" size="small" >审批通过</el-tag>
+          <el-tag v-else-if="scope.row.approvalStatus === '审批失败'" size="small" type="danger">审批失败</el-tag>
+          <el-tag v-else size="small" type="warning">审批中</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="flow"
         header-align="center"
@@ -49,7 +55,7 @@
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
-          <el-button type="text" size="small" @click="lookHandle(scope.row)">查看</el-button>
+          <el-button type="primary" icon="el-icon-view" size="small" @click="lookHandle(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
