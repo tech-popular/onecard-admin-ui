@@ -58,6 +58,7 @@
            class="el-icon--right"
            size="small"
            v-for="tag in detalList.defaultApproverList" 
+           :key="tag.name"
            :type="tag.status === '审批通过' ? 'success' : tag.status === '审批失败' ? 'danger' : 'warning'" 
            :icon="tag.status === '审批通过' ? 'el-icon-circle-check' : tag.status === '审批失败' ? 'el-icon-circle-close' : 'el-icon-remove-outline'">
             {{tag.name}}
