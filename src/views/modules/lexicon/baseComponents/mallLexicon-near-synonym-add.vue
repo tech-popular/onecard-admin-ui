@@ -26,7 +26,7 @@
             </el-form>
             </div>
             <div class="left-footer" slot="footer">
-              手动添加：<el-input v-model="dataForm.name" placeholder="请输入Query名" size="mini" style="width:200px;display:inline-block"/>
+              手动添加：<el-input v-model.trim="dataForm.name" @keyup.native="validateNameRule" placeholder="请输入Query名，可输入中英文" size="mini" style="width:200px;display:inline-block"/>
             </div>
           </left-transfer>
         </div>
@@ -84,7 +84,7 @@ export default {
       if (!this.rightData.length) {
         return {
           checkedLen: 0,
-          msg: '请至少从左侧选择一个Query!',
+          msg: '请至少从左侧选择一个Query，添加至右侧!',
           list: []
         }
       }
@@ -95,7 +95,7 @@ export default {
       })
       return {
         checkedLen: checkedArr.length,
-        msg: '请至少从左侧选择一个Query!',
+        msg: '请至少从左侧选择一个Query，添加至右侧!',
         list: allArr
       }
     }
@@ -135,10 +135,12 @@ export default {
               })
             }
           }
-          console.log(arr)
           this.leftData = arr
         }
       })
+    },
+    validateNameRule () {
+      this.dataForm.name = this.dataForm.name.replace(/[^\u4E00-\u9FA5A-Za-z]/g, '')
     },
     searchNameChange (name) { // 搜索词改变时
       this.nameWord = name
@@ -150,7 +152,6 @@ export default {
         needBrandName: 0,
         needCategoryName: 0
       }
-      console.log(label)
       if (this.dataForm.query) {
         this.needType[this.dataForm.query] = 1
       }
@@ -167,7 +168,7 @@ export default {
         }
       })
       leftCheckedArr.forEach(item => {
-        let isOnRight = this.rightData.filter(ritem => ritem.name === item.name).length
+        let isOnRight = this.rightData.filter(ritem => ritem.name.toLowerCase() === item.name.toLowerCase()).length
         if (!isOnRight) {
           this.rightData.push(item)
         }
@@ -177,7 +178,7 @@ export default {
           id: 'manual*' + this.dataForm.name,
           name: this.dataForm.name
         }
-        if (this.rightData.filter(item => item.name === param.name).length) {
+        if (this.rightData.filter(item => item.name.toLowerCase() === param.name.toLowerCase()).length) {
           return this.$message({
             type: 'error',
             message: '右侧已存在该搜索词，请重新输入添加'
@@ -186,6 +187,7 @@ export default {
         this.rightData.push(param)
         this.dataForm.name = ''
       }
+      this.leftChecked = [] // 选中数据清空
       this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
       this.$refs.leftTransfer.checkedAll.forEach((item, index) => {
         if (item) {

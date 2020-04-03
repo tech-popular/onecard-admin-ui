@@ -5,7 +5,7 @@
       <el-card shadow="never" class="query-card-content">
         <el-form :model="dataForm" inline ref="dataForm">
           <el-form-item>
-            <el-input v-model.trim="dataForm.query" placeholder="手动填入Query名" style="width: 400px" />
+            <el-input v-model.trim="dataForm.query" @keyup.native="validateNameRule" placeholder="手动填入Query名，可输入中英文" style="width: 400px" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
@@ -18,7 +18,6 @@
   </div>
 </template>
 <script>
-import { findParent } from '../assets/js/utils'
 import queryTableList from '../components/queryTableList'
 import queryTagList from '../components/queryTagList'
 export default {
@@ -32,16 +31,6 @@ export default {
     }
   },
   components: { queryTableList, queryTagList },
-  created () {
-    this.data.forEach(item => {
-      this.tableData.push({
-        name: item
-      })
-    })
-  },
-  mounted () {
-    this.parent = findParent(this.$parent)
-  },
   props: {
     data: {
       type: Array,
@@ -68,21 +57,37 @@ export default {
     }
   },
   methods: {
+    init () {
+      this.tableData = []
+      this.data.forEach(item => {
+        this.tableData.push({
+          name: item
+        })
+      })
+    },
+    validateNameRule () {
+      this.dataForm.query = this.dataForm.query.replace(/[^\u4E00-\u9FA5A-Za-z]/g, '')
+    },
     tagChangeEvent (data) {
       this.dynamicQuery = data
     },
     addQuery () { // 手动添加query
       let query = this.dataForm.query
-      if (query !== '' && !this.dynamicQuery.includes(query)) {
-        this.dynamicQuery.push(query)
-        this.dataForm.query = ''
+      if (!query) return
+      let isHas = this.dynamicQuery.filter(item => item.toLowerCase() === query.toLowerCase()).length
+      if (isHas > 0) {
+        return this.$message({
+          type: 'error',
+          message: '该搜索词已存在，请重新输入添加'
+        })
       }
+      this.dynamicQuery.push(query)
+      this.dataForm.query = ''
     },
     multiAddClick () { // 批量新增至以下词组中
-      console.log('批量新增')
       this.dynamicQuery.forEach(item => {
         // 判断上面手动添加的数据是否已经存在于表格中，不存在时再添加至表格，已存在则不添加
-        let isInArray = this.tableData.filter(ritem => ritem.name === item).length
+        let isInArray = this.tableData.filter(ritem => ritem.name.toLowerCase() === item.toLowerCase()).length
         if (isInArray === 0) { // 不存在
           this.tableData.push({
             name: item
@@ -92,7 +97,6 @@ export default {
       this.dynamicQuery = []
     },
     tableDataChangeClick (data) { // 批量删除
-      console.log('批量删除', data)
       this.tableData = data
     }
   }

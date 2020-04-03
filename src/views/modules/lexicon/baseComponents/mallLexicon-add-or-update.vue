@@ -92,30 +92,35 @@ export default {
         wordName: '',
         wordType: '近义词'
       }
+      this.searchWords = []
       if (row && row.id) {
         this.id = row.id
-        showWordsInfo(row.id).then(({data}) => { // 查看详情信息
-          if (data.code !== 0) {
-            return this.$message({
-              type: 'error',
-              message: data.msg
-            })
-          }
-          this.dataForm = {
-            wordName: data.data.wordsName,
-            wordType: data.data.wordsType
-          }
-          this.searchWords = data.data.searchWords
-          this.$nextTick(() => {
-            this.visible = true
-          })
-        })
+        this.getWordsInfo(this.id)
       } else {
         this.visible = true
         this.$nextTick(() => {
           this.$refs.addSynonym.initData()
         })
       }
+    },
+    getWordsInfo (id) {
+      showWordsInfo(id).then(({data}) => { // 查看详情信息
+        if (data.code !== 0) {
+          return this.$message({
+            type: 'error',
+            message: data.msg
+          })
+        }
+        this.dataForm = {
+          wordName: data.data.wordsName,
+          wordType: data.data.wordsType
+        }
+        this.searchWords = data.data.searchWords
+        this.visible = true
+        this.$nextTick(() => {
+          this.$refs.updateSynonym.init()
+        })
+      })
     },
     wordTypeChange () {
       if (!this.id) {

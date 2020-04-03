@@ -42,7 +42,6 @@
   </div>
 </template>
 <script>
-import { findParent } from '../assets/js/utils'
 import queryTagList from '../components/queryTagList'
 import queryTableList from '../components/queryTableList'
 import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
@@ -64,16 +63,6 @@ export default {
     }
   },
   components: { queryTagList, queryTableList },
-  created () {
-    this.data.forEach(item => {
-      this.tableData.push({
-        name: item
-      })
-    })
-  },
-  mounted () {
-    this.parent = findParent(this.$parent)
-  },
   props: {
     data: {
       type: Array,
@@ -100,6 +89,14 @@ export default {
     }
   },
   methods: {
+    init () {
+      this.tableData = []
+      this.data.forEach(item => {
+        this.tableData.push({
+          name: item
+        })
+      })
+    },
     remoteMethod (query) {
       this.query = query
       if (query !== '') {
@@ -145,7 +142,8 @@ export default {
     },
     addQuery () { // 手动添加query
       this.selectedQuery.forEach(item => {
-        if (!this.dynamicQuery.includes(item)) {
+        let isHas = this.dynamicQuery.filter(ditem => ditem.toLowerCase() === item.toLowerCase()).length
+        if (isHas === 0) {
           this.dynamicQuery.push(item)
         }
       })
@@ -155,7 +153,7 @@ export default {
     multiAddClick () { // 批量新增至以下词组中
       this.dynamicQuery.forEach(item => {
         // 判断上面手动添加的数据是否已经存在于表格中，不存在时再添加至表格，已存在则不添加
-        let isInArray = this.tableData.filter(ritem => ritem.name === item).length
+        let isInArray = this.tableData.filter(ritem => ritem.name.toLowerCase() === item.toLowerCase()).length
         if (isInArray === 0) { // 不存在
           this.tableData.push({
             name: item

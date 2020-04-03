@@ -14,8 +14,8 @@
       <el-table-column prop="name" label="Query" header-align="center" align="center"></el-table-column>
       <el-table-column label="操作" header-align="center" align="center" v-if="isSort">
         <template slot-scope="scope">
-          <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)"></i>
-          <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)"></i>
+          <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)" v-if="scope.$index !== 0"></i>
+          <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)" v-if="scope.$index !== data.length-1"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -39,9 +39,6 @@ export default {
       type: Boolean,
       default: false
     }
-  },
-  mounted () {
-    console.log(66666, this.data)
   },
   methods: {
     handleSelectionChange (val) {
@@ -67,7 +64,6 @@ export default {
       this.$emit('dataChange', data)
     },
     multiRemoveClick () { // 批量删除
-      console.log(this.tableDataChecked)
       let data = deepClone(this.data)
       if (data.length === this.tableDataChecked.length) {
         data = []

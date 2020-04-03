@@ -5,7 +5,7 @@
       <el-card shadow="never" class="query-card-content">
         <el-form :model="dataForm" inline ref="dataForm">
           <el-form-item>
-            <el-input v-model.trim="dataForm.query" placeholder="请填入Query名" style="width: 400px"/>
+            <el-input v-model.trim="dataForm.query" @keyup.native="validateNameRule" placeholder="请填入Query名" style="width: 400px"/>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
@@ -78,12 +78,21 @@ export default {
     handleClose (tag) {
       this.dynamicQuery.splice(this.dynamicQuery.indexOf(tag), 1)
     },
+    validateNameRule () {
+      this.dataForm.query = this.dataForm.query.replace(/[^\u4E00-\u9FA5A-Za-z]/g, '')
+    },
     addQuery () {
       let query = this.dataForm.query
-      if (query !== '' && !this.dynamicQuery.includes(query)) {
-        this.dynamicQuery.push(query)
-        this.dataForm.query = ''
+      if (!query) return
+      let isHas = this.dynamicQuery.filter(item => item.toLowerCase() === query.toLowerCase()).length
+      if (isHas > 0) {
+        return this.$message({
+          type: 'error',
+          message: '该搜索词已存在，请重新输入添加'
+        })
       }
+      this.dynamicQuery.push(query)
+      this.dataForm.query = ''
     },
     uploadSuccess (response, file) { // 上传成功时
       if (response.code !== 0) {

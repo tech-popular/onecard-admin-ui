@@ -52,15 +52,6 @@ export default {
       default: false
     }
   },
-  // computed: {
-  //   filteredData () {
-  //     console.log(111, this.data)
-  //     return this.data
-  //   }
-  // },
-  mounted () {
-    console.log(444, this.data)
-  },
   methods: {
     // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
     moveUp (index) {
@@ -92,7 +83,6 @@ export default {
       this.tableDataChecked = val
     },
     multiRemoveClick () {
-      console.log(this.tableDataChecked)
       let data = deepClone(this.data)
       if (data.length === this.tableDataChecked.length) {
         data = []
@@ -105,7 +95,6 @@ export default {
           })
         })
       }
-      console.log(data)
       this.$emit('dataChange', data)
     }
   }

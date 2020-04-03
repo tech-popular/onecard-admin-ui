@@ -79,7 +79,7 @@ export default {
       if (!this.rightData.length) {
         return {
           checkedLen: 0,
-          msg: '请至少从左侧选择一个Query!',
+          msg: '请至少从左侧选择一个Query，添加至右侧!',
           list: []
         }
       }
@@ -90,7 +90,7 @@ export default {
       })
       return {
         checkedLen: checkedArr.length,
-        msg: '请至少从左侧选择一个Query!',
+        msg: '请至少从左侧选择一个Query，添加至右侧!',
         list: allArr
       }
     }
@@ -130,7 +130,6 @@ export default {
               })
             }
           }
-          console.log(arr)
           this.leftData = arr
         }
       })
@@ -145,14 +144,12 @@ export default {
         needBrandName: 0,
         needCategoryName: 0
       }
-      console.log(label)
       if (this.dataForm.query) {
         this.needType[this.dataForm.query] = 1
       }
       this.getNamesList()
     },
     leftCheckChange (val) { // 左侧选中状态改变时
-      console.log(val)
       this.leftChecked = val
     },
     addToRight () { // 添加到右侧
@@ -163,27 +160,14 @@ export default {
         }
       })
       leftCheckedArr.forEach(item => {
-        let isOnRight = this.rightData.filter(ritem => ritem.name === item.name).length
+        let isOnRight = this.rightData.filter(ritem => ritem.name.toLowerCase() === item.name.toLowerCase()).length
         if (!isOnRight) {
           this.rightData.push(item)
         }
       })
-      if (this.dataForm.name) {
-        let param = {
-          id: 'manual*' + this.dataForm.name,
-          name: this.dataForm.name
-        }
-        if (this.rightData.filter(item => item.name === param.name).length) {
-          return this.$message({
-            type: 'error',
-            message: '右侧已存在该搜索词，请重新输入添加'
-          })
-        }
-        this.rightData.push(param)
-        this.dataForm.name = ''
-      }
+      this.leftChecked = [] // 选中数据清空
       this.$refs.leftTransfer.checked = [] // 取消左侧的选中状态
-      this.$refs.leftTransfer.checkedAll.forEach((item, index) => {
+      this.$refs.leftTransfer.checkedAll.forEach((item, index) => { // 取消左侧的全选状态
         if (item) {
           this.$refs.leftTransfer.checkedAll.splice(index, 1, false)
         }

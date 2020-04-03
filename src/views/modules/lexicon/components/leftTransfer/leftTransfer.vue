@@ -21,7 +21,6 @@
     <div class="data-list">
       <div class="data-list-item" v-for="(item, index) in data" :key="index">
         <div v-if="item.list.length > 0">
-          <!-- <h3 v-text="queryTitleList[item.type]"></h3> -->
           <el-checkbox v-model="checkedAll[index]" @change="data => handleCheckAllChange(data, index, item)">{{queryTitleList[item.type]}}</el-checkbox>
           <el-checkbox-group
             v-model="checked"
@@ -90,7 +89,6 @@ export default {
   },
   watch: {
     data () {
-      console.log(this.data)
       this.checkedAll = []
       this.data.forEach(item => {
         this.checkedAll.push(false)
