@@ -175,6 +175,23 @@
         this.$refs.formData.validate((valid) => {
           if (valid) {
             let data = this.formData.tableData
+            // 判断是否有重复的数据
+            let judgeObj = {}
+            let isMulti = false
+            data.forEach(item => {
+              if (!judgeObj[item.fieldName]) {
+                judgeObj[item.fieldName] = 1
+              } else {
+                judgeObj[item.fieldName] += 1
+                isMulti = true
+              }
+            })
+            if (isMulti) {
+              return this.$message({
+                type: 'error',
+                message: '字段名称不能重复，请重新编辑！'
+              })
+            }
             dataCustomisedAdd(this.userName, data).then(({data}) => {
               if (data && data.status !== '1') {
                 return this.$message({
