@@ -486,7 +486,9 @@ export default {
                   this.$emit('refreshDataList')
                   this.$refs['severDataForm'].resetFields()
                   this.staffTemp.pageNum = 1
+                  this.staffTemp.name = ''
                   this.selectedStaffList = []
+                  this.$refs.staffTable.clearSelection()
                 }
               })
             } else {
@@ -507,6 +509,7 @@ export default {
     },
     // 将左边表格选择项存入staffData中
     handleStaffChange (rows) {
+      console.log(rows, 'sss')
       this.staffData = rows
     },
     // 左边表格选择项移到右边
@@ -565,7 +568,9 @@ export default {
     severDataFormCancel () {
       this.visible = false
       this.staffTemp.pageNum = 1
+      this.staffTemp.name = ''
       this.selectedStaffList = []
+      this.$refs.staffTable.clearSelection()
     },
     // 当前页
     currentChangeHandle (val) {
