@@ -54,12 +54,14 @@
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
         <el-form-item label="审批流">
-          <el-tag
-            style="margin-left:10px;"
-            v-for="tag in detalList.defaultApproverList"
-            :key="tag.name"
-            :type="tag.name"
-          >{{tag.name}}</el-tag>
+          <el-button 
+           class="el-icon--right"
+           size="small"
+           v-for="tag in detalList.defaultApproverList" 
+           :type="tag.status === '审批通过' ? 'success' : tag.status === '审批失败' ? 'danger' : 'warning'" 
+           :icon="tag.status === '审批通过' ? 'el-icon-circle-check' : tag.status === '审批失败' ? 'el-icon-circle-close' : 'el-icon-remove-outline'">
+            {{tag.name}}
+          </el-button>
         </el-form-item>
         <el-form-item label="驳回理由">
           <span>{{detalList.refuseReason}}</span>
