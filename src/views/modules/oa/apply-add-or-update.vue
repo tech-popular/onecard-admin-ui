@@ -82,9 +82,16 @@
                   <el-row :gutter="24" style="padding:5px;">
                     <el-col :span="10" style="padding:0;">
                       <el-form-item prop="selectDbName" style="margin: 0;">
-                        <el-select v-model="staffTemp.project" placeholder="请选择数据库">
-                          <el-option value="test_onecard" label="test_onecard">test_onecard</el-option>
+                        <el-select v-model="staffTemp.project" placeholder="请选择数据库" @change="currentSel">
+                          <el-option
+                            v-for="item in touchActionlist"
+                            :key="item.value"
+                            :label="item.value"
+                            :value="item.value"/>
                         </el-select>
+                        <!-- <el-select v-model="staffTemp.project" placeholder="请选择数据库">
+                          <el-option value="test_onecard" label="test_onecard">test_onecard</el-option>
+                        </el-select> -->
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" style="padding:0;">
@@ -354,6 +361,13 @@ export default {
       }, // 任务类型
       // 库表授权结束
       listLoading: false,
+      touchActionlist: [
+        {
+          value: 'test_onecard'
+        }, {
+          value: 'test_onecard2'
+        }
+      ],
       staffTemp: {
         project: 'test_onecard',
         pageSize: 5,
@@ -392,13 +406,14 @@ export default {
           this.severApplyAuthList = data.data.applyAuthList
           this.severdefaultApproverList = data.data.defaultApproverList
           this.severdepartment = data.data.department
+          this.touchActionlist = data.data.touchActionList
         })
       })
     },
     // 模块选择
-    handleChange (value) {
-      console.log(value)
-    },
+    // handleChange (value) {
+    //   console.log(value)
+    // },
     // 任务类型
     clickType () {
       this.fatherData = {
@@ -507,9 +522,15 @@ export default {
         }
       })
     },
+    // 重置库的时候清空表
+    currentSel (value) {
+      this.staffTemp.project = value
+      this.getStaffList()
+      this.selectedStaffList = []
+      this.$refs.staffTable.clearSelection()
+    },
     // 将左边表格选择项存入staffData中
     handleStaffChange (rows) {
-      console.log(rows, 'sss')
       this.staffData = rows
     },
     // 左边表格选择项移到右边
