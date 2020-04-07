@@ -295,11 +295,13 @@
           callback()
         }
       }
-  
+
       return {
         loading: false,
         visible: true,
         isStatic: false,
+        channelCode: '',
+        originOutParamsList: [],
         baseForm: {
           id: '',
           taskUniqueFlag: null, // 蜂巢任务ID
@@ -400,13 +402,12 @@
     mounted () {
       this.dataAssembly()
       this.disTimeTurnOff('MINUTE')
-      this.getCusterList()
       this.getKafkaServerList()
       this.getMysqlServerList()
     },
 
     computed: {
-  
+
     },
 
     components: {Treeselect},
@@ -459,6 +460,7 @@
               obj.sourceTable = item.sourceTable
               obj.dataStandar = item.dataStandar
               obj.fieldId = item.id
+              obj.channelCode = item.channelCode
             } else {
               obj.id = item.id
               obj.label = item.name
@@ -470,7 +472,13 @@
               if (!item.fieldType) {
                 obj.children = null
               } else {
-                arr.push(obj)
+                if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
+                  arr.push(obj)
+                } else { // 选择分群时，展示对应的指标
+                  if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+                    arr.push(obj) // 每个指标都放在集合中
+                  }
+                }
               }
             }
           })
@@ -478,25 +486,33 @@
         return arr
       },
       // 获取分群名称
-      getCusterList () {
+      getCusterList (fn) {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
             this.templateIdList = data.data
+          } else {
+            this.templateIdList = []
+          }
+          if (fn) {
+            fn(this.templateIdList)
           }
         })
       },
-      // 获取分群出参
+      // 获取分群出参 指标列表
       getOutParamsList (row) {
         dataTransferManageOutParams().then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
+              this.originOutParamsList = data.data
               this.getOutParamsEditList(row.id, this.filterAllCata(data.data))
             } else {
+              this.originOutParamsList = data.data
               this.outParamsList = this.filterAllCata(data.data)
               this.$nextTick(() => {
                 this.loading = false
               })
             }
+            console.log(this.originOutParamsList)
           } else {
             this.outParamsList = []
           }
@@ -549,8 +565,12 @@
       },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
+        console.log(this.templateIdList)
         let obj = {}
         obj = this.templateIdList.find((item) => {
+          if (item.value === selVal) {
+            this.channelCode = item.channelCode
+          }
           if (item.value === selVal && item.type === 'static') {
             this.isStatic = true
           } else {
@@ -560,6 +580,10 @@
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
+        this.baseForm.outParams = []
+        this.outParams = []
+        this.outParamsList = this.filterAllCata(this.originOutParamsList)
+        console.log(this.outParamsList, this.originOutParamsList)
       },
       // 选中出参
       outParamsSelect (node) {
@@ -689,14 +713,11 @@
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
-            let isStaticObj = this.templateIdList.find((item) => {
-              if (item.value === disData.templateId && item.type === 'static') {
-                return true
-              } else if (item.value === disData.templateId) {
-                return false
-              }
-            })
-            if (isStaticObj) {
+            // 要先拿到this.templateIdList
+            this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
+            // 要先拿到this.channelCode,才能去获取对应的出参列表
+            this.getOutParamsList(row)
+            if (disData.increModel === -1) {
               this.isStatic = true
             } else {
               this.isStatic = false
@@ -788,13 +809,20 @@
         this.visible = true
         this.loading = true
         this.outParamsList = []
-        this.getOutParamsList(row)
-        this.$nextTick(() => {
-          this.$refs['baseForm'].resetFields()
-          if (tag) {
-            this.dataDisplay(row)
-          }
-        })
+        if (tag) {
+          this.getCusterList((data) => {
+            this.dataDisplay(row) // 选获取到分群列表再去渲染页面
+            this.$nextTick(() => {
+              this.$refs['baseForm'].resetFields()
+            })
+          })
+        } else {
+          this.getCusterList()
+          this.getOutParamsList()
+          this.$nextTick(() => {
+            this.$refs['baseForm'].resetFields()
+          })
+        }
       },
       // 关闭抽屉弹窗
       drawerClose () {
