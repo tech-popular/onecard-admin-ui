@@ -14,8 +14,8 @@
       <el-table-column prop="name" label="Query" header-align="center" align="center"></el-table-column>
       <el-table-column label="操作" header-align="center" align="center" v-if="isSort">
         <template slot-scope="scope">
-          <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)" v-if="scope.$index !== 0"></i>
-          <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)" v-if="scope.$index !== data.length-1"></i>
+          <span @click="moveUp(scope.$index)" v-if="scope.$index !== 0"><icon-svg name="top" style="color: #2093f7"></icon-svg></span>
+          <span @click="moveDown(scope.$index)" v-if="scope.$index !== data.length-1"><icon-svg name="down" style="color: green"></icon-svg></span>
         </template>
       </el-table-column>
     </el-table>
