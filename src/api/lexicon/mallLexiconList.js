@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import { httpGet, httpPost } from '@/api'
 import http from '@/utils/httpRequest'
-let base = '/lexicon/'
-// let base = '/'
+// let base = '/lexicon/'
+let base = '/'
 export const wordTypeList = () => httpGet(base + 'word/wordTypeList') // 词组类型列表-
 export const wordList = params => httpPost(base + 'word/list', params) // 列表-
 export const changeWordsInfoStatus = (id, status) => httpPost(base + `word/changeWordsInfoStatus/${id}/${status}`) // 修改词组状态 启用停用

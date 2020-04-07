@@ -15,8 +15,9 @@
       <el-table-column prop="name" label="Query" header-align="center" align="center"></el-table-column>
       <el-table-column label="排序" header-align="center" align="center" v-if="hasTableSort">
         <template slot-scope="scope">
-          <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)" v-if="scope.$index !== 0"></i>
-          <i class="el-icon-bottom icon-move" style="color: green" @click="moveDown(scope.$index)" v-if="scope.$index !== data.length-1"></i>
+          <span @click="moveUp(scope.$index)" v-if="scope.$index !== 0"><icon-svg name="top" style="color: #2093f7"></icon-svg></span>
+          <!-- <i class="el-icon-top icon-move" style="color: #2093f7" @click="moveUp(scope.$index)" v-if="scope.$index !== 0"></i> -->
+          <span @click="moveDown(scope.$index)" v-if="scope.$index !== data.length-1"><icon-svg name="down" style="color: green"></icon-svg></span>
           <!-- <i class="el-icon-delete icon-move" style="color: red" @click="remove(scope)"></i> -->
         </template>
       </el-table-column>
