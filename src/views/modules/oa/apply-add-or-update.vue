@@ -80,6 +80,7 @@
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
                 <el-form :inline="true" :model="staffTemp" size="mini">
                   <el-row :gutter="24" style="padding:5px;">
+                    <el-alert title="切换库后已选库表将会清空" show-icon type="warning" :closable="false" style="padding:0px;margin-bottom: 5px;padding-left:5px"></el-alert>
                     <el-col :span="10" style="padding:0;">
                       <el-form-item prop="selectDbName" style="margin: 0;">
                         <el-select v-model="staffTemp.project" placeholder="请选择数据库" @change="currentSel">
