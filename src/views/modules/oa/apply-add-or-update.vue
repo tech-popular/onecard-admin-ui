@@ -362,15 +362,9 @@ export default {
       }, // 任务类型
       // 库表授权结束
       listLoading: false,
-      touchActionlist: [
-        {
-          value: 'test_onecard'
-        }, {
-          value: 'test_onecard2'
-        }
-      ],
+      touchActionlist: [],
       staffTemp: {
-        project: 'test_onecard',
+        project: '',
         pageSize: 5,
         pageNum: 1,
         name: ''
