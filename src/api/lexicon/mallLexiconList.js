@@ -13,3 +13,5 @@ export const addWordsInfo = params => httpPost(base + 'word/addWordsInfo', param
 export const showWordsInfo = id => httpPost(base + `word/showWordsInfo/${id}`) // 查看词组信息
 export const updateWordsInfo = params => httpPost(base + 'word/updateWordsInfo', params) // 更新词组信息
 export const getBrandNamesAndCategoryNames = params => httpPost(base + 'word/showBrandNamesAndCategoryNames', params) // 词组搜索词模糊查询
+// export const downLoadWordsTXT = type => httpGet(base + `/word/downLoadWordsTXT/${type}`)
+export const downLoadWordsTXT = type => http.adornUrl(base + 'word/downLoadWordsTXT/' + type + '?token=' + Vue.cookie.get('token'))
