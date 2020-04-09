@@ -30,7 +30,7 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
         <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button type="warning" @click="publishHandle()">发布</el-button>
+        <el-button type="warning" @click="downLoadWordsTxt()">发布</el-button>
         <!-- <el-button type="primary" @click="importFile()" plain>导入</el-button>
         <el-button type="success" @click="exportFile()" plain>导出</el-button> -->
       </el-form-item>
@@ -65,13 +65,13 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper" />
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" :type-list="queryTypeList" @refreshDataList="getDataList"/>
-    <publish-handle v-if="publishHandleVisible" ref="publishHandle" :type-list="queryTypeList"></publish-handle>
+    <download-txt v-if="publishHandleVisible" ref="publishHandle" :type-list="queryTypeList"></download-txt>
   </div>
 </template>
 <script>
   import { wordList, wordTypeList, deleteWordsInfo, changeWordsInfoStatus } from '@/api/lexicon/mallLexiconList'
   import AddOrUpdate from './baseComponents/mallLexicon-add-or-update'
-  import publishHandle from './baseComponents/mallLexicon-publish'
+  import downloadTxt from './baseComponents/mallLexicon-downloadTxt'
   export default {
     data () {
       return {
@@ -93,7 +93,7 @@
     },
     components: {
       AddOrUpdate,
-      publishHandle
+      downloadTxt
     },
     mounted () {
       this.getDataList()
@@ -207,7 +207,7 @@
         this.pageNo = page
         this.getDataList()
       },
-      publishHandle () { // 发布
+      downLoadWordsTxt () { // 发布
         this.publishHandleVisible = true
         this.$nextTick(() => {
           this.$refs.publishHandle.init()

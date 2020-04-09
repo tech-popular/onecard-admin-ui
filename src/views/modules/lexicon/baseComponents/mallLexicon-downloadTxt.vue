@@ -15,15 +15,17 @@
     </el-form>
     <div slot="footer">
       <el-button @click="cancel">取消</el-button>
-      <el-button type="primary" @click="dataSubmit">确定</el-button>
+      <el-button type="primary" @click="dataSubmit"><a :href="downloadUrl" style="color:#fff;text-decoration: none;">确定</a></el-button>
     </div>
   </el-dialog>
 </template>
 <script>
+import { downLoadWordsTXT } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
       visible: false,
+      downloadUrl: '',
       dataForm: {
         wordType: '近义词'
       },
@@ -54,6 +56,9 @@ export default {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
           console.log(valid)
+          this.downloadUrl = downLoadWordsTXT(this.dataForm.wordType)
+        } else {
+          this.downloadUrl = 'javascript:;'
         }
       })
     }
