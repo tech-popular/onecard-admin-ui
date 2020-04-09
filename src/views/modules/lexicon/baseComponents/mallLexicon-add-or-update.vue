@@ -2,10 +2,10 @@
   <el-dialog :title="id ? '查看/编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="900px">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
       <el-form-item label="词组名称:" prop="wordName">
-        <el-input v-model="dataForm.wordName" placeholder="" :disabled="!!id" />
+        <el-input v-model="dataForm.wordName" placeholder="" :disabled="!!id" ref="wordName" />
       </el-form-item>
       <el-form-item label="所属词组类型:" prop="wordType">
-        <el-radio-group v-model="dataForm.wordType" @change="wordTypeChange">
+        <el-radio-group v-model="dataForm.wordType" @change="wordTypeChange" :disabled="!!id">
           <el-radio
             v-for="item in typeList"
             :key="item"
@@ -93,6 +93,9 @@ export default {
         wordType: '近义词'
       }
       this.searchWords = []
+      this.$nextTick(() => { // 默认将基本信息的错误提示消除
+        this.$refs.dataForm.clearValidate()
+      })
       if (row && row.id) {
         this.id = row.id
         this.getWordsInfo(this.id)
