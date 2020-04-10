@@ -12,8 +12,8 @@
           <el-option v-for="(item, index) in fieldTypeList" :value="item.childrenValue" :key="index" :label="item.childrenValue"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="所属渠道" prop="channelId">
-        <el-select filterable v-model="dataForm.channelId" style="width:60%">
+      <el-form-item label="渠道" prop="channelCode">
+        <el-select filterable v-model="dataForm.channelCode" style="width:60%">
           <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -107,7 +107,7 @@
           sourceDatasource: '', // 指标数据源
           enable: 'true', // 指标状态
           remark: '', // 描述
-          channelId: ''
+          channelCode: ''
         },
         tag: '', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -158,7 +158,7 @@
           enable: [
             { required: true, message: '请选择指标状态', trigger: 'change' }
           ],
-          channelId: [
+          channelCode: [
             { required: true, message: '请选择所属渠道', trigger: 'change' }
           ]
         }
