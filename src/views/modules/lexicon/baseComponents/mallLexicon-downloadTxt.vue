@@ -48,6 +48,9 @@ export default {
       this.dataForm = { // 初始化
         wordType: ''
       }
+      this.$nextTick(() => {
+        this.$refs.dataForm.clearValidate()
+      })
     },
     cancel () {
       this.visible = false
