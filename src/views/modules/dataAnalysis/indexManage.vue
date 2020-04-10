@@ -58,6 +58,7 @@
       </el-table-column>
       <el-table-column prop="fieldType" header-align="center" align="center" :formatter="fieldTypeFormat" label="数据类型"></el-table-column>
       <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="指标类别"></el-table-column>
+      <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
