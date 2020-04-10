@@ -12,6 +12,11 @@
           <el-option v-for="(item, index) in fieldTypeList" :value="item.childrenValue" :key="index" :label="item.childrenValue"/>
         </el-select>
       </el-form-item>
+      <el-form-item label="所属渠道" prop="channelId">
+        <el-select filterable v-model="dataForm.channelId" style="width:60%">
+          <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
        <el-form-item label="枚举类型:" prop="enumTypeNum" :required="enumeration" v-show="enumeration">
         <el-select filterable v-model="dataForm.enumTypeNum" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
           <el-option v-for="(item, index) in enumTypeNumList" :value="item.typeNum" :key="index" :label="item.typeValue"/>
@@ -61,6 +66,7 @@
 </template>
 <script>
   import { addIndexManage, updateIndexManage, indexManageTypeList, indexManageMinCataList, indexManageTypeNumList } from '@/api/dataAnalysis/indexManage'
+  import { channelsList } from '@/api/dataAnalysis/dataInsightManage'
   import { deepClone, findVueSelectItemIndex, nameToLabel, findOption } from '../dataAnalysisUtils/utils'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -100,7 +106,8 @@
           sourceTable: '', // 来源表
           sourceDatasource: '', // 指标数据源
           enable: 'true', // 指标状态
-          remark: '' // 描述
+          remark: '', // 描述
+          channelId: ''
         },
         tag: '', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -117,6 +124,7 @@
         ],
         enumTypeNumList: [// 枚举类型
         ],
+        channelList: [],
         dataRule: {
           englishName: [
             { required: true, message: '请输入指标名', trigger: 'blur' },
@@ -149,6 +157,9 @@
           ],
           enable: [
             { required: true, message: '请选择指标状态', trigger: 'change' }
+          ],
+          channelId: [
+            { required: true, message: '请选择所属渠道', trigger: 'change' }
           ]
         }
       }
@@ -158,6 +169,7 @@
       // this.getCategoryIdList()
       this.getFieldTypeList()
       this.getEnumTypeNumList()
+      this.getChannelsList()
     },
 
     computed: {
@@ -226,6 +238,16 @@
       // 指标类别选择
       changeOption () {
         this.$refs.dataForm.validateField('categoryId')
+      },
+
+      getChannelsList () {
+        channelsList().then(res => {
+          if (res.data.status * 1 !== 1) {
+            this.channelList = []
+            return
+          }
+          this.channelList = res.data.data
+        })
       },
 
       init (row, tag) {
