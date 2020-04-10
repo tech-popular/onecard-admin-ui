@@ -137,10 +137,10 @@ export default {
     return {
       loading: false,
       inParamsList: [
-        {
-          title: '账户编号（account_no）',
-          value: 'account_no'
-        },
+        // {
+        //   title: '账户编号（account_no）',
+        //   value: 'account_no'
+        // },
         {
           title: '客户编号（cust_no）',
           value: 'cust_no'
