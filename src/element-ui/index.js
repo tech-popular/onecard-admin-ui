@@ -77,7 +77,8 @@ import {
   Message,
   Notification,
   Drawer,
-  Calendar
+  Calendar,
+  Divider
 } from 'element-ui'
 
 Vue.use(Pagination)
@@ -145,6 +146,7 @@ Vue.use(Main)
 Vue.use(Footer)
 Vue.use(Drawer)
 Vue.use(Calendar)
+Vue.use(Divider)
 
 Vue.use(Loading.directive)
 
