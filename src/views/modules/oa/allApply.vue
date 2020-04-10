@@ -41,7 +41,7 @@
         header-align="center"
         align="center"
         label="发起审批时间"/>
-      <!-- <el-table-column
+      <el-table-column
         prop="approvalStatus"
         header-align="center"
         align="center"
@@ -51,7 +51,7 @@
           <el-tag v-else-if="scope.row.approvalStatus === '审批失败'" size="small" type="danger">审批失败</el-tag>
           <el-tag v-else size="small" type="warning">审批中</el-tag>
         </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column
         prop="flow"
         header-align="center"
@@ -93,6 +93,7 @@ export default {
       applyType: [],
       applyTypeId: '',
       applyTypeValue: '',
+      approvalStatus: [],
       approvalStatusId: '',
       approvalStatusValeu: '',
       allApplyName: '',
