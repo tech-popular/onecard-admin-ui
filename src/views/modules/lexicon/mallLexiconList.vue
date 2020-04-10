@@ -65,7 +65,7 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper" />
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" :type-list="queryTypeList" @refreshDataList="getDataList"/>
-    <download-txt v-if="publishHandleVisible" ref="publishHandle" :type-list="queryTypeList"></download-txt>
+    <download-txt v-if="downloadTxtVisible" ref="downloadTxt" :type-list="queryTypeList"></download-txt>
   </div>
 </template>
 <script>
@@ -88,7 +88,7 @@
         totalCount: 0,
         dataListLoading: false,
         addOrUpdateVisible: false,
-        publishHandleVisible: false
+        downloadTxtVisible: false
       }
     },
     components: {
@@ -208,9 +208,9 @@
         this.getDataList()
       },
       downLoadWordsTxt () { // 发布
-        this.publishHandleVisible = true
+        this.downloadTxtVisible = true
         this.$nextTick(() => {
-          this.$refs.publishHandle.init()
+          this.$refs.downloadTxt.init()
         })
       }
     }
