@@ -230,7 +230,7 @@
         </el-form>
         <div class="foot">
           <el-button @click="severDataFormCancel()">取消</el-button>
-          <el-button type="primary" @click="severDataFormSubmit()">确定</el-button>
+          <el-button type="primary" @click="severDataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -349,6 +349,7 @@ export default {
         ]
       }, // 库表权限表单校验
       dataFormValue: '',
+      buttonloading: false,
       ruleTypeList: [],
       severApplyAuthList: [], // 申请权限数据载体
       severdefaultApproverList: [], // 本次申请默认审批人数据载体
@@ -473,6 +474,7 @@ export default {
       // 库表授权提交
       this.$refs['severDataForm'].validate(valid => {
         if (valid) {
+          this.buttonloading = true
           let newData = {
             title: this.severDataForm.title,
             applicantName: this.severDataForm.applicantName,
@@ -499,10 +501,12 @@ export default {
                   this.staffTemp.name = ''
                   this.selectedStaffList = []
                   this.$refs.staffTable.clearSelection()
+                  this.buttonloading = false
                 }
               })
             } else {
               this.$message.error(data.message)
+              this.buttonloading = false
             }
           })
         }
@@ -520,6 +524,7 @@ export default {
     // 重置库的时候清空表
     currentSel (value) {
       this.staffTemp.project = value
+      this.staffTemp.pageNum = 1
       this.getStaffList()
       this.selectedStaffList = []
       this.$refs.staffTable.clearSelection()
