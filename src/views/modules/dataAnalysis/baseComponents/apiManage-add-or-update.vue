@@ -142,9 +142,13 @@ export default {
         //   value: 'account_no'
         // },
         {
-          title: '客户编号（cust_no）',
-          value: 'cust_no'
+          title: '用户ID（user_id）',
+          value: 'user_id'
         },
+        // {
+        //   title: '客户编号（cust_no）',
+        //   value: 'cust_no'
+        // },
         {
           title: '身份证号（cert_id）',
           value: 'cert_id'
@@ -152,15 +156,15 @@ export default {
         {
           title: '手机号（mobile_no）',
           value: 'mobile_no'
-        },
+        }
         // {
         //   title: '用户中心统一编号（UUID）',
         //   value: 'UUID'
         // },
-        {
-          title: '新商城用户ID（mall_user_id）',
-          value: 'mall_user_id'
-        }
+        // {
+        //   title: '新商城用户ID（mall_user_id）',
+        //   value: 'mall_user_id'
+        // }
       ],
       id: '',
       flowId: '',
