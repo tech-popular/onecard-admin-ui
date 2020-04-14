@@ -779,7 +779,9 @@ export default {
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
             data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
-            data.append('rejectGroupPackageIds', this.rejectForm.rejectGroupPackageIds)
+            this.rejectForm.rejectGroupPackageIds.forEach(item => {
+              data.append('rejectGroupPackageIds', item)
+            })
             let flag = 0
             if (this.rejectForm.rejectGroupPackageIds.length) {
               flag = 1
