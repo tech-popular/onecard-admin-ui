@@ -47,7 +47,7 @@
             </el-checkbox-group> -->
           </el-form-item>
           <el-form-item label="API模式" prop="outType">
-            <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
+            <el-radio-group v-model="baseForm.outType" @change="outTypeChange" :disabled="baseForm.type === 'static'">
               <el-radio label="JUDGE">判断模式（返回值为是/否在此分群）</el-radio>
               <el-radio label="INDICATOR">选择模式（返回值为所选指标）</el-radio>
             </el-radio-group>
@@ -304,12 +304,16 @@ export default {
     custerNamesChange (value) { // 选中数据变化时
       if (value.length === 0) {
         this.filterCursterList = []
+        this.baseForm.type = ''
       }
       // 当选中数据为1时，更新下拉数据状态
       let filterFirstObj = []
       if (value.length === 1) {
         filterFirstObj = this.custerNameList.filter(item => item.value === value[0]) // 筛选出第一条数据，要获取第一条数据的type
         this.baseForm.type = filterFirstObj[0].type
+        if (this.baseForm.type === 'static') {
+          this.baseForm.outType = 'JUDGE'
+        }
         let newArr = this.custerNameList.map(item => {
           if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
             return {...item, disabled: true}
