@@ -52,6 +52,16 @@
         header-align="center"
         align="center"
         label="钉钉审批流"/>
+      <el-table-column
+        prop="grantResult"
+        header-align="center"
+        align="center"
+        label="授权状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.grantResult === '授权成功'" size="small" >授权成功</el-tag>
+          <el-tag v-else size="small" type="danger">授权异常</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
@@ -184,8 +194,6 @@ export default {
     },
      // 查看
     lookHandle (val) {
-      console.log(val)
-
       this.applyDetailVisible = true
       this.$nextTick(() => {
         this.$refs.applyDetail.init(val)

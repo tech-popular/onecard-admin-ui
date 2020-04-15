@@ -53,13 +53,19 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="flow"
+        prop="grantResult"
         header-align="center"
         align="center"
-        label="钉钉审批流"/>
+        label="授权状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.grantResult === '授权成功'" size="small" >授权成功</el-tag>
+          <el-tag v-else size="small" type="danger">授权异常</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-finished" size="small"  @click="addOrUpdateHandle(scope.row)">审批记录</el-button>
+          <el-button type="primary" icon="el-icon-finished" size="small"  style="width:100px" @click="addOrUpdateHandle(scope.row)">审批记录</el-button>
+          <el-button type="success" icon="el-icon-tickets" size="small" style="width:100px;margin-left:0;margin-top:10px;" @click="applyDetailHandle(scope.row)">授权详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -73,10 +79,13 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate"/>
+    <!-- 授权详情 -->
+    <allApplyDetail v-if="allApplyDetailVisible" ref="allApplyDetail"/>
   </div>
 </template>
 <script>
 import AddOrUpdate from './allApply-add-or-update'
+import AllApplyDetail from './allApplyDetail'
 import { myAccoutList, myAccoutSelect } from '@/api/oa/apply'
 
 export default {
@@ -89,6 +98,7 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
+      allApplyDetailVisible: false,
       newList: [],
       applyType: [],
       applyTypeId: '',
@@ -101,7 +111,8 @@ export default {
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    AllApplyDetail
   },
   activated () {
     this.getDataList()
@@ -184,6 +195,13 @@ export default {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(val)
+      })
+    },
+    // 授权详情
+    applyDetailHandle (val) {
+      this.allApplyDetailVisible = true
+      this.$nextTick(() => {
+        this.$refs.allApplyDetail.init(val)
       })
     }
   }
