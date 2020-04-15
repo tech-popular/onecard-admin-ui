@@ -41,7 +41,8 @@
             <el-button type="primary" @click="previewCusterInfo" size="small">预览</el-button>
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
-            <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
+            <el-radio v-model="baseForm.inParam" label="cust_no" v-if="!!id && baseForm.inParam === 'cust_no'" :disabled="!!id && baseForm.inParam === 'cust_no'">客户编号（cust_no）</el-radio>
+            <el-radio v-model="baseForm.inParam" :label="fitem.value" :disabled="!!id && baseForm.inParam === 'cust_no'" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
             <!-- <el-checkbox-group v-model="baseForm.inParam">
               <el-checkbox :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-checkbox>
             </el-checkbox-group> -->
@@ -176,14 +177,6 @@ export default {
       outParamsIndexList: [],
       expression: '',
       expressionTemplate: '',
-      // initFieldType: '',
-      // initDataStandar: '',
-      // initFieldCode: '',
-      // initSourceTable: '',
-      // initFieldId: '',
-      // initEnumTypeNum: '',
-      // initSelectOperateList: [],
-      // initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
       baseForm: {
