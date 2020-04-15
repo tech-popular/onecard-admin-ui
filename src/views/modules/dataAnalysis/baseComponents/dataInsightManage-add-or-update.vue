@@ -16,20 +16,14 @@
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="分群类型" prop="userType">
-            <!-- <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange" :disabled="!!id">
-              <div class="type-radio-item type-radio-one">
-                <el-radio label="indicator">指标筛选</el-radio>
-              </div>
-              <div class="type-radio-item type-radio-two">
-                <el-radio label="excel">excel文件导入</el-radio>
-              </div>
-            </el-radio-group> -->
             <div class="type-radio-item type-radio-one">
               <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 用户所属渠道
-                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable>
-                  <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
+                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable :disabled="!!id">
+                  <template v-for="(item, index) in channelList">
+                    <el-option :key="index" :label="item.text" :value="item.value" v-if="!id && item.value !== '0000' || !!id"></el-option>
+                  </template>
                 </el-select>
               </div>
             </div>
@@ -38,8 +32,10 @@
             </div>
           </el-form-item>
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
-            <el-select v-model="baseForm.channelId">
-              <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
+            <el-select v-model="baseForm.channelId" :disabled="!!id">
+              <template v-for="(item, index) in channelList">
+                <el-option :key="index" :label="item.text" :value="item.value" v-if="!id && item.value !== '0000' || !!id"></el-option>
+              </template>
             </el-select>
             <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
                 <el-upload
@@ -120,8 +116,8 @@
     </div>
     <div class="footer">
       <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
-      <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel'">复制创建新分群</el-button>
-      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'" :disabled="loading">保存</el-button>
+      <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel' && baseForm.channelId !== '0000'">复制创建新分群</el-button>
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view' && baseForm.channelId !== '0000'" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
