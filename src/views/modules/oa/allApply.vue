@@ -52,25 +52,20 @@
           <el-tag v-else size="small" type="warning">审批中</el-tag>
         </template>
       </el-table-column>
-        <el-table-column
-        prop="approvalStatus"
+      <el-table-column
+        prop="grantResult"
         header-align="center"
         align="center"
         label="授权状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.approvalStatus === '审批通过'" size="small" >审批通过</el-tag>
-          <el-tag v-else-if="scope.row.approvalStatus === '审批失败'" size="small" type="danger">审批失败</el-tag>
-          <el-tag v-else size="small" type="warning">审批中</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="授权详情">
-        <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-tickets" size="small"  @click="applyDetailHandle(scope.row)">详情</el-button>
+          <el-tag v-if="scope.row.grantResult === '授权成功'" size="small" >授权成功</el-tag>
+          <el-tag v-else size="small" type="danger">授权异常</el-tag>
         </template>
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-finished" size="small"  @click="addOrUpdateHandle(scope.row)">审批记录</el-button>
+          <el-button type="primary" icon="el-icon-finished" size="small"  style="width:100px" @click="addOrUpdateHandle(scope.row)">审批记录</el-button>
+          <el-button type="success" icon="el-icon-tickets" size="small" style="width:100px;margin-left:0;margin-top:10px;" @click="applyDetailHandle(scope.row)">授权详情</el-button>
         </template>
       </el-table-column>
     </el-table>
