@@ -211,12 +211,12 @@
               params.categoryId = ''
             }
             indexManageList(params, false).then(({data}) => {
-              if (data && data.status === '1') {
-                this.dataList = data.data.list
-                this.totalCount = data.data.total
-              } else {
+              if (!data || (data && (data.status !== '1' || !data.data))) {
                 this.dataList = []
                 this.totalCount = 0
+              } else {
+                this.dataList = data.data.list
+                this.totalCount = data.data.total
               }
               this.dataListLoading = false
             })
