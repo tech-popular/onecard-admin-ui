@@ -250,7 +250,7 @@
       </el-form>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view'">保存</el-button>
+      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view' && channelCode !== '0000'">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-drawer>
