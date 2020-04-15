@@ -44,11 +44,11 @@
       <el-form-item label="来源表:" prop="sourceTable">
         <el-input v-model="dataForm.sourceTable" placeholder="" v-bind:readonly="readonly" />
       </el-form-item>
-      <el-form-item label="指标数据源:" prop="sourceDatasource">
+      <!-- <el-form-item label="指标数据源:" prop="sourceDatasource">
         <el-select filterable v-model="dataForm.sourceDatasource" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
           <el-option v-for="(item, index) in sourceDatasource" :value="item.typeNum" :key="index" :label="item.typeValue"/>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="指标状态:" prop="enable">
         <el-radio v-model="dataForm.enable" label="true" v-bind:disabled="readonly" >有效</el-radio>
         <el-radio v-model="dataForm.enable" label="false" v-bind:disabled="readonly" >无效</el-radio>
@@ -81,7 +81,7 @@
           callback()
         }
       }
-  
+
       let checkSpace = (rule, value, callback) => {
         const spaceReg = /^\S*$/
         setTimeout(() => {
@@ -104,7 +104,7 @@
           enumTypeNum: '', // 枚举类型
           dataStandar: '', // 数据格式
           sourceTable: '', // 来源表
-          sourceDatasource: '', // 指标数据源
+          // sourceDatasource: '', // 指标数据源
           enable: 'true', // 指标状态
           remark: '', // 描述
           channelCode: ''
@@ -116,12 +116,12 @@
         ],
         categoryIdList: [ // 指标类别
         ],
-        sourceDatasource: [ // 指标数据源
-          {
-            typeNum: 'adb_user_label_res_da',
-            typeValue: 'adb_user_label_res_da'
-          }
-        ],
+        // sourceDatasource: [ // 指标数据源
+        //   {
+        //     typeNum: 'adb_user_label_res_da',
+        //     typeValue: 'adb_user_label_res_da'
+        //   }
+        // ],
         enumTypeNumList: [// 枚举类型
         ],
         channelList: [],
@@ -152,9 +152,9 @@
           sourceTable: [
             { required: true, message: '请输入来源表', trigger: 'blur' }
           ],
-          sourceDatasource: [
-            { required: true, message: '请选择指标数据源', trigger: 'change' }
-          ],
+          // sourceDatasource: [
+          //   { required: true, message: '请选择指标数据源', trigger: 'change' }
+          // ],
           enable: [
             { required: true, message: '请选择指标状态', trigger: 'change' }
           ],
@@ -201,7 +201,7 @@
           callback()
         }
       },
-  
+
       // 获取指标类别
       getCategoryIdList (row) {
         indexManageMinCataList().then(({data}) => {
