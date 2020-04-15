@@ -57,9 +57,12 @@
         header-align="center"
         align="center"
         label="授权状态">
-        <template slot-scope="scope">
+        <template slot-scope="scope" v-if="scope.row.approvalStatus === '审批通过'">
           <el-tag v-if="scope.row.grantResult === '授权成功'" size="small" >授权成功</el-tag>
           <el-tag v-else size="small" type="danger">授权异常</el-tag>
+        </template>
+        <template v-else>
+          <span>-</span>
         </template>
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
