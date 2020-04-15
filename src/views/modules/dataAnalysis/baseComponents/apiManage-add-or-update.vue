@@ -103,7 +103,7 @@
       </div>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view'">保存</el-button>
+      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view' && !isHasOldChannel">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-drawer>
@@ -228,7 +228,8 @@ export default {
       custerLoading: false,
       filterCursterList: [], // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
       allSelectedChannelCode: [], // 选中的分群名称中所包含的所有channelCode
-      originCataList: []
+      originCataList: [],
+      isHasOldChannel: false
     }
   },
   components: { rulesSet, Treeselect },
@@ -469,9 +470,14 @@ export default {
           this.allSelectedChannelCode = [] // 获取选中的所有的channelCode
           let templateIds = data.data.templateIds
           for (let i = 0; i < templateIds.length; i++) {
-            this.allSelectedChannelCode.push(this.custerNameList.filter(item => item.value === templateIds[i])[0].channelCode)
+            let channelCode = this.custerNameList.filter(item => item.value === templateIds[i])[0].channelCode
+            if (channelCode === '0000') {
+              this.isHasOldChannel = true
+            }
+            this.allSelectedChannelCode.push(channelCode)
           }
           this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
+          console.log(this.allSelectedChannelCode)
           // 分群包
           if (!this.baseForm.templateIds) {
             this.filterCursterList = this.custerNameList
