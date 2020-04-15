@@ -153,6 +153,7 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
+      allCusterNameList: [],
       baseForm: {
         name: '',
         userType: 'indicator',
@@ -252,6 +253,7 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
+          this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
           this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
@@ -301,6 +303,8 @@ export default {
     },
     channelIdChange () { // 用户渠道改变时，重新过滤指标数据
       this.setInitRulesConfig(this.filterAllCata(this.originIndexList))
+      this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+      this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
       vestPackAvailable().then(res => {
@@ -324,7 +328,8 @@ export default {
             message: data.message || '数据异常'
           })
         }
-        this.custerNameList = data.data
+        this.allCusterNameList = data.data
+        this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
       })
     },
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
