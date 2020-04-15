@@ -28,14 +28,27 @@
             {{code}}
             <el-button type="primary" @click="copyCode" size="small" class="copy-code" v-if="isCopyBtn">复制编码</el-button>
           </el-form-item>
+          <el-form-item label="分群名称" prop="templateIds">
+            <el-select v-model="baseForm.templateIds" @change="custerNamesChange" filterable multiple placeholder="请选择分群名称" class="base-pane-item">
+              <el-option
+                v-for="item in newCusterNameList"
+                :key="item.value"
+                :label="item.text"
+                :disabled="item.disabled"
+                :value="item.value">
+              </el-option>
+            </el-select>
+            <el-button type="primary" @click="previewCusterInfo" size="small">预览</el-button>
+          </el-form-item>
           <el-form-item label="API入参" prop="inParam">
-            <el-radio v-model="baseForm.inParam" :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
+            <el-radio v-model="baseForm.inParam" label="cust_no" v-if="!!id && baseForm.inParam === 'cust_no'" :disabled="!!id && baseForm.inParam === 'cust_no'">客户编号（cust_no）</el-radio>
+            <el-radio v-model="baseForm.inParam" :label="fitem.value" :disabled="!!id && baseForm.inParam === 'cust_no'" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
             <!-- <el-checkbox-group v-model="baseForm.inParam">
               <el-checkbox :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-checkbox>
             </el-checkbox-group> -->
           </el-form-item>
           <el-form-item label="API模式" prop="outType">
-            <el-radio-group v-model="baseForm.outType" @change="outTypeChange">
+            <el-radio-group v-model="baseForm.outType" @change="outTypeChange" :disabled="baseForm.type === 'static'">
               <el-radio label="JUDGE">判断模式（返回值为是/否在此分群）</el-radio>
               <el-radio label="INDICATOR">选择模式（返回值为所选指标）</el-radio>
             </el-radio-group>
@@ -60,18 +73,6 @@
           <el-form-item label="API描述">
             <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
             <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
-          </el-form-item>
-          <el-form-item label="分群名称" prop="templateIds">
-            <el-select v-model="baseForm.templateIds" @change="custerNamesChange" filterable multiple placeholder="请选择分群名称" class="base-pane-item">
-              <el-option
-                v-for="item in newCusterNameList"
-                :key="item.value"
-                :label="item.text"
-                :disabled="item.disabled"
-                :value="item.value">
-              </el-option>
-            </el-select>
-            <el-button type="primary" @click="previewCusterInfo" size="small">预览</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -102,7 +103,7 @@
       </div>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view'">保存</el-button>
+      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view' && !isHasOldChannel">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-drawer>
@@ -137,14 +138,18 @@ export default {
     return {
       loading: false,
       inParamsList: [
+        // {
+        //   title: '账户编号（account_no）',
+        //   value: 'account_no'
+        // },
         {
-          title: '账户编号（account_no）',
-          value: 'account_no'
+          title: '用户ID（user_id）',
+          value: 'user_id'
         },
-        {
-          title: '客户编号（cust_no）',
-          value: 'cust_no'
-        },
+        // {
+        //   title: '客户编号（cust_no）',
+        //   value: 'cust_no'
+        // },
         {
           title: '身份证号（cert_id）',
           value: 'cert_id'
@@ -152,15 +157,15 @@ export default {
         {
           title: '手机号（mobile_no）',
           value: 'mobile_no'
-        },
+        }
         // {
         //   title: '用户中心统一编号（UUID）',
         //   value: 'UUID'
         // },
-        {
-          title: '新商城用户ID（mall_user_id）',
-          value: 'mall_user_id'
-        }
+        // {
+        //   title: '新商城用户ID（mall_user_id）',
+        //   value: 'mall_user_id'
+        // }
       ],
       id: '',
       flowId: '',
@@ -172,14 +177,6 @@ export default {
       outParamsIndexList: [],
       expression: '',
       expressionTemplate: '',
-      initFieldType: '',
-      initDataStandar: '',
-      initFieldCode: '',
-      initSourceTable: '',
-      initFieldId: '',
-      initEnumTypeNum: '',
-      initSelectOperateList: [],
-      initEnglishName: '',
       isTreeRoot: true, // 父根节点
       visible: false,
       baseForm: {
@@ -229,7 +226,10 @@ export default {
       custerInfoList: [],
       curCusterInfo: {},
       custerLoading: false,
-      filterCursterList: [] // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
+      filterCursterList: [], // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
+      allSelectedChannelCode: [], // 选中的分群名称中所包含的所有channelCode
+      originCataList: [],
+      isHasOldChannel: false
     }
   },
   components: { rulesSet, Treeselect },
@@ -249,10 +249,24 @@ export default {
       return false
     },
     newCusterNameList () {
-      if (!this.filterCursterList.length) {
-        return this.custerNameList
+      if (!this.id) { // 新增时不展示旧分群
+        if (!this.filterCursterList.length) {
+          return this.custerNameList.filter(item => item.channelCode !== '0000')
+        }
+        return this.filterCursterList.filter(item => item.channelCode !== '0000')
+      } else {
+        if (this.isHasOldChannel === true) { // 编辑时，如果之前有选中旧分群则展示旧分群
+          if (!this.filterCursterList.length) {
+            return this.custerNameList
+          }
+          return this.filterCursterList
+        } else { // 编辑时，如果之前没有选中旧分群则不展示旧分群
+          if (!this.filterCursterList.length) {
+            return this.custerNameList.filter(item => item.channelCode !== '0000')
+          }
+          return this.filterCursterList.filter(item => item.channelCode !== '0000')
+        }
       }
-      return this.filterCursterList
     }
   },
   methods: {
@@ -279,7 +293,7 @@ export default {
       })
     },
     // 获取分群名称
-    getCusterList () {
+    getCusterList (fn) {
       dataTransferManageCuster().then(({data}) => {
         if (data.status !== '1') {
           this.custerNameList = []
@@ -288,18 +302,25 @@ export default {
             message: data.message
           })
         }
-        this.custerNameList = data.data.filter(item => item.type === 'dynamic') // 修改，只展示动态的分群
+        this.custerNameList = data.data
+        if (fn) {
+          fn()
+        }
       })
     },
     custerNamesChange (value) { // 选中数据变化时
       if (value.length === 0) {
         this.filterCursterList = []
+        this.baseForm.type = ''
       }
       // 当选中数据为1时，更新下拉数据状态
       let filterFirstObj = []
       if (value.length === 1) {
         filterFirstObj = this.custerNameList.filter(item => item.value === value[0]) // 筛选出第一条数据，要获取第一条数据的type
         this.baseForm.type = filterFirstObj[0].type
+        if (this.baseForm.type === 'static') {
+          this.baseForm.outType = 'JUDGE'
+        }
         let newArr = this.custerNameList.map(item => {
           if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
             return {...item, disabled: true}
@@ -308,6 +329,15 @@ export default {
         })
         this.filterCursterList = newArr
       }
+      this.allSelectedChannelCode = [] // 获取选中的所有的channelCode
+      for (let i = 0; i < value.length; i++) {
+        this.allSelectedChannelCode.push(this.custerNameList.filter(item => item.value === value[i])[0].channelCode)
+      }
+      this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
+      // this.custerInfoList = []
+      this.baseForm.outParams = []
+      this.outParams = []
+      this.outParamsIndexList = this.filterAllCata(this.originCataList)
     },
     previewCusterInfo () {
       if (!this.baseForm.templateIds.length) return
@@ -338,7 +368,6 @@ export default {
       this.visible = true
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getDepartmentList()
-      this.getCusterList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
@@ -346,6 +375,7 @@ export default {
       if (!tag) {
         this.loading = false
         this.drawerTitle = '新增'
+        this.getCusterList()
         this.getSelectAllCata((indexList) => {
           this.outParamsIndexList = deepClone(indexList)
         })
@@ -353,7 +383,9 @@ export default {
       } else {
         this.id = row.id
         this.drawerTitle = tag === 'view' ? '查看' : '编辑'
-        this.getOutParam(row.id)
+        this.getCusterList(() => { // 先获取到分群列表，出参数据，再回显
+          this.getOutParam(row.id)
+        })
       }
     },
     initEmptyData () { // 当数据异常时，初始化数据
@@ -447,6 +479,18 @@ export default {
             out.push(item.onlyId)
           })
           this.baseForm.outParams = out
+          // 选中的分群channelCode
+          this.allSelectedChannelCode = [] // 获取选中的所有的channelCode
+          let templateIds = data.data.templateIds
+          for (let i = 0; i < templateIds.length; i++) {
+            let channelCode = this.custerNameList.filter(item => item.value === templateIds[i])[0].channelCode
+            if (channelCode === '0000') {
+              this.isHasOldChannel = true
+            }
+            this.allSelectedChannelCode.push(channelCode)
+          }
+          this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
+          console.log(this.allSelectedChannelCode)
           // 分群包
           if (!this.baseForm.templateIds) {
             this.filterCursterList = this.custerNameList
@@ -487,8 +531,7 @@ export default {
           })
         }
         if (res.data.data && res.data.data.length) {
-          let outParams = res.data.data
-          this.getApiInfo(id, outParams)
+          this.getApiInfo(id, res.data.data)
         } else {
           this.getApiInfo(id, [])
         }
@@ -546,34 +589,15 @@ export default {
       })
       return arr
     },
-    getInitTypeCode (arr) { // 获取初始选项及id, 为初始化数据做准备
-      arr.forEach((item, index) => {
-        if (index === 0) {
-          if (item.fieldType) {
-            this.initFieldType = item.fieldType // item.fieldType
-            this.initFieldCode = item.id // item.englishName
-            this.initDataStandar = item.dataStandar
-            this.initEnumTypeNum = item.enumTypeNum
-            this.initSourceTable = item.sourceTable
-            this.initFieldId = item.fieldId
-            this.initEnglishName = item.englishName
-          } else {
-            this.getInitTypeCode(item.children)
-          }
-        }
-      })
-    },
     getSelectAllCata (fn) { // 获取所有指标
+      this.originCataList = []
       selectAllCata().then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
+          this.originCataList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
-        this.getInitTypeCode(this.indexList)
-        this.getSelectOperateList(this.initFieldType, (selectOperateList) => {
-          this.initSelectOperateList = selectOperateList
-        })
         if (fn) {
           fn(this.indexList)
         }
@@ -593,6 +617,7 @@ export default {
             obj.sourceTable = item.sourceTable
             obj.dataStandar = item.dataStandar
             obj.fieldId = item.id
+            obj.channelCode = item.channelCode
           } else {
             obj.id = item.id
             obj.label = item.name
@@ -604,7 +629,15 @@ export default {
             if (!item.fieldType) {
               obj.children = null
             } else {
-              arr.push(obj)
+              if (!this.allSelectedChannelCode.length) {
+                arr.push(obj)
+              } else {
+                for (let i = 0; i < this.allSelectedChannelCode.length; i++) {
+                  if (obj.channelCode && obj.channelCode == this.allSelectedChannelCode[i]) {
+                    arr.push(obj)
+                  }
+                }
+              }
             }
           }
         })
@@ -619,17 +652,18 @@ export default {
     getRuleTemplateItem (index) { // 条件模板
       return {
         'type': 'rule',
-        'fieldType': this.initFieldType,
-        'fieldCode': this.initFieldCode,
-        'format': this.initDataStandar,
-        'func': this.initSelectOperateList[0].code,
-        'sourceTable': this.initSourceTable,
-        'fieldId': this.initFieldId,
-        'englishName': this.initEnglishName,
+        'fieldType': '',
+        'fieldCode': null,
+        'format': '',
+        'func': '',
+        'sourceTable': '',
+        'fieldId': '',
+        'englishName': '',
         'indexList': this.indexList, // 指标下拉选
         'enumTypeNum': '',
-        'selectOperateList': this.initSelectOperateList, // 操作符下拉选
+        'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
+        'subFunc': '',
         'params': [{
           value: '',
           title: ''

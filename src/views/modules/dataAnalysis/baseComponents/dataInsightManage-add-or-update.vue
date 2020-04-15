@@ -16,16 +16,26 @@
             <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="分群类型" prop="userType">
-            <el-radio-group v-model="baseForm.userType" class="type-radio-group" @change="radioTypeChange" :disabled="!!id">
-              <div class="type-radio-item type-radio-one"><el-radio label="indicator">指标筛选</el-radio></div>
-              <div class="type-radio-item type-radio-two">
-                <el-radio label="excel">excel文件导入</el-radio>
+            <div class="type-radio-item type-radio-one">
+              <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
+              <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
+                用户所属渠道
+                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable :disabled="!!id">
+                  <template v-for="(item, index) in channelList">
+                    <el-option :key="index" :label="item.text" :value="item.value" v-if="!id && item.value !== '0000' || !!id"></el-option>
+                  </template>
+                </el-select>
               </div>
-            </el-radio-group>
+            </div>
+            <div class="type-radio-item type-radio-two">
+              <el-radio label="excel" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">excel文件导入</el-radio>
+            </div>
           </el-form-item>
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
-            <el-select v-model="baseForm.channelId">
-              <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
+            <el-select v-model="baseForm.channelId" :disabled="!!id">
+              <template v-for="(item, index) in channelList">
+                <el-option :key="index" :label="item.text" :value="item.value" v-if="!id && item.value !== '0000' || !!id"></el-option>
+              </template>
             </el-select>
             <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
                 <el-upload
@@ -106,8 +116,8 @@
     </div>
     <div class="footer">
       <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
-      <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel'">复制创建新分群</el-button>
-      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'" :disabled="loading">保存</el-button>
+      <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel' && baseForm.channelId !== '0000'">复制创建新分群</el-button>
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view' && baseForm.channelId !== '0000'" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
@@ -143,6 +153,7 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
+      allCusterNameList: [],
       baseForm: {
         name: '',
         userType: 'indicator',
@@ -174,7 +185,8 @@ export default {
         'relation': 'and',
         'rules': []
       },
-      channelList: []
+      channelList: [],
+      originIndexList: [] // 没有处理过的指标列表数据
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -241,6 +253,7 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
+          this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
           this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
@@ -288,6 +301,11 @@ export default {
         this.channelList = res.data.data
       })
     },
+    channelIdChange () { // 用户渠道改变时，重新过滤指标数据
+      this.setInitRulesConfig(this.filterAllCata(this.originIndexList))
+      this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+      this.rejectForm.rejectGroupPackageIds = []
+    },
     getVestPackAvailable () {
       vestPackAvailable().then(res => {
         if (res.data.status * 1 !== 1) {
@@ -310,7 +328,8 @@ export default {
             message: data.message || '数据异常'
           })
         }
-        this.custerNameList = data.data
+        this.allCusterNameList = data.data
+        this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
       })
     },
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
@@ -373,11 +392,20 @@ export default {
       })
       return arr
     },
+    setInitRulesConfig (indexList) {  // 将规则初始化
+      this.indexList = indexList
+      if (this.ruleConfig.rules.length) {
+        this.ruleConfig.rules = []
+        this.ruleConfig.rules.push(this.getRuleTemplateItem())
+      }
+      this.updateConditionId(this.ruleConfig)
+    },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata().then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
+          this.originIndexList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
         if (fn) {
@@ -399,18 +427,21 @@ export default {
             obj.sourceTable = item.sourceTable
             obj.dataStandar = item.dataStandar
             obj.fieldId = item.id
+            obj.channelCode = item.channelCode
           } else {
             obj.id = item.id
             obj.label = item.name
           }
           if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-            obj.children = this.filterAllCata(item.dataCataLogList)
+            obj.children = this.filterAllCata(item.dataCataLogList) // 指标集合
             arr.push(obj)
-          } else {
+          } else { // 指标父级层
             if (!item.fieldType) {
               obj.children = null
             } else {
-              arr.push(obj)
+              if (obj.channelCode && obj.channelCode === this.baseForm.channelId) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+                arr.push(obj) // 每个指标都放在集合中
+              }
             }
           }
         })
@@ -422,7 +453,7 @@ export default {
         callback()
       }
     },
-    getRuleTemplateItem (index) { // 条件模板
+    getRuleTemplateItem () { // 条件模板
       return {
         'type': 'rule',
         'fieldType': '',
@@ -727,7 +758,7 @@ export default {
         this.id = ''
         this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
       }).catch(() => {
-        console.log('取消')
+        console.log('cancel')
       })
     },
     saveHandle (type) {
@@ -749,7 +780,9 @@ export default {
             data.append('desc', this.baseForm.desc)
             data.append('channelId', this.baseForm.channelId)
             data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
-            data.append('rejectGroupPackageIds', this.rejectForm.rejectGroupPackageIds)
+            this.rejectForm.rejectGroupPackageIds.forEach(item => {
+              data.append('rejectGroupPackageIds', item)
+            })
             let flag = 0
             if (this.rejectForm.rejectGroupPackageIds.length) {
               flag = 1
@@ -933,7 +966,7 @@ export default {
     margin-top: 12px;
   }
   .insight-manage-drawer .type-radio-two {
-    margin-top: 20px;
+    margin-top: 10px;
   }
   .insight-manage-drawer .upload-excel {
     display: inline-block;
@@ -970,6 +1003,10 @@ export default {
   }
   .insight-manage-drawer .user-channel {
     margin-left: 110px;
+  }
+  .insight-manage-drawer .indicator-channel {
+    display: inline-block;
+    margin-left: 20px;
   }
   .insight-manage-drawer .pane-reject {
     margin-top: 20px;
