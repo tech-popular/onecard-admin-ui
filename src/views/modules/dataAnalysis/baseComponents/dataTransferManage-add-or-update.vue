@@ -486,13 +486,13 @@
         return arr
       },
       // 获取分群名称
-      getCusterList (fn) {
+      getCusterList (tag, fn) {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
-            if (!this.baseForm.id) {
-              this.templateIdList = data.data
-            } else {
+            if (!tag) {
               this.templateIdList = data.data.filter(item => item.channelCode !== '0000')
+            } else {
+              this.templateIdList = data.data
             }
           } else {
             this.templateIdList = []
@@ -719,6 +719,11 @@
             this.baseForm.transferType = disData.transferType.split(',')
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
+            if (this.channelCode !== '0000') {
+              this.templateIdList = this.templateIdList.filter(item => item.channelCode !== '0000')
+            } else {
+              this.templateIdList = this.templateIdList
+            }
             // 要先拿到this.channelCode,才能去获取对应的出参列表
             this.getOutParamsList(row)
             if (disData.increModel === -1) {
@@ -814,14 +819,14 @@
         this.loading = true
         this.outParamsList = []
         if (tag) {
-          this.getCusterList((data) => {
+          this.getCusterList(tag, (data) => {
             this.dataDisplay(row) // 选获取到分群列表再去渲染页面
             this.$nextTick(() => {
               this.$refs['baseForm'].resetFields()
             })
           })
         } else {
-          this.getCusterList()
+          this.getCusterList(tag)
           this.getOutParamsList()
           this.$nextTick(() => {
             this.$refs['baseForm'].resetFields()
