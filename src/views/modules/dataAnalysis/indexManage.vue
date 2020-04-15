@@ -58,6 +58,7 @@
       </el-table-column>
       <el-table-column prop="fieldType" header-align="center" align="center" :formatter="fieldTypeFormat" label="数据类型"></el-table-column>
       <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="指标类别"></el-table-column>
+      <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -66,7 +67,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="sourceDatasource" header-align="center" align="center" label="指标数据源"></el-table-column>
+      <el-table-column prop="sourceTable" header-align="center" align="center" label="来源表"></el-table-column>
       <el-table-column prop="remark" header-align="center" align="center" label="指标描述">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -163,7 +164,7 @@
           callback()
         }
       },
-  
+
       // 数据类型
       fieldTypeFormat (row, column) {
         for (var i = 0; i < this.fieldTypeList.length; i++) {
@@ -185,7 +186,7 @@
           }
         })
       },
-  
+
       // 获取数据类型
       getFieldTypeList () {
         let params = 6
