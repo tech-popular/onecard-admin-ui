@@ -489,7 +489,11 @@
       getCusterList (fn) {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
-            this.templateIdList = data.data
+            if (!this.baseForm.id) {
+              this.templateIdList = data.data
+            } else {
+              this.templateIdList = data.data.filter(item => item.channelCode !== '0000')
+            }
           } else {
             this.templateIdList = []
           }
