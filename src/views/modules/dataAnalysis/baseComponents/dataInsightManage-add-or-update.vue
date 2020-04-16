@@ -117,7 +117,7 @@
     <div class="footer">
       <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
       <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel' && baseForm.channelId !== '0000'">复制创建新分群</el-button>
-      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view' && baseForm.channelId !== '0000'" :disabled="loading">保存</el-button>
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="!tag || tag !== 'view' && baseForm.channelId !== '0000'" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
