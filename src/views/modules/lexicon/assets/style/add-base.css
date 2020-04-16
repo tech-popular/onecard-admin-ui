@@ -1,0 +1,70 @@
+.query-title {
+  padding-bottom: 10px;
+}
+.el-transfer-panel-new {
+  width: 350px;
+  text-align: left;
+}
+.el-transfer-panel-new .el-transfer-panel__list.is-filterable {
+  padding-bottom: 40px;
+  height: 354px;
+}
+.el-transfer-panel-new  .el-transfer-panel__body {
+  height: 400px;
+}
+.left-footer {
+  padding-top: 6px;
+  padding-left: 10px;
+}
+.right-footer {
+  text-align: right;
+  margin: 0;
+  padding: 8px 10px 0 0;
+}
+.right-footer span {
+  color: red
+}
+.add-wrap .el-radio-button {
+  margin-right: 10px;
+}
+.add-wrap .el-radio-button .el-radio-button__inner {
+  border-left: 1px solid #dcdfe6;
+  border-radius: 4px;
+  box-shadow: none!important;
+}
+.footer {
+  text-align: right;
+  margin-top: 20px;
+}
+.query-card-content {
+  background: #eff0f3;
+}
+.query-tag-content {
+  padding: 10px;
+  background: #fff;
+  min-height: 150px;
+  max-height: 300px;
+  overflow: auto;
+}
+.query-tag-content .tag-item {
+  margin: 0 10px 10px 0;
+}
+.query-tag-content p {
+  margin: 0;
+  color: #dcdfe6;
+}
+.query-tag-total {
+  text-align: right;
+  padding-top: 10px;
+}
+.query-tag-total i {
+  color: red;
+  font-style: normal;
+}
+.upload-file {
+  display: inline-block
+}
+.upload-name {
+  margin: -20px 0 15px 3px;
+  font-size: 12px;
+}
