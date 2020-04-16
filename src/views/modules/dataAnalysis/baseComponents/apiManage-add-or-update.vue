@@ -249,11 +249,11 @@ export default {
       return false
     },
     newCusterNameList () {
-      if (!this.id) { // 新增时不展示旧分群
+      if (!this.id) { // 新增时展示旧分群
         if (!this.filterCursterList.length) {
-          return this.custerNameList.filter(item => item.channelCode !== '0000')
+          return this.custerNameList
         }
-        return this.filterCursterList.filter(item => item.channelCode !== '0000')
+        return this.filterCursterList
       } else {
         if (this.isHasOldChannel === true) { // 编辑时，如果之前有选中旧分群则展示旧分群
           if (!this.filterCursterList.length) {
@@ -302,6 +302,7 @@ export default {
             message: data.message
           })
         }
+        // this.custerNameList = data.data.filter(item => item.type === 'dynamic') // 修改，只展示动态的分群
         this.custerNameList = data.data
         if (fn) {
           fn()

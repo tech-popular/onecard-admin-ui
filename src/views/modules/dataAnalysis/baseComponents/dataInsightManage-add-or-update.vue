@@ -22,7 +22,7 @@
                 用户所属渠道
                 <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable :disabled="!!id">
                   <template v-for="(item, index) in channelList">
-                    <el-option :key="index" :label="item.text" :value="item.value" v-if="!id && item.value !== '0000' || !!id"></el-option>
+                    <el-option :key="index" :label="item.text" :value="item.value"></el-option>
                   </template>
                 </el-select>
               </div>
@@ -34,7 +34,7 @@
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
             <el-select v-model="baseForm.channelId" :disabled="!!id">
               <template v-for="(item, index) in channelList">
-                <el-option :key="index" :label="item.text" :value="item.value" v-if="!id && item.value !== '0000' || !!id"></el-option>
+                <el-option :key="index" :label="item.text" :value="item.value"></el-option>
               </template>
             </el-select>
             <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
@@ -153,7 +153,7 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
-      allCusterNameList: [],
+      // allCusterNameList: [],
       baseForm: {
         name: '',
         userType: 'indicator',
@@ -253,7 +253,7 @@ export default {
             channelId: data.data.channelId,
             type: data.data.type
           }
-          this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+          // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
           this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
@@ -303,7 +303,7 @@ export default {
     },
     channelIdChange () { // 用户渠道改变时，重新过滤指标数据
       this.setInitRulesConfig(this.filterAllCata(this.originIndexList))
-      this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+      // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -328,8 +328,9 @@ export default {
             message: data.message || '数据异常'
           })
         }
-        this.allCusterNameList = data.data
-        this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+        this.custerNameList = data.data
+        // this.allCusterNameList = data.data
+        // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
       })
     },
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空

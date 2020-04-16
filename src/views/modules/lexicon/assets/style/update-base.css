@@ -1,0 +1,51 @@
+.query-title {
+  padding-bottom: 10px;
+}
+.query-card-content {
+  background: #eff0f3;
+}
+.query-tag-content {
+  padding: 10px;
+  background: #fff;
+  min-height: 100px;
+  max-height: 300px;
+  overflow: auto;
+}
+.query-tag-content .tag-item {
+  margin: 0 10px 10px 0;
+}
+.query-tag-content p {
+  margin: 0;
+  color: #dcdfe6;
+}
+.query-tag-total {
+  text-align: right;
+  padding-top: 10px;
+}
+.query-tag-total b {
+  font-weight: normal;
+}
+.query-tag-total i {
+  color: red;
+  font-style: normal;
+}
+.btn-group {
+  text-align: right;
+  margin-bottom: 10px;
+}
+.table-content {
+  margin-top: 10px;
+  background: #eff0f3;
+  padding: 10px 20px;
+}
+.footer {
+  text-align: right;
+  margin-top: 20px;
+}
+.upload-file {
+  display: inline-block
+}
+.upload-name {
+  margin: -20px 0 15px 3px;
+  font-size: 12px;
+}
