@@ -250,7 +250,7 @@
       </el-form>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view' && channelCode !== '0000'">保存</el-button>
+      <el-button type="primary" @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-drawer>
@@ -325,7 +325,7 @@
           mysqlServer: '', // sftp数据源地址
           triggerMode: '0' // 下发类型，默认0主动型 1被动
         },
-        tag: '新增', // 说明是否是“查看”
+        tag: '新建', // 说明是否是“查看”
         readonly: false, // 不可编辑
         disIntervalMess: '分钟',
         templateIdList: [],
