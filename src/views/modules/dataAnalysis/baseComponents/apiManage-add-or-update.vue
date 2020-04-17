@@ -103,7 +103,7 @@
       </div>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view' && !isHasOldChannel">保存</el-button>
+      <el-button type="primary" @click="saveHandle" size="small" v-if="tag !== 'view'">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-drawer>
@@ -228,8 +228,8 @@ export default {
       custerLoading: false,
       filterCursterList: [], // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
       allSelectedChannelCode: [], // 选中的分群名称中所包含的所有channelCode
-      originCataList: [],
-      isHasOldChannel: false
+      originCataList: []
+      // isHasOldChannel: false
     }
   },
   components: { rulesSet, Treeselect },
@@ -249,24 +249,24 @@ export default {
       return false
     },
     newCusterNameList () {
-      if (!this.id) { // 新增时展示旧分群
-        if (!this.filterCursterList.length) {
-          return this.custerNameList
-        }
-        return this.filterCursterList
-      } else {
-        if (this.isHasOldChannel === true) { // 编辑时，如果之前有选中旧分群则展示旧分群
-          if (!this.filterCursterList.length) {
-            return this.custerNameList
-          }
-          return this.filterCursterList
-        } else { // 编辑时，如果之前没有选中旧分群则不展示旧分群
-          if (!this.filterCursterList.length) {
-            return this.custerNameList.filter(item => item.channelCode !== '0000')
-          }
-          return this.filterCursterList.filter(item => item.channelCode !== '0000')
-        }
+      // if (!this.id) { // 新增时展示旧分群
+      if (!this.filterCursterList.length) {
+        return this.custerNameList
       }
+      return this.filterCursterList
+      // } else {
+      //   if (this.isHasOldChannel === true) { // 编辑时，如果之前有选中旧分群则展示旧分群
+      //     if (!this.filterCursterList.length) {
+      //       return this.custerNameList
+      //     }
+      //     return this.filterCursterList
+      //   } else { // 编辑时，如果之前没有选中旧分群则不展示旧分群
+      //     if (!this.filterCursterList.length) {
+      //       return this.custerNameList.filter(item => item.channelCode !== '0000')
+      //     }
+      //     return this.filterCursterList.filter(item => item.channelCode !== '0000')
+      //   }
+      // }
     }
   },
   methods: {
@@ -485,9 +485,9 @@ export default {
           let templateIds = data.data.templateIds
           for (let i = 0; i < templateIds.length; i++) {
             let channelCode = this.custerNameList.filter(item => item.value === templateIds[i])[0].channelCode
-            if (channelCode === '0000') {
-              this.isHasOldChannel = true
-            }
+            // if (channelCode === '0000') {
+            //   this.isHasOldChannel = true
+            // }
             this.allSelectedChannelCode.push(channelCode)
           }
           this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))

@@ -720,11 +720,12 @@
             this.baseForm.transferType = disData.transferType.split(',')
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
-            if (this.channelCode !== '0000') {
-              this.templateIdList = this.templateIdList.filter(item => item.channelCode !== '0000')
-            } else {
-              this.templateIdList = this.templateIdList
-            }
+            // if (this.channelCode !== '0000') {
+            //   this.templateIdList = this.templateIdList.filter(item => item.channelCode !== '0000')
+            // } else {
+            //   this.templateIdList = this.templateIdList
+            // }
+            this.templateIdList = this.templateIdList
             // 要先拿到this.channelCode,才能去获取对应的出参列表
             this.getOutParamsList(row)
             if (disData.increModel === -1) {
