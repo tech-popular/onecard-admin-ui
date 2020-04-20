@@ -720,6 +720,7 @@
             this.baseForm.transferType = disData.transferType.split(',')
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
+            let custerType = this.templateIdList.filter(item => item.value === disData.templateId)[0].type
             // if (this.channelCode !== '0000') {
             //   this.templateIdList = this.templateIdList.filter(item => item.channelCode !== '0000')
             // } else {
@@ -728,7 +729,7 @@
             this.templateIdList = this.templateIdList
             // 要先拿到this.channelCode,才能去获取对应的出参列表
             this.getOutParamsList(row)
-            if (disData.increModel === -1) {
+            if (custerType === 'static') {
               this.isStatic = true
             } else {
               this.isStatic = false
