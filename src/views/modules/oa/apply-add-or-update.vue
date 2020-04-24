@@ -15,13 +15,18 @@
             <el-input v-model="dataForm.name" placeholder="标题" />
           </el-form-item>
           <el-form-item label="申请系统" prop="system">
+            <el-radio-group v-model="dataForm.system" @change="testFunction">
+              <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList">{{item.label}}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="申请系统模块" prop="systemmodel">
             <el-cascader
               style="width: 100%"
               :props="props"
-              v-model="dataForm.system"
+              v-model="dataForm.systemmodel"
               clearable
-              :options="systemList"
-              @change="handleChange">
+              :options="systemmodelList">
             </el-cascader>
           </el-form-item>
           <el-form-item label="申请权限" prop="jurisdictionvalue">
@@ -177,7 +182,7 @@
             </el-row>
           </el-form-item>
           <el-form-item label="申请权限" prop="applyAuthTypeList">
-            <el-checkbox-group v-model="severDataForm.applyAuthTypeList" @change="changeAuthType">
+            <el-checkbox-group v-model="severDataForm.applyAuthTypeList">
               <el-checkbox
                 v-for="(item, index) in severApplyAuthList"
                 :label="item"
@@ -259,9 +264,11 @@ export default {
       visible: false,
       // 账号权限开始
       systemList: [], // 申请系统数据载体
+      systemmodelList: [], // 申请系统模块数据载体
       applyAuthList: [], // 申请权限数据载体
       props: {
-        multiple: true
+        multiple: true,
+        checkStrictly: true
       }, // 可多选申请系统
       defaultApproverList: [], // 本次申请默认审批人数据载体
       department: '', // 默认部门数据载体
@@ -269,6 +276,7 @@ export default {
       dataForm: {
         name: '', // 标题
         system: '', // 申请系统
+        systemmodel: '', // 申请系统模块
         jurisdictionvalue: [], // 申请权限
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
@@ -280,6 +288,9 @@ export default {
         name: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
         system: [
           { required: true, message: '请选择申请系统', trigger: 'blur' }
+        ],
+        systemmodel: [
+          { required: true, message: '请选择申请系统模块', trigger: 'blur' }
         ],
         jurisdictionvalue: [
           { required: true, message: '请选择申请权限', trigger: 'blur' }
@@ -375,6 +386,7 @@ export default {
         this.getStaffList()
         accoutAuthInitInfo().then(({ data }) => {
           this.systemList = data.data.systemList
+          this.systemmodelList = data.data.systemList
           this.applyAuthList = data.data.applyAuthList
           this.defaultApproverList = data.data.defaultApproverList
           this.department = data.data.department
@@ -429,9 +441,9 @@ export default {
             applicantTel: this.dataForm.phone,
             applyReason: this.dataForm.reason,
             systemId: this.dataForm.system,
+            modelList: this.dataForm.systemmodel,
             applyAuthTypeList: this.dataForm.jurisdictionvalue
           }
-
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === 0) {
               this.$message({
@@ -450,6 +462,13 @@ export default {
           })
         }
       })
+    },
+    // 账号选中系统数据处理
+    testFunction (value) {
+      let a = [{value: value}]
+      let b = this.systemmodelList
+      let arr = [...b].filter(x => [...a].some(y => y.value === x.value))
+      this.systemmodelList = arr
     },
     // 账号取消
     applyDataFormCancel () {
@@ -583,9 +602,6 @@ export default {
     currentChangeHandle (val) {
       this.staffTemp.pageNum = val
       this.getStaffList()
-    },
-    changeAuthType () {
-      console.log(this.severDataForm.applyAuthTypeList)
     },
     getRowKey (row) {
       return row.id
