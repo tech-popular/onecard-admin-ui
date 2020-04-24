@@ -45,7 +45,7 @@
             <el-input v-model="dataForm.phone" placeholder="申请人手机号" />
           </el-form-item>
           <el-form-item label="默认所属部门">
-            <span>{{department}}</span>
+            <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
           <el-form-item label="申请人邮箱" prop="email">
             <el-input v-model="dataForm.email" placeholder="申请人邮箱" />
@@ -202,6 +202,9 @@
           <el-form-item label="手机号" prop="applicantTel">
             <el-input v-model="severDataForm.applicantTel" placeholder="手机号" />
           </el-form-item>
+           <el-form-item label="默认所属部门">
+            <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
+          </el-form-item>
           <el-form-item label="本次申请默认审批人">
             <el-tag
               style="margin-left:10px;"
@@ -271,7 +274,7 @@ export default {
         checkStrictly: true
       }, // 可多选申请系统
       defaultApproverList: [], // 本次申请默认审批人数据载体
-      department: '', // 默认部门数据载体
+      departmentList: [], // 默认部门数据载体
       // jurisdictionvalue: [], // 选中的权限
       dataForm: {
         name: '', // 标题
@@ -389,7 +392,7 @@ export default {
           this.systemmodelList = data.data.systemList
           this.applyAuthList = data.data.applyAuthList
           this.defaultApproverList = data.data.defaultApproverList
-          this.department = data.data.department
+          this.departmentList = data.data.departmentList
           this.dataForm.userName = data.data.applicantName
           this.dataForm.phone = data.data.applicantTel
         })
