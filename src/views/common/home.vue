@@ -60,6 +60,8 @@
           <el-col :span="16">
             <el-card>
               <el-row>
+                <h4>去往其他系统</h4>
+                <hr>
                 <el-col :span="8">
                   <el-card :body-style="{ padding: '0px' }" style="margin:5px">
                     <img width="100%" height="155px" src="~@/assets/img/fenghuang.png">
