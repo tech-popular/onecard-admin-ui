@@ -14,7 +14,7 @@
           <el-form-item label="标题" prop="name">
             <el-input v-model="dataForm.name" placeholder="标题" />
           </el-form-item>
-          <el-form-item label="申请系统" prop="sysmodel">
+          <el-form-item label="申请系统" prop="system">
             <el-cascader
               style="width: 100%"
               :props="props"
@@ -58,7 +58,7 @@
           </el-form-item>
         </el-form>
         <div class="foot">
-          <el-button @click="visible = false">取消</el-button>
+          <el-button @click="applyDataFormCancel()">取消</el-button>
           <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
         </div>
       </el-tab-pane>
@@ -269,7 +269,6 @@ export default {
       dataForm: {
         name: '', // 标题
         system: '', // 申请系统
-        // sysmodel: '', // 申请模块
         jurisdictionvalue: [], // 申请权限
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
@@ -279,7 +278,7 @@ export default {
       }, // 账号权限form
       dataRule: {
         name: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
-        sysmodel: [
+        system: [
           { required: true, message: '请选择申请系统', trigger: 'blur' }
         ],
         jurisdictionvalue: [
@@ -432,7 +431,6 @@ export default {
             systemId: this.dataForm.system,
             applyAuthTypeList: this.dataForm.jurisdictionvalue
           }
-          console.log(newData, 'shuju')
 
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === 0) {
@@ -452,6 +450,11 @@ export default {
           })
         }
       })
+    },
+    // 账号取消
+    applyDataFormCancel () {
+      this.visible = false
+      this.$refs['dataForm'].resetFields()
     },
     severDataFormSubmit (form) {
       // 库表授权提交
@@ -568,7 +571,7 @@ export default {
       this.staffTemp.pageNum = 1
       this.getStaffList()
     },
-    // 取消
+    // 库表取消
     severDataFormCancel () {
       this.visible = false
       this.staffTemp.pageNum = 1
