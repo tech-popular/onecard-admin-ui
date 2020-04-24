@@ -18,14 +18,14 @@
             <el-cascader
               style="width: 100%"
               :props="props"
-              v-model="dataForm.sysmodel"
+              v-model="dataForm.system"
               clearable
               :options="systemList"
               @change="handleChange">
             </el-cascader>
           </el-form-item>
-          <el-form-item label="申请权限" prop="jurisdiction">
-            <el-checkbox-group v-model="jurisdictionvalue">
+          <el-form-item label="申请权限" prop="jurisdictionvalue">
+            <el-checkbox-group v-model="dataForm.jurisdictionvalue">
               <el-checkbox
                 v-for="(item, index) in applyAuthList"
                 :label="item"
@@ -223,6 +223,7 @@ import {
   getListOnPage,
   databaseInitInfo,
   accoutAuthInitInfo,
+  saveAccountAuthApply,
   saveDatabaseAuthApply
 } from '@/api/oa/apply'
 export default {
@@ -264,12 +265,12 @@ export default {
       }, // 可多选申请系统
       defaultApproverList: [], // 本次申请默认审批人数据载体
       department: '', // 默认部门数据载体
-      jurisdictionvalue: [], // 选中的权限
+      // jurisdictionvalue: [], // 选中的权限
       dataForm: {
         name: '', // 标题
         system: '', // 申请系统
-        sysmodel: '', // 申请模块
-        jurisdiction: '', // 申请权限
+        // sysmodel: '', // 申请模块
+        jurisdictionvalue: [], // 申请权限
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
@@ -281,7 +282,7 @@ export default {
         sysmodel: [
           { required: true, message: '请选择申请系统', trigger: 'blur' }
         ],
-        jurisdiction: [
+        jurisdictionvalue: [
           { required: true, message: '请选择申请权限', trigger: 'blur' }
         ],
         userName: [
@@ -424,13 +425,16 @@ export default {
         if (valid) {
           let newData = {
             title: this.dataForm.name,
-            applicantName: '',
-            applicantEmail: '',
-            applyReason: '',
-            info: {},
-            applyAuthTypeList: []
+            applicantName: this.dataForm.userName,
+            applicantEmail: this.dataForm.email,
+            applicantTel: this.dataForm.phone,
+            applyReason: this.dataForm.reason,
+            systemId: this.dataForm.system,
+            applyAuthTypeList: this.dataForm.jurisdictionvalue
           }
-          saveDatabaseAuthApply(newData).then(({ data }) => {
+          console.log(newData, 'shuju')
+
+          saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === 0) {
               this.$message({
                 message: '操作成功',
