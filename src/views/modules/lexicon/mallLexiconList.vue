@@ -29,8 +29,8 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button type="warning" @click="downLoadWordsTxt()">发布</el-button>
+        <el-button type="success" @click="addOrUpdateHandle()" v-if="isAuth('word:list:add')">新增</el-button>
+        <el-button type="warning" @click="downLoadWordsTxt()" v-if="isAuth('word:list:release')">发布</el-button>
         <!-- <el-button type="primary" @click="importFile()" plain>导入</el-button>
         <el-button type="success" @click="exportFile()" plain>导出</el-button> -->
       </el-form-item>
@@ -42,17 +42,19 @@
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
+      <el-table-column prop="last-updator" header-align="center" align="center" label="最后修改人"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="词组状态">
         <template slot-scope="scope">
           {{scope.row.status === 1 ? '启用' : '停用'}}
         </template>
       </el-table-column>
-      <el-table-column header-align="center" width="260" align="center" label="操作">
+      <el-table-column header-align="center" width="300" align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="success" plain size="mini" @click="changeStatus(scope.row)" v-if="scope.row.status === 0">启用</el-button>
-          <el-button type="danger" plain size="mini" @click="changeStatus(scope.row)" v-else>停用</el-button>
-          <el-button type="primary" plain size="mini" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
-          <el-button type="warning" plain size="mini" @click="deleteHandle(scope.row)">删除</el-button>
+          <el-button type="success" plain size="mini" @click="changeStatus(scope.row)" v-if="scope.row.status === 0 && isAuth('word:list:update:status')">启用</el-button>
+          <el-button type="danger" plain size="mini" @click="changeStatus(scope.row)" v-if="scope.row.status !== 0 && isAuth('word:list:update:status')">停用</el-button>
+          <el-button plain size="mini" @click="addOrUpdateHandle(scope.row, 'view')" v-if="isAuth('word:list:info')">查看</el-button>
+          <el-button type="primary" plain size="mini" @click="addOrUpdateHandle(scope.row, 'edit')" v-if="isAuth('word:list:update')">编辑</el-button>
+          <el-button type="warning" plain size="mini" @click="deleteHandle(scope.row)" v-if="isAuth('word:list:delete')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -98,6 +100,11 @@
     mounted () {
       this.getDataList()
       this.getWordTypeList()
+    },
+    computed: {
+      userName: {
+        get () { return this.$store.state.user.name }
+      }
     },
     methods: {
       // 获取数据列表
@@ -159,7 +166,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => { // 确认创建分群时的操作
-          changeWordsInfoStatus(row.id, status).then(({data}) => {
+          changeWordsInfoStatus(row.id, status, this.userName).then(({data}) => {
             if (data.code !== 0) {
               return this.$message({
                 type: 'error',
@@ -177,10 +184,10 @@
         })
       },
       // 新增 / 修改
-      addOrUpdateHandle (row) {
+      addOrUpdateHandle (row, tag) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(row)
+          this.$refs.addOrUpdate.init(row, tag)
         })
       },
       /** 查询 */

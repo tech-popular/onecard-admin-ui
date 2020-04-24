@@ -14,6 +14,13 @@
           </el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item label="热搜词类型:" prop="hotWordType" v-if="dataForm.wordType === '热门词'">
+        <el-radio-group v-model="dataForm.hotWordType" :disabled="!!id">
+          <el-radio :label="0">首页搜索默认词</el-radio>
+          <el-radio :label="1">搜索默认词</el-radio>
+          <el-radio :label="2">搜索热词</el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     <!--近义词 or 同义词新增-->
     <div v-if="!id">
@@ -33,7 +40,7 @@
     </div>
     <div slot="footer">
       <el-button @click="cancel">取消</el-button>
-      <el-button type="primary" @click="dataSubmit">确定</el-button>
+      <el-button type="primary" @click="dataSubmit" v-if="tag !== 'view'">确定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -48,12 +55,14 @@ import { showWordsInfo, addWordsInfo, updateWordsInfo } from '@/api/lexicon/mall
 export default {
   data () {
     return {
+      tag: '',
       isTreeRoot: true,
       id: '',
       visible: false,
       dataForm: {
         wordName: '',
-        wordType: '近义词'
+        wordType: '近义词',
+        hotWordType: 0
       },
       dataRule: {
         wordName: [
@@ -61,6 +70,9 @@ export default {
         ],
         wordType: [
           { required: true, message: '请选择所属词组类型', trigger: 'change' }
+        ],
+        hotWordType: [
+          { required: true, message: '请选择热搜词类型', trigger: 'change' }
         ]
       },
       searchWords: [] // 编辑时的查看数据，数组
@@ -86,11 +98,13 @@ export default {
     }
   },
   methods: {
-    init (row) {
+    init (row, tag) {
       this.id = ''
+      this.tag = ''
       this.dataForm = { // 初始化
         wordName: '',
-        wordType: '近义词'
+        wordType: '近义词',
+        hotWordType: 0
       }
       this.searchWords = []
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
@@ -98,6 +112,7 @@ export default {
       })
       if (row && row.id) {
         this.id = row.id
+        this.tag = tag
         this.getWordsInfo(this.id)
       } else {
         this.visible = true
@@ -154,6 +169,7 @@ export default {
           params = {
             ...this.dataForm,
             creator: this.userName,
+            updater: this.userName,
             searchWords: searchWords.list
           }
           if (this.id) {
