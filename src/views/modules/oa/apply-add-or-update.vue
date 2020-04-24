@@ -441,11 +441,11 @@ export default {
             applicantTel: this.dataForm.phone,
             applyReason: this.dataForm.reason,
             systemId: this.dataForm.system,
-            modelList: this.dataForm.systemmodel,
+            menuList: this.dataForm.systemmodel,
             applyAuthTypeList: this.dataForm.jurisdictionvalue
           }
           saveAccountAuthApply(newData).then(({ data }) => {
-            if (data && data.status === 0) {
+            if (data && data.status === '1') {
               this.$message({
                 message: '操作成功',
                 type: 'success',
