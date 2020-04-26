@@ -107,9 +107,6 @@ export default {
         hotWordType: 0
       }
       this.searchWords = []
-      this.$nextTick(() => { // 默认将基本信息的错误提示消除
-        this.$refs.dataForm.clearValidate()
-      })
       if (row && row.id) {
         this.id = row.id
         this.tag = tag
@@ -117,6 +114,7 @@ export default {
       } else {
         this.visible = true
         this.$nextTick(() => {
+          this.$refs.dataForm.clearValidate()
           this.$refs.addSynonym.initData()
         })
       }
@@ -136,6 +134,7 @@ export default {
         this.searchWords = data.data.searchWords
         this.visible = true
         this.$nextTick(() => {
+          this.$refs.dataForm.clearValidate()
           this.$refs.updateSynonym.init()
         })
       })
