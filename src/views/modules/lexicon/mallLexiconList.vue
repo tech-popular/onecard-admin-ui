@@ -42,7 +42,7 @@
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
-      <el-table-column prop="last-updator" header-align="center" align="center" label="最后修改人"></el-table-column>
+      <el-table-column prop="updater" header-align="center" align="center" label="最后修改人"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="词组状态">
         <template slot-scope="scope">
           {{scope.row.status === 1 ? '启用' : '停用'}}

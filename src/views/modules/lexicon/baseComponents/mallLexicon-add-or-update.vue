@@ -129,7 +129,8 @@ export default {
         }
         this.dataForm = {
           wordName: data.data.wordsName,
-          wordType: data.data.wordsType
+          wordType: data.data.wordsType,
+          hotWordType: data.data.hotWordType
         }
         this.searchWords = data.data.searchWords
         this.visible = true
