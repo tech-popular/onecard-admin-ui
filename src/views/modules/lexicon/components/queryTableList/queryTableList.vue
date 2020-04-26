@@ -64,19 +64,28 @@ export default {
       this.$emit('dataChange', data)
     },
     multiRemoveClick () { // 批量删除
-      let data = deepClone(this.data)
-      if (data.length === this.tableDataChecked.length) {
-        data = []
-      } else {
-        this.tableDataChecked.forEach(item => {
-          data.forEach((ditem, dindex) => {
-            if (item.name === ditem.name) {
-              data.splice(dindex, 1)
-            }
+      if (!this.tableDataChecked.length) return
+      this.$confirm('确定批量删除选中Query？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => { // 确认创建分群时的操作
+        let data = deepClone(this.data)
+        if (data.length === this.tableDataChecked.length) {
+          data = []
+        } else {
+          this.tableDataChecked.forEach(item => {
+            data.forEach((ditem, dindex) => {
+              if (item.name === ditem.name) {
+                data.splice(dindex, 1)
+              }
+            })
           })
-        })
-      }
-      this.$emit('dataChange', data)
+        }
+        this.$emit('dataChange', data)
+      }).catch(() => {
+        console.log('取消')
+      })
     }
   }
 }
