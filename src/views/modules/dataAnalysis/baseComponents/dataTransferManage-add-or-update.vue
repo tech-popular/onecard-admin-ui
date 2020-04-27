@@ -511,13 +511,14 @@
               if (!item.fieldType) {
                 obj.children = null
               } else {
-                if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
-                  arr.push(obj)
-                } else { // 选择分群时，展示对应的指标
-                  if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
-                    arr.push(obj) // 每个指标都放在集合中
-                  }
-                }
+                arr.push(obj)
+                // if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
+                //   arr.push(obj)
+                // } else { // 选择分群时，展示对应的指标
+                //   if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+                //     arr.push(obj) // 每个指标都放在集合中
+                //   }
+                // }
               }
             }
           })
@@ -528,15 +529,13 @@
       getCusterList (tag, fn) {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
-            // if (!tag) {
-            //   this.templateIdList = data.data.filter(item => item.channelCode !== '0000')
-            // } else {
-            //   this.templateIdList = data.data
-            // }
             this.templateIdList = data.data
           } else {
             this.templateIdList = []
           }
+          this.$nextTick(() => {
+            this.loading = false
+          })
           if (fn) {
             fn(this.templateIdList)
           }
@@ -544,7 +543,7 @@
       },
       // 获取分群出参 指标列表
       getOutParamsList (row) {
-        dataTransferManageOutParams().then(({data}) => {
+        dataTransferManageOutParams({ channelCode: this.channelCode }).then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
               this.originOutParamsList = data.data
@@ -552,9 +551,6 @@
             } else {
               this.originOutParamsList = data.data
               this.outParamsList = this.filterAllCata(data.data)
-              this.$nextTick(() => {
-                this.loading = false
-              })
             }
             console.log(this.originOutParamsList)
           } else {
@@ -635,7 +631,7 @@
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
-        this.getOutParamsList(this.channelCode)
+        this.getOutParamsList()
         this.baseForm.outParams = []
         this.outParams = []
         // this.outParamsList = this.filterAllCata(this.originOutParamsList)
@@ -675,6 +671,9 @@
       // 下发日志
       viewLog () {
         this.transferLogVisible = true
+        this.$nextTick(() => {
+          this.$refs.transferLog.init()
+        })
       },
       // 提交数据格式化
       formatPostData (data, outParams) {
