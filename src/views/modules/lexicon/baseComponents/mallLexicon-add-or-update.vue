@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="id ? '查看/编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="900px">
+   <el-dialog :title="id ? tag === 'view' ? '查看' : '编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="900px">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
       <el-form-item label="词组名称:" prop="wordName">
         <el-input v-model="dataForm.wordName" placeholder="" :disabled="!!id" ref="wordName" />
@@ -32,11 +32,11 @@
     </div>
     <div v-else>
       <!--近义词 or 同义词修改-->
-      <near-synonym-update v-if="dataForm.wordType === '近义词' || dataForm.wordType === '同义词'" ref="updateSynonym" :data="searchWords"></near-synonym-update>
+      <near-synonym-update v-if="dataForm.wordType === '近义词' || dataForm.wordType === '同义词'" ref="updateSynonym" :data="searchWords" :tag="tag"></near-synonym-update>
       <!-- 热门词修改 -->
-      <hot-synonym-update v-if="dataForm.wordType ==='热门词'" ref="updateSynonym" :data="searchWords"></hot-synonym-update>
+      <hot-synonym-update v-if="dataForm.wordType ==='热门词'" ref="updateSynonym" :data="searchWords" :tag="tag"></hot-synonym-update>
       <!--敏感词和停用词修改-->
-      <stop-synonym-update v-if="dataForm.wordType ==='敏感词' || dataForm.wordType ==='停用词'" ref="updateSynonym" :data="searchWords"></stop-synonym-update>
+      <stop-synonym-update v-if="dataForm.wordType ==='敏感词' || dataForm.wordType ==='停用词'" ref="updateSynonym" :data="searchWords" :tag="tag"></stop-synonym-update>
     </div>
     <div slot="footer">
       <el-button @click="cancel">取消</el-button>

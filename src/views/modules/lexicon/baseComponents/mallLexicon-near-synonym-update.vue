@@ -5,7 +5,7 @@
       <el-card shadow="never" class="query-card-content">
         <el-form :model="dataForm" inline ref="dataForm">
           <el-form-item>
-            <el-input v-model.trim="dataForm.query" @keyup.native="validateNameRule" placeholder="手动填入Query名，可输入中英文" style="width: 400px" />
+            <el-input v-model.trim="dataForm.query" @keyup.native="validateNameRule" placeholder="手动填入Query名，可输入中英文" style="width: 400px" :disabled="tag === 'view'" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addQuery" size="small">确定</el-button>
@@ -13,7 +13,7 @@
         </el-form>
         <query-tag-list :data="dynamicQuery" @tagChange="tagChangeEvent" @multiAdd="multiAddClick"></query-tag-list>
       </el-card>
-      <query-table-list :data="tableData" @dataChange="tableDataChangeClick"></query-table-list>
+      <query-table-list :data="tableData" @dataChange="tableDataChangeClick" :tag="tag"></query-table-list>
     </div>
   </div>
 </template>
@@ -35,6 +35,9 @@ export default {
     data: {
       type: Array,
       default: []
+    },
+    tag: {
+      type: String
     }
   },
   computed: {

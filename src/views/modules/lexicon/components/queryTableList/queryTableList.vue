@@ -2,7 +2,7 @@
   <div class="table-content">
     <div class="btn-group">
       <span style="float: left">目前词组中的Query</span>
-      <el-button type="danger" size="small" @click="multiRemoveClick">批量删除选中Query</el-button>
+      <el-button type="danger" size="small" @click="multiRemoveClick" :disabled="tag === 'view'">批量删除选中Query</el-button>
     </div>
     <el-table :data="data" border @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange">
       <el-table-column type="selection" header-align="center" align="center" width="100"></el-table-column>
@@ -38,6 +38,9 @@ export default {
     isSort: {
       type: Boolean,
       default: false
+    },
+    tag: {
+      type: String
     }
   },
   methods: {
