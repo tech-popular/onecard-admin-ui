@@ -8,32 +8,32 @@
   >
     <el-divider>请选择申请类别</el-divider>
     <el-tabs type="border-card">
-      <!-- <el-tab-pane label="账号权限">
+      <el-tab-pane label="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
           <el-form-item label="标题" prop="name">
             <el-input v-model="dataForm.name" placeholder="标题" />
           </el-form-item>
           <el-form-item label="申请系统" prop="system">
-            <el-radio-group v-model="dataForm.system">
-              <el-radio :label="item.id" :key="item.id" v-for="(item) in systemList">{{item.name}}</el-radio>
+            <el-radio-group v-model="dataForm.system" @change="testFunction">
+              <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="申请模块" prop="model">
+
+          <el-form-item label="申请系统模块" prop="systemmodel">
             <el-cascader
+              style="width: 100%"
               :props="props"
-              v-model="dataForm.model"
+              v-model="dataForm.systemmodel"
               clearable
-              :options="moduleList"
-              @change="handleChange"
-              ref="all"
-            ></el-cascader>
+              :options="systemmodelList">
+            </el-cascader>
           </el-form-item>
-          <el-form-item label="申请权限" prop="jurisdiction">
-            <el-checkbox-group v-model="dataForm.jurisdiction">
+          <el-form-item label="申请权限" prop="jurisdictionvalue">
+            <el-checkbox-group v-model="dataForm.jurisdictionvalue">
               <el-checkbox
                 v-for="(item, index) in applyAuthList"
-                :label="item.id"
+                :label="item"
                 :key="index"
               >{{item.name}}</el-checkbox>
             </el-checkbox-group>
@@ -41,8 +41,11 @@
           <el-form-item label="申请人姓名" prop="userName">
             <el-input v-model="dataForm.userName" placeholder="申请人姓名" />
           </el-form-item>
+          <el-form-item label="申请人手机号" prop="phone">
+            <el-input v-model="dataForm.phone" placeholder="申请人手机号" />
+          </el-form-item>
           <el-form-item label="默认所属部门">
-            <span>{{department}}</span>
+            <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
           <el-form-item label="申请人邮箱" prop="email">
             <el-input v-model="dataForm.email" placeholder="申请人邮箱" />
@@ -60,10 +63,10 @@
           </el-form-item>
         </el-form>
         <div class="foot">
-          <el-button @click="visible = false">取消</el-button>
+          <el-button @click="applyDataFormCancel()">取消</el-button>
           <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
         </div>
-      </el-tab-pane> -->
+      </el-tab-pane>
       <el-tab-pane label="库表授权">
         <el-form
           :model="severDataForm"
@@ -90,9 +93,6 @@
                             :label="item.value"
                             :value="item.value"/>
                         </el-select>
-                        <!-- <el-select v-model="staffTemp.project" placeholder="请选择数据库">
-                          <el-option value="test_onecard" label="test_onecard">test_onecard</el-option>
-                        </el-select> -->
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" style="padding:0;">
@@ -128,11 +128,6 @@
                       <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
-                  <!-- <el-table-column label="字段名称" align="center">
-                    <template slot-scope="{row}">
-                      <span>{{ row.owner }}</span>
-                    </template>
-                  </el-table-column> -->
                 </el-table>
                 <!-- 分页 -->
                 <el-pagination
@@ -177,23 +172,17 @@
                       <span>{{ row.project }}</span>
                     </template>
                   </el-table-column>
-
                   <el-table-column label="表名称" align="center">
                     <template slot-scope="{row}">
                       <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
-                  <!-- <el-table-column label="字段名称" align="center">
-                    <template slot-scope="{row}">
-                      <span>{{ row.owner }}</span>
-                    </template>
-                  </el-table-column> -->
                 </el-table>
               </el-col>
             </el-row>
           </el-form-item>
           <el-form-item label="申请权限" prop="applyAuthTypeList">
-            <el-checkbox-group v-model="severDataForm.applyAuthTypeList" @change="changeAuthType">
+            <el-checkbox-group v-model="severDataForm.applyAuthTypeList">
               <el-checkbox
                 v-for="(item, index) in severApplyAuthList"
                 :label="item"
@@ -207,14 +196,14 @@
           <el-form-item label="申请人姓名" prop="applicantName">
             <el-input v-model="severDataForm.applicantName" placeholder="申请人姓名" />
           </el-form-item>
-          <!-- <el-form-item label="默认所属部门">
-            <span>{{severdepartment}}</span>
-          </el-form-item> -->
           <el-form-item label="申请人邮箱" prop="applicantEmail">
             <el-input v-model="severDataForm.applicantEmail" placeholder="申请人邮箱" />
           </el-form-item>
           <el-form-item label="手机号" prop="applicantTel">
             <el-input v-model="severDataForm.applicantTel" placeholder="手机号" />
+          </el-form-item>
+           <el-form-item label="默认所属部门">
+            <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
           <el-form-item label="本次申请默认审批人">
             <el-tag
@@ -241,6 +230,8 @@
 import {
   getListOnPage,
   databaseInitInfo,
+  accoutAuthInitInfo,
+  saveAccountAuthApply,
   saveDatabaseAuthApply
 } from '@/api/oa/apply'
 export default {
@@ -276,22 +267,22 @@ export default {
       visible: false,
       // 账号权限开始
       systemList: [], // 申请系统数据载体
+      systemmodelList: [], // 申请系统模块数据载体
       applyAuthList: [], // 申请权限数据载体
       props: {
         multiple: true,
-        value: 'id',
-        label: 'name',
-        children: 'children'
-      }, // 可多选申请模块
-      moduleList: [], // 申请模块数据载体
+        checkStrictly: true
+      }, // 可多选申请系统
       defaultApproverList: [], // 本次申请默认审批人数据载体
-      department: '', // 默认部门数据载体
+      departmentList: [], // 默认部门数据载体
+      // jurisdictionvalue: [], // 选中的权限
       dataForm: {
         name: '', // 标题
         system: '', // 申请系统
-        model: '', // 申请模块
-        jurisdiction: '', // 申请权限
+        systemmodel: '', // 申请系统模块
+        jurisdictionvalue: [], // 申请权限
         userName: '', // 申请人姓名
+        phone: '', // 申请人手机号
         email: '', // 申请人邮箱
         approvalPeop: '', // 本次申请默认审批人
         reason: '' // 申请理由
@@ -301,15 +292,20 @@ export default {
         system: [
           { required: true, message: '请选择申请系统', trigger: 'blur' }
         ],
-        model: [{ required: true, message: '请选择模块', trigger: 'blur' }],
-        jurisdiction: [
+        systemmodel: [
+          { required: true, message: '请选择申请系统模块', trigger: 'blur' }
+        ],
+        jurisdictionvalue: [
           { required: true, message: '请选择申请权限', trigger: 'blur' }
         ],
         userName: [
           { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
         ],
+        phone: [
+          { required: true, validator: checkPhone, trigger: 'blur' }
+        ],
         email: [
-          { required: true, message: '申请人邮箱不能为空', trigger: 'blur' }
+          { required: true, validator: checkemail, trigger: 'blur' }
         ],
         reason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
@@ -391,13 +387,15 @@ export default {
       this.$nextTick(() => {
         this.$refs['severDataForm'].resetFields()
         this.getStaffList()
-        // accoutAuthInitInfo().then(({ data }) => {
-        //   this.systemList = data.data.systemList
-        //   this.applyAuthList = data.data.applyAuthList
-        //   this.moduleList = data.data.moduleList
-        //   this.defaultApproverList = data.data.defaultApproverList
-        //   this.department = data.data.department
-        // })
+        accoutAuthInitInfo().then(({ data }) => {
+          this.systemList = data.data.systemList
+          this.systemmodelList = data.data.systemList
+          this.applyAuthList = data.data.applyAuthList
+          this.defaultApproverList = data.data.defaultApproverList
+          this.departmentList = data.data.departmentList
+          this.dataForm.userName = data.data.applicantName
+          this.dataForm.phone = data.data.applicantTel
+        })
         databaseInitInfo().then(({ data }) => {
           this.severApplyAuthList = data.data.applyAuthList
           this.severdefaultApproverList = data.data.defaultApproverList
@@ -406,10 +404,6 @@ export default {
         })
       })
     },
-    // 模块选择
-    // handleChange (value) {
-    //   console.log(value)
-    // },
     // 任务类型
     clickType () {
       this.fatherData = {
@@ -444,15 +438,17 @@ export default {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           let newData = {
-            title: '',
-            applicantName: '',
-            applicantEmail: '',
-            applyReason: '',
-            info: {},
-            applyAuthTypeList: []
+            title: this.dataForm.name,
+            applicantName: this.dataForm.userName,
+            applicantEmail: this.dataForm.email,
+            applicantTel: this.dataForm.phone,
+            applyReason: this.dataForm.reason,
+            systemId: this.dataForm.system,
+            menuList: this.dataForm.systemmodel,
+            applyAuthTypeList: this.dataForm.jurisdictionvalue
           }
-          saveDatabaseAuthApply(newData).then(({ data }) => {
-            if (data && data.status === 0) {
+          saveAccountAuthApply(newData).then(({ data }) => {
+            if (data && data.status === '1') {
               this.$message({
                 message: '操作成功',
                 type: 'success',
@@ -469,6 +465,18 @@ export default {
           })
         }
       })
+    },
+    // 账号选中系统数据处理
+    testFunction (value) {
+      let a = [{value: value}]
+      let b = this.systemmodelList
+      let arr = [...b].filter(x => [...a].some(y => y.value === x.value))
+      this.systemmodelList = arr
+    },
+    // 账号取消
+    applyDataFormCancel () {
+      this.visible = false
+      this.$refs['dataForm'].resetFields()
     },
     severDataFormSubmit (form) {
       // 库表授权提交
@@ -585,7 +593,7 @@ export default {
       this.staffTemp.pageNum = 1
       this.getStaffList()
     },
-    // 取消
+    // 库表取消
     severDataFormCancel () {
       this.visible = false
       this.staffTemp.pageNum = 1
@@ -597,9 +605,6 @@ export default {
     currentChangeHandle (val) {
       this.staffTemp.pageNum = val
       this.getStaffList()
-    },
-    changeAuthType () {
-      console.log(this.severDataForm.applyAuthTypeList)
     },
     getRowKey (row) {
       return row.id
