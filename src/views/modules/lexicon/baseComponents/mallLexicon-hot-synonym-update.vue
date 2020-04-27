@@ -15,6 +15,7 @@
               placeholder="请输入搜索内容查询数据"
               style="width: 500px"
               @visible-change="visibleChange"
+              :disabled="tag === 'view'"
             >
               <template v-for="group in queryList">
                 <el-option-group
@@ -37,7 +38,7 @@
         </el-form>
         <query-tag-list :data="dynamicQuery" @tagChange="tagChangeEvent" @multiAdd="multiAddClick"></query-tag-list>
       </el-card>
-      <query-table-list :data="tableData" :is-sort="true" @dataChange="tableDataChangeClick"></query-table-list>
+      <query-table-list :data="tableData" :is-sort="true" @dataChange="tableDataChangeClick" :tag="tag"></query-table-list>
     </div>
   </div>
 </template>
@@ -67,6 +68,9 @@ export default {
     data: {
       type: Array,
       default: []
+    },
+    tag: {
+      type: String
     }
   },
   computed: {
