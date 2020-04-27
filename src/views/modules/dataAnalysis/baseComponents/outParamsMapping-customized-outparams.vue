@@ -122,7 +122,7 @@
       },
       // 获取数据类型
       getFieldTypeList () {
-        let params = 6
+        let params = 53
         indexManageTypeList(params).then(({data}) => {
           if (data && data.status === '1') {
             this.fieldTypeList = data.data

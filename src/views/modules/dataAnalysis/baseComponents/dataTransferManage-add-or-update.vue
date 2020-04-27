@@ -186,9 +186,9 @@
             </el-row>
         </div>
         <div class="pane-rules">
-          <h3>下发数据源</h3>
+          <h3>下发数据源<el-button type="success" class="transfer-log" @click="viewLog" size="mini">下发日志</el-button></h3>
           <el-row :gutter="20">
-            <el-col style="width: 6.33333%;">
+            <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="kafka" name="transferType" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
               </el-form-item>
@@ -213,7 +213,7 @@
             </el-col>
           </el-row>
           <el-row :gutter="20">
-            <el-col style="width: 6.33333%;">
+            <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
                   <el-checkbox label="mysql" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
               </el-form-item>
@@ -235,17 +235,39 @@
                   </el-select>
               </el-form-item>
             </el-col>
-            <el-col>
-              <el-form-item label="下发模式" prop="increModel">
-                <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
-                <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
-                <el-tooltip placement="top" v-if="isStatic">
-                  <div slot="content">静态分群不支持增量</div>
-                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
-                </el-tooltip>
-              </el-form-item>
-            </el-col>
-          </el-row>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col style="width: 8.33333%;">
+                <el-form-item class="label-remove-margin" prop="transferType">
+                    <el-checkbox label="sqlServer" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item prop="sqlServer">
+                    <el-select
+                      v-model= "baseForm.sqlServer"
+                      collapse-tags
+                      filterable
+                      style="margin-left: 5px; width:220px;"
+                      placeholder="请选择">
+                      <el-option
+                        v-for="item in sqlServerList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                      </el-option>
+                    </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item label="下发模式" prop="increModel">
+              <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
+              <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
+              <el-tooltip placement="top" v-if="isStatic">
+                <div slot="content">静态分群不支持增量</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+            </el-form-item>
         </div>
       </el-form>
     </div>
@@ -253,6 +275,7 @@
       <el-button type="primary" @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
+    <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
   </el-drawer>
 </template>
 <script>
@@ -260,6 +283,7 @@
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+  import transferLog from './data-transfer-log'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -273,6 +297,14 @@
 
       let validateMysqlServer = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
+          callback(new Error('请选择数据源'))
+        } else {
+          callback()
+        }
+      }
+
+      let validateSqlServer = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('sqlserver') > -1 && this.baseForm.sqlServer === '') {
           callback(new Error('请选择数据源'))
         } else {
           callback()
@@ -323,6 +355,7 @@
           kafkaServer: '', // kafka数据源地址
           topic: '',
           mysqlServer: '', // sftp数据源地址
+          sqlServer: '',
           triggerMode: '0' // 下发类型，默认0主动型 1被动
         },
         tag: '新建', // 说明是否是“查看”
@@ -353,6 +386,9 @@
         ],
         kafkaServerList: [],
         mysqlServerList: [],
+        sqlServerList: [],
+        transferLogVisible: false,
+        transferLogList: [],
         baseRule: {
           templateId: [
             { required: true, message: '请选择分群名称', trigger: 'change' }
@@ -394,23 +430,26 @@
           ],
           mysqlServer: [
             { validator: validateMysqlServer }
+          ],
+          sqlServer: [
+            { validator: validateSqlServer }
           ]
         }
       }
     },
-
     mounted () {
       this.dataAssembly()
       this.disTimeTurnOff('MINUTE')
       this.getKafkaServerList()
       this.getMysqlServerList()
+      this.getSqlServerList()
     },
 
     computed: {
 
     },
 
-    components: {Treeselect},
+    components: { Treeselect, transferLog },
 
     methods: {
       // 树加载
@@ -472,13 +511,14 @@
               if (!item.fieldType) {
                 obj.children = null
               } else {
-                if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
-                  arr.push(obj)
-                } else { // 选择分群时，展示对应的指标
-                  if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
-                    arr.push(obj) // 每个指标都放在集合中
-                  }
-                }
+                arr.push(obj)
+                // if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
+                //   arr.push(obj)
+                // } else { // 选择分群时，展示对应的指标
+                //   if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+                //     arr.push(obj) // 每个指标都放在集合中
+                //   }
+                // }
               }
             }
           })
@@ -489,15 +529,13 @@
       getCusterList (tag, fn) {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
-            // if (!tag) {
-            //   this.templateIdList = data.data.filter(item => item.channelCode !== '0000')
-            // } else {
-            //   this.templateIdList = data.data
-            // }
             this.templateIdList = data.data
           } else {
             this.templateIdList = []
           }
+          this.$nextTick(() => {
+            this.loading = false
+          })
           if (fn) {
             fn(this.templateIdList)
           }
@@ -505,7 +543,7 @@
       },
       // 获取分群出参 指标列表
       getOutParamsList (row) {
-        dataTransferManageOutParams().then(({data}) => {
+        dataTransferManageOutParams({ channelCode: this.channelCode }).then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
               this.originOutParamsList = data.data
@@ -513,9 +551,6 @@
             } else {
               this.originOutParamsList = data.data
               this.outParamsList = this.filterAllCata(data.data)
-              this.$nextTick(() => {
-                this.loading = false
-              })
             }
             console.log(this.originOutParamsList)
           } else {
@@ -568,6 +603,17 @@
           }
         })
       },
+      // mysql 数据源
+      getSqlServerList () {
+        let params = {
+          type: 'sqlServer'
+        }
+        dataTransferManageMysql(params).then(({data}) => {
+          if (data && data.status === '1') {
+            this.sqlServerList = data.data
+          }
+        })
+      },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
         console.log(this.templateIdList)
@@ -585,9 +631,10 @@
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
+        this.getOutParamsList()
         this.baseForm.outParams = []
         this.outParams = []
-        this.outParamsList = this.filterAllCata(this.originOutParamsList)
+        // this.outParamsList = this.filterAllCata(this.originOutParamsList)
         console.log(this.outParamsList, this.originOutParamsList)
       },
       // 选中出参
@@ -620,6 +667,13 @@
           })
         })
         return indexListArr
+      },
+      // 下发日志
+      viewLog () {
+        this.transferLogVisible = true
+        this.$nextTick(() => {
+          this.$refs.transferLog.init()
+        })
       },
       // 提交数据格式化
       formatPostData (data, outParams) {
@@ -830,7 +884,7 @@
           })
         } else {
           this.getCusterList(tag)
-          this.getOutParamsList()
+          // this.getOutParamsList()
           this.$nextTick(() => {
             this.$refs['baseForm'].resetFields()
           })
@@ -966,6 +1020,9 @@
     }
     & .radio-incremodel {
       margin-right: 15px;
+    }
+    & .transfer-log {
+      margin-left: 20px;
     }
   }
 </style>

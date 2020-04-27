@@ -1,10 +1,10 @@
-import { httpGet, httpPost, httpPut } from '@/api'
+import { httpGet, httpGetSeries, httpPost, httpPut } from '@/api'
 // let da = '/dataAnalysis/'
 let da = '/'
 // 元数据管理任务模块
 export const apiManageList = params => httpGet(da + 'data/api/listOnPage', params) // 查询数据API列表并分页
 export const selectOperate = params => httpGet(da + `common/select/operators/${params}`) // 获取操作符
-export const selectAllCata = () => httpGet(da + 'dataCatalog/selectAllCata') // 加载目录树接口
+export const selectAllCata = (params) => httpGetSeries(da + `dataCatalog/outparams`, params) // 加载目录树接口
 export const enumTypeList = type => httpGet(da + `dataEnumType/selectByTypeNum/${type}`) // 获取枚举数据
 export const savaApiInfo = params => httpPost(da + 'data/api/info', params) // 新增保存
 export const updateApiInfo = params => httpPut(da + 'data/api/info', params) // 编辑保存

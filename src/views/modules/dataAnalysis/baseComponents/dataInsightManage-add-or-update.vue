@@ -185,8 +185,8 @@ export default {
         'relation': 'and',
         'rules': []
       },
-      channelList: [],
-      originIndexList: [] // 没有处理过的指标列表数据
+      channelList: []
+      // originIndexList: [] // 没有处理过的指标列表数据
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -302,8 +302,10 @@ export default {
       })
     },
     channelIdChange () { // 用户渠道改变时，重新过滤指标数据
-      this.setInitRulesConfig(this.filterAllCata(this.originIndexList))
-      // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+      this.getSelectAllCata((indexList) => {
+        this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
+      })
+      this.setInitRulesConfig(this.indexList)
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -402,11 +404,11 @@ export default {
       this.updateConditionId(this.ruleConfig)
     },
     getSelectAllCata (fn) { // 获取所有指标
-      selectAllCata().then(({data}) => {
+      selectAllCata({channelCode: this.baseForm.channelId}).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
-          this.originIndexList = data.data
+          // this.originIndexList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
         if (fn) {
@@ -440,9 +442,9 @@ export default {
             if (!item.fieldType) {
               obj.children = null
             } else {
-              if (obj.channelCode && obj.channelCode === this.baseForm.channelId) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
-                arr.push(obj) // 每个指标都放在集合中
-              }
+              // if (obj.channelCode && obj.channelCode === this.baseForm.channelId) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+              arr.push(obj) // 每个指标都放在集合中
+              // }
             }
           }
         })

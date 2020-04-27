@@ -227,8 +227,8 @@ export default {
       curCusterInfo: {},
       custerLoading: false,
       filterCursterList: [], // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
-      allSelectedChannelCode: [], // 选中的分群名称中所包含的所有channelCode
-      originCataList: []
+      allSelectedChannelCode: [] // 选中的分群名称中所包含的所有channelCode
+      // originCataList: []
       // isHasOldChannel: false
     }
   },
@@ -336,9 +336,14 @@ export default {
       }
       this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
       // this.custerInfoList = []
+      if (this.baseForm.type === 'dynamic') {
+        this.getSelectAllCata((indexList) => {
+          this.outParamsIndexList = deepClone(indexList)
+        })
+      }
       this.baseForm.outParams = []
       this.outParams = []
-      this.outParamsIndexList = this.filterAllCata(this.originCataList)
+      // this.outParamsIndexList = this.filterAllCata(this.originCataList)
     },
     previewCusterInfo () {
       if (!this.baseForm.templateIds.length) return
@@ -377,9 +382,7 @@ export default {
         this.loading = false
         this.drawerTitle = '新增'
         this.getCusterList()
-        this.getSelectAllCata((indexList) => {
-          this.outParamsIndexList = deepClone(indexList)
-        })
+
         this.initEmptyData()
       } else {
         this.id = row.id
@@ -591,12 +594,11 @@ export default {
       return arr
     },
     getSelectAllCata (fn) { // 获取所有指标
-      this.originCataList = []
-      selectAllCata().then(({data}) => {
+      selectAllCata({channelCode: this.allSelectedChannelCode}).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
-          this.originCataList = data.data
+          // this.originCataList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
         if (fn) {
@@ -630,15 +632,16 @@ export default {
             if (!item.fieldType) {
               obj.children = null
             } else {
-              if (!this.allSelectedChannelCode.length) {
-                arr.push(obj)
-              } else {
-                for (let i = 0; i < this.allSelectedChannelCode.length; i++) {
-                  if (obj.channelCode && obj.channelCode == this.allSelectedChannelCode[i]) {
-                    arr.push(obj)
-                  }
-                }
-              }
+              arr.push(obj)
+              // if (!this.allSelectedChannelCode.length) {
+              //   arr.push(obj)
+              // } else {
+              //   for (let i = 0; i < this.allSelectedChannelCode.length; i++) {
+              //     if (obj.channelCode && obj.channelCode == this.allSelectedChannelCode[i]) {
+              //       arr.push(obj)
+              //     }
+              //   }
+              // }
             }
           }
         })
