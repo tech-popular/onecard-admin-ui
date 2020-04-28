@@ -19,8 +19,7 @@
               <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
-
-          <el-form-item label="申请系统模块" prop="systemmodel">
+          <el-form-item label="申请系统模块" prop="systemmodel" v-if="isShow">
             <el-cascader
               style="width: 100%"
               :props="props"
@@ -270,12 +269,13 @@ export default {
       systemmodelList: [], // 申请系统模块数据载体
       applyAuthList: [], // 申请权限数据载体
       props: {
-        multiple: true,
-        checkStrictly: true
+        multiple: true
+        // checkStrictly: true
       }, // 可多选申请系统
       defaultApproverList: [], // 本次申请默认审批人数据载体
       departmentList: [], // 默认部门数据载体
       // jurisdictionvalue: [], // 选中的权限
+      isShow: false, // 判断是否选择系统
       dataForm: {
         name: '', // 标题
         system: '', // 申请系统
@@ -459,6 +459,7 @@ export default {
                   this.$emit('refreshDataList')
                   this.$refs['dataForm'].resetFields()
                   this.buttonloading = false
+                  this.isShow = false
                 }
               })
             } else {
@@ -471,6 +472,11 @@ export default {
     },
     // 账号选中系统数据处理
     testFunction (value) {
+      if (value === 2 || value === 3) {
+        this.isShow = false
+      } else {
+        this.isShow = true
+      }
       accoutAuthInitInfo().then(({ data }) => {
         var a = [{value: value}]
         var b = data.data.systemList
@@ -481,6 +487,7 @@ export default {
     // 账号取消
     applyDataFormCancel () {
       this.visible = false
+      this.isShow = false
       this.$refs['dataForm'].resetFields()
     },
     severDataFormSubmit (form) {
