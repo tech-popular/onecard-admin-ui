@@ -64,7 +64,7 @@
         </el-form>
         <div class="foot">
           <el-button @click="applyDataFormCancel()">取消</el-button>
-          <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+          <el-button type="primary" @click="dataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
       <el-tab-pane label="库表授权">
@@ -437,6 +437,7 @@ export default {
       // 账号权限提交
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
+          this.buttonloading = true
           let newData = {
             title: this.dataForm.name,
             applicantName: this.dataForm.userName,
@@ -457,10 +458,12 @@ export default {
                   this.visible = false
                   this.$emit('refreshDataList')
                   this.$refs['dataForm'].resetFields()
+                  this.buttonloading = false
                 }
               })
             } else {
               this.$message.error(data.msg)
+              this.buttonloading = false
             }
           })
         }
