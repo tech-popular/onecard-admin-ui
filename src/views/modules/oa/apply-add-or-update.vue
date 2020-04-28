@@ -38,18 +38,18 @@
               >{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="申请人姓名" prop="userName">
-            <el-input v-model="dataForm.userName" placeholder="申请人姓名" />
+          <el-form-item label="申请人姓名">
+            <el-input v-model="dataForm.userName" placeholder="申请人姓名" disabled/>
           </el-form-item>
-          <el-form-item label="申请人手机号" prop="phone">
-            <el-input v-model="dataForm.phone" placeholder="申请人手机号" />
+          <el-form-item label="申请人手机号">
+            <el-input v-model="dataForm.phone" placeholder="申请人手机号" disabled/>
           </el-form-item>
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
           <el-form-item label="申请人邮箱" prop="email">
             <el-input v-model="dataForm.email" placeholder="申请人邮箱" />
-          </el-form-item>
+          </el-form-item> 
           <el-form-item label="本次申请默认审批人" prop="approvalPeop">
             <el-tag
               style="margin-left:10px;"
@@ -202,7 +202,7 @@
           <el-form-item label="手机号" prop="applicantTel">
             <el-input v-model="severDataForm.applicantTel" placeholder="手机号" />
           </el-form-item>
-           <el-form-item label="默认所属部门">
+          <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
           <el-form-item label="本次申请默认审批人">
@@ -298,12 +298,12 @@ export default {
         jurisdictionvalue: [
           { required: true, message: '请选择申请权限', trigger: 'blur' }
         ],
-        userName: [
-          { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
-        ],
-        phone: [
-          { required: true, validator: checkPhone, trigger: 'blur' }
-        ],
+        // userName: [
+        //   { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
+        // ],
+        // phone: [
+        //   { required: true, validator: checkPhone, trigger: 'blur' }
+        // ],
         email: [
           { required: true, validator: checkemail, trigger: 'blur' }
         ],
@@ -468,10 +468,12 @@ export default {
     },
     // 账号选中系统数据处理
     testFunction (value) {
-      let a = [{value: value}]
-      let b = this.systemmodelList
-      let arr = [...b].filter(x => [...a].some(y => y.value === x.value))
-      this.systemmodelList = arr
+      accoutAuthInitInfo().then(({ data }) => {
+        var a = [{value: value}]
+        var b = data.data.systemList
+        var arr = [...b].filter(x => [...a].some(y => y.value === x.value))
+        this.systemmodelList = arr
+      })
     },
     // 账号取消
     applyDataFormCancel () {
