@@ -13,3 +13,4 @@ export const dataTransferManageOutParams = (params) => httpGet(da + `dataCatalog
 export const dataTransferManageOutParamsEdit = (id) => httpGet(da + `dataTransferOutParams/outParams/${id}`) // 修改回显时查询出参
 export const dataTransferManageKafka = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // kafka地址
 export const dataTransferManageMysql = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
+export const defaultOutParams = (channelCode, datasourceId) => httpGet(da + `dataTransfer/out/default/channel/${channelCode}/datasource/${datasourceId}`)
