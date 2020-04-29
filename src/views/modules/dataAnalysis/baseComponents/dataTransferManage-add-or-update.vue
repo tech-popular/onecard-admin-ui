@@ -249,6 +249,7 @@
                       collapse-tags
                       filterable
                       style="margin-left: 5px; width:220px;"
+                      @change="sqlServerChange"
                       placeholder="请选择">
                       <el-option
                         v-for="item in sqlServerList"
@@ -279,7 +280,7 @@
   </el-drawer>
 </template>
 <script>
-  import { addDataTransferManage, updateDataTransferManage, dataTransferManageOutParams, dataTransferManageOutParamsEdit, dataTransferManageCuster, dataTransferManageKafka, dataTransferManageMysql, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
+  import { addDataTransferManage, updateDataTransferManage, dataTransferManageOutParams, dataTransferManageOutParamsEdit, dataTransferManageCuster, dataTransferManageKafka, dataTransferManageMysql, infoDataTransferManage, defaultOutParams } from '@/api/dataAnalysis/dataTransferManage'
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -614,6 +615,18 @@
           }
         })
       },
+      sqlServerChange (val) { // 选中sqlServer时
+        if (this.baseForm.transferType === 'sqlServer') {
+          this.getSqlServerDefaultOutParams(this.channelCode, val)
+        }
+      },
+      getSqlServerDefaultOutParams () { // 选择r3下发数据源时，先判断是否需要指定默认出参
+        defaultOutParams().then(({data}) => {
+          if (data && data.status === '1') {
+            console.log(data.data)
+          }
+        })
+      },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
         console.log(this.templateIdList)
@@ -900,8 +913,10 @@
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             let params = this.formatPostData(this.baseForm, this.outParams)
+            this.loading = true
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
+                this.loading = false
                 if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',
@@ -918,6 +933,7 @@
               })
             } else {
               updateDataTransferManage(params).then(({data}) => {
+                this.loading = false
                 if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',
