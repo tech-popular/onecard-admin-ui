@@ -155,7 +155,11 @@ export default {
         this.sysment.map(item => {
           this.systemListcarrent = item.value
         })
-        this.detalList.applyAuthTypeList.map(item => {
+        let c = [{selected: true}]
+        let d = this.detalList.applyAuthTypeList
+        let arr2 = [...d].filter(x => [...c].some(y => y.selected === x.selected))
+        this.checkedCities = arr2
+        this.checkedCities.map(item => {
           this.checkedCities.push(item.name)
         })
       })
