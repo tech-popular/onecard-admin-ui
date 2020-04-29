@@ -161,10 +161,10 @@ export default {
   },
   methods: {
     fhHandle (url) {
-      window.location.href = url
+      window.open(url, '_blank')
     },
     biHandle (url) {
-      window.location.href = url
+      window.open(url, '_blank')
     }
   }
 }
