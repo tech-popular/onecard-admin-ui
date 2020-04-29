@@ -913,8 +913,10 @@
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             let params = this.formatPostData(this.baseForm, this.outParams)
+            this.loading = true
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
+                this.loading = false
                 if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',
@@ -931,6 +933,7 @@
               })
             } else {
               updateDataTransferManage(params).then(({data}) => {
+                this.loading = false
                 if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',

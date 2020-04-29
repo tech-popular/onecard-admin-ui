@@ -127,7 +127,7 @@
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, selectAllCataNew, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -404,6 +404,7 @@ export default {
       this.updateConditionId(this.ruleConfig)
     },
     getSelectAllCata (fn) { // 获取所有指标
+      console.log(selectAllCataNew)
       selectAllCata({channelCode: this.baseForm.channelId}).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
@@ -416,6 +417,20 @@ export default {
         }
       })
     },
+    // getSelectAllCata (fn) { // 获取所有指标
+    //   console.log(selectAllCata)
+    //   selectAllCataNew().then(({data}) => {
+    //     if (data.status !== '1') {
+    //       this.indexList = []
+    //     } else {
+    //       // this.originIndexList = data.data
+    //       this.indexList = this.filterAllCata(data.data)
+    //     }
+    //     if (fn) {
+    //       fn(this.indexList)
+    //     }
+    //   })
+    // },
     filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
       let arr = []
       if (!!tree && tree.length !== 0) {

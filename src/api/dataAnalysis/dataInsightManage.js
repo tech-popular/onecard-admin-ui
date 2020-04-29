@@ -20,3 +20,5 @@ export const channelsList = () => httpGet(da + 'common/select/channels')
 export const vestPackAvailable = params => httpGet(da + 'vest/pack/select/available', params)
 export const custerAvailable = () => httpGet(da + `data/group/select/available`) // 分群ID
 export const templateDownload = http.adornUrl(da + 'data/group/template/download?token=' + Vue.cookie.get('token'))
+
+export const selectAllCataNew = () => httpGet('http://10.3.1.64:8085/dataCatalog/selectAllCataNew', {}, true, true)
