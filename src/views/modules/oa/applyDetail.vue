@@ -137,7 +137,6 @@ export default {
       detalList: {},
       checkedCities: [],
       quanxian: '',
-      tableData: [],
       sysment: [],
       systemListcarrent: ''
     }
