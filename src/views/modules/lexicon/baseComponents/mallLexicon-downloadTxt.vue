@@ -4,7 +4,7 @@
       <el-form-item label="词组类型:" prop="wordType">
         <el-select v-model="dataForm.wordType" filterable placeholder="请选择">
           <el-option
-            v-for="item in typeList"
+            v-for="item in newTypeList"
             :key="item"
             :label="item"
             :value="item"
@@ -40,6 +40,14 @@ export default {
     typeList: {
       type: Array,
       default: []
+    }
+  },
+  computed: {
+    newTypeList () {
+      let arr = []
+      arr = this.typeList.filter(item => item !== '敏感词')
+      arr = arr.filter(item => item !== '热门词')
+      return arr
     }
   },
   methods: {

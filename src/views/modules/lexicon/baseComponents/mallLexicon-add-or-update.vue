@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="id ? '查看/编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="900px">
+   <el-dialog :title="id ? tag === 'view' ? '查看' : '编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="900px">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
       <el-form-item label="词组名称:" prop="wordName">
         <el-input v-model="dataForm.wordName" placeholder="" :disabled="!!id" ref="wordName" />
@@ -14,6 +14,13 @@
           </el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item label="热搜词类型:" prop="hotWordType" v-if="dataForm.wordType === '热门词'">
+        <el-radio-group v-model="dataForm.hotWordType" :disabled="!!id">
+          <el-radio :label="0">首页搜索默认词</el-radio>
+          <el-radio :label="1">搜索默认词</el-radio>
+          <el-radio :label="2">搜索热词</el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     <!--近义词 or 同义词新增-->
     <div v-if="!id">
@@ -25,15 +32,15 @@
     </div>
     <div v-else>
       <!--近义词 or 同义词修改-->
-      <near-synonym-update v-if="dataForm.wordType === '近义词' || dataForm.wordType === '同义词'" ref="updateSynonym" :data="searchWords"></near-synonym-update>
+      <near-synonym-update v-if="dataForm.wordType === '近义词' || dataForm.wordType === '同义词'" ref="updateSynonym" :data="searchWords" :tag="tag"></near-synonym-update>
       <!-- 热门词修改 -->
-      <hot-synonym-update v-if="dataForm.wordType ==='热门词'" ref="updateSynonym" :data="searchWords"></hot-synonym-update>
+      <hot-synonym-update v-if="dataForm.wordType ==='热门词'" ref="updateSynonym" :data="searchWords" :tag="tag"></hot-synonym-update>
       <!--敏感词和停用词修改-->
-      <stop-synonym-update v-if="dataForm.wordType ==='敏感词' || dataForm.wordType ==='停用词'" ref="updateSynonym" :data="searchWords"></stop-synonym-update>
+      <stop-synonym-update v-if="dataForm.wordType ==='敏感词' || dataForm.wordType ==='停用词'" ref="updateSynonym" :data="searchWords" :tag="tag"></stop-synonym-update>
     </div>
     <div slot="footer">
       <el-button @click="cancel">取消</el-button>
-      <el-button type="primary" @click="dataSubmit">确定</el-button>
+      <el-button type="primary" @click="dataSubmit" v-if="tag !== 'view'">确定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -48,12 +55,14 @@ import { showWordsInfo, addWordsInfo, updateWordsInfo } from '@/api/lexicon/mall
 export default {
   data () {
     return {
+      tag: '',
       isTreeRoot: true,
       id: '',
       visible: false,
       dataForm: {
         wordName: '',
-        wordType: '近义词'
+        wordType: '近义词',
+        hotWordType: 0
       },
       dataRule: {
         wordName: [
@@ -61,6 +70,9 @@ export default {
         ],
         wordType: [
           { required: true, message: '请选择所属词组类型', trigger: 'change' }
+        ],
+        hotWordType: [
+          { required: true, message: '请选择热搜词类型', trigger: 'change' }
         ]
       },
       searchWords: [] // 编辑时的查看数据，数组
@@ -86,22 +98,23 @@ export default {
     }
   },
   methods: {
-    init (row) {
+    init (row, tag) {
       this.id = ''
+      this.tag = ''
       this.dataForm = { // 初始化
         wordName: '',
-        wordType: '近义词'
+        wordType: '近义词',
+        hotWordType: 0
       }
       this.searchWords = []
-      this.$nextTick(() => { // 默认将基本信息的错误提示消除
-        this.$refs.dataForm.clearValidate()
-      })
       if (row && row.id) {
         this.id = row.id
+        this.tag = tag
         this.getWordsInfo(this.id)
       } else {
         this.visible = true
         this.$nextTick(() => {
+          this.$refs.dataForm.clearValidate()
           this.$refs.addSynonym.initData()
         })
       }
@@ -116,11 +129,13 @@ export default {
         }
         this.dataForm = {
           wordName: data.data.wordsName,
-          wordType: data.data.wordsType
+          wordType: data.data.wordsType,
+          hotWordType: data.data.hotWordType
         }
         this.searchWords = data.data.searchWords
         this.visible = true
         this.$nextTick(() => {
+          this.$refs.dataForm.clearValidate()
           this.$refs.updateSynonym.init()
         })
       })
@@ -154,6 +169,7 @@ export default {
           params = {
             ...this.dataForm,
             creator: this.userName,
+            updater: this.userName,
             searchWords: searchWords.list
           }
           if (this.id) {
