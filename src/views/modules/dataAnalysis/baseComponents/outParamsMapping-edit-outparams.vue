@@ -157,6 +157,7 @@
         let params = {
           ...this.dataForm,
           channelCode: this.dataForm.channelCode === '' ? null : this.dataForm.channelCode,
+          id: this.dataForm.id === '' ? null : this.dataForm.id,
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
@@ -203,7 +204,9 @@
         this.dataForm = {
           englishName: '',
           chineseName: '',
-          enable: ''
+          enable: '',
+          channelCode: null,
+          id: ''
         }
       },
       blurIndexAliasEvent (row) { // 输入框失去焦点时，保存数据
