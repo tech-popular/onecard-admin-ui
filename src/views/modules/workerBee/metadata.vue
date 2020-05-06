@@ -2,7 +2,15 @@
   <div>
     <el-form :inline="true">
       <el-form-item label="任务定义名称">
-        <el-input v-model.trim="name" placeholder="" clearable />
+        <el-input v-model.trim="sacherName" placeholder="任务定义名称" clearable />
+      </el-form-item>
+      <el-form-item label="任务具体id">
+        <el-input v-model.trim="sacherId" placeholder="任务具体id" clearable />
+      </el-form-item>
+      <el-form-item label="任务类型">
+        <el-select filterable v-model="sacherType" placeholder="请选择" @change="clickType">
+          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -77,10 +85,16 @@
           </el-tooltip>
         </template>
       </el-table-column>
+      <el-table-column header-align="center" align="center" width="150" label="状态">
+        <template slot-scope="scope">
+          <el-button type="primary" size="small" @click="addOrUpdateHandle(scope.row.id)">启用</el-button>
+          <el-button type="warning" size="small" @click="deleteHandle(scope.row.id)">禁用</el-button>
+        </template>
+      </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="primary" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-button type="danger" icon="el-icon-delete" circle size="small" @click="deleteHandle(scope.row.id)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -99,11 +113,14 @@
 
 <script>
   import AddOrUpdate from './metadata-add-or-update'
-  import { beeTaskList, deleteBeeTask } from '@/api/workerBee/metadata'
+  import { beeTaskList, deleteBeeTask, getBeeTaskTypeList } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
-        name: '',
+        sacherName: '',
+        sacherId: '',
+        sacherType: '',
+        ruleTypeList: [],
         dataList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
@@ -118,13 +135,20 @@
     },
     activated () {
       this.getDataList()
+      getBeeTaskTypeList().then(({data}) => {
+        if (data && data.status === 0) {
+          this.ruleTypeList = data.data
+        }
+      })
     },
     methods: {
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
         const dataBody = {
-          'name': this.name,
+          'name': this.sacherName,
+          'sacherId': this.sacherId,
+          'sacherType': this.sacherType,
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
@@ -146,6 +170,10 @@
           this.dataListLoading = false
         })
       },
+      // 选择类型
+      clickType (value) {
+        this.sacherType = value
+      },
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
@@ -165,7 +193,10 @@
       /** 重置 */
       resetHandle () {
         this.pageNum = 1
-        this.name = ''
+        this.sacherName = ''
+        this.sacherId = ''
+        this.sacherType = ''
+        this.getDataList()
       },
       // 新增 / 修改
       addOrUpdateHandle (id) {
