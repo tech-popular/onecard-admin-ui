@@ -25,10 +25,10 @@
       <el-input v-model="dataForm.user" placeholder="任务使用者"/>
     </el-form-item>
     <el-form-item label="入参数据的key的ID集合" prop="inputParams">
-      <el-input v-model="dataForm.inputParams" placeholder="多个参数用英文逗号隔开"/>
+      <el-input v-model="dataForm.inputParams" placeholder="param1,param2(多个参数逗号隔开)"/>
     </el-form-item>
     <el-form-item label="出参数据的key的ID集合" prop="outputParams">
-      <el-input v-model="dataForm.outputParams" placeholder="出参数据的key的ID集合"/>
+      <el-input v-model="dataForm.outputParams" placeholder="result1,result2(多个结果逗号隔开)"/>
     </el-form-item>
     <el-form-item label="所属系统" prop="ownerApp">
       <el-input v-model="dataForm.ownerApp" placeholder="所属系统"/>

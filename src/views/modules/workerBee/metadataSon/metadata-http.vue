@@ -5,7 +5,7 @@
         <el-input v-model="fatherData.url" placeholder="请输入URL"/>
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
-        <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
+        <el-input v-model="fatherData.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
         </el-form-item>
         <el-form-item label="请求head入参" prop="requestHeadFields">
         <el-input v-model="fatherData.requestHeadFields" placeholder="请输入请求head入参"/>
@@ -17,7 +17,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
-        <el-input v-model="fatherData.responseFields" placeholder="请输入响应参数的fieldId数组"/>
+        <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
         <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
