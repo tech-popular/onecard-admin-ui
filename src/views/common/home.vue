@@ -61,7 +61,7 @@
             <el-card>
               <el-row>
                 <h4>去往其他系统</h4>
-                <hr>
+                <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
                 <el-col :span="8">
                   <el-card :body-style="{ padding: '0px' }" style="margin:5px">
                     <img width="100%" height="155px" src="~@/assets/img/fenghuang.png">
