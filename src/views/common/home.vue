@@ -11,7 +11,6 @@
                     </div>
                   </el-col>
                   <el-col :span="24">{{ userName }}</el-col>
-                   <!-- <el-col :span="24" class="orginName">注册时间: {{ createTime }}</el-col> -->
                 </el-row>
                 <el-row style="border-bottom:1px dashed #ccc;margin: 20px;"/>
                 <div class="bottom clearfix">
@@ -25,11 +24,12 @@
                       <time class="time">
                         欢迎使用<span style="color: #2093f7;">数据中台系统，</span>本系统的主要板块：
                         <p>
-                          <el-tag>用户画像板块</el-tag>
-                          <el-tag type="success">审批板块</el-tag>
-                          <el-tag type="info">搜索推荐板块</el-tag>
-                          <el-tag type="warning">调度板块</el-tag>
-                          <el-tag type="danger">报警板块</el-tag>
+                          <el-tag class="tagText">用户画像板块</el-tag>
+                          <el-tag class="tagText" type="success">审批板块</el-tag>
+                          <el-tag class="tagText" type="info">搜索推荐板块</el-tag>
+                          <el-tag class="tagText" type="warning">调度板块</el-tag>
+                          <el-tag class="tagText" type="danger">报警板块</el-tag>
+                          <el-tag class="tagText">凤凰系统</el-tag>
                         </p>
                       </time>
                     </el-col>
@@ -58,10 +58,59 @@
             </el-card>
           </el-col>
           <el-col :span="16">
-            <el-card :body-style="{ padding: '0px' }">
-              <div style="padding: 14px;">
-                <el-calendar v-model="value"></el-calendar>
-              </div>
+            <el-card>
+              <el-row>
+                <h4>去往其他系统</h4>
+                <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
+                <el-col :span="8">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                    <img width="100%" height="155px" src="~@/assets/img/fenghuang.png">
+                    <el-row style="padding:10px">
+                      <el-col :span="12" style="line-height: 38px;"><span>凤凰系统</span></el-col>
+                      <el-col :span="12" style="text-align: right;vertical-align: middle;">
+                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="fhHandle(fenghuang)"></el-button>
+                      </el-col>
+                    </el-row>
+                  </el-card>
+                </el-col>
+                <el-col :span="8">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                    <img width="100%" height="155px" src="~@/assets/img/bi.jpg">
+                    <el-row style="padding:10px">
+                      <el-col :span="12" style="line-height: 38px;"><span>BI系统</span></el-col>
+                      <el-col :span="12" style="text-align: right;vertical-align: middle;">
+                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="biHandle(bi)"></el-button>
+                      </el-col>
+                    </el-row>
+                  </el-card>
+                </el-col>
+                <!-- <el-col :span="8">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
+                    <el-row style="padding:10px">
+                      <el-col :span="12"><span>凤凰系统</span></el-col>
+                      <el-col :span="12" style="text-align: right;color: #2093f7;"><i class="el-icon-right"></i></el-col>
+                    </el-row>
+                  </el-card>
+                </el-col> -->
+              </el-row>
+              <!-- <el-row>
+                <el-col :span="8">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
+                  </el-card>
+                </el-col>
+                <el-col :span="8">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
+                  </el-card>
+                </el-col>
+                <el-col :span="8">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
+                  </el-card>
+                </el-col>
+              </el-row> -->
             </el-card>
           </el-col>
         </el-row>
@@ -72,7 +121,9 @@ export default {
   data () {
     return {
       value: new Date(),
-      dataHoste: ''
+      dataHoste: '',
+      fenghuang: 'http://tech.9fbank.com/phoenix/#/login',
+      bi: 'http://data.9fbank.com/plate.jsp'
     }
   },
   computed: {
@@ -107,6 +158,14 @@ export default {
     var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
     var seconds = Math.round(leave3 / 1000)
     this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
+  },
+  methods: {
+    fhHandle (url) {
+      window.open(url, '_blank')
+    },
+    biHandle (url) {
+      window.open(url, '_blank')
+    }
   }
 }
 </script>
@@ -159,6 +218,7 @@ export default {
     color: #999;
     .tagText{
       margin: 5px;
+      
     }
 }
 </style>
