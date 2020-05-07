@@ -20,6 +20,10 @@
       <el-button type="primary" size="mini" style="background: #f43574; border:none">FORK_JOIN</el-button>
       <el-button type="primary" size="mini" style="background: #430b98; border:none">JOIN</el-button>
       <el-button type="primary" size="mini" style="background: #065361; border:none">SUB_WORKFLOW</el-button>
+      <el-button type="primary" size="mini" style="background: #0868d3; border:none">FREEMARKER</el-button>
+      <el-button type="primary" size="mini" style="background: #724a3b; border:none">FORRCH</el-button>
+      <el-button type="primary" size="mini" style="background: #0b9ccb; border:none">REDIS</el-button>
+      <el-button type="primary" size="mini" style="background: #a9cb0b; border:none">HBASE</el-button>
     </div>
     <div id="myDiagramDiv" style="width:100%; height:650px; background-color: #ccc;"></div>
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/>
@@ -73,7 +77,7 @@ export default{
         this.myDiagram.div = null
       }
       const $ = go.GraphObject.make
-
+      // a function that produces the content of the diagram tooltip
       mySelf.myDiagram =
         $(go.Diagram, 'myDiagramDiv',
           {
@@ -87,93 +91,329 @@ export default{
             isReadOnly: true // 只读
           })
       mySelf.myDiagram.nodeTemplateMap.add('Start',
-          $(go.Node, 'Auto',
-            $(go.Shape, 'Circle', { fill: '#17B3A3' }),
-            $(go.TextBlock, { stroke: '#fff' }, new go.Binding('text'))
-          )
+        $(go.Node, 'Auto',
+          $(go.Shape, 'Circle', { fill: '#17B3A3' }),
+          $(go.TextBlock, { stroke: '#fff' }, new go.Binding('text'))
         )
+      )
       mySelf.myDiagram.nodeTemplateMap.add('Judge',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'Diamond', {fill: '#e559f2'}),
-          $(go.TextBlock, { stroke: '#fff', margin: 8 }, new go.Binding('text'))
+          $(go.TextBlock, { stroke: '#fff', margin: 8 }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('Condition',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#58ce7a' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('HTTP',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#103a87' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('JDBC',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#6d89b1' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('KAFKA',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#ed6e19' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('GROOVY',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#e39f24' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('DECISION',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#e559f2' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('CASSANDRA',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#8859f2' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('AVIATOR',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#863816' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('FORK_JOIN',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#f43574' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('JOIN',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#430b98' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('SUB_WORKFLOW',
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#065361' }),
-          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('FREEMARKER',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#0868d3' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('FORRCH',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#724a3b' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('REDIS',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#0b9ccb' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
+        )
+      )
+      mySelf.myDiagram.nodeTemplateMap.add('HBASE',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#a9cb0b' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text')),
+          {
+            toolTip: // define a tooltip for each node
+            $(go.Adornment, 'Spot',      // that has several labels around it
+              { background: 'transparent' },  // avoid hiding tooltip when mouse moves
+              $(go.Placeholder, { padding: 5 }),
+              $(go.TextBlock,
+                { alignment: go.Spot.Top, alignmentFocus: go.Spot.Bottom, stroke: '#2093f7' },
+                new go.Binding('text', 'key', function (s) { return '鼠标左击查看详情' })),
+              $(go.TextBlock, 'Bottom',
+                { alignment: go.Spot.Bottom, alignmentFocus: go.Spot.Top, stroke: '#2093f7' },
+                new go.Binding('text', 'color', function (s) { return '鼠标右击查看子流程' }))
+            )  // end Adornment
+          }
         )
       )
       mySelf.myDiagram.nodeTemplateMap.add('End',
@@ -263,7 +503,7 @@ export default{
           })
         } else {
           mySelf.$message({
-            message: '没有子流程哦!',
+            message: '该节点没有子流程',
             type: 'warning'
           })
         }
@@ -277,6 +517,7 @@ export default{
           nodeDataArray: this.dataAllList.nodeDataArrays,
           linkDataArray: this.dataAllList.linkDataArrays
         })
+      console.log(this.dataAllList.nodeDataArrays)
     },
     // 放大事件
     enlarge () {
