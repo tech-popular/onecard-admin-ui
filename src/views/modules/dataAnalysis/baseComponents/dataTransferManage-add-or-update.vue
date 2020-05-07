@@ -187,7 +187,7 @@
             </el-row>
         </div>
         <div class="pane-rules">
-          <h3>下发数据源<el-button type="success" class="transfer-log" @click="viewLog" size="mini" v-if="baseForm.id">下发日志</el-button></h3>
+          <h3>下发数据源</h3>
           <el-row :gutter="20">
             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
@@ -243,8 +243,8 @@
                     <el-checkbox label="sqlServer" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
                 </el-form-item>
               </el-col>
-              <el-col :span="6">
-                <el-form-item prop="sqlServer">
+              <el-col :span="10">
+                <el-form-item prop="sqlServer" inline>
                     <el-select
                       v-model= "baseForm.sqlServer"
                       collapse-tags
@@ -259,6 +259,7 @@
                         :value="item.id">
                       </el-option>
                     </el-select>
+                    <el-button type="success" class="transfer-log" @click="viewLog" size="mini" v-if="baseForm.transferType.includes('sqlServer') && baseForm.sqlServer">下发日志</el-button>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -905,6 +906,7 @@
         this.baseForm.kafkaServer = ''
         this.baseForm.topic = ''
         this.baseForm.mysqlServer = ''
+        this.baseForm.sqlServer = ''
         this.baseForm.outParams = []
         this.baseForm.templateId = ''
         this.tag = tag == 'edit' ? '编辑' : '新建'
