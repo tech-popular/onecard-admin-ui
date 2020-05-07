@@ -15,3 +15,4 @@ export const dataTransferManageOutParamsEdit = (id) => httpGet(da + `dataTransfe
 export const dataTransferManageKafka = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // kafka地址
 export const dataTransferManageMysql = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
 export const defaultOutParams = (channelCode, datasourceId) => httpGet(da + `dataTransfer/out/default/channel/${channelCode}/datasource/${datasourceId}`)
+export const r3Log = params => httpPost(da + 'r3log/list', params)

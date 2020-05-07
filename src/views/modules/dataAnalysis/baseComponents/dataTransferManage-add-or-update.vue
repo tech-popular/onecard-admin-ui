@@ -50,6 +50,7 @@
                 :load-options="loadOptions"
                 :searchable="true"
                 :clearable="true"
+                :disabled="isR3DefaultOut"
                 @input="changeOption"
                 @select="outParamsSelect"
                 @deselect="outParamsDeselect"
@@ -186,7 +187,7 @@
             </el-row>
         </div>
         <div class="pane-rules">
-          <h3>下发数据源<el-button type="success" class="transfer-log" @click="viewLog" size="mini">下发日志</el-button></h3>
+          <h3>下发数据源<el-button type="success" class="transfer-log" @click="viewLog" size="mini" v-if="baseForm.id">下发日志</el-button></h3>
           <el-row :gutter="20">
             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
@@ -284,7 +285,7 @@
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-  import transferLog from './data-transfer-log'
+  import transferLog from './data-transfer-r3-log'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -435,7 +436,8 @@
           sqlServer: [
             { validator: validateSqlServer }
           ]
-        }
+        },
+        isR3DefaultOut: false // 选中R3下发源，且有默认出参时，不可再操作出参
       }
     },
     mounted () {
@@ -632,6 +634,7 @@
             })
             this.baseForm.outParams = Array.from(new Set(out))
             this.outParamsList = this.updateOutParamsList(this.outParamsList)
+            this.isR3DefaultOut = true
           }
         })
       },
@@ -657,6 +660,7 @@
         this.baseForm.outParams = []
         this.outParams = []
         this.baseForm.sqlServer = ''
+        this.isR3DefaultOut = false
         // this.outParamsList = this.filterAllCata(this.originOutParamsList)
         // console.log(this.outParamsList, this.originOutParamsList)
       },

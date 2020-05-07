@@ -7,22 +7,66 @@
     <el-table-column prop="fieldType" header-align="center" align="center" label="下发用户数"></el-table-column>
     <el-table-column prop="categoryId" header-align="center" align="center" label="下发类型"></el-table-column>
   </el-table>
+  <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageNum"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalCount"
+      style="margin-top: 15px;text-align:right"
+      layout="total, sizes, prev, pager, next, jumper"/>
   <div class="footer">
     <el-button type="default" @click="cancelHandle" size="small">关闭</el-button>
   </div>
   </el-dialog>
 </template>
 <script>
+import { r3Log } from '@/api/dataAnalysis/dataTransferManage'
 export default {
   data () {
     return {
       visible: false,
-      dataList: []
+      dataList: [],
+      totalCount: 0,
+      pageNum: 1, // 当前页
+      pageSize: 10 // 默认每页10条
     }
   },
   methods: {
     init () {
       this.visible = true
+      this.getDataList()
+    },
+    getDataList () {
+      r3Log({
+        pageSize: this.pageSize,
+        pageNum: this.pageNum
+      }).then(({data}) => {
+        if (data && data.status === '1') {
+          if (data.data == null) {
+            this.dataList = []
+            this.totalCount = 0
+          } else {
+            this.dataList = data.data.list
+            this.totalCount = data.data.total
+          }
+        } else {
+          this.dataList = []
+          this.totalCount = 0
+        }
+      })
+    },
+    // 每页数
+    sizeChangeHandle (page) {
+      this.pageSize = page
+      this.pageNum = 1
+      this.getDataList()
+    },
+    // 当前页
+    currentChangeHandle (page) {
+      this.pageNum = page
+      this.getDataList()
     },
     cancelHandle () {
       this.visible = false
