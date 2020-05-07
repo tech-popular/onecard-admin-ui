@@ -22,7 +22,7 @@
 					<template slot-scope="scope">
 						<el-form-item :prop="'tableData.' + scope.$index + '.fieldType'" :rules='rules.fieldType'>
 							<el-select v-model="scope.row.fieldType" placeholder="请选择">
-								<el-option v-for="(item, index) in fieldTypeList" :value="item.childrenValue" :key="index" :label="item.childrenValue"></el-option>
+								<el-option v-for="(item, index) in fieldTypeList" :value="item.childrenNum" :key="index" :label="item.childrenValue"></el-option>
 							</el-select>
 						</el-form-item>
 					</template>
