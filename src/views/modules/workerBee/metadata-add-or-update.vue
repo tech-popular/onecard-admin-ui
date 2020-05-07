@@ -60,7 +60,7 @@
     <metadata-aviator
     v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataAviator"/>
-     <!-- AVIATOR 类型7 -->
+     <!-- FREEMARKER 类型7 -->
     <metadata-freemarke
     v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
@@ -68,6 +68,10 @@
     <metadataHbase
     v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHbase"/>
+    <!-- REDIS 类型9 -->
+    <metadataHbase
+    v-if="dataForm.type == 'REDIS'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataRedis"/>
     </el-form>
    
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
@@ -86,6 +90,7 @@
   import metadataAviator from './metadataSon/metadata-aviator'
   import metadataFreemarke from './metadataSon/metadata-freemarke'
   import metadataHbase from './metadataSon/metadata-hbase'
+  import metadataRedis from './metadataSon/metadata-redis'
 
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   import Filter from './filter'
@@ -161,7 +166,8 @@
       metadataGroovy, // GROOVY
       metadataAviator, // AVIATOR
       metadataFreemarke, // Freemarke
-      metadataHbase // Hbase
+      metadataHbase, // Hbase
+      metadataRedis // Redis
     },
     methods: {
       init (id, value) {
