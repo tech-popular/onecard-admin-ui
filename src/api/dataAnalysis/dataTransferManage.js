@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut } from '@/api'
+import { httpGet, httpGetSeries, httpPost, httpPut } from '@/api'
 // let da = 'dataTransfer/'
 let da = '/'
 // 数据流转管理模块
@@ -13,6 +13,6 @@ export const dataTransferManageCuster = () => httpGet(da + `data/group/select/av
 export const dataTransferManageOutParams = params => httpGet(da + 'dataCatalog/selectAllCata', params) // 加载目录树接口
 export const dataTransferManageOutParamsEdit = (id) => httpGet(da + `dataTransferOutParams/outParams/${id}`) // 修改回显时查询出参
 export const dataTransferManageKafka = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // kafka地址
-export const dataTransferManageMysql = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
+export const dataTransferManageMysql = (params) => httpGetSeries(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
 export const defaultOutParams = (channelCode, datasourceId) => httpGet(da + `dataTransfer/out/default/channel/${channelCode}/datasource/${datasourceId}`)
 export const r3Log = params => httpPost(da + 'r3log/list', params)
