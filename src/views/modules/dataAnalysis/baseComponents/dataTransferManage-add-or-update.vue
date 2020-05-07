@@ -334,7 +334,7 @@
         visible: true,
         isStatic: false,
         channelCode: '',
-        originOutParamsList: [],
+        // originOutParamsList: [],
         baseForm: {
           id: '',
           taskUniqueFlag: null, // 蜂巢任务ID
@@ -547,13 +547,13 @@
         dataTransferManageOutParams({ channelCode: this.channelCode }).then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
-              this.originOutParamsList = data.data
+              // this.originOutParamsList = data.data
               this.getOutParamsEditList(row.id, this.filterAllCata(data.data))
             } else {
-              this.originOutParamsList = data.data
+              // this.originOutParamsList = data.data
               this.outParamsList = this.filterAllCata(data.data)
             }
-            console.log(this.originOutParamsList)
+            // console.log(this.originOutParamsList)
           } else {
             this.outParamsList = []
           }
@@ -616,14 +616,22 @@
         })
       },
       sqlServerChange (val) { // 选中sqlServer时
-        if (this.baseForm.transferType === 'sqlServer') {
+        if (this.baseForm.transferType.includes('sqlServer')) {
           this.getSqlServerDefaultOutParams(this.channelCode, val)
         }
       },
-      getSqlServerDefaultOutParams () { // 选择r3下发数据源时，先判断是否需要指定默认出参
-        defaultOutParams().then(({data}) => {
+      getSqlServerDefaultOutParams (channelCode, id) { // 选择r3下发数据源时，先判断是否需要指定默认出参
+        defaultOutParams(channelCode, id).then(({data}) => {
           if (data && data.status === '1') {
-            console.log(data.data)
+            if (!data.data || !data.data.length) return
+            let out = []
+            this.outParams = []
+            data.data.forEach(item => {
+              out.push(item.value + '-' + item.id)
+              this.outParams.push({value: item.value, id: item.id, sourceTable: item.sourceTable})
+            })
+            this.baseForm.outParams = Array.from(new Set(out))
+            this.outParamsList = this.updateOutParamsList(this.outParamsList)
           }
         })
       },
@@ -644,11 +652,13 @@
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
+        // 改变分群名称时，出参及sqlserver选项都初始化，因为他们依赖分群
         this.getOutParamsList()
         this.baseForm.outParams = []
         this.outParams = []
+        this.baseForm.sqlServer = ''
         // this.outParamsList = this.filterAllCata(this.originOutParamsList)
-        console.log(this.outParamsList, this.originOutParamsList)
+        // console.log(this.outParamsList, this.originOutParamsList)
       },
       // 选中出参
       outParamsSelect (node) {
@@ -712,6 +722,13 @@
           let tempServer = {
             type: 'mysql',
             id: data.mysqlServer
+          }
+          postData.datasourceParams.push(tempServer)
+        }
+        if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
+          let tempServer = {
+            type: 'sqlServer',
+            id: data.sqlServer
           }
           postData.datasourceParams.push(tempServer)
         }
@@ -808,6 +825,8 @@
                 this.baseForm.topic = item.topic
               } else if (item.type == 'mysql') {
                 this.baseForm.mysqlServer = item.id
+              } else if (item.type == 'sqlServer') {
+                this.baseForm.sqlServer = item.id
               }
             })
             let tempTime = disData.taskScheduleConfig
@@ -910,9 +929,11 @@
       },
       // 保存
       saveHandle () {
+        console.log(this.formatPostData(this.baseForm, this.outParams))
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             let params = this.formatPostData(this.baseForm, this.outParams)
+            console.log(params)
             this.loading = true
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
