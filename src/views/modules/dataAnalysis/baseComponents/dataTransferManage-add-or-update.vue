@@ -240,7 +240,7 @@
             <el-row :gutter="20">
               <el-col style="width: 8.33333%;">
                 <el-form-item class="label-remove-margin" prop="transferType">
-                    <el-checkbox label="sqlServer" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
+                    <el-checkbox label="sqlServer" v-model="baseForm.transferType" @change="transferTypeChage" style="margin-left: 8px;"></el-checkbox>
                 </el-form-item>
               </el-col>
               <el-col :span="10">
@@ -639,6 +639,19 @@
           }
         })
       },
+      transferTypeChage (val) { // 选中sqlServer与否
+        if (!this.baseForm.transferType.includes('sqlServer')) { // 取消选中sqlServer时。出参变为可选状态，且清除原有的
+          if (this.isR3DefaultOut) {
+            this.isR3DefaultOut = false
+            this.baseForm.outParams = []
+            this.outParams = []
+          }
+        } else { // 选中时，之前有选择下拉项则直接请求接口数据，获取出参
+          if (this.baseForm.sqlServer != '') {
+            this.getSqlServerDefaultOutParams(this.channelCode, this.baseForm.sqlServer)
+          }
+        }
+      },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
         console.log(this.templateIdList)
@@ -700,7 +713,7 @@
       viewLog () {
         this.transferLogVisible = true
         this.$nextTick(() => {
-          this.$refs.transferLog.init()
+          this.$refs.transferLog.init(this.baseForm.id)
         })
       },
       // 提交数据格式化
@@ -832,6 +845,7 @@
                 this.baseForm.mysqlServer = item.id
               } else if (item.type == 'sqlServer') {
                 this.baseForm.sqlServer = item.id
+                this.isR3DefaultOut = true
               }
             })
             let tempTime = disData.taskScheduleConfig

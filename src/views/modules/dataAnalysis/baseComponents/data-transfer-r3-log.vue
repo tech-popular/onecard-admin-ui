@@ -35,15 +35,19 @@ export default {
     }
   },
   methods: {
-    init () {
+    init (id) {
       this.visible = true
-      this.getDataList()
+      this.getDataList(id)
     },
-    getDataList () {
-      r3Log({
+    getDataList (id) {
+      let params = {
         pageSize: this.pageSize,
         pageNum: this.pageNum
-      }).then(({data}) => {
+      }
+      if (id) {
+        params.transferId = id
+      }
+      r3Log(params).then(({data}) => {
         if (data && data.status === '1') {
           if (data.data == null) {
             this.dataList = []
