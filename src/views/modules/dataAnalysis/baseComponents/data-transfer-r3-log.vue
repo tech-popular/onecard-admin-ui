@@ -29,6 +29,7 @@ export default {
     return {
       visible: false,
       dataList: [],
+      id: '',
       totalCount: 0,
       pageNum: 1, // 当前页
       pageSize: 10 // 默认每页10条
@@ -37,15 +38,16 @@ export default {
   methods: {
     init (id) {
       this.visible = true
-      this.getDataList(id)
+      this.id = id
+      this.getDataList()
     },
-    getDataList (id) {
+    getDataList () {
       let params = {
         pageSize: this.pageSize,
         pageNum: this.pageNum
       }
-      if (id) {
-        params.transferId = id
+      if (this.id) {
+        params.transferId = this.id
       }
       r3Log(params).then(({data}) => {
         if (data && data.status === '1') {
