@@ -307,7 +307,7 @@
       }
 
       let validateSqlServer = (rule, value, callback) => {
-        if (this.baseForm.transferType.indexOf('sqlserver') > -1 && this.baseForm.sqlServer === '') {
+        if (this.baseForm.transferType.indexOf('sqlServer') > -1 && this.baseForm.sqlServer === '') {
           callback(new Error('请选择数据源'))
         } else {
           callback()
