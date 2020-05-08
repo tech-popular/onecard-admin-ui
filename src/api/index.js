@@ -1,4 +1,5 @@
 import http from '../utils/httpRequest'
+import Qs from 'qs'
 
 // POST 请求
 function httpPost (url, params, flag = true) {
@@ -35,7 +36,22 @@ function httpDelete (url, params, flag = true) {
   })
 }
 // GET 请求
-function httpGet (url, data = {}, flag = true) {
+function httpGet (url, data = {}, flag = true, urlFlag = false) {
+  if (data.utcParam) { // utcParam 为数组
+    const router = data.utcParam.join('/')
+    url = `${url}/${router}`
+    delete data.utcParam
+  }
+
+  return http({
+    method: 'get',
+    url: urlFlag ? url : http.adornUrl(url),
+    params: data ? http.adornParams(data, flag) : http.adornParams()
+  })
+}
+
+// GET 请求
+function httpGetSeries (url, data = {}, flag = true) {
   if (data.utcParam) { // utcParam 为数组
     const router = data.utcParam.join('/')
     url = `${url}/${router}`
@@ -45,13 +61,17 @@ function httpGet (url, data = {}, flag = true) {
   return http({
     method: 'get',
     url: http.adornUrl(url),
-    params: data ? http.adornParams(data, flag) : http.adornParams()
+    params: data ? http.adornParams(data, flag) : http.adornParams(),
+    paramsSerializer: (params) => {
+      return Qs.stringify(params, {arrayFormat: 'repeat'})
+    }
   })
 }
 export {
   httpPost,
   httpPostFile,
   httpGet,
+  httpGetSeries,
   httpPut,
   httpDelete
 }
