@@ -148,13 +148,16 @@ export default {
       this.dialogVisible = true
       lookAccout(val.id).then(({data}) => {
         this.detalList = data.data
-        let a = [{selected: true}]
-        let b = this.detalList.systemList
-        let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
-        this.sysment = arr
-        this.sysment.map(item => {
-          this.systemListcarrent = item.value
-        })
+        if (this.quanxian === '账号权限') {
+          let a = [{selected: true}]
+          let b = this.detalList.systemList
+          let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
+          this.sysment = arr
+          this.sysment.map(item => {
+            this.systemListcarrent = item.value
+          })
+        }
+
         let c = [{selected: true}]
         let d = this.detalList.applyAuthTypeList
         let arr2 = [...d].filter(x => [...c].some(y => y.selected === x.selected))
