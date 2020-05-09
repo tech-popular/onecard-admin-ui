@@ -4,7 +4,7 @@
       <el-form-item label="任务定义名称">
         <el-input v-model.trim="sacherName" placeholder="任务定义名称" clearable />
       </el-form-item>
-      <el-form-item label="任务具体id">
+      <el-form-item label="任务具体ID">
         <el-input v-model.trim="sacherId" placeholder="任务具体id" clearable />
       </el-form-item>
       <el-form-item label="任务类型">
@@ -26,7 +26,7 @@
         prop="id"
         header-align="center"
         align="center"
-        label="任务具体id"/>
+        label="任务具体ID"/>
       <el-table-column
         prop="name"
         header-align="center"
@@ -85,16 +85,22 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="状态">
+      <el-table-column
+        prop="enable"
+        header-align="center"
+        align="center"
+        label="状态">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="addOrUpdateHandle(scope.row.id)">启用</el-button>
-          <el-button type="warning" size="small" @click="deleteHandle(scope.row.id)">禁用</el-button>
+          <el-tag v-if="scope.row.enable === true" size="small" >启动</el-tag>
+          <el-tag v-else size="small" type="danger">停止</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="操作">
+      <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-          <el-button type="danger" icon="el-icon-delete" circle size="small" @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-button type="success" size="mini" icon="el-icon-open" circle @click="actionOpen(scope.row.id)"></el-button>
+          <el-button type="warning" size="mini" icon="el-icon-turn-off" circle @click="storpOff(scope.row.id)"></el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -147,8 +153,8 @@
         this.dataListLoading = true
         const dataBody = {
           'name': this.sacherName,
-          'sacherId': this.sacherId,
-          'sacherType': this.sacherType,
+          'id': this.sacherId,
+          'type': this.sacherType,
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
@@ -234,3 +240,8 @@
     }
   }
 </script>
+<style scoped>
+  .el-button+.el-button{
+    margin: 0 !important;
+  }
+</style>
