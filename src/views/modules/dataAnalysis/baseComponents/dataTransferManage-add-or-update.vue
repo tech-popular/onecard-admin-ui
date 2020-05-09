@@ -50,6 +50,7 @@
                 :load-options="loadOptions"
                 :searchable="true"
                 :clearable="true"
+                :disabled="isR3DefaultOut"
                 @input="changeOption"
                 @select="outParamsSelect"
                 @deselect="outParamsDeselect"
@@ -188,7 +189,7 @@
         <div class="pane-rules">
           <h3>下发数据源</h3>
           <el-row :gutter="20">
-            <el-col style="width: 6.33333%;">
+            <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="kafka" name="transferType" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
               </el-form-item>
@@ -213,7 +214,7 @@
             </el-col>
           </el-row>
           <el-row :gutter="20">
-            <el-col style="width: 6.33333%;">
+            <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
                   <el-checkbox label="mysql" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
               </el-form-item>
@@ -235,17 +236,41 @@
                   </el-select>
               </el-form-item>
             </el-col>
-            <el-col>
-              <el-form-item label="下发模式" prop="increModel">
-                <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
-                <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
-                <el-tooltip placement="top" v-if="isStatic">
-                  <div slot="content">静态分群不支持增量</div>
-                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
-                </el-tooltip>
-              </el-form-item>
-            </el-col>
-          </el-row>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col style="width: 8.33333%;">
+                <el-form-item class="label-remove-margin" prop="transferType">
+                    <el-checkbox label="sqlServer" v-model="baseForm.transferType" @change="transferTypeChage" style="margin-left: 8px;"></el-checkbox>
+                </el-form-item>
+              </el-col>
+              <el-col :span="10">
+                <el-form-item prop="sqlServer" inline>
+                    <el-select
+                      v-model= "baseForm.sqlServer"
+                      collapse-tags
+                      filterable
+                      style="margin-left: 5px; width:220px;"
+                      @change="sqlServerChange"
+                      placeholder="请选择">
+                      <el-option
+                        v-for="item in sqlServerList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                      </el-option>
+                    </el-select>
+                    <el-button type="success" class="transfer-log" @click="viewLog" size="mini" v-if="baseForm.transferType.includes('sqlServer') && baseForm.sqlServer">下发日志</el-button>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item label="下发模式" prop="increModel">
+              <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
+              <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
+              <el-tooltip placement="top" v-if="isStatic">
+                <div slot="content">静态分群不支持增量</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+            </el-form-item>
         </div>
       </el-form>
     </div>
@@ -253,13 +278,15 @@
       <el-button type="primary" @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
+    <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
   </el-drawer>
 </template>
 <script>
-  import { addDataTransferManage, updateDataTransferManage, dataTransferManageOutParams, dataTransferManageOutParamsEdit, dataTransferManageCuster, dataTransferManageKafka, dataTransferManageMysql, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
+  import { addDataTransferManage, updateDataTransferManage, dataTransferManageOutParams, dataTransferManageOutParamsEdit, dataTransferManageCuster, dataTransferManageKafka, dataTransferManageMysql, infoDataTransferManage, defaultOutParams } from '@/api/dataAnalysis/dataTransferManage'
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+  import transferLog from './data-transfer-r3-log'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -273,6 +300,14 @@
 
       let validateMysqlServer = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
+          callback(new Error('请选择数据源'))
+        } else {
+          callback()
+        }
+      }
+
+      let validateSqlServer = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('sqlServer') > -1 && this.baseForm.sqlServer === '') {
           callback(new Error('请选择数据源'))
         } else {
           callback()
@@ -301,7 +336,7 @@
         visible: true,
         isStatic: false,
         channelCode: '',
-        originOutParamsList: [],
+        // originOutParamsList: [],
         baseForm: {
           id: '',
           taskUniqueFlag: null, // 蜂巢任务ID
@@ -323,6 +358,7 @@
           kafkaServer: '', // kafka数据源地址
           topic: '',
           mysqlServer: '', // sftp数据源地址
+          sqlServer: '',
           triggerMode: '0' // 下发类型，默认0主动型 1被动
         },
         tag: '新建', // 说明是否是“查看”
@@ -353,6 +389,9 @@
         ],
         kafkaServerList: [],
         mysqlServerList: [],
+        sqlServerList: [],
+        transferLogVisible: false,
+        transferLogList: [],
         baseRule: {
           templateId: [
             { required: true, message: '请选择分群名称', trigger: 'change' }
@@ -394,23 +433,27 @@
           ],
           mysqlServer: [
             { validator: validateMysqlServer }
+          ],
+          sqlServer: [
+            { validator: validateSqlServer }
           ]
-        }
+        },
+        isR3DefaultOut: false // 选中R3下发源，且有默认出参时，不可再操作出参
       }
     },
-
     mounted () {
       this.dataAssembly()
       this.disTimeTurnOff('MINUTE')
       this.getKafkaServerList()
       this.getMysqlServerList()
+      this.getSqlServerList()
     },
 
     computed: {
 
     },
 
-    components: {Treeselect},
+    components: { Treeselect, transferLog },
 
     methods: {
       // 树加载
@@ -472,13 +515,14 @@
               if (!item.fieldType) {
                 obj.children = null
               } else {
-                if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
-                  arr.push(obj)
-                } else { // 选择分群时，展示对应的指标
-                  if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
-                    arr.push(obj) // 每个指标都放在集合中
-                  }
-                }
+                arr.push(obj)
+                // if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
+                //   arr.push(obj)
+                // } else { // 选择分群时，展示对应的指标
+                //   if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+                //     arr.push(obj) // 每个指标都放在集合中
+                //   }
+                // }
               }
             }
           })
@@ -489,15 +533,13 @@
       getCusterList (tag, fn) {
         dataTransferManageCuster().then(({data}) => {
           if (data && data.status === '1') {
-            // if (!tag) {
-            //   this.templateIdList = data.data.filter(item => item.channelCode !== '0000')
-            // } else {
-            //   this.templateIdList = data.data
-            // }
             this.templateIdList = data.data
           } else {
             this.templateIdList = []
           }
+          this.$nextTick(() => {
+            this.loading = false
+          })
           if (fn) {
             fn(this.templateIdList)
           }
@@ -505,19 +547,16 @@
       },
       // 获取分群出参 指标列表
       getOutParamsList (row) {
-        dataTransferManageOutParams().then(({data}) => {
+        dataTransferManageOutParams({ channelCode: this.channelCode }).then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
-              this.originOutParamsList = data.data
+              // this.originOutParamsList = data.data
               this.getOutParamsEditList(row.id, this.filterAllCata(data.data))
             } else {
-              this.originOutParamsList = data.data
+              // this.originOutParamsList = data.data
               this.outParamsList = this.filterAllCata(data.data)
-              this.$nextTick(() => {
-                this.loading = false
-              })
             }
-            console.log(this.originOutParamsList)
+            // console.log(this.originOutParamsList)
           } else {
             this.outParamsList = []
           }
@@ -568,6 +607,51 @@
           }
         })
       },
+      // mysql 数据源
+      getSqlServerList () {
+        let params = {
+          type: 'sqlServer'
+        }
+        dataTransferManageMysql(params).then(({data}) => {
+          if (data && data.status === '1') {
+            this.sqlServerList = data.data
+          }
+        })
+      },
+      sqlServerChange (val) { // 选中sqlServer时
+        if (this.baseForm.transferType.includes('sqlServer')) {
+          this.getSqlServerDefaultOutParams(this.channelCode, val)
+        }
+      },
+      getSqlServerDefaultOutParams (channelCode, id) { // 选择r3下发数据源时，先判断是否需要指定默认出参
+        defaultOutParams(channelCode, id).then(({data}) => {
+          if (data && data.status === '1') {
+            if (!data.data || !data.data.length) return
+            let out = []
+            this.outParams = []
+            data.data.forEach(item => {
+              out.push(item.value + '-' + item.id)
+              this.outParams.push({value: item.value, id: item.id, sourceTable: item.sourceTable})
+            })
+            this.baseForm.outParams = Array.from(new Set(out))
+            this.outParamsList = this.updateOutParamsList(this.outParamsList)
+            this.isR3DefaultOut = true
+          }
+        })
+      },
+      transferTypeChage (val) { // 选中sqlServer与否
+        if (!this.baseForm.transferType.includes('sqlServer')) { // 取消选中sqlServer时。出参变为可选状态，且清除原有的
+          if (this.isR3DefaultOut) {
+            this.isR3DefaultOut = false
+            this.baseForm.outParams = []
+            this.outParams = []
+          }
+        } else { // 选中时，之前有选择下拉项则直接请求接口数据，获取出参
+          if (this.baseForm.sqlServer != '') {
+            this.getSqlServerDefaultOutParams(this.channelCode, this.baseForm.sqlServer)
+          }
+        }
+      },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
         console.log(this.templateIdList)
@@ -585,10 +669,14 @@
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + '下发任务'
+        // 改变分群名称时，出参及sqlserver选项都初始化，因为他们依赖分群
+        this.getOutParamsList()
         this.baseForm.outParams = []
         this.outParams = []
-        this.outParamsList = this.filterAllCata(this.originOutParamsList)
-        console.log(this.outParamsList, this.originOutParamsList)
+        this.baseForm.sqlServer = ''
+        this.isR3DefaultOut = false
+        // this.outParamsList = this.filterAllCata(this.originOutParamsList)
+        // console.log(this.outParamsList, this.originOutParamsList)
       },
       // 选中出参
       outParamsSelect (node) {
@@ -621,6 +709,13 @@
         })
         return indexListArr
       },
+      // 下发日志
+      viewLog () {
+        this.transferLogVisible = true
+        this.$nextTick(() => {
+          this.$refs.transferLog.init(this.baseForm.id)
+        })
+      },
       // 提交数据格式化
       formatPostData (data, outParams) {
         let postData = {}
@@ -645,6 +740,13 @@
           let tempServer = {
             type: 'mysql',
             id: data.mysqlServer
+          }
+          postData.datasourceParams.push(tempServer)
+        }
+        if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
+          let tempServer = {
+            type: 'sqlServer',
+            id: data.sqlServer
           }
           postData.datasourceParams.push(tempServer)
         }
@@ -741,6 +843,9 @@
                 this.baseForm.topic = item.topic
               } else if (item.type == 'mysql') {
                 this.baseForm.mysqlServer = item.id
+              } else if (item.type == 'sqlServer') {
+                this.baseForm.sqlServer = item.id
+                this.isR3DefaultOut = true
               }
             })
             let tempTime = disData.taskScheduleConfig
@@ -815,6 +920,7 @@
         this.baseForm.kafkaServer = ''
         this.baseForm.topic = ''
         this.baseForm.mysqlServer = ''
+        this.baseForm.sqlServer = ''
         this.baseForm.outParams = []
         this.baseForm.templateId = ''
         this.tag = tag == 'edit' ? '编辑' : '新建'
@@ -830,7 +936,7 @@
           })
         } else {
           this.getCusterList(tag)
-          this.getOutParamsList()
+          // this.getOutParamsList()
           this.$nextTick(() => {
             this.$refs['baseForm'].resetFields()
           })
@@ -843,11 +949,15 @@
       },
       // 保存
       saveHandle () {
+        console.log(this.formatPostData(this.baseForm, this.outParams))
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             let params = this.formatPostData(this.baseForm, this.outParams)
+            console.log(params)
+            this.loading = true
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
+                this.loading = false
                 if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',
@@ -864,6 +974,7 @@
               })
             } else {
               updateDataTransferManage(params).then(({data}) => {
+                this.loading = false
                 if (data && data.status === '1') {
                   this.$message({
                     message: '操作成功',
@@ -966,6 +1077,9 @@
     }
     & .radio-incremodel {
       margin-right: 15px;
+    }
+    & .transfer-log {
+      margin-left: 20px;
     }
   }
 </style>

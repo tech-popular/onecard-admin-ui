@@ -243,7 +243,7 @@ export default {
     // mysql 数据源
     getMysqlServerList () {
       let params = {
-        type: 'mysql'
+        type: ['mysql', 'sqlServer']
       }
       dataTransferManageMysql(params).then(({data}) => {
         if (data && data.status === '1') {
