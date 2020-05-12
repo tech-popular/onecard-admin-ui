@@ -91,15 +91,15 @@
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === true" size="small" >启动</el-tag>
-          <el-tag v-else size="small" type="danger">停止</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" >启用</el-tag>
+          <el-tag v-else size="small" type="danger">禁用</el-tag>
         </template>
       </el-table-column>
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-          <el-button type="success" size="mini" icon="el-icon-open" circle @click="actionOpen(scope.row.id)"></el-button>
-          <el-button type="warning" size="mini" icon="el-icon-turn-off" circle @click="storpOff(scope.row.id)"></el-button>
+          <el-button type="success" size="mini" icon="el-icon-open" v-if="scope.row.status === 0" circle @click="actionOpen(scope.row)"></el-button>
+          <el-button type="warning" size="mini" icon="el-icon-turn-off" v-else circle @click="storpOff(scope.row)"></el-button>
           <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
         </template>
       </el-table-column>
@@ -119,7 +119,7 @@
 
 <script>
   import AddOrUpdate from './metadata-add-or-update'
-  import { beeTaskList, deleteBeeTask, getBeeTaskTypeList } from '@/api/workerBee/metadata'
+  import { beeTaskList, deleteBeeTask, getBeeTaskTypeList, updateStatus } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
@@ -233,6 +233,62 @@
               })
             } else {
               this.$message.error(data.msg)
+            }
+          })
+        })
+      },
+      // 启动
+      actionOpen (val) {
+        console.log(val, 'id,staus')
+  
+        this.$confirm(`确定启用?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          const dataBody = {
+            'id': val.id,
+            'status': 1
+          }
+          updateStatus(dataBody).then(({data}) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.message)
+            }
+          })
+        })
+      },
+      // 禁用
+      storpOff (val) {
+        this.$confirm(`确定禁用?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          const dataBody = {
+            'id': val.id,
+            'status': 0
+          }
+          updateStatus(dataBody).then(({data}) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.message)
             }
           })
         })
