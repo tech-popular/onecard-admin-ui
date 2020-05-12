@@ -25,10 +25,10 @@
       <el-input v-model="dataForm.user" placeholder="任务使用者"/>
     </el-form-item>
     <el-form-item label="入参数据的key的ID集合" prop="inputParams">
-      <el-input v-model="dataForm.inputParams" placeholder="多个参数用英文逗号隔开"/>
+      <el-input v-model="dataForm.inputParams" placeholder="param1,param2(多个参数逗号隔开)"/>
     </el-form-item>
     <el-form-item label="出参数据的key的ID集合" prop="outputParams">
-      <el-input v-model="dataForm.outputParams" placeholder="出参数据的key的ID集合"/>
+      <el-input v-model="dataForm.outputParams" placeholder="result1,result2(多个结果逗号隔开)"/>
     </el-form-item>
     <el-form-item label="所属系统" prop="ownerApp">
       <el-input v-model="dataForm.ownerApp" placeholder="所属系统"/>
@@ -60,7 +60,7 @@
     <metadata-aviator
     v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataAviator"/>
-     <!-- AVIATOR 类型7 -->
+     <!-- FREEMARKER 类型7 -->
     <metadata-freemarke
     v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
@@ -68,6 +68,10 @@
     <metadataHbase
     v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHbase"/>
+    <!-- REDIS 类型9 -->
+    <metadataHbase
+    v-if="dataForm.type == 'REDIS'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataRedis"/>
     </el-form>
    
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
@@ -86,6 +90,7 @@
   import metadataAviator from './metadataSon/metadata-aviator'
   import metadataFreemarke from './metadataSon/metadata-freemarke'
   import metadataHbase from './metadataSon/metadata-hbase'
+  import metadataRedis from './metadataSon/metadata-redis'
 
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   import Filter from './filter'
@@ -161,7 +166,8 @@
       metadataGroovy, // GROOVY
       metadataAviator, // AVIATOR
       metadataFreemarke, // Freemarke
-      metadataHbase // Hbase
+      metadataHbase, // Hbase
+      metadataRedis // Redis
     },
     methods: {
       init (id, value) {

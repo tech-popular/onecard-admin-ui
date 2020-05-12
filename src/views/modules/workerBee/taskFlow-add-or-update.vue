@@ -86,7 +86,15 @@
         </el-select>
       </el-form-item>
       <el-form-item label="子流程ID" prop="subWorkFlow">
-        <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/>
+        <el-select v-model="dataForm.subWorkFlow" placeholder="子流程ID" style="width:100%">
+          <el-option
+            v-for="(item, index) in indexlist"
+            :key="index"
+            :label="item"
+            :value="item">
+          </el-option>
+        </el-select>
+        <!-- <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/> -->
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"/>

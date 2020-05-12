@@ -5,6 +5,14 @@
         <el-input v-model.trim="dataForm.workerBee" placeholder="工作流名称"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
+      <el-form-item label="工作流id">
+        <el-input v-model.trim="dataForm.id" placeholder="工作流名称"
+        onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
+      </el-form-item>
+      <el-form-item label="工作流code">
+        <el-input v-model.trim="dataForm.flowCode" placeholder="工作流名称"
+        onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
@@ -24,7 +32,8 @@
       <el-table-column prop="owner" header-align="center" align="center" label="拥有者"/>
       <el-table-column prop="user" header-align="center" align="center" label="使用者"/>
       <el-table-column prop="createdBy" header-align="center" align="center" label="创建人"/>
-      <el-table-column prop="flowCode" header-align="center" align="center" label="工作流编码"/>
+      <!-- <el-table-column prop="flowCode" header-align="center" align="center" label="工作流编码"/> -->
+      <el-table-column prop="flowCode" header-align="center" align="center" label="工作流code"/>
       <el-table-column prop="inputParameters" header-align="center" align="center" label="工作流入参">
         <template slot-scope="scope">
           <el-tooltip effect="dark" placement="top">
@@ -41,13 +50,13 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="操作">
+      <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-button type="text" @click="clickSketchMap(scope.row.id,scope.row)">预览</el-button>
-          <el-button type="text" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" @click="clickFlowEdit(scope.row.id)">任务关系</el-button>
-          <el-button type="text" style="color:#f56c6c" @click="deleteddialog(scope.row.id)">删除</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-button type="success" size="mini" icon="el-icon-view" circle @click="clickSketchMap(scope.row.id,scope.row)"></el-button>
+          <el-button type="warning" size="mini" icon="el-icon-sort" circle @click="clickFlowEdit(scope.row.id)"></el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
           <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
         </template>
       </el-table-column>
@@ -66,7 +75,9 @@
       @close="handleClosede"
       fullscreen
       style="max-height: 100vh"
+      :show-close="false"
       :visible.sync="visible">
+      <i class="el-icon-back goback" @click="visible = false"></i>
       <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" :list="list" @refreshDataList="getDataList"/>
     </el-dialog>
     <!-- 删除弹窗 -->
@@ -112,7 +123,9 @@
         flowTaskFlowVisible: false,
         flowTaskFlow: false,
         dataForm: {
-          workerBee: ''
+          workerBee: '',
+          id: '',
+          flowCode: ''
         },
         dataList: [],
         dataAllList: {},
@@ -145,7 +158,9 @@
             const dataBody = {
               'pageNum': this.pageNum,
               'pageSize': this.pageSize,
-              'name': this.dataForm.workerBee
+              'name': this.dataForm.workerBee,
+              'id': this.dataForm.id,
+              'flowCode': this.dataForm.flowCode
             }
             workFlowList(dataBody, false).then(({data}) => {
               if (data && data.message === 'success') {
@@ -220,6 +235,8 @@
       resetHandle () {
         this.pageNum = 1
         this.dataForm.workerBee = ''
+        this.dataForm.id = ''
+        this.dataForm.flowCode = ''
         this.getDataList()
       },
       // 取消或关闭流程图弹窗
@@ -247,8 +264,18 @@
   }
 </script>
 <style scoped>
+  .el-button+.el-button{
+    margin: 0 !important;
+  }
   .toZhi {
     line-height: 36px;
     margin-right: 8px;
+  }
+  .goback{
+    position: absolute;
+    right: 50px;
+    top:20px;
+    font-size: 25px;
+    cursor:pointer;
   }
 </style>

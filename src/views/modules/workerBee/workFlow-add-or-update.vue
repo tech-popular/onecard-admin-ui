@@ -23,7 +23,10 @@
       <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
     </el-form-item>
      <el-form-item label="版本" prop="version">
-      <el-input v-model="dataForm.version" placeholder="版本"/>
+        <el-select filterable v-model="dataForm.version" placeholder="请选择">
+          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+        </el-select>
+      <!-- <el-input v-model="dataForm.version" placeholder="版本"/> -->
     </el-form-item>
     <el-form-item label="描述">
       <el-input v-model="dataForm.description" placeholder="描述"/>
@@ -32,7 +35,10 @@
       <el-input v-model="dataForm.createdBy" placeholder="创建人姓名" disabled/>
     </el-form-item>
     <el-form-item label="归属系统" prop="ownerApp">
-      <el-input v-model="dataForm.ownerApp" placeholder="归属系统"/>
+        <el-select filterable v-model="dataForm.ownerApp" placeholder="请选择">
+          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+        </el-select>
+      <!-- <el-input v-model="dataForm.ownerApp" placeholder="归属系统"/> -->
     </el-form-item>
     <el-form-item label="是否重试">
       <el-radio-group v-model="dataForm.restartable">

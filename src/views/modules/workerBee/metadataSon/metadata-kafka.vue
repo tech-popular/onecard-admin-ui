@@ -5,7 +5,7 @@
           <el-input v-model="fatherData.topic" placeholder="请输入topic"/>
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields">
-          <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
+          <el-input v-model="fatherData.requestFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="是否启用">
           <el-radio-group v-model="fatherData.enable">
