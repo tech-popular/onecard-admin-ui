@@ -123,7 +123,9 @@
         flowTaskFlowVisible: false,
         flowTaskFlow: false,
         dataForm: {
-          workerBee: ''
+          workerBee: '',
+          id: '',
+          flowCode: ''
         },
         dataList: [],
         dataAllList: {},
@@ -156,7 +158,9 @@
             const dataBody = {
               'pageNum': this.pageNum,
               'pageSize': this.pageSize,
-              'name': this.dataForm.workerBee
+              'name': this.dataForm.workerBee,
+              'id': this.dataForm.id,
+              'flowCode': this.dataForm.flowCode
             }
             workFlowList(dataBody, false).then(({data}) => {
               if (data && data.message === 'success') {
@@ -231,6 +235,8 @@
       resetHandle () {
         this.pageNum = 1
         this.dataForm.workerBee = ''
+        this.dataForm.id = ''
+        this.dataForm.flowCode = ''
         this.getDataList()
       },
       // 取消或关闭流程图弹窗
