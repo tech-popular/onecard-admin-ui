@@ -10,7 +10,6 @@
               :value="item.id">
             </el-option>
           </el-select>
-        <!-- <el-input autosize v-model="fatherData.redisDataSourceId" placeholder="请输入数据源ID"/> -->
         </el-form-item>
         <el-form-item label="redis数据类型" prop="dataType">
           <el-select v-model="fatherData.dataType" placeholder="请选择">
@@ -69,7 +68,7 @@
           label: 'map'
         }, {
           value: 'list',
-          label: 'list,'
+          label: 'list'
         }, {
           value: 'zset',
           label: 'zset'

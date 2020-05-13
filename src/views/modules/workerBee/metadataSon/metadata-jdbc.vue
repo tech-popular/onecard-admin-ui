@@ -4,11 +4,15 @@
         <el-form-item label="sql" prop="sql" :rules="dataRule.sql">
         <el-input type="textarea" autosize v-model="fatherData.sql" placeholder="请输入sql"/>
         </el-form-item>
-        <el-form-item label="数据源id" prop="datasourceId">
-          <el-select filterable v-model="fatherData.datasourceId" placeholder="请选择">
-            <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+        <el-form-item label="数据源ID" prop="datasourceId">
+          <el-select v-model="fatherData.datasourceId" filterable placeholder="请输入datasourceName">
+            <el-option
+              v-for="item in dataidlist"
+              :key="item.id"
+              :label="item.datasourceName"
+              :value="item.id">
+            </el-option>
           </el-select>
-        <!-- <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/> -->
         </el-form-item>
         <el-form-item label="is_query" prop="isQuery">
           <el-radio-group v-model="fatherData.isQuery">
@@ -56,6 +60,8 @@
 
 <script>
   import Filter from '../filter'
+  import { getAllDataSourceByType } from '@/api/workerBee/metadata'
+
   export default {
     props: [
       'hideVisibleClick',
@@ -85,8 +91,22 @@
           cacheKeyFields: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
-        }
+        },
+        dataidlist: [],
+        intlist: {}
       }
+    },
+    mounted () {
+      this.intlist = this.$parent.$parent.$parent.fatherData
+      const dataBody = {
+        type: this.intlist.type,
+        name: this.fatherData.redisDataSourceId
+      }
+      getAllDataSourceByType(dataBody).then(({data}) => {
+        if (data && data.status === 0) {
+          this.dataidlist = data.data
+        }
+      })
     },
     methods: {
       cancel () {
