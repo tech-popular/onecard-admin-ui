@@ -24,7 +24,7 @@
     </el-form-item>
      <el-form-item label="版本" prop="version">
         <el-select filterable v-model="dataForm.version" placeholder="请选择">
-          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+          <el-option v-for="item in versionList" :value="item.id" :key="item.value" :label="item.id"/>
         </el-select>
       <!-- <el-input v-model="dataForm.version" placeholder="版本"/> -->
     </el-form-item>
@@ -115,7 +115,10 @@
             { required: true, validator: Filter.FlowCode, trigger: 'change' }
           ]
         },
-        updateId: ''
+        updateId: '',
+        versionList: [
+          {id: '1.0', value: '1.0'}
+        ]
       }
     },
     components: {
