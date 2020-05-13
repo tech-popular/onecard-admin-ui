@@ -19,9 +19,16 @@
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
         <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
-        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
-        <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
-        </el-form-item>
+        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType"> 
+          <el-select v-model="fatherData.responseType" placeholder="请选择响应参数的数据类型">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+         </el-form-item>
         <el-form-item label="是否使用缓存">
           <el-radio-group v-model="fatherData.enableCache">
             <el-radio :label="0">不启用</el-radio>
@@ -71,7 +78,14 @@
           cacheKeyFields: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
-        }
+        },
+        options: [{
+          value: 'map',
+          label: 'map'
+        }, {
+          value: 'list',
+          label: 'list'
+        }]
       }
     },
     methods: {

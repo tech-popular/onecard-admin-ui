@@ -4,7 +4,7 @@
         <el-form-item label="sql" prop="sql" :rules="dataRule.sql">
         <el-input type="textarea" autosize v-model="fatherData.sql" placeholder="请输入sql"/>
         </el-form-item>
-        <el-form-item label="数据源ID" prop="datasourceId">
+        <el-form-item label="数据源ID" prop="datasourceId" :rules="dataRule.datasourceId">
           <el-select v-model="fatherData.datasourceId" filterable placeholder="请输入datasourceName">
             <el-option
               v-for="item in dataidlist"
@@ -27,7 +27,15 @@
         <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType">
-        <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
+          <el-select v-model="fatherData.responseType" placeholder="请选择响应参数的数据类型">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        <!-- <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/> -->
         </el-form-item>
         <el-form-item label="是否使用缓存">
           <el-radio-group v-model="fatherData.enableCache">
@@ -86,14 +94,21 @@
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           datasourceId: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择数据源ID', trigger: 'blur' }
           ],
           cacheKeyFields: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },
         dataidlist: [],
-        intlist: {}
+        intlist: {},
+        options: [{
+          value: 'map',
+          label: 'map'
+        }, {
+          value: 'list',
+          label: 'list'
+        }]
       }
     },
     mounted () {
