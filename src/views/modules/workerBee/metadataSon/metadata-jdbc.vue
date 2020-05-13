@@ -15,7 +15,6 @@
             <el-radio :label="0">是</el-radio>
             <el-radio :label="1">否</el-radio>
           </el-radio-group>
-        <!-- <el-input v-model="fatherData.isQuery" placeholder="is_query"/> -->
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>

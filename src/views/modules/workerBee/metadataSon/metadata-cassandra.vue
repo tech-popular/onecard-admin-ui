@@ -7,9 +7,15 @@
         <el-form-item label="数据源id" prop="datasourceId" :rules="dataRule.datasourceId">
         <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
         </el-form-item>
-        <el-form-item label="is_query" prop="isQuery" :rules="dataRule.isQuery">
-        <el-input v-model="fatherData.isQuery" placeholder="is_query"/>
+        <el-form-item label="is_query" prop="isQuery">
+          <el-radio-group v-model="fatherData.isQuery">
+            <el-radio :label="0">是</el-radio>
+            <el-radio :label="1">否</el-radio>
+          </el-radio-group>
         </el-form-item>
+        <!-- <el-form-item label="is_query" prop="isQuery" :rules="dataRule.isQuery">
+        <el-input v-model="fatherData.isQuery" placeholder="is_query"/>
+        </el-form-item> -->
         <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
         </el-form-item>
