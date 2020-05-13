@@ -6,7 +6,7 @@
       <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
     </el-form-item>
     <el-form-item label="任务类型" prop="type" v-if="dataForm.id">
-      <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()' disabled>
+      <el-select filterable v-model="dataForm.type" placeholder="请选择" disabled>
         <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
       </el-select>
     </el-form-item>
@@ -69,7 +69,7 @@
     v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHbase"/>
     <!-- REDIS 类型9 -->
-    <metadataHbase
+    <metadataRedis
     v-if="dataForm.type == 'REDIS'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataRedis"/>
     </el-form>
@@ -154,7 +154,9 @@
           enableCache: 1,
           parsTemplate: false,
           requestFieldType: 0,
-          requestParamTemplateStatus: 0
+          isQuery: 1,
+          requestParamTemplateStatus: 0,
+          type: ''
         }
       }
     },
@@ -210,6 +212,8 @@
           enableCache: 1,
           parsTemplate: false,
           requestFieldType: 0,
+          isQuery: 1,
+          type: this.dataForm.type,
           requestParamTemplateStatus: 0
         }
       },
@@ -243,7 +247,8 @@
               'groovy': null,
               'aviator': null,
               'freemarker': null,
-              'hbase': null
+              'hbase': null,
+              'redis': null
             }
             if (form) {
               for (let key in data) {
@@ -273,7 +278,7 @@
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             })
           }

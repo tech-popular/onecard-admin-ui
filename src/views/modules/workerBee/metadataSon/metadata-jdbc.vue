@@ -4,18 +4,21 @@
         <el-form-item label="sql" prop="sql" :rules="dataRule.sql">
         <el-input type="textarea" autosize v-model="fatherData.sql" placeholder="请输入sql"/>
         </el-form-item>
-        <el-form-item label="数据源id" prop="datasourceId">
-          <el-select filterable v-model="fatherData.datasourceId" placeholder="请选择">
-            <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+        <el-form-item label="数据源ID" prop="datasourceId" :rules="dataRule.datasourceId">
+          <el-select v-model="fatherData.datasourceId" filterable placeholder="请输入datasourceName">
+            <el-option
+              v-for="item in dataidlist"
+              :key="item.id"
+              :label="item.datasourceName"
+              :value="item.id">
+            </el-option>
           </el-select>
-        <!-- <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/> -->
         </el-form-item>
         <el-form-item label="is_query" prop="isQuery">
           <el-radio-group v-model="fatherData.isQuery">
             <el-radio :label="0">是</el-radio>
             <el-radio :label="1">否</el-radio>
           </el-radio-group>
-        <!-- <el-input v-model="fatherData.isQuery" placeholder="is_query"/> -->
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields">
         <el-input v-model="fatherData.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
@@ -24,7 +27,15 @@
         <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType">
-        <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
+          <el-select v-model="fatherData.responseType" placeholder="请选择响应参数的数据类型">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        <!-- <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/> -->
         </el-form-item>
         <el-form-item label="是否使用缓存">
           <el-radio-group v-model="fatherData.enableCache">
@@ -57,6 +68,8 @@
 
 <script>
   import Filter from '../filter'
+  import { getAllDataSourceByType } from '@/api/workerBee/metadata'
+
   export default {
     props: [
       'hideVisibleClick',
@@ -81,13 +94,34 @@
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           datasourceId: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择数据源ID', trigger: 'blur' }
           ],
           cacheKeyFields: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
-        }
+        },
+        dataidlist: [],
+        intlist: {},
+        options: [{
+          value: 'map',
+          label: 'map'
+        }, {
+          value: 'list',
+          label: 'list'
+        }]
       }
+    },
+    mounted () {
+      this.intlist = this.$parent.$parent.$parent.fatherData
+      const dataBody = {
+        type: this.intlist.type,
+        name: this.fatherData.redisDataSourceId
+      }
+      getAllDataSourceByType(dataBody).then(({data}) => {
+        if (data && data.status === 0) {
+          this.dataidlist = data.data
+        }
+      })
     },
     methods: {
       cancel () {
