@@ -69,7 +69,7 @@
     v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHbase"/>
     <!-- REDIS 类型9 -->
-    <metadataHbase
+    <metadataRedis
     v-if="dataForm.type == 'REDIS'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataRedis"/>
     </el-form>
@@ -154,7 +154,9 @@
           enableCache: 1,
           parsTemplate: false,
           requestFieldType: 0,
-          requestParamTemplateStatus: 0
+          isQuery: 1,
+          requestParamTemplateStatus: 0,
+          type: ''
         }
       }
     },
@@ -210,6 +212,8 @@
           enableCache: 1,
           parsTemplate: false,
           requestFieldType: 0,
+          isQuery: 1,
+          type: this.dataForm.type,
           requestParamTemplateStatus: 0
         }
       },
@@ -243,7 +247,8 @@
               'groovy': null,
               'aviator': null,
               'freemarker': null,
-              'hbase': null
+              'hbase': null,
+              'redis': null
             }
             if (form) {
               for (let key in data) {
