@@ -8,7 +8,7 @@
   >
     <el-divider>请选择申请类别</el-divider>
     <el-tabs type="border-card">
-      <!-- <el-tab-pane label="账号权限">
+      <el-tab-pane label="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
           <el-form-item label="标题" prop="name">
@@ -28,7 +28,7 @@
               :options="systemmodelList">
             </el-cascader>
           </el-form-item>
-          <!-- <el-form-item label="申请权限" prop="jurisdictionvalue">
+          <el-form-item label="申请权限" prop="jurisdictionvalue">
             <el-checkbox-group v-model="dataForm.jurisdictionvalue">
               <el-checkbox
                 v-for="(item, index) in applyAuthList"
@@ -36,7 +36,7 @@
                 :key="index"
               >{{item.name}}</el-checkbox>
             </el-checkbox-group>
-          </el-form-item> -->
+          </el-form-item>
           <el-form-item label="申请人姓名">
             <el-input v-model="dataForm.userName" placeholder="申请人姓名" disabled/>
           </el-form-item>
@@ -65,7 +65,7 @@
           <el-button @click="applyDataFormCancel()">取消</el-button>
           <el-button type="primary" @click="dataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
-      </el-tab-pane> -->
+      </el-tab-pane>
       <el-tab-pane label="库表授权">
         <el-form
           :model="severDataForm"
