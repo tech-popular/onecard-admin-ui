@@ -5,12 +5,12 @@
         <el-input v-model.trim="dataForm.workerBee" placeholder="工作流名称"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
-      <el-form-item label="工作流id">
-        <el-input v-model.trim="dataForm.id" placeholder="工作流名称"
+      <el-form-item label="工作流ID">
+        <el-input v-model.trim="dataForm.id" placeholder="工作流ID"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
-      <el-form-item label="工作流code">
-        <el-input v-model.trim="dataForm.flowCode" placeholder="工作流名称"
+      <el-form-item label="工作流CODE">
+        <el-input v-model.trim="dataForm.flowCode" placeholder="工作流CODE"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
       <el-form-item>

@@ -20,7 +20,7 @@
       <el-table-column prop="sysCode" header-align="center" align="center" label="归属系统编码"/>
 
       <el-table-column prop="creator" header-align="center" align="center" label="创建者"/>
-      <el-table-column prop="update" header-align="center" align="center" label="最近更新"/>
+      <el-table-column prop="update" header-align="center" align="center" label="最近更新者"/>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"/>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最近更新时间"/>
       <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
@@ -57,7 +57,7 @@
 
 <script>
   import AddOrUpdate from './ascription-add-or-update'
-  import { workFlowList, deleteWorkFlow } from '@/api/workerBee/workFlow'
+  import { sysManagerList, deleteBeeTask } from '@/api/workerBee/ascription'
 
   export default {
     data () {
@@ -99,11 +99,10 @@
             const dataBody = {
               'pageNum': this.pageNum,
               'pageSize': this.pageSize,
-              'name': this.dataForm.workerBee,
-              'id': this.dataForm.id,
-              'flowCode': this.dataForm.flowCode
+              'sysName': this.dataForm.sysName,
+              'sysCode': this.dataForm.sysCode
             }
-            workFlowList(dataBody, false).then(({data}) => {
+            sysManagerList(dataBody, false).then(({data}) => {
               if (data && data.message === 'success') {
                 this.dataList = data.data.list
                 this.totalPage = data.data.totalCount
@@ -131,7 +130,7 @@
       // 删除
       deleted () {
         const dataBody = this.deletedId
-        deleteWorkFlow(dataBody, false).then(({data}) => {
+        deleteBeeTask(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.deleteVisible = false
             this.getDataList()
@@ -146,9 +145,8 @@
       /** 重置 */
       resetHandle () {
         this.pageNum = 1
-        this.dataForm.workerBee = ''
-        this.dataForm.id = ''
-        this.dataForm.flowCode = ''
+        this.dataForm.sysName = ''
+        this.dataForm.sysCode = ''
         this.getDataList()
       },
       // 每页数

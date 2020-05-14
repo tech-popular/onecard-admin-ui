@@ -26,13 +26,20 @@
 </template>
 
 <script>
-  import { saveWorkFlow } from '@/api/workerBee/workFlow'
+  import { saveorupt } from '@/api/workerBee/ascription'
   import Filter from './filter'
   export default {
     data () {
       return {
         visible: false,
-        dataForm: {},
+        dataForm: {
+          sysName: '',
+          sysCode: '',
+          remark: '',
+          creator: '',
+          update: ''
+        },
+
         dataRule: {
           sysName: [
             { required: true, message: '归属系统名称不能为空', trigger: 'blur' },
@@ -57,7 +64,15 @@
         }
       }
     },
-    components: {},
+    mounted () {
+      this.dataForm.creator = this.$store.state.user.name
+      this.dataForm.update = this.$store.state.user.name
+    },
+    components: {
+      userName: {
+        get () { return this.$store.state.user.name }
+      }
+    },
     methods: {
       init (id) {
         this.updateId = id
@@ -74,7 +89,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            saveWorkFlow(this.dataForm).then(({data}) => {
+            saveorupt(this.dataForm).then(({data}) => {
               if (data && data.message === 'success') {
                 this.$message({
                   message: '操作成功',
@@ -83,9 +98,6 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
-                    this.dataForm.description = ''
-                    this.dataForm.createdBy = ''
-                    this.dataForm.ownerApp = ''
                   }
                 })
               } else {
