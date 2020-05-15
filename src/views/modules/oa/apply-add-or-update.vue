@@ -28,7 +28,7 @@
               :options="systemmodelList">
             </el-cascader>
           </el-form-item>
-          <el-form-item label="申请权限" prop="jurisdictionvalue">
+          <!-- <el-form-item label="申请权限" prop="jurisdictionvalue">
             <el-checkbox-group v-model="dataForm.jurisdictionvalue">
               <el-checkbox
                 v-for="(item, index) in applyAuthList"
@@ -36,7 +36,7 @@
                 :key="index"
               >{{item.name}}</el-checkbox>
             </el-checkbox-group>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="申请人姓名">
             <el-input v-model="dataForm.userName" placeholder="申请人姓名" disabled/>
           </el-form-item>
@@ -473,6 +473,7 @@ export default {
     },
     // 账号选中系统数据处理
     testFunction (value) {
+      this.systemmodelList = []
       if (value === 2 || value === 3) {
         this.isShow = false
       } else {
