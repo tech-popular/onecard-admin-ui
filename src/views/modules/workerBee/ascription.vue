@@ -64,22 +64,15 @@
       return {
         visible: false,
         deleteVisible: false,
-        visibleEdit: false,
-        flowTaskFlowVisible: false,
-        flowTaskFlow: false,
         dataForm: {
-          workerBee: '',
-          id: '',
-          flowCode: ''
+          sysName: '',
+          sysCode: ''
         },
         dataList: [],
-        workerBee: '',
-        list: '',
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
         totalPage: 0,
         dataListLoading: false,
-        sketchMap: false,
         addOrUpdateVisible: false,
         deletedId: ''
       }
