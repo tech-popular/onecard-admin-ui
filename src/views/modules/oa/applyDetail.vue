@@ -51,14 +51,14 @@
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <el-form-item label="本次申请默认审批人">
+        <!-- <el-form-item label="本次申请默认审批人">
           <el-tag
             style="margin-left:10px;"
             v-for="tag in detalList.defaultApproverList"
             :key="tag.name"
             :type="tag.name"
           >{{tag.name}}</el-tag>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
@@ -113,14 +113,14 @@
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <el-form-item label="本次申请默认审批人">
+        <!-- <el-form-item label="本次申请默认审批人">
           <el-tag
             style="margin-left:10px;"
             v-for="tag in detalList.defaultApproverList"
             :key="tag.name"
             :type="tag.name"
           >{{tag.name}}</el-tag>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
