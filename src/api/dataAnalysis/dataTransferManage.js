@@ -14,5 +14,5 @@ export const dataTransferManageOutParams = params => httpGetSeries(da + 'dataCat
 export const dataTransferManageOutParamsEdit = (id) => httpGet(da + `dataTransferOutParams/outParams/${id}`) // 修改回显时查询出参
 export const dataTransferManageKafka = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // kafka地址
 export const dataTransferManageMysql = (params) => httpGetSeries(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
-export const defaultOutParams = (channelCode, datasourceId) => httpGet(da + `dataTransfer/out/default/channel/datasource/${datasourceId}`, channelCode) // 渠道多选，传参方式改变
+export const defaultOutParams = (channelCode, datasourceId) => httpGetSeries(da + `dataTransfer/out/default/channel/datasource/${datasourceId}`, channelCode) // 渠道多选，传参方式改变
 export const r3Log = params => httpPost(da + 'r3log/list', params)

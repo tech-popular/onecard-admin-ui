@@ -547,7 +547,8 @@
       },
       // 获取分群出参 指标列表
       getOutParamsList (row) {
-        dataTransferManageOutParams({ channelCode: this.channelCode }).then(({data}) => {
+        let code = this.channelCode.split(',').filter(item => item !== '')
+        dataTransferManageOutParams({ channelCode: code }).then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
               // this.originOutParamsList = data.data
@@ -620,7 +621,8 @@
       },
       sqlServerChange (val) { // 选中sqlServer时
         if (this.baseForm.transferType.includes('sqlServer')) {
-          this.getSqlServerDefaultOutParams({channelCode: this.channelCode}, val) // 渠道多选后，传参方式改变
+          let code = this.channelCode.split(',').filter(item => item !== '')
+          this.getSqlServerDefaultOutParams({channelCode: code}, val) // 渠道多选后，传参方式改变
         }
       },
       getSqlServerDefaultOutParams (channelCode, id) { // 选择r3下发数据源时，先判断是否需要指定默认出参

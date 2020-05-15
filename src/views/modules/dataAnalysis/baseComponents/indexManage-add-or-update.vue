@@ -260,6 +260,7 @@
           this.$refs['dataForm'].resetFields()
           if (row) {
             this.dataForm = deepClone(row)
+            this.dataForm.channelCode = this.dataForm.channelCode.split(',').filter(item => item !== '')
             if (row.remark === null) {
               this.dataForm.remark = ''
             }
@@ -285,6 +286,7 @@
             } else {
               this.dataForm.enable = false
             }
+            this.dataForm.channelCode = this.dataForm.channelCode.join(',')
             if (!this.dataForm.id) {
               addIndexManage(this.dataForm).then(({data}) => {
                 if (data && data.status === '1') {
