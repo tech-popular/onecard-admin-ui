@@ -26,7 +26,6 @@
         <el-select filterable v-model="dataForm.version" placeholder="请选择">
           <el-option v-for="item in versionList" :value="item.id" :key="item.value" :label="item.id"/>
         </el-select>
-      <!-- <el-input v-model="dataForm.version" placeholder="版本"/> -->
     </el-form-item>
     <el-form-item label="描述">
       <el-input v-model="dataForm.description" placeholder="描述"/>
@@ -36,9 +35,8 @@
     </el-form-item>
     <el-form-item label="归属系统" prop="ownerApp">
         <el-select filterable v-model="dataForm.ownerApp" placeholder="请选择">
-          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+          <el-option v-for="item in ownerAppList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
         </el-select>
-      <!-- <el-input v-model="dataForm.ownerApp" placeholder="归属系统"/> -->
     </el-form-item>
     <el-form-item label="是否重试">
       <el-radio-group v-model="dataForm.restartable">
@@ -46,9 +44,6 @@
           <el-radio :label="1">重试</el-radio>
         </el-radio-group>
     </el-form-item>
-    <!-- <el-form-item label="Tasks">
-      <el-input v-model="dataForm.tasks" placeholder="Tasks"/>
-    </el-form-item> -->
     </el-form>
     <span slot="footer">
       <el-button @click="datano()">取消</el-button>
@@ -118,7 +113,8 @@
         updateId: '',
         versionList: [
           {id: '1.0', value: '1.0'}
-        ]
+        ],
+        ownerAppList: []
       }
     },
     components: {

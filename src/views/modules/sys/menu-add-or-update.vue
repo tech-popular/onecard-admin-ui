@@ -241,6 +241,7 @@
       max-height: 180px;
       padding: 0;
       margin: -8px 0 0 -8px;
+      overflow: auto;
       > .el-button {
         padding: 8px;
         margin: 8px 0 0 8px;
