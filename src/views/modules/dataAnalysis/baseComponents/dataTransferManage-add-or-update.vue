@@ -620,7 +620,7 @@
       },
       sqlServerChange (val) { // 选中sqlServer时
         if (this.baseForm.transferType.includes('sqlServer')) {
-          this.getSqlServerDefaultOutParams(this.channelCode, val)
+          this.getSqlServerDefaultOutParams({channelCode: this.channelCode}, val) // 渠道多选后，传参方式改变
         }
       },
       getSqlServerDefaultOutParams (channelCode, id) { // 选择r3下发数据源时，先判断是否需要指定默认出参

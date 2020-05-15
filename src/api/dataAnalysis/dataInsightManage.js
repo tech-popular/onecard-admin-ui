@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { httpGet, httpPost, httpPostFile, httpPut, httpDelete } from '@/api'
+import { httpGet, httpGetSeries, httpPost, httpPostFile, httpPut, httpDelete } from '@/api'
 import http from '@/utils/httpRequest'
 // let da = '/dataAnalysis/'
 let da = '/'
@@ -7,7 +7,7 @@ let da = '/'
 // 元数据管理任务模块
 export const dataInsightManageList = params => httpGet(da + 'data/group/listOnPage', params) // 查询数据API列表并分页
 export const selectOperate = params => httpGet(da + `common/select/operators/${params}`) // 获取操作符
-export const selectAllCata = params => httpGet(da + 'dataCatalog/selectAllCata', params) // 加载目录树接口
+export const selectAllCata = params => httpGetSeries(da + 'dataCatalog/selectAllCata', params) // 加载目录树接口
 export const enumTypeList = type => httpGet(da + `dataEnumType/selectByTypeNum/${type}`) // 获取枚举数据
 export const savaDataInfo = params => httpPost(da + 'data/group/info', params) // 新增保存
 export const updateDataInfo = params => httpPut(da + 'data/group/info', params) // 编辑保存
