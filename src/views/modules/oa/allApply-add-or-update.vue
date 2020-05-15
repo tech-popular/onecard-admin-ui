@@ -32,7 +32,7 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-        <el-form-item label="申请权限">
+        <!-- <el-form-item label="申请权限">
           <el-checkbox-group v-model="checkedCities">
             <el-checkbox
               disabled
@@ -41,7 +41,7 @@
               :key="item.id"
             >{{item.name}}</el-checkbox>
           </el-checkbox-group>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="申请事由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
@@ -139,20 +139,23 @@ export default {
       this.dialogVisible = true
       lookAccout(val.id).then(({data}) => {
         this.detalList = data.data
-        let a = [{selected: true}]
-        let b = this.detalList.systemList
-        let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
-        this.sysment = arr
-        this.sysment.map(item => {
-          this.systemListcarrent = item.value
-        })
-        let c = [{selected: true}]
-        let d = this.detalList.applyAuthTypeList
-        let arr2 = [...d].filter(x => [...c].some(y => y.selected === x.selected))
-        this.checkedCities = arr2
-        this.checkedCities.map(item => {
-          this.checkedCities.push(item.name)
-        })
+        if (this.quanxian === '账号权限') {
+          let a = [{selected: true}]
+          let b = this.detalList.systemList
+          let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
+          this.sysment = arr
+          this.sysment.map(item => {
+            this.systemListcarrent = item.value
+          })
+        } else {
+          let c = [{selected: true}]
+          let d = this.detalList.applyAuthTypeList
+          let arr2 = [...d].filter(x => [...c].some(y => y.selected === x.selected))
+          this.checkedCities = arr2
+          this.checkedCities.map(item => {
+            this.checkedCities.push(item.name)
+          })
+        }
       })
     },
 

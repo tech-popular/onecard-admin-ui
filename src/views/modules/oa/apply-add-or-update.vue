@@ -28,7 +28,7 @@
               :options="systemmodelList">
             </el-cascader>
           </el-form-item>
-          <el-form-item label="申请权限" prop="jurisdictionvalue">
+          <!-- <el-form-item label="申请权限" prop="jurisdictionvalue">
             <el-checkbox-group v-model="dataForm.jurisdictionvalue">
               <el-checkbox
                 v-for="(item, index) in applyAuthList"
@@ -36,7 +36,7 @@
                 :key="index"
               >{{item.name}}</el-checkbox>
             </el-checkbox-group>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="申请人姓名">
             <el-input v-model="dataForm.userName" placeholder="申请人姓名" disabled/>
           </el-form-item>
@@ -225,6 +225,7 @@
   </el-dialog>
 </template>
 
+
 <script>
 import {
   getListOnPage,
@@ -267,7 +268,7 @@ export default {
       // 账号权限开始
       systemList: [], // 申请系统数据载体
       systemmodelList: [], // 申请系统模块数据载体
-      applyAuthList: [], // 申请权限数据载体
+      // applyAuthList: [], // 申请权限数据载体
       props: {
         multiple: true
         // checkStrictly: true
@@ -280,7 +281,7 @@ export default {
         name: '', // 标题
         system: '', // 申请系统
         systemmodel: '', // 申请系统模块
-        jurisdictionvalue: [], // 申请权限
+        // jurisdictionvalue: [], // 申请权限
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
@@ -295,9 +296,9 @@ export default {
         systemmodel: [
           { required: true, message: '请选择申请系统模块', trigger: 'blur' }
         ],
-        jurisdictionvalue: [
-          { required: true, message: '请选择申请权限', trigger: 'blur' }
-        ],
+        // jurisdictionvalue: [
+        //   { required: true, message: '请选择申请权限', trigger: 'blur' }
+        // ],
         // userName: [
         //   { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
         // ],
@@ -390,7 +391,7 @@ export default {
         accoutAuthInitInfo().then(({ data }) => {
           this.systemList = data.data.systemList
           this.systemmodelList = data.data.systemList
-          this.applyAuthList = data.data.applyAuthList
+          // this.applyAuthList = data.data.applyAuthList
           this.defaultApproverList = data.data.defaultApproverList
           this.departmentList = data.data.departmentList
           this.dataForm.userName = data.data.applicantName
@@ -445,8 +446,8 @@ export default {
             applicantTel: this.dataForm.phone,
             applyReason: this.dataForm.reason,
             systemId: this.dataForm.system,
-            menuList: this.dataForm.systemmodel,
-            applyAuthTypeList: this.dataForm.jurisdictionvalue
+            menuList: this.dataForm.systemmodel
+            // applyAuthTypeList: this.dataForm.jurisdictionvalue
           }
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {
@@ -463,7 +464,7 @@ export default {
                 }
               })
             } else {
-              this.$message.error(data.msg)
+              this.$message.error(data.message)
               this.buttonloading = false
             }
           })
