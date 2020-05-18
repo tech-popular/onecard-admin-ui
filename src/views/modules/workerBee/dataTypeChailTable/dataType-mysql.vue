@@ -20,8 +20,8 @@
       <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
       <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-          <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
+          <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="charleId(scope.row.id)"></el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deletedId(scope.row.id)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -39,6 +39,12 @@
       }
     },
     methods: {
+      charleId (addOrUpdateHandle) {
+        this.$emit('addOrUpdateHandle', addOrUpdateHandle)
+      },
+      deletedId (deleteddialog) {
+        this.$emit('deleteddialog', deleteddialog)
+      }
     }
   }
 </script>
