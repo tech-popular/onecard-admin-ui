@@ -20,7 +20,7 @@
               <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 用户所属渠道
-                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable :disabled="!!id">
+                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable multiple :disabled="!!id" style="width: 400px">
                   <template v-for="(item, index) in channelList">
                     <el-option :key="index" :label="item.text" :value="item.value"></el-option>
                   </template>
@@ -32,7 +32,7 @@
             </div>
           </el-form-item>
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
-            <el-select v-model="baseForm.channelId" :disabled="!!id">
+            <el-select v-model="baseForm.channelId" :disabled="!!id" multiple style="width: 300px">
               <template v-for="(item, index) in channelList">
                 <el-option :key="index" :label="item.text" :value="item.value"></el-option>
               </template>
@@ -158,7 +158,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: '2001',
+        channelId: ['2001'],
         desc: ''
       },
       rejectForm: {
@@ -223,7 +223,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: '2001',
+        channelId: ['2001'],
         desc: ''
       }
       this.ruleConfig = { // 规则数据
@@ -250,9 +250,9 @@ export default {
             name: data.data.name,
             desc: data.data.desc,
             userType: data.data.userType,
-            channelId: data.data.channelId,
             type: data.data.type
           }
+          this.baseForm.channelId = data.data.channelId.split(',').filter(item => item != '')
           // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
           this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
@@ -796,7 +796,7 @@ export default {
             data.append('type', this.baseForm.type)
             data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
-            data.append('channelId', this.baseForm.channelId)
+            data.append('channelId', this.baseForm.channelId.join(','))
             data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
             this.rejectForm.rejectGroupPackageIds.forEach(item => {
               data.append('rejectGroupPackageIds', item)
@@ -875,6 +875,7 @@ export default {
             return
           }
           params.vestPackCode = params.vestPackCode.join(',')
+          params.channelId = params.channelId.join(',')
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
