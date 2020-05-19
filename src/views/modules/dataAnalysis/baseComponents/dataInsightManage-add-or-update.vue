@@ -32,9 +32,9 @@
             </div>
           </el-form-item>
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
-            <el-select v-model="baseForm.channelId" :disabled="!!id" multiple style="width: 300px">
+            <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px">
               <template v-for="(item, index) in channelList">
-                <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
+                <el-option :key="index" :label="item.text" :value="item.value"></el-option>
               </template>
             </el-select>
             <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
@@ -252,7 +252,6 @@ export default {
             userType: data.data.userType,
             type: data.data.type
           }
-          this.baseForm.channelId = data.data.channelId.split(',').filter(item => item != '')
           // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
           this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
@@ -262,9 +261,11 @@ export default {
           }
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
+            this.baseForm.channelId = data.data.channelId
             this.loading = false
             return
           }
+          this.baseForm.channelId = data.data.channelId.split(',').filter(item => item != '')
           if (!data.data.configJson) {
             this.initEmptyData()
             this.loading = false
@@ -826,7 +827,7 @@ export default {
             data.append('type', this.baseForm.type)
             data.append('userType', this.baseForm.userType)
             data.append('desc', this.baseForm.desc)
-            data.append('channelId', this.baseForm.channelId.join(','))
+            data.append('channelId', this.baseForm.channelId)
             data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
             this.rejectForm.rejectGroupPackageIds.forEach(item => {
               data.append('rejectGroupPackageIds', item)
