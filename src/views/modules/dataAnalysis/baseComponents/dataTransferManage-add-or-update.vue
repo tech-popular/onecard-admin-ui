@@ -622,6 +622,9 @@
       sqlServerChange (val) { // 选中sqlServer时
         if (this.baseForm.transferType.includes('sqlServer')) {
           let code = this.channelCode.split(',').filter(item => item !== '')
+          if (code.includes('2001') && !code.includes('1001')) { // 商城渠道时，把万卡渠道也传过去
+            code.push('1001')
+          }
           this.getSqlServerDefaultOutParams({channelCode: code}, val) // 渠道多选后，传参方式改变
         }
       },
