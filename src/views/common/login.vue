@@ -269,6 +269,7 @@ export default {
           loginIn(params, url).then(({ data }) => {
             if (data && data.code === 0) {
               this.$cookie.set('token', data.token)
+              localStorage.setItem('test', '12345')
               this.$router.replace({ name: 'home' })
             } else {
               this.getCaptcha()
