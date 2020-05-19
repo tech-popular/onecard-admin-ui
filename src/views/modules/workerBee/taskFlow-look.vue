@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="renwuId ? '修改任务关系' : '新增任务关系'" @close="taskDialgClose" :visible.sync="visible">
+  <el-dialog :title="dataForm.taskId ? '修改任务关系' : '新增任务关系'" @close="taskDialgClose" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
       <el-form-item label="工作流Id">
         <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
@@ -88,7 +88,7 @@
       <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'DECISION' || zirenwucarent === 'FOR_EACH'">
         <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
           <el-option
-            v-for="(item) in renwuindexlist"
+            v-for="(item) in indexlist"
             :key="item.id"
             :label="item.name"
             :value="item.id">
@@ -171,9 +171,7 @@
         preTasklist: [],
         parentTasklist: [],
         indexlist: [],
-        renwuindexlist: [],
-        zirenwucarent: '',
-        renwuId: ''
+        zirenwucarent: ''
       }
     },
     components: {
@@ -198,28 +196,13 @@
     },
 
     methods: {
-      init (id, value, flowId) {
-        this.renwuId = id
+      init (value, flowId) {
         this.dataForm.flowId = flowId
         this.visible = true
         const dataBody = {}
-        workFlowTaskinfo(id).then(({data}) => {
+        workFlowTaskinfo(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
-            this.dataForm.taskId = data.data.taskId
-            this.dataForm.index = data.data.index
-            this.dataForm.preTask = data.data.preTask
-            this.dataForm.parentTask = data.data.parentTask
-            this.dataForm.taskReferenceName = data.data.taskReferenceName
-            this.dataForm.remark = data.data.remark
-            this.dataForm.type = data.data.type
-            this.dataForm.caseValueParam = data.data.caseValueParam
-            this.dataForm.caseExpression = data.data.caseSwitchList
-            this.dataForm.caseSwitchList = data.data.caseSwitchList
-            this.dataForm.inputParams = data.data.inputParams
-            this.dataForm.outputParams = data.data.outputParams
-            this.dataForm.subWorkFlow = data.data.subWorkFlow
-            this.dataForm.caseExpressionParamType = data.data.caseExpressionParamType
-            this.zirenwucarent = data.data.type
+            this.taskIdlist = data.data
           }
         })
         getAllBeeTaskList(dataBody, false).then(({data}) => {
@@ -232,13 +215,11 @@
             this.dataForm.ruleTypeList = data.data
           }
         })
-  
-        value && value.length > 0 && value.map(item => {
+        value && value.map(item => {
           this.preTasklist.push(item.index)
           this.parentTasklist.push({name: item.taskReferenceName, id: item.id})
           this.indexlist.push(item.index)
         })
-  
         var max = 0
         if (this.indexlist.length > 0) {
           max = this.indexlist.reduce(function (a, b) {
@@ -257,7 +238,7 @@
             if (dataBody.type !== 'DECISION') {
               delete dataBody.caseExpressionParamType
             }
-            saveWorkTaskFlow(dataBody, this.renwuId).then(({data}) => {
+            saveWorkTaskFlow(dataBody).then(({data}) => {
               if (data && data.message === 'success') {
                 this.$message({
                   message: '操作成功',
@@ -294,7 +275,7 @@
           getAllWorkFlow(this.dataForm.flowId).then(({data}) => {
             console.log(data, '999')
             if (data && data.message === 'success') {
-              this.renwuindexlist = data.data
+              this.indexlist = data.data
             }
           })
         }
@@ -327,7 +308,6 @@
         this.preTasklist = []
         this.parentTasklist = []
         this.indexlist = []
-        this.renwuindexlist = []
       }
     }
   }

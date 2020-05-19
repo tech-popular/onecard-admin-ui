@@ -1,6 +1,19 @@
 <template>
   <div>
-    <el-dialog title="数据关系" :close-on-click-modal="false" :visible.sync="visible">
+    <!-- 删除弹窗 -->
+    <el-dialog
+      title="删除"
+      :visible.sync="deleteVisible"
+      :append-to-body='false'
+      :modal-append-to-body='true'
+      width="30%">
+      <span>确定删除吗？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="deleteVisible = false">取 消</el-button>
+        <el-button type="primary" @click="deleted()">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="数据关系" :close-on-click-modal="false" :visible.sync="visible" width="60%">
     <el-button type="primary" style="margin-bottom: 15px;" @click="addOrUpdateHandle()">新增</el-button>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="id"/>
@@ -25,7 +38,13 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
+      <el-table-column header-align="center" align="center" width="150" label="操作">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-button type="success" size="mini" icon="el-icon-view" circle @click="clickSketchMap(scope.row.id)"></el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -38,12 +57,17 @@
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init" />
+     <!-- 弹窗, 查看 -->
+    <look v-if="lookVisible" ref="look" @refreshDataList="init" />
+    
   </div>
 </template>
 
 <script>
-  import { workFlowTaskList } from '@/api/workerBee/workFlow'
+  import { workFlowTaskList, workFlowTaskDelete } from '@/api/workerBee/workFlow'
   import AddOrUpdate from './taskFlow-add-or-update'
+  import Look from './taskFlow-look'
+
 export default {
     data () {
       return {
@@ -54,11 +78,15 @@ export default {
         totalPage: 0,
         addOrUpdateVisible: false,
         dataListLoading: false,
-        list: ''
+        list: '',
+        deletedId: '',
+        deleteVisible: false,
+        lookVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      Look
     },
     mounted () {
       this.init()
@@ -84,10 +112,35 @@ export default {
         })
       },
       // 新增 / 修改
-      addOrUpdateHandle () {
+      addOrUpdateHandle (id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(this.dataList, this.flowId)
+          this.$refs.addOrUpdate.init(id, this.dataList, this.flowId)
+        })
+      },
+      // 删除弹窗获取值
+      deleteddialog (value) {
+        this.deletedId = value
+        this.deleteVisible = true
+      },
+      // 删除
+      deleted () {
+        const dataBody = this.deletedId
+        workFlowTaskDelete(dataBody, false).then(({data}) => {
+          if (data && data.message === 'success') {
+            this.deleteVisible = false
+            this.init()
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      },
+      // 查看
+      /** 查看示意图 */
+      clickSketchMap (value) {
+        this.lookVisible = true
+        this.$nextTick(() => {
+          this.$refs.look.init(value)
         })
       },
       // 每页数
@@ -105,3 +158,8 @@ export default {
     }
   }
 </script>
+<style scoped>
+  .el-button+.el-button{
+    margin: 0 !important;
+  }
+</style>
