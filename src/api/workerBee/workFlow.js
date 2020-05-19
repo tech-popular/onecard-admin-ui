@@ -13,3 +13,4 @@ export const getAllBeeTaskList = (params, flag) => httpPost(gf + '/beeTask/getAl
 export const getTaskDefWithWorkFlowTask = (params) => httpGet(gf + `/bee/workflow/getshowPicWorkFlowTask/${params}`) // 初始化列表
 export const getNotBaseTypeList = () => httpGet(gf + '/beeTask/getNotBaseTypeList') // 初始化TYPE列表
 export const getAllWorkFlow = (params) => httpGet(gf + `/bee/workflow/getAllWorkFlow/${params}`) // SUB_WORKFLOW&&FOR_EACH子流程
+export const getAllSys = () => httpGet(gf + '/beeSysManager/getAllSys') // 归属系统
