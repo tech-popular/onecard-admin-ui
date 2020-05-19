@@ -15,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="任务类型">
-        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable  v-if="dataFormType === true">
+        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable  v-if="dataFormType === true" @change="renwu">
           <el-option
             v-for="item in dataForm.ruleTypeList"
             :key="item.baseName"
@@ -60,13 +60,13 @@
       <el-form-item label="参考名称" prop="taskReferenceName" :rules="dataRule.taskReferenceName">
         <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
       </el-form-item>
-      <el-form-item label="判断case参数" prop="caseValueParam">
+      <el-form-item label="判断case参数" prop="caseValueParam" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseValueParam" placeholder="判断case参数"/>
       </el-form-item>
-      <el-form-item label="判断表达式">
+      <el-form-item label="判断表达式" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseExpression" placeholder="判断表达式"/>
       </el-form-item>
-      <el-form-item label="switch判断项集合">
+      <el-form-item label="switch判断项集合" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
       <el-form-item label="任务入参" prop="inputParams">
@@ -85,8 +85,18 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="子流程ID" prop="subWorkFlow">
-        <el-select v-model="dataForm.subWorkFlow" placeholder="子流程ID" style="width:100%">
+      <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'DECISION' || zirenwucarent === 'FOR_EACH'">
+        <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
+          <el-option
+            v-for="(item) in indexlist"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="子流程ID" prop="subWorkFlow" v-else>
+        <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
           <el-option
             v-for="(item, index) in indexlist"
             :key="index"
@@ -94,7 +104,6 @@
             :value="item">
           </el-option>
         </el-select>
-        <!-- <el-input v-model="dataForm.subWorkFlow" placeholder="子流程i"/> -->
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"/>
@@ -108,7 +117,7 @@
 </template>
 
 <script>
-  import { saveWorkTaskFlow, getAllBeeTaskList, getNotBaseTypeList } from '@/api/workerBee/workFlow'
+  import { saveWorkTaskFlow, getAllBeeTaskList, getNotBaseTypeList, getAllWorkFlow } from '@/api/workerBee/workFlow'
   import Filter from './filter'
   export default {
     data () {
@@ -161,7 +170,8 @@
         taskIdlist: [],
         preTasklist: [],
         parentTasklist: [],
-        indexlist: []
+        indexlist: [],
+        zirenwucarent: ''
       }
     },
     components: {
@@ -252,6 +262,18 @@
             })
           }
         })
+      },
+      // 任务类型调用接口
+      renwu (value) {
+        this.zirenwucarent = value
+        if (value === 'SUB_WORKFLOW' || value === 'FOR_EACH') {
+          getAllWorkFlow(this.dataForm.flowId).then(({data}) => {
+            console.log(data, '999')
+            if (data && data.message === 'success') {
+              this.indexlist = data.data
+            }
+          })
+        }
       },
       onSelectedDrug (event, item) {
         var findVal = this.taskIdlist.find(item => {
