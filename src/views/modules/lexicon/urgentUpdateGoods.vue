@@ -7,6 +7,7 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button type="success" @click="updateHandle()">一键更新</el-button>
+        <el-button type="danger" @click="clearCacheHandle()">一键清除推荐缓存</el-button>
         <el-button type="warning" @click="multiImportFile()">批量文件上传</el-button>
         <span v-if="!!uploadText" :class="uploadText ==='上传成功'? 'isSuccess': 'isFail'">{{uploadText}}</span>
       </el-form-item>
@@ -33,7 +34,7 @@
       <el-table-column prop="brand_english_name" header-align="center" align="center" label="品牌英文名"></el-table-column>
       <el-table-column header-align="center" align="center" label="操作">
         <template slot-scope="scope">
-          <el-button plain size="mini" @click="addOrUpdateHandle(scope.row)" ref="addOrUpdate">查看</el-button>
+          <el-button plain size="mini" @click="addOrUpdateHandle(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -44,7 +45,7 @@
 <script>
 import AddOrUpdate from './baseComponents/urgetUpdateGoods-add-or-update'
 import multiImportFile from './baseComponents/urgetUpdateGoods-multi-import-file'
-import { productInfoList, updateEsProductInfo } from '@/api/lexicon/urgentUpdateGoods'
+import { productInfoList, updateEsProductInfo, clearRecommendCache } from '@/api/lexicon/urgentUpdateGoods'
 export default {
   data () {
     return {
@@ -59,9 +60,6 @@ export default {
     }
   },
   components: { AddOrUpdate, multiImportFile },
-  mounted () {
-    this.getDataList([ this.dataForm.skus ])
-  },
   methods: {
     getDataList (arr) {
       productInfoList({
@@ -92,13 +90,21 @@ export default {
           skus: skus
         }).then(({data}) => {
           if (data.code === 0) {
-            this.$message.success(data.message || '更新成功')
+            this.$message.success(data.data || '更新成功')
           } else {
-            this.$message.error(data.message || '更新失败')
+            this.$message.error(data.data || '更新失败')
           }
         })
       }).catch(() => {
         console.log('取消')
+      })
+    },
+    clearCacheHandle () { // 一键清除推荐缓存
+      clearRecommendCache().then(({data}) => {
+        if (data.code !== 0) {
+          return this.$message.error(data.data || '清除失败')
+        }
+        return this.$message.success(data.data || '清除成功')
       })
     },
     multiImportFile () { // 批量上传文件
@@ -112,9 +118,6 @@ export default {
     },
     importSuccessChange (data) { // 数据导入完成后
       let arr = []
-      if (!this.dataForm.skus) {
-        arr.push(this.dataForm.skus)
-      }
       data.forEach(item => {
         if (!arr.includes(item.sku)) {
           arr.push(item.sku)
