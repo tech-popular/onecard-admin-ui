@@ -70,10 +70,10 @@
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
       <el-form-item label="任务入参" prop="inputParams">
-        <el-input v-model="dataForm.inputParams" placeholder="任务入参"/>
+        <el-input v-model="dataForm.inputParams" placeholder="例：{'inputName':'inputOtherName'}"/>
       </el-form-item>
        <el-form-item label="任务出参别名映射" prop="outputParams">
-        <el-input v-model="dataForm.outputParams" placeholder="任务出参别名映射"/>
+        <el-input v-model="dataForm.outputParams" placeholder="例：{'outputName':'outputOtherName'} "/>
       </el-form-item>
       <el-form-item label="任务加入任务Id">
         <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
