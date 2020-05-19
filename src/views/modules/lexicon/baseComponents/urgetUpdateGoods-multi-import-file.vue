@@ -8,6 +8,8 @@
       :action="uploadFile"
       accept=".csv"
       :show-file-list="false"
+      :auto-upload="false"
+      :on-change="handlePreview"
       :on-success="uploadSuccess"
     >
       <el-button type="primary" size="small">选择文件</el-button>
@@ -16,39 +18,41 @@
     </el-upload>
     <div slot="footer">
       <el-button @click="cancel">取消</el-button>
-      <el-button type="primary" @click="dataSubmit">确定</el-button>
+      <el-button type="primary" @click="submitUpload">确定</el-button>
     </div>
   </el-dialog>
 </template>
 <script>
-import { uploadFile } from '@/api/lexicon/urgentUpdateGoods'
+import { downloadTemplate, uploadFile } from '@/api/lexicon/urgentUpdateGoods'
 export default {
   data () {
     return {
       visible: false,
       excelFile: '',
-      uploadFile: uploadFile
+      uploadFile: uploadFile,
+      templateUrl: downloadTemplate
     }
   },
   methods: {
     init () {
       this.visible = true
+      this.excelFile = ''
     },
     uploadSuccess (response, file) { // 上传成功时
       if (response.code !== 0) {
-        return this.$message({
-          type: 'error',
-          message: response.msg
-        })
+        this.$emit('importFail')
       }
+      this.$emit('importSuccess', response.data)
+      this.visible = false
+    },
+    handlePreview (file) {
       this.excelFile = file.name
-      console.log(response.data) // 取到的数据
     },
     cancel () {
       this.visible = false
     },
-    dataSubmit () {
-      console.log('dq')
+    submitUpload () {
+      this.$refs.upload.submit()
     }
   }
 }
