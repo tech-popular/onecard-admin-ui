@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="dataForm.taskId ? '修改任务关系' : '新增任务关系'" @close="taskDialgClose" :visible.sync="visible">
+  <el-dialog title="查看任务关系" @close="taskDialgClose" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
       <el-form-item label="工作流Id">
         <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
