@@ -22,7 +22,7 @@
                 用户所属渠道
                 <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable multiple :disabled="!!id" style="width: 400px">
                   <template v-for="(item, index) in channelList">
-                    <el-option :key="index" :label="item.text" :value="item.value"></el-option>
+                    <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
                   </template>
                 </el-select>
               </div>
@@ -34,7 +34,7 @@
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
             <el-select v-model="baseForm.channelId" :disabled="!!id" multiple style="width: 300px">
               <template v-for="(item, index) in channelList">
-                <el-option :key="index" :label="item.text" :value="item.value"></el-option>
+                <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
               </template>
             </el-select>
             <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
@@ -298,10 +298,40 @@ export default {
           this.channelList = []
           return
         }
-        this.channelList = res.data.data
+        this.channelList = res.data.data.map(item => {
+          if (item.value === '0000') {
+            item.disabled = true
+          } else {
+            item.disabled = false
+          }
+          return item
+        })
       })
     },
     channelIdChange () { // 用户渠道改变时，重新过滤指标数据
+      console.log(this.baseForm.channelId)
+      if (this.baseForm.channelId.length === 0) {
+        this.channelList.forEach(item => {
+          item.disabled = false
+        })
+      }
+      if (this.baseForm.channelId.length === 1) {
+        this.channelList.forEach(item => {
+          if (this.baseForm.channelId[0] === '0000') {
+            if (item.value === '0000') {
+              item.disabled = false
+            } else {
+              item.disabled = true
+            }
+          } else {
+            if (item.value === '0000') {
+              item.disabled = true
+            } else {
+              item.disabled = false
+            }
+          }
+        })
+      }
       this.getSelectAllCata((indexList) => {
         this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
       })
@@ -867,6 +897,7 @@ export default {
             code = 1
           }
           let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm, rejectGroupPackCode: code }
+          params.channelId = params.channelId.join(',')
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
@@ -875,7 +906,6 @@ export default {
             return
           }
           params.vestPackCode = params.vestPackCode.join(',')
-          params.channelId = params.channelId.join(',')
           let url = savaDataInfo
           if (this.id) {
             url = updateDataInfo
