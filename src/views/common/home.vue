@@ -123,7 +123,7 @@ export default {
     return {
       value: new Date(),
       dataHoste: '',
-      fenghuang: originHost + '/phoenix/#/login',
+      fenghuang: originHost + '/phoenix/#/home',
       bi: 'http://data.9fbank.com/plate.jsp'
     }
   },
