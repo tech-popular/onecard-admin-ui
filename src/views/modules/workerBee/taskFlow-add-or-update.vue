@@ -179,9 +179,6 @@
     components: {
   
     },
-    mounted () {
-      this.init()
-    },
 
     watch: {
       'dataForm.type': {
@@ -203,25 +200,28 @@
         this.dataForm.flowId = flowId
         this.visible = true
         const dataBody = {}
-        workFlowTaskinfo(id).then(({data}) => {
-          if (data && data.message === 'success') {
-            this.dataForm.taskId = data.data.taskId
-            this.dataForm.index = data.data.index
-            this.dataForm.preTask = data.data.preTask
-            this.dataForm.parentTask = data.data.parentTask
-            this.dataForm.taskReferenceName = data.data.taskReferenceName
-            this.dataForm.remark = data.data.remark
-            this.dataForm.type = data.data.type
-            this.dataForm.caseValueParam = data.data.caseValueParam
-            this.dataForm.caseExpression = data.data.caseSwitchList
-            this.dataForm.caseSwitchList = data.data.caseSwitchList
-            this.dataForm.inputParams = data.data.inputParams
-            this.dataForm.outputParams = data.data.outputParams
-            this.dataForm.subWorkFlow = data.data.subWorkFlow
-            this.dataForm.caseExpressionParamType = data.data.caseExpressionParamType
-            this.zirenwucarent = data.data.type
-          }
-        })
+        if (id) {
+          workFlowTaskinfo(id).then(({data}) => {
+            if (data && data.message === 'success') {
+              this.dataForm.taskId = data.data.taskId
+              this.dataForm.index = data.data.index
+              this.dataForm.preTask = data.data.preTask
+              this.dataForm.parentTask = data.data.parentTask
+              this.dataForm.taskReferenceName = data.data.taskReferenceName
+              this.dataForm.remark = data.data.remark
+              this.dataForm.type = data.data.type
+              this.dataForm.caseValueParam = data.data.caseValueParam
+              this.dataForm.caseExpression = data.data.caseExpression
+              this.dataForm.caseSwitchList = data.data.caseSwitchList
+              this.dataForm.inputParams = data.data.inputParams
+              this.dataForm.outputParams = data.data.outputParams
+              this.dataForm.subWorkFlow = data.data.subWorkFlow
+              this.dataForm.caseExpressionParamType = data.data.caseExpressionParamType
+              this.zirenwucarent = data.data.type
+            }
+          })
+        }
+  
         getAllBeeTaskList(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.taskIdlist = data.data
