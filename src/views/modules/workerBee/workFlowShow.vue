@@ -5,7 +5,7 @@
         <el-input v-model.trim="dataForm.workerBee" placeholder="工作流名称"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
-      <el-form-item label="工作流ID">
+      <el-form-item label="工作流编号">
         <el-input v-model.trim="dataForm.id" placeholder="工作流ID"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
@@ -53,10 +53,19 @@
       <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-          <el-button type="success" size="mini" icon="el-icon-view" circle @click="clickSketchMap(scope.row.id,scope.row)"></el-button>
-          <el-button type="warning" size="mini" icon="el-icon-sort" circle @click="clickFlowEdit(scope.row.id)"></el-button>
-          <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="查看工作流" placement="top">
+            <el-button type="success" size="mini" icon="el-icon-view" circle @click="clickSketchMap(scope.row.id,scope.row)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="任务关系" placement="top">
+            <el-button type="warning" size="mini" icon="el-icon-sort" circle @click="clickFlowEdit(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
+          </el-tooltip>
+
           <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
         </template>
       </el-table-column>

@@ -66,16 +66,8 @@
             { required: true, message: '请输入URL地址', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          requestFields: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          responseFields: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
           responseType: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          cacheKeyFields: [
+            { required: true, message: '请选择响应参数的数据类型', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
         },

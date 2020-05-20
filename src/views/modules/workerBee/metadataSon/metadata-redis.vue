@@ -39,9 +39,6 @@
             <el-radio :label="true">是</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="出参类型" prop="queryType">
-        <el-input v-model="fatherData.outType" placeholder="出参类型"/>
-        </el-form-item>
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>

@@ -91,6 +91,7 @@
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           responseType: [
+            { required: true, message: '请选择响应参数的数据类型', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           datasourceId: [
