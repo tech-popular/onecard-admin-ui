@@ -37,18 +37,18 @@
               >{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item> -->
-          <el-form-item label="申请人姓名">
+          <!-- <el-form-item label="申请人姓名">
             <el-input v-model="dataForm.userName" placeholder="申请人姓名" disabled/>
           </el-form-item>
           <el-form-item label="申请人手机号">
             <el-input v-model="dataForm.phone" placeholder="申请人手机号" disabled/>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
-          <el-form-item label="申请人邮箱" prop="email">
+          <!-- <el-form-item label="申请人邮箱" prop="email">
             <el-input v-model="dataForm.email" placeholder="申请人邮箱" />
-          </el-form-item> 
+          </el-form-item>  -->
           <!-- <el-form-item label="本次申请默认审批人" prop="approvalPeop">
             <el-tag
               style="margin-left:10px;"
@@ -192,7 +192,7 @@
           <el-form-item label="maxcomputer账号" prop="account">
             <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
           </el-form-item>
-          <el-form-item label="申请人姓名" prop="applicantName">
+          <!-- <el-form-item label="申请人姓名" prop="applicantName">
             <el-input v-model="severDataForm.applicantName" placeholder="申请人姓名" />
           </el-form-item>
           <el-form-item label="申请人邮箱" prop="applicantEmail">
@@ -200,7 +200,7 @@
           </el-form-item>
           <el-form-item label="手机号" prop="applicantTel">
             <el-input v-model="severDataForm.applicantTel" placeholder="手机号" />
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>

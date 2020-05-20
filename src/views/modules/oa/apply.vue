@@ -47,11 +47,11 @@
           <el-tag v-else size="small" type="warning">审批中</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="flow"
         header-align="center"
         align="center"
-        label="钉钉审批流"/>
+        label="钉钉审批流"/> -->
       <el-table-column
         prop="grantResult"
         header-align="center"
