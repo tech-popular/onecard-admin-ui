@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="查看" :modal-append-to-body='false' :append-to-body="true" @close="showClisk" :visible.sync="visible">
+  <el-dialog title="查看任务关系" @close="taskDialgClose" :visible.sync="visible">
     <el-form :model="dataForm" ref="dataForm" label-width="20%">
       <el-form-item label="工作流Id">
         <span>{{dataForm.flowId}}</span>
@@ -65,6 +65,10 @@
       <!-- REDIS 类型9 -->
       <taskFlow-redis v-if="dataForm.type == 'REDIS'" :fatherData='fatherData' ref="taskFlowRedis"/>
     </el-form>
+    <span slot="footer">
+      <el-button @click="taskDialgClose">取消</el-button>
+      <el-button type="primary" @click="taskDialgClose">确定</el-button>
+    </span>
   </el-dialog>
 </template>
 
@@ -79,10 +83,12 @@
   import taskFlowAviator from './flowLook/flowLook-aviator'
   import taskFlowFreemarke from './flowLook/flowLook-freemarke'
   import taskFlowHbase from './flowLook/flowLook-hbase'
+
   export default {
     data () {
       return {
         visible: false,
+        dataFormType: true,
         isDecision: false, // 决策任务
         dataForm: {
           flowId: '',
@@ -115,21 +121,6 @@
       taskFlowAviator,
       taskFlowFreemarke,
       taskFlowHbase
-
-    },
-
-    watch: {
-      'dataForm.type': {
-        handler (newVal, oldVal) {
-          if (newVal == 'DECISION') {
-            this.isDecision = true
-          } else {
-            this.isDecision = false
-          }
-        },
-        deep: true,
-        immediate: true
-      }
     },
 
     methods: {
@@ -170,8 +161,10 @@
           }
         })
       },
-      showClisk () {
+      taskDialgClose () {
         this.visible = false
+        this.dataFormType = true
+        this.isDecision = false
       }
     }
   }

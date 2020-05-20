@@ -52,12 +52,12 @@
         <el-form-item label="缓存生成的key需要的字段" prop="cacheKeyFields">
         <el-input v-model="fatherData.cacheKeyFields" placeholder="请输入缓存生成的key需要的字段"/>
         </el-form-item>
-        <el-form-item label="是否启用">
+        <!-- <el-form-item label="是否启用">
           <el-radio-group v-model="fatherData.enable">
             <el-radio :label="false">禁用</el-radio>
             <el-radio :label="true">正常</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
@@ -91,6 +91,7 @@
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           responseType: [
+            { required: true, message: '请选择响应参数的数据类型', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           datasourceId: [

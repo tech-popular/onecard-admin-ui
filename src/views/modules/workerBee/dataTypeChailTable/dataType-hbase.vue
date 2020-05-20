@@ -1,0 +1,49 @@
+<template>
+    <div class="aviator">
+      <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+      <el-table-column prop="zookeeperName" header-align="center" align="center" label="zookeeper名称"/>
+      <el-table-column prop="zookeeperQuorum" header-align="center" align="center" label="zookeeper"/>
+      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"/>
+      <el-table-column
+        prop="enable"
+        header-align="center"
+        align="center"
+        label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.enable === 1" size="small" >启用</el-tag>
+          <el-tag v-else size="small" type="danger">禁用</el-tag>
+        </template>
+      </el-table-column>
+      
+      <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
+      <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+</template>
+
+<script>
+  export default {
+    props: [
+      'dataList'
+    ],
+    data () {
+      return {
+        dataListLoading: false
+      }
+    },
+    methods: {
+    }
+  }
+</script>
+<style>
+
+</style>

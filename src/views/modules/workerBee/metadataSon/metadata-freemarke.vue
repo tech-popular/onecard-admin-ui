@@ -13,12 +13,12 @@
         <el-form-item label="未解析的模板" prop="template">
           <el-input v-model="fatherData.template" placeholder="请输入请未解析的模板"/>
         </el-form-item>
-        <el-form-item label="是否启用">
+        <!-- <el-form-item label="是否启用">
           <el-radio-group v-model="fatherData.enable">
             <el-radio :label="false">禁用</el-radio>
             <el-radio :label="true">正常</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>

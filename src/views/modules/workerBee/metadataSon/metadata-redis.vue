@@ -33,15 +33,12 @@
             <el-radio :label="1">是</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="是否启用">
+        <!-- <el-form-item label="是否启用">
           <el-radio-group v-model="fatherData.enable">
             <el-radio :label="false">否</el-radio>
             <el-radio :label="true">是</el-radio>
           </el-radio-group>
-        </el-form-item>
-        <el-form-item label="出参类型" prop="queryType">
-        <el-input v-model="fatherData.outType" placeholder="出参类型"/>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>

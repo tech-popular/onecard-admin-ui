@@ -13,11 +13,24 @@
     <el-form-item label="工作流入参">
       <el-input v-model="dataForm.inputParameters" placeholder="多个参数用英文逗号隔开，例：name,costumerId"/>
     </el-form-item>
-    <el-form-item v-show="!dataForm.id ? true : false" label="工作流编码" prop="flowCode" >
-      <el-input v-model="dataForm.flowCode"  placeholder="只能输入英文 数字 和下划线"/>
+    <el-form-item v-if="!dataForm.id" label="组合工作流编码" prop="flowCode" >
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <div class="grid-content bg-purple">
+            <el-select filterable v-model="flowCodeSys" placeholder="请选择" @change="flowCode" style="width:100%;">
+              <el-option v-for="item in ownerAppList" :value="item.sysCode" :key="item.sysCode" :label="item.sysCode"/>
+            </el-select>
+          </div>
+        </el-col>
+        <el-col :span="11" style="float: right;">
+          <div class="grid-content bg-purple">
+            <el-input v-model="dataForm.flowCode" placeholder="只能输入英文 数字 和下划线" style="width:100%;"/>
+          </div>
+        </el-col>
+      </el-row>
     </el-form-item>
-    <el-form-item v-show="!dataForm.id ? false : true" label="工作流编码">
-      <el-input v-model="dataForm.flowCode" :disabled="true"  placeholder="只能输入英文 数字 和下划线"/>
+    <el-form-item label="工作流编码">
+      <span>{{flowCodeSys+dataForm.flowCode}}</span>
     </el-form-item>
     <el-form-item label="返回结果" prop="outputParameters">
       <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
@@ -35,7 +48,7 @@
     </el-form-item>
     <el-form-item label="归属系统" prop="ownerApp">
         <el-select filterable v-model="dataForm.ownerApp" placeholder="请选择">
-          <el-option v-for="item in ownerAppList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+          <el-option v-for="item in ownerAppList" :value="item.sysName" :key="item.sysName" :label="item.sysName"/>
         </el-select>
     </el-form-item>
     <el-form-item label="是否重试">
@@ -53,7 +66,7 @@
 </template>
 
 <script>
-  import { saveWorkFlow, getUpdateWorkFlow } from '@/api/workerBee/workFlow'
+  import { saveWorkFlow, getUpdateWorkFlow, getAllSys } from '@/api/workerBee/workFlow'
   import Filter from './filter'
   export default {
     data () {
@@ -114,7 +127,8 @@
         versionList: [
           {id: '1.0', value: '1.0'}
         ],
-        ownerAppList: []
+        ownerAppList: [],
+        flowCodeSys: ''
       }
     },
     components: {
@@ -127,6 +141,11 @@
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
+          getAllSys().then(({data}) => {
+            if (data && data.message === 'success') {
+              this.ownerAppList = data.data
+            }
+          })
           if (this.dataForm.id) {
             const dataBody = id
             const updateIds = this.updateId
@@ -153,6 +172,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.dataForm.flowCode = this.flowCodeSys + this.dataForm.flowCode
             const dataBody = this.dataForm
             const dataUpdateId = this.updateId
             saveWorkFlow(dataBody, dataUpdateId).then(({data}) => {
@@ -167,6 +187,7 @@
                     this.dataForm.description = ''
                     this.dataForm.createdBy = ''
                     this.dataForm.ownerApp = ''
+                    this.flowCodeSys = ''
                   }
                 })
               } else {
@@ -178,6 +199,10 @@
             })
           }
         })
+      },
+      // 工作流编码
+      flowCode (value) {
+        this.flowCodeSys = value + `_`
       },
       datano () {
         this.visible = false
