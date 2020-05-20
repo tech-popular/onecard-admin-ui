@@ -65,7 +65,6 @@
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
           </el-tooltip>
-
           <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
         </template>
       </el-table-column>
@@ -86,7 +85,7 @@
       style="max-height: 100vh"
       :show-close="false"
       :visible.sync="visible">
-      <i class="el-icon-back goback" @click="visible = false"></i>
+      <i class="el-icon-back goback" @click="visible = false">返回</i>
       <showFlow v-if="sketchMap" ref="showFlow" :dataAllList="dataAllList" :list="list" @refreshDataList="getDataList"/>
     </el-dialog>
     <!-- 删除弹窗 -->
@@ -284,7 +283,7 @@
     position: absolute;
     right: 50px;
     top:20px;
-    font-size: 25px;
+    font-size: 18px;
     cursor:pointer;
   }
 </style>
