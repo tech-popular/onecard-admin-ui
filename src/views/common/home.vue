@@ -162,7 +162,6 @@ export default {
   },
   methods: {
     fhHandle (url) {
-      localStorage.setItem('token', this.$cookie.get('token'))
       window.open(url, '_blank')
     },
     biHandle (url) {
