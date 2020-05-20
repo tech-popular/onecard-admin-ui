@@ -146,7 +146,7 @@ export default {
       clickSketchMap (value) {
         this.lookVisible = true
         this.$nextTick(() => {
-          this.$refs.look.init(value)
+          this.$refs.look.init(value, this.flowId)
         })
       },
       // 每页数

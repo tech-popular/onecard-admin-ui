@@ -1,124 +1,89 @@
 <template>
   <el-dialog title="查看任务关系" @close="taskDialgClose" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+    <el-form :model="dataForm" ref="dataForm" label-width="20%">
       <el-form-item label="工作流Id">
-        <el-input v-model="dataForm.flowId" placeholder="工作流Id" disabled/>
+        <span>{{dataForm.flowId}}</span>
       </el-form-item>
       <el-form-item label="任务Id">
-        <el-select v-model="dataForm.taskId" placeholder="任务Id" style="width:100%" filterable @change="onSelectedDrug">
-          <el-option
-            v-for="item in taskIdlist"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
+        <span>{{dataForm.taskId}}</span>
       </el-form-item>
       <el-form-item label="任务类型">
-        <el-select v-model="dataForm.type" placeholder="任务类型" style="width:100%" filterable  v-if="dataFormType === true" @change="renwu">
-          <el-option
-            v-for="item in dataForm.ruleTypeList"
-            :key="item.baseName"
-            :label="item.baseName"
-            :value="item.baseName">
-          </el-option>
-        </el-select>
-        <el-select v-model="dataForm.type" disabled placeholder="任务类型" style="width:100%" filterable v-else>
-          <el-option
-            v-for="item in dataForm.ruleTypeList"
-            :key="item.baseName"
-            :label="item.baseName"
-            :value="item.baseName">
-          </el-option>
-        </el-select>
+        <span>{{dataForm.type}}</span>
       </el-form-item>
-      <el-form-item label="表达式参数类型:" prop="caseExpressionParamType" v-show="isDecision">
-        <el-select filterable v-model="dataForm.caseExpressionParamType" placeholder="请选择" style="width:100%">
-          <el-option v-for="(item, index) in caseExpressionParamType" :value="item.id" :key="index" :label="item.name"/>
-        </el-select>
+      <el-form-item label="表达式参数类型">
+        <span>{{dataForm.caseExpressionParamType}}</span>
       </el-form-item>
       <el-form-item label="父级名称">
-        <el-select v-model="dataForm.parentTask" placeholder="父级名称" style="width:100%">
-          <el-option
-            v-for="(item, index) in parentTasklist"
-            :key="index"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
+        <span>{{dataForm.parentTask}}</span>
       </el-form-item>
       <el-form-item label="执行下标">
-        <el-select v-model="dataForm.index" placeholder="执行下标" style="width:100%">
-          <el-option
-            v-for="(item, index) in indexlist"
-            :key="index"
-            :label="item"
-            :value="item">
-          </el-option>
-        </el-select>
+        <span>{{dataForm.index}}</span>
       </el-form-item>
-      <el-form-item label="参考名称" prop="taskReferenceName" :rules="dataRule.taskReferenceName">
-        <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
+      <el-form-item label="参考名称">
+        <span>{{dataForm.taskReferenceName}}</span>
       </el-form-item>
-      <el-form-item label="判断case参数" prop="caseValueParam" v-if="zirenwucarent === 'DECISION'">
-        <el-input v-model="dataForm.caseValueParam" placeholder="判断case参数"/>
+      <el-form-item label="判断case参数" v-if="dataForm.type === 'DECISION'">
+        <span>{{dataForm.caseValueParam}}</span>
       </el-form-item>
-      <el-form-item label="判断表达式" v-if="zirenwucarent === 'DECISION'">
-        <el-input v-model="dataForm.caseExpression" placeholder="判断表达式"/>
+      <el-form-item label="判断表达式" v-if="dataForm.type === 'DECISION'">
+        <span>{{dataForm.caseExpression}}</span>
       </el-form-item>
-      <el-form-item label="switch判断项集合" v-if="zirenwucarent === 'DECISION'">
-        <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
+      <el-form-item label="switch判断项集合" v-if="dataForm.type === 'DECISION'">
+        <span>{{dataForm.caseSwitchList}}</span>
       </el-form-item>
-      <el-form-item label="任务入参" prop="inputParams">
-        <el-input v-model="dataForm.inputParams" placeholder="例：{'inputName':'inputOtherName'}"/>
+      <el-form-item label="任务入参">
+        <span>{{dataForm.inputParams}}</span>
       </el-form-item>
-       <el-form-item label="任务出参别名映射" prop="outputParams">
-        <el-input v-model="dataForm.outputParams" placeholder="例：{'outputName':'outputOtherName'} "/>
+       <el-form-item label="任务出参别名映射">
+        <span>{{dataForm.outputParams}}</span>
       </el-form-item>
       <el-form-item label="任务加入任务Id">
-        <el-select v-model="dataForm.preTask" placeholder="任务加入任务Id" style="width:100%">
-          <el-option
-            v-for="(item, index) in preTasklist"
-            :key="index"
-            :label="item"
-            :value="item">
-          </el-option>
-        </el-select>
+        <span>{{dataForm.preTask}}</span>
       </el-form-item>
-      <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'DECISION' || zirenwucarent === 'FOR_EACH'">
-        <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
-          <el-option
-            v-for="(item) in indexlist"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
+      <el-form-item label="子流程ID">
+        <span>{{dataForm.subWorkFlow}}</span>
       </el-form-item>
-      <el-form-item label="子流程ID" prop="subWorkFlow" v-else>
-        <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
-          <el-option
-            v-for="(item, index) in indexlist"
-            :key="index"
-            :label="item"
-            :value="item">
-          </el-option>
-        </el-select>
+      <el-form-item label="备注">
+        <span>{{dataForm.remark}}</span>
       </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input v-model="dataForm.remark" placeholder="备注"/>
-      </el-form-item>
+      <!-- HTTP 类型1 -->
+      <taskFlow-http v-if="dataForm.type == 'HTTP'" :fatherData='fatherData' ref="taskFlowHttp"/>
+      <!-- JDBC 类型2 -->
+      <taskFlow-jdbc v-if="dataForm.type == 'JDBC'" :fatherData='fatherData' ref="taskFlowJdbc"/>
+      <!-- KAFKA 类型3 -->
+      <taskFlow-kafka v-if="dataForm.type == 'KAFKA'" :fatherData='fatherData' ref="taskFlowKafka"/>
+      <!-- CASSANDRA 类型4 -->
+      <taskFlow-cassandra v-if="dataForm.type == 'CASSANDRA'" :fatherData='fatherData' ref="taskFlowCassandra"/>
+      <!-- GROOVY 类型5 -->
+      <taskFlow-groovy v-if="dataForm.type == 'GROOVY'" :fatherData='fatherData' ref="taskFlowGroovy"/>
+      <!-- AVIATOR 类型6 -->
+      <taskFlow-aviator v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData' ref="taskFlowAviator"/>
+      <!-- FREEMARKER 类型7 -->
+      <taskFlow-freemarke v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData' ref="taskFlowFreemarke"/>
+      <!-- HBASE 类型8 -->
+      <taskFlow-Hbase v-if="dataForm.type == 'HBASE'" :fatherData='fatherData' ref="taskFlowHbase"/>
+      <!-- REDIS 类型9 -->
+      <taskFlow-redis v-if="dataForm.type == 'REDIS'" :fatherData='fatherData' ref="taskFlowRedis"/>
     </el-form>
     <span slot="footer">
       <el-button @click="taskDialgClose">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="taskDialgClose">确定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
-  import { saveWorkTaskFlow, getAllBeeTaskList, getNotBaseTypeList, getAllWorkFlow, workFlowTaskinfo } from '@/api/workerBee/workFlow'
-  import Filter from './filter'
+  import { workFlowTaskshow } from '@/api/workerBee/workFlow'
+  import taskFlowRedis from './flowLook/flowLook-redis'
+  import taskFlowHttp from './flowLook/flowLook-http'
+  import taskFlowCassandra from './flowLook/flowLook-cassandra'
+  import taskFlowJdbc from './flowLook/flowLook-jdbc'
+  import taskFlowKafka from './flowLook/flowLook-kafka'
+  import taskFlowGroovy from './flowLook/flowLook-groovy'
+  import taskFlowAviator from './flowLook/flowLook-aviator'
+  import taskFlowFreemarke from './flowLook/flowLook-freemarke'
+  import taskFlowHbase from './flowLook/flowLook-hbase'
+
   export default {
     data () {
       return {
@@ -143,171 +108,63 @@
           subWorkFlow: '',
           caseExpressionParamType: 0
         },
-        caseExpressionParamType: [
-          {id: 1, name: '集合类型'},
-          {id: 0, name: '普通类型'}
-        ],
-        dataRule: {
-          inputParams: [
-            { required: true, message: '任务入参不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          outputParams: [
-            { required: true, message: '任务出参别名映射不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          taskReferenceName: [
-            { required: true, message: '参考名称不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          caseValueParam: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          subWorkFlow: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ]
-        },
-        taskIdlist: [],
-        preTasklist: [],
-        parentTasklist: [],
-        indexlist: [],
-        zirenwucarent: ''
+        fatherData: []
       }
     },
     components: {
-  
-    },
-    mounted () {
-      this.init()
-    },
-
-    watch: {
-      'dataForm.type': {
-        handler (newVal, oldVal) {
-          if (newVal == 'DECISION') {
-            this.isDecision = true
-          } else {
-            this.isDecision = false
-          }
-        },
-        deep: true,
-        immediate: true
-      }
+      taskFlowRedis,
+      taskFlowHttp,
+      taskFlowCassandra,
+      taskFlowJdbc,
+      taskFlowKafka,
+      taskFlowGroovy,
+      taskFlowAviator,
+      taskFlowFreemarke,
+      taskFlowHbase
     },
 
     methods: {
-      init (value, flowId) {
+      init (id, flowId) {
         this.dataForm.flowId = flowId
         this.visible = true
-        const dataBody = {}
-        workFlowTaskinfo(dataBody, false).then(({data}) => {
+        workFlowTaskshow(id).then(({data}) => {
           if (data && data.message === 'success') {
-            this.taskIdlist = data.data
-          }
-        })
-        getAllBeeTaskList(dataBody, false).then(({data}) => {
-          if (data && data.message === 'success') {
-            this.taskIdlist = data.data
-          }
-        })
-        getNotBaseTypeList().then(({data}) => {
-          if (data && data.message === 'success') {
-            this.dataForm.ruleTypeList = data.data
-          }
-        })
-        value && value.map(item => {
-          this.preTasklist.push(item.index)
-          this.parentTasklist.push({name: item.taskReferenceName, id: item.id})
-          this.indexlist.push(item.index)
-        })
-        var max = 0
-        if (this.indexlist.length > 0) {
-          max = this.indexlist.reduce(function (a, b) {
-            return b > a ? b : a
-          })
-        } else {
-          max = 0
-        }
-        this.dataForm.index = max + 1
-      },
-      // 表单提交
-      dataFormSubmit () {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            let dataBody = this.dataForm
-            if (dataBody.type !== 'DECISION') {
-              delete dataBody.caseExpressionParamType
+            this.dataForm = data.data.beeWorkFlowTaskVo
+            if (this.dataForm.type == 'HTTP') {
+              this.fatherData = data.data.beeTaskVo.http
             }
-            saveWorkTaskFlow(dataBody).then(({data}) => {
-              if (data && data.message === 'success') {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 200,
-                  onClose: () => {
-                    this.visible = false
-                    this.dataFormType = true
-                    this.isDecision = false
-                    this.$emit('refreshDataList')
-                    this.dataForm.taskReferenceName = ''
-                    this.dataForm.remark = ''
-                    this.dataForm.type = ''
-                    this.dataForm.caseValueParam = ''
-                    this.dataForm.caseExpression = ''
-                    this.dataForm.caseSwitchList = ''
-                    this.dataForm.inputParams = ''
-                    this.dataForm.outputParams = ''
-                    this.dataForm.subWorkFlow = ''
-                    this.dataForm.caseExpressionParamType = 0
-                  }
-                })
-              } else {
-                this.$message.error(data.message ? data.message : data.msg)
-              }
-            })
+            if (this.dataForm.type == 'JDBC') {
+              this.fatherData = data.data.beeTaskVo.jdbc
+            }
+            if (this.dataForm.type == 'KAFKA') {
+              this.fatherData = data.data.beeTaskVo.kafka
+            }
+            if (this.dataForm.type == 'CASSANDRA') {
+              this.fatherData = data.data.beeTaskVo.cassandra
+            }
+            if (this.dataForm.type == 'GROOVY') {
+              this.fatherData = data.data.beeTaskVo.groovy
+            }
+            if (this.dataForm.type == 'AVIATOR') {
+              this.fatherData = data.data.beeTaskVo.aviator
+            }
+            if (this.dataForm.type == 'FREEMARKER') {
+              this.fatherData = data.data.beeTaskVo.freemarker
+            }
+            if (this.dataForm.type == 'HBASE') {
+              this.fatherData = data.data.beeTaskVo.hbase
+            }
+            if (this.dataForm.type == 'REDIS') {
+              this.fatherData = data.data.beeTaskVo.redis
+            }
+            console.log(this.fatherData, 'sha')
           }
         })
-      },
-      // 任务类型调用接口
-      renwu (value) {
-        this.zirenwucarent = value
-        if (value === 'SUB_WORKFLOW' || value === 'FOR_EACH') {
-          getAllWorkFlow(this.dataForm.flowId).then(({data}) => {
-            console.log(data, '999')
-            if (data && data.message === 'success') {
-              this.indexlist = data.data
-            }
-          })
-        }
-      },
-      onSelectedDrug (event, item) {
-        var findVal = this.taskIdlist.find(item => {
-          return item.id === event
-        })
-        this.dataForm.type = findVal.type
-        this.dataFormType = false
       },
       taskDialgClose () {
         this.visible = false
         this.dataFormType = true
         this.isDecision = false
-        this.dataForm.taskId = -1
-        this.dataForm.index = 1
-        this.dataForm.preTask = -1
-        this.dataForm.parentTask = -1
-        this.dataForm.taskReferenceName = ''
-        this.dataForm.remark = ''
-        this.dataForm.type = ''
-        this.dataForm.caseValueParam = ''
-        this.dataForm.caseExpression = ''
-        this.dataForm.caseSwitchList = ''
-        this.dataForm.inputParams = ''
-        this.dataForm.outputParams = ''
-        this.dataForm.subWorkFlow = ''
-        this.dataForm.caseExpressionParamType = 0
-        this.preTasklist = []
-        this.parentTasklist = []
-        this.indexlist = []
       }
     }
   }

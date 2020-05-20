@@ -16,3 +16,4 @@ export const getAllWorkFlow = (params) => httpGet(gf + `/bee/workflow/getAllWork
 export const getAllSys = () => httpGet(gf + '/beeSysManager/getAllSys') // 归属系统
 export const workFlowTaskDelete = (params) => httpGet(gf + `/bee/workflowtask/delete/${params}`) // 数据关系删除
 export const workFlowTaskinfo = (params) => httpGet(gf + `/bee/workflowtask/info/${params}`) // 数据关系详情
+export const workFlowTaskshow = (params) => httpGet(gf + `/bee/workflowtask/show/${params}`) // 数据关系查看
