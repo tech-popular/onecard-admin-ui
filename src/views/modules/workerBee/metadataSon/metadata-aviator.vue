@@ -26,12 +26,12 @@
             </el-option>
           </el-select>
          </el-form-item>
-        <el-form-item label="是否启用">
-        <el-radio-group v-model="fatherData.enable">
-          <el-radio :label="false">禁用</el-radio>
-          <el-radio :label="true">正常</el-radio>
+        <!-- <el-form-item label="是否启用">
+          <el-radio-group v-model="fatherData.enable">
+            <el-radio :label="false">禁用</el-radio>
+            <el-radio :label="true">正常</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
