@@ -49,14 +49,14 @@
           <el-form-item label="申请人邮箱" prop="email">
             <el-input v-model="dataForm.email" placeholder="申请人邮箱" />
           </el-form-item> 
-          <el-form-item label="本次申请默认审批人" prop="approvalPeop">
+          <!-- <el-form-item label="本次申请默认审批人" prop="approvalPeop">
             <el-tag
               style="margin-left:10px;"
               v-for="tag in defaultApproverList"
               :key="tag.name"
               :type="tag.name"
             >{{tag.name}}</el-tag>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="申请理由" prop="reason">
             <el-input type="textarea" v-model="dataForm.reason"></el-input>
           </el-form-item>
@@ -204,14 +204,14 @@
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
-          <el-form-item label="本次申请默认审批人">
+          <!-- <el-form-item label="本次申请默认审批人">
             <el-tag
               style="margin-left:10px;"
               v-for="tag in severdefaultApproverList"
               :key="tag.name"
               :type="tag.name"
             >{{tag.name}}</el-tag>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="申请理由" prop="applyReason">
             <el-input type="textarea" v-model="severDataForm.applyReason" placeholder="申请理由"></el-input>
           </el-form-item>
@@ -285,7 +285,7 @@ export default {
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
-        approvalPeop: '', // 本次申请默认审批人
+        // approvalPeop: '', // 本次申请默认审批人
         reason: '' // 申请理由
       }, // 账号权限form
       dataRule: {
@@ -320,7 +320,7 @@ export default {
         applicantName: '', // 申请人姓名
         applicantEmail: '', // 申请人邮箱
         applicantTel: '', // 申请人手机号
-        approvalPeop: '', // 默认审批人
+        // approvalPeop: '', // 默认审批人
         account: '', // maxcomputer账号
         applyReason: '' // 申请理由
       },
@@ -349,7 +349,7 @@ export default {
       buttonloading: false,
       ruleTypeList: [],
       severApplyAuthList: [], // 申请权限数据载体
-      severdefaultApproverList: [], // 本次申请默认审批人数据载体
+      // severdefaultApproverList: [], // 本次申请默认审批人数据载体
       severdepartment: '', // 默认部门数据载体
       fatherData: {
         enable: true,
@@ -399,7 +399,7 @@ export default {
         })
         databaseInitInfo().then(({ data }) => {
           this.severApplyAuthList = data.data.applyAuthList
-          this.severdefaultApproverList = data.data.defaultApproverList
+          // this.severdefaultApproverList = data.data.defaultApproverList
           this.severdepartment = data.data.department
           this.touchActionlist = data.data.touchActionList
         })
