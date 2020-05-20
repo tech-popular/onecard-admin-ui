@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-form :inline="true" :model="dataForm" ref="dataForm">
+    <el-form :inline="true" :model="dataForm" ref="dataForm" :rules="dataRule">
       <el-form-item label="工作流名称">
         <el-input v-model.trim="dataForm.workerBee" placeholder="工作流名称"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
-      <el-form-item label="工作流编号">
+      <el-form-item label="工作流编号" :rules="dataRule.id" prop="id">
         <el-input v-model.trim="dataForm.id" placeholder="工作流ID"
         onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/\s/g,''))" clearable />
       </el-form-item>
@@ -134,6 +134,11 @@
           workerBee: '',
           id: '',
           flowCode: ''
+        },
+        dataRule: {
+          id: [
+            { max: 9, message: '长度在 9 个字符' }
+          ]
         },
         dataList: [],
         dataAllList: {},
