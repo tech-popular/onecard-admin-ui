@@ -209,6 +209,12 @@
         this.dataForm.flowId = flowId
         this.visible = true
         const dataBody = {}
+        getAllWorkFlow(this.dataForm.flowId).then(({data}) => {
+          console.log(data, '999')
+          if (data && data.message === 'success') {
+            this.renwuindexlist = data.data
+          }
+        })
         if (id) {
           workFlowTaskinfo(id).then(({data}) => {
             if (data && data.message === 'success') {
@@ -224,7 +230,7 @@
               this.dataForm.caseSwitchList = data.data.caseSwitchList
               this.dataForm.inputParams = data.data.inputParams
               this.dataForm.outputParams = data.data.outputParams
-              this.dataForm.subWorkFlow = data.data.subWorkFlow
+              this.dataForm.subWorkFlow = data.data.subWorkFlowName
               this.dataForm.caseExpressionParamType = data.data.caseExpressionParamType
               this.zirenwucarent = data.data.type
             }

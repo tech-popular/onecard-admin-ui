@@ -15,11 +15,11 @@
     <!-- mysqlTable -->
     <mysql-table v-if="dataForm.type === 'mysql/oracle'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <!-- redisTable -->
-    <redis-table v-if="dataForm.type === 'redis'" :dataList='dataList'/>
+    <redis-table v-if="dataForm.type === 'redis'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <!-- redisTable -->
-    <cassandra-table v-if="dataForm.type === 'cassandra'" :dataList='dataList'/>
+    <cassandra-table v-if="dataForm.type === 'cassandra'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <!-- hbase -->
-    <hbase-table v-if="dataForm.type === 'hbase'" :dataList='dataList'/>
+    <hbase-table v-if="dataForm.type === 'hbase'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
