@@ -60,13 +60,13 @@
       <el-form-item label="参考名称" prop="taskReferenceName" :rules="dataRule.taskReferenceName">
         <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
       </el-form-item>
-      <el-form-item label="判断case参数" prop="caseValueParam" v-if="zirenwucarent === 'DECISION'">
+      <el-form-item label="判断case参数" prop="caseValueParam" :rules="dataRule.caseValueParam" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseValueParam" placeholder="判断case参数"/>
       </el-form-item>
-      <el-form-item label="判断表达式" v-if="zirenwucarent === 'DECISION'">
+      <el-form-item label="判断表达式" prop="caseExpression" :rules="dataRule.caseExpression" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseExpression" placeholder="判断表达式"/>
       </el-form-item>
-      <el-form-item label="switch判断项集合" v-if="zirenwucarent === 'DECISION'">
+      <el-form-item label="switch判断项集合" prop="caseSwitchList" :rules="dataRule.caseSwitchList" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
       <el-form-item label="任务入参" prop="inputParams">
@@ -161,6 +161,15 @@
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           caseValueParam: [
+            { required: true, message: '判断case参数不能为空', trigger: 'blur' },
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          caseExpression: [
+            { required: true, message: '判断表达式不能为空', trigger: 'blur' },
+            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+          ],
+          caseSwitchList: [
+            { required: true, message: 'switch判断项集合不能为空', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           subWorkFlow: [
