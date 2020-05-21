@@ -58,8 +58,9 @@ http.adornUrl = (actionName) => {
   // } else if (actionName.indexOf('lexicon') !== -1) {
   //   actionName = actionName.replace(/lexicon\//, '')
   //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://songxintest.sk.9f.cn/canary-admin' : window.SITE_CONFIG.baseUrl) + actionName
-  } else {
-    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
+  } else { //
+    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://unify-manager.sk.9f.cn/canary-admin' : window.SITE_CONFIG.baseUrl) + actionName
+    // return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
   }
 }
 /**
