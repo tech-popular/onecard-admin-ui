@@ -119,10 +119,11 @@
 <script>
 export default {
   data () {
+    let originHost = location.origin
     return {
       value: new Date(),
       dataHoste: '',
-      fenghuang: 'http://tech.9fbank.com/phoenix/#/login',
+      fenghuang: originHost + '/phoenix/#/home',
       bi: 'http://data.9fbank.com/plate.jsp'
     }
   },
@@ -218,7 +219,7 @@ export default {
     color: #999;
     .tagText{
       margin: 5px;
-      
+
     }
 }
 </style>
