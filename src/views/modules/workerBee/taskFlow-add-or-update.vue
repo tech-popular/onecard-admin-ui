@@ -85,7 +85,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'DECISION' || zirenwucarent === 'FOR_EACH'">
+      <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'SUB_WORKFLOW' || zirenwucarent === 'FOR_EACH'">
         <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
           <el-option
             v-for="(item) in renwuindexlist"
