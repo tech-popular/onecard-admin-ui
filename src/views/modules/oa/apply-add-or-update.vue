@@ -236,32 +236,32 @@ import {
 } from '@/api/oa/apply'
 export default {
   data () {
-    var checkPhone = (rule, value, callback) => {
-      const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
-      if (!value) {
-        return callback(new Error('申请人手机号不能为空'))
-      }
-      setTimeout(() => {
-        if (phoneReg.test(value)) {
-          callback()
-        } else {
-          callback(new Error('电话号码格式不正确'))
-        }
-      }, 100)
-    }
-    var checkemail = (rule, value, callback) => {
-      const emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
-      if (!value) {
-        return callback(new Error('申请人邮箱不能为空'))
-      }
-      setTimeout(() => {
-        if (emailReg.test(value)) {
-          callback()
-        } else {
-          callback(new Error('邮箱格式不正确'))
-        }
-      }, 100)
-    }
+    // var checkPhone = (rule, value, callback) => {
+    //   const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
+    //   if (!value) {
+    //     return callback(new Error('申请人手机号不能为空'))
+    //   }
+    //   setTimeout(() => {
+    //     if (phoneReg.test(value)) {
+    //       callback()
+    //     } else {
+    //       callback(new Error('电话号码格式不正确'))
+    //     }
+    //   }, 100)
+    // }
+    // var checkemail = (rule, value, callback) => {
+    //   const emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
+    //   if (!value) {
+    //     return callback(new Error('申请人邮箱不能为空'))
+    //   }
+    //   setTimeout(() => {
+    //     if (emailReg.test(value)) {
+    //       callback()
+    //     } else {
+    //       callback(new Error('邮箱格式不正确'))
+    //     }
+    //   }, 100)
+    // }
     return {
       totalPage: 0,
       visible: false,
@@ -305,9 +305,9 @@ export default {
         // phone: [
         //   { required: true, validator: checkPhone, trigger: 'blur' }
         // ],
-        email: [
-          { required: true, validator: checkemail, trigger: 'blur' }
-        ],
+        // email: [
+        //   { required: true, validator: checkemail, trigger: 'blur' }
+        // ],
         reason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ]
@@ -318,8 +318,8 @@ export default {
         title: '', // 库表权限标题
         applyAuthTypeList: [], // 申请权限
         applicantName: '', // 申请人姓名
-        applicantEmail: '', // 申请人邮箱
-        applicantTel: '', // 申请人手机号
+        // applicantEmail: '', // 申请人邮箱
+        // applicantTel: '', // 申请人手机号
         // approvalPeop: '', // 默认审批人
         account: '', // maxcomputer账号
         applyReason: '' // 申请理由
@@ -332,12 +332,12 @@ export default {
         applicantName: [
           { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
         ],
-        applicantEmail: [
-          { required: true, validator: checkemail, trigger: 'blur' }
-        ],
-        applicantTel: [
-          { required: true, validator: checkPhone, trigger: 'blur' }
-        ],
+        // applicantEmail: [
+        //   { required: true, validator: checkemail, trigger: 'blur' }
+        // ],
+        // applicantTel: [
+        //   { required: true, validator: checkPhone, trigger: 'blur' }
+        // ],
         applyReason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ],
