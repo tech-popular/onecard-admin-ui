@@ -24,7 +24,7 @@
           <el-row>
             <el-col :span="24">
               <div class="box-bottom">
-                <el-button type="primary" size="mini">规则配置</el-button>
+                <el-button type="primary" size="mini" @click="ruleConfigClick">规则配置</el-button>
                 <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
                 <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button>
               </div>
@@ -57,7 +57,7 @@
           <el-row>
             <el-col :span="24">
               <div class="box-bottom">
-                <el-button type="primary" size="mini">规则配置</el-button>
+                <el-button type="primary" size="mini" @click="ruleConfigClick">规则配置</el-button>
                 <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
                 <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button>
               </div>
@@ -68,15 +68,17 @@
     </el-card>
     <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene"></add-search-scene>
     <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene"></add-recommend-scene>
+    <rule-config v-if="ruleConfigVisible" ref="ruleConfig"></rule-config>
     <statistic-chart v-if="statisticChartVisible" ref="statisticChart"></statistic-chart>
     <real-time-strategy v-if="realTimeStrategyVisible" ref="realTimeStrategy" @closeDialog="closeDialogEvent"></real-time-strategy>
   </div>
 </template>
 <script>
-import addSearchScene from './baseComponents/sceneManage-sceneConfig-add-search-scene'
-import addRecommendScene from './baseComponents/sceneManage-sceneConfig-add-recommend-scene'
-import statisticChart from './baseComponents/sceneManage-sceneConfig-statistic-chart'
-import realTimeStrategy from './baseComponents/sceneManage-sceneConfig-real-time-strategy'
+import addSearchScene from './sceneManageComponents/sceneManage-sceneConfig-add-search-scene'
+import addRecommendScene from './sceneManageComponents/sceneManage-sceneConfig-add-recommend-scene'
+import ruleConfig from './sceneManageComponents/sceneManage-sceneConfig-rule-config'
+import statisticChart from './sceneManageComponents/sceneManage-sceneConfig-statistic-chart'
+import realTimeStrategy from './sceneManageComponents/sceneManage-sceneConfig-real-time-strategy'
 export default {
   data () {
     return {
@@ -122,22 +124,29 @@ export default {
       ],
       addSearchSceneVisible: false,
       addRecommendSceneVisible: false,
+      ruleConfigVisible: false,
       statisticChartVisible: false,
       realTimeStrategyVisible: false
     }
   },
-  components: { addSearchScene, addRecommendScene, statisticChart, realTimeStrategy },
+  components: { addSearchScene, addRecommendScene, ruleConfig, statisticChart, realTimeStrategy },
   methods: {
-    addSearchScene () {
+    addSearchScene () { // 新建搜索场景
       this.addSearchSceneVisible = true
       this.$nextTick(() => {
         this.$refs.addSearchScene.init()
       })
     },
-    addRecommendScene () {
+    addRecommendScene () { // 新建推荐场景
       this.addRecommendSceneVisible = true
       this.$nextTick(() => {
         this.$refs.addRecommendScene.init()
+      })
+    },
+    ruleConfigClick () { // 规则配置
+      this.ruleConfigVisible = true
+      this.$nextTick(() => {
+        this.$refs.ruleConfig.init()
       })
     },
     statisticChartClick () { // 统计分析
