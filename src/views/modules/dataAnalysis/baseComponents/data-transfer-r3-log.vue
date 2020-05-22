@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="历史日志下发" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="600px">
+  <el-dialog title="历史日志下发" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="800px">
   <el-table :data="dataList" border style="width: 100%;">
     <el-table-column prop="index" header-align="center" align="center" label="序号"></el-table-column>
     <el-table-column prop="transferTargetDataSource" header-align="center" align="center" label="下发数据源"></el-table-column>
