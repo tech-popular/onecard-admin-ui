@@ -10,7 +10,7 @@
           <el-row :gutter="20">
             <el-col :span="8">
               <div class="box-left">
-                <img width="80px" height="80px" :src="imgList[item.type]" />
+                <img width="60px" height="60px" :src="imgList[item.type]" />
               </div>
             </el-col>
             <el-col :span="16">
@@ -43,7 +43,7 @@
           <el-row :gutter="20">
             <el-col :span="8">
               <div class="box-left">
-                <img width="80px" height="80px" :src="imgList[item.type]" />
+                <img width="60px" height="60px" :src="imgList[item.type]" />
               </div>
             </el-col>
             <el-col :span="16">
@@ -69,12 +69,14 @@
     <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene"></add-search-scene>
     <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene"></add-recommend-scene>
     <statistic-chart v-if="statisticChartVisible" ref="statisticChart"></statistic-chart>
+    <real-time-strategy v-if="realTimeStrategyVisible" ref="realTimeStrategy" @closeDialog="closeDialogEvent"></real-time-strategy>
   </div>
 </template>
 <script>
 import addSearchScene from './baseComponents/sceneManage-sceneConfig-add-search-scene'
 import addRecommendScene from './baseComponents/sceneManage-sceneConfig-add-recommend-scene'
 import statisticChart from './baseComponents/sceneManage-sceneConfig-statistic-chart'
+import realTimeStrategy from './baseComponents/sceneManage-sceneConfig-real-time-strategy'
 export default {
   data () {
     return {
@@ -120,10 +122,11 @@ export default {
       ],
       addSearchSceneVisible: false,
       addRecommendSceneVisible: false,
-      statisticChartVisible: false
+      statisticChartVisible: false,
+      realTimeStrategyVisible: false
     }
   },
-  components: { addSearchScene, addRecommendScene, statisticChart },
+  components: { addSearchScene, addRecommendScene, statisticChart, realTimeStrategy },
   methods: {
     addSearchScene () {
       this.addSearchSceneVisible = true
@@ -144,7 +147,13 @@ export default {
       })
     },
     realTimestrategyClick () { // 实时策略
-
+      this.realTimeStrategyVisible = true
+      this.$nextTick(() => {
+        this.$refs.realTimeStrategy.init()
+      })
+    },
+    closeDialogEvent () {
+      this.realTimeStrategyVisible = false
     }
   }
 }
@@ -172,7 +181,8 @@ export default {
     margin: 0 50px 20px 0;
   }
   .box-left {
-    padding-top: 10px;
+    padding-top: 28px;
+    text-align: center;
   }
   .box-right {
     font-size: 14px;
