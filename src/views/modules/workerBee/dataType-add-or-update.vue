@@ -70,8 +70,8 @@
       </el-form-item>  
     </el-form>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%" v-if="type === 'cassandra'">
-      <el-form-item label="数据源名字" prop="cDatasourceName">
-        <el-input v-model="dataForm.cDatasourceName" placeholder="数据库名字"/>
+      <el-form-item label="数据源名字" prop="cassandraName">
+        <el-input v-model="dataForm.cassandraName" placeholder="数据库名字"/>
       </el-form-item>
       <el-form-item label="集群节点地址" prop="contactPoints">
         <el-input v-model="dataForm.contactPoints" placeholder="集群节点地址"/>
@@ -148,7 +148,7 @@
           waitmillis: '',
           zookeeperName: '',
           zookeeperQuorum: '',
-          cDatasourceName: '',
+          cassandraName: '',
           enable: true,
           version: '',
           remark: '',
@@ -166,7 +166,7 @@
             { required: true, message: '数据源名称不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          cDatasourceName: [
+          cassandraName: [
             { required: true, message: '数据源名称不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
