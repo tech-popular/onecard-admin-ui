@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="渠道" prop="channelCode">
-        <el-select filterable v-model="dataForm.channelCode" style="width:60%">
+        <el-select filterable v-model="dataForm.channelCode" style="width:100%" multiple>
           <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -107,7 +107,7 @@
           // sourceDatasource: '', // 指标数据源
           enable: 'true', // 指标状态
           remark: '', // 描述
-          channelCode: ''
+          channelCode: []
         },
         tag: '', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -260,6 +260,7 @@
           this.$refs['dataForm'].resetFields()
           if (row) {
             this.dataForm = deepClone(row)
+            this.dataForm.channelCode = this.dataForm.channelCode.split(',').filter(item => item !== '')
             if (row.remark === null) {
               this.dataForm.remark = ''
             }
@@ -285,6 +286,7 @@
             } else {
               this.dataForm.enable = false
             }
+            this.dataForm.channelCode = this.dataForm.channelCode.join(',')
             if (!this.dataForm.id) {
               addIndexManage(this.dataForm).then(({data}) => {
                 if (data && data.status === '1') {
@@ -301,7 +303,7 @@
                     }
                   })
                 } else {
-                  this.$message.error(data.message)
+                  this.$message.error(data.message || '数据异常')
                 }
               })
             } else {

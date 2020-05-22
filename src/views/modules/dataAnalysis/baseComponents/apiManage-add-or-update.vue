@@ -302,8 +302,8 @@ export default {
             message: data.message
           })
         }
-        // this.custerNameList = data.data.filter(item => item.type === 'dynamic') // 修改，只展示动态的分群
-        this.custerNameList = data.data
+        this.custerNameList = data.data.filter(item => item.channelCode.split(',').filter(citem => citem !== '').length === 1) // 多渠道的分群不让选择
+        // this.custerNameList = data.data
         if (fn) {
           fn()
         }
