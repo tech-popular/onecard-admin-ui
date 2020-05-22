@@ -5,8 +5,8 @@
         <el-input v-model="mysqldataForm.datasourceName" placeholder="数据源名称"/>
       </el-form-item>
       <el-form-item label="数据源类型" prop="datasourceType">
-        <el-select filterable v-model="mysqldataForm.datasourceType" placeholder="请选择"  disabled>
-            <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
+        <el-select filterable v-model="mysqldataForm.datasourceType" placeholder="请选择">
+            <el-option v-for="item in datasourceTypeList" :value="item.value" :key="item.value" :label="item.value"/>
           </el-select>
       </el-form-item>
       <el-form-item label="数据库驱动" prop="driver">
@@ -40,11 +40,6 @@
       <el-form-item label="host" prop="host">
         <el-input v-model="redisdataForm.host" placeholder="host"/>
       </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select filterable v-model="redisdataForm.type" placeholder="请选择" disabled>
-            <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
-          </el-select>
-      </el-form-item>
       <el-form-item label="端口" prop="port">
         <el-input v-model="redisdataForm.port" placeholder="端口"/>
       </el-form-item>
@@ -75,14 +70,13 @@
         <el-input v-model="redisdataForm.remark" placeholder="备注"/>
       </el-form-item>  
     </el-form>
+     <!-- REDIS 类型9 -->
+    <!-- <dataTYpeFormRedis
+     v-if="type === 'redis'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="dataTYpeFormRedis"/> -->
     <el-form :model="cassandradataForm" :rules="cassandradataRule" ref="cassandradataForm" label-width="20%" v-if="type === 'cassandra'">
       <el-form-item label="数据源名字" prop="datasourceName">
         <el-input v-model="cassandradataForm.datasourceName" placeholder="数据库名字"/>
-      </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select filterable v-model="cassandradataForm.type" placeholder="请选择" disabled>
-            <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
-          </el-select>
       </el-form-item>
       <el-form-item label="集群节点地址" prop="contactPoints">
         <el-input v-model="cassandradataForm.contactPoints" placeholder="集群节点地址"/>
@@ -118,11 +112,6 @@
       <el-form-item label="zookeeper名称" prop="zookeeperName">
         <el-input v-model="hbasedataForm.zookeeperName" placeholder="zookeeper名称"/>
       </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select filterable v-model="hbasedataForm.type" placeholder="请选择" disabled>
-            <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
-          </el-select>
-      </el-form-item>
       <el-form-item label="zookeeper" prop="zookeeperQuorum">
         <el-input v-model="hbasedataForm.zookeeperQuorum" placeholder="zookeeper"/>
       </el-form-item>
@@ -144,7 +133,9 @@
 </template>
 
 <script>
-  import { saveorupt } from '@/api/workerBee/dataType'
+  import { saveorupt, infoDatdType } from '@/api/workerBee/dataType'
+  // import DataTYpeFormRedis from './dataTypeChailTable/dataType-form-redis'
+
   import Filter from './filter'
   export default {
     data () {
@@ -162,6 +153,7 @@
           remark: '',
           type: ''
         },
+        // fatherData: {},
         redisdataForm: {
           host: '',
           passwd: '',
@@ -341,18 +333,27 @@
           ]
         },
         versionList: [
-          {id: '1.0', value: '1.0'}
+          {id: 1, value: 1}
+        ],
+        datasourceTypeList: [
+          { id: 'mysql', value: 'mysql' },
+          { id: 'oracle', value: 'oracle' },
+          { id: 'postgre', value: 'postgre' },
+          { id: 'maxCompute', value: 'maxCompute' },
+          { id: 'kafka', value: 'kafka' },
+          { id: 'ftp', value: 'ftp' },
+          { id: 'canary', value: 'canary' },
+          { id: 'es', value: 'es' }
         ]
       }
     },
     mounted () {
     },
     components: {
+      // DataTYpeFormRedis
     },
     methods: {
       init (id, type) {
-        console.log(id, type, '999')
-  
         this.type = type
         this.mysqldataForm.type = type
         this.redisdataForm.type = type
@@ -362,12 +363,25 @@
         this.updateId = id
         this.mysqldataForm.id = id || 0
         this.visible = true
-        this.$nextTick(() => {
-          this.$refs['mysqldataForm'].resetFields()
-          this.$refs['redisdataForm'].resetFields()
-          this.$refs['hbasedataForm'].resetFields()
-          this.$refs['cassandradataForm'].resetFields()
-        })
+        if (id) {
+          const dataBody = {
+            id: id,
+            type: type
+          }
+          infoDatdType(dataBody).then(({data}) => {
+            if (data && data.message === 'success') {
+              this.mysqldataForm = data.data
+              this.redisdataForm = data.data
+              this.hbasedataForm = data.data
+              this.cassandradataForm = data.data
+            } else {
+              this.$message({
+                message: data.message || '数据异常',
+                type: 'error'
+              })
+            }
+          })
+        }
       },
       // 表单提交
       dataFormSubmit () {
@@ -399,7 +413,7 @@
             if (this.type === 'cassandra') {
               dataBody = this.cassandradataForm
             }
-            saveorupt(dataBody).then(({data}) => {
+            saveorupt(dataBody, this.updateId).then(({data}) => {
               if (data && data.message === 'success') {
                 this.$message({
                   message: '操作成功',
@@ -422,6 +436,7 @@
       },
       datano () {
         this.visible = false
+        this.$refs.form.resetFields()
       }
     }
   }

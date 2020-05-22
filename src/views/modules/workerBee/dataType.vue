@@ -50,7 +50,7 @@
   import RedisTable from './dataTypeChailTable/dataType-redis'
   import CassandraTable from './dataTypeChailTable/dataType-cassandra'
   import HbaseTable from './dataTypeChailTable/dataType-hbase'
-  import { dataTypeList, deleteBeeTask } from '@/api/workerBee/dataType'
+  import { dataTypeList, deleteDatdType } from '@/api/workerBee/dataType'
 
   export default {
     data () {
@@ -122,8 +122,11 @@
       },
       // 删除
       deleted () {
-        const dataBody = this.deletedId
-        deleteBeeTask(dataBody, false).then(({data}) => {
+        const dataBody = {
+          id: this.deletedId,
+          type: this.dataForm.type
+        }
+        deleteDatdType(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.deleteVisible = false
             this.getDataList()
