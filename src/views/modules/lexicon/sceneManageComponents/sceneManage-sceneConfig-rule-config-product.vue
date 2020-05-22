@@ -61,6 +61,7 @@
           <el-date-picker
             v-model="weightForm.date"
             type="datetimerange"
+            :picker-options="pickerOptions"
             start-placeholder="生效时间"
             end-placeholder="失效时间"
             :default-time="['12:00:00']">
@@ -146,6 +147,11 @@ export default {
       weightForm: {
         weight: '',
         date: []
+      },
+      pickerOptions: {
+        disabledDate: date => {
+          return date && date.valueOf() < Date.now()
+        }
       }
     }
   },
