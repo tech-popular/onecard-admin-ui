@@ -51,7 +51,7 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper" />
     <el-dialog title="修改" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-      <el-form label-width="100px" :model="weightForm" ref="weightForm">
+      <el-form label-width="100px" :model="weightForm" :rules="weightFormRules" ref="weightForm">
         <el-form-item label="权重：" prop="weight">
           <el-select v-model="weightForm.weight">
             <el-option v-for="item in 5" :key="item" :value="item">{{item}}</el-option>
@@ -61,17 +61,17 @@
           <el-date-picker
             v-model="weightForm.date"
             type="datetimerange"
-            :picker-options="pickerOptions"
             start-placeholder="生效时间"
             end-placeholder="失效时间"
-            :default-time="['12:00:00']">
+            value-format="yyyy-MM-dd hh:mm:ss"
+          >
           </el-date-picker>
-          <p class="tips">失效时间距离当前时间最短不低于5分钟，最长不超过180天</p>
         </el-form-item>
+         <p class="tips">失效时间距离当前时间最短不低于5分钟，最长不超过180天</p>
       </el-form>
       <div slot="footer">
         <el-button @click="cancel">取消</el-button>
-        <el-button type="primary" @click="cancel">确定</el-button>
+        <el-button type="primary" @click="dataSubmit">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -148,10 +148,13 @@ export default {
         weight: '',
         date: []
       },
-      pickerOptions: {
-        disabledDate: date => {
-          return date && date.valueOf() < Date.now()
-        }
+      weightFormRules: {
+        weight: [
+          { required: true, message: '请输入', trigger: 'blur' }
+        ],
+        date: [
+          { required: true, message: '请选择', trigger: 'change' }
+        ]
       }
     }
   },
@@ -169,6 +172,22 @@ export default {
     currentChangeHandle (page) {
       this.pageNo = page
       this.getDataList()
+    },
+    dataSubmit () {
+      console.log(this.weightForm)
+      let uneffectTime = new Date(this.weightForm.date[1]).getTime()
+      let now = Date.now()
+      if (now + 1000 * 60 * 5 > uneffectTime) {
+        return this.$message.error('失效时间距离当前时间最短不低于5分钟')
+      }
+      if (now + 1000 * 60 * 60 * 24 * 180 < uneffectTime) {
+        return this.$message.error('失效时间距离当前时间最长不超过180天')
+      }
+      this.$refs.weightForm.validate((valid) => {
+        if (valid) {
+          console.log(9999)
+        }
+      })
     },
     cancel () {
       this.visible = false
@@ -213,6 +232,7 @@ export default {
     color: #ff0000;
   }
   .tips {
-    color: #999
+    color: #999;
+    padding-left: 100px;
   }
 </style>

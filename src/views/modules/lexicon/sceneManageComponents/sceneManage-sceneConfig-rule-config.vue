@@ -56,6 +56,16 @@ export default {
     },
     handleClick () {
       console.log(this.activeName)
+      this.ruleConfigProductVisible = false
+      this.ruleConfigDuplicateVisible = false
+      this.ruleConfigMustpushVisible = false
+      if (this.activeName === '1') {
+        this.ruleConfigProductVisible = true
+      } else if (this.activeName === '2') {
+        this.ruleConfigDuplicateVisible = true
+      } else {
+        this.ruleConfigMustpushVisible = true
+      }
     },
     drawerClose () {
       this.visible = false
