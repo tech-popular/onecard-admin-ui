@@ -15,11 +15,11 @@
     <!-- mysqlTable -->
     <mysql-table v-if="dataForm.type === 'mysql/oracle'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <!-- redisTable -->
-    <redis-table v-if="dataForm.type === 'redis'" :dataList='dataList'/>
+    <redis-table v-if="dataForm.type === 'redis'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <!-- redisTable -->
-    <cassandra-table v-if="dataForm.type === 'cassandra'" :dataList='dataList'/>
+    <cassandra-table v-if="dataForm.type === 'cassandra'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <!-- hbase -->
-    <hbase-table v-if="dataForm.type === 'hbase'" :dataList='dataList'/>
+    <hbase-table v-if="dataForm.type === 'hbase'" @addOrUpdateHandle="addOrUpdateHandle" @deleteddialog="deleteddialog" :dataList='dataList'/>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -50,7 +50,7 @@
   import RedisTable from './dataTypeChailTable/dataType-redis'
   import CassandraTable from './dataTypeChailTable/dataType-cassandra'
   import HbaseTable from './dataTypeChailTable/dataType-hbase'
-  import { dataTypeList, deleteBeeTask } from '@/api/workerBee/dataType'
+  import { dataTypeList, deleteDatdType } from '@/api/workerBee/dataType'
 
   export default {
     data () {
@@ -122,8 +122,11 @@
       },
       // 删除
       deleted () {
-        const dataBody = this.deletedId
-        deleteBeeTask(dataBody, false).then(({data}) => {
+        const dataBody = {
+          id: this.deletedId,
+          type: this.dataForm.type
+        }
+        deleteDatdType(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.deleteVisible = false
             this.getDataList()

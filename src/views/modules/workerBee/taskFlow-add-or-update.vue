@@ -85,7 +85,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'DECISION' || zirenwucarent === 'FOR_EACH'">
+      <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'SUB_WORKFLOW' || zirenwucarent === 'FOR_EACH'">
         <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
           <el-option
             v-for="(item) in renwuindexlist"
@@ -209,6 +209,12 @@
         this.dataForm.flowId = flowId
         this.visible = true
         const dataBody = {}
+        getAllWorkFlow(this.dataForm.flowId).then(({data}) => {
+          console.log(data, '999')
+          if (data && data.message === 'success') {
+            this.renwuindexlist = data.data
+          }
+        })
         if (id) {
           workFlowTaskinfo(id).then(({data}) => {
             if (data && data.message === 'success') {
@@ -224,7 +230,7 @@
               this.dataForm.caseSwitchList = data.data.caseSwitchList
               this.dataForm.inputParams = data.data.inputParams
               this.dataForm.outputParams = data.data.outputParams
-              this.dataForm.subWorkFlow = data.data.subWorkFlow
+              this.dataForm.subWorkFlow = data.data.subWorkFlowName
               this.dataForm.caseExpressionParamType = data.data.caseExpressionParamType
               this.zirenwucarent = data.data.type
             }
