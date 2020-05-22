@@ -547,7 +547,8 @@
       },
       // 获取分群出参 指标列表
       getOutParamsList (row) {
-        dataTransferManageOutParams({ channelCode: this.channelCode }).then(({data}) => {
+        let code = this.channelCode.split(',').filter(item => item !== '')
+        dataTransferManageOutParams({ channelCode: code }).then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
               // this.originOutParamsList = data.data
@@ -620,7 +621,11 @@
       },
       sqlServerChange (val) { // 选中sqlServer时
         if (this.baseForm.transferType.includes('sqlServer')) {
-          this.getSqlServerDefaultOutParams(this.channelCode, val)
+          let code = this.channelCode.split(',').filter(item => item !== '')
+          if (code.includes('2001') && !code.includes('1001')) { // 商城渠道时，把万卡渠道也传过去
+            code.push('1001')
+          }
+          this.getSqlServerDefaultOutParams({channelCode: code}, val) // 渠道多选后，传参方式改变
         }
       },
       getSqlServerDefaultOutParams (channelCode, id) { // 选择r3下发数据源时，先判断是否需要指定默认出参
