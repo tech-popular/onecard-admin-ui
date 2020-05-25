@@ -40,7 +40,9 @@ export default {
     },
     uploadSuccess (response, file) { // 上传成功时
       if (response.code !== 0) {
-        this.$emit('importFail')
+        this.$emit('importFail', response)
+        this.visible = false
+        return
       }
       this.$emit('importSuccess', response.data)
       this.visible = false
