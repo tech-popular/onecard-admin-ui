@@ -402,6 +402,8 @@ export default {
           // this.severdefaultApproverList = data.data.defaultApproverList
           this.severdepartment = data.data.department
           this.touchActionlist = data.data.touchActionList
+          this.severDataForm.applicantEmail = data.data.applicantName
+          this.severDataForm.applicantTel = data.data.applicantTel
         })
       })
     },
