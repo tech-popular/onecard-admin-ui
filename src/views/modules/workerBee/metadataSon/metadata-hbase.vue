@@ -48,7 +48,8 @@
   export default {
     props: [
       'hideVisibleClick',
-      'fatherData'
+      'fatherData',
+      'dataformType'
     ],
     data () {
       return {
@@ -70,7 +71,7 @@
     mounted () {
       this.intlist = this.$parent.$parent.$parent.fatherData
       const dataBody = {
-        type: this.intlist.type,
+        type: this.dataformType ? this.dataformType : this.intlist.type,
         name: this.fatherData.redisDataSourceId
       }
       getAllDataSourceByType(dataBody).then(({data}) => {

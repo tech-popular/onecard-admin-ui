@@ -43,7 +43,7 @@
     <!-- JDBC 类型2 -->
     <metadata-jdbc
     v-if="dataForm.type == 'JDBC'" :fatherData='fatherData'
-    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataJdbc"/>
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataJdbc"/>
     <!-- KAFKA 类型3 -->
     <metadata-kafka
     v-if="dataForm.type == 'KAFKA'" :fatherData='fatherData'
@@ -155,8 +155,7 @@
           parsTemplate: false,
           requestFieldType: 0,
           isQuery: 1,
-          requestParamTemplateStatus: 0,
-          type: ''
+          requestParamTemplateStatus: 0
         }
       }
     },
@@ -232,7 +231,8 @@
           enableCache: 1,
           parsTemplate: false,
           requestFieldType: 0,
-          requestParamTemplateStatus: 0
+          requestParamTemplateStatus: 0,
+          type: ''
         }
         this.visible = data
       },
