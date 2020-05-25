@@ -51,7 +51,7 @@
     <!-- CASSANDRA 类型4 -->
     <metadata-cassandra
     v-if="dataForm.type == 'CASSANDRA'" :fatherData='fatherData'
-    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataCassandra"/>
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataCassandra"/>
     <!-- GROOVY 类型5 -->
     <metadata-groovy
     v-if="dataForm.type == 'GROOVY'" :fatherData='fatherData'
@@ -67,11 +67,11 @@
     <!-- HBASE 类型8 -->
     <metadataHbase
     v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
-    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHbase"/>
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataHbase"/>
     <!-- REDIS 类型9 -->
     <metadataRedis
     v-if="dataForm.type == 'REDIS'" :fatherData='fatherData'
-    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataRedis"/>
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataRedis"/>
     </el-form>
    
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
