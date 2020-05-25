@@ -110,6 +110,16 @@ export default {
       this.$refs.mustpushForm.validate((valid) => {
         if (valid) {
           console.log(9999)
+          this.$confirm('配置必推商品后将覆盖原坑位必推商品，是否确定？<br/><br/><span style="padding:10px;border:1px solid #dedede;display:inline-block">原SKU商品名称</span> --> <span style="padding:10px;border:1px solid #dedede;display:inline-block">原SKU商品名称</span>', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            dangerouslyUseHTMLString: true,
+            type: ''
+          }).then(() => { //
+            console.log('取消')
+          }).catch(() => {
+            console.log('取消')
+          })
         }
       })
     }
