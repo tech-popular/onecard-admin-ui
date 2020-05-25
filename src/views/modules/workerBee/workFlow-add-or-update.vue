@@ -125,7 +125,7 @@
         },
         updateId: '',
         versionList: [
-          {id: '1.0', value: '1.0'}
+          {id: 1, value: 1}
         ],
         ownerAppList: [],
         flowCodeSys: ''
