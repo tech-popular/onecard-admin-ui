@@ -113,8 +113,8 @@ export default {
         this.$refs.multiImportFile.init()
       })
     },
-    importFailChange () {
-      this.uploadText = '上传失败'
+    importFailChange (data) {
+      this.uploadText = data.msg || '上传失败'
     },
     importSuccessChange (data) { // 数据导入完成后
       let arr = []
