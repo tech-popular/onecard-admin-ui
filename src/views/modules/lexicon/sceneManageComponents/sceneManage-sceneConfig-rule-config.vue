@@ -75,7 +75,7 @@ export default {
 </script>
 <style scoped>
   .content {
-    padding: 0 30px 30px
+    padding: 0 30px 30px;
   }
   .footer {
     position: absolute;

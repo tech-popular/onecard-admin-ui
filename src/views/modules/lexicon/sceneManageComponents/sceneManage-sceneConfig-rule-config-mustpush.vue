@@ -1,6 +1,12 @@
 <template>
   <div class="mustpust-content">
-    <div class="pane-left"></div>
+    <div class="pane-left">
+      <div class="pane-left-1">
+        <div class="pane-left-2">
+          <img :src="imgUrl" />
+        </div>
+      </div>
+    </div>
     <div class="pane-right">
       <div>上架商品 45678 件</div>
       <el-form label-width="80px" :model="baseForm" ref="baseForm" inline>
@@ -54,6 +60,7 @@
 export default {
   data () {
     return {
+      'imgUrl': require('../assets/images/img_phone.jpg'),
       loading: false,
       baseForm: {
         sku: '',
@@ -116,10 +123,25 @@ export default {
   }
   .pane-left {
     width: 350px;
-    height: 705px;
+    height: 702px;
     background: url(../assets/images/bg_phone.png) no-repeat;
     background-size: 100% auto;
     margin-right: 50px;
+    padding: 89px 23px 77px 24px;
+    overflow: hidden;
+  }
+  .pane-left-1 {
+    width: 302px;
+    height: 525px;
+    overflow: hidden;
+  }
+  .pane-left-2 {
+    overflow: auto;
+    width: 320px;
+    height: 525px;
+  }
+  .pane-left img {
+    width: 100%;
   }
   .pane-right {
     flex: 1;
