@@ -35,7 +35,7 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="success" @click="manualSync()">手动同步</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -87,7 +87,7 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="100" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
+          <!-- <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button> -->
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
         </template>
       </el-table-column>
@@ -248,6 +248,10 @@
           enable: ''
         }
         // this.getDataList()
+      },
+      // 手动同步
+      manualSync () {
+
       },
       // 每页数
       sizeChangeHandle (page) {
