@@ -118,13 +118,7 @@ export default {
       this.uploadText = data.msg || '上传失败'
     },
     importSuccessChange (data) { // 数据导入完成后
-      let arr = []
-      data.forEach(item => {
-        if (!arr.includes(item.sku)) {
-          arr.push(item.sku)
-        }
-      })
-      this.getDataList(arr)
+      this.dataList = data
       this.uploadText = '上传成功'
     },
     handleSelectionChange (val) { // 选中表格数据
