@@ -29,8 +29,8 @@
         </el-form-item>
         <el-form-item label="是否查询">
           <el-radio-group v-model="fatherData.isQuery">
-            <el-radio :label="0">否</el-radio>
-            <el-radio :label="1">是</el-radio>
+            <el-radio :label="1">否</el-radio>
+            <el-radio :label="0">是</el-radio>
           </el-radio-group>
         </el-form-item>
         <!-- <el-form-item label="是否启用">
