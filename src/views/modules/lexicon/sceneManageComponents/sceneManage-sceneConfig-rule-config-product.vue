@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="total">上架商品 <span>45678</span> 件</div>
     <el-form label-width="80px" :model="baseForm" ref="baseForm" inline>
       <el-form-item label="SKU" prop="sku">
         <el-input v-model.trim="baseForm.sku" placeholder="sku" clearable />
@@ -18,9 +19,11 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary">查询</el-button>
+        <el-button type="warning" @click="multiEditWeight">批量修改权重</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="loading" style="width: 100%;">
+    <el-table :data="dataList" border v-loading="loading" style="width: 100%;" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="sku" header-align="center" align="center" label="SKU"></el-table-column>
       <el-table-column prop="product_name" header-align="center" align="center" label="商品名称"></el-table-column>
       <el-table-column prop="weight" header-align="center" align="center">
@@ -155,13 +158,11 @@ export default {
         date: [
           { required: true, message: '请选择', trigger: 'change' }
         ]
-      }
+      },
+      multiSelectedData: []
     }
   },
   methods: {
-    productWeightChange () { // 改变权重
-      this.visible = true
-    },
     // 每页数
     sizeChangeHandle (page) {
       this.pageSize = page
@@ -172,6 +173,16 @@ export default {
     currentChangeHandle (page) {
       this.pageNo = page
       this.getDataList()
+    },
+    handleSelectionChange (val) {
+      console.log(val)
+      this.multiSelectedData = val
+    },
+    productWeightChange () { // 单一修改权重
+      this.visible = true
+    },
+    multiEditWeight () { // 批量修改权重
+      this.visible = true
     },
     dataSubmit () {
       console.log(this.weightForm)
@@ -234,5 +245,12 @@ export default {
   .tips {
     color: #999;
     padding-left: 100px;
+  }
+  .total {
+    padding: 10px 0 20px 35px;
+  }
+  .total span {
+    color: red;
+    font-weight: bold;
   }
 </style>

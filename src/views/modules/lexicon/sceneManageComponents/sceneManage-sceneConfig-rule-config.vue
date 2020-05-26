@@ -9,7 +9,7 @@
     class="rule-config-drawer"
   >
     <div class="content">
-      <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+      <el-tabs v-model="activeName" type="card" @tab-click="handleClick" class="tabs">
         <el-tab-pane v-for="(item, index) in tabsList" :key="index" :name="item.id" :label="item.name"></el-tab-pane>
       </el-tabs>
       <rule-config-product v-if="ruleConfigProductVisible" ref="ruleConfigProduct"></rule-config-product>
@@ -23,7 +23,7 @@
 </template>
 <script>
 import ruleConfigProduct from './sceneManage-sceneConfig-rule-config-product'
-import ruleConfigDuplicate from './sceneManage-sceneConfig-rule-config-duplicate'
+import ruleConfigDuplicate from './sceneManage-sceneConfig-rule-config-removeDuplicate'
 import ruleConfigMustpush from './sceneManage-sceneConfig-rule-config-mustpush'
 export default {
   data () {
@@ -76,6 +76,9 @@ export default {
 <style scoped>
   .content {
     padding: 0 30px 30px;
+  }
+  .tabs {
+    margin-bottom: 10px;
   }
   .footer {
     position: absolute;

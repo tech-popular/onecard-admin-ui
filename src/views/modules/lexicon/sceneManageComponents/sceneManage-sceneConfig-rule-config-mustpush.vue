@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="pane-right">
-      <div>上架商品 45678 件</div>
+      <div class="total">上架商品 <span>45678</span> 件</div>
       <el-form label-width="80px" :model="baseForm" ref="baseForm" inline>
         <el-form-item label="SKU" prop="sku">
           <el-input v-model.trim="baseForm.sku" placeholder="sku" clearable />
@@ -132,23 +132,23 @@ export default {
     margin-top: 20px;
   }
   .pane-left {
-    width: 350px;
-    height: 702px;
+    width: 330px;
+    height: 670px;
     background: url(../assets/images/bg_phone.png) no-repeat;
     background-size: 100% auto;
     margin-right: 50px;
-    padding: 89px 23px 77px 24px;
+    padding: 84px 22px 88px 22px;
     overflow: hidden;
   }
   .pane-left-1 {
-    width: 302px;
-    height: 525px;
+    width: 286px;
+    height: 490px;
     overflow: hidden;
   }
   .pane-left-2 {
     overflow: auto;
-    width: 320px;
-    height: 525px;
+    width: 303px;
+    height: 490px;
   }
   .pane-left img {
     width: 100%;
@@ -162,5 +162,12 @@ export default {
   }
   .mpane {
     margin-top: 20px;
+  }
+  .total {
+    padding: 0 0 20px 35px;
+  }
+  .total span {
+    color: red;
+    font-weight: bold;
   }
 </style>
