@@ -161,8 +161,7 @@
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           caseValueParam: [
-            { required: true, message: '判断case参数不能为空', trigger: 'blur' },
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '判断case参数不能为空', trigger: 'blur' }
           ],
           caseExpression: [
             { required: true, message: '判断表达式不能为空', trigger: 'blur' },
