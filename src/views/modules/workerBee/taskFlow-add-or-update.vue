@@ -293,6 +293,7 @@
                     this.dataForm.outputParams = ''
                     this.dataForm.subWorkFlow = ''
                     this.dataForm.caseExpressionParamType = 0
+                    this.zirenwucarent = ''
                   }
                 })
               } else {
@@ -343,6 +344,7 @@
         this.parentTasklist = []
         this.indexlist = []
         this.renwuindexlist = []
+        this.zirenwucarent = ''
       }
     }
   }
