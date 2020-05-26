@@ -60,7 +60,7 @@
       <el-form-item label="参考名称" prop="taskReferenceName" :rules="dataRule.taskReferenceName">
         <el-input v-model="dataForm.taskReferenceName" placeholder="参考名称"/>
       </el-form-item>
-      <el-form-item label="判断case参数" prop="caseValueParam" :rules="dataRule.caseValueParam" v-if="zirenwucarent === 'DECISION'">
+      <el-form-item label="判断case参数" prop="caseValueParam" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseValueParam" placeholder="判断case参数"/>
       </el-form-item>
       <el-form-item label="判断表达式" prop="caseExpression" :rules="dataRule.caseExpression" v-if="zirenwucarent === 'DECISION'">
@@ -160,9 +160,9 @@
             { required: true, message: '参考名称不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          caseValueParam: [
-            { required: true, message: '判断case参数不能为空', trigger: 'blur' }
-          ],
+          // caseValueParam: [
+          //   { required: true, message: '判断case参数不能为空', trigger: 'blur' }
+          // ],
           caseExpression: [
             { required: true, message: '判断表达式不能为空', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
