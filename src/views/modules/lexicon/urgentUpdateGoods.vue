@@ -73,6 +73,7 @@ export default {
       })
     },
     searchHandle () { // 查询
+      if (!this.dataForm.skus) return
       this.getDataList([ this.dataForm.skus ])
     },
     updateHandle () { // 一键更新 2018072610261631205c15
