@@ -2,12 +2,12 @@
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
 			<el-form-item label="sku(商品编号)：">
-        <el-input v-model="dataForm.skus" placeholder="请输入sku(商品编号)" clearable style="width: 400px" />
+        <el-input v-model.trim="dataForm.skus" placeholder="请输入sku(商品编号)" clearable style="width: 400px" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button type="success" @click="updateHandle()">一键更新</el-button>
-        <el-button type="danger" @click="clearCacheHandle()">一键清除推荐缓存</el-button>
+        <el-button type="danger" @click="clearCacheHandle()">一键更新推荐缓存</el-button>
         <el-button type="warning" @click="multiImportFile()">批量文件上传</el-button>
         <span v-if="!!uploadText" :class="uploadText ==='上传成功'? 'isSuccess': 'isFail'">{{uploadText}}</span>
       </el-form-item>
