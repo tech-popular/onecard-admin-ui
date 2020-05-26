@@ -8,7 +8,7 @@
         <el-input v-model.trim="sacherId" placeholder="任务具体id" clearable />
       </el-form-item>
       <el-form-item label="任务类型">
-        <el-select filterable v-model="sacherType" placeholder="请选择" @change="clickType">
+        <el-select filterable v-model="sacherType" clearable placeholder="请选择" @change="clickType">
           <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
         </el-select>
       </el-form-item>
