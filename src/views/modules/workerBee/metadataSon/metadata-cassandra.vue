@@ -16,8 +16,8 @@
         </el-form-item>
         <el-form-item label="is_query" prop="isQuery">
           <el-radio-group v-model="fatherData.isQuery">
-            <el-radio :label="0">是</el-radio>
-            <el-radio :label="1">否</el-radio>
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="请求参数的field数组" prop="requestFields" :rules="dataRule.requestFields">
@@ -124,8 +124,10 @@
     },
     mounted () {
       this.intlist = this.$parent.$parent.$parent.fatherData
-      this.arr = this.requestFieldTypes.split(',')
-      this.fatherData.requestFieldTypes = this.arr
+      if (this.requestFieldTypes) {
+        this.arr = this.requestFieldTypes.split(',')
+        this.fatherData.requestFieldTypes = this.arr
+      }
       const dataBody = {
         type: this.dataformType ? this.dataformType : this.intlist.type,
         name: this.fatherData.redisDataSourceId
