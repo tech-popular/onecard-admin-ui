@@ -476,7 +476,7 @@ export default {
     // 账号选中系统数据处理
     testFunction (value) {
       this.systemmodelList = []
-      if (value === 2 || value === 3) {
+      if (value === 3) {
         this.isShow = false
       } else {
         this.isShow = true
