@@ -51,7 +51,7 @@
     <!-- CASSANDRA 类型4 -->
     <metadata-cassandra
     v-if="dataForm.type == 'CASSANDRA'" :fatherData='fatherData'
-    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataCassandra"/>
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type'  :requestFieldTypes='requestFieldTypes' ref="metadataCassandra"/>
     <!-- GROOVY 类型5 -->
     <metadata-groovy
     v-if="dataForm.type == 'GROOVY'" :fatherData='fatherData'
@@ -146,7 +146,8 @@
           requestFieldType: 0,
           isQuery: 1,
           requestParamTemplateStatus: 0
-        }
+        },
+        requestFieldTypes: ''
       }
     },
     components: {
@@ -188,6 +189,7 @@
                 this.dataForm.outputParams = data.beeTaskDef.outputParams
                 this.dataForm.ownerApp = data.beeTaskDef.ownerApp
                 this.dataForm.remark = data.beeTaskDef.remark
+                this.requestFieldTypes = data && data.cassandra ? data.cassandra.requestFieldTypes : ''
                 this.fatherData = data[this.dataForm.type.toLowerCase()]
               }
             })
