@@ -255,7 +255,6 @@
               'beeTaskDef': this.dataForm,
               ...data
             }
-            console.log(newData, 'zhi')
   
             beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
               if (data && data.status === 0) {

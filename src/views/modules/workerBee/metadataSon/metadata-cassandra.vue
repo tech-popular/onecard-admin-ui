@@ -34,7 +34,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
-        <el-input v-model="fatherData.requestFields" placeholder="result1,result2(多个结果逗号隔开)"/>
+        <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
           <el-select v-model="fatherData.responseType" placeholder="请选择响应参数的数据类型">
@@ -122,6 +122,8 @@
     },
     mounted () {
       this.intlist = this.$parent.$parent.$parent.fatherData
+      console.log(this.$parent.$parent.$parent.fatherData, '000')
+  
       const dataBody = {
         type: this.dataformType ? this.dataformType : this.intlist.type,
         name: this.fatherData.redisDataSourceId
