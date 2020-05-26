@@ -96,16 +96,6 @@
   import Filter from './filter'
   export default {
     data () {
-      var checkDecisionName = (rule, value, callback) => {
-        const nullValue = /^[^\s]+$/
-        if (!value) {
-          callback(new Error('请输入任务定义名称'))
-        }
-        if (!nullValue.test(value)) {
-          callback(new Error('不能输入含空格的任务定义名称'))
-        }
-        callback()
-      }
       return {
         visible: false,
         dataForm: {
@@ -124,7 +114,7 @@
         ruleTypeList: [],
         dataRule: {
           name: [
-            { required: true, validator: checkDecisionName, trigger: 'change' },
+            { required: true, message: '请输入任务定义名称', trigger: 'change' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           type: [
@@ -265,6 +255,8 @@
               'beeTaskDef': this.dataForm,
               ...data
             }
+            console.log(newData, 'zhi')
+  
             beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {
               if (data && data.status === 0) {
                 this.$message({
