@@ -27,14 +27,14 @@
           <el-select v-model="fatherData.requestFieldTypes" multiple placeholder="请选择">
             <el-option
               v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
-        <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
+        <el-input v-model="fatherData.requestFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
           <el-select v-model="fatherData.responseType" placeholder="请选择响应参数的数据类型">
@@ -101,14 +101,14 @@
         dataidlist: [],
         intlist: {},
         options: [{
-          value: 'string',
-          label: 'string'
+          id: 'string',
+          name: 'string'
         }, {
-          value: 'int',
-          label: 'int'
+          id: 'int',
+          name: 'int'
         }, {
-          value: 'long',
-          label: 'long'
+          id: 'long',
+          name: 'long'
         }],
         fatherData: {},
         statyoptions: [{
@@ -151,8 +151,11 @@
               isQuery: this.fatherData.isQuery,
               requestFields: this.fatherData.requestFields,
               requestFieldTypes: this.fatherData.requestFieldTypes.join(),
+              responseType: this.fatherData.responseType,
+              cacheKeyFields: this.fatherData.cacheKeyFields,
               type: this.fatherData.type,
-              datasourceId: this.fatherData.datasourceId
+              datasourceId: this.fatherData.datasourceId,
+              id: this.fatherData.id
             }
             this.$emit('dataFormSubmit', this.fatherData)
           } else {
