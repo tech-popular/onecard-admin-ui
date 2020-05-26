@@ -76,7 +76,8 @@
     props: [
       'hideVisibleClick',
       'fatherData',
-      'dataformType'
+      'dataformType',
+      'requestFieldTypes'
     ],
     data () {
       return {
@@ -99,6 +100,7 @@
           ]
         },
         dataidlist: [],
+        arr: [],
         intlist: {},
         options: [{
           id: 'string',
@@ -122,8 +124,8 @@
     },
     mounted () {
       this.intlist = this.$parent.$parent.$parent.fatherData
-      console.log(this.$parent.$parent.$parent.fatherData, '000')
-  
+      this.arr = this.requestFieldTypes.split(',')
+      this.fatherData.requestFieldTypes = this.arr
       const dataBody = {
         type: this.dataformType ? this.dataformType : this.intlist.type,
         name: this.fatherData.redisDataSourceId
