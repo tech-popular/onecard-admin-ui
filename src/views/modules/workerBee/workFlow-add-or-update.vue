@@ -188,6 +188,7 @@
                     this.dataForm.createdBy = ''
                     this.dataForm.ownerApp = ''
                     this.flowCodeSys = ''
+                    this.dataForm.flowCode = ''
                   }
                 })
               } else {
@@ -209,6 +210,8 @@
         this.dataForm.description = ''
         this.dataForm.createdBy = ''
         this.dataForm.ownerApp = ''
+        this.flowCodeSys = ''
+        this.dataForm.flowCode = ''
       }
     }
   }
