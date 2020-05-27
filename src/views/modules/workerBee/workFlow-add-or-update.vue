@@ -189,6 +189,7 @@
                     this.dataForm.ownerApp = ''
                     this.flowCodeSys = ''
                     this.dataForm.flowCode = ''
+                    this.dataForm.inputParameters = ''
                   }
                 })
               } else {
@@ -212,6 +213,7 @@
         this.dataForm.ownerApp = ''
         this.flowCodeSys = ''
         this.dataForm.flowCode = ''
+        this.dataForm.inputParameters = ''
       }
     }
   }
