@@ -7,8 +7,8 @@
     width="1000px"
   >
     <el-divider>请选择申请类别</el-divider>
-    <el-tabs type="border-card" @tab-click="tabClick">
-      <el-tab-pane label="账号权限">
+    <el-tabs type="border-card" @tab-click="tabClick" v-model="actoveTab">
+      <el-tab-pane label="账号权限" name="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
           <el-form-item label="标题" prop="name">
@@ -40,7 +40,7 @@
           <el-button type="primary" @click="dataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="库表授权">
+      <el-tab-pane label="库表授权" name="库表授权">
         <el-form
           :model="severDataForm"
           :rules="severDataRule"
@@ -197,6 +197,7 @@ export default {
     return {
       totalPage: 0,
       visible: false,
+      actoveTab: '账号权限',
       // 账号权限开始
       systemList: [], // 申请系统数据载体
       systemmodelList: [], // 申请系统模块数据载体
@@ -312,7 +313,7 @@ export default {
     },
     // 选择库表
     tabClick () {
-      if (event.target.getAttribute('id') === 'tab-1') {
+      if (this.actoveTab === '库表授权') {
         const newData = {
           userName: this.$store.state.user.name
         }
@@ -443,6 +444,7 @@ export default {
                   this.selectedStaffList = []
                   this.$refs.staffTable.clearSelection()
                   this.buttonloading = false
+                  this.actoveTab = '账号权限'
                 }
               })
             } else {
@@ -533,6 +535,7 @@ export default {
       this.staffTemp.name = ''
       this.selectedStaffList = []
       this.$refs.staffTable.clearSelection()
+      this.actoveTab = '账号权限'
     },
     // 当前页
     currentChangeHandle (val) {
