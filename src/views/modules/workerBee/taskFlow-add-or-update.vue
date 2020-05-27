@@ -69,6 +69,9 @@
       <el-form-item label="switch判断项集合" prop="caseSwitchList" :rules="dataRule.caseSwitchList" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
+        <el-form-item label="join_on" prop="join_on" v-if="zirenwucarent === 'JOIN'">
+        <el-input v-model="dataForm.join_on" placeholder="join_on"/>
+      </el-form-item>
       <el-form-item label="任务入参" prop="inputParams">
         <el-input v-model="dataForm.inputParams" placeholder="例：{'inputName':'inputOtherName'}"/>
       </el-form-item>
