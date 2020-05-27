@@ -185,7 +185,8 @@ export default {
         'relation': 'and',
         'rules': []
       },
-      channelList: []
+      channelList: [],
+      isSelectedUneffectIndex: [] // 选中的指标是否有无效指标
       // originIndexList: [] // 没有处理过的指标列表数据
     }
   },
@@ -467,19 +468,38 @@ export default {
       if (!!tree && tree.length !== 0) {
         tree.forEach((item, index) => {
           let obj = {}
-          if (item.fieldType) {
-            obj.id = item.englishName + '-' + item.id
-            obj.englishName = item.englishName
-            obj.label = item.chineseName
-            obj.fieldType = item.fieldType
-            obj.enumTypeNum = item.enumTypeNum
-            obj.sourceTable = item.sourceTable
-            obj.dataStandar = item.dataStandar
-            obj.fieldId = item.id
-            obj.channelCode = item.channelCode
-          } else {
-            obj.id = item.id
-            obj.label = item.name
+          if (!this.id) { // 不要无效指标，只展示有效指标
+            if (item.fieldType && item.enable) {
+              obj.id = item.englishName + '-' + item.id
+              obj.englishName = item.englishName
+              obj.label = item.chineseName
+              obj.fieldType = item.fieldType
+              obj.enumTypeNum = item.enumTypeNum
+              obj.sourceTable = item.sourceTable
+              obj.dataStandar = item.dataStandar
+              obj.fieldId = item.id
+              obj.channelCode = item.channelCode
+              obj.enable = item.enable
+            } else {
+              obj.id = item.id
+              obj.label = item.name
+            }
+          } else { // 修改时。展示全部指标
+            if (item.fieldType) {
+              obj.id = item.englishName + '-' + item.id
+              obj.englishName = item.englishName
+              obj.label = item.chineseName
+              obj.fieldType = item.fieldType
+              obj.enumTypeNum = item.enumTypeNum
+              obj.sourceTable = item.sourceTable
+              obj.dataStandar = item.dataStandar
+              obj.fieldId = item.id
+              obj.channelCode = item.channelCode
+              obj.enable = item.enable
+            } else {
+              obj.id = item.id
+              obj.label = item.name
+            }
           }
           if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
             obj.children = this.filterAllCata(item.dataCataLogList) // 指标集合
@@ -773,6 +793,10 @@ export default {
           })
           item.selectEnumsList = selectEnumsArr
           item.indexList = []
+          if (item.label && !item.enable) {
+            this.isSelectedUneffectIndex.push(item.label)
+            console.log(this.isSelectedUneffectIndex)
+          }
         } else {
           if (item.rules) {
             this.updateRulesConfig(item)
@@ -893,6 +917,13 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
+          if (this.isSelectedUneffectIndex.length) {
+            return this.$message({
+              message: `【${this.isSelectedUneffectIndex.join('，')}】为无效指标，请重新选择`,
+              type: 'error',
+              center: true
+            })
+          }
           let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
             code = 1

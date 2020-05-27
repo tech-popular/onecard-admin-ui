@@ -106,7 +106,7 @@
 </template>
 
 <script>
-  import { indexManageList, indexManageTypeList, indexManageMinCataList } from '@/api/dataAnalysis/indexManage'
+  import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex } from '@/api/dataAnalysis/indexManage'
   import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -251,7 +251,9 @@
       },
       // 手动同步
       manualSync () {
-
+        syncDataIndex().then(({data}) => {
+          console.log(data)
+        })
       },
       // 每页数
       sizeChangeHandle (page) {
