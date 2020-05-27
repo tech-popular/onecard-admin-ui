@@ -72,8 +72,11 @@
     <metadataRedis
     v-if="dataForm.type == 'REDIS'" :fatherData='fatherData'
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataRedis"/>
+    <!-- JOIN 类型10 -->
+    <metadata-join
+    v-if="dataForm.type == 'JOIN'" :fatherData='fatherData'
+    @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataJoin"/>
     </el-form>
-   
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -91,6 +94,7 @@
   import metadataFreemarke from './metadataSon/metadata-freemarke'
   import metadataHbase from './metadataSon/metadata-hbase'
   import metadataRedis from './metadataSon/metadata-redis'
+  import metadataJoin from './metadataSon/metadata-join'
 
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   import Filter from './filter'
@@ -159,7 +163,8 @@
       metadataAviator, // AVIATOR
       metadataFreemarke, // Freemarke
       metadataHbase, // Hbase
-      metadataRedis // Redis
+      metadataRedis, // Redis
+      metadataJoin // join
     },
     methods: {
       init (id, value) {
