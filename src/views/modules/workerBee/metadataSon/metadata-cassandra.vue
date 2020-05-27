@@ -157,6 +157,7 @@
               isQuery: this.fatherData.isQuery,
               requestFields: this.fatherData.requestFields,
               requestFieldTypes: this.fatherData.requestFieldTypes.join(),
+              responseFields: this.fatherData.responseFields,
               responseType: this.fatherData.responseType,
               cacheKeyFields: this.fatherData.cacheKeyFields,
               type: this.fatherData.type,
