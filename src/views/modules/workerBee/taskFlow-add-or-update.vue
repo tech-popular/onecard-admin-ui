@@ -86,7 +86,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="子流程ID" prop="subWorkFlow" v-if="zirenwucarent === 'SUB_WORKFLOW' || zirenwucarent === 'FOR_EACH'">
-        <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
+        <el-select v-model="dataForm.subWorkFlowName" filterable placeholder="子流程ID" style="width:100%" @change="ziliucheng">
           <el-option
             v-for="(item) in renwuindexlist"
             :key="item.id"
@@ -96,7 +96,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="子流程ID" prop="subWorkFlow" v-else>
-        <el-select v-model="dataForm.subWorkFlow" filterable placeholder="子流程ID" style="width:100%">
+        <el-select v-model="dataForm.subWorkFlowName" filterable placeholder="子流程ID" style="width:100%" @change="ziliucheng">
           <el-option
             v-for="(item, index) in indexlist"
             :key="index"
@@ -140,6 +140,7 @@
           caseSwitchList: '',
           inputParams: '',
           outputParams: '',
+          subWorkFlowName: '',
           subWorkFlow: '',
           caseExpressionParamType: 0
         },
@@ -209,7 +210,6 @@
         this.visible = true
         const dataBody = {}
         getAllWorkFlow(this.dataForm.flowId).then(({data}) => {
-          console.log(data, '999')
           if (data && data.message === 'success') {
             this.renwuindexlist = data.data
           }
@@ -229,13 +229,13 @@
               this.dataForm.caseSwitchList = data.data.caseSwitchList
               this.dataForm.inputParams = data.data.inputParams
               this.dataForm.outputParams = data.data.outputParams
-              this.dataForm.subWorkFlow = data.data.subWorkFlowName
+              this.dataForm.subWorkFlowName = data.data.subWorkFlowName
+              this.dataForm.subWorkFlow = data.data.subWorkFlow
               this.dataForm.caseExpressionParamType = data.data.caseExpressionParamType
               this.zirenwucarent = data.data.type
             }
           })
         }
-  
         getAllBeeTaskList(dataBody, false).then(({data}) => {
           if (data && data.message === 'success') {
             this.taskIdlist = data.data
@@ -291,6 +291,7 @@
                     this.dataForm.inputParams = ''
                     this.dataForm.outputParams = ''
                     this.dataForm.subWorkFlow = ''
+                    this.dataForm.subWorkFlowName = ''
                     this.dataForm.caseExpressionParamType = 0
                     this.zirenwucarent = ''
                   }
@@ -302,12 +303,15 @@
           }
         })
       },
+       // 获取子流程id
+      ziliucheng (val) {
+        this.dataForm.subWorkFlow = val
+      },
       // 任务类型调用接口
       renwu (value) {
         this.zirenwucarent = value
         if (value === 'SUB_WORKFLOW' || value === 'FOR_EACH') {
           getAllWorkFlow(this.dataForm.flowId).then(({data}) => {
-            console.log(data, '999')
             if (data && data.message === 'success') {
               this.renwuindexlist = data.data
             }
@@ -338,6 +342,7 @@
         this.dataForm.inputParams = ''
         this.dataForm.outputParams = ''
         this.dataForm.subWorkFlow = ''
+        this.dataForm.subWorkFlowName = ''
         this.dataForm.caseExpressionParamType = 0
         this.preTasklist = []
         this.parentTasklist = []
