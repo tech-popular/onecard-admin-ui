@@ -7,7 +7,7 @@
     width="1000px"
   >
     <el-divider>请选择申请类别</el-divider>
-    <el-tabs type="border-card">
+    <el-tabs type="border-card" @tab-click="tabClick">
       <el-tab-pane label="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
@@ -232,36 +232,11 @@ import {
   databaseInitInfo,
   accoutAuthInitInfo,
   saveAccountAuthApply,
-  saveDatabaseAuthApply
+  saveDatabaseAuthApply,
+  mcCompute
 } from '@/api/oa/apply'
 export default {
   data () {
-    // var checkPhone = (rule, value, callback) => {
-    //   const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
-    //   if (!value) {
-    //     return callback(new Error('申请人手机号不能为空'))
-    //   }
-    //   setTimeout(() => {
-    //     if (phoneReg.test(value)) {
-    //       callback()
-    //     } else {
-    //       callback(new Error('电话号码格式不正确'))
-    //     }
-    //   }, 100)
-    // }
-    // var checkemail = (rule, value, callback) => {
-    //   const emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
-    //   if (!value) {
-    //     return callback(new Error('申请人邮箱不能为空'))
-    //   }
-    //   setTimeout(() => {
-    //     if (emailReg.test(value)) {
-    //       callback()
-    //     } else {
-    //       callback(new Error('邮箱格式不正确'))
-    //     }
-    //   }, 100)
-    // }
     return {
       totalPage: 0,
       visible: false,
@@ -406,6 +381,22 @@ export default {
           this.severDataForm.applicantTel = data.data.applicantTel
         })
       })
+    },
+    // 选择库表
+    tabClick () {
+      console.log(event.target.getAttribute('id'))  // 获取到当前元素的id
+      if (event.target.getAttribute('id') === 'tab-1') {
+        const newData = {
+          userName: this.$store.state.user.name
+        }
+        mcCompute(newData).then(({ data }) => {
+          if (data && data.status === '1') {
+            this.severDataForm.account = data.data.mcAccount
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      }
     },
     // 任务类型
     clickType () {
