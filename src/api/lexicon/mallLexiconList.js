@@ -15,3 +15,5 @@ export const updateWordsInfo = params => httpPost(base + 'word/updateWordsInfo',
 export const getBrandNamesAndCategoryNames = params => httpPost(base + 'word/showBrandNamesAndCategoryNames', params) // 词组搜索词模糊查询
 // export const downLoadWordsTXT = type => httpGet(base + `/word/downLoadWordsTXT/${type}`)
 export const downLoadWordsTXT = type => http.adornUrl(base + 'word/downLoadWordsTXT/' + type + '?token=' + Vue.cookie.get('token'))
+
+// 场景推荐
