@@ -17,9 +17,6 @@
           :options="firstCategoryTypeList">
         </el-cascader>
       </el-form-item>
-      <!-- <el-form-item label="二级品类" prop="second_category_type">
-        <el-input v-model.trim="baseForm.second_category_type" placeholder="二级品类" clearable />
-      </el-form-item> -->
       <el-form-item label="品牌" prop="brand_name">
         <el-input v-model.trim="baseForm.brand_name" placeholder="品牌" clearable />
       </el-form-item>
@@ -86,7 +83,7 @@
   </div>
 </template>
 <script>
-import { selectFirstCategoryName } from '@/api/lexicon/sceneManage'
+import { selectFirstCategoryName, saveorupt, getSceneWeightList } from '@/api/lexicon/sceneManage'
 export default {
   props: [
     'boxId'
@@ -101,39 +98,11 @@ export default {
         brand_name: ''
       },
       props: {
-        multiple: false
+        multiple: false,
+        label: 'categoryName',
+        value: 'categoryType'
       },
-      firstCategoryTypeList: [{
-        value: 'zhinan',
-        label: '数据中台',
-        children: [{
-          value: 'shejiyuanze',
-          label: '天眼临时',
-          children: [{
-            value: 'yizhi',
-            label: '一致'
-          }, {
-            value: 'fankui',
-            label: '报表信息'
-          }, {
-            value: 'xiaolv',
-            label: '报表图表'
-          }, {
-            value: 'kekong',
-            label: '图表数据指标说明'
-          }]
-        }, {
-          value: 'daohang',
-          label: '蜂巢',
-          children: [{
-            value: 'cexiangdaohang',
-            label: '侧向导航'
-          }, {
-            value: 'dingbudaohang',
-            label: '数据库连接配置表'
-          }]
-        }]
-      }],
+      firstCategoryTypeList: [],
       loading: false,
       dataList: [
         {
@@ -212,12 +181,31 @@ export default {
   methods: {
     init () {
       selectFirstCategoryName().then(({data}) => {
-        // this.firstCategoryTypeList = data.data
+        this.firstCategoryTypeList = data.data
       })
     },
     // 查询
     seachWeight () {
-      console.log(this.baseForm, 'baseForm')
+      saveorupt(this.baseForm).then(({data}) => {
+        if (data && data.status === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false
+              this.$emit('refreshDataList')
+              this.$refs['dataForm'].resetFields()
+            }
+          })
+          getSceneWeightList().then(({data}) => {
+            console.log(data, '444')
+            this.dataList = data.data
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (page) {
