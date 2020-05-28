@@ -12,9 +12,9 @@
               :key="index"
               :label="item.id"
             >
-            {{item.name}}
+            {{item.boxName}}
             <el-tooltip placement="top">
-              <div slot="content" v-html="item.tips"></div>
+              <div slot="content" v-html="item.boxDesc"></div>
               <i class="el-icon-info"></i>
             </el-tooltip>
             </el-radio>
@@ -46,28 +46,12 @@
   </div>
 </template>
 <script>
-import { saveorupt, listSceneBoxInfo } from '@/api/lexicon/sceneManage'
+import { saveorupt, listSceneBoxInfo, listProductPool } from '@/api/lexicon/sceneManage'
 export default {
   data () {
     return {
       visible: false,
-      typeList: [ // 推荐类型
-        {
-          id: 1,
-          name: '猜你喜欢',
-          tips: '根据用户兴趣，推荐给用户感兴趣的物<br/>品，达到“千人千面”的效果。常见于产<br/>品内“Feed流“、”猜你喜欢”模块。'
-        },
-        {
-          id: 2,
-          name: '热门推荐',
-          tips: '基于全站物品各维度统计值进行全局排<br/>序。常见于产品内首页“热销周榜”等模<br/>块。'
-        },
-        {
-          id: 3,
-          name: '相关推荐',
-          tips: '推荐与当前物品相似的物品，以提升产品<br/>访问深度。常见于产品内详情页“相关推<br/>荐”模块。'
-        }
-      ],
+      typeList: [],
       productPoolList: [ // 商品池
         {
           id: '1',
@@ -102,7 +86,10 @@ export default {
         goodsPool: ''
       }
       listSceneBoxInfo().then(({data}) => {
-        console.log(data, 'shuju')
+        this.typeList = data.data
+      })
+      listProductPool().then(({data}) => {
+        this.productPoolList = data.data
       })
     },
     searchProductNum () { // 查询商品数量
@@ -112,13 +99,12 @@ export default {
       this.visible = false
     },
     dataSubmit () {
-      console.log(this.dataForm)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const dataBody = this.dataForm
           const dataUpdateId = this.dataForm.id
           saveorupt(dataBody, dataUpdateId).then(({data}) => {
-            if (data && data.status === 0) {
+            if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
                 type: 'success',
@@ -140,6 +126,10 @@ export default {
 }
 </script>
 <style scoped>
+  .el-radio+.el-radio{
+    margin-left: 0;
+    margin-top: 5px;
+  }
   .pool-sel {
     width: 280px;
     margin-right: 10px

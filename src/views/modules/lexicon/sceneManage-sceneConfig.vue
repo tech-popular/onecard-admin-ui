@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-card class="search-content" shadow="nerver">
+    <!-- <el-card class="search-content" shadow="nerver">
       <div class="search-title clearfix" slot="header">
         搜索服务
-        <!-- <el-button type="success" size="mini" icon="el-icon-plus" @click="addSearchScene">新建搜索场景</el-button> -->
+        <el-button type="success" size="mini" icon="el-icon-plus" @click="addSearchScene">新建搜索场景</el-button>
       </div>
       <div class="search-pane">
         <el-card class="box-card" shadow="hover" v-for="(item, index) in searchServiceList" :key="index">
@@ -17,7 +17,6 @@
               <div class="box-right">
                 <p>场景名称：{{item.name}}</p>
                 <p>场景ID（boxid）：{{item.boxid}}</p>
-                <p>状态：{{item.status}}</p>
               </div>
             </el-col>
           </el-row>
@@ -32,7 +31,7 @@
           </el-row>
         </el-card>
       </div>
-    </el-card>
+    </el-card> -->
     <el-card class="recommend-content" shadow="nerver">
       <div class="search-title" slot="header">
         推荐服务
@@ -43,21 +42,22 @@
           <el-row :gutter="20">
             <el-col :span="8">
               <div class="box-left">
-                <img width="60px" height="60px" :src="imgList[item.type]" />
+                <img width="60px" height="60px" :src="imgList.homeRecommend" />
               </div>
             </el-col>
             <el-col :span="16">
               <div class="box-right">
-                <p>场景名称：{{item.name}}</p>
-                <p>场景ID（boxid）：{{item.boxid}}</p>
-                <p>状态：{{item.status}}</p>
+                <p>场景名称：{{item.sceneName}}</p>
+                <p>场景ID（boxid）：{{item.boxId}}</p>
+                <p>推荐类型：{{item.boxName}}</p>
+                <!-- <p>状态：{{item.status}}</p> -->
               </div>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="24">
               <div class="box-bottom">
-                <el-button type="primary" size="mini" @click="ruleConfigClick">规则配置</el-button>
+                <el-button type="primary" size="mini" @click="ruleConfigClick(item.boxId)">规则配置</el-button>
                 <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
                 <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button>
               </div>
@@ -68,7 +68,7 @@
     </el-card>
     <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene"></add-search-scene>
     <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene"></add-recommend-scene>
-    <rule-config v-if="ruleConfigVisible" ref="ruleConfig"></rule-config>
+    <rule-config v-if="ruleConfigVisible" ref="ruleConfig" :boxId='boxId'></rule-config>
     <statistic-chart v-if="statisticChartVisible" ref="statisticChart"></statistic-chart>
     <real-time-strategy v-if="realTimeStrategyVisible" ref="realTimeStrategy" @closeDialog="closeDialogEvent"></real-time-strategy>
   </div>
@@ -79,6 +79,7 @@ import addSearchScene from './sceneManageComponents/sceneManage-sceneConfig-add-
 import ruleConfig from './sceneManageComponents/sceneManage-sceneConfig-rule-config'
 import statisticChart from './sceneManageComponents/sceneManage-sceneConfig-statistic-chart'
 import realTimeStrategy from './sceneManageComponents/sceneManage-sceneConfig-real-time-strategy'
+import { listSearchScene } from '@/api/lexicon/sceneManage'
 export default {
   data () {
     return {
@@ -88,62 +89,53 @@ export default {
         'searchNoResult': require('./assets/images/img-noresult.png'),
         'serachInputPage': require('./assets/images/img-input.png')
       },
-      searchServiceList: [
-        {
-          type: 'serachResult',
-          name: '搜索结果页',
-          boxid: '1232323',
-          status: '已上线'
-        },
-        {
-          type: 'serachResult',
-          name: '搜索结果页',
-          boxid: '545454',
-          status: '未上线'
-        }
-      ],
-      recommendServiceList: [
-        {
-          type: 'homeRecommend',
-          name: '首页推荐',
-          boxid: '1232323',
-          status: '已上线'
-        },
-        {
-          type: 'searchNoResult',
-          name: '搜索无结果',
-          boxid: '545454',
-          status: '未上线'
-        },
-        {
-          type: 'serachInputPage',
-          name: '搜索输入页',
-          boxid: '545454',
-          status: '未上线'
-        }
-      ],
+      // searchServiceList: [
+      //   {
+      //     type: 'serachResult',
+      //     name: '搜索结果页',
+      //     boxid: '1232323',
+      //     status: '已上线'
+      //   },
+      //   {
+      //     type: 'serachResult',
+      //     name: '搜索结果页',
+      //     boxid: '545454',
+      //     status: '未上线'
+      //   }
+      // ],
+      recommendServiceList: [],
       addSearchSceneVisible: false,
       addRecommendSceneVisible: false,
       ruleConfigVisible: false,
       statisticChartVisible: false,
-      realTimeStrategyVisible: false
+      realTimeStrategyVisible: false,
+      boxId: ''
     }
   },
   components: { addSearchScene, addRecommendScene, ruleConfig, statisticChart, realTimeStrategy },
+  mounted () {
+    this.init()
+  },
   methods: {
-    addSearchScene () { // 新建搜索场景
-      this.addSearchSceneVisible = true
-      this.$nextTick(() => {
-        this.$refs.addSearchScene.init()
+    init () {
+      listSearchScene().then(({data}) => {
+        this.recommendServiceList = data.data
       })
     },
+    // addSearchScene () { // 新建搜索场景
+    //   this.addSearchSceneVisible = true
+    //   this.$nextTick(() => {
+    //     this.$refs.addSearchScene.init()
+    //   })
+    // },
     addRecommendScene () { // 新建推荐场景
       this.addRecommendSceneVisible = true
       this.$nextTick(() => {
         this.$refs.addRecommendScene.init()
       })
     },
-    ruleConfigClick () { // 规则配置
+    ruleConfigClick (boxId) { // 规则配置
+      this.boxId = boxId
       this.ruleConfigVisible = true
       this.$nextTick(() => {
         this.$refs.ruleConfig.init()

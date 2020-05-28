@@ -12,7 +12,7 @@
       <el-tabs v-model="activeName" type="card" @tab-click="handleClick" class="tabs">
         <el-tab-pane v-for="(item, index) in tabsList" :key="index" :name="item.id" :label="item.name"></el-tab-pane>
       </el-tabs>
-      <rule-config-product v-if="ruleConfigProductVisible" ref="ruleConfigProduct"></rule-config-product>
+      <rule-config-product v-if="ruleConfigProductVisible" ref="ruleConfigProduct" :boxId='boxId'></rule-config-product>
       <rule-config-duplicate v-if="ruleConfigDuplicateVisible" ref="ruleConfigDuplicate"></rule-config-duplicate>
       <rule-config-mustpush v-if="ruleConfigMustpushVisible" ref="ruleConfigMustpush"></rule-config-mustpush>
     </div>
@@ -26,6 +26,9 @@ import ruleConfigProduct from './sceneManage-sceneConfig-rule-config-product'
 import ruleConfigDuplicate from './sceneManage-sceneConfig-rule-config-removeDuplicate'
 import ruleConfigMustpush from './sceneManage-sceneConfig-rule-config-mustpush'
 export default {
+  props: [
+    'boxId'
+  ],
   data () {
     return {
       visible: false,
@@ -53,6 +56,7 @@ export default {
   methods: {
     init () {
       this.visible = true
+      console.log(this.boxId, 'ppp')
     },
     handleClick () {
       console.log(this.activeName)

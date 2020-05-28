@@ -8,8 +8,21 @@
       <el-form-item label="商品名称" prop="product_name">
         <el-input v-model.trim="baseForm.product_name" placeholder="sku" clearable />
       </el-form-item>
-      <el-form-item label="一级品类" prop="first_category_type">
-        <el-input v-model.trim="baseForm.first_category_type" placeholder="一级品类" clearable />
+      <el-form-item label="一级品类" prop="firstCategoryType">
+        <el-select
+            v-model="baseForm.firstCategoryType"
+            filterable
+            placeholder="请选择"
+            class="pool-sel"
+          >
+            <el-option
+              v-for="(item, index) in firstCategoryTypeList"
+              :key="index"
+              :label="item.categoryName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        <!-- <el-input v-model.trim="baseForm.first_category_type" placeholder="一级品类" clearable /> -->
       </el-form-item>
       <el-form-item label="二级品类" prop="second_category_type">
         <el-input v-model.trim="baseForm.second_category_type" placeholder="二级品类" clearable />
@@ -80,16 +93,21 @@
   </div>
 </template>
 <script>
+import { selectFirstCategoryName } from '@/api/lexicon/sceneManage'
 export default {
+  props: [
+    'boxId'
+  ],
   data () {
     return {
       baseForm: {
         sku: '',
         product_name: '',
-        first_category_type: '',
+        firstCategoryType: '',
         second_category_type: '',
         brand_name: ''
       },
+      firstCategoryTypeList: [],
       loading: false,
       dataList: [
         {
@@ -162,7 +180,15 @@ export default {
       multiSelectedData: []
     }
   },
+  mounted () {
+    this.init()
+  },
   methods: {
+    init () {
+      selectFirstCategoryName().then(({data}) => {
+        this.firstCategoryTypeList = data.data
+      })
+    },
     // 每页数
     sizeChangeHandle (page) {
       this.pageSize = page
