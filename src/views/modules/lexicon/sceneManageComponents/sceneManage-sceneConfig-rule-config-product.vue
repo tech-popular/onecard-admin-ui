@@ -8,30 +8,23 @@
       <el-form-item label="商品名称" prop="product_name">
         <el-input v-model.trim="baseForm.product_name" placeholder="sku" clearable />
       </el-form-item>
-      <el-form-item label="一级品类" prop="firstCategoryType">
-        <el-select
-            v-model="baseForm.firstCategoryType"
-            filterable
-            placeholder="请选择"
-            class="pool-sel"
-          >
-            <el-option
-              v-for="(item, index) in firstCategoryTypeList"
-              :key="index"
-              :label="item.categoryName"
-              :value="item.id">
-            </el-option>
-          </el-select>
-        <!-- <el-input v-model.trim="baseForm.first_category_type" placeholder="一级品类" clearable /> -->
+      <el-form-item label="品类" prop="firstCategoryType">
+        <el-cascader
+          style="width: 100%"
+          :props="props"
+          v-model="baseForm.firstCategoryType"
+          clearable
+          :options="firstCategoryTypeList">
+        </el-cascader>
       </el-form-item>
-      <el-form-item label="二级品类" prop="second_category_type">
+      <!-- <el-form-item label="二级品类" prop="second_category_type">
         <el-input v-model.trim="baseForm.second_category_type" placeholder="二级品类" clearable />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="品牌" prop="brand_name">
         <el-input v-model.trim="baseForm.brand_name" placeholder="品牌" clearable />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">查询</el-button>
+        <el-button type="primary" @click="seachWeight">查询</el-button>
         <el-button type="warning" @click="multiEditWeight">批量修改权重</el-button>
       </el-form-item>
     </el-form>
@@ -107,7 +100,40 @@ export default {
         second_category_type: '',
         brand_name: ''
       },
-      firstCategoryTypeList: [],
+      props: {
+        multiple: false
+      },
+      firstCategoryTypeList: [{
+        value: 'zhinan',
+        label: '数据中台',
+        children: [{
+          value: 'shejiyuanze',
+          label: '天眼临时',
+          children: [{
+            value: 'yizhi',
+            label: '一致'
+          }, {
+            value: 'fankui',
+            label: '报表信息'
+          }, {
+            value: 'xiaolv',
+            label: '报表图表'
+          }, {
+            value: 'kekong',
+            label: '图表数据指标说明'
+          }]
+        }, {
+          value: 'daohang',
+          label: '蜂巢',
+          children: [{
+            value: 'cexiangdaohang',
+            label: '侧向导航'
+          }, {
+            value: 'dingbudaohang',
+            label: '数据库连接配置表'
+          }]
+        }]
+      }],
       loading: false,
       dataList: [
         {
@@ -186,8 +212,12 @@ export default {
   methods: {
     init () {
       selectFirstCategoryName().then(({data}) => {
-        this.firstCategoryTypeList = data.data
+        // this.firstCategoryTypeList = data.data
       })
+    },
+    // 查询
+    seachWeight () {
+      console.log(this.baseForm, 'baseForm')
     },
     // 每页数
     sizeChangeHandle (page) {
