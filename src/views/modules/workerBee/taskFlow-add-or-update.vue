@@ -70,7 +70,7 @@
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
       <el-form-item label="joinOn" prop="joinOn" v-if="zirenwucarent === 'JOIN'">
-        <el-input v-model.number="dataForm.joinOn" placeholder="输入joinOn的ID"/>
+        <el-input v-model="dataForm.joinOn" placeholder="joinOn"/>
       </el-form-item>
       <el-form-item label="任务入参" prop="inputParams">
         <el-input v-model="dataForm.inputParams" placeholder="例：{'inputName':'inputOtherName'}"/>
@@ -166,9 +166,9 @@
             { required: true, message: '参考名称不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          joinOn: [
-            { type: 'number', message: 'join必须为数字值', trigger: 'blur' }
-          ],
+          // joinOn: [
+          //   { type: 'number', message: 'join必须为数字值', trigger: 'blur' }
+          // ],
           caseExpression: [
             { required: true, message: '判断表达式不能为空', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
@@ -272,8 +272,8 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.joinArr.push(Number(this.dataForm.joinOn))
-            this.dataForm.joinOn = this.joinArr
+            // this.joinArr.push(Number(this.dataForm.joinOn))
+            // this.dataForm.joinOn = this.joinArr
             let dataBody = this.dataForm
             if (dataBody.type !== 'DECISION') {
               delete dataBody.caseExpressionParamType
