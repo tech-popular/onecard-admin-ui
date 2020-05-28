@@ -16,3 +16,5 @@ export const myAccoutSelect = (params) => httpGet(da + 'oa/initApplyRecordInfo',
 export const lookAccout = (params) => httpGet(da + `oa/detail/${params}`, params)
 // 库表保存
 export const saveDatabaseAuthApply = (params) => httpPost(da + 'oa/saveDatabaseAuthApply', params)
+// maxcomputer申请记录接口
+export const mcCompute = (params) => httpPost(da + 'mcCompute/getDefaultApplyInfo', params)

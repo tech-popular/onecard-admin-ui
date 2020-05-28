@@ -7,8 +7,8 @@
     width="1000px"
   >
     <el-divider>请选择申请类别</el-divider>
-    <el-tabs type="border-card">
-      <el-tab-pane label="账号权限">
+    <el-tabs type="border-card" @tab-click="tabClick" v-model="actoveTab">
+      <el-tab-pane label="账号权限" name="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
           <el-form-item label="标题" prop="name">
@@ -28,35 +28,9 @@
               :options="systemmodelList">
             </el-cascader>
           </el-form-item>
-          <!-- <el-form-item label="申请权限" prop="jurisdictionvalue">
-            <el-checkbox-group v-model="dataForm.jurisdictionvalue">
-              <el-checkbox
-                v-for="(item, index) in applyAuthList"
-                :label="item"
-                :key="index"
-              >{{item.name}}</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item> -->
-          <el-form-item label="申请人姓名">
-            <el-input v-model="dataForm.userName" placeholder="申请人姓名" disabled/>
-          </el-form-item>
-          <el-form-item label="申请人手机号">
-            <el-input v-model="dataForm.phone" placeholder="申请人手机号" disabled/>
-          </el-form-item>
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
-          <el-form-item label="申请人邮箱" prop="email">
-            <el-input v-model="dataForm.email" placeholder="申请人邮箱" />
-          </el-form-item> 
-          <!-- <el-form-item label="本次申请默认审批人" prop="approvalPeop">
-            <el-tag
-              style="margin-left:10px;"
-              v-for="tag in defaultApproverList"
-              :key="tag.name"
-              :type="tag.name"
-            >{{tag.name}}</el-tag>
-          </el-form-item> -->
           <el-form-item label="申请理由" prop="reason">
             <el-input type="textarea" v-model="dataForm.reason"></el-input>
           </el-form-item>
@@ -66,7 +40,7 @@
           <el-button type="primary" @click="dataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="库表授权">
+      <el-tab-pane label="库表授权" name="库表授权">
         <el-form
           :model="severDataForm"
           :rules="severDataRule"
@@ -192,26 +166,9 @@
           <el-form-item label="maxcomputer账号" prop="account">
             <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
           </el-form-item>
-          <el-form-item label="申请人姓名" prop="applicantName">
-            <el-input v-model="severDataForm.applicantName" placeholder="申请人姓名" />
-          </el-form-item>
-          <el-form-item label="申请人邮箱" prop="applicantEmail">
-            <el-input v-model="severDataForm.applicantEmail" placeholder="申请人邮箱" />
-          </el-form-item>
-          <el-form-item label="手机号" prop="applicantTel">
-            <el-input v-model="severDataForm.applicantTel" placeholder="手机号" />
-          </el-form-item>
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
-          <!-- <el-form-item label="本次申请默认审批人">
-            <el-tag
-              style="margin-left:10px;"
-              v-for="tag in severdefaultApproverList"
-              :key="tag.name"
-              :type="tag.name"
-            >{{tag.name}}</el-tag>
-          </el-form-item> -->
           <el-form-item label="申请理由" prop="applyReason">
             <el-input type="textarea" v-model="severDataForm.applyReason" placeholder="申请理由"></el-input>
           </el-form-item>
@@ -232,60 +189,31 @@ import {
   databaseInitInfo,
   accoutAuthInitInfo,
   saveAccountAuthApply,
-  saveDatabaseAuthApply
+  saveDatabaseAuthApply,
+  mcCompute
 } from '@/api/oa/apply'
 export default {
   data () {
-    var checkPhone = (rule, value, callback) => {
-      const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
-      if (!value) {
-        return callback(new Error('申请人手机号不能为空'))
-      }
-      setTimeout(() => {
-        if (phoneReg.test(value)) {
-          callback()
-        } else {
-          callback(new Error('电话号码格式不正确'))
-        }
-      }, 100)
-    }
-    var checkemail = (rule, value, callback) => {
-      const emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
-      if (!value) {
-        return callback(new Error('申请人邮箱不能为空'))
-      }
-      setTimeout(() => {
-        if (emailReg.test(value)) {
-          callback()
-        } else {
-          callback(new Error('邮箱格式不正确'))
-        }
-      }, 100)
-    }
     return {
       totalPage: 0,
       visible: false,
+      actoveTab: '账号权限',
       // 账号权限开始
       systemList: [], // 申请系统数据载体
       systemmodelList: [], // 申请系统模块数据载体
-      // applyAuthList: [], // 申请权限数据载体
       props: {
         multiple: true
-        // checkStrictly: true
       }, // 可多选申请系统
       defaultApproverList: [], // 本次申请默认审批人数据载体
       departmentList: [], // 默认部门数据载体
-      // jurisdictionvalue: [], // 选中的权限
       isShow: false, // 判断是否选择系统
       dataForm: {
         name: '', // 标题
         system: '', // 申请系统
         systemmodel: '', // 申请系统模块
-        // jurisdictionvalue: [], // 申请权限
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
-        // approvalPeop: '', // 本次申请默认审批人
         reason: '' // 申请理由
       }, // 账号权限form
       dataRule: {
@@ -295,18 +223,6 @@ export default {
         ],
         systemmodel: [
           { required: true, message: '请选择申请系统模块', trigger: 'blur' }
-        ],
-        // jurisdictionvalue: [
-        //   { required: true, message: '请选择申请权限', trigger: 'blur' }
-        // ],
-        // userName: [
-        //   { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
-        // ],
-        // phone: [
-        //   { required: true, validator: checkPhone, trigger: 'blur' }
-        // ],
-        email: [
-          { required: true, validator: checkemail, trigger: 'blur' }
         ],
         reason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
@@ -318,9 +234,6 @@ export default {
         title: '', // 库表权限标题
         applyAuthTypeList: [], // 申请权限
         applicantName: '', // 申请人姓名
-        applicantEmail: '', // 申请人邮箱
-        applicantTel: '', // 申请人手机号
-        // approvalPeop: '', // 默认审批人
         account: '', // maxcomputer账号
         applyReason: '' // 申请理由
       },
@@ -331,12 +244,6 @@ export default {
         ],
         applicantName: [
           { required: true, message: '申请人姓名不能为空', trigger: 'blur' }
-        ],
-        applicantEmail: [
-          { required: true, validator: checkemail, trigger: 'blur' }
-        ],
-        applicantTel: [
-          { required: true, validator: checkPhone, trigger: 'blur' }
         ],
         applyReason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
@@ -349,7 +256,6 @@ export default {
       buttonloading: false,
       ruleTypeList: [],
       severApplyAuthList: [], // 申请权限数据载体
-      // severdefaultApproverList: [], // 本次申请默认审批人数据载体
       severdepartment: '', // 默认部门数据载体
       fatherData: {
         enable: true,
@@ -391,7 +297,6 @@ export default {
         accoutAuthInitInfo().then(({ data }) => {
           this.systemList = data.data.systemList
           this.systemmodelList = data.data.systemList
-          // this.applyAuthList = data.data.applyAuthList
           this.defaultApproverList = data.data.defaultApproverList
           this.departmentList = data.data.departmentList
           this.dataForm.userName = data.data.applicantName
@@ -399,11 +304,27 @@ export default {
         })
         databaseInitInfo().then(({ data }) => {
           this.severApplyAuthList = data.data.applyAuthList
-          // this.severdefaultApproverList = data.data.defaultApproverList
           this.severdepartment = data.data.department
           this.touchActionlist = data.data.touchActionList
+          this.severDataForm.applicantEmail = data.data.applicantName
+          this.severDataForm.applicantTel = data.data.applicantTel
         })
       })
+    },
+    // 选择库表
+    tabClick () {
+      if (this.actoveTab === '库表授权') {
+        const newData = {
+          userName: this.$store.state.user.name
+        }
+        mcCompute(newData).then(({ data }) => {
+          if (data && data.status === '1') {
+            this.severDataForm.account = data.data.mcAccount
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      }
     },
     // 任务类型
     clickType () {
@@ -447,7 +368,6 @@ export default {
             applyReason: this.dataForm.reason,
             systemId: this.dataForm.system,
             menuList: this.dataForm.systemmodel
-            // applyAuthTypeList: this.dataForm.jurisdictionvalue
           }
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {
@@ -474,7 +394,7 @@ export default {
     // 账号选中系统数据处理
     testFunction (value) {
       this.systemmodelList = []
-      if (value === 2 || value === 3) {
+      if (value === 3) {
         this.isShow = false
       } else {
         this.isShow = true
@@ -524,6 +444,7 @@ export default {
                   this.selectedStaffList = []
                   this.$refs.staffTable.clearSelection()
                   this.buttonloading = false
+                  this.actoveTab = '账号权限'
                 }
               })
             } else {
@@ -614,6 +535,7 @@ export default {
       this.staffTemp.name = ''
       this.selectedStaffList = []
       this.$refs.staffTable.clearSelection()
+      this.actoveTab = '账号权限'
     },
     // 当前页
     currentChangeHandle (val) {
