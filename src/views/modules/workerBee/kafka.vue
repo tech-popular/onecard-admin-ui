@@ -63,12 +63,20 @@
         header-align="center"
         align="center"
         label="备注"/> -->
-      <el-table-column header-align="center" align="center" width="180" label="操作">
+      <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="action(scope.row.id)">启动</el-button>
-          <el-button type="text" size="small" @click="storp(scope.row.id)">停止</el-button>
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="启用" placement="top">
+            <el-button type="success" size="mini" icon="el-icon-open" circle @click="action(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="禁用" placement="top">
+            <el-button type="warning" size="mini" icon="el-icon-turn-off" circle @click="storp(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -218,3 +226,8 @@
     }
   }
 </script>
+<style scoped>
+  .el-button+.el-button{
+    margin: 0 !important;
+  }
+</style>

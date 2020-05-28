@@ -1,38 +1,42 @@
 <template>
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
-        <el-form-item label="数据源ID" prop="zookeeperQuorumId">
-          <el-select v-model="fatherData.zookeeperQuorumId" filterable placeholder="请输入zookeeperName">
+        <el-form-item label="数据源ID" prop="redisDatasourceId">
+          <el-select v-model="fatherData.redisDatasourceId" filterable placeholder="请输入host">
             <el-option
               v-for="item in dataidlist"
               :key="item.id"
-              :label="item.zookeeperName"
+              :label="item.host"
               :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="HBASE表名" prop="tableName">
-        <el-input v-model="fatherData.tableName" placeholder="请输入HBASE表名"/>
+        <el-form-item label="redis数据类型" prop="dataType">
+          <el-select v-model="fatherData.dataType" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="列簇名" prop="familyName">
-        <el-input v-model="fatherData.familyName" placeholder="请输入列簇名"/>
+        <el-form-item label="redisKey的前缀" prop="dataPrefix">
+        <el-input v-model="fatherData.dataPrefix" placeholder="请输入redisKey的前缀"/>
         </el-form-item>
-        <el-form-item label="列名" prop="columnName">
-        <el-input v-model="fatherData.columnName" placeholder="请输入列名"/>
+        <el-form-item label="数据返回字段名称" prop="outField">
+        <el-input v-model="fatherData.outField" placeholder="请输入数据返回字段名称"/>
         </el-form-item>
-        <el-form-item label="查询类型(GET,SCAN)" prop="queryType">
-        <el-input v-model="fatherData.queryType" placeholder="目前只支持GET查询"/>
+        <el-form-item label="是否查询">
+          <el-radio-group v-model="fatherData.isQuery">
+            <el-radio :label="1">否</el-radio>
+            <el-radio :label="0">是</el-radio>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="是否有效">
+        <!-- <el-form-item label="是否启用">
           <el-radio-group v-model="fatherData.enable">
             <el-radio :label="false">否</el-radio>
             <el-radio :label="true">是</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <!-- <el-form-item label="是否缓存">
-          <el-radio-group v-model="fatherData.enableCache">
-            <el-radio :label="0">否</el-radio>
-            <el-radio :label="1">是</el-radio>
           </el-radio-group>
         </el-form-item> -->
     </el-form>
@@ -45,6 +49,7 @@
 
 <script>
   import { getAllDataSourceByType } from '@/api/workerBee/metadata'
+
   export default {
     props: [
       'hideVisibleClick',
@@ -53,19 +58,36 @@
     ],
     data () {
       return {
-        dataRule: {
-          zookeeperQuorumId: [
-            { required: true, message: '请输入数据源地址编号', trigger: 'blur' }
-          ],
-          tableName: [
-            { required: true, message: '请输入hbase表名', trigger: 'blur' }
-          ],
-          queryType: [
-            { required: true, message: '请输入查询类型(GET,SCAN)', trigger: 'blur' }
-          ]
-        },
+        options: [{
+          value: 'string',
+          label: 'string'
+        }, {
+          value: 'map',
+          label: 'map'
+        }, {
+          value: 'list',
+          label: 'list'
+        }, {
+          value: 'zset',
+          label: 'zset'
+        }],
         dataidlist: [],
-        intlist: {}
+        intlist: {},
+        name: '',
+        dataRule: {
+          redisDatasourceId: [
+            { required: true, message: '请选择数据源ID', trigger: 'blur' }
+          ],
+          dataType: [
+            { required: true, message: '请选择redis数据类型', trigger: 'blur' }
+          ],
+          dataPrefix: [
+            { required: true, message: '请输入redisKey的前缀', trigger: 'blur' }
+          ],
+          outField: [
+            { required: true, message: '请输入数据返回字段名称', trigger: 'blur' }
+          ]
+        }
       }
     },
     mounted () {

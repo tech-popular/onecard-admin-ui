@@ -5,20 +5,20 @@
           <el-input v-model="fatherData.name" placeholder="请输入模板名称'"/>
         </el-form-item>
         <el-form-item label="模板中需要赋值的字段" prop="requestFields">
-          <el-input v-model="fatherData.requestFields" placeholder="请输入模板中需要赋值的字段"/>
+          <el-input v-model="fatherData.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
         </el-form-item>
         <el-form-item label="返回字段值" prop="responseFields">
-          <el-input v-model="fatherData.responseFields" placeholder="请输入请返回字段值"/>
+          <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="未解析的模板" prop="template">
           <el-input v-model="fatherData.template" placeholder="请输入请未解析的模板"/>
         </el-form-item>
-        <el-form-item label="是否启用">
+        <!-- <el-form-item label="是否启用">
           <el-radio-group v-model="fatherData.enable">
             <el-radio :label="false">禁用</el-radio>
             <el-radio :label="true">正常</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>

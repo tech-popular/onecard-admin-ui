@@ -12,6 +12,10 @@
         <el-button type="primary" size="mini" style="background: #f43574; border:none; margin-top: 5px">FORK_JOIN</el-button>
         <el-button type="primary" size="mini" style="background: #430b98; border:none; margin-top: 5px">JOIN</el-button>
         <el-button type="primary" size="mini" style="background: #065361; border:none; margin-top: 5px">SUB_WORKFLOW</el-button>
+        <el-button type="primary" size="mini" style="background: #0868d3; border:none">FREEMARKER</el-button>
+        <el-button type="primary" size="mini" style="background: #724a3b; border:none">FORRCH</el-button>
+        <el-button type="primary" size="mini" style="background: #0b9ccb; border:none">REDIS</el-button>
+        <el-button type="primary" size="mini" style="background: #a9cb0b; border:none">HBASE</el-button>
     </div>
     <div id="mySubProcess" style="width:100%; height:650px; background-color: #ccc;"/>
   </el-dialog>
@@ -145,6 +149,34 @@ export default {
         $(go.Node, 'Auto',
           { position: new go.Point(100, 0) },
           $(go.Shape, 'RoundedRectangle', { fill: '#065361' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('FREEMARKER',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#0868d3' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('FORRCH',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#724a3b' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('REDIS',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#0b9ccb' }),
+          $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
+        )
+      )
+          mySelf.myDiagram.nodeTemplateMap.add('HBASE',
+        $(go.Node, 'Auto',
+          { position: new go.Point(100, 0) },
+          $(go.Shape, 'RoundedRectangle', { fill: '#a9cb0b' }),
           $(go.TextBlock, { margin: 8, stroke: '#fff', alignment: go.Spot.Center }, new go.Binding('text'))
         )
       )
