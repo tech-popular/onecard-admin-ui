@@ -69,8 +69,8 @@
       <el-form-item label="switch判断项集合" prop="caseSwitchList" :rules="dataRule.caseSwitchList" v-if="zirenwucarent === 'DECISION'">
         <el-input v-model="dataForm.caseSwitchList" placeholder="switch判断项集合"/>
       </el-form-item>
-        <el-form-item label="join_on" prop="join_on" v-if="zirenwucarent === 'JOIN'">
-        <el-input v-model="dataForm.join_on" placeholder="join_on"/>
+      <el-form-item label="joinOn" prop="joinOn" v-if="zirenwucarent === 'JOIN'">
+        <el-input v-model.number="dataForm.joinOn" placeholder="输入joinOn的ID"/>
       </el-form-item>
       <el-form-item label="任务入参" prop="inputParams">
         <el-input v-model="dataForm.inputParams" placeholder="例：{'inputName':'inputOtherName'}"/>
@@ -145,8 +145,10 @@
           outputParams: '',
           subWorkFlowName: '',
           subWorkFlow: '',
-          caseExpressionParamType: 0
+          caseExpressionParamType: 0,
+          joinOn: ''
         },
+        joinArr: [],
         caseExpressionParamType: [
           {id: 1, name: '集合类型'},
           {id: 0, name: '普通类型'}
@@ -164,9 +166,9 @@
             { required: true, message: '参考名称不能为空', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          // caseValueParam: [
-          //   { required: true, message: '判断case参数不能为空', trigger: 'blur' }
-          // ],
+          joinOn: [
+            { type: 'number', message: 'join必须为数字值', trigger: 'blur' }
+          ],
           caseExpression: [
             { required: true, message: '判断表达式不能为空', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
@@ -270,6 +272,8 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.joinArr.push(Number(this.dataForm.joinOn))
+            this.dataForm.joinOn = this.joinArr
             let dataBody = this.dataForm
             if (dataBody.type !== 'DECISION') {
               delete dataBody.caseExpressionParamType
