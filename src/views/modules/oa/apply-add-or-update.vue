@@ -320,8 +320,6 @@ export default {
         mcCompute(newData).then(({ data }) => {
           if (data && data.status === '1') {
             this.severDataForm.account = data.data.mcAccount
-          } else {
-            this.$message.error(data.message)
           }
         })
       }
