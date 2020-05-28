@@ -7,7 +7,7 @@
   // api接口请求地址
   window.SITE_CONFIG['baseUrl'] = '//unify-manager.sk.9f.cn/canary-admin' // 开发环境
 
-  // window.SITE_CONFIG['baseUrl'] = '//oa.sk.9f.cn/canary-admin' // 开发环境
+  // window.SITE_CONFIG['baseUrl'] = '//songxintest.sk.9f.cn/canary-admin' // 开发环境
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain'] = './' // 域名

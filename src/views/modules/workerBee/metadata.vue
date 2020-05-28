@@ -2,7 +2,15 @@
   <div>
     <el-form :inline="true">
       <el-form-item label="任务定义名称">
-        <el-input v-model.trim="name" placeholder="" clearable />
+        <el-input v-model.trim="sacherName" placeholder="任务定义名称" clearable />
+      </el-form-item>
+      <el-form-item label="任务具体ID">
+        <el-input v-model.trim="sacherId" placeholder="任务具体id" clearable />
+      </el-form-item>
+      <el-form-item label="任务类型">
+        <el-select filterable v-model="sacherType" clearable placeholder="请选择" @change="clickType">
+          <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -18,7 +26,7 @@
         prop="id"
         header-align="center"
         align="center"
-        label="任务具体id"/>
+        label="任务具体ID"/>
       <el-table-column
         prop="name"
         header-align="center"
@@ -77,10 +85,30 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="操作">
+      <el-table-column
+        prop="enable"
+        header-align="center"
+        align="center"
+        label="状态">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-tag v-if="scope.row.status === 1" size="small" >启用</el-tag>
+          <el-tag v-else size="small" type="danger">禁用</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" width="200" label="操作">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="启用" placement="top" v-if="scope.row.status === 0">
+            <el-button type="success" size="mini" icon="el-icon-open" circle @click="actionOpen(scope.row)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="禁用" placement="top" v-else>
+            <el-button type="warning" size="mini" icon="el-icon-turn-off"  circle @click="storpOff(scope.row)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -99,18 +127,22 @@
 
 <script>
   import AddOrUpdate from './metadata-add-or-update'
-  import { beeTaskList, deleteBeeTask } from '@/api/workerBee/metadata'
+  import { beeTaskList, deleteBeeTask, getBeeTaskTypeList, updateStatus } from '@/api/workerBee/metadata'
   export default {
     data () {
       return {
-        name: '',
+        sacherName: '',
+        sacherId: '',
+        sacherType: '',
+        ruleTypeList: [],
         dataList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
         totalPage: 0,
         dataListLoading: false,
         addOrUpdateVisible: false,
-        newList: []
+        newList: [],
+        visible: false
       }
     },
     components: {
@@ -118,13 +150,20 @@
     },
     activated () {
       this.getDataList()
+      getBeeTaskTypeList().then(({data}) => {
+        if (data && data.status === 0) {
+          this.ruleTypeList = data.data
+        }
+      })
     },
     methods: {
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
         const dataBody = {
-          'name': this.name,
+          'name': this.sacherName,
+          'id': this.sacherId,
+          'type': this.sacherType,
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
@@ -146,6 +185,10 @@
           this.dataListLoading = false
         })
       },
+      // 选择类型
+      clickType (value) {
+        this.sacherType = value
+      },
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
@@ -165,7 +208,10 @@
       /** 重置 */
       resetHandle () {
         this.pageNum = 1
-        this.name = ''
+        this.sacherName = ''
+        this.sacherId = ''
+        this.sacherType = ''
+        this.getDataList()
       },
       // 新增 / 修改
       addOrUpdateHandle (id) {
@@ -199,7 +245,68 @@
             }
           })
         })
+      },
+      // 启动
+      actionOpen (val) {
+        console.log(val, 'id,staus')
+  
+        this.$confirm(`确定启用?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          const dataBody = {
+            'id': val.id,
+            'status': 1
+          }
+          updateStatus(dataBody).then(({data}) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.message)
+            }
+          })
+        })
+      },
+      // 禁用
+      storpOff (val) {
+        this.$confirm(`确定禁用?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          const dataBody = {
+            'id': val.id,
+            'status': 0
+          }
+          updateStatus(dataBody).then(({data}) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.message)
+            }
+          })
+        })
       }
     }
   }
 </script>
+<style scoped>
+  .el-button+.el-button{
+    margin: 0 !important;
+  }
+</style>
