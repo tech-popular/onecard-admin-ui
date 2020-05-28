@@ -2,11 +2,11 @@
   <div>
     <el-dialog title="新增推荐场景" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="600px">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="90px">
-        <el-form-item label="场景名称:" prop="name">
-          <el-input v-model="dataForm.name" placeholder="分期专区" />
+        <el-form-item label="场景名称:" prop="sceneName">
+          <el-input v-model="dataForm.sceneName" placeholder="分期专区" />
         </el-form-item>
-        <el-form-item label="推荐类型:" prop="type">
-          <el-radio-group v-model="dataForm.type">
+        <el-form-item label="推荐类型:" prop="boxId">
+          <el-radio-group v-model="dataForm.boxId">
             <el-radio
               v-for="(item, index) in typeList"
               :key="index"
@@ -20,9 +20,9 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="商品池:" prop="productPool">
+        <el-form-item label="商品池:" prop="goodsPool">
           <el-select
-            v-model="dataForm.productPool"
+            v-model="dataForm.goodsPool"
             filterable
             placeholder="请选择"
             class="pool-sel"
@@ -46,6 +46,7 @@
   </div>
 </template>
 <script>
+import { saveorupt, listSceneBoxInfo } from '@/api/lexicon/sceneManage'
 export default {
   data () {
     return {
@@ -74,18 +75,18 @@ export default {
         }
       ],
       dataForm: {
-        name: '',
-        type: '',
-        productPool: ''
+        sceneName: '',
+        boxId: '',
+        goodsPool: ''
       },
       dataRule: {
-        name: [
+        sceneName: [
           { required: true, message: '请输入场景名称', trigger: 'blur' }
         ],
-        type: [
+        boxId: [
           { required: true, message: '请选择推荐类型', trigger: 'change' }
         ],
-        productPool: [
+        goodsPool: [
           { required: true, message: '请选择商品池', trigger: 'change' }
         ]
       },
@@ -96,10 +97,13 @@ export default {
     init () {
       this.visible = true
       this.dataForm = {
-        name: '',
-        type: '',
-        productPool: ''
+        sceneName: '',
+        boxId: '',
+        goodsPool: ''
       }
+      listSceneBoxInfo().then(({data}) => {
+        console.log(data, 'shuju')
+      })
     },
     searchProductNum () { // 查询商品数量
       console.log(3)
@@ -109,6 +113,28 @@ export default {
     },
     dataSubmit () {
       console.log(this.dataForm)
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const dataBody = this.dataForm
+          const dataUpdateId = this.dataForm.id
+          saveorupt(dataBody, dataUpdateId).then(({data}) => {
+            if (data && data.status === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                  this.$refs['dataForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }
+      })
     }
   }
 }

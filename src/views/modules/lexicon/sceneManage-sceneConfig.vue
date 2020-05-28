@@ -3,7 +3,7 @@
     <el-card class="search-content" shadow="nerver">
       <div class="search-title clearfix" slot="header">
         搜索服务
-        <el-button type="success" size="mini" icon="el-icon-plus" @click="addSearchScene">新建搜索场景</el-button>
+        <!-- <el-button type="success" size="mini" icon="el-icon-plus" @click="addSearchScene">新建搜索场景</el-button> -->
       </div>
       <div class="search-pane">
         <el-card class="box-card" shadow="hover" v-for="(item, index) in searchServiceList" :key="index">
@@ -74,8 +74,8 @@
   </div>
 </template>
 <script>
-import addSearchScene from './sceneManageComponents/sceneManage-sceneConfig-add-search-scene'
-import addRecommendScene from './sceneManageComponents/sceneManage-sceneConfig-add-recommend-scene'
+import addRecommendScene from './sceneManageComponents/sceneManage-sceneConfig-add-search-scene'
+import addSearchScene from './sceneManageComponents/sceneManage-sceneConfig-add-recommend-scene'
 import ruleConfig from './sceneManageComponents/sceneManage-sceneConfig-rule-config'
 import statisticChart from './sceneManageComponents/sceneManage-sceneConfig-statistic-chart'
 import realTimeStrategy from './sceneManageComponents/sceneManage-sceneConfig-real-time-strategy'
