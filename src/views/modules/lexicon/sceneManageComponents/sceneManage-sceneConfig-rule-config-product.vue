@@ -99,6 +99,7 @@ export default {
       },
       props: {
         multiple: false,
+        checkStrictly: true,
         label: 'categoryName',
         value: 'categoryType'
       },
