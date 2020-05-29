@@ -37,7 +37,8 @@
         推荐服务
         <el-button type="success" size="mini" icon="el-icon-plus" @click="addRecommendScene">新建推荐场景</el-button>
       </div>
-      <div class="recommend-pane">
+      <div class="recommend-pane" v-if="recommendServiceList.length === 0">暂无推荐服务，快去新建吧～</div>
+      <div class="recommend-pane" v-else>
         <el-card class="box-card" shadow="hover" v-for="(item, index) in recommendServiceList" :key="index">
           <el-row :gutter="20">
             <el-col :span="8">
