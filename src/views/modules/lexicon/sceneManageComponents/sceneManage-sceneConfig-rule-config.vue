@@ -13,8 +13,8 @@
         <el-tab-pane v-for="(item, index) in tabsList" :key="index" :name="item.id" :label="item.name"></el-tab-pane>
       </el-tabs>
       <rule-config-product v-if="ruleConfigProductVisible" ref="ruleConfigProduct" :boxId='boxId'></rule-config-product>
-      <rule-config-duplicate v-if="ruleConfigDuplicateVisible" ref="ruleConfigDuplicate"></rule-config-duplicate>
-      <rule-config-mustpush v-if="ruleConfigMustpushVisible" ref="ruleConfigMustpush"></rule-config-mustpush>
+      <rule-config-duplicate v-if="ruleConfigDuplicateVisible" ref="ruleConfigDuplicate" :boxId='boxId'></rule-config-duplicate>
+      <rule-config-mustpush v-if="ruleConfigMustpushVisible" ref="ruleConfigMustpush" :boxId='boxId'></rule-config-mustpush>
     </div>
     <div class="footer">
       <el-button type="default" @click="drawerClose" size="small">关闭</el-button>
@@ -56,10 +56,8 @@ export default {
   methods: {
     init () {
       this.visible = true
-      console.log(this.boxId, 'ppp')
     },
     handleClick () {
-      console.log(this.activeName)
       this.ruleConfigProductVisible = false
       this.ruleConfigDuplicateVisible = false
       this.ruleConfigMustpushVisible = false
@@ -79,7 +77,9 @@ export default {
 </script>
 <style scoped>
   .content {
-    padding: 0 30px 30px;
+    padding: 0px 30px 200px 30px;
+    overflow: auto;
+    height: 100vh;
   }
   .tabs {
     margin-bottom: 10px;
