@@ -53,7 +53,7 @@
               type="datetimerange"
               start-placeholder="生效时间"
               end-placeholder="失效时间"
-              value-format="yyyy-MM-dd hh:mm:ss"
+              value-format="yyyy-MM-dd HH:mm:ss" 
             >
             </el-date-picker>
           </el-form-item>
