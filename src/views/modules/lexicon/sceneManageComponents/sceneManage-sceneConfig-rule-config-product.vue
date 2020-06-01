@@ -55,7 +55,7 @@
       :page-sizes="[5, 10, 20, 50, 100]"
       :page-size="pageSize"
       :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper" />
+      layout="total, sizes" />
     <el-dialog title="修改" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
       <el-form label-width="100px" :model="weightForm" :rules="weightFormRules" ref="weightForm">
         <el-form-item label="权重：" prop="weight">
@@ -129,7 +129,6 @@ export default {
   watch: {
     'fatahVisible': {
       handler (newVal, oldVal) {
-        console.log(newVal, oldVal, '----')
         if (newVal === false) {
           this.baseForm = {}
           this.dataList = []
