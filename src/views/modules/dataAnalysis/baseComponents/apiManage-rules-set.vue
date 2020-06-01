@@ -31,13 +31,13 @@
             <div v-if="item.fieldType === 'string' || item.fieldType === ''" class="pane-rules-inline">
               <!--string型等于或不等于可以输入多个-->
               <el-form-item prop="params[0].selectVal" :ref="'stringMultiVal' + item.ruleCode" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.func === 'eq' || item.func === 'neq'">
-                <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'string')" :valueType="'string'" :add-tag-on-blur="true" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
-                <div class="input-tag-tips">
+                <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'string')" :tag-tips="item.strTips" :valueType="'string'" :add-tag-on-blur="true" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
+                <!-- <div class="input-tag-tips" v-if="item.strTips">
                   <el-tooltip placement="top">
-                    <div slot="content" v-html="tipsHtmlCont(item)" class="tips-content"></div>
+                    <div slot="content" v-html="strTipCont(item)" class="tips-content"></div>
                     <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                   </el-tooltip>
-                </div>
+                </div> -->
               </el-form-item>
               <el-form-item prop="params[0].value" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-else>
                 <el-input v-model.trim="item.params[0].value" class="itemIput" placeholder="请输入" />
@@ -338,6 +338,10 @@ export default {
         return false
       }
     },
+    // strTipCont (item) {
+    //   console.log(item)
+    //   return '输入示例：' + item.strTips
+    // },
     tipsHtmlCont (item) {
       if (item.func === 'relative_time_in') {
         return this.tips[item.func]
@@ -444,7 +448,7 @@ export default {
   }
   .inputTag {
     border-radius: 4px;
-    min-height: 40px;
+    /* min-height: 40px; */
     line-height: 22px;
     display: inline-block;
     border: 1px solid #dcdfe6

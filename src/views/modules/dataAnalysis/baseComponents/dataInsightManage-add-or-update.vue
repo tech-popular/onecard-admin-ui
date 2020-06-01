@@ -127,7 +127,7 @@
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
-import { selectOperate, selectAllCata, selectAllCataNew, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, selectAllCataNew, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -517,6 +517,7 @@ export default {
         'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
         'subFunc': '',
+        'strTips': [],
         'params': [{
           value: '',
           title: ''
@@ -660,13 +661,8 @@ export default {
           selectOperateList: selectOperateList,
           func: selectOperateList[0].code,
           subFunc: '',
+          strTips: [],
           params: [{ value: '', title: '' }]
-        }
-        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-        }
-        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
         }
         if (params.func === 'relative_time') {
           params.subFunc = 'relative_before'
@@ -674,7 +670,25 @@ export default {
         Object.keys(obj).forEach(oitem => {
           params[oitem] = obj[oitem]
         })
-        this.updateRulesArr(data, citem, params)
+        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+        }
+        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+          let res = data
+          dataIndexManagerCandidate({ // 字符串提示输入示例
+            sourceTable: obj.sourceTable,
+            fieldName: obj.englishName,
+            count: 10
+          }).then(({data}) => {
+            if (data.status * 1 === 1 && data.data.length) {
+              params.strTips = data.data
+            }
+            this.updateRulesArr(res, citem, params)
+          })
+        } else {
+          this.updateRulesArr(data, citem, params)
+        }
       })
     },
     addChildreRules (data, citem) {

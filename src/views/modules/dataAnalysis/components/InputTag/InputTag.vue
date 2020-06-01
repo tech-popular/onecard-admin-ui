@@ -1,26 +1,32 @@
 <template>
   <div
-    @click="focusNewTag()"
     :class="{'read-only': readOnly,'vue-input-tag-wrapper--active': isInputActive}"
-    class="vue-input-tag-wrapper"
-  >
-    <span v-for="(tag, index) in innerTags" :key="index" class="input-tag">
-      <span>{{ tag }}</span>
-      <i class="el-icon-error remove" v-if="!readOnly" @click.prevent.stop="remove(index)"></i>
-    </span>
-    <input
-      v-if                     = "!readOnly && !isLimit"
-      ref                      = "inputtag"
-      :placeholder             = "placeholder"
-      type                     = "text"
-      v-model                  = "newTag"
-      v-on:keydown.delete.stop = "removeLastTag"
-      v-on:keydown             = "addNew"
-      v-on:blur                = "handleInputBlur"
-      v-on:focus               = "handleInputFocus"
-      v-on:input               = "handleInputInput"
-      class                    = "new-tag"
-    />
+    class="vue-input-tag-wrapper">
+    <div
+      @click="focusNewTag()"
+    >
+      <span v-for="(tag, index) in innerTags" :key="index" class="input-tag">
+        <span>{{ tag }}</span>
+        <i class="el-icon-error remove" v-if="!readOnly" @click.prevent.stop="remove(index)"></i>
+      </span>
+      <input
+        v-if                     = "!readOnly && !isLimit"
+        ref                      = "inputtag"
+        :placeholder             = "placeholder"
+        type                     = "text"
+        v-model                  = "newTag"
+        v-on:keydown.delete.stop = "removeLastTag"
+        v-on:keydown             = "addNew"
+        v-on:blur                = "handleInputBlur"
+        v-on:focus               = "handleInputFocus"
+        v-on:input               = "handleInputInput"
+        class                    = "new-tag"
+      />
+    </div>
+    <ul class="example-list" v-if="isListShow">
+      <li>最近取值：</li>
+      <li v-for="(item, index) in tagTips" :key="index">{{item}}</li>
+    </ul>
   </div>
 </template>
 <script>
@@ -72,6 +78,10 @@ export default {
     maxlength: { // 限制输入的长度
       type: Number,
       default: 9999
+    },
+    tagTips: {
+      type: Array,
+      default: []
     }
   },
 
@@ -79,7 +89,8 @@ export default {
     return {
       newTag: '',
       innerTags: [...this.value],
-      isInputActive: false
+      isInputActive: false,
+      isListShow: false
     }
   },
   mounted () {
@@ -106,10 +117,14 @@ export default {
 
     handleInputFocus () {
       this.isInputActive = true
+      if (this.tagTips.length) {
+        this.isListShow = true
+      }
     },
 
     handleInputBlur (e) {
       this.isInputActive = false
+      this.isListShow = false
       this.addNew(e)
     },
 
@@ -201,7 +216,7 @@ export default {
 .vue-input-tag-wrapper {
   background-color: #fff;
   border: 1px solid #ccc;
-  overflow: hidden;
+  /* overflow: hidden; */
   padding-left: 4px;
   padding-top: 4px;
   cursor: text;
@@ -209,6 +224,7 @@ export default {
   -webkit-appearance: textfield;
   display: flex;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .vue-input-tag-wrapper .input-tag {
@@ -261,5 +277,41 @@ export default {
   background-color: #f4f4f5;
   border-color: #e9e9eb;
   color: #909399;
+}
+.example-list {
+  margin: 10px 0 0 -4px;
+  border: 1px solid #e4e7ed;
+  line-height: 26px;
+  list-style: none;
+  color: #999;
+  position: absolute;
+  /* top: 49px; */
+  width: 100%;
+  z-index: 999;
+  background: #fff;
+  -webkit-box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+}
+.example-list::before {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 6px;
+  border-top: 0;
+  top: -5px;
+  margin-left: -6px;
+  border-top-width: 0;
+  border-bottom-color: #fff;
+}
+.example-list li {
+  list-style: none;
+}
+.example-list li:first-child {
+  margin-left: -25px;
+  margin-top: 10px;
 }
 </style>
