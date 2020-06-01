@@ -79,6 +79,7 @@ export default {
   .content {
     padding: 0px 30px 200px 30px;
     min-height:auto;
+    margin-bottom: 100px;
     overflow: auto;
     height: 750px;
   }
