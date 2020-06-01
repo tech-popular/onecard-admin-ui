@@ -86,7 +86,8 @@
 import { selectFirstCategoryName, getSceneWeightList, updateSceneWeightInfo } from '@/api/lexicon/sceneManage'
 export default {
   props: [
-    'boxId'
+    'boxId',
+    'activeName'
   ],
   data () {
     return {
@@ -142,7 +143,8 @@ export default {
         'boxId': this.boxId,
         'productName': this.baseForm.productName,
         'sku': this.baseForm.sku,
-        'categoryType': this.baseForm.categoryType
+        'categoryType': this.baseForm.categoryType ? this.baseForm.categoryType : [],
+        'brandName': this.baseForm.brandName
       }
       getSceneWeightList(dataBody).then(({data}) => {
         if (data && data.msg === 'success') {

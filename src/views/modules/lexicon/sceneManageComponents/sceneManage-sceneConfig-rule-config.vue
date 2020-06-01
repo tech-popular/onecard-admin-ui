@@ -3,18 +3,18 @@
     title="规则配置"
     :append-to-body="false"
     :visible.sync="visible"
-    :show-close="true"
+    @close="drawerClose"
     :wrapperClosable="false"
     size="1200px"
     class="rule-config-drawer"
   >
     <div class="content">
-      <el-tabs v-model="activeName" type="card" @tab-click="handleClick" class="tabs">
+      <el-tabs v-model="activeName" type="card" class="tabs">
         <el-tab-pane v-for="(item, index) in tabsList" :key="index" :name="item.id" :label="item.name"></el-tab-pane>
       </el-tabs>
-      <rule-config-product v-if="ruleConfigProductVisible" ref="ruleConfigProduct" :boxId='boxId'></rule-config-product>
-      <rule-config-duplicate v-if="ruleConfigDuplicateVisible" ref="ruleConfigDuplicate" :boxId='boxId'></rule-config-duplicate>
-      <rule-config-mustpush v-if="ruleConfigMustpushVisible" ref="ruleConfigMustpush" :boxId='boxId'></rule-config-mustpush>
+      <rule-config-product v-if="activeName === '1'" :activeName='activeName' ref="ruleConfigProduct" :boxId='boxId'></rule-config-product>
+      <rule-config-duplicate v-if="activeName === '2'" ref="ruleConfigDuplicate" :boxId='boxId'></rule-config-duplicate>
+      <rule-config-mustpush v-if="activeName === '3'" ref="ruleConfigMustpush" :boxId='boxId'></rule-config-mustpush>
     </div>
     <div class="footer">
       <el-button type="default" @click="drawerClose" size="small">关闭</el-button>
@@ -32,9 +32,6 @@ export default {
   data () {
     return {
       visible: false,
-      ruleConfigProductVisible: true,
-      ruleConfigDuplicateVisible: false,
-      ruleConfigMustpushVisible: false,
       activeName: '1',
       tabsList: [
         {
@@ -57,20 +54,9 @@ export default {
     init () {
       this.visible = true
     },
-    handleClick () {
-      this.ruleConfigProductVisible = false
-      this.ruleConfigDuplicateVisible = false
-      this.ruleConfigMustpushVisible = false
-      if (this.activeName === '1') {
-        this.ruleConfigProductVisible = true
-      } else if (this.activeName === '2') {
-        this.ruleConfigDuplicateVisible = true
-      } else {
-        this.ruleConfigMustpushVisible = true
-      }
-    },
     drawerClose () {
       this.visible = false
+      this.activeName = '1'
     }
   }
 }
