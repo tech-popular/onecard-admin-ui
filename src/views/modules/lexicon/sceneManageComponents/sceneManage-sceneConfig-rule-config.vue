@@ -78,8 +78,9 @@ export default {
 <style scoped>
   .content {
     padding: 0px 30px 200px 30px;
+    min-height:auto;
     overflow: auto;
-    height: 100vh;
+    height: 750px;
   }
   .tabs {
     margin-bottom: 10px;
