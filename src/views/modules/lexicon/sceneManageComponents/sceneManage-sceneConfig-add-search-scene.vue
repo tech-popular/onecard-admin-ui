@@ -89,7 +89,7 @@ export default {
         this.typeList = data.data
       })
       listProductPool().then(({data}) => {
-        this.productPoolList = data.data
+        // this.productPoolList = data.data
       })
     },
     searchProductNum () { // 查询商品数量
