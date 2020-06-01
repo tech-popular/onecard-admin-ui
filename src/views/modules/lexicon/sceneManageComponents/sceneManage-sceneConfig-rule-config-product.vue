@@ -87,7 +87,7 @@ import { selectFirstCategoryName, getSceneWeightList, updateSceneWeightInfo } fr
 export default {
   props: [
     'boxId',
-    'activeName'
+    'fatahVisible'
   ],
   data () {
     return {
@@ -124,6 +124,19 @@ export default {
       },
       multiSelectedData: [],
       skuid: ''
+    }
+  },
+  watch: {
+    'fatahVisible': {
+      handler (newVal, oldVal) {
+        console.log(newVal, oldVal, '----')
+        if (newVal === false) {
+          this.baseForm = {}
+          this.dataList = []
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   mounted () {
