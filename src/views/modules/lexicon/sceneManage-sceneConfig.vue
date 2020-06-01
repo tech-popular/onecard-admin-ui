@@ -68,7 +68,7 @@
       </div>
     </el-card>
     <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene"></add-search-scene>
-    <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene"></add-recommend-scene>
+    <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene" @childByValue="childByValue"></add-recommend-scene>
     <rule-config v-if="ruleConfigVisible" ref="ruleConfig" :boxId='boxId'></rule-config>
     <statistic-chart v-if="statisticChartVisible" ref="statisticChart"></statistic-chart>
     <real-time-strategy v-if="realTimeStrategyVisible" ref="realTimeStrategy" @closeDialog="closeDialogEvent"></real-time-strategy>
@@ -129,6 +129,9 @@ export default {
     //     this.$refs.addSearchScene.init()
     //   })
     // },
+    childByValue (value) {
+      this.init()
+    },
     addRecommendScene () { // 新建推荐场景
       this.addRecommendSceneVisible = true
       this.$nextTick(() => {
