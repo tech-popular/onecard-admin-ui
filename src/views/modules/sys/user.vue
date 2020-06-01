@@ -1,23 +1,23 @@
 <template>
   <div class="mod-user">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">   
+      <el-form-item label="姓名: ">
+        <el-input v-model="dataForm.userName" placeholder="用户姓名" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="用户名: ">
+        <el-input v-model="dataForm.mobile" placeholder="手机号" clearable></el-input>
+      </el-form-item>
       <el-form-item label="邮箱账号: ">
         <el-input v-model="dataForm.email" placeholder="邮箱账号" clearable></el-input>
       </el-form-item>
-      <el-form-item label="手机号: ">
-        <el-input v-model="dataForm.mobile" placeholder="手机号" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="用户姓名: ">
-        <el-input v-model="dataForm.userName" placeholder="用户姓名" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="角色: ">
+      <el-form-item label="状态: ">
         <el-select v-model="dataForm.role" filterable clearable placeholder="请选择">
           <el-option v-for="item in roles" :key="item.roleId" :label="item.roleName" :value="item.roleId">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="getDataList()" type="primary">查询</el-button>
         <!-- <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
         <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -45,6 +45,12 @@
         prop="username"
         header-align="center"
         align="center"
+        label="姓名">
+      </el-table-column>
+      <el-table-column
+        prop="username"
+        header-align="center"
+        align="center"
         label="用户名">
       </el-table-column>
       <el-table-column
@@ -60,6 +66,30 @@
         label="手机号">
       </el-table-column>
       <el-table-column
+        prop="roleName"
+        header-align="center"
+        align="center"
+        label="功能角色">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.roleName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.roleName}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="roleName"
+        header-align="center"
+        align="center"
+        label="数据角色">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.roleName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.roleName}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="status"
         header-align="center"
         align="center"
@@ -70,37 +100,12 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="roleName"
-        header-align="center"
-        align="center"
-        label="角色">
-        <template slot-scope="scope">
-          <el-tooltip effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.roleName)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.roleName}}</div>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="createrName"
-        header-align="center"
-        align="center"
-        label="创建人">
-      </el-table-column>
-      <el-table-column
-        prop="createTime"
-        header-align="center"
-        align="center"
-        width="180"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column
         header-align="center"
         align="center"
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <!-- <el-button v-if="isAuth('sys:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button> -->
+          <el-button v-if="isAuth('sys:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button>
           <el-button v-if="isAuth('sys:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button>
         </template>
       </el-table-column>
