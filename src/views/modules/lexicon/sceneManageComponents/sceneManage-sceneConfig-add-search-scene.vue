@@ -10,7 +10,7 @@
             <el-radio
               v-for="(item, index) in typeList"
               :key="index"
-              :label="item.id"
+              :label="item.boxId"
             >
             {{item.boxName}}
             <el-tooltip placement="top">
@@ -111,7 +111,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.$emit('childByValue', this.visible)
                   this.$refs['dataForm'].resetFields()
                 }
               })
