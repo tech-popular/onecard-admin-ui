@@ -22,11 +22,11 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="seachWeight">查询</el-button>
-        <!-- <el-button type="warning" @click="multiEditWeight">批量修改权重</el-button> -->
+        <el-button type="warning" @click="multiEditWeight">批量修改权重</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="loading" style="width: 100%;" @selection-change="handleSelectionChange">
-      <!-- <el-table-column type="selection" width="55"></el-table-column> -->
+      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="sku" header-align="center" align="center" label="SKU"></el-table-column>
       <el-table-column prop="productName" header-align="center" align="center" label="商品名称"></el-table-column>
       <el-table-column prop="weight" header-align="center" align="center">
@@ -55,7 +55,7 @@
       :page-sizes="[5, 10, 20, 50, 100]"
       :page-size="pageSize"
       :total="totalPage"
-      layout="total, sizes" />
+      layout="total, sizes, prev, pager, next, jumper" />
     <el-dialog title="修改" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
       <el-form label-width="100px" :model="weightForm" :rules="weightFormRules" ref="weightForm">
         <el-form-item label="权重：" prop="weight">
@@ -177,15 +177,21 @@ export default {
       this.seachWeight()
     },
     handleSelectionChange (val) {
-      this.multiSelectedData = val
+      val.map(item => {
+        this.multiSelectedData.push(item.sku)
+        this.multiSelectedData = Array.from(new Set(this.multiSelectedData))
+      })
     },
     productWeightChange (val) { // 单一修改权重
+      console.log(val, ';;;')
+
       this.visible = true
       this.skuid = val.sku
+      this.weightForm.weight = val.weight
     },
-    // multiEditWeight () { // 批量修改权重
-    //   this.visible = true
-    // },
+    multiEditWeight () { // 批量修改权重
+      this.visible = true
+    },
     dataSubmit () {
       let uneffectTime = new Date(this.weightForm.date[1]).getTime()
       let now = Date.now()
@@ -202,12 +208,13 @@ export default {
             onlineTime: this.weightForm.date[0],
             offlineTime: this.weightForm.date[1],
             weight: this.weightForm.weight,
-            skuid: this.skuid
+            skuid: this.multiSelectedData && this.multiSelectedData.length > 0 ? this.multiSelectedData.join(',') : this.skuid
           }
           updateSceneWeightInfo(dataBody).then(({data}) => {
             if (data && data.msg === 'success') {
               this.visible = false
               this.$message.success('更新成功')
+              this.weightForm = {}
               this.seachWeight()
             } else {
               return this.$message.error(data.msg)
@@ -218,6 +225,7 @@ export default {
     },
     cancel () {
       this.visible = false
+      this.weightForm = {}
     }
   }
 }
