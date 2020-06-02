@@ -185,7 +185,8 @@ export default {
         'relation': 'and',
         'rules': []
       },
-      channelList: []
+      channelList: [],
+      isSelectedUneffectIndex: [] // 选中的指标是否有无效指标
       // originIndexList: [] // 没有处理过的指标列表数据
     }
   },
@@ -310,7 +311,6 @@ export default {
       })
     },
     channelIdChange () { // 用户渠道改变时，重新过滤指标数据
-      console.log(this.baseForm.channelId)
       if (this.baseForm.channelId.length === 0) {
         this.channelList.forEach(item => {
           item.disabled = false
@@ -436,7 +436,10 @@ export default {
     },
     getSelectAllCata (fn) { // 获取所有指标
       console.log(selectAllCataNew)
-      selectAllCata({channelCode: this.baseForm.channelId}).then(({data}) => {
+      selectAllCata({
+        channelCode: this.baseForm.channelId,
+        flag: this.id ? '-1' : '1'
+      }).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
@@ -477,6 +480,7 @@ export default {
             obj.dataStandar = item.dataStandar
             obj.fieldId = item.id
             obj.channelCode = item.channelCode
+            obj.enable = item.enable
           } else {
             obj.id = item.id
             obj.label = item.name
@@ -592,7 +596,6 @@ export default {
         }
       })
       this.ruleConfig = arr
-      console.log(this.ruleConfig)
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
       let selectEnumsList = []
@@ -680,7 +683,6 @@ export default {
     addChildreRules (data, citem) {
       let indexPath = findRuleIndex(data.rules, citem) + ''
       let indexPathArr = indexPath.split(',')
-      console.log(indexPathArr)
       if (indexPathArr.length === 1) {
         let newObj = {
           'relation': 'and',
@@ -773,6 +775,9 @@ export default {
           })
           item.selectEnumsList = selectEnumsArr
           item.indexList = []
+          if (item.label && !item.enable) {
+            this.isSelectedUneffectIndex.push(item.label)
+          }
         } else {
           if (item.rules) {
             this.updateRulesConfig(item)
@@ -893,6 +898,13 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
+          if (this.isSelectedUneffectIndex.length) {
+            return this.$message({
+              message: `【${this.isSelectedUneffectIndex.join('，')}】为无效指标，请重新选择`,
+              type: 'error',
+              center: true
+            })
+          }
           let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
             code = 1
