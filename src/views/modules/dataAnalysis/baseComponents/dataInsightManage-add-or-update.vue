@@ -311,7 +311,6 @@ export default {
       })
     },
     channelIdChange () { // 用户渠道改变时，重新过滤指标数据
-      console.log(this.baseForm.channelId)
       if (this.baseForm.channelId.length === 0) {
         this.channelList.forEach(item => {
           item.disabled = false
@@ -437,7 +436,10 @@ export default {
     },
     getSelectAllCata (fn) { // 获取所有指标
       console.log(selectAllCataNew)
-      selectAllCata({channelCode: this.baseForm.channelId}).then(({data}) => {
+      selectAllCata({
+        channelCode: this.baseForm.channelId,
+        flag: this.id ? '-1' : '1'
+      }).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
@@ -468,38 +470,20 @@ export default {
       if (!!tree && tree.length !== 0) {
         tree.forEach((item, index) => {
           let obj = {}
-          if (!this.id) { // 不要无效指标，只展示有效指标
-            if (item.fieldType && item.enable) {
-              obj.id = item.englishName + '-' + item.id
-              obj.englishName = item.englishName
-              obj.label = item.chineseName
-              obj.fieldType = item.fieldType
-              obj.enumTypeNum = item.enumTypeNum
-              obj.sourceTable = item.sourceTable
-              obj.dataStandar = item.dataStandar
-              obj.fieldId = item.id
-              obj.channelCode = item.channelCode
-              obj.enable = item.enable
-            } else {
-              obj.id = item.id
-              obj.label = item.name
-            }
-          } else { // 修改时。展示全部指标
-            if (item.fieldType) {
-              obj.id = item.englishName + '-' + item.id
-              obj.englishName = item.englishName
-              obj.label = item.chineseName
-              obj.fieldType = item.fieldType
-              obj.enumTypeNum = item.enumTypeNum
-              obj.sourceTable = item.sourceTable
-              obj.dataStandar = item.dataStandar
-              obj.fieldId = item.id
-              obj.channelCode = item.channelCode
-              obj.enable = item.enable
-            } else {
-              obj.id = item.id
-              obj.label = item.name
-            }
+          if (item.fieldType) {
+            obj.id = item.englishName + '-' + item.id
+            obj.englishName = item.englishName
+            obj.label = item.chineseName
+            obj.fieldType = item.fieldType
+            obj.enumTypeNum = item.enumTypeNum
+            obj.sourceTable = item.sourceTable
+            obj.dataStandar = item.dataStandar
+            obj.fieldId = item.id
+            obj.channelCode = item.channelCode
+            obj.enable = item.enable
+          } else {
+            obj.id = item.id
+            obj.label = item.name
           }
           if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
             obj.children = this.filterAllCata(item.dataCataLogList) // 指标集合
@@ -612,7 +596,6 @@ export default {
         }
       })
       this.ruleConfig = arr
-      console.log(this.ruleConfig)
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
       let selectEnumsList = []
@@ -700,7 +683,6 @@ export default {
     addChildreRules (data, citem) {
       let indexPath = findRuleIndex(data.rules, citem) + ''
       let indexPathArr = indexPath.split(',')
-      console.log(indexPathArr)
       if (indexPathArr.length === 1) {
         let newObj = {
           'relation': 'and',
@@ -795,7 +777,6 @@ export default {
           item.indexList = []
           if (item.label && !item.enable) {
             this.isSelectedUneffectIndex.push(item.label)
-            console.log(this.isSelectedUneffectIndex)
           }
         } else {
           if (item.rules) {

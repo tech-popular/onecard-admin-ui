@@ -9,4 +9,4 @@ export const updateIndexManage = (id, params) => httpPut(da + `dataIndexManager/
 export const indexManageTypeList = (params) => httpGet(da + `dataEnumType/selectByTypeNum/${params}`) // 数据类型
 export const indexManageMinCataList = () => httpGet(da + 'dataCatalog/selectMinCata') // 指标类别
 export const indexManageTypeNumList = () => httpGet(da + 'dataEnumType/selectAllGroupTypeNum') // 枚举类型值
-export const syncDataIndex = () => httpGet(da + 'sync/dataIndex') // 同步数语指标
+export const syncDataIndex = () => httpPost(da + 'sync/v3/dataIndex', {}) // 同步数语指标
