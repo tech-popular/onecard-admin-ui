@@ -123,6 +123,7 @@ export default {
         ]
       },
       multiSelectedData: [],
+      multiValue: false,
       skuid: ''
     }
   },
@@ -137,6 +138,13 @@ export default {
       deep: true,
       immediate: true
     }
+    // 'multiValues': {
+    //   handler (newVal, oldVal) {
+    //     console.log(newVal, 'newVal', oldVal, 'oldVal')
+    //   },
+    //   deep: true,
+    //   immediate: true
+    // }
   },
   mounted () {
     this.init()
@@ -177,9 +185,16 @@ export default {
       this.seachWeight()
     },
     handleSelectionChange (val) {
+      this.multiplevalue = val
+      if (val === []) {
+        this.multiValue = false
+      } else {
+        this.multiValue = true
+      }
       val.map(item => {
         this.multiSelectedData.push(item.sku)
         this.multiSelectedData = Array.from(new Set(this.multiSelectedData))
+        this.multiValues = this.multiSelectedData.join(',')
       })
     },
     productWeightChange (val) { // 单一修改权重
@@ -188,7 +203,11 @@ export default {
       this.weightForm.weight = val.weight
     },
     multiEditWeight () { // 批量修改权重
-      this.visible = true
+      if (this.multiValue === true) {
+        this.visible = true
+      } else {
+        return this.$message.error('请选择批量修改的数据')
+      }
     },
     dataSubmit () {
       let uneffectTime = new Date(this.weightForm.date[1]).getTime()
