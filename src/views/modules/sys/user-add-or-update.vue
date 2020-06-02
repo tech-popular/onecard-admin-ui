@@ -3,9 +3,12 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px" disabled>
+      <el-form-item label="姓名" prop="name">
+        <el-input v-model="dataForm.name" placeholder="姓名" readonly></el-input>
+      </el-form-item>
       <el-form-item label="用户名" prop="userName">
-        <el-input v-model="dataForm.userName" placeholder="登录帐号" readonly></el-input>
+        <el-input v-model="dataForm.userName" placeholder="用户名" readonly></el-input>
       </el-form-item>
       <!-- <el-form-item label="密码" prop="password" :class="{ 'is-required': !dataForm.id }">
         <el-input v-model="dataForm.password" autocomplete='off' type="password" placeholder="密码" @focus="cleanData()" @blur="midifyflag()"></el-input>
@@ -19,36 +22,48 @@
       <el-form-item label="手机号" prop="mobile">
         <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
       </el-form-item>
-      <el-form-item label="角色" prop="roleIdList">
+       <el-form-item label="员工工号" prop="jobnumber">
+        <el-input v-model="dataForm.jobnumber" placeholder="员工工号"></el-input>
+      </el-form-item>
+       <el-form-item label="入职时间" prop="modifyTime">
+        <el-input v-model="dataForm.modifyTime" placeholder="入职时间"></el-input>
+      </el-form-item>
+      <el-form-item label="部门" prop="mobile">
+        <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
+      </el-form-item>
+      <el-form-item label="阿里云账号" prop="mobile">
+        <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
+      </el-form-item>
+      <!-- <el-form-item label="角色" prop="roleIdList">
         <el-select v-model="dataForm.roleIdList" filterable multiple placeholder="请选择">
           <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId">
           </el-option>
         </el-select>
-      </el-form-item>
-      <el-form-item label="数据权限" size="mini" prop="systenandIdList">
+      </el-form-item> -->
+      <!-- <el-form-item label="数据权限" size="mini" prop="systenandIdList">
         <el-checkbox-group v-model="dataForm.systenandIdList">
           <el-checkbox v-for="tenant in systenantList" :key="tenant.tenantId" :label="tenant.tenantId">{{ tenant.name }}</el-checkbox>
         </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="状态" size="mini" prop="status">
+      </el-form-item> -->
+      <!-- <el-form-item label="状态" size="mini" prop="status">
         <el-radio-group v-model="dataForm.status">
           <el-radio :label="0">禁用</el-radio>
           <el-radio :label="1">正常</el-radio>
         </el-radio-group>
-      </el-form-item>
-      <el-form-item label="备注">
+      </el-form-item> -->
+      <!-- <el-form-item label="备注">
         <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <!-- <el-button type="primary" @click="dataFormSubmit()">确定</el-button> -->
     </span>
   </el-dialog>
 </template>
 
 <script>
-  import { isEmail, isMobile } from '@/utils/validate'
+  // import { isEmail, isMobile } from '@/utils/validate'
   import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
   export default {
     data () {
@@ -79,34 +94,34 @@
       //     callback()
       //   }
       // }
-      var validateEmail = (rule, value, callback) => {
-        const reg = new RegExp(/9fbank|ithro/)
-        if (!isEmail(value)) {
-          callback(new Error('邮箱格式错误'))
-        } else if (!reg.test(value)) {
-          callback(new Error('账号格式有误'))
-        } else {
-          callback()
-        }
-      }
-      var validateMobile = async (rule, value, callback) => {
-        if (!isMobile(value)) {
-          callback(new Error('手机号格式错误'))
-        } else if (!await this.checkIfMobile() && value != this.checkedMobile) {
-          callback(new Error('该手机号已被注册'))
-        } else {
-          callback()
-        }
-      }
-      var validateUserName = async (rule, value, callback) => {
-        if (!value) {
-          callback(new Error('用户名不能为空'))
-        } else if (!await this.checkIfUsername() && value != this.checkedName) {
-          callback(new Error('用户名已经存在'))
-        } else {
-          callback()
-        }
-      }
+      // var validateEmail = (rule, value, callback) => {
+      //   const reg = new RegExp(/9fbank|ithro/)
+      //   if (!isEmail(value)) {
+      //     callback(new Error('邮箱格式错误'))
+      //   } else if (!reg.test(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
+      // var validateMobile = async (rule, value, callback) => {
+      //   if (!isMobile(value)) {
+      //     callback(new Error('手机号格式错误'))
+      //   } else if (!await this.checkIfMobile() && value != this.checkedMobile) {
+      //     callback(new Error('该手机号已被注册'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
+      // var validateUserName = async (rule, value, callback) => {
+      //   if (!value) {
+      //     callback(new Error('用户名不能为空'))
+      //   } else if (!await this.checkIfUsername() && value != this.checkedName) {
+      //     callback(new Error('用户名已经存在'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
       return {
         visible: false,
         roleList: [],
@@ -126,26 +141,26 @@
         },
         systenantList: [],
         dataRule: {
-          userName: [
-            { required: true, validator: validateUserName, trigger: 'blur' }
-          ],
+          // userName: [
+          //   { required: true, validator: validateUserName, trigger: 'blur' }
+          // ],
           // password: [
           //   { validator: validatePassword, trigger: 'blur' }
           // ],
           // comfirmPassword: [
           //   { validator: validateComfirmPassword, trigger: 'blur' }
           // ],
-          email: [
-            { required: true, message: '邮箱不能为空', trigger: 'blur' },
-            { validator: validateEmail, trigger: 'blur' }
-          ],
-          mobile: [
-            { required: true, message: '手机号不能为空', trigger: 'blur' },
-            { validator: validateMobile, trigger: 'blur' }
-          ],
-          roleIdList: [
-            { required: true, message: '角色不能为空', trigger: 'blur' }
-          ]
+          // email: [
+          //   { required: true, message: '邮箱不能为空', trigger: 'blur' },
+          //   { validator: validateEmail, trigger: 'blur' }
+          // ],
+          // mobile: [
+          //   { required: true, message: '手机号不能为空', trigger: 'blur' },
+          //   { validator: validateMobile, trigger: 'blur' }
+          // ],
+          // roleIdList: [
+          //   { required: true, message: '角色不能为空', trigger: 'blur' }
+          // ]
         },
         checkedName: '',
         checkedMobile: ''
@@ -154,6 +169,9 @@
     },
     methods: {
       init (id) {
+        console.log(id, 'id')
+  
+        this.dataForm.id = id
         this.checkedName = ''
         this.checkedMobile = ''
         this.checkedName = ''
@@ -189,6 +207,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
+                this.dataForm = data.user
                 this.dataForm.userName = data.user.username
                 this.checkedName = data.user.username
                 this.dataForm.salt = data.user.salt

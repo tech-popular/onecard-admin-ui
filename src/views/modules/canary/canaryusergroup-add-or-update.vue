@@ -1,16 +1,30 @@
 <template>
 <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
     <el-form-item label="用户组名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
-    <el-transfer v-model="userGroupUserArray" :props="{
+     <el-form-item label="接收人" prop="receiver">
+      <el-select v-model="receiver" multiple placeholder="请选择" style="width:100%">
+        <el-option
+          v-for="item in jieshouren"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+          <span style="float: left">{{ item.label }}</span>
+          <span style="float: right; color: #8492a6; font-size: 13px;  margin-right: 20px;">{{ item.value }}</span>
+        </el-option>
+      </el-select>
+      <!-- <el-input v-model="dataForm.name" placeholder="接受人"></el-input> -->
+    </el-form-item>
+    <!-- <el-transfer v-model="userGroupUserArray" :props="{
                   key: 'id',
                   label: 'name'
-                }" :data="allUserEntities" :filterable="true"></el-transfer>
+                }" :data="allUserEntities" :filterable="true"></el-transfer> -->
     <!--<el-form-item label="租户Id" prop="tenantId">-->
       <!--<el-input v-model="dataForm.tenantId" placeholder="租户Id"></el-input>-->
     <!--</el-form-item>-->
+
     <el-form-item label="是否启用" prop="enable">
       <el-radio-group v-model="dataForm.enable">
         <el-radio :label="0">禁用</el-radio>
@@ -26,6 +40,7 @@
 </template>
 
 <script>
+import { getUser9FbankEmail } from '@/api/canary/canary'
 export default {
   data () {
     return {
@@ -36,10 +51,26 @@ export default {
         tenantId: 1,
         enable: 1
       },
+      jieshouren: [{
+        value: 'lvzhiming@9fbanl.com.cn',
+        label: '吕志明'
+      }, {
+        value: 'renxiaohui@9fbanck.com.cn',
+        label: '任小辉'
+      }, {
+        value: 'ouyangbo@9fbanck.com.cn',
+        label: '欧阳波'
+      }],
+      receiver: [],
       dataRule: {
         name: [{
           required: true,
           message: '用户组名称不能为空',
+          trigger: 'blur'
+        }],
+        receiver: [{
+          required: true,
+          message: '请选择接收人',
           trigger: 'blur'
         }],
         enable: [{
@@ -48,8 +79,8 @@ export default {
           trigger: 'blur'
         }]
       },
-      allUserEntities: [],
-      userGroupUserArray: []
+      allUserEntities: []
+      // userGroupUserArray: []
     }
   },
   methods: {
@@ -58,6 +89,9 @@ export default {
       this.visible = true
 
       this.$nextTick(() => {
+        getUser9FbankEmail().then(({ data }) => {
+          console.log(data, '邮箱')
+        })
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.id) {
           this.$http({
@@ -72,7 +106,7 @@ export default {
               this.dataForm.tenantId = data.canaryUserGroup.tenantId
               this.dataForm.enable = data.canaryUserGroup.enable
               this.allUserEntities = data.canaryUserGroup.allUserList
-              this.userGroupUserArray = data.canaryUserGroup.userGroupUserArray
+              // this.userGroupUserArray = data.canaryUserGroup.userGroupUserArray
             }
           })
         } else {
@@ -80,9 +114,7 @@ export default {
             url: this.$http.adornUrl(`/canary/canaryusergroup/getalluser`),
             method: 'get',
             params: this.$http.adornParams()
-          }).then(({
-                     data
-                   }) => {
+          }).then(({data}) => {
             if (data && data.code === 0) {
               this.allUserEntities = data.canaryUserEntities
             }
@@ -102,11 +134,10 @@ export default {
               'name': this.dataForm.name,
               'tenantId': this.dataForm.tenantId,
               'enable': this.dataForm.enable,
-              'userGroupUserArray': this.userGroupUserArray
+              // 'userGroupUserArray': this.userGroupUserArray,
+              'receiver': this.receiver
             })
-          }).then(({
-            data
-          }) => {
+          }).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
@@ -114,6 +145,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
+                  this.receiver = []
                   this.$emit('refreshDataList')
                 }
               })
