@@ -145,9 +145,11 @@ export default {
           }
           getSceneWillPushList(dataBody).then(({data}) => {
             if (data && data.msg === 'success') {
-              this.showform = true
               this.dataList = data.data.list
               this.totalPage = data.data.totalPage
+            }
+            if (data && data.data && !data.data.list) {
+              this.showform = true
             }
           })
         }
