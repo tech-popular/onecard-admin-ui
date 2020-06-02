@@ -14,6 +14,7 @@
           :props="props"
           v-model="baseForm.categoryType"
           clearable
+          @change="selectChan"
           :options="categoryTypeList">
         </el-cascader>
       </el-form-item>
@@ -184,6 +185,9 @@ export default {
       this.pageNo = page
       this.seachWeight()
     },
+    selectChan (value) {
+      this.pageNo = 1
+    },
     handleSelectionChange (val) {
       this.multiplevalue = val
       if (val === []) {
@@ -234,6 +238,9 @@ export default {
               this.$refs.multipleTable.clearSelection()
               this.multiValue = false
               this.seachWeight()
+              this.$nextTick(() => {
+                this.$refs['weightForm'].clearValidate()
+              })
             } else {
               return this.$message.error(data.msg)
             }
@@ -246,6 +253,9 @@ export default {
       this.weightForm = {}
       this.$refs.multipleTable.clearSelection()
       this.multiValue = false
+      this.$nextTick(() => {
+        this.$refs['weightForm'].clearValidate()
+      })
     }
   }
 }
