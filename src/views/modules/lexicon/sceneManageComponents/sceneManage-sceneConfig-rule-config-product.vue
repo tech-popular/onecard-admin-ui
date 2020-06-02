@@ -25,7 +25,7 @@
         <el-button type="warning" @click="multiEditWeight">批量修改权重</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="loading" style="width: 100%;" @selection-change="handleSelectionChange">
+    <el-table :data="dataList" border v-loading="loading" style="width: 100%;" ref="multipleTable" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="sku" header-align="center" align="center" label="SKU"></el-table-column>
       <el-table-column prop="productName" header-align="center" align="center" label="商品名称"></el-table-column>
@@ -137,14 +137,14 @@ export default {
       },
       deep: true,
       immediate: true
+    },
+    'multiValue': {
+      handler (newVal, oldVal) {
+        this.multiValue = newVal
+      },
+      deep: true,
+      immediate: true
     }
-    // 'multiValues': {
-    //   handler (newVal, oldVal) {
-    //     console.log(newVal, 'newVal', oldVal, 'oldVal')
-    //   },
-    //   deep: true,
-    //   immediate: true
-    // }
   },
   mounted () {
     this.init()
@@ -194,7 +194,6 @@ export default {
       val.map(item => {
         this.multiSelectedData.push(item.sku)
         this.multiSelectedData = Array.from(new Set(this.multiSelectedData))
-        this.multiValues = this.multiSelectedData.join(',')
       })
     },
     productWeightChange (val) { // 单一修改权重
@@ -232,6 +231,8 @@ export default {
               this.visible = false
               this.$message.success('更新成功')
               this.weightForm = {}
+              this.$refs.multipleTable.clearSelection()
+              this.multiValue = false
               this.seachWeight()
             } else {
               return this.$message.error(data.msg)
@@ -243,6 +244,8 @@ export default {
     cancel () {
       this.visible = false
       this.weightForm = {}
+      this.$refs.multipleTable.clearSelection()
+      this.multiValue = false
     }
   }
 }
