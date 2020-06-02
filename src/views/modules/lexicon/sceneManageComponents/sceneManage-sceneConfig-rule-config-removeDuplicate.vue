@@ -43,10 +43,10 @@
     <el-dialog title="修改去重规则" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
       <el-form label-width="140px" :model="duplicateForm" :rules="duplicateFormRules" ref="duplicateForm">
         <el-form-item label="点击数量去重:" prop="clickNumber">
-          同一物品推荐点击后<el-input v-model="duplicateForm.clickNumber" placeholder="1000" class="input-item" />条内不重复
+          同一物品推荐点击后<el-input-number v-model="duplicateForm.clickNumber" :min="1" label="1000" class="input-item" ></el-input-number>条内不重复
         </el-form-item>
         <el-form-item label="点击时间去重:" prop="clickTime">
-          同一物品推荐点击后<el-input v-model="duplicateForm.clickTime" placeholder="1000" class="input-item" />天内不重复
+          同一物品推荐点击后<el-input-number v-model="duplicateForm.clickTime" :min="1" label="1000" class="input-item" ></el-input-number>天内不重复
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -179,7 +179,6 @@ export default {
 </script>
 <style scoped>
   .input-item {
-    width: 100px;
     margin: 0 10px;
   }
   .el-form-item__error {
