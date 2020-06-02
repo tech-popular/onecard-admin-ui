@@ -5,14 +5,12 @@
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
      <el-form-item label="接收人" prop="receiver">
-      <el-select v-model="receiver" multiple placeholder="请选择" style="width:100%">
+      <el-select v-model="dataForm.receiver" multiple placeholder="请选择" style="width:100%">
         <el-option
           v-for="item in jieshouren"
           :key="item.value"
           :label="item.label"
           :value="item.value">
-          <span style="float: left">{{ item.label }}</span>
-          <span style="float: right; color: #8492a6; font-size: 13px;  margin-right: 20px;">{{ item.value }}</span>
         </el-option>
       </el-select>
       <!-- <el-input v-model="dataForm.name" placeholder="接受人"></el-input> -->
@@ -49,7 +47,8 @@ export default {
         id: 0,
         name: '',
         tenantId: 1,
-        enable: 1
+        enable: 1,
+        receiver: []
       },
       jieshouren: [{
         value: 'lvzhiming@9fbanl.com.cn',
@@ -61,7 +60,6 @@ export default {
         value: 'ouyangbo@9fbanck.com.cn',
         label: '欧阳波'
       }],
-      receiver: [],
       dataRule: {
         name: [{
           required: true,
@@ -135,7 +133,7 @@ export default {
               'tenantId': this.dataForm.tenantId,
               'enable': this.dataForm.enable,
               // 'userGroupUserArray': this.userGroupUserArray,
-              'receiver': this.receiver
+              'receiver': this.dataForm.receiver
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
@@ -145,7 +143,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.receiver = []
+                  this.dataForm.receiver = []
                   this.$emit('refreshDataList')
                 }
               })

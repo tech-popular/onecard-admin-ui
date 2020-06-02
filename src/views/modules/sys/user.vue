@@ -2,18 +2,18 @@
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">   
       <el-form-item label="姓名: ">
-        <el-input v-model="dataForm.userName" placeholder="用户姓名" clearable></el-input>
+        <el-input v-model="dataForm.name" placeholder="姓名" clearable></el-input>
       </el-form-item>
       <el-form-item label="用户名: ">
-        <el-input v-model="dataForm.mobile" placeholder="手机号" clearable></el-input>
+        <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
       </el-form-item>
       <el-form-item label="邮箱账号: ">
         <el-input v-model="dataForm.email" placeholder="邮箱账号" clearable></el-input>
       </el-form-item>
       <el-form-item label="状态: ">
-        <el-select v-model="dataForm.role" filterable clearable placeholder="请选择">
-          <el-option v-for="item in roles" :key="item.roleId" :label="item.roleName" :value="item.roleId">
-          </el-option>
+        <el-select v-model="dataForm.status " filterable clearable placeholder="请选择">
+          <el-option v-for="item in statusList" :key="item.id" :label="item.value" :value="item.id">
+        </el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -71,7 +71,7 @@
         align="center"
         label="手机号">
       </el-table-column> -->
-      <el-table-column
+      <!-- <el-table-column
         prop="roleName"
         header-align="center"
         align="center"
@@ -94,15 +94,15 @@
             <div class="text-to-long-cut">{{scope.row.roleName}}</div>
           </el-tooltip>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="status"
         header-align="center"
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>
-          <el-tag v-else size="small">正常</el-tag>
+          <el-tag v-if="scope.row.status === '0'" size="small">正常</el-tag>
+          <el-tag v-else size="small" type="danger">冻结</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -139,10 +139,19 @@
         dataForm: {
           userName: '',
           email: '',
-          mobile: '',
-          role: ''
+          name: '',
+          status: ''
         },
         dataList: [],
+        statusList: [
+          {
+            id: '0',
+            value: '正常'
+          }, {
+            id: '1',
+            value: '冻结'
+          }
+        ],
         roles: [],
         pageIndex: 1,
         pageSize: 10,
@@ -180,8 +189,8 @@
             'limit': this.pageSize,
             'username': this.dataForm.userName,
             'email': this.dataForm.email,
-            'mobile': this.dataForm.mobile,
-            'roleId': this.dataForm.role
+            'name': this.dataForm.name,
+            'status': this.dataForm.status
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -211,8 +220,6 @@
       },
       // 新增 / 修改
       addOrUpdateHandle (id) {
-        console.log(id, '父级')
-  
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)

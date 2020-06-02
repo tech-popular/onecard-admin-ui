@@ -25,14 +25,14 @@
        <el-form-item label="员工工号" prop="jobnumber">
         <el-input v-model="dataForm.jobnumber" placeholder="员工工号"></el-input>
       </el-form-item>
-       <el-form-item label="入职时间" prop="modifyTime">
+       <!-- <el-form-item label="入职时间" prop="modifyTime">
         <el-input v-model="dataForm.modifyTime" placeholder="入职时间"></el-input>
+      </el-form-item> -->
+      <el-form-item label="部门" prop="department">
+        <el-input v-model="dataForm.department" placeholder="部门"></el-input>
       </el-form-item>
-      <el-form-item label="部门" prop="mobile">
-        <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
-      </el-form-item>
-      <el-form-item label="阿里云账号" prop="mobile">
-        <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
+      <el-form-item label="阿里云账号" prop="aliyunAccount">
+        <el-input v-model="dataForm.aliyunAccount" placeholder="阿里云账号"></el-input>
       </el-form-item>
       <!-- <el-form-item label="角色" prop="roleIdList">
         <el-select v-model="dataForm.roleIdList" filterable multiple placeholder="请选择">
