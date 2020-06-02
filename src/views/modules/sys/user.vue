@@ -8,7 +8,7 @@
         <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
       </el-form-item>
       <el-form-item label="邮箱账号: ">
-        <el-input v-model="dataForm.email" placeholder="邮箱账号" clearable></el-input>
+        <el-input v-model="dataForm.emailList" placeholder="邮箱账号" clearable></el-input>
       </el-form-item>
       <el-form-item label="状态: ">
         <el-select v-model="dataForm.status " filterable clearable placeholder="请选择">
@@ -60,7 +60,7 @@
         label="用户名">
       </el-table-column>
       <el-table-column
-        prop="email"
+        prop="emailList"
         header-align="center"
         align="center"
         label="邮箱">
@@ -138,7 +138,7 @@
       return {
         dataForm: {
           userName: '',
-          email: '',
+          emailList: '',
           name: '',
           status: ''
         },
@@ -188,7 +188,7 @@
             'page': this.pageIndex,
             'limit': this.pageSize,
             'username': this.dataForm.userName,
-            'email': this.dataForm.email,
+            'emailList': this.dataForm.emailList,
             'name': this.dataForm.name,
             'status': this.dataForm.status
           })

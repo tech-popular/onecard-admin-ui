@@ -4,13 +4,13 @@
     <el-form-item label="用户组名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
-     <el-form-item label="接收人" prop="receiver">
-      <el-select v-model="dataForm.receiver" multiple placeholder="请选择" style="width:100%">
+     <el-form-item label="接收人" prop="emailList">
+      <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%">
         <el-option
           v-for="item in jieshouren"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
+          :key="item.userId"
+          :label="item.emailList"
+          :value="item.userId">
         </el-option>
       </el-select>
       <!-- <el-input v-model="dataForm.name" placeholder="接受人"></el-input> -->
@@ -46,9 +46,9 @@ export default {
       dataForm: {
         id: 0,
         name: '',
-        tenantId: 1,
+        // tenantId: 1,
         enable: 1,
-        receiver: []
+        emailList: []
       },
       jieshouren: [{
         value: 'lvzhiming@9fbanl.com.cn',
@@ -66,7 +66,7 @@ export default {
           message: '用户组名称不能为空',
           trigger: 'blur'
         }],
-        receiver: [{
+        emailList: [{
           required: true,
           message: '请选择接收人',
           trigger: 'blur'
@@ -85,10 +85,9 @@ export default {
     init (id) {
       this.dataForm.id = id || 0
       this.visible = true
-
       this.$nextTick(() => {
         getUser9FbankEmail().then(({ data }) => {
-          console.log(data, '邮箱')
+          this.jieshouren = data.data
         })
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.id) {
@@ -101,7 +100,7 @@ export default {
           }) => {
             if (data && data.code === 0) {
               this.dataForm.name = data.canaryUserGroup.name
-              this.dataForm.tenantId = data.canaryUserGroup.tenantId
+              // this.dataForm.tenantId = data.canaryUserGroup.tenantId
               this.dataForm.enable = data.canaryUserGroup.enable
               this.allUserEntities = data.canaryUserGroup.allUserList
               // this.userGroupUserArray = data.canaryUserGroup.userGroupUserArray
@@ -130,10 +129,10 @@ export default {
             data: this.$http.adornData({
               'id': this.dataForm.id || undefined,
               'name': this.dataForm.name,
-              'tenantId': this.dataForm.tenantId,
+              // 'tenantId': this.dataForm.tenantId,
               'enable': this.dataForm.enable,
               // 'userGroupUserArray': this.userGroupUserArray,
-              'receiver': this.dataForm.receiver
+              'emailList': this.dataForm.emailList
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
@@ -143,7 +142,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.dataForm.receiver = []
+                  this.dataForm.emailList = []
                   this.$emit('refreshDataList')
                 }
               })
