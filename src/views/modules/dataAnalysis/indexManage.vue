@@ -251,8 +251,13 @@
       },
       // 手动同步
       manualSync () {
+        this.dataListLoading = true
         syncDataIndex().then(({data}) => {
-          console.log(data)
+          if (data && data.status === '1') {
+            this.getDataList()
+          } else {
+            this.dataListLoading = false
+          }
         })
       },
       // 每页数
