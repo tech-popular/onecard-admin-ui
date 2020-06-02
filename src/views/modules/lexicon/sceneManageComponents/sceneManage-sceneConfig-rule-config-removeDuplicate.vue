@@ -7,6 +7,7 @@
           :props="props"
           v-model="baseForm.categoryType"
           clearable
+          @change="selectChan"
           :options="categoryTypeList">
         </el-cascader>
       </el-form-item>
@@ -142,6 +143,9 @@ export default {
     currentChangeHandle (page) {
       this.pageNo = page
       this.seachWeight()
+    },
+    selectChan (value) {
+      this.pageNo = 1
     },
     dataSubmit () {
       this.$refs.duplicateForm.validate((valid) => {
