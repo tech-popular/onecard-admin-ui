@@ -148,7 +148,7 @@ export default {
               this.dataList = data.data.list
               this.totalPage = data.data.totalPage
             }
-            if (data && data.data && !data.data.list) {
+            if (data && data.data && data.data.list.length > 0) {
               this.showform = true
             }
           })
