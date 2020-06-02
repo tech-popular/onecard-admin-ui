@@ -22,3 +22,4 @@ export const custerAvailable = () => httpGet(da + `data/group/select/available`)
 export const templateDownload = http.adornUrl(da + 'data/group/template/download?token=' + Vue.cookie.get('token'))
 
 export const selectAllCataNew = () => httpGet('http://10.3.1.64:8085/dataCatalog/selectAllCataNew', {}, true, true)
+export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManager/value/candidate', params)
