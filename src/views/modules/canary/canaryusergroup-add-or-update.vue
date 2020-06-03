@@ -5,7 +5,7 @@
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
      <el-form-item label="接收人" prop="emailList">
-      <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%">
+      <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%"  @change="selectGet">
         <el-option
           v-for="item in jieshouren"
           :key="item.userId"
@@ -77,8 +77,8 @@ export default {
           trigger: 'blur'
         }]
       },
-      allUserEntities: []
-      // userGroupUserArray: []
+      allUserEntities: [],
+      userGroupUserArray: []
     }
   },
   methods: {
@@ -117,6 +117,19 @@ export default {
         }
       })
     },
+    // 触发接收人
+    selectGet (val) {
+      var activityList = []
+      for (let i = 0; i <= val.length - 1; i++) {
+        this.jieshouren.find((item) => { // 这里的options就是数据源
+          if (item.userId == val[i]) {
+            var obj = {userId: item.userId, email: item.email}
+            activityList.push(obj)
+          }
+        })
+      }
+      this.userGroupUserArray = activityList
+    },
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
@@ -130,7 +143,7 @@ export default {
               // 'tenantId': this.dataForm.tenantId,
               'enable': this.dataForm.enable,
               // 'userGroupUserArray': this.userGroupUserArray,
-              'emailList': this.dataForm.emailList
+              'groupUsers': this.userGroupUserArray
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
