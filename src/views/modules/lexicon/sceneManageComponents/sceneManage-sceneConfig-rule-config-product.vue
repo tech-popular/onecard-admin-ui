@@ -3,10 +3,10 @@
     <div class="total">上架商品 <span>45678</span> 件</div>
     <el-form label-width="80px" :model="baseForm" ref="baseForm" inline>
       <el-form-item label="SKU" prop="sku">
-        <el-input v-model.trim="baseForm.sku" placeholder="sku" clearable />
+        <el-input v-model.trim="baseForm.sku" placeholder="sku" clearable @change="selectChan" />
       </el-form-item>
       <el-form-item label="商品名称" prop="productName">
-        <el-input v-model.trim="baseForm.productName" placeholder="商品名称" clearable />
+        <el-input v-model.trim="baseForm.productName" placeholder="商品名称" clearable @change="selectChan" />
       </el-form-item>
       <el-form-item label="品类" prop="categoryType">
         <el-cascader
@@ -19,7 +19,7 @@
         </el-cascader>
       </el-form-item>
       <el-form-item label="品牌" prop="brandName">
-        <el-input v-model.trim="baseForm.brandName" placeholder="品牌" clearable />
+        <el-input v-model.trim="baseForm.brandName" placeholder="品牌" clearable @change="selectChan" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="seachWeight">查询</el-button>
