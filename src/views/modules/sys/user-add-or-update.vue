@@ -57,7 +57,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <!-- <el-button type="primary" @click="dataFormSubmit()">确定</el-button> -->
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -242,16 +242,8 @@
               method: 'post',
               data: this.$http.adornData({
                 'userId': this.dataForm.id || undefined,
-                'username': this.dataForm.userName,
-                // 'password': this.dataForm.password,
-                'salt': this.dataForm.salt,
-                'email': this.dataForm.email,
-                'mobile': this.dataForm.mobile,
-                'status': this.dataForm.status,
-                'roleIdList': this.dataForm.roleIdList,
-                'ismodifyPasswd': this.dataForm.ismodifyPasswd,
-                'systenandIdList': this.dataForm.systenandIdList,
-                'remark': this.dataForm.remark
+                'emailList': this.dataForm.email,
+                'aliyunAccount': this.dataForm.aliyunAccount
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

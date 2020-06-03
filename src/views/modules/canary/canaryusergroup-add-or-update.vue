@@ -77,7 +77,7 @@ export default {
           trigger: 'blur'
         }]
       },
-      allUserEntities: [],
+      // allUserEntities: [],
       userGroupUserArray: []
     }
   },
@@ -100,7 +100,12 @@ export default {
               this.dataForm.name = data.canaryUserGroup.name
               // this.dataForm.tenantId = data.canaryUserGroup.tenantId
               this.dataForm.enable = data.canaryUserGroup.enable
-              this.allUserEntities = data.canaryUserGroup.allUserList
+              this.emailList = data.canaryUserGroup.reviceInfo
+              this.emailList.map(item => {
+                console.log(item)
+                console.log(item.emailList)
+              })
+              // this.allUserEntities = data.canaryUserGroup.allUserList
               // this.userGroupUserArray = data.canaryUserGroup.userGroupUserArray
             }
           })
