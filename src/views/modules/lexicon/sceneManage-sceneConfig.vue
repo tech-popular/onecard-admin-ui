@@ -16,8 +16,8 @@
             </el-col>
             <el-col :span="16">
               <div class="box-right">
-                <p>场景名称：{{item.name}}</p>
-                <p>场景ID（boxid）：{{item.boxid}}</p>
+                <p>场景名称：{{item.boxName}}</p>
+                <p>场景ID（boxid）：{{item.boxId}}</p>
               </div>
             </el-col>
           </el-row>
@@ -68,7 +68,7 @@
         </el-card>
       </div>
     </el-card>
-    <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene"></add-search-scene>
+    <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene" @childByValue="childByValue"></add-search-scene>
     <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene" @childByValue="childByValue"></add-recommend-scene>
     <rule-config v-if="ruleConfigVisible" ref="ruleConfig" :boxId='boxId'></rule-config>
     <statistic-chart v-if="statisticChartVisible" ref="statisticChart"></statistic-chart>
@@ -108,7 +108,8 @@ export default {
   methods: {
     init () {
       listSearchScene().then(({data}) => {
-        this.recommendServiceList = data.data
+        this.searchServiceList = data.data.listSearchSceneSets
+        this.recommendServiceList = data.data.listRecommendSceneSets
       })
     },
     addSearchScene () { // 新建搜索场景
