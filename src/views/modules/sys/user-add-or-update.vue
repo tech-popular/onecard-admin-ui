@@ -242,8 +242,9 @@
               method: 'post',
               data: this.$http.adornData({
                 'userId': this.dataForm.id || undefined,
-                'emailList': this.dataForm.email,
-                'aliyunAccount': this.dataForm.aliyunAccount
+                'username': this.dataForm.username,
+                'emailList': [this.dataForm.email],
+                'mcAccount': this.dataForm.aliyunAccount
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
