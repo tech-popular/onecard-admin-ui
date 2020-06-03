@@ -5,7 +5,7 @@
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
      <el-form-item label="接收人" prop="emailList">
-      <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%"  @change="selectGet">
+      <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%" filterable @change="selectGet">
         <el-option
           v-for="item in jieshouren"
           :key="item.userId"
