@@ -2,12 +2,12 @@
   <div>
     <el-dialog title="新增搜索场景" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="600px">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="90px">
-        <el-form-item label="场景名称:" prop="name">
-          <el-input v-model="dataForm.name" placeholder="分期专区" />
+        <el-form-item label="场景名称:" prop="sceneName">
+          <el-input v-model="dataForm.sceneName" placeholder="分期专区" />
         </el-form-item>
-        <el-form-item label="商品池:" prop="productPool">
+        <el-form-item label="商品池:" prop="goodsPool">
           <el-select
-            v-model="dataForm.productPool"
+            v-model="dataForm.goodsPool"
             filterable
             placeholder="请选择"
             class="pool-sel"
@@ -31,6 +31,7 @@
   </div>
 </template>
 <script>
+import { saveorupt, listSceneBoxInfo, listProductPool } from '@/api/lexicon/sceneManage'
 export default {
   data () {
     return {
@@ -42,14 +43,15 @@ export default {
         }
       ],
       dataForm: {
-        name: '',
-        productPool: ''
+        sceneName: '',
+        goodsPool: '',
+        sceneType: 0
       },
       dataRule: {
-        name: [
+        sceneName: [
           { required: true, message: '请输入场景名称', trigger: 'blur' }
         ],
-        productPool: [
+        goodsPool: [
           { required: true, message: '请选择商品池', trigger: 'change' }
         ]
       },
@@ -60,9 +62,16 @@ export default {
     init () {
       this.visible = true
       this.dataForm = {
-        name: '',
-        productPool: ''
+        sceneName: '',
+        goodsPool: '',
+        sceneType: 0
       }
+      listSceneBoxInfo().then(({data}) => {
+        this.typeList = data.data
+      })
+      listProductPool().then(({data}) => {
+        // this.productPoolList = data.data
+      })
     },
     searchProductNum () { // 查询商品数量
       console.log(3)
@@ -71,7 +80,28 @@ export default {
       this.visible = false
     },
     dataSubmit () {
-      console.log(this.dataForm)
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const dataBody = this.dataForm
+          const dataUpdateId = this.dataForm.id
+          saveorupt(dataBody, dataUpdateId).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('childByValue', this.visible)
+                  this.$refs['dataForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }
+      })
     }
   }
 }
