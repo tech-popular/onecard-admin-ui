@@ -915,6 +915,7 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
+          this.isSelectedUneffectIndex = Array.from(new Set(this.isSelectedUneffectIndex))
           if (this.isSelectedUneffectIndex.length) {
             return this.$message({
               message: `【${this.isSelectedUneffectIndex.join('，')}】为无效指标，请重新选择`,
