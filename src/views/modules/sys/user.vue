@@ -1,27 +1,33 @@
 <template>
   <div class="mod-user">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">   
+      <el-form-item label="姓名: ">
+        <el-input v-model="dataForm.name" placeholder="姓名" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="用户名: ">
+        <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
+      </el-form-item>
       <el-form-item label="邮箱账号: ">
-        <el-input v-model="dataForm.email" placeholder="邮箱账号" clearable></el-input>
+        <el-input v-model="dataForm.emailList" placeholder="邮箱账号" clearable></el-input>
       </el-form-item>
-      <el-form-item label="手机号: ">
-        <el-input v-model="dataForm.mobile" placeholder="手机号" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="用户姓名: ">
-        <el-input v-model="dataForm.userName" placeholder="用户姓名" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="角色: ">
-        <el-select v-model="dataForm.role" filterable clearable placeholder="请选择">
-          <el-option v-for="item in roles" :key="item.roleId" :label="item.roleName" :value="item.roleId">
-          </el-option>
+      <el-form-item label="状态: ">
+        <el-select v-model="dataForm.status " filterable clearable placeholder="请选择">
+          <el-option v-for="item in statusList" :key="item.id" :label="item.value" :value="item.id">
+        </el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="getDataList()" type="primary">查询</el-button>
         <!-- <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
         <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
+    <el-alert
+      :title="modifyTime"
+      type="info"
+      :closable='false'
+      show-icon>
+    </el-alert>
     <el-table
       :data="dataList"
       border
@@ -35,11 +41,17 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="userId"
+        prop="id"
         header-align="center"
         align="center"
         width="80"
         label="ID">
+      </el-table-column>
+      <el-table-column
+        prop="name"
+        header-align="center"
+        align="center"
+        label="姓名">
       </el-table-column>
       <el-table-column
         prop="username"
@@ -48,32 +60,22 @@
         label="用户名">
       </el-table-column>
       <el-table-column
-        prop="email"
+        prop="emailList"
         header-align="center"
         align="center"
         label="邮箱">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="mobile"
         header-align="center"
         align="center"
         label="手机号">
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        header-align="center"
-        align="center"
-        label="状态">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>
-          <el-tag v-else size="small">正常</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
+      </el-table-column> -->
+      <!-- <el-table-column
         prop="roleName"
         header-align="center"
         align="center"
-        label="角色">
+        label="功能角色">
         <template slot-scope="scope">
           <el-tooltip effect="dark" placement="top">
             <div v-html="toBreak(scope.row.roleName)" slot="content"></div>
@@ -82,17 +84,26 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="createrName"
+        prop="roleName"
         header-align="center"
         align="center"
-        label="创建人">
-      </el-table-column>
+        label="数据角色">
+        <template slot-scope="scope">
+          <el-tooltip effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.roleName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.roleName}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column> -->
       <el-table-column
-        prop="createTime"
+        prop="status"
         header-align="center"
         align="center"
-        width="180"
-        label="创建时间">
+        label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === '0'" size="small">正常</el-tag>
+          <el-tag v-else size="small" type="danger">冻结</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         header-align="center"
@@ -100,8 +111,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <!-- <el-button v-if="isAuth('sys:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button> -->
-          <el-button v-if="isAuth('sys:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button>
+          <el-button v-if="isAuth('sys:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
+          <!-- <el-button v-if="isAuth('sys:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -127,15 +138,25 @@
       return {
         dataForm: {
           userName: '',
-          email: '',
-          mobile: '',
-          role: ''
+          emailList: '',
+          name: '',
+          status: ''
         },
         dataList: [],
+        statusList: [
+          {
+            id: '0',
+            value: '正常'
+          }, {
+            id: '1',
+            value: '冻结'
+          }
+        ],
         roles: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
+        modifyTime: '',
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false
@@ -168,13 +189,14 @@
             'page': this.pageIndex,
             'limit': this.pageSize,
             'username': this.dataForm.userName,
-            'email': this.dataForm.email,
-            'mobile': this.dataForm.mobile,
-            'roleId': this.dataForm.role
+            'email': this.dataForm.emailList,
+            'name': this.dataForm.name,
+            'status': this.dataForm.status
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.dataList = data.page.list
+            this.modifyTime = data.page.modifyTime
             this.totalPage = data.page.totalCount
           } else {
             this.dataList = []
@@ -199,10 +221,10 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (val) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(val)
         })
       },
       // 删除
