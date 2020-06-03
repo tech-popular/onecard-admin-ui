@@ -23,7 +23,7 @@
       </el-form-item>
     </el-form>
     <el-alert
-      title="2020-06-02"
+      :title="modifyTime"
       type="info"
       :closable='false'
       show-icon>
@@ -156,6 +156,7 @@
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
+        modifyTime: '',
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false
@@ -188,13 +189,14 @@
             'page': this.pageIndex,
             'limit': this.pageSize,
             'username': this.dataForm.userName,
-            'emailList': this.dataForm.emailList,
+            'email': this.dataForm.emailList,
             'name': this.dataForm.name,
             'status': this.dataForm.status
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.dataList = data.page.list
+            this.modifyTime = data.page.modifyTime
             this.totalPage = data.page.totalCount
           } else {
             this.dataList = []

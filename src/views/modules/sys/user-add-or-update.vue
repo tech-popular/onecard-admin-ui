@@ -204,11 +204,11 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm = data.user
+                this.dataForm = data.user.user
                 this.dataForm.userName = data.user.username
                 this.checkedName = data.user.username
                 this.dataForm.salt = data.user.salt
-                this.dataForm.email = data.user.email
+                this.dataForm.email = data.user.emailList
                 this.dataForm.mobile = data.user.mobile
                 this.dataForm.remark = data.user.remark
                 this.checkedMobile = data.user.mobile
@@ -217,6 +217,7 @@
                 this.dataForm.roleIdList = data.user.roleIdList
                 this.dataForm.status = data.user.status
                 this.dataForm.systenandIdList = data.user.systenandIdList
+                this.dataForm.aliyunAccount = data.user.mcAccount
                 this.$refs.dataForm.validateField('userName')
                 // this.$refs.dataForm.validateField('password')
               }
