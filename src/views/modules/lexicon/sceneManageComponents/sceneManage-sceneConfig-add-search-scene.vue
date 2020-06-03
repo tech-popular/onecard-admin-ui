@@ -61,7 +61,8 @@ export default {
       dataForm: {
         sceneName: '',
         boxId: '',
-        goodsPool: ''
+        goodsPool: '',
+        sceneType: 1
       },
       dataRule: {
         sceneName: [
@@ -83,7 +84,8 @@ export default {
       this.dataForm = {
         sceneName: '',
         boxId: '',
-        goodsPool: ''
+        goodsPool: '',
+        sceneType: 1
       }
       listSceneBoxInfo().then(({data}) => {
         this.typeList = data.data
