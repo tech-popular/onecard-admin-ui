@@ -25,7 +25,7 @@
       </el-form>
       <div slot="footer">
         <el-button @click="cancel">取消</el-button>
-        <el-button type="primary" @click="dataSubmit">确定</el-button>
+        <el-button type="primary" @click="dataSubmit" :loading="loadingVlaue">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -36,6 +36,7 @@ export default {
   data () {
     return {
       visible: false,
+      loadingVlaue: false,
       productPoolList: [ // 商品池
         {
           id: '1',
@@ -82,6 +83,7 @@ export default {
     dataSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.loadingVlaue = true
           const dataBody = this.dataForm
           const dataUpdateId = this.dataForm.id
           saveorupt(dataBody, dataUpdateId).then(({data}) => {
@@ -92,12 +94,14 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
+                  this.loadingVlaue = false
                   this.$emit('childByValue', this.visible)
                   this.$refs['dataForm'].resetFields()
                 }
               })
             } else {
               this.$message.error(data.msg)
+              this.loadingVlaue = false
             }
           })
         }

@@ -11,6 +11,7 @@
               v-for="(item, index) in typeList"
               :key="index"
               :label="item.boxId"
+              @change="cliskBoxName(item.boxName)"
             >
             {{item.boxName}}
             <el-tooltip placement="top">
@@ -40,7 +41,7 @@
       </el-form>
       <div slot="footer">
         <el-button @click="cancel">取消</el-button>
-        <el-button type="primary" @click="dataSubmit">确定</el-button>
+        <el-button type="primary" @click="dataSubmit" :loading="loadingVlaue">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -51,6 +52,7 @@ export default {
   data () {
     return {
       visible: false,
+      loadingVlaue: false,
       typeList: [],
       productPoolList: [ // 商品池
         {
@@ -62,7 +64,8 @@ export default {
         sceneName: '',
         boxId: '',
         goodsPool: '',
-        sceneType: 1
+        sceneType: 1,
+        boxName: ''
       },
       dataRule: {
         sceneName: [
@@ -85,7 +88,8 @@ export default {
         sceneName: '',
         boxId: '',
         goodsPool: '',
-        sceneType: 1
+        sceneType: 1,
+        boxName: ''
       }
       listSceneBoxInfo().then(({data}) => {
         this.typeList = data.data
@@ -97,12 +101,16 @@ export default {
     searchProductNum () { // 查询商品数量
       console.log(3)
     },
+    cliskBoxName (val) {
+      this.dataForm.boxName = val
+    },
     cancel () {
       this.visible = false
     },
     dataSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.loadingVlaue = true
           const dataBody = this.dataForm
           const dataUpdateId = this.dataForm.id
           saveorupt(dataBody, dataUpdateId).then(({data}) => {
@@ -113,12 +121,14 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
+                  this.loadingVlaue = false
                   this.$emit('childByValue', this.visible)
                   this.$refs['dataForm'].resetFields()
                 }
               })
             } else {
               this.$message.error(data.msg)
+              this.loadingVlaue = false
             }
           })
         }
