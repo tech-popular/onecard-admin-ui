@@ -403,6 +403,9 @@ export default {
             if (findex < indexPathArr.length - 1) {
               a[fitem].isDefaultExpanded = true
               a = a[fitem].children
+            } else {
+              console.log(a[fitem], item)
+              item.enable = a[fitem].enable
             }
           })
           item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
