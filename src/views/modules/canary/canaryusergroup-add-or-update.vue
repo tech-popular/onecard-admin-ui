@@ -95,9 +95,7 @@ export default {
             url: this.$http.adornUrl(`/canary/canaryusergroup/info/${this.dataForm.id}`),
             method: 'get',
             params: this.$http.adornParams()
-          }).then(({
-            data
-          }) => {
+          }).then(({data}) => {
             if (data && data.code === 0) {
               this.dataForm.name = data.canaryUserGroup.name
               // this.dataForm.tenantId = data.canaryUserGroup.tenantId
