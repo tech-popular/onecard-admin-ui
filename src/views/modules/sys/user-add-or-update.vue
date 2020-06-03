@@ -63,7 +63,7 @@
 </template>
 
 <script>
-  // import { isEmail, isMobile } from '@/utils/validate'
+  import { isEmail } from '@/utils/validate'
   import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
   export default {
     data () {
@@ -94,16 +94,16 @@
       //     callback()
       //   }
       // }
-      // var validateEmail = (rule, value, callback) => {
-      //   const reg = new RegExp(/9fbank|ithro/)
-      //   if (!isEmail(value)) {
-      //     callback(new Error('邮箱格式错误'))
-      //   } else if (!reg.test(value)) {
-      //     callback(new Error('账号格式有误'))
-      //   } else {
-      //     callback()
-      //   }
-      // }
+      var validateEmail = (rule, value, callback) => {
+        const reg = new RegExp(/9fbank|ithro/)
+        if (!isEmail(value)) {
+          callback(new Error('邮箱格式错误'))
+        } else if (!reg.test(value)) {
+          callback(new Error('账号格式有误'))
+        } else {
+          callback()
+        }
+      }
       // var validateMobile = async (rule, value, callback) => {
       //   if (!isMobile(value)) {
       //     callback(new Error('手机号格式错误'))
@@ -150,10 +150,9 @@
           // comfirmPassword: [
           //   { validator: validateComfirmPassword, trigger: 'blur' }
           // ],
-          // email: [
-          //   { required: true, message: '邮箱不能为空', trigger: 'blur' },
-          //   { validator: validateEmail, trigger: 'blur' }
-          // ],
+          email: [
+            { validator: validateEmail, trigger: 'blur' }
+          ]
           // mobile: [
           //   { required: true, message: '手机号不能为空', trigger: 'blur' },
           //   { validator: validateMobile, trigger: 'blur' }
@@ -168,10 +167,9 @@
       }
     },
     methods: {
-      init (id) {
-        console.log(id, 'id')
-  
-        this.dataForm.id = id
+      init (val) {
+        this.dataForm.id = val.id
+        this.dataForm.userid = val.userid
         this.checkedName = ''
         this.checkedMobile = ''
         this.checkedName = ''
@@ -186,7 +184,6 @@
             this.systenantList = data.sysTenantEntities
           }
         })
-        this.dataForm.id = id || 0
         this.$http({
           url: this.$http.adornUrl('/sys/role/select'),
           method: 'get',
@@ -241,7 +238,7 @@
               url: this.$http.adornUrl(`/sys/user/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'userId': this.dataForm.id || undefined,
+                'userId': this.dataForm.userid || undefined,
                 'username': this.dataForm.username,
                 'emailList': [this.dataForm.email],
                 'mcAccount': this.dataForm.aliyunAccount
