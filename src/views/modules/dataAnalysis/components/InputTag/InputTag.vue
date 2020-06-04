@@ -24,7 +24,7 @@
       />
     </div>
     <ul class="example-list" v-if="isListShow">
-      <li>最近取值：</li>
+      <li>取值示例：</li>
       <li v-for="(item, index) in tagTips" :key="index">{{item}}</li>
     </ul>
   </div>
