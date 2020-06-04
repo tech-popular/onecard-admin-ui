@@ -8,9 +8,9 @@
       <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%" filterable @change="selectGet">
         <el-option
           v-for="item in jieshouren"
-          :key="item.userId"
+          :key="item.email"
           :label="item.emailList"
-          :value="item.userId">
+          :value="item.email">
         </el-option>
       </el-select>
       <!-- <el-input v-model="dataForm.name" placeholder="接受人"></el-input> -->
@@ -125,7 +125,7 @@ export default {
       var activityList = []
       for (let i = 0; i <= val.length - 1; i++) {
         this.jieshouren.find((item) => { // 这里的options就是数据源
-          if (item.userId == val[i]) {
+          if (item.email == val[i]) {
             var obj = {userId: item.userId, email: item.email}
             activityList.push(obj)
           }
