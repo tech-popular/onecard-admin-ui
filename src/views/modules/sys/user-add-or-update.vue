@@ -21,9 +21,9 @@
         <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:62%" filterable @change="selectGet">
           <el-option
             v-for="item in jieshouren"
-            :key="item.userId"
+            :key="item.email"
             :label="item.emailList"
-            :value="item.userId">
+            :value="item.email">
           </el-option>
         </el-select>
       </el-form-item>
@@ -39,7 +39,7 @@
       <el-form-item label="部门" prop="department">
         <el-input v-model="dataForm.department" placeholder="部门" disabled></el-input>
       </el-form-item>
-      <el-form-item label="阿里云账号" prop="mcAccount">
+      <el-form-item label="阿里云账号">
         <el-input v-model="dataForm.mcAccount" placeholder="阿里云账号"></el-input>
       </el-form-item>
       <!-- <el-form-item label="角色" prop="roleIdList">
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import { isEmail } from '@/utils/validate'
+  // import { isEmail } from '@/utils/validate'
   import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
   import { getUser9FbankEmail } from '@/api/canary/canary'
   export default {
@@ -103,16 +103,16 @@
       //     callback()
       //   }
       // }
-      var validateEmail = (rule, value, callback) => {
-        const reg = new RegExp(/9fbank|ithro/)
-        if (!isEmail(value)) {
-          callback(new Error('邮箱格式错误'))
-        } else if (!reg.test(value)) {
-          callback(new Error('账号格式有误'))
-        } else {
-          callback()
-        }
-      }
+      // var validateEmail = (rule, value, callback) => {
+      //   const reg = new RegExp(/9fbank|ithro/)
+      //   if (!isEmail(value)) {
+      //     callback(new Error('邮箱格式错误'))
+      //   } else if (!reg.test(value)) {
+      //     callback(new Error('账号格式有误'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
       // var validateMobile = async (rule, value, callback) => {
       //   if (!isMobile(value)) {
       //     callback(new Error('手机号格式错误'))
@@ -160,9 +160,9 @@
           // comfirmPassword: [
           //   { validator: validateComfirmPassword, trigger: 'blur' }
           // ],
-          email: [
-            { validator: validateEmail, trigger: 'blur' }
-          ]
+          // email: [
+          //   { validator: validateEmail, trigger: 'blur' }
+          // ]
           // mobile: [
           //   { required: true, message: '手机号不能为空', trigger: 'blur' },
           //   { validator: validateMobile, trigger: 'blur' }
@@ -258,7 +258,7 @@
         var activityList = []
         for (let i = 0; i <= val.length - 1; i++) {
           this.jieshouren.find((item) => { // 这里的options就是数据源
-            if (item.userId == val[i]) {
+            if (item.email == val[i]) {
               var obj = {email: item.email}
               activityList.push(obj)
             }
