@@ -1,21 +1,14 @@
 <template>
   <div>
     <el-row style="margin-bottom: 15px;">
-      <el-col span="2">
-        <el-select v-model="type" style="width:120px;" @on-change="reload">
-          <el-option value="全部" >全部</el-option>
-          <el-option value="钱包" :disabled="true">钱包</el-option>
-          <el-option value="悟空" :disabled="true">悟空</el-option>
-        </el-select>
-      </el-col>
-      <el-col span="7" offset="15" >
+      <el-col :span="7" :offset="17">
         <span style="margin-right: 15px;">数据时间 {{ts}}</span>
         <el-button type="primary" icon="ios-download" @click="down">下载</el-button>
       </el-col>
     </el-row>
-    <el-table ref="tab" id="tab" stripe border size="small" :loading="loading" :columns="columns" :data="data">
+    <el-table ref="tab" id="tab" stripe border size="small" v-loading="loading" :data="data">
       <el-table-column prop="dts_bank_name" label="银行名称"></el-table-column>
-      <el-table-column prop="dts_product_name" label="产品名称"></el-table-column>
+      <el-table-column prop="dts_product_name" width="300" label="产品名称"></el-table-column>
       <el-table-column prop="invest_user_count" label="购买人数" align="right"></el-table-column>
       <el-table-column prop="invest_count" label="购买笔数" align="right"></el-table-column>
       <el-table-column prop="invest_amount" label="购买金额" align="right"></el-table-column>
@@ -26,13 +19,13 @@
   </div>
 </template>
 <script>
+import echarts from 'echarts'
 import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
-import { log, list, chart } from '@/api/phRealtimeBoard/bankSelection'
+import { list, chart } from '@/api/phRealtimeBoard/bankSelection'
 export default {
   data () {
     return {
-      type: '全部',
       loading: false,
       ts: '',
       data: [],
@@ -44,9 +37,6 @@ export default {
     this.timer = setInterval(() => {
       this.reload()
     }, 300000)
-    log().then(({data}) => {
-      console.log(data)
-    })
   },
   beforeDestroy () {
     clearInterval(this.timer)
@@ -69,7 +59,7 @@ export default {
         // 返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
         new Blob([wbout], { type: 'application/octet-stream' }),
         // 设置导出文件名称
-        'sheetjs.xlsx'
+        'data.xlsx'
         )
       } catch (e) {
         if (typeof console !== 'undefined') console.log(e, wbout)
@@ -77,7 +67,9 @@ export default {
       return wbout
     },
     reload () {
+      this.loading = true
       list().then(({data}) => {
+        this.loading = false
         this.data = []
         let total = {
           dts_bank_name: '总计',
@@ -134,7 +126,7 @@ export default {
             }
           ]
         }
-        let chart = this.$echarts.init(document.getElementById('echarts'))
+        let chart = echarts.init(document.getElementById('echarts'))
         chart.setOption(option, true)
         this.$nextTick(() => {
           window.addEventListener('resize', () => {
