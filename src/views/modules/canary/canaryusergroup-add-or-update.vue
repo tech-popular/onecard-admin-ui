@@ -13,7 +13,6 @@
           :value="item.email">
         </el-option>
       </el-select>
-      <!-- <el-input v-model="dataForm.name" placeholder="接受人"></el-input> -->
     </el-form-item>
     <!-- <el-transfer v-model="userGroupUserArray" :props="{
                   key: 'id',
@@ -46,20 +45,10 @@ export default {
       dataForm: {
         id: 0,
         name: '',
-        // tenantId: 1,
         enable: 1,
         emailList: []
       },
-      jieshouren: [{
-        value: 'lvzhiming@9fbanl.com.cn',
-        label: '吕志明'
-      }, {
-        value: 'renxiaohui@9fbanck.com.cn',
-        label: '任小辉'
-      }, {
-        value: 'ouyangbo@9fbanck.com.cn',
-        label: '欧阳波'
-      }],
+      jieshouren: [],
       dataRule: {
         name: [{
           required: true,
@@ -77,7 +66,6 @@ export default {
           trigger: 'blur'
         }]
       },
-      // allUserEntities: [],
       userGroupUserArray: []
     }
   },
@@ -98,13 +86,10 @@ export default {
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.dataForm.name = data.canaryUserGroup.name
-              // this.dataForm.tenantId = data.canaryUserGroup.tenantId
               this.dataForm.enable = data.canaryUserGroup.enable
               data.canaryUserGroup.reviceInfo.map(item => {
                 this.dataForm.emailList.push(item.emailList)
               })
-              // this.allUserEntities = data.canaryUserGroup.allUserList
-              // this.userGroupUserArray = data.canaryUserGroup.userGroupUserArray
             }
           })
         } else {
@@ -118,6 +103,7 @@ export default {
             }
           })
         }
+        console.log(this.dataForm.emailList, 'bianji')
       })
     },
     // 触发接收人
@@ -131,6 +117,7 @@ export default {
           }
         })
       }
+
       this.userGroupUserArray = activityList
     },
     // 表单提交
@@ -143,9 +130,7 @@ export default {
             data: this.$http.adornData({
               'id': this.dataForm.id || undefined,
               'name': this.dataForm.name,
-              // 'tenantId': this.dataForm.tenantId,
               'enable': this.dataForm.enable,
-              // 'userGroupUserArray': this.userGroupUserArray,
               'groupUsers': this.userGroupUserArray
             })
           }).then(({data}) => {
