@@ -594,7 +594,7 @@ export default {
       return arr
     },
     getSelectAllCata (fn) { // 获取所有指标
-      selectAllCata({channelCode: this.allSelectedChannelCode}).then(({data}) => {
+      selectAllCata({ channelCode: this.allSelectedChannelCode, flag: '-1' }).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
