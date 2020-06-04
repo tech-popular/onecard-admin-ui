@@ -55,17 +55,11 @@
         dataForm: {
           id: 0,
           userName: '',
-          // password: '',
-          // comfirmPassword: '',
           ismodifyPasswd: '',
-          salt: '',
           email: '',
           mobile: '',
-          roleIdList: [],
-          systenandIdList: [],
-          status: 1,
-          remark: '',
-          mcAccount: ''
+          mcAccount: '',
+          department: ''
         },
         systenantList: [],
         dataRule: {
@@ -75,7 +69,6 @@
         },
         jieshouren: [],
         emailGroup: []
-        // checkedPass: ''
       }
     },
     methods: {
@@ -113,23 +106,15 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dataForm = data.user.user
-                this.dataForm.userName = data.user.username
-                this.checkedName = data.user.username
-                this.dataForm.salt = data.user.salt
+                this.dataForm.userName = data.user.user.username
                 this.dataForm.email = data.user.emailList
-                this.dataForm.mobile = data.user.mobile
-                this.checkedMobile = data.user.mobile
-                this.dataForm.roleIdList = data.user.roleIdList
-                this.dataForm.status = data.user.status
-                this.dataForm.systenandIdList = data.user.systenandIdList
+                this.dataForm.mobile = data.user.user.mobile
                 this.dataForm.mcAccount = data.user.mcAccount
+                this.dataForm.department = data.user.user.department
               }
             })
           }
         })
-      },
-      cleanData () {
-        // this.dataForm.password = ''
       },
       change (e) {
         this.$forceUpdate()
