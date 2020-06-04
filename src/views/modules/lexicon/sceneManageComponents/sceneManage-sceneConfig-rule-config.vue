@@ -27,7 +27,8 @@ import ruleConfigDuplicate from './sceneManage-sceneConfig-rule-config-removeDup
 import ruleConfigMustpush from './sceneManage-sceneConfig-rule-config-mustpush'
 export default {
   props: [
-    'boxId'
+    'boxId',
+    'sacherRule'
   ],
   data () {
     return {
@@ -50,13 +51,59 @@ export default {
     }
   },
   components: { ruleConfigProduct, ruleConfigDuplicate, ruleConfigMustpush },
+  watch: {
+    'sacherRule': {
+      handler (newVal, oldVal) {
+        this.sacherRule = newVal
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   methods: {
     init () {
       this.visible = true
+      if (this.sacherRule) {
+        this.tabsList = [
+          {
+            id: '1',
+            name: '物品规则'
+          }
+        ]
+      } else {
+        this.tabsList = [
+          {
+            id: '1',
+            name: '物品规则'
+          },
+          {
+            id: '2',
+            name: '去重规则'
+          },
+          {
+            id: '3',
+            name: '必推规则'
+          }
+        ]
+      }
     },
     drawerClose () {
       this.visible = false
       this.activeName = '1'
+      this.tabsList = [
+        {
+          id: '1',
+          name: '物品规则'
+        },
+        {
+          id: '2',
+          name: '去重规则'
+        },
+        {
+          id: '3',
+          name: '必推规则'
+        }
+      ]
     }
   }
 }
