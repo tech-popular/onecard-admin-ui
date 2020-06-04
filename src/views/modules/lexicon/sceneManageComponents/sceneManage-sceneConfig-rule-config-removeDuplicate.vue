@@ -1,14 +1,18 @@
 <template>
   <div>
     <el-form label-width="80px" :model="baseForm" ref="baseForm" inline>
-      <el-form-item label="一级品类" prop="first_category_type">
-        <el-input v-model.trim="baseForm.first_category_type" placeholder="一级品类" clearable />
-      </el-form-item>
-      <el-form-item label="二级品类" prop="second_category_type">
-        <el-input v-model.trim="baseForm.second_category_type" placeholder="二级品类" clearable />
+      <el-form-item label="品类" prop="categoryType">
+        <el-cascader
+          style="width: 100%"
+          :props="props"
+          v-model="baseForm.categoryType"
+          clearable
+          @change="selectChan"
+          :options="categoryTypeList">
+        </el-cascader>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">查询</el-button>
+        <el-button type="primary" @click="seachWeight">查询</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="loading" style="width: 100%;">
@@ -17,12 +21,12 @@
           {{scope.$index + 1}}
         </template>
       </el-table-column>
-      <el-table-column prop="first_category_type" header-align="center" align="center" label="一级品类"></el-table-column>
-      <el-table-column prop="second_category_type" header-align="center" align="center" label="二级品类"></el-table-column>
-      <el-table-column prop="click_num" header-align="center" align="center" label="点击数量去重"></el-table-column>
-      <el-table-column prop="click_time" header-align="center" align="center" label="点击时间去重"></el-table-column>
-      <el-table-column prop="last_updator" header-align="center" align="center" label="最近一次修改人"></el-table-column>
-      <el-table-column prop="lat_update_time" header-align="center" align="center" label="最近一次修改时间"></el-table-column>
+      <el-table-column prop="firstCategoryName" header-align="center" align="center" label="一级品类"></el-table-column>
+      <el-table-column prop="secondCategoryName" header-align="center" align="center" label="二级品类"></el-table-column>
+      <el-table-column prop="clickNumber" header-align="center" align="center" label="点击数量去重"></el-table-column>
+      <el-table-column prop="clickTime" header-align="center" align="center" label="点击时间去重"></el-table-column>
+      <el-table-column prop="updateUser" header-align="center" align="center" label="最近一次修改人"></el-table-column>
+      <el-table-column prop="updateTime" header-align="center" align="center" label="最近一次修改时间"></el-table-column>
       <el-table-column header-align="center" align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="success" size="mini" @click="modifyDataClick(scope.row)">修改</el-button>
@@ -33,17 +37,17 @@
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
       :current-page="pageNo"
-      :page-sizes="[10, 20, 50, 100]"
+      :page-sizes="[5, 10, 20, 50, 100]"
       :page-size="pageSize"
-      :total="totalCount"
+      :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper" />
     <el-dialog title="修改去重规则" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
       <el-form label-width="140px" :model="duplicateForm" :rules="duplicateFormRules" ref="duplicateForm">
-        <el-form-item label="点击数量去重:" prop="number">
-          同一物品推荐点击后<el-input v-model="duplicateForm.number" placeholder="1000" class="input-item" />条内不重复
+        <el-form-item label="点击数量去重:" prop="clickNumber">
+          同一物品推荐点击后<el-input-number v-model="duplicateForm.clickNumber" :min="1" label="1000" class="input-item" ></el-input-number>条内不重复
         </el-form-item>
-        <el-form-item label="点击时间去重:" prop="days">
-          同一物品推荐点击后<el-input v-model="duplicateForm.days" placeholder="1000" class="input-item" />天内不重复
+        <el-form-item label="点击时间去重:" prop="clickTime">
+          同一物品推荐点击后<el-input-number v-model="duplicateForm.clickTime" :min="1" label="1000" class="input-item" ></el-input-number>天内不重复
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -54,81 +58,131 @@
   </div>
 </template>
 <script>
+import { selectFirstCategoryName, getSceneDistinctList, updateSceneDistinctInfo } from '@/api/lexicon/sceneManage'
 export default {
+  props: [
+    'boxId'
+  ],
   data () {
     return {
       baseForm: {
-        first_category_type: '',
-        second_category_type: ''
+        categoryType: ''
       },
       loading: false,
-      dataList: [
-        {
-          last_updator: '遥遥',
-          first_category_type: '434',
-          second_category_type: 'try',
-          click_num: 'lll',
-          click_time: '12.98',
-          lat_update_time: '2020-12-12 12:12:12'
-        },
-        {
-          last_updator: '遥遥',
-          first_category_type: '434',
-          second_category_type: 'try',
-          click_num: 'lll',
-          click_time: '12.98',
-          lat_update_time: '2020-12-12 12:12:12'
-        }
-      ],
+      categoryTypeList: [],
+      props: {
+        multiple: false,
+        checkStrictly: true,
+        label: 'categoryName',
+        value: 'categoryType'
+      },
+      dataList: [],
       pageNo: 1, // 当前页
-      pageSize: 10, // 默认每页10条
-      totalCount: 0,
+      pageSize: 5, // 默认每页10条
+      totalPage: 0,
       visible: false,
       duplicateForm: {
-        number: '',
-        days: ''
-      },
+        clickNumber: '',
+        clickTime: ''
+      }, // 修改去重规则
+      duplicateId: '',
+      firstCategoryType: '',
+      firstCategoryName: '',
+      secondCategoryType: '',
+      secondCategoryName: '',
       duplicateFormRules: {
-        number: [
+        clickNumber: [
           { required: true, message: '请输入', trigger: 'blur' }
         ],
-        days: [
-          { required: true, message: '请输入', trigger: 'blur' }
+        clickTime: [
+          { required: true, message: '请选择', trigger: 'blur' }
         ]
       }
     }
   },
+  mounted () {
+    this.init()
+  },
   methods: {
-    modifyDataClick () { // 改变权重
+    init () {
+      selectFirstCategoryName().then(({data}) => {
+        this.categoryTypeList = data.data
+      })
+    },
+    // 查询
+    seachWeight () {
+      const dataBody = {
+        'pageNo': this.pageNo,
+        'pageSize': this.pageSize,
+        'boxId': this.boxId,
+        'categoryType': this.baseForm.categoryType
+      }
+      getSceneDistinctList(dataBody).then(({data}) => {
+        if (data && data.msg === 'success') {
+          this.dataList = data.data.list
+          this.totalPage = data.data.totalCount
+        }
+      })
+    },
+    modifyDataClick (val) { // 修改去重规则
       this.visible = true
+      this.firstCategoryType = val.firstCategoryType
+      this.firstCategoryName = val.firstCategoryName
+      this.secondCategoryName = val.secondCategoryName
+      this.secondCategoryType = val.secondCategoryType
+      this.duplicateForm.clickNumber = val.clickNumber
+      this.duplicateForm.clickTime = val.clickTime
     },
     // 每页数
     sizeChangeHandle (page) {
       this.pageSize = page
       this.pageNo = 1
-      this.getDataList()
+      this.seachWeight()
     },
     // 当前页
     currentChangeHandle (page) {
       this.pageNo = page
-      this.getDataList()
+      this.seachWeight()
+    },
+    selectChan (value) {
+      this.pageNo = 1
     },
     dataSubmit () {
       this.$refs.duplicateForm.validate((valid) => {
         if (valid) {
-          console.log(9999)
+          const dataBody = {
+            boxId: this.boxId,
+            firstCategoryType: this.firstCategoryType,
+            firstCategoryName: this.firstCategoryName,
+            secondCategoryName: this.secondCategoryName,
+            secondCategoryType: this.secondCategoryType,
+            clickNumber: this.duplicateForm.clickNumber,
+            clickTime: this.duplicateForm.clickTime
+          }
+          updateSceneDistinctInfo(dataBody).then(({data}) => {
+            if (data && data.msg === 'success') {
+              this.$message.success('更新成功')
+              this.visible = false
+              this.seachWeight()
+              this.duplicateForm.clickNumber = ''
+              this.duplicateForm.clickTime = ''
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
         }
       })
     },
     cancel () {
       this.visible = false
+      this.duplicateForm.clickNumber = ''
+      this.duplicateForm.clickTime = ''
     }
   }
 }
 </script>
 <style scoped>
   .input-item {
-    width: 100px;
     margin: 0 10px;
   }
   .el-form-item__error {

@@ -1,29 +1,30 @@
 <template>
   <div>
-    <!-- <el-card class="search-content" shadow="nerver">
+    <el-card class="search-content" shadow="nerver">
       <div class="search-title clearfix" slot="header">
         搜索服务
         <el-button type="success" size="mini" icon="el-icon-plus" @click="addSearchScene">新建搜索场景</el-button>
       </div>
-      <div class="search-pane">
+      <div class="recommend-pane" v-if="searchServiceList.length === 0">暂无搜索服务，快去新建吧～</div>
+      <div class="search-pane" v-else>
         <el-card class="box-card" shadow="hover" v-for="(item, index) in searchServiceList" :key="index">
           <el-row :gutter="20">
             <el-col :span="8">
               <div class="box-left">
-                <img width="60px" height="60px" :src="imgList[item.type]" />
+                <img width="60px" height="60px" :src="imgList.serachResult" />
               </div>
             </el-col>
             <el-col :span="16">
               <div class="box-right">
-                <p>场景名称：{{item.name}}</p>
-                <p>场景ID（boxid）：{{item.boxid}}</p>
+                <p>场景名称：{{item.boxName}}</p>
+                <p>场景ID（boxid）：{{item.boxId}}</p>
               </div>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="24">
               <div class="box-bottom">
-                <el-button type="primary" size="mini" @click="ruleConfigClick">规则配置</el-button>
+                <el-button type="primary" size="mini" @click="ruleConfigClick(item.boxId,'sousuo')">规则配置</el-button>
                 <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
                 <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button>
               </div>
@@ -31,13 +32,14 @@
           </el-row>
         </el-card>
       </div>
-    </el-card> -->
+    </el-card>
     <el-card class="recommend-content" shadow="nerver">
       <div class="search-title" slot="header">
         推荐服务
         <el-button type="success" size="mini" icon="el-icon-plus" @click="addRecommendScene">新建推荐场景</el-button>
       </div>
-      <div class="recommend-pane">
+      <div class="recommend-pane" v-if="recommendServiceList.length === 0">暂无推荐服务，快去新建吧～</div>
+      <div class="recommend-pane" v-else>
         <el-card class="box-card" shadow="hover" v-for="(item, index) in recommendServiceList" :key="index">
           <el-row :gutter="20">
             <el-col :span="8">
@@ -66,9 +68,9 @@
         </el-card>
       </div>
     </el-card>
-    <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene"></add-search-scene>
-    <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene"></add-recommend-scene>
-    <rule-config v-if="ruleConfigVisible" ref="ruleConfig" :boxId='boxId'></rule-config>
+    <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene" @childByValue="childByValue"></add-search-scene>
+    <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene" @childByValue="childByValue"></add-recommend-scene>
+    <rule-config v-if="ruleConfigVisible" ref="ruleConfig" :boxId='boxId' :sacherRule='rules'></rule-config>
     <statistic-chart v-if="statisticChartVisible" ref="statisticChart"></statistic-chart>
     <real-time-strategy v-if="realTimeStrategyVisible" ref="realTimeStrategy" @closeDialog="closeDialogEvent"></real-time-strategy>
   </div>
@@ -89,27 +91,15 @@ export default {
         'searchNoResult': require('./assets/images/img-noresult.png'),
         'serachInputPage': require('./assets/images/img-input.png')
       },
-      // searchServiceList: [
-      //   {
-      //     type: 'serachResult',
-      //     name: '搜索结果页',
-      //     boxid: '1232323',
-      //     status: '已上线'
-      //   },
-      //   {
-      //     type: 'serachResult',
-      //     name: '搜索结果页',
-      //     boxid: '545454',
-      //     status: '未上线'
-      //   }
-      // ],
+      searchServiceList: [],
       recommendServiceList: [],
       addSearchSceneVisible: false,
       addRecommendSceneVisible: false,
       ruleConfigVisible: false,
       statisticChartVisible: false,
       realTimeStrategyVisible: false,
-      boxId: ''
+      boxId: '',
+      rules: false
     }
   },
   components: { addSearchScene, addRecommendScene, ruleConfig, statisticChart, realTimeStrategy },
@@ -119,24 +109,32 @@ export default {
   methods: {
     init () {
       listSearchScene().then(({data}) => {
-        this.recommendServiceList = data.data
+        this.searchServiceList = data.data.listSearchSceneSets
+        this.recommendServiceList = data.data.listRecommendSceneSets
       })
     },
-    // addSearchScene () { // 新建搜索场景
-    //   this.addSearchSceneVisible = true
-    //   this.$nextTick(() => {
-    //     this.$refs.addSearchScene.init()
-    //   })
-    // },
+    addSearchScene () { // 新建搜索场景
+      this.addSearchSceneVisible = true
+      this.$nextTick(() => {
+        this.$refs.addSearchScene.init()
+      })
+    },
+    childByValue (value) {
+      this.init()
+    },
     addRecommendScene () { // 新建推荐场景
       this.addRecommendSceneVisible = true
       this.$nextTick(() => {
         this.$refs.addRecommendScene.init()
       })
     },
-    ruleConfigClick (boxId) { // 规则配置
+    ruleConfigClick (boxId, val) { // 规则配置
+      this.rules = val
       this.boxId = boxId
       this.ruleConfigVisible = true
+      // if (val === 'sousuo') {
+      //   this.rules = true
+      // }
       this.$nextTick(() => {
         this.$refs.ruleConfig.init()
       })

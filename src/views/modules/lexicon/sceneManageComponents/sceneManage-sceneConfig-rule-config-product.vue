@@ -3,35 +3,33 @@
     <div class="total">上架商品 <span>45678</span> 件</div>
     <el-form label-width="80px" :model="baseForm" ref="baseForm" inline>
       <el-form-item label="SKU" prop="sku">
-        <el-input v-model.trim="baseForm.sku" placeholder="sku" clearable />
+        <el-input v-model.trim="baseForm.sku" placeholder="sku" clearable @change="selectChan" />
       </el-form-item>
-      <el-form-item label="商品名称" prop="product_name">
-        <el-input v-model.trim="baseForm.product_name" placeholder="sku" clearable />
+      <el-form-item label="商品名称" prop="productName">
+        <el-input v-model.trim="baseForm.productName" placeholder="商品名称" clearable @change="selectChan" />
       </el-form-item>
-      <el-form-item label="品类" prop="firstCategoryType">
+      <el-form-item label="品类" prop="categoryType">
         <el-cascader
           style="width: 100%"
           :props="props"
-          v-model="baseForm.firstCategoryType"
+          v-model="baseForm.categoryType"
           clearable
-          :options="firstCategoryTypeList">
+          @change="selectChan"
+          :options="categoryTypeList">
         </el-cascader>
       </el-form-item>
-      <!-- <el-form-item label="二级品类" prop="second_category_type">
-        <el-input v-model.trim="baseForm.second_category_type" placeholder="二级品类" clearable />
-      </el-form-item> -->
-      <el-form-item label="品牌" prop="brand_name">
-        <el-input v-model.trim="baseForm.brand_name" placeholder="品牌" clearable />
+      <el-form-item label="品牌" prop="brandName">
+        <el-input v-model.trim="baseForm.brandName" placeholder="品牌" clearable @change="selectChan" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="seachWeight">查询</el-button>
         <el-button type="warning" @click="multiEditWeight">批量修改权重</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="loading" style="width: 100%;" @selection-change="handleSelectionChange">
+    <el-table :data="dataList" border v-loading="loading" style="width: 100%;" ref="multipleTable" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="sku" header-align="center" align="center" label="SKU"></el-table-column>
-      <el-table-column prop="product_name" header-align="center" align="center" label="商品名称"></el-table-column>
+      <el-table-column prop="productName" header-align="center" align="center" label="商品名称"></el-table-column>
       <el-table-column prop="weight" header-align="center" align="center">
         <template slot="header">
           <span>权重</span>
@@ -42,22 +40,22 @@
         </template>
         <template slot-scope="scope">
           <span :class="'weight-shape weight-shape-color-' + scope.row.weight">{{scope.row.weight}}</span>
-          <i class="el-icon-edit" @click="productWeightChange"></i>
+          <i class="el-icon-edit" @click="productWeightChange(scope.row)"></i>
         </template>
       </el-table-column>
-      <el-table-column prop="first_category_type" header-align="center" align="center" label="一级品类"></el-table-column>
-      <el-table-column prop="second_category_type" header-align="center" align="center" label="二级品类"></el-table-column>
-      <el-table-column prop="brand_name" header-align="center" align="center" label="品牌"></el-table-column>
-      <el-table-column prop="price" header-align="center" align="center" label="价格"></el-table-column>
-      <el-table-column prop="publishTime" header-align="center" align="center" label="发布时间"></el-table-column>
+      <el-table-column prop="firstCategoryName" header-align="center" align="center" label="一级品类"></el-table-column>
+      <el-table-column prop="secondCategoryName" header-align="center" align="center" label="二级品类"></el-table-column>
+      <el-table-column prop="brandName" header-align="center" align="center" label="品牌"></el-table-column>
+      <el-table-column prop="salePrice" header-align="center" align="center" label="价格"></el-table-column>
+      <el-table-column prop="createTime" header-align="center" align="center" label="发布时间"></el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
       :current-page="pageNo"
-      :page-sizes="[10, 20, 50, 100]"
+      :page-sizes="[5, 10, 20, 50, 100]"
       :page-size="pageSize"
-      :total="totalCount"
+      :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper" />
     <el-dialog title="修改" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
       <el-form label-width="100px" :model="weightForm" :rules="weightFormRules" ref="weightForm">
@@ -72,7 +70,7 @@
             type="datetimerange"
             start-placeholder="生效时间"
             end-placeholder="失效时间"
-            value-format="yyyy-MM-dd hh:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss" 
           >
           </el-date-picker>
         </el-form-item>
@@ -86,110 +84,32 @@
   </div>
 </template>
 <script>
-import { selectFirstCategoryName } from '@/api/lexicon/sceneManage'
+import { selectFirstCategoryName, getSceneWeightList, updateSceneWeightInfo } from '@/api/lexicon/sceneManage'
 export default {
   props: [
-    'boxId'
+    'boxId',
+    'fatahVisible'
   ],
   data () {
     return {
       baseForm: {
         sku: '',
-        product_name: '',
-        firstCategoryType: '',
-        second_category_type: '',
-        brand_name: ''
+        productName: '',
+        categoryType: '',
+        brandName: ''
       },
       props: {
-        multiple: false
+        multiple: false,
+        checkStrictly: true,
+        label: 'categoryName',
+        value: 'categoryType'
       },
-      firstCategoryTypeList: [{
-        value: 'zhinan',
-        label: '数据中台',
-        children: [{
-          value: 'shejiyuanze',
-          label: '天眼临时',
-          children: [{
-            value: 'yizhi',
-            label: '一致'
-          }, {
-            value: 'fankui',
-            label: '报表信息'
-          }, {
-            value: 'xiaolv',
-            label: '报表图表'
-          }, {
-            value: 'kekong',
-            label: '图表数据指标说明'
-          }]
-        }, {
-          value: 'daohang',
-          label: '蜂巢',
-          children: [{
-            value: 'cexiangdaohang',
-            label: '侧向导航'
-          }, {
-            value: 'dingbudaohang',
-            label: '数据库连接配置表'
-          }]
-        }]
-      }],
+      categoryTypeList: [],
       loading: false,
-      dataList: [
-        {
-          sku: '121212',
-          product_name: '遥遥',
-          weight: 1,
-          first_category_type: '434',
-          second_category_type: 'try',
-          brand_name: 'lll',
-          price: '12.98',
-          publishTime: '2020-12-12 12:12:12'
-        },
-        {
-          sku: '121212',
-          product_name: '遥遥',
-          weight: 2,
-          first_category_type: '434',
-          second_category_type: 'try',
-          brand_name: 'lll',
-          price: '12.98',
-          publishTime: '2020-12-12 12:12:12'
-        },
-        {
-          sku: '121212',
-          product_name: '遥遥',
-          weight: 3,
-          first_category_type: '434',
-          second_category_type: 'try',
-          brand_name: 'lll',
-          price: '12.98',
-          publishTime: '2020-12-12 12:12:12'
-        },
-        {
-          sku: '121212',
-          product_name: '遥遥',
-          weight: 4,
-          first_category_type: '434',
-          second_category_type: 'try',
-          brand_name: 'lll',
-          price: '12.98',
-          publishTime: '2020-12-12 12:12:12'
-        },
-        {
-          sku: '121212',
-          product_name: '遥遥',
-          weight: 5,
-          first_category_type: '434',
-          second_category_type: 'try',
-          brand_name: 'lll',
-          price: '12.98',
-          publishTime: '2020-12-12 12:12:12'
-        }
-      ],
+      dataList: [],
       pageNo: 1, // 当前页
-      pageSize: 10, // 默认每页10条
-      totalCount: 0,
+      pageSize: 5, // 默认每页10条
+      totalPage: 0,
       visible: false,
       weightForm: {
         weight: '',
@@ -203,7 +123,28 @@ export default {
           { required: true, message: '请选择', trigger: 'change' }
         ]
       },
-      multiSelectedData: []
+      multiSelectedData: [],
+      multiValue: false,
+      skuid: ''
+    }
+  },
+  watch: {
+    'fatahVisible': {
+      handler (newVal, oldVal) {
+        if (newVal === false) {
+          this.baseForm = {}
+          this.dataList = []
+        }
+      },
+      deep: true,
+      immediate: true
+    },
+    'multiValue': {
+      handler (newVal, oldVal) {
+        this.multiValue = newVal
+      },
+      deep: true,
+      immediate: true
     }
   },
   mounted () {
@@ -212,36 +153,66 @@ export default {
   methods: {
     init () {
       selectFirstCategoryName().then(({data}) => {
-        // this.firstCategoryTypeList = data.data
+        this.categoryTypeList = data.data
       })
     },
     // 查询
     seachWeight () {
-      console.log(this.baseForm, 'baseForm')
+      const dataBody = {
+        'pageNo': this.pageNo,
+        'pageSize': this.pageSize,
+        'boxId': this.boxId,
+        'productName': this.baseForm.productName,
+        'sku': this.baseForm.sku,
+        'categoryType': this.baseForm.categoryType ? this.baseForm.categoryType : [],
+        'brandName': this.baseForm.brandName
+      }
+      getSceneWeightList(dataBody).then(({data}) => {
+        if (data && data.msg === 'success') {
+          this.dataList = data.data.list
+          this.totalPage = data.data.totalCount
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (page) {
       this.pageSize = page
       this.pageNo = 1
-      this.getDataList()
+      this.seachWeight()
     },
     // 当前页
     currentChangeHandle (page) {
       this.pageNo = page
-      this.getDataList()
+      this.seachWeight()
+    },
+    selectChan (value) {
+      this.pageNo = 1
     },
     handleSelectionChange (val) {
-      console.log(val)
-      this.multiSelectedData = val
+      this.multiplevalue = val
+      if (val === []) {
+        this.multiValue = false
+      } else {
+        this.multiValue = true
+      }
+      val.map(item => {
+        this.multiSelectedData.push(item.sku)
+        this.multiSelectedData = Array.from(new Set(this.multiSelectedData))
+      })
     },
-    productWeightChange () { // 单一修改权重
+    productWeightChange (val) { // 单一修改权重
       this.visible = true
+      this.skuid = val.sku
+      this.weightForm.weight = val.weight
     },
     multiEditWeight () { // 批量修改权重
-      this.visible = true
+      if (this.multiValue === true) {
+        this.visible = true
+      } else {
+        return this.$message.error('请选择批量修改的数据')
+      }
     },
     dataSubmit () {
-      console.log(this.weightForm)
       let uneffectTime = new Date(this.weightForm.date[1]).getTime()
       let now = Date.now()
       if (now + 1000 * 60 * 5 > uneffectTime) {
@@ -252,12 +223,39 @@ export default {
       }
       this.$refs.weightForm.validate((valid) => {
         if (valid) {
-          console.log(9999)
+          const dataBody = {
+            boxId: this.boxId,
+            onlineTime: this.weightForm.date[0],
+            offlineTime: this.weightForm.date[1],
+            weight: this.weightForm.weight,
+            skuid: this.multiSelectedData && this.multiSelectedData.length > 0 ? this.multiSelectedData.join(',') : this.skuid
+          }
+          updateSceneWeightInfo(dataBody).then(({data}) => {
+            if (data && data.msg === 'success') {
+              this.visible = false
+              this.$message.success('更新成功')
+              this.weightForm = {}
+              this.$refs.multipleTable.clearSelection()
+              this.multiValue = false
+              this.seachWeight()
+              this.$nextTick(() => {
+                this.$refs['weightForm'].clearValidate()
+              })
+            } else {
+              return this.$message.error(data.msg)
+            }
+          })
         }
       })
     },
     cancel () {
       this.visible = false
+      this.weightForm = {}
+      this.$refs.multipleTable.clearSelection()
+      this.multiValue = false
+      this.$nextTick(() => {
+        this.$refs['weightForm'].clearValidate()
+      })
     }
   }
 }
