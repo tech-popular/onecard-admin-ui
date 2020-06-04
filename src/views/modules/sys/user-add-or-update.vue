@@ -17,7 +17,15 @@
         <el-input v-model="dataForm.comfirmPassword" type="password" placeholder="确认密码"></el-input>
       </el-form-item> -->
       <el-form-item label="邮箱" prop="email">
-        <el-input v-model="dataForm.email" placeholder="邮箱"></el-input>
+        <el-input v-model="dataForm.email" placeholder="邮箱" style="width:35%;margin-right: 2%;" disabled></el-input>
+        <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:62%" filterable @change="selectGet">
+          <el-option
+            v-for="item in jieshouren"
+            :key="item.userId"
+            :label="item.emailList"
+            :value="item.userId">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="手机号" prop="mobile">
         <el-input v-model="dataForm.mobile" placeholder="手机号" disabled></el-input>
@@ -31,8 +39,8 @@
       <el-form-item label="部门" prop="department">
         <el-input v-model="dataForm.department" placeholder="部门" disabled></el-input>
       </el-form-item>
-      <el-form-item label="阿里云账号" prop="aliyunAccount">
-        <el-input v-model="dataForm.aliyunAccount" placeholder="阿里云账号"></el-input>
+      <el-form-item label="阿里云账号" prop="mcAccount">
+        <el-input v-model="dataForm.mcAccount" placeholder="阿里云账号"></el-input>
       </el-form-item>
       <!-- <el-form-item label="角色" prop="roleIdList">
         <el-select v-model="dataForm.roleIdList" filterable multiple placeholder="请选择">
@@ -65,6 +73,7 @@
 <script>
   import { isEmail } from '@/utils/validate'
   import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
+  import { getUser9FbankEmail } from '@/api/canary/canary'
   export default {
     data () {
       // var validatePassword = (rule, value, callback) => {
@@ -137,7 +146,8 @@
           roleIdList: [],
           systenandIdList: [],
           status: 1,
-          remark: ''
+          remark: '',
+          mcAccount: ''
         },
         systenantList: [],
         dataRule: {
@@ -162,7 +172,18 @@
           // ]
         },
         checkedName: '',
-        checkedMobile: ''
+        checkedMobile: '',
+        jieshouren: [{
+          value: 'lvzhiming@9fbanl.com.cn',
+          label: '吕志明'
+        }, {
+          value: 'renxiaohui@9fbanck.com.cn',
+          label: '任小辉'
+        }, {
+          value: 'ouyangbo@9fbanck.com.cn',
+          label: '欧阳波'
+        }],
+        emailGroup: []
         // checkedPass: ''
       }
     },
@@ -183,6 +204,10 @@
           if (data && data.code === 0) {
             this.systenantList = data.sysTenantEntities
           }
+        })
+        // 邮箱列表
+        getUser9FbankEmail().then(({ data }) => {
+          this.jieshouren = data.data
         })
         this.$http({
           url: this.$http.adornUrl('/sys/role/select'),
@@ -217,7 +242,7 @@
                 this.dataForm.roleIdList = data.user.roleIdList
                 this.dataForm.status = data.user.status
                 this.dataForm.systenandIdList = data.user.systenandIdList
-                this.dataForm.aliyunAccount = data.user.mcAccount
+                this.dataForm.mcAccount = data.user.mcAccount
                 this.$refs.dataForm.validateField('userName')
                 // this.$refs.dataForm.validateField('password')
               }
@@ -227,6 +252,19 @@
       },
       cleanData () {
         // this.dataForm.password = ''
+      },
+      // 触发接收人
+      selectGet (val) {
+        var activityList = []
+        for (let i = 0; i <= val.length - 1; i++) {
+          this.jieshouren.find((item) => { // 这里的options就是数据源
+            if (item.userId == val[i]) {
+              var obj = {email: item.email}
+              activityList.push(obj)
+            }
+          })
+        }
+        this.emailGroup = activityList
       },
       midifyflag () {
         this.dataForm.ismodifyPasswd = 'modify'
@@ -241,8 +279,8 @@
               data: this.$http.adornData({
                 'userId': this.dataForm.userid || undefined,
                 'username': this.dataForm.username,
-                'emailList': [this.dataForm.email],
-                'mcAccount': this.dataForm.aliyunAccount
+                'emailList': this.emailGroup,
+                'mcAccount': this.dataForm.mcAccount
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
