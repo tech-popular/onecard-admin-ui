@@ -548,7 +548,7 @@
       // 获取分群出参 指标列表
       getOutParamsList (row) {
         let code = this.channelCode.split(',').filter(item => item !== '')
-        dataTransferManageOutParams({ channelCode: code }).then(({data}) => {
+        dataTransferManageOutParams({ channelCode: code, flag: '-1' }).then(({data}) => {
           if (data && data.status === '1') {
             if (row) {
               // this.originOutParamsList = data.data
