@@ -61,12 +61,11 @@
       </el-table-column>
        <el-table-column
           prop="emailList"
-          label="标签"
+          label="邮箱"
+          width="350"
           filter-placement="bottom-end">
           <template slot-scope="scope">
-            <div v-for="(item, index) in scope.row.emailList" :key="index">
-              <el-tag type="primary" style="margin:2px">{{item}}</el-tag>
-            </div>
+            <el-tag v-for="(item, index) in scope.row.emailList" :key="index" type="primary" style="margin:2px">{{item}}</el-tag>
           </template>
       </el-table-column>
       <!-- <el-table-column
