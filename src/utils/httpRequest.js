@@ -59,8 +59,13 @@ http.adornUrl = (actionName) => {
   //   actionName = actionName.replace(/lexicon\//, '')
   //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://sku-clear-cache.sk.9f.cn/canary-admin' : window.SITE_CONFIG.baseUrl) + actionName
   } else {
+<<<<<<< HEAD
     // return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
     return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://unify-manager.sk.9f.cn/canary-admin' : window.SITE_CONFIG.baseUrl) + actionName
+=======
+    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi/' : window.SITE_CONFIG.baseUrl) + actionName
+    // return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://unify-manager.sk.9f.cn/canary-admin' : window.SITE_CONFIG.baseUrl) + actionName
+>>>>>>> fix_index20200604_zb
   }
 }
 /**
