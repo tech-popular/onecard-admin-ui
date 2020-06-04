@@ -59,11 +59,15 @@
         align="center"
         label="用户名">
       </el-table-column>
-      <el-table-column
-        prop="emailList"
-        header-align="center"
-        align="center"
-        label="邮箱">
+       <el-table-column
+          prop="emailList"
+          label="标签"
+          filter-placement="bottom-end">
+          <template slot-scope="scope">
+            <div v-for="(item, index) in scope.row.emailList" :key="index">
+              <el-tag type="primary" style="margin:2px">{{item}}</el-tag>
+            </div>
+          </template>
       </el-table-column>
       <!-- <el-table-column
         prop="mobile"

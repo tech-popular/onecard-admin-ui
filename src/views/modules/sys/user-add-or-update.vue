@@ -110,7 +110,7 @@
                 this.dataForm.email = data.user.emailList
                 this.dataForm.mobile = data.user.user.mobile
                 this.dataForm.mcAccount = data.user.mcAccount
-                this.dataForm.department = data.user.user.department
+                this.dataForm.department = data.user.department
               }
             })
           }
