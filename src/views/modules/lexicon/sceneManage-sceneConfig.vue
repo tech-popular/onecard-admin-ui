@@ -24,7 +24,7 @@
           <el-row>
             <el-col :span="24">
               <div class="box-bottom">
-                <el-button type="primary" size="mini" @click="ruleConfigClick(item.boxId)">规则配置</el-button>
+                <el-button type="primary" size="mini" @click="ruleConfigClick(item.boxId,'sousuo')">规则配置</el-button>
                 <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
                 <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button>
               </div>
@@ -70,7 +70,7 @@
     </el-card>
     <add-search-scene v-if="addSearchSceneVisible" ref="addSearchScene" @childByValue="childByValue"></add-search-scene>
     <add-recommend-scene v-if="addRecommendSceneVisible" ref="addRecommendScene" @childByValue="childByValue"></add-recommend-scene>
-    <rule-config v-if="ruleConfigVisible" ref="ruleConfig" :boxId='boxId'></rule-config>
+    <rule-config v-if="ruleConfigVisible" ref="ruleConfig" :boxId='boxId' :sacherRule='rules'></rule-config>
     <statistic-chart v-if="statisticChartVisible" ref="statisticChart"></statistic-chart>
     <real-time-strategy v-if="realTimeStrategyVisible" ref="realTimeStrategy" @closeDialog="closeDialogEvent"></real-time-strategy>
   </div>
@@ -98,7 +98,8 @@ export default {
       ruleConfigVisible: false,
       statisticChartVisible: false,
       realTimeStrategyVisible: false,
-      boxId: ''
+      boxId: '',
+      rules: false
     }
   },
   components: { addSearchScene, addRecommendScene, ruleConfig, statisticChart, realTimeStrategy },
@@ -127,9 +128,13 @@ export default {
         this.$refs.addRecommendScene.init()
       })
     },
-    ruleConfigClick (boxId) { // 规则配置
+    ruleConfigClick (boxId, val) { // 规则配置
+      this.rules = val
       this.boxId = boxId
       this.ruleConfigVisible = true
+      // if (val === 'sousuo') {
+      //   this.rules = true
+      // }
       this.$nextTick(() => {
         this.$refs.ruleConfig.init()
       })
