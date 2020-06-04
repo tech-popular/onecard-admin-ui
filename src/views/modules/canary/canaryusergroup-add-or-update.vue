@@ -103,23 +103,8 @@ export default {
             }
           })
         }
-        console.log(this.dataForm.emailList, 'opopo')
       })
     },
-    // 触发接收人
-    // selectGet (val) {
-    //   var activityList = []
-    //   for (let i = 0; i <= val.length - 1; i++) {
-    //     this.jieshouren.find((item) => { // 这里的options就是数据源
-    //       if (item.email == val[i]) {
-    //         var obj = {userId: item.userId, email: item.email}
-    //         activityList.push(obj)
-    //       }
-    //     })
-    //   }
-
-    //   this.userGroupUserArray = activityList
-    // },
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
