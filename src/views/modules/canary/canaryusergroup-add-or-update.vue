@@ -5,7 +5,7 @@
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
      <el-form-item label="接收人" prop="emailList">
-      <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%" filterable @change="selectGet">
+      <el-select v-model="dataForm.emailList" multiple placeholder="请选择" style="width:100%" filterable>
         <el-option
           v-for="item in jieshouren"
           :key="item.email"
@@ -88,7 +88,7 @@ export default {
               this.dataForm.name = data.canaryUserGroup.name
               this.dataForm.enable = data.canaryUserGroup.enable
               data.canaryUserGroup.reviceInfo.map(item => {
-                this.dataForm.emailList.push(item.emailList)
+                this.dataForm.emailList.push(item.email)
               })
             }
           })
@@ -103,23 +103,23 @@ export default {
             }
           })
         }
-        console.log(this.dataForm.emailList, 'bianji')
+        console.log(this.dataForm.emailList, 'opopo')
       })
     },
     // 触发接收人
-    selectGet (val) {
-      var activityList = []
-      for (let i = 0; i <= val.length - 1; i++) {
-        this.jieshouren.find((item) => { // 这里的options就是数据源
-          if (item.email == val[i]) {
-            var obj = {userId: item.userId, email: item.email}
-            activityList.push(obj)
-          }
-        })
-      }
+    // selectGet (val) {
+    //   var activityList = []
+    //   for (let i = 0; i <= val.length - 1; i++) {
+    //     this.jieshouren.find((item) => { // 这里的options就是数据源
+    //       if (item.email == val[i]) {
+    //         var obj = {userId: item.userId, email: item.email}
+    //         activityList.push(obj)
+    //       }
+    //     })
+    //   }
 
-      this.userGroupUserArray = activityList
-    },
+    //   this.userGroupUserArray = activityList
+    // },
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
@@ -131,7 +131,7 @@ export default {
               'id': this.dataForm.id || undefined,
               'name': this.dataForm.name,
               'enable': this.dataForm.enable,
-              'groupUsers': this.userGroupUserArray
+              'groupUsers': this.jieshouren.filter(e => this.dataForm.emailList.includes(e.email))
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
