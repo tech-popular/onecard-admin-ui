@@ -11,7 +11,8 @@
         <el-input v-model="dataForm.userName" placeholder="用户名" readonly disabled></el-input>
       </el-form-item>
       <el-form-item label="邮箱" prop="email">
-        <el-input v-model="dataForm.email" placeholder="邮箱" style="width:100%;margin-right: 2%;" disabled></el-input>
+        <el-tag v-for="(item, index) in email" :key="index" type="primary" style="margin:2px">{{item}}</el-tag>
+        <!-- <el-input v-model="dataForm.email" placeholder="邮箱" style="width:100%;margin-right: 2%;" disabled></el-input> -->
         <el-input v-model="dataForm.emailList" placeholder="输入多个邮箱','隔开" style="margin-top: 2%;" @change='inputblur'/>
       </el-form-item>
       <el-form-item label="手机号" prop="mobile">
@@ -35,20 +36,9 @@
 </template>
 
 <script>
-  // import { isEmail } from '@/utils/validate'
   import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
   export default {
     data () {
-      // var validateEmail = (rule, value, callback) => {
-      //   const reg = new RegExp(/9fbank|ithro/)
-      //   if (!isEmail(value)) {
-      //     callback(new Error('邮箱格式错误'))
-      //   } else if (!reg.test(value)) {
-      //     callback(new Error('账号格式有误'))
-      //   } else {
-      //     callback()
-      //   }
-      // }
       return {
         visible: false,
         roleList: [],
@@ -56,23 +46,24 @@
           id: 0,
           userName: '',
           ismodifyPasswd: '',
-          email: '',
           mobile: '',
           mcAccount: '',
           department: ''
         },
+        email: [],
         systenantList: [],
+        jieshouren: [],
+        emailGroup: [],
         dataRule: {
           // email: [
           //   { validator: validateEmail, trigger: 'blur' }
           // ]
-        },
-        jieshouren: [],
-        emailGroup: []
+        }
       }
     },
     methods: {
       init (val) {
+        this.email = val.emailList
         this.dataForm.id = val.id
         this.dataForm.userid = val.userid
         // 数据权限列表
@@ -107,7 +98,6 @@
               if (data && data.code === 0) {
                 this.dataForm = data.user.user
                 this.dataForm.userName = data.user.user.username
-                this.dataForm.email = data.user.emailList
                 this.dataForm.mobile = data.user.user.mobile
                 this.dataForm.mcAccount = data.user.mcAccount
                 this.dataForm.department = data.user.department
