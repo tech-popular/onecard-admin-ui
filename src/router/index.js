@@ -77,7 +77,7 @@ router.beforeEach((to, from, next) => {
       '95dd8c99-8c51-4394-b2f4-95ba472c2ef4' // 小鱼福卡uuid
     ]
     if (sysUuid && sysArr.includes(sysUuid)) { // 嵌入统一后台的免登陆处理
-      http.get(http.adornUrl('/data/login')).then(res => {
+      http.get(http.adornUrl('/data/login?systemUuid=' + sysUuid)).then(res => {
         // Vue.cookie.set('isUnifyManage', 1) // isUnifyManage 为1时表示 是嵌入统一后台的页面，0 表示原系统
         Vue.cookie.set('token', res.data.token)
         httpNav(to, from, next)
