@@ -72,7 +72,11 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     let sysUuid = getQueryString('system_uuid')
-    if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') { // 嵌入统一后台的免登陆处理
+    let sysArr = [
+      'ecf36297-37ea-489e-a350-045b1ab49f75', // 统一后台uuid
+      '95dd8c99-8c51-4394-b2f4-95ba472c2ef4' // 小鱼福卡uuid
+    ]
+    if (sysUuid && sysArr.includes(sysUuid)) { // 嵌入统一后台的免登陆处理
       http.get(http.adornUrl('/data/login')).then(res => {
         // Vue.cookie.set('isUnifyManage', 1) // isUnifyManage 为1时表示 是嵌入统一后台的页面，0 表示原系统
         Vue.cookie.set('token', res.data.token)
