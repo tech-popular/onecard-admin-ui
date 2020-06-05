@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row style="margin-bottom: 15px;">
-      <el-col :span="7" :offset="17">
+      <el-col :span="7" :offset="17" style="text-align: right;">
         <span style="margin-right: 15px;">数据时间 {{ts}}</span>
         <el-button type="primary" icon="ios-download" @click="down">下载</el-button>
       </el-col>
