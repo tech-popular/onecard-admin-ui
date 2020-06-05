@@ -944,7 +944,11 @@ export default {
             params.flowId = this.flowId
           }
           let sysUuid = getQueryString('system_uuid')
-          if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') {
+          let sysArr = [
+            'ecf36297-37ea-489e-a350-045b1ab49f75', // 统一后台uuid
+            '95dd8c99-8c51-4394-b2f4-95ba472c2ef4' // 小鱼福卡uuid
+          ]
+          if (sysUuid && sysArr.includes(sysUuid)) {
             params.username = this.getQueryParams('username') || ''
           }
           this.loading = true
