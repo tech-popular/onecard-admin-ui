@@ -53,6 +53,11 @@
               label="纬度">
             </el-table-column>
             <el-table-column
+              v-if="disbild === true"
+              prop="priority"
+              label="召回占比%">
+            </el-table-column>
+            <el-table-column
               label="召回占比%"
               header-align="center" 
               align="center"
@@ -132,10 +137,8 @@
           {id: 4, value: '策略层级4'}
         ],
         typeList: [
-          {id: 1, value: '策略类型1'},
-          {id: 2, value: '策略类型2'},
-          {id: 3, value: '策略类型3'},
-          {id: 4, value: '策略类型4'}
+          {id: 1, value: '召回'},
+          {id: 2, value: '占比'}
         ],
         loginTypeList: [
           {id: 1, value: '登陆类型1'},
@@ -199,26 +202,35 @@
       // 弹窗状态
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.dataForm.latitude = this.lists
-            const dataBody = this.dataForm
-            const dataUpdateId = this.dataForm.id
-            saveorupt(dataBody, dataUpdateId).then(({data}) => {
-              if (data && data.status === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                    this.$refs['dataForm'].resetFields()
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
+          var sum = 0
+          this.lists.forEach((val) => {
+            sum += Number(val.weight)
+            this.weightSum = sum
+          }, 0)
+          if (this.weightSum > 100) {
+            this.$message.error('召回占比不得超过100%')
+          } else {
+            if (valid) {
+              this.dataForm.latitude = this.lists
+              const dataBody = this.dataForm
+              const dataUpdateId = this.dataForm.id
+              saveorupt(dataBody, dataUpdateId).then(({data}) => {
+                if (data && data.status === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                      this.$refs['dataForm'].resetFields()
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
+            }
           }
         })
       }
