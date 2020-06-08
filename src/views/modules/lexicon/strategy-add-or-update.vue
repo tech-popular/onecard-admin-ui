@@ -19,7 +19,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="策略类型">
-          <el-select filterable v-model="dataForm.type" placeholder="请选择策略类型" style="width:100%">
+          <el-select filterable v-model="dataForm.type" placeholder="请选择策略类型" style="width:100%" @change="typeClick">
             <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
           </el-select>
         </el-form-item>
@@ -53,14 +53,15 @@
               label="纬度">
             </el-table-column>
             <el-table-column
-              v-if="disbild === true"
+              v-if="disbild === true && paixudisbuld === '排序'"
               prop="priority"
-              label="召回占比%">
+              label="排序占比%">
             </el-table-column>
             <el-table-column
-              label="召回占比%"
+              label="排序占比%"
               header-align="center" 
               align="center"
+              v-if="paixudisbuld === '排序'"
               >
               <editable-cell 
                 slot-scope="scope"
@@ -70,15 +71,33 @@
               </editable-cell>
             </el-table-column>
             <el-table-column
-              v-if="disbild === true"
+              v-if="disbild === true && paixudisbuld === '召回'"
+              prop="priority"
+              label="召回占比%">
+            </el-table-column>
+            <el-table-column
+              label="召回占比%"
+              header-align="center" 
+              align="center"
+              v-if="paixudisbuld === '召回'"
+              >
+              <editable-cell 
+                slot-scope="scope"
+                :can-edit="editModeEnabled"
+                v-model="scope.row.weight">
+                <span slot="content">{{scope.row.weight}}</span>
+              </editable-cell>
+            </el-table-column>
+            <el-table-column
+              v-if="disbild === true && paixudisbuld === '召回'"
               prop="priority"
               label="排序优先级">
             </el-table-column>
             <el-table-column
-              v-else
               label="排序优先级"
               header-align="center" 
               align="center"
+              v-if="paixudisbuld === '召回'"
               >
               <editable-cell 
                 slot-scope="scope"
@@ -138,7 +157,7 @@
         ],
         typeList: [
           {id: 1, value: '召回'},
-          {id: 2, value: '占比'}
+          {id: 2, value: '排序'}
         ],
         loginTypeList: [
           {id: 1, value: '登陆类型1'},
@@ -155,7 +174,8 @@
         ],
         weightForm: { weight: '' },
         priorityForm: { priority: '' },
-        disbild: false
+        disbild: false,
+        paixudisbuld: ''
       }
     },
     components: {
@@ -198,6 +218,11 @@
       },
       clickNewAddText (val) {
         this.latitude = val
+      },
+      // 类型
+      typeClick (val) {
+        console.log(val, 'val')
+        this.paixudisbuld = val
       },
       // 弹窗状态
       dataFormSubmit (form) {
