@@ -1,6 +1,6 @@
 <template>
   <el-dialog :title="dataFormValue ? '查看' : dataForm.id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled='disbild'>
       <el-card shadow="never">
         <div slot="header" class="clearfix">
           <span>基本信息</span>
@@ -31,9 +31,9 @@
       </el-card>
       <el-card shadow="never" style="margin-top:20px">
         <div slot="header" class="clearfix">
-          <span>详细占比</span><el-tag type="danger" style="margin-left:5px">占比和需等于100%</el-tag>
+          <span>详细配置</span><el-tag type="danger" style="margin-left:5px">占比和需等于100%</el-tag>
         </div>
-        <el-form-item label="纬度">
+        <el-form-item label="纬度" v-if="disbild === false">
           <el-select filterable v-model="latitude" placeholder="请选择数据源类型" @change='clickNewAddText'>
             <el-option v-for="item in newAddTextList" :value="item.value" :key="item.value" :label="item.value"/>
           </el-select>
@@ -65,6 +65,12 @@
               </editable-cell>
             </el-table-column>
             <el-table-column
+              v-if="disbild === true"
+              prop="priority"
+              label="排序优先级">
+            </el-table-column>
+            <el-table-column
+              v-else
               label="排序优先级"
               header-align="center" 
               align="center"
@@ -76,7 +82,7 @@
                 <span slot="content">{{scope.row.priority}}</span>
               </editable-cell>
             </el-table-column>
-            <el-table-column header-align="center" align="center" width="200" label="操作">
+            <el-table-column header-align="center" align="center" width="200" label="操作" v-if="disbild === false">
               <template slot-scope="scope">
                 <el-tooltip class="item" effect="dark" content="删除" placement="top">
                   <el-button type="danger" size="mini" icon="el-icon-minus" circle @click='deletedlLists(scope.row.id)'></el-button>
@@ -89,7 +95,7 @@
 
     <div slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()" v-if="disbild === false">确定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -145,7 +151,8 @@
           {id: 3, value: '渠道'}
         ],
         weightForm: { weight: '' },
-        priorityForm: { priority: '' }
+        priorityForm: { priority: '' },
+        disbild: false
       }
     },
     components: {
@@ -159,6 +166,7 @@
         this.dataForm.id = id || ''
         this.dataFormValue = value
         this.visible = true
+        this.dataFormValue ? this.disbild = true : this.disbild = false
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (id) {
