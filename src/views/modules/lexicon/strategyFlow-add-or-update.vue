@@ -5,35 +5,35 @@
         <div slot="header" class="clearfix">
           <span>基本信息</span>
         </div>
-        <el-form-item label="策略名称" prop="consumerName">
+        <el-form-item label="策略流名称" prop="consumerName">
           <el-input v-model="dataForm.consumerName" placeholder="消费者名字"/>
         </el-form-item>
-        <el-form-item label="策略场景">
+        <el-form-item label="场景类型">
           <el-select filterable v-model="dataForm.scene" placeholder="请选择策略场景" style="width:100%">
             <el-option v-for="item in sceneList" :value="item.value" :key="item.value" :label="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="策略层级">
+        <el-form-item label="策略流场景">
           <el-select filterable v-model="dataForm.hierarchy" placeholder="请选择策略层级" style="width:100%">
             <el-option v-for="item in hierarchyList" :value="item.value" :key="item.value" :label="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="策略类型">
+        <el-form-item label="推荐类型">
           <el-select filterable v-model="dataForm.type" placeholder="请选择策略类型" style="width:100%">
             <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="登陆类型">
-          <el-select filterable v-model="dataForm.loginType" placeholder="请选择登陆类型" style="width:100%">
-            <el-option v-for="item in loginTypeList" :value="item.value" :key="item.value" :label="item.value"/>
           </el-select>
         </el-form-item>
       </el-card>
       <el-card shadow="never" style="margin-top:20px">
         <div slot="header" class="clearfix">
-          <span>详细占比</span><el-tag type="danger" style="margin-left:5px">占比和需等于100%</el-tag>
+          <span>层级设置</span>
         </div>
-        <el-form-item label="纬度">
+        <el-form-item label="策略ID">
+          <el-select filterable v-model="latitude" placeholder="请选择数据源类型" @change='clickNewAddText'>
+            <el-option v-for="item in newAddTextList" :value="item.value" :key="item.value" :label="item.value"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="选择层级">
           <el-select filterable v-model="latitude" placeholder="请选择数据源类型" @change='clickNewAddText'>
             <el-option v-for="item in newAddTextList" :value="item.value" :key="item.value" :label="item.value"/>
           </el-select>
@@ -46,35 +46,19 @@
             style="width: 100%">
             <el-table-column
               prop="id"
-              label="序号">
+              label="层级">
             </el-table-column>
             <el-table-column
               prop="title"
-              label="纬度">
+              label="任务ID">
             </el-table-column>
             <el-table-column
-              label="召回占比%"
-              header-align="center" 
-              align="center"
-              >
-              <editable-cell 
-                slot-scope="scope"
-                :can-edit="editModeEnabled"
-                v-model="scope.row.weight">
-                <span slot="content">{{scope.row.weight}}</span>
-              </editable-cell>
+              prop="title"
+              label="策略名称">
             </el-table-column>
             <el-table-column
-              label="排序优先级"
-              header-align="center" 
-              align="center"
-              >
-              <editable-cell 
-                slot-scope="scope"
-                :can-edit="editModeEnabled"
-                v-model="scope.row.priority">
-                <span slot="content">{{scope.row.priority}}</span>
-              </editable-cell>
+              prop="title"
+              label="策略层级">
             </el-table-column>
             <el-table-column header-align="center" align="center" width="200" label="操作">
               <template slot-scope="scope">
@@ -84,6 +68,12 @@
               </template>
             </el-table-column>
           </el-table>
+      </el-card>
+      <el-card shadow="never" style="margin-top:20px">
+        <div slot="header" class="clearfix">
+          <span>预览图</span>
+        </div>
+        <real-time-strategy v-if="realTimeStrategyVisible" ref="realTimeStrategy"></real-time-strategy>
       </el-card>
     </el-form>
 
@@ -96,6 +86,7 @@
 
 <script>
   import EditableCell from './components/EditableCell'
+  import realTimeStrategy from './sceneManageComponents/sceneManage-sceneConfig-real-time-strategy'
   import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
   export default {
     data () {
@@ -145,11 +136,13 @@
           {id: 3, value: '渠道'}
         ],
         weightForm: { weight: '' },
-        priorityForm: { priority: '' }
+        priorityForm: { priority: '' },
+        realTimeStrategyVisible: true
       }
     },
     components: {
-      EditableCell
+      EditableCell,
+      realTimeStrategy
     },
     mounted () {
       this.init()

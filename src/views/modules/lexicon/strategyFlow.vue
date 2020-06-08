@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="策略ID">
+      <el-form-item label="策略流ID">
         <el-input v-model="dataForm.sacherId" placeholder="任务具体id" clearable />
       </el-form-item>
-      <el-form-item label="策略名称">
+      <el-form-item label="策略流名称">
         <el-input v-model="dataForm.sacherName" placeholder="任务定义名称" clearable />
       </el-form-item>
-      <el-form-item label="策略场景">
+      <el-form-item label="策略流场景">
         <el-select filterable v-model="dataForm.type" placeholder="请选择数据源类型">
           <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
         </el-select>
@@ -26,43 +26,33 @@
         prop="flowId"
         header-align="center"
         align="center"
-        label="策略ID"/>
+        label="策略流ID"/>
       <el-table-column
         prop="consumerName"
         header-align="center"
         align="center"
-        label="策略名称"
+        label="策略流名称"
         width="150px"/>
       <el-table-column
         prop="topic"
         header-align="center"
         align="center"
-        label="策略场景"/>
+        label="场景类型"/>
       <el-table-column
         prop="groupId"
         header-align="center"
         align="center"
-        label="策略层级"/>
+        label="策略流场景"/>
         <el-table-column
         prop="bootstrapServers"
         header-align="center"
         align="center"
-        label="策略类型">
+        label="推荐类型">
         <template slot-scope="scope">
           <el-tooltip effect="dark" placement="top">
             <div v-html="toBreak(scope.row.bootstrapServers)" slot="content"></div>
             <div class="text-to-long-cut">{{scope.row.bootstrapServers}}</div>
           </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="enable"
-        header-align="center"
-        align="center"
-        label="登陆状态">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === true" size="small" >启动</el-tag>
-          <el-tag v-else size="small" type="danger">停止</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -81,7 +71,7 @@
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-document-copy" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="查看" placement="top">
+          <el-tooltip class="item" effect="dark" content="预览" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="addOrUpdateHandle(scope.row.id,'look')"></el-button>
           </el-tooltip>
         </template>
@@ -101,7 +91,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './strategy-add-or-update'
+  import AddOrUpdate from './strategyFlow-add-or-update'
   import { beeTaskList } from '@/api/workerBee/kafka'
   export default {
     data () {
