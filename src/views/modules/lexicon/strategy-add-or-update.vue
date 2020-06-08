@@ -10,22 +10,22 @@
         </el-form-item>
         <el-form-item label="策略场景">
           <el-select filterable v-model="dataForm.scene" placeholder="请选择策略场景" style="width:100%">
-            <el-option v-for="item in sceneList" :value="item.value" :key="item.value" :label="item.value"/>
+            <el-option v-for="item in sceneList" :value="item.id" :key="item.id" :label="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="策略层级">
           <el-select filterable v-model="dataForm.hierarchy" placeholder="请选择策略层级" style="width:100%">
-            <el-option v-for="item in hierarchyList" :value="item.value" :key="item.value" :label="item.value"/>
+            <el-option v-for="item in hierarchyList" :value="item.id" :key="item.id" :label="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="策略类型">
           <el-select filterable v-model="dataForm.type" placeholder="请选择策略类型" style="width:100%" @change="typeClick">
-            <el-option v-for="item in typeList" :value="item.value" :key="item.value" :label="item.value"/>
+            <el-option v-for="item in typeList" :value="item.id" :key="item.id" :label="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="登陆类型">
           <el-select filterable v-model="dataForm.loginType" placeholder="请选择登陆类型" style="width:100%">
-            <el-option v-for="item in loginTypeList" :value="item.value" :key="item.value" :label="item.value"/>
+            <el-option v-for="item in loginTypeList" :value="item.id" :key="item.id" :label="item.value"/>
           </el-select>
         </el-form-item>
       </el-card>
@@ -53,7 +53,7 @@
               label="纬度">
             </el-table-column>
             <el-table-column
-              v-if="disbild === true && paixudisbuld === '排序'"
+              v-if="disbild === true && paixudisbuld === 2"
               prop="priority"
               label="排序占比%">
             </el-table-column>
@@ -61,7 +61,7 @@
               label="排序占比%"
               header-align="center" 
               align="center"
-              v-if="paixudisbuld === '排序'"
+              v-if="paixudisbuld === 2"
               >
               <editable-cell 
                 slot-scope="scope"
@@ -71,7 +71,7 @@
               </editable-cell>
             </el-table-column>
             <el-table-column
-              v-if="disbild === true && paixudisbuld === '召回'"
+              v-if="disbild === true && paixudisbuld === 1"
               prop="priority"
               label="召回占比%">
             </el-table-column>
@@ -79,7 +79,7 @@
               label="召回占比%"
               header-align="center" 
               align="center"
-              v-if="paixudisbuld === '召回'"
+              v-if="paixudisbuld === 1"
               >
               <editable-cell 
                 slot-scope="scope"
@@ -89,7 +89,7 @@
               </editable-cell>
             </el-table-column>
             <el-table-column
-              v-if="disbild === true && paixudisbuld === '召回'"
+              v-if="disbild === true && paixudisbuld === 1"
               prop="priority"
               label="排序优先级">
             </el-table-column>
@@ -97,7 +97,7 @@
               label="排序优先级"
               header-align="center" 
               align="center"
-              v-if="paixudisbuld === '召回'"
+              v-if="paixudisbuld === 1"
               >
               <editable-cell 
                 slot-scope="scope"
