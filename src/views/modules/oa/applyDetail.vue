@@ -29,7 +29,7 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-        <el-form-item label="申请权限">
+        <!-- <el-form-item label="申请权限">
           <el-checkbox-group v-model="checkedCities">
             <el-checkbox
               disabled
@@ -38,7 +38,7 @@
               :key="item.id"
             >{{item.name}}</el-checkbox>
           </el-checkbox-group>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="申请人姓名">
           <span>{{detalList.applicantName}}</span>
         </el-form-item>
@@ -51,14 +51,14 @@
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <el-form-item label="本次申请默认审批人">
+        <!-- <el-form-item label="本次申请默认审批人">
           <el-tag
             style="margin-left:10px;"
             v-for="tag in detalList.defaultApproverList"
             :key="tag.name"
             :type="tag.name"
           >{{tag.name}}</el-tag>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
@@ -113,14 +113,14 @@
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <el-form-item label="本次申请默认审批人">
+        <!-- <el-form-item label="本次申请默认审批人">
           <el-tag
             style="margin-left:10px;"
             v-for="tag in detalList.defaultApproverList"
             :key="tag.name"
             :type="tag.name"
           >{{tag.name}}</el-tag>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
@@ -137,7 +137,6 @@ export default {
       detalList: {},
       checkedCities: [],
       quanxian: '',
-      tableData: [],
       sysment: [],
       systemListcarrent: ''
     }
@@ -149,16 +148,23 @@ export default {
       this.dialogVisible = true
       lookAccout(val.id).then(({data}) => {
         this.detalList = data.data
-        let a = [{selected: true}]
-        let b = this.detalList.systemList
-        let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
-        this.sysment = arr
-        this.sysment.map(item => {
-          this.systemListcarrent = item.value
-        })
-        this.detalList.applyAuthTypeList.map(item => {
-          this.checkedCities.push(item.name)
-        })
+        if (this.quanxian === '账号权限') {
+          let a = [{selected: true}]
+          let b = this.detalList.systemList
+          let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
+          this.sysment = arr
+          this.sysment.map(item => {
+            this.systemListcarrent = item.value
+          })
+        } else {
+          let c = [{selected: true}]
+          let d = this.detalList.applyAuthTypeList
+          let arr2 = [...d].filter(x => [...c].some(y => y.selected === x.selected))
+          this.checkedCities = arr2
+          this.checkedCities.map(item => {
+            this.checkedCities.push(item.name)
+          })
+        }
       })
     },
 

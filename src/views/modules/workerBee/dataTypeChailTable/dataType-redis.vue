@@ -1,0 +1,56 @@
+<template>
+    <div class="aviator">
+      <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+      <el-table-column prop="host" header-align="center" align="center" label="host"/>
+      <el-table-column prop="port" header-align="center" align="center" label="端口"/>
+      <el-table-column prop="version" header-align="center" align="center" label="版本"/>
+      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"/>
+      <el-table-column
+        prop="enable"
+        header-align="center"
+        align="center"
+        label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.enable === 1" size="small" >启用</el-tag>
+          <el-tag v-else size="small" type="danger">禁用</el-tag>
+        </template>
+      </el-table-column>
+      
+      <el-table-column prop="remark" header-align="center" align="center" label="备注"/>
+      <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">    
+            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="charleId(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deletedId(scope.row.id)"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+</template>
+
+<script>
+  export default {
+    props: [
+      'dataList'
+    ],
+    data () {
+      return {
+        dataListLoading: false
+      }
+    },
+    methods: {
+      charleId (addOrUpdateHandle) {
+        this.$emit('addOrUpdateHandle', addOrUpdateHandle)
+      },
+      deletedId (deleteddialog) {
+        this.$emit('deleteddialog', deleteddialog)
+      }
+    }
+  }
+</script>
+<style>
+
+</style>

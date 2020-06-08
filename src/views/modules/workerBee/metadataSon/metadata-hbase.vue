@@ -1,8 +1,15 @@
 <template>
     <div class="aviator">
       <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
-        <el-form-item label="数据源地址编号" prop="zookeeperQuorumId">
-        <el-input autosize v-model="fatherData.zookeeperQuorumId" placeholder="请输入数据源地址编号"/>
+        <el-form-item label="数据源ID" prop="zookeeperQuorumId">
+          <el-select v-model="fatherData.zookeeperQuorumId" filterable placeholder="请输入zookeeperName">
+            <el-option
+              v-for="item in dataidlist"
+              :key="item.id"
+              :label="item.zookeeperName"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="HBASE表名" prop="tableName">
         <el-input v-model="fatherData.tableName" placeholder="请输入HBASE表名"/>
@@ -22,12 +29,12 @@
             <el-radio :label="true">是</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="是否缓存">
+        <!-- <el-form-item label="是否缓存">
           <el-radio-group v-model="fatherData.enableCache">
             <el-radio :label="0">否</el-radio>
             <el-radio :label="1">是</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
@@ -37,10 +44,12 @@
 </template>
 
 <script>
+  import { getAllDataSourceByType } from '@/api/workerBee/metadata'
   export default {
     props: [
       'hideVisibleClick',
-      'fatherData'
+      'fatherData',
+      'dataformType'
     ],
     data () {
       return {
@@ -50,9 +59,26 @@
           ],
           tableName: [
             { required: true, message: '请输入hbase表名', trigger: 'blur' }
+          ],
+          queryType: [
+            { required: true, message: '请输入查询类型(GET,SCAN)', trigger: 'blur' }
           ]
-        }
+        },
+        dataidlist: [],
+        intlist: {}
       }
+    },
+    mounted () {
+      this.intlist = this.$parent.$parent.$parent.fatherData
+      const dataBody = {
+        type: this.dataformType ? this.dataformType : this.intlist.type,
+        name: this.fatherData.redisDataSourceId
+      }
+      getAllDataSourceByType(dataBody).then(({data}) => {
+        if (data && data.status === 0) {
+          this.dataidlist = data.data
+        }
+      })
     },
     methods: {
       cancel () {

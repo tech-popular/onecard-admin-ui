@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut } from '@/api'
+import { httpGet, httpGetSeries, httpPost, httpPut } from '@/api'
 // let da = 'dataTransfer/'
 let da = '/'
 // 数据流转管理模块
@@ -9,7 +9,10 @@ export const updateDataTransferManage = (params) => httpPut(da + `dataTransfer/u
 export const enableDataTransferManage = (id, status) => httpGet(da + `dataTransfer/${id}/status/${status}`) // 开关
 export const lowerDataTransferManage = (id) => httpGet(da + `dataTransfer/trigger/${id}`) // 立即下发
 export const dataTransferManageCuster = () => httpGet(da + `data/group/select/available`) // 分群ID
-export const dataTransferManageOutParams = () => httpGet(da + `dataCatalog/selectAllCata`) // 分群出参
+// export const dataTransferManageOutParams = (params) => httpGet(da + `dataCatalog/outparams`, params) // 分群出参
+export const dataTransferManageOutParams = params => httpGetSeries(da + 'dataCatalog/selectAllCata', params) // 加载目录树接口
 export const dataTransferManageOutParamsEdit = (id) => httpGet(da + `dataTransferOutParams/outParams/${id}`) // 修改回显时查询出参
 export const dataTransferManageKafka = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // kafka地址
-export const dataTransferManageMysql = (params) => httpGet(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
+export const dataTransferManageMysql = (params) => httpGetSeries(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
+export const defaultOutParams = (channelCode, datasourceId) => httpGetSeries(da + `dataTransfer/out/default/datasource/${datasourceId}`, channelCode) // 渠道多选，传参方式改变
+export const r3Log = params => httpPost(da + 'r3log/list', params)

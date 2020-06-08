@@ -4,20 +4,47 @@
         <el-form-item label="cql" prop="cql" :rules="dataRule.cql">
         <el-input type="textarea" autosize v-model="fatherData.cql" placeholder="请输入cql"/>
         </el-form-item>
-        <el-form-item label="数据源id" prop="datasourceId" :rules="dataRule.datasourceId">
-        <el-input v-model="fatherData.datasourceId" placeholder="请输入数据源id"/>
+        <el-form-item label="数据源ID" prop="datasourceId" :rules="dataRule.datasourceId">
+          <el-select v-model="fatherData.datasourceId" filterable placeholder="请输入datasourceName">
+            <el-option
+              v-for="item in dataidlist"
+              :key="item.id"
+              :label="item.datasourceName"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="is_query" prop="isQuery" :rules="dataRule.isQuery">
-        <el-input v-model="fatherData.isQuery" placeholder="is_query"/>
+        <el-form-item label="is_query" prop="isQuery">
+          <el-radio-group v-model="fatherData.isQuery">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
-        <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
+        <el-form-item label="请求参数的field数组" prop="requestFields" :rules="dataRule.requestFields">
+        <el-input v-model="fatherData.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
+        </el-form-item>
+        <el-form-item label="请求参数的类型数组" :rules="dataRule.requestFieldTypes">
+          <el-select v-model="fatherData.requestFieldTypes" multiple placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
-        <el-input v-model="fatherData.responseFields" placeholder="请输入响应参数的fieldId数组"/>
+        <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
-        <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
+          <el-select v-model="fatherData.responseType" placeholder="请选择响应参数的数据类型">
+            <el-option
+              v-for="item in statyoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="是否使用缓存">
           <el-radio-group v-model="fatherData.enableCache">
@@ -28,12 +55,12 @@
         <el-form-item label="缓存生成的key需要的字段" prop="cacheKeyFields" :rules="dataRule.noKongGe">
         <el-input v-model="fatherData.cacheKeyFields" placeholder="请输入缓存生成的key需要的字段"/>
         </el-form-item>
-        <el-form-item label="是否启用">
+        <!-- <el-form-item label="是否启用">
         <el-radio-group v-model="fatherData.enable">
           <el-radio :label="false">禁用</el-radio>
           <el-radio :label="true">正常</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
@@ -44,10 +71,13 @@
 
 <script>
   import Filter from '../filter'
+  import { getAllDataSourceByType } from '@/api/workerBee/metadata'
   export default {
     props: [
       'hideVisibleClick',
-      'fatherData'
+      'fatherData',
+      'dataformType',
+      'requestFieldTypes'
     ],
     data () {
       return {
@@ -56,10 +86,7 @@
             { required: true, message: '请输入cql', trigger: 'blur' }
           ],
           datasourceId: [
-            { required: true, message: '请输入数据源id', trigger: 'blur' }
-          ],
-          isQuery: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '请选择数据源ID', trigger: 'blur' }
           ],
           requestFields: [
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
@@ -68,10 +95,48 @@
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           responseType: [
+            { required: true, message: '请选择响应参数的数据类型', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
-        }
+        },
+        dataidlist: [],
+        arr: [],
+        intlist: {},
+        options: [{
+          id: 'string',
+          name: 'string'
+        }, {
+          id: 'int',
+          name: 'int'
+        }, {
+          id: 'long',
+          name: 'long'
+        }],
+        fatherData: {},
+        statyoptions: [{
+          value: 'map',
+          label: 'map'
+        }, {
+          value: 'list',
+          label: 'list'
+        }]
       }
+    },
+    mounted () {
+      this.intlist = this.$parent.$parent.$parent.fatherData
+      if (this.requestFieldTypes) {
+        this.arr = this.requestFieldTypes.split(',')
+        this.fatherData.requestFieldTypes = this.arr
+      }
+      const dataBody = {
+        type: this.dataformType ? this.dataformType : this.intlist.type,
+        name: this.fatherData.redisDataSourceId
+      }
+      getAllDataSourceByType(dataBody).then(({data}) => {
+        if (data && data.status === 0) {
+          this.dataidlist = data.data
+        }
+      })
     },
     methods: {
       cancel () {
@@ -85,6 +150,20 @@
         let res = this.$parent.$parent.$parent.fatherCheck()
         this.$refs['fatherData'].validate((valid) => {
           if (valid && res) {
+            this.fatherData = {
+              cql: this.fatherData.cql,
+              enable: this.fatherData.enable,
+              enableCache: this.fatherData.enableCache,
+              isQuery: this.fatherData.isQuery,
+              requestFields: this.fatherData.requestFields,
+              requestFieldTypes: this.fatherData.requestFieldTypes.join(),
+              responseFields: this.fatherData.responseFields,
+              responseType: this.fatherData.responseType,
+              cacheKeyFields: this.fatherData.cacheKeyFields,
+              type: this.fatherData.type,
+              datasourceId: this.fatherData.datasourceId,
+              id: this.fatherData.id
+            }
             this.$emit('dataFormSubmit', this.fatherData)
           } else {
             return false

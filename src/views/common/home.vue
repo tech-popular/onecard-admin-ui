@@ -61,7 +61,7 @@
             <el-card>
               <el-row>
                 <h4>去往其他系统</h4>
-                <hr>
+                <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
                 <el-col :span="8">
                   <el-card :body-style="{ padding: '0px' }" style="margin:5px">
                     <img width="100%" height="155px" src="~@/assets/img/fenghuang.png">
@@ -119,10 +119,11 @@
 <script>
 export default {
   data () {
+    let originHost = location.origin
     return {
       value: new Date(),
       dataHoste: '',
-      fenghuang: 'http://tech.9fbank.com/phoenix/#/login',
+      fenghuang: originHost + '/phoenix/#/home',
       bi: 'http://data.9fbank.com/plate.jsp'
     }
   },
@@ -161,10 +162,10 @@ export default {
   },
   methods: {
     fhHandle (url) {
-      window.location.href = url
+      window.open(url, '_blank')
     },
     biHandle (url) {
-      window.location.href = url
+      window.open(url, '_blank')
     }
   }
 }
@@ -218,7 +219,7 @@ export default {
     color: #999;
     .tagText{
       margin: 5px;
-      
+
     }
 }
 </style>

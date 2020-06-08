@@ -68,7 +68,7 @@
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="primary" icon="el-icon-finished" size="small"  style="width:100px" @click="addOrUpdateHandle(scope.row)">审批记录</el-button>
-          <el-button type="success" icon="el-icon-tickets" size="small" style="width:100px;margin-left:0;margin-top:10px;" @click="applyDetailHandle(scope.row)">授权详情</el-button>
+          <el-button v-if="scope.row.grantResult === '授权异常'" type="success" icon="el-icon-tickets" size="small" style="width:100px;margin-left:0;margin-top:10px;" @click="applyDetailHandle(scope.row)">授权详情</el-button>
         </template>
       </el-table-column>
     </el-table>

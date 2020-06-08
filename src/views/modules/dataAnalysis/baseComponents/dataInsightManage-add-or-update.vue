@@ -20,9 +20,9 @@
               <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 用户所属渠道
-                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable :disabled="!!id">
+                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable multiple :disabled="!!id" style="width: 400px">
                   <template v-for="(item, index) in channelList">
-                    <el-option :key="index" :label="item.text" :value="item.value"></el-option>
+                    <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
                   </template>
                 </el-select>
               </div>
@@ -32,7 +32,7 @@
             </div>
           </el-form-item>
           <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
-            <el-select v-model="baseForm.channelId" :disabled="!!id">
+            <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px">
               <template v-for="(item, index) in channelList">
                 <el-option :key="index" :label="item.text" :value="item.value"></el-option>
               </template>
@@ -127,7 +127,7 @@
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, selectAllCataNew, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -158,7 +158,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: '2001',
+        channelId: ['2001'],
         desc: ''
       },
       rejectForm: {
@@ -186,7 +186,8 @@ export default {
         'rules': []
       },
       channelList: [],
-      originIndexList: [] // 没有处理过的指标列表数据
+      isSelectedUneffectIndex: [] // 选中的指标是否有无效指标
+      // originIndexList: [] // 没有处理过的指标列表数据
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -223,7 +224,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: '2001',
+        channelId: ['2001'],
         desc: ''
       }
       this.ruleConfig = { // 规则数据
@@ -250,7 +251,6 @@ export default {
             name: data.data.name,
             desc: data.data.desc,
             userType: data.data.userType,
-            channelId: data.data.channelId,
             type: data.data.type
           }
           // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
@@ -262,9 +262,11 @@ export default {
           }
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
+            this.baseForm.channelId = data.data.channelId
             this.loading = false
             return
           }
+          this.baseForm.channelId = data.data.channelId.split(',').filter(item => item != '')
           if (!data.data.configJson) {
             this.initEmptyData()
             this.loading = false
@@ -298,12 +300,43 @@ export default {
           this.channelList = []
           return
         }
-        this.channelList = res.data.data
+        this.channelList = res.data.data.map(item => {
+          if (item.value === '0000') {
+            item.disabled = true
+          } else {
+            item.disabled = false
+          }
+          return item
+        })
       })
     },
     channelIdChange () { // 用户渠道改变时，重新过滤指标数据
-      this.setInitRulesConfig(this.filterAllCata(this.originIndexList))
-      // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+      if (this.baseForm.channelId.length === 0) {
+        this.channelList.forEach(item => {
+          item.disabled = false
+        })
+      }
+      if (this.baseForm.channelId.length === 1) {
+        this.channelList.forEach(item => {
+          if (this.baseForm.channelId[0] === '0000') {
+            if (item.value === '0000') {
+              item.disabled = false
+            } else {
+              item.disabled = true
+            }
+          } else {
+            if (item.value === '0000') {
+              item.disabled = true
+            } else {
+              item.disabled = false
+            }
+          }
+        })
+      }
+      this.getSelectAllCata((indexList) => {
+        this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
+      })
+      this.setInitRulesConfig(this.indexList)
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -370,6 +403,9 @@ export default {
             if (findex < indexPathArr.length - 1) {
               a[fitem].isDefaultExpanded = true
               a = a[fitem].children
+            } else {
+              console.log(a[fitem], item)
+              item.enable = a[fitem].enable
             }
           })
           item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
@@ -402,11 +438,15 @@ export default {
       this.updateConditionId(this.ruleConfig)
     },
     getSelectAllCata (fn) { // 获取所有指标
-      selectAllCata().then(({data}) => {
+      console.log(selectAllCataNew)
+      selectAllCata({
+        channelCode: this.baseForm.channelId,
+        flag: this.id ? '-1' : '1'
+      }).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
-          this.originIndexList = data.data
+          // this.originIndexList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
         if (fn) {
@@ -414,6 +454,20 @@ export default {
         }
       })
     },
+    // getSelectAllCata (fn) { // 获取所有指标
+    //   console.log(selectAllCata)
+    //   selectAllCataNew().then(({data}) => {
+    //     if (data.status !== '1') {
+    //       this.indexList = []
+    //     } else {
+    //       // this.originIndexList = data.data
+    //       this.indexList = this.filterAllCata(data.data)
+    //     }
+    //     if (fn) {
+    //       fn(this.indexList)
+    //     }
+    //   })
+    // },
     filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
       let arr = []
       if (!!tree && tree.length !== 0) {
@@ -429,6 +483,7 @@ export default {
             obj.dataStandar = item.dataStandar
             obj.fieldId = item.id
             obj.channelCode = item.channelCode
+            obj.enable = item.enable
           } else {
             obj.id = item.id
             obj.label = item.name
@@ -440,9 +495,9 @@ export default {
             if (!item.fieldType) {
               obj.children = null
             } else {
-              if (obj.channelCode && obj.channelCode === this.baseForm.channelId) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
-                arr.push(obj) // 每个指标都放在集合中
-              }
+              // if (obj.channelCode && obj.channelCode === this.baseForm.channelId) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
+              arr.push(obj) // 每个指标都放在集合中
+              // }
             }
           }
         })
@@ -469,6 +524,7 @@ export default {
         'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
         'subFunc': '',
+        'strTips': [],
         'params': [{
           value: '',
           title: ''
@@ -544,7 +600,6 @@ export default {
         }
       })
       this.ruleConfig = arr
-      console.log(this.ruleConfig)
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
       let selectEnumsList = []
@@ -612,13 +667,8 @@ export default {
           selectOperateList: selectOperateList,
           func: selectOperateList[0].code,
           subFunc: '',
+          strTips: [],
           params: [{ value: '', title: '' }]
-        }
-        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-        }
-        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
         }
         if (params.func === 'relative_time') {
           params.subFunc = 'relative_before'
@@ -626,13 +676,30 @@ export default {
         Object.keys(obj).forEach(oitem => {
           params[oitem] = obj[oitem]
         })
-        this.updateRulesArr(data, citem, params)
+        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+        }
+        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+          let res = data
+          dataIndexManagerCandidate({ // 字符串提示输入示例
+            sourceTable: obj.sourceTable,
+            fieldName: obj.englishName,
+            count: 10
+          }).then(({data}) => {
+            if (data.status * 1 === 1 && data.data.length) {
+              params.strTips = data.data
+            }
+            this.updateRulesArr(res, citem, params)
+          })
+        } else {
+          this.updateRulesArr(data, citem, params)
+        }
       })
     },
     addChildreRules (data, citem) {
       let indexPath = findRuleIndex(data.rules, citem) + ''
       let indexPathArr = indexPath.split(',')
-      console.log(indexPathArr)
       if (indexPathArr.length === 1) {
         let newObj = {
           'relation': 'and',
@@ -725,6 +792,9 @@ export default {
           })
           item.selectEnumsList = selectEnumsArr
           item.indexList = []
+          if (item.label && !item.enable) {
+            this.isSelectedUneffectIndex.push(item.label)
+          }
         } else {
           if (item.rules) {
             this.updateRulesConfig(item)
@@ -845,11 +915,20 @@ export default {
           this.isRequired = false
         } else { // 全部校验通过后，可保存数据
           let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
+          this.isSelectedUneffectIndex = Array.from(new Set(this.isSelectedUneffectIndex))
+          if (this.isSelectedUneffectIndex.length) {
+            return this.$message({
+              message: `【${this.isSelectedUneffectIndex.join('，')}】为无效指标，请重新选择`,
+              type: 'error',
+              center: true
+            })
+          }
           let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
             code = 1
           }
           let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm, rejectGroupPackCode: code }
+          params.channelId = params.channelId.join(',')
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {

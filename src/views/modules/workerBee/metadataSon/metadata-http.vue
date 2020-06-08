@@ -5,7 +5,7 @@
         <el-input v-model="fatherData.url" placeholder="请输入URL"/>
         </el-form-item>
         <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="dataRule.requestFields">
-        <el-input v-model="fatherData.requestFields" placeholder="请输入请求参数的fieldId数组"/>
+        <el-input v-model="fatherData.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
         </el-form-item>
         <el-form-item label="请求head入参" prop="requestHeadFields">
         <el-input v-model="fatherData.requestHeadFields" placeholder="请输入请求head入参"/>
@@ -17,11 +17,18 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="dataRule.responseFields">
-        <el-input v-model="fatherData.responseFields" placeholder="请输入响应参数的fieldId数组"/>
+        <el-input v-model="fatherData.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
-        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType">
-        <el-input v-model="fatherData.responseType" placeholder="请输入响应参数的数据类型"/>
-        </el-form-item>
+        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="dataRule.responseType"> 
+          <el-select v-model="fatherData.responseType" placeholder="请选择响应参数的数据类型">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+         </el-form-item>
         <el-form-item label="是否使用缓存">
           <el-radio-group v-model="fatherData.enableCache">
             <el-radio :label="0">不启用</el-radio>
@@ -31,12 +38,12 @@
         <el-form-item label="缓存生成的key需要的字段" prop="cacheKeyFields" :rules="dataRule.cacheKeyFields">
         <el-input v-model="fatherData.cacheKeyFields" placeholder="请输入缓存生成的key需要的字段"/>
         </el-form-item>
-        <el-form-item label="是否启用">
+        <!-- <el-form-item label="是否启用">
         <el-radio-group v-model="fatherData.enable">
           <el-radio :label="false">禁用</el-radio>
           <el-radio :label="true">正常</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
@@ -59,19 +66,18 @@
             { required: true, message: '请输入URL地址', trigger: 'blur' },
             { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
-          requestFields: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          responseFields: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
           responseType: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
-          ],
-          cacheKeyFields: [
+            { required: true, message: '请选择响应参数的数据类型', trigger: 'blur' },
             { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ]
-        }
+        },
+        options: [{
+          value: 'map',
+          label: 'map'
+        }, {
+          value: 'list',
+          label: 'list'
+        }]
       }
     },
     methods: {
