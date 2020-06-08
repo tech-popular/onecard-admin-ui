@@ -90,6 +90,8 @@ export default {
               data.canaryUserGroup.reviceInfo.map(item => {
                 this.dataForm.emailList.push(item.email)
               })
+            } else {
+              this.$message.error(data.msg)
             }
           })
         } else {
