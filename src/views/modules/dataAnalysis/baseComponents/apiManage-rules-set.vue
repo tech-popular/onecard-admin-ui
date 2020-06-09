@@ -58,7 +58,7 @@
               <div v-else>
                 <!--数值型等于或不等于可以输入多个-->
                 <el-form-item prop="params[0].selectVal" :ref="'numberMultiVal' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-if="item.func === 'eq' || item.func === 'neq'">
-                  <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'number')" :valueType="'number'" :maxlength="10" :add-tag-on-blur="true" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
+                  <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'number')" :valueType="'number'" :tag-tips="[]" :maxlength="10" :add-tag-on-blur="true" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
                 </el-form-item>
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
                   <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
