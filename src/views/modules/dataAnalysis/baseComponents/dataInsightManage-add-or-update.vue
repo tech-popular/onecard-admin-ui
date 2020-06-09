@@ -334,9 +334,13 @@ export default {
         })
       }
       this.getSelectAllCata((indexList) => {
-        this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
+        if (indexList.length === 0) {
+          this.setInitRulesConfig(this.indexList)
+        } else {
+          this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
+          this.setInitRulesConfig(this.indexList)
+        }
       })
-      this.setInitRulesConfig(this.indexList)
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -399,28 +403,29 @@ export default {
           let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
           let indexPathArr = indexPath.split(',')
           let a = indexListArr
-          indexPathArr.forEach((fitem, findex) => {
-            if (findex < indexPathArr.length - 1) {
-              a[fitem].isDefaultExpanded = true
-              a = a[fitem].children
-            } else {
-              console.log(a[fitem], item)
-              item.enable = a[fitem].enable
-            }
-          })
-          item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
-          if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
-            item.subFunc = item.func
-            item.func = 'relative_time'
-            this.getSelectOperateList(item.fieldType, (selectOperateList) => {
-              item.selectOperateList = selectOperateList
-              item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+          if (indexPath) {
+            indexPathArr.forEach((fitem, findex) => {
+              if (findex < indexPathArr.length - 1) {
+                a[fitem].isDefaultExpanded = true
+                a = a[fitem].children
+              } else {
+                item.enable = a[fitem].enable
+              }
             })
-          }
-          // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
-          if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
-            if (!item.params[0].selectVal) {
-              item.params[0].selectVal = [ item.params[0].value ]
+            item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
+            if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
+              item.subFunc = item.func
+              item.func = 'relative_time'
+              this.getSelectOperateList(item.fieldType, (selectOperateList) => {
+                item.selectOperateList = selectOperateList
+                item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+              })
+            }
+            // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+            if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
+              if (!item.params[0].selectVal) {
+                item.params[0].selectVal = [ item.params[0].value ]
+              }
             }
           }
         } else {
