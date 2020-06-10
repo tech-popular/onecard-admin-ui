@@ -45,7 +45,7 @@
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'> 
         <el-form-item label="纬度" v-if="disbild === false" prop="latitude">
           <el-select filterable v-model="dimensionForm.latitude" placeholder="请选择纬度" @change='clickNewAddText'>
-            <el-option v-for="item in newAddTextList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in newAddTextList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-plus" circle @click='addNewList()' style="float: right;" ></el-button>
@@ -199,7 +199,10 @@
         nextTodoId: 1,
         newAddTextList: [],
         disbild: false,
-        paixudisbuld: ''
+        paixudisbuld: '',
+        strategyLevel: {},
+        strategyType: {},
+        loginStatus: {}
       }
     },
     components: {
@@ -228,7 +231,7 @@
       init (id, value, type) {
         this.dataForm.id = id || ''
         this.dataFormValue = value
-        this.paixudisbuld = type
+        this.paixudisbuld = Number(type)
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         getSceneDropDown().then(({data}) => {
@@ -245,9 +248,15 @@
           if (id) {
             const dataBody = this.dataForm.id
             infoBeeTask(dataBody).then(({data}) => {
-              this.dataForm = data.data
               this.lists = data.data.strategySetDetails
               this.paixudisbuld = data.data.strategyType
+              this.dataForm = data.data
+              this.strategyLevel = this.hierarchyList.find(item => { return item.baseValue == data.data.strategyLevel })
+              this.strategyType = this.typeList.find(item => { return item.baseValue == data.data.strategyType })
+              this.loginStatus = this.loginTypeList.find(item => { return item.baseValue == data.data.loginStatus })
+              this.dataForm.strategyLevel = this.strategyLevel.baseName
+              this.dataForm.strategyType = this.strategyType.baseName
+              this.dataForm.loginStatus = this.loginStatus.baseName
             })
           }
         })
