@@ -2,14 +2,14 @@
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="策略ID">
-        <el-input v-model="dataForm.sacherId" placeholder="任务具体id" clearable />
+        <el-input v-model="dataForm.sacherId" placeholder="策略ID" clearable />
       </el-form-item>
       <el-form-item label="策略名称">
-        <el-input v-model="dataForm.sacherName" placeholder="任务定义名称" clearable />
+        <el-input v-model="dataForm.sacherName" placeholder="策略名称" clearable />
       </el-form-item>
       <el-form-item label="策略场景">
-        <el-select filterable v-model="dataForm.type" placeholder="请选择数据源类型">
-          <el-option v-for="item in typeList" :value="item.id" :key="item.id" :label="item.baseName"/>
+        <el-select filterable v-model="dataForm.type" placeholder="请选择策略场景" clearable>
+          <el-option v-for="item in typeList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -143,7 +143,7 @@
           this.dataListLoading = false
         })
         showStrategyDropDown().then(({data}) => {
-          this.typeList = data.data.strategyTypes
+          this.typeList = data.data.strategyScenes
         })
       },
       // 删除
@@ -189,6 +189,7 @@
       /** 重置 */
       resetHandle () {
         this.pageNo = 1
+        this.dataForm = []
         this.getDataList()
       },
       // 新增 / 修改
