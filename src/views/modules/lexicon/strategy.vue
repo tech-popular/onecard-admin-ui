@@ -135,12 +135,14 @@
         }
         beeTaskList(dataBody).then(({data}) => {
           if (data && data.code === 0) {
+            this.dataListLoading = false
             this.dataList = data.data.list
-            this.totalPage = data.totalCount
+            this.totalPage = data.data.totalCount
           } else {
+            this.dataList = []
+            this.totalPage = 0
             this.$message.error(data.msg)
           }
-          this.dataListLoading = false
         })
         showStrategyDropDown().then(({data}) => {
           this.typeList = data.data.strategyScenes
