@@ -45,7 +45,7 @@
         </el-form-item>
       </el-form>
        <el-table
-          v-if="dataFormValue === 'look'"
+          v-if="dataFormValue"
           :data="lists"
           style="width: 100%">
           <el-table-column
@@ -308,6 +308,7 @@
         this.visible = false
         this.$refs['dataForm'].resetFields()
         this.$refs['dimensionForm'].resetFields()
+        this.paixudisbuld = ''
         this.lists = []
       }
     }
