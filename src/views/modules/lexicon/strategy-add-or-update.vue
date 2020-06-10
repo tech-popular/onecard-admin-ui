@@ -9,23 +9,31 @@
           <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
         </el-form-item>
         <el-form-item label="策略场景" prop="strategyName">
-          <el-select filterable v-model="dataForm.strategyScene" placeholder="请选择策略场景" style="width:100%">
-            <el-option v-for="item in sceneList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
-          </el-select>
+          <el-cascader
+          style="width: 100%"
+          :props="props"
+          v-model="dataForm.strategyScene"
+          clearable
+          :options="sceneList">
+        </el-cascader>
         </el-form-item>
         <el-form-item label="策略层级" prop="strategyLevel">
           <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%">
-            <el-option v-for="item in hierarchyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option 
+              v-for="item in hierarchyList" 
+              :value="item.baseValue" 
+              :key="item.baseValue" 
+              :label="item.baseName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="策略类型" prop="strategyType">
           <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%" @change="typeClick">
-            <el-option v-for="item in typeList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in typeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="登陆类型" prop="loginStatus">
           <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择登陆类型" style="width:100%">
-            <el-option v-for="item in loginTypeList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in loginTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -37,7 +45,7 @@
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'> 
         <el-form-item label="纬度" v-if="disbild === false" prop="latitude">
           <el-select filterable v-model="dimensionForm.latitude" placeholder="请选择纬度" @change='clickNewAddText'>
-            <el-option v-for="item in newAddTextList" :value="item.baseName" :key="item.id" :label="item.baseName"/>
+            <el-option v-for="item in newAddTextList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-plus" circle @click='addNewList()' style="float: right;" ></el-button>
@@ -55,15 +63,15 @@
             prop="strategyDimension"
             label="纬度"/>
           <el-table-column
-            v-if="paixudisbuld === '排序'"
+            v-if="paixudisbuld === 1"
             prop="strategyRecall"
             label="排序占比%"/>
           <el-table-column
-            v-if="paixudisbuld === '召回'"
+            v-if="paixudisbuld === 0"
             prop="strategyRecall"
             label="召回占比%"/>
           <el-table-column
-            v-if="paixudisbuld === '召回'"
+            v-if="paixudisbuld === 0"
             prop="strategySort"
             label="排序优先级"/>
         </el-table>
@@ -81,7 +89,7 @@
             label="排序占比%"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === '排序'"
+            v-if="paixudisbuld === 1"
             >
             <editable-cell
               slot-scope="scope"
@@ -94,7 +102,7 @@
             label="召回占比%"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === '召回'"
+            v-if="paixudisbuld === 0"
             >
             <editable-cell 
               slot-scope="scope"
@@ -108,7 +116,7 @@
             label="排序优先级"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === '召回'"
+            v-if="paixudisbuld === 0"
             >
             <editable-cell
               slot-scope="scope"
@@ -136,16 +144,22 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown } from '@/api/lexicon/strategy'
+  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown } from '@/api/lexicon/strategy'
   export default {
     data () {
       return {
         visible: false,
         editModeEnabled: true,
+        props: {
+          multiple: false,
+          checkStrictly: false,
+          label: 'sceneName',
+          value: 'sceneType'
+        },
         dataForm: {
           id: '',
           strategyName: '',
-          strategyScene: '',
+          strategyScene: [],
           strategyLevel: '',
           strategyType: '',
           loginStatus: '',
@@ -177,7 +191,6 @@
             { required: true, message: '请选择纬度', trigger: 'blur' }
           ]
         },
-        // latitude: '',
         sceneList: [],
         hierarchyList: [],
         typeList: [],
@@ -196,7 +209,6 @@
       'paixudisbuld': {
         handler (newVal, oldVal) {
           this.paixudisbuld = newVal
-          console.log(newVal, oldVal, 'xinxx')
         },
         deep: true,
         immediate: true
@@ -204,7 +216,6 @@
       'dataFormValue': {
         handler (newVal, oldVal) {
           this.dataFormValue = newVal
-          console.log(newVal, oldVal, '22222')
         },
         deep: true,
         immediate: true
@@ -220,10 +231,12 @@
         this.paixudisbuld = type
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
+        getSceneDropDown().then(({data}) => {
+          this.sceneList = data.data
+        })
         showStrategyDropDown().then(({data}) => {
           this.loginTypeList = data.data.loginStatus
           this.hierarchyList = data.data.strategyLevels
-          this.sceneList = data.data.strategyScenes
           this.typeList = data.data.strategyTypes
           this.newAddTextList = data.data.strategyDimension
         })
@@ -244,9 +257,9 @@
           if (valid) {
             this.lists.push({
               strategySort: this.nextTodoId++,
-              strategyDimension: this.dimensionRule.latitude
+              strategyDimension: this.dimensionForm.latitude
             })
-            this.dimensionRule.latitude = ''
+            this.dimensionForm.latitude = ''
           }
         })
       },
@@ -261,11 +274,11 @@
         })
       },
       clickNewAddText (val) {
-        this.dimensionRule.latitude = val
+        this.dimensionForm.latitude = val
       },
       // 类型
       typeClick (val) {
-        this.paixudisbuld = val
+        this.paixudisbuld = Number(val)
       },
       // 提交
       dataFormSubmit (form) {

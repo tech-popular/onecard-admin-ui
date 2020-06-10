@@ -8,9 +8,16 @@
         <el-input v-model="dataForm.sacherName" placeholder="策略名称" clearable />
       </el-form-item>
       <el-form-item label="策略场景">
-        <el-select filterable v-model="dataForm.type" placeholder="请选择策略场景" clearable>
-          <el-option v-for="item in typeList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
-        </el-select>
+        <el-cascader
+          style="width: 100%"
+          :props="props"
+          v-model="dataForm.type"
+          clearable
+          :options="typeList">
+        </el-cascader>
+        <!-- <el-select filterable v-model="dataForm.type" placeholder="请选择策略场景" clearable>
+          <el-option v-for="item in typeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+        </el-select> -->
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -98,14 +105,21 @@
 
 <script>
   import AddOrUpdate from './strategy-add-or-update'
-  import { beeTaskList, deleteBeeTask, showStrategyDropDown } from '@/api/lexicon/strategy'
+  import { beeTaskList, deleteBeeTask, getSceneDropDown } from '@/api/lexicon/strategy'
   export default {
     data () {
       return {
+        props: {
+          multiple: false,
+          checkStrictly: true,
+          label: 'sceneName',
+          value: 'sceneType',
+          children: ''
+        },
         dataForm: {
           sacherId: '',
           sacherName: '',
-          type: ''
+          type: []
         },
         typeList: [],
         dataList: [],
@@ -144,8 +158,8 @@
             this.$message.error(data.msg)
           }
         })
-        showStrategyDropDown().then(({data}) => {
-          this.typeList = data.data.strategyScenes
+        getSceneDropDown().then(({data}) => {
+          this.typeList = data.data
         })
       },
       // 删除
