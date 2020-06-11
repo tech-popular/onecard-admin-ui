@@ -129,7 +129,7 @@
           <el-table-column header-align="center" align="center" width="200" label="操作">
             <template slot-scope="scope" v-if="disbild === false">
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                <el-button type="danger" size="mini" icon="el-icon-minus" circle @click='deletedlLists(scope.row.id)'></el-button>
+                <el-button type="danger" size="mini" icon="el-icon-minus" circle @click='deletedlLists(scope.row)'></el-button>
               </el-tooltip>
             </template>
           </el-table-column>
@@ -274,7 +274,7 @@
       },
       deletedlLists (val) {
         this.lists && this.lists.length > 0 && this.lists.forEach((item) => {
-          if (item.id === val) {
+          if (item.strategySort === val.strategySort) {
             if (this.lists.indexOf(item) > -1) {
               var i = this.lists.indexOf(item)
               this.lists.splice(i, 1)
