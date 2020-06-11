@@ -1,13 +1,7 @@
 <template>
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="策略ID">
-        <el-input v-model="dataForm.sacherId" placeholder="策略ID" clearable />
-      </el-form-item>
-      <el-form-item label="策略名称">
-        <el-input v-model="dataForm.sacherName" placeholder="策略名称" clearable />
-      </el-form-item>
-      <el-form-item label="策略场景">
+      <el-form-item label="实验场景">
         <el-cascader
           style="width: 100%"
           :props="props"
@@ -15,9 +9,14 @@
           clearable
           :options="typeList">
         </el-cascader>
-        <!-- <el-select filterable v-model="dataForm.type" placeholder="请选择策略场景" clearable>
-          <el-option v-for="item in typeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
-        </el-select> -->
+      </el-form-item>
+      <el-form-item label="实验状态">
+        <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择实验状态" style="width:100%">
+          <el-option v-for="item in loginTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="实验名称">
+        <el-input v-model="dataForm.sacherName" placeholder="请选择实验名称" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -33,60 +32,50 @@
         prop="id"
         header-align="center"
         align="center"
-        label="策略ID"/>
+        label="实验ID"/>
       <el-table-column
         prop="strategyName"
         header-align="center"
         align="center"
-        label="策略名称"
+        label="实验名称"
         width="150px"/>
-      <el-table-column
-        prop="strategyScene"
-        header-align="center"
-        align="center"
-        label="策略场景"/>
-      <el-table-column
-        prop="strategyLevel"
-        header-align="center"
-        align="center"
-        label="策略层级"/>
-      <el-table-column
-        prop="strategyType"
-        header-align="center"
-        align="center"
-        label="策略类型"/>
       <el-table-column
         prop="enable"
         header-align="center"
         align="center"
-        label="登陆状态">
+        label="实验状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.loginStatus === '已登录'" size="small" >已登录</el-tag>
           <el-tag v-else size="small" type="danger">未登录</el-tag>
         </template>
       </el-table-column>
       <el-table-column
+        prop="createTime"
+        header-align="center"
+        align="center"
+        label="实验启用时间"/>
+      <el-table-column
+        prop="createTime"
+        header-align="center"
+        align="center"
+        label="实验停用时间"/>
+      <el-table-column
         prop="createUser"
         header-align="center"
         align="center"
         label="创建人"
         width="150px"/>
-      <el-table-column
-        prop="createTime"
-        header-align="center"
-        align="center"
-        label="创建时间"/>
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" content="复制" placement="top">
-            <el-button type="primary" size="mini" icon="el-icon-document-copy" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-          </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="addOrUpdateHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
+            <el-button type="primary" size="mini" icon="el-icon-document-copy" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           </el-tooltip>
+          <!-- <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          </el-tooltip> -->
         </template>
       </el-table-column>
     </el-table>
@@ -105,7 +94,7 @@
 
 <script>
   import AddOrUpdate from './seneABTest-add-or-update'
-  import { beeTaskList, deleteBeeTask, getSceneDropDown } from '@/api/lexicon/strategy'
+  import { beeTaskList, getSceneDropDown } from '@/api/lexicon/strategy'
   export default {
     data () {
       return {
@@ -121,6 +110,7 @@
           sacherName: '',
           type: []
         },
+        loginTypeList: [],
         typeList: [],
         dataList: [],
         pageNo: 1, // 当前页
@@ -163,29 +153,29 @@
         })
       },
       // 删除
-      deleteHandle (id) {
-        this.$confirm(`确定删除操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          const dataBody = id
-          deleteBeeTask(dataBody).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        })
-      },
+      // deleteHandle (id) {
+      //   this.$confirm(`确定删除操作?`, '提示', {
+      //     confirmButtonText: '确定',
+      //     cancelButtonText: '取消',
+      //     type: 'warning'
+      //   }).then(() => {
+      //     const dataBody = id
+      //     deleteBeeTask(dataBody).then(({data}) => {
+      //       if (data && data.code === 0) {
+      //         this.$message({
+      //           message: '操作成功',
+      //           type: 'success',
+      //           duration: 1500,
+      //           onClose: () => {
+      //             this.getDataList()
+      //           }
+      //         })
+      //       } else {
+      //         this.$message.error(data.msg)
+      //       }
+      //     })
+      //   })
+      // },
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val

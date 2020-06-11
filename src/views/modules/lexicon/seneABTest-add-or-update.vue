@@ -1,131 +1,54 @@
 <template>
   <el-dialog :title="dataForm.id && dataFormValue ? '查看' : dataForm.id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
     <el-card shadow="never">
+      <div slot="header" class="clearfix">
+        <span>基本信息</span>
+      </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled='disbild'>
-        <div slot="header" class="clearfix">
-          <span>基本信息</span>
-        </div>
-        <el-form-item label="策略名称" prop="strategyName">
+        <el-form-item label="实验名称" prop="strategyName">
           <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
-        </el-form-item>
-        <el-form-item label="策略场景" prop="strategyName">
-          <el-cascader
-          style="width: 100%"
-          :props="props"
-          v-model="dataForm.strategyScene"
-          clearable
-          :options="sceneList">
-        </el-cascader>
-        </el-form-item>
-        <el-form-item label="策略层级" prop="strategyLevel">
-          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%">
-            <el-option 
-              v-for="item in hierarchyList" 
-              :value="item.baseValue" 
-              :key="item.baseValue" 
-              :label="item.baseName"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="策略类型" prop="strategyType">
-          <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%" @change="typeClick">
-            <el-option v-for="item in typeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="登陆类型" prop="loginStatus">
-          <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择登陆类型" style="width:100%">
-            <el-option v-for="item in loginTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
-          </el-select>
         </el-form-item>
       </el-form>
     </el-card>
     <el-card shadow="never" style="margin-top:20px">
       <div slot="header" class="clearfix">
-        <span>详细配置</span><el-tag type="danger" style="margin-left:5px">占比和需等于100%</el-tag>
+        <span>流量参数配置</span><el-tag type="danger" style="margin-left:5px">各工具流量条件设置</el-tag>
       </div>
-      <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'> 
-        <el-form-item label="纬度" v-if="disbild === false" prop="latitude">
-          <el-select filterable v-model="dimensionForm.latitude" placeholder="请选择纬度" @change='clickNewAddText'>
-            <el-option v-for="item in newAddTextList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+      <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'>
+        <el-form-item label="策略" v-if="disbild === false" prop="strategy">
+          <el-select filterable v-model="dimensionForm.strategy" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
+            <el-option v-for="item in strategyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
+        </el-form-item>
+        <el-form-item label="分群名称" v-if="disbild === false" prop="subgroupName">
+          <el-select filterable v-model="dimensionForm.subgroupName" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
+            <el-option v-for="item in subgroupNameList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="占比" prop="proportion">
+          <el-input v-model="dimensionForm.proportion" placeholder="请输入占比"/>
+        </el-form-item>
+        <el-form-item v-if="disbild === false">
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-plus" circle @click='addNewList()' style="float: right;" ></el-button>
           </el-tooltip>
         </el-form-item>
       </el-form>
-       <el-table
-          v-if="dataFormValue"
-          :data="lists"
-          style="width: 100%">
-          <el-table-column
-            prop="strategySort"
-            label="序号"/>
-          <el-table-column
-            prop="strategyDimension"
-            label="纬度"/>
-          <el-table-column
-            v-if="paixudisbuld === 1"
-            prop="strategyRecall"
-            label="排序占比%"/>
-          <el-table-column
-            v-if="paixudisbuld === 0"
-            prop="strategyRecall"
-            label="召回占比%"/>
-          <el-table-column
-            v-if="paixudisbuld === 0"
-            prop="strategySort"
-            label="排序优先级"/>
-        </el-table>
         <el-table
-          v-else
           :data="lists"
           style="width: 100%">
           <el-table-column
             prop="strategySort"
             label="序号"/>
           <el-table-column
-            prop="strategyDimension"
-            label="纬度"/>
+            prop="strategy"
+            label="策略"/>
           <el-table-column
-            label="排序占比%"
-            header-align="center" 
-            align="center"
-            v-if="paixudisbuld === 1"
-            >
-            <editable-cell
-              slot-scope="scope"
-              :can-edit="editModeEnabled"
-              v-model="scope.row.strategyRecall">
-              <span slot="content">{{scope.row.strategyRecall}}</span>
-            </editable-cell>
-          </el-table-column>
+            prop="subgroupName"
+            label="人群包"/>
           <el-table-column
-            label="召回占比%"
-            header-align="center" 
-            align="center"
-            v-if="paixudisbuld === 0"
-            >
-            <editable-cell 
-              slot-scope="scope"
-              :can-edit="editModeEnabled"
-              :tablDis='dataFormValue'
-              v-model="scope.row.strategyRecall">
-              <span slot="content">{{scope.row.strategyRecall}}</span>
-            </editable-cell>
-          </el-table-column>
-          <el-table-column
-            label="排序优先级"
-            header-align="center" 
-            align="center"
-            v-if="paixudisbuld === 0"
-            >
-            <editable-cell
-              slot-scope="scope"
-              :can-edit="editModeEnabled"
-              :tablDis='dataFormValue'
-              v-model="scope.row.strategySort">
-              <span slot="content">{{scope.row.strategySort}}</span>
-            </editable-cell>
-          </el-table-column>
+            prop="proportion"
+            label="占比%"/>
           <el-table-column header-align="center" align="center" width="200" label="操作">
             <template slot-scope="scope" v-if="disbild === false">
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
@@ -158,64 +81,46 @@
         },
         dataForm: {
           id: '',
-          strategyName: '',
-          strategyScene: [],
-          strategyLevel: '',
-          strategyType: '',
-          loginStatus: '',
-          strategySetDetails: []
+          strategyName: ''
         },
         dataFormValue: '',
         dataRule: {
           strategyName: [
-            { required: true, message: '策略名称不能为空', trigger: 'blur' }
-          ],
-          strategyScene: [
-            { required: true, message: '请选择策略场景', trigger: 'blur' }
-          ],
-          strategyLevel: [
-            { required: true, message: '请选择策略层级', trigger: 'blur' }
-          ],
-          strategyType: [
-            { required: true, message: '请选择策略类型', trigger: 'blur' }
-          ],
-          loginStatus: [
-            { required: true, message: '请选择登录类型', trigger: 'blur' }
+            { required: true, message: '实验名称不能为空', trigger: 'blur' }
           ]
         },
         dimensionForm: {
-          latitude: ''
+          strategy: '',
+          subgroupName: '',
+          proportion: ''
         },
         dimensionRule: {
-          latitude: [
-            { required: true, message: '请选择纬度', trigger: 'blur' }
+          strategy: [
+            { required: true, message: '请选择策略', trigger: 'blur' }
+          ],
+          subgroupName: [
+            { required: true, message: '请选择分群名称', trigger: 'blur' }
+          ],
+          proportion: [
+            { required: true, message: '请输入占比', trigger: 'blur' }
           ]
         },
         sceneList: [],
-        hierarchyList: [],
-        typeList: [],
+        subgroupNameList: [
+          {id: 2, baseName: '分群1', baseValue: '1', baseType: 'strategyScene', baseLevel: 2, baseSort: 1},
+          {id: 1, baseName: '分群2', baseValue: '2', baseType: 'strategyScene', baseLevel: 1, baseSort: 2}
+        ],
+        strategyList: [],
         loginTypeList: [],
         lists: [],
         nextTodoId: 1,
-        newAddTextList: [],
-        disbild: false,
-        paixudisbuld: '',
-        strategyLevel: {},
-        strategyType: {},
-        loginStatus: {}
+        disbild: false
       }
     },
     components: {
       EditableCell
     },
     watch: {
-      'paixudisbuld': {
-        handler (newVal, oldVal) {
-          this.paixudisbuld = newVal
-        },
-        deep: true,
-        immediate: true
-      },
       'dataFormValue': {
         handler (newVal, oldVal) {
           this.dataFormValue = newVal
@@ -231,7 +136,6 @@
       init (id, value, type) {
         this.dataForm.id = id || ''
         this.dataFormValue = value
-        this.paixudisbuld = Number(type)
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         getSceneDropDown().then(({data}) => {
@@ -240,23 +144,13 @@
         showStrategyDropDown().then(({data}) => {
           this.loginTypeList = data.data.loginStatus
           this.hierarchyList = data.data.strategyLevels
-          this.typeList = data.data.strategyTypes
-          this.newAddTextList = data.data.strategyDimension
+          this.strategyList = data.data.strategyTypes
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (id) {
             const dataBody = this.dataForm.id
             infoBeeTask(dataBody).then(({data}) => {
-              this.lists = data.data.strategySetDetails
-              this.paixudisbuld = data.data.strategyType
-              this.dataForm = data.data
-              this.strategyLevel = this.hierarchyList.find(item => { return item.baseValue == data.data.strategyLevel })
-              this.strategyType = this.typeList.find(item => { return item.baseValue == data.data.strategyType })
-              this.loginStatus = this.loginTypeList.find(item => { return item.baseValue == data.data.loginStatus })
-              this.dataForm.strategyLevel = this.strategyLevel.baseName
-              this.dataForm.strategyType = this.strategyType.baseName
-              this.dataForm.loginStatus = this.loginStatus.baseName
             })
           }
         })
@@ -266,9 +160,10 @@
           if (valid) {
             this.lists.push({
               strategySort: this.nextTodoId++,
-              strategyDimension: this.dimensionForm.latitude
+              subgroupName: this.dimensionForm.subgroupName,
+              strategy: this.dimensionForm.strategy,
+              proportion: this.dimensionForm.proportion
             })
-            this.dimensionForm.latitude = ''
           }
         })
       },
@@ -283,11 +178,10 @@
         })
       },
       clickNewAddText (val) {
-        this.dimensionForm.latitude = val
+        this.dimensionForm.strategy = val
       },
-      // 类型
-      typeClick (val) {
-        this.paixudisbuld = Number(val)
+      subgroupNameAddText (val) {
+        this.dimensionForm.subgroupName = val
       },
       // 提交
       dataFormSubmit (form) {
@@ -297,8 +191,8 @@
             sum += Number(val.strategyRecall)
             this.weightSum = sum
           }, 0)
-          if (this.weightSum > 100) {
-            this.$message.error('占比和不得超过100%')
+          if (this.weightSum > 100 || this.weightSum < 100) {
+            this.$message.error('占比和需等于100%')
           } else {
             if (valid) {
               this.dataForm.strategySetDetails = this.lists
@@ -330,7 +224,6 @@
         this.visible = false
         this.$refs['dataForm'].resetFields()
         this.$refs['dimensionForm'].resetFields()
-        this.paixudisbuld = ''
         this.lists = []
       }
     }
