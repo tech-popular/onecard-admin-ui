@@ -45,7 +45,7 @@
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'> 
         <el-form-item label="纬度" v-if="disbild === false" prop="latitude">
           <el-select filterable v-model="dimensionForm.latitude" placeholder="请选择纬度" @change='clickNewAddText'>
-            <el-option v-for="item in newAddTextList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in newAddTextList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-plus" circle @click='addNewList()' style="float: right;" ></el-button>
@@ -315,7 +315,6 @@
                       this.$emit('refreshDataList')
                       this.$refs['dataForm'].resetFields()
                       this.$refs['dimensionForm'].resetFields()
-                      this.dataForm.strategyScene = ''
                       this.lists = []
                     }
                   })
@@ -331,7 +330,6 @@
         this.visible = false
         this.$refs['dataForm'].resetFields()
         this.$refs['dimensionForm'].resetFields()
-        this.dataForm.strategyScene = ''
         this.paixudisbuld = ''
         this.lists = []
       }
