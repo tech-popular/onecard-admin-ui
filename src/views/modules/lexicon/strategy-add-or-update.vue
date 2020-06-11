@@ -370,6 +370,7 @@
                       this.typeChange = false
                       this.cengjiChange = false
                       this.loginChange = false
+                      this.nextTodoId = 1
                     }
                   })
                 } else {
@@ -391,6 +392,7 @@
         this.typeChange = false
         this.cengjiChange = false
         this.loginChange = false
+        this.nextTodoId = 1
       }
     }
   }
