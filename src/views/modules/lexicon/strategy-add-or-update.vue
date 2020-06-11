@@ -310,6 +310,14 @@
               this.dataForm.strategySetDetails = this.lists
               const dataBody = this.dataForm
               const dataUpdateId = this.dataForm.id
+              if (this.id) {
+                this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
+                this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
+                this.loginStatus = this.loginTypeList.find(item => { return item.baseName == this.dataForm.loginStatus })
+                this.dataForm.strategyLevel = this.strategyLevel.baseValue
+                this.dataForm.strategyType = this.strategyType.baseValue
+                this.dataForm.loginStatus = this.loginStatus.baseValue
+              }
               saveorupt(dataBody, dataUpdateId).then(({data}) => {
                 if (data && data.code === 0) {
                   this.$message({
