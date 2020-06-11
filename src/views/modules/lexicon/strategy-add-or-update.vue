@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="dataForm.id && dataFormValue ? '查看' : dataForm.id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
+  <el-dialog :title="dataFormValue === 'look' ? '查看' : id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
     <el-card shadow="never">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled='disbild'>
         <div slot="header" class="clearfix">
@@ -165,6 +165,7 @@
           loginStatus: '',
           strategySetDetails: []
         },
+        id: '',
         dataFormValue: '',
         dataRule: {
           strategyName: [
@@ -219,6 +220,7 @@
       'dataFormValue': {
         handler (newVal, oldVal) {
           this.dataFormValue = newVal
+          console.log(newVal, 'ppp')
         },
         deep: true,
         immediate: true
@@ -229,11 +231,10 @@
     },
     methods: {
       init (id, value, type) {
+        this.id = id
         this.dataForm.id = id || ''
-        this.dataFormValue = value
-        this.paixudisbuld = Number(type)
         this.visible = true
-        this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
+        this.paixudisbuld = Number(type)
         getSceneDropDown().then(({data}) => {
           this.sceneList = data.data
         })
@@ -245,6 +246,11 @@
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
+          if (value) {
+            this.dataFormValue = value
+          }
+          this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
+
           if (id) {
             const dataBody = this.dataForm.id
             infoBeeTask(dataBody).then(({data}) => {
@@ -316,6 +322,7 @@
                       this.$refs['dataForm'].resetFields()
                       this.$refs['dimensionForm'].resetFields()
                       this.dataForm.strategyScene = ''
+                      this.dataFormValue = ''
                       this.lists = []
                     }
                   })
@@ -334,6 +341,7 @@
         this.dataForm.strategyScene = ''
         this.paixudisbuld = ''
         this.lists = []
+        this.dataFormValue = ''
       }
     }
   }
