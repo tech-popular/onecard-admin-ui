@@ -13,6 +13,7 @@
           style="width: 100%"
           :props="props"
           v-model="dataForm.strategyScene"
+          :key="id"
           clearable
           :options="sceneList">
         </el-cascader>
@@ -157,7 +158,6 @@
           value: 'sceneType'
         },
         dataForm: {
-          id: '',
           strategyName: '',
           strategyScene: [],
           strategyLevel: '',
@@ -220,7 +220,6 @@
       'dataFormValue': {
         handler (newVal, oldVal) {
           this.dataFormValue = newVal
-          console.log(newVal, 'ppp')
         },
         deep: true,
         immediate: true
@@ -232,7 +231,6 @@
     methods: {
       init (id, value, type) {
         this.id = id
-        this.dataForm.id = id || ''
         this.visible = true
         this.paixudisbuld = Number(type)
         getSceneDropDown().then(({data}) => {
@@ -252,7 +250,7 @@
           this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
 
           if (id) {
-            const dataBody = this.dataForm.id
+            const dataBody = this.id
             infoBeeTask(dataBody).then(({data}) => {
               this.lists = data.data.strategySetDetails
               this.paixudisbuld = data.data.strategyType
@@ -309,7 +307,6 @@
             if (valid) {
               this.dataForm.strategySetDetails = this.lists
               const dataBody = this.dataForm
-              const dataUpdateId = this.dataForm.id
               if (this.id) {
                 this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
                 this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
@@ -318,7 +315,7 @@
                 this.dataForm.strategyType = this.strategyType.baseValue
                 this.dataForm.loginStatus = this.loginStatus.baseValue
               }
-              saveorupt(dataBody, dataUpdateId).then(({data}) => {
+              saveorupt(dataBody).then(({data}) => {
                 if (data && data.code === 0) {
                   this.$message({
                     message: '操作成功',

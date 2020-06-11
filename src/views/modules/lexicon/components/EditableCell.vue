@@ -30,7 +30,7 @@ export default {
   inheritAttrs: false,
   props: {
     value: {
-      type: String,
+      type: Number,
       default: ''
     },
     toolTipContent: {
@@ -55,7 +55,7 @@ export default {
     },
     closeEvent: {
       type: String,
-      default: 'blur'
+      default: 'change'
     },
     canEdit: {
       type: Boolean,
@@ -70,7 +70,7 @@ export default {
   computed: {
     model: {
       get () {
-        return this.value
+        return this.value ? this.value : ''
       },
       set (val) {
         this.$emit('input', val)
