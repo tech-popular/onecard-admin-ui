@@ -45,8 +45,8 @@
         align="center"
         label="实验状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.loginStatus === '已登录'" size="small" >已登录</el-tag>
-          <el-tag v-else size="small" type="danger">未登录</el-tag>
+          <el-tag v-if="scope.row.loginStatus === '已登录'" size="small" >启用</el-tag>
+          <el-tag v-else size="small" type="danger">停用</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -71,7 +71,7 @@
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="addOrUpdateHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
-            <el-button type="primary" size="mini" icon="el-icon-document-copy" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-document" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           </el-tooltip>
           <!-- <el-tooltip class="item" effect="dark" content="删除" placement="top">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>

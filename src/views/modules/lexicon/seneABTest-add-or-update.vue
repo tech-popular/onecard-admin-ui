@@ -14,21 +14,21 @@
       <div slot="header" class="clearfix">
         <span>流量参数配置</span><el-tag type="danger" style="margin-left:5px">各工具流量条件设置</el-tag>
       </div>
-      <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'>
-        <el-form-item label="策略" v-if="disbild === false" prop="strategy">
+      <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild' v-if="disbild === false">
+        <el-form-item label="策略" prop="strategy">
           <el-select filterable v-model="dimensionForm.strategy" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
             <el-option v-for="item in strategyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="分群名称" v-if="disbild === false" prop="subgroupName">
+        <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="subgroupName">
           <el-select filterable v-model="dimensionForm.subgroupName" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
             <el-option v-for="item in subgroupNameList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="占比" prop="proportion">
+        <el-form-item label="占比" prop="proportion" v-if="proportionDisbild === false" @change='proportionAddText'>
           <el-input v-model="dimensionForm.proportion" placeholder="请输入占比"/>
         </el-form-item>
-        <el-form-item v-if="disbild === false">
+        <el-form-item>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-plus" circle @click='addNewList()' style="float: right;" ></el-button>
           </el-tooltip>
@@ -44,9 +44,11 @@
             prop="strategy"
             label="策略"/>
           <el-table-column
+            v-if="subgroupNameDisbild === false"
             prop="subgroupName"
             label="人群包"/>
           <el-table-column
+            v-if="proportionDisbild === false"
             prop="proportion"
             label="占比%"/>
           <el-table-column header-align="center" align="center" width="200" label="操作">
@@ -114,7 +116,9 @@
         loginTypeList: [],
         lists: [],
         nextTodoId: 1,
-        disbild: false
+        disbild: false,
+        subgroupNameDisbild: false,
+        proportionDisbild: false
       }
     },
     components: {
@@ -182,6 +186,10 @@
       },
       subgroupNameAddText (val) {
         this.dimensionForm.subgroupName = val
+        this.proportionDisbild = true
+      },
+      proportionAddText () {
+        this.subgroupNameDisbild = true
       },
       // 提交
       dataFormSubmit (form) {
@@ -210,6 +218,8 @@
                       this.$refs['dataForm'].resetFields()
                       this.$refs['dimensionForm'].resetFields()
                       this.lists = []
+                      this.proportionDisbild = false
+                      this.subgroupNameDisbild = false
                     }
                   })
                 } else {
@@ -225,6 +235,8 @@
         this.$refs['dataForm'].resetFields()
         this.$refs['dimensionForm'].resetFields()
         this.lists = []
+        this.proportionDisbild = false
+        this.subgroupNameDisbild = false
       }
     }
   }
