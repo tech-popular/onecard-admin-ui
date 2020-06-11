@@ -19,7 +19,7 @@
         </el-cascader>
         </el-form-item>
         <el-form-item label="策略层级" prop="strategyLevel">
-          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%">
+          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="cengjiChangess">
             <el-option 
               v-for="item in hierarchyList" 
               :value="item.baseValue" 
@@ -33,7 +33,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="登陆类型" prop="loginStatus">
-          <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择登陆类型" style="width:100%">
+          <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择登陆类型" style="width:100%" @change="loginChangess">
             <el-option v-for="item in loginTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
         </el-form-item>
@@ -200,6 +200,9 @@
         nextTodoId: 1,
         newAddTextList: [],
         disbild: false,
+        typeChange: false,
+        cengjiChange: false,
+        loginChange: false,
         paixudisbuld: '',
         strategyLevel: {},
         strategyType: {},
@@ -261,6 +264,8 @@
               this.dataForm.strategyLevel = this.strategyLevel.baseName
               this.dataForm.strategyType = this.strategyType.baseName
               this.dataForm.loginStatus = this.loginStatus.baseName
+              this.nextTodoId = Math.max.apply(Math, data && data.data && data.data.strategySetDetails.length > 0 &&
+                data.data.strategySetDetails.map(item => { return item.strategySort }))
             })
           }
         })
@@ -269,7 +274,7 @@
         this.$refs['dimensionForm'].validate((valid) => {
           if (valid) {
             this.lists.push({
-              strategySort: this.nextTodoId++,
+              strategySort: this.id ? this.nextTodoId + 1 : this.nextTodoId++,
               strategyDimension: this.dimensionForm.latitude
             })
             this.dimensionForm.latitude = ''
@@ -292,6 +297,13 @@
       // 类型
       typeClick (val) {
         this.paixudisbuld = Number(val)
+        this.typeChange = true
+      },
+      cengjiChangess () {
+        this.cengjiChange = true
+      },
+      loginChangess () {
+        this.loginChange = true
       },
       // 提交
       dataFormSubmit (form) {
@@ -307,7 +319,33 @@
             if (valid) {
               this.dataForm.strategySetDetails = this.lists
               const dataBody = this.dataForm
-              if (this.id) {
+              if (this.id && this.typeChange === true && this.cengjiChange === false && this.loginChange === false) {
+                this.dataForm.strategyType = this.dataForm.strategyType
+                this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
+                this.loginStatus = this.loginTypeList.find(item => { return item.baseName == this.dataForm.loginStatus })
+                this.dataForm.strategyLevel = this.strategyLevel.baseValue
+                this.dataForm.loginStatus = this.loginStatus.baseValue
+              }
+              if (this.id && this.typeChange === false && this.cengjiChange === true && this.loginChange === false) {
+                this.dataForm.strategyLevel = this.dataForm.strategyLevel
+                this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
+                this.loginStatus = this.loginTypeList.find(item => { return item.baseName == this.dataForm.loginStatus })
+                this.dataForm.strategyType = this.strategyType.baseValue
+                this.dataForm.loginStatus = this.loginStatus.baseValue
+              }
+              if (this.id && this.typeChange === false && this.cengjiChange === false && this.loginChange === true) {
+                this.dataForm.loginStatus = this.dataForm.loginStatus
+                this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
+                this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
+                this.dataForm.strategyLevel = this.strategyLevel.baseValue
+                this.dataForm.strategyType = this.strategyType.baseValue
+              }
+              if (this.id && this.typeChange === true && this.cengjiChange === true && this.loginChange === true) {
+                this.dataForm.strategyLevel = this.dataForm.strategyLevel
+                this.dataForm.strategyType = this.dataForm.strategyType
+                this.dataForm.loginStatus = this.dataForm.loginStatus
+              }
+              if (this.id && this.typeChange === false && this.cengjiChange === false && this.loginChange === false) {
                 this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
                 this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
                 this.loginStatus = this.loginTypeList.find(item => { return item.baseName == this.dataForm.loginStatus })
@@ -329,6 +367,9 @@
                       this.dataForm.strategyScene = ''
                       this.dataFormValue = ''
                       this.lists = []
+                      this.typeChange = false
+                      this.cengjiChange = false
+                      this.loginChange = false
                     }
                   })
                 } else {
@@ -347,6 +388,9 @@
         this.paixudisbuld = ''
         this.lists = []
         this.dataFormValue = ''
+        this.typeChange = false
+        this.cengjiChange = false
+        this.loginChange = false
       }
     }
   }
