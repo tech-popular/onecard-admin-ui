@@ -259,7 +259,7 @@
               this.lists = data.data.strategySetDetails
               this.paixudisbuld = data.data.strategyType
               this.dataForm = data.data
-              this.dataForm.strategyName = data.data.strategyName + '_复制'
+              this.dataFormValue === 'look' ? this.dataForm.strategyName = data.data.strategyName : this.dataForm.strategyName = data.data.strategyName + '_复制'
               this.strategyLevel = this.hierarchyList.find(item => { return item.baseValue == data.data.strategyLevel })
               this.strategyType = this.typeList.find(item => { return item.baseValue == data.data.strategyType })
               this.loginStatus = this.loginTypeList.find(item => { return item.baseValue == data.data.loginStatus })
