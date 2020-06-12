@@ -206,7 +206,8 @@
         paixudisbuld: '',
         strategyLevel: {},
         strategyType: {},
-        loginStatus: {}
+        loginStatus: {},
+        bName: ''
       }
     },
     components: {
@@ -266,11 +267,15 @@
               this.dataForm.loginStatus = this.loginStatus.baseName
               this.nextTodoId = Math.max.apply(Math, data && data.data && data.data.strategySetDetails.length > 0 &&
                 data.data.strategySetDetails.map(item => { return item.strategySort }))
+              let arr1Ids = data.data.strategySetDetails.map(item => item.strategyDimension)
+              const result = this.newAddTextList.filter(item => !arr1Ids.includes(item.baseName))
+              this.newAddTextList = result
             })
           }
         })
       },
       addNewList () {
+      // console.log('llll', this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === bName, 1))
         this.$refs['dimensionForm'].validate((valid) => {
           if (valid) {
             this.lists.push({
@@ -278,6 +283,8 @@
               strategyDimension: this.dimensionForm.latitude
             })
             this.dimensionForm.latitude = ''
+            this.lists.forEach(item => { this.bName = item.strategyDimension })
+            this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           }
         })
       },

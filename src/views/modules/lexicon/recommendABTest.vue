@@ -104,7 +104,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './recommend-add-or-update'
+  import AddOrUpdate from './recommendABTest-add-or-update'
   import { beeTaskList, deleteBeeTask, getSceneDropDown } from '@/api/lexicon/strategy'
   export default {
     data () {
