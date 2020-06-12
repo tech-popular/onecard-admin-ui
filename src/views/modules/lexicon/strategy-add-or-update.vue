@@ -301,7 +301,6 @@
         })
       },
       deletedlLists (val) {
-        this.weidu = false
         this.lists && this.lists.length > 0 && this.lists.forEach((item) => {
           if (item.strategySort === val.strategySort) {
             if (this.lists.indexOf(item) > -1) {
@@ -311,6 +310,7 @@
           }
         })
         weidushowStrategyDropDown().then(({data}) => {
+          this.weidu = false
           this.newAddTextList = data.data.strategyDimension
           if (this.lists.length > 0) {
             this.lists.forEach(item => { this.bName = item.strategyDimension })
