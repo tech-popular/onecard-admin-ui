@@ -1,10 +1,10 @@
 <template>
   <el-dialog :title="dataFormValue === 'look' ? '查看' : id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
     <el-card shadow="never">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled='disbild'>
-        <div slot="header" class="clearfix">
-          <span>基本信息</span>
-        </div>
+      <div slot="header" class="clearfix">
+        <span>基本信息</span>
+      </div>
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled='disbild'> 
         <el-form-item label="策略名称" prop="strategyName">
           <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
         </el-form-item>
