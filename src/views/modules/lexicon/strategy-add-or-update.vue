@@ -228,6 +228,13 @@
         },
         deep: true,
         immediate: true
+      },
+      'newAddTextList': {
+        handler (newVal, oldVal) {
+  
+        },
+        deep: true,
+        immediate: true
       }
     },
     mounted () {
@@ -334,8 +341,23 @@
             sum += Number(val.strategyRecall)
             this.weightSum = sum
           }, 0)
+          var hash = {}
+          for (var i in this.lists) {
+            if (
+              hash[this.lists[i].strategyDimension]
+            ) {
+              this.weidu = hash[this.lists[i].strategyDimension]
+              this.$message.error('纬度不能重复')
+              return true
+            } else {
+              hash[this.lists[i].strategyDimension] = true
+            }
+          }
+
           if (this.weightSum > 100 || this.weightSum < 100) {
             this.$message.error('占比和需等于100%')
+          } else if (this.weidu === true) {
+            this.$message.error('纬度不能重复')
           } else {
             if (valid) {
               this.dataForm.strategySetDetails = this.lists
@@ -393,6 +415,7 @@
                       this.loginChange = false
                       this.nextTodoId = 1
                       this.numId = 1
+                      this.weidu = false
                     }
                   })
                 } else {
@@ -416,6 +439,7 @@
         this.loginChange = false
         this.nextTodoId = 1
         this.numId = 1
+        this.weidu = false
       }
     }
   }
