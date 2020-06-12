@@ -301,6 +301,7 @@
         })
       },
       deletedlLists (val) {
+        this.weidu = false
         this.lists && this.lists.length > 0 && this.lists.forEach((item) => {
           if (item.strategySort === val.strategySort) {
             if (this.lists.indexOf(item) > -1) {
@@ -350,7 +351,7 @@
               this.$message.error('纬度不能重复')
               return true
             } else {
-              hash[this.lists[i].strategyDimension] = true
+              hash[this.lists[i].strategyDimension] = false
             }
           }
 
