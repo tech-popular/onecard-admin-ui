@@ -351,7 +351,7 @@
               this.$message.error('纬度不能重复')
               return true
             } else {
-              hash[this.lists[i].strategyDimension] = false
+              hash[this.lists[i].strategyDimension] = true
             }
           }
 
