@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="实验场景">
+    <el-form :inline="true" :model="dataForm" :rules="dataRule" ref="dataForm">
+      <el-form-item label="实验场景" prop="type">
         <el-cascader
           style="width: 100%"
           :props="props"
@@ -11,12 +11,12 @@
         </el-cascader>
       </el-form-item>
       <el-form-item label="实验状态">
-        <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择实验状态" style="width:100%">
+        <el-select filterable v-model="dataForm.testStatus" placeholder="请选择实验状态" style="width:100%">
           <el-option v-for="item in loginTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
         </el-select>
       </el-form-item>
       <el-form-item label="实验名称">
-        <el-input v-model="dataForm.sacherName" placeholder="请选择实验名称" clearable />
+        <el-input v-model="dataForm.testName" placeholder="请选择实验名称" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -73,9 +73,6 @@
           <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-document" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           </el-tooltip>
-          <!-- <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-          </el-tooltip> -->
         </template>
       </el-table-column>
     </el-table>
@@ -106,9 +103,14 @@
           children: ''
         },
         dataForm: {
-          sacherId: '',
-          sacherName: '',
-          type: []
+          type: [],
+          testStatus: '',
+          testName: ''
+        },
+        dataRule: {
+          type: [
+            { required: true, message: '请选择实验场景', trigger: 'blur' }
+          ]
         },
         loginTypeList: [],
         typeList: [],
@@ -152,30 +154,6 @@
           this.typeList = data.data
         })
       },
-      // 删除
-      // deleteHandle (id) {
-      //   this.$confirm(`确定删除操作?`, '提示', {
-      //     confirmButtonText: '确定',
-      //     cancelButtonText: '取消',
-      //     type: 'warning'
-      //   }).then(() => {
-      //     const dataBody = id
-      //     deleteBeeTask(dataBody).then(({data}) => {
-      //       if (data && data.code === 0) {
-      //         this.$message({
-      //           message: '操作成功',
-      //           type: 'success',
-      //           duration: 1500,
-      //           onClose: () => {
-      //             this.getDataList()
-      //           }
-      //         })
-      //       } else {
-      //         this.$message.error(data.msg)
-      //       }
-      //     })
-      //   })
-      // },
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
@@ -200,9 +178,13 @@
       },
       // 新增 / 修改
       addOrUpdateHandle (id, val, type) {
-        this.addOrUpdateVisible = true
-        this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id, val, type)
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.addOrUpdateVisible = true
+            this.$nextTick(() => {
+              this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type)
+            })
+          }
         })
       }
     }

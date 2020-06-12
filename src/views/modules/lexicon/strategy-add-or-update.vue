@@ -58,7 +58,7 @@
           :data="lists"
           style="width: 100%">
           <el-table-column
-            prop="strategySort"
+            prop="id"
             label="序号"/>
           <el-table-column
             prop="strategyDimension"
@@ -81,7 +81,7 @@
           :data="lists"
           style="width: 100%">
           <el-table-column
-            prop="strategySort"
+            prop="id"
             label="序号"/>
           <el-table-column
             prop="strategyDimension"
@@ -198,6 +198,7 @@
         loginTypeList: [],
         lists: [],
         nextTodoId: 1,
+        numId: 1,
         newAddTextList: [],
         disbild: false,
         typeChange: false,
@@ -267,7 +268,9 @@
               this.dataForm.strategyType = this.strategyType.baseName
               this.dataForm.loginStatus = this.loginStatus.baseName
               this.nextTodoId = Math.max.apply(Math, data && data.data && data.data.strategySetDetails.length > 0 &&
-                data.data.strategySetDetails.map(item => { return item.strategySort }))
+                data.data.strategySetDetails.map(item => { return item.strategySort })) // 获取排序最大值
+              this.numId = Math.max.apply(Math, data && data.data && data.data.strategySetDetails.length > 0 &&
+                data.data.strategySetDetails.map(item => { return item.id })) // 获取序号最大值
               let arr1Ids = data.data.strategySetDetails.map(item => item.strategyDimension)
               const result = this.newAddTextList.filter(item => !arr1Ids.includes(item.baseName))
               this.newAddTextList = result
@@ -280,6 +283,7 @@
         this.$refs['dimensionForm'].validate((valid) => {
           if (valid) {
             this.lists.push({
+              id: this.id ? this.numId + 1 : this.numId++,
               strategySort: this.id ? this.nextTodoId + 1 : this.nextTodoId++,
               strategyDimension: this.dimensionForm.latitude
             })
@@ -321,8 +325,8 @@
             sum += Number(val.strategyRecall)
             this.weightSum = sum
           }, 0)
-          if (this.weightSum > 100) {
-            this.$message.error('占比和不得超过100%')
+          if (this.weightSum > 100 || this.weightSum < 100) {
+            this.$message.error('占比和需等于100%')
           } else {
             if (valid) {
               this.dataForm.strategySetDetails = this.lists
