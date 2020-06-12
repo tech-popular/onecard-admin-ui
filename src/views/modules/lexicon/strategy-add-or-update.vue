@@ -392,6 +392,7 @@
                       this.cengjiChange = false
                       this.loginChange = false
                       this.nextTodoId = 1
+                      this.numId = 1
                     }
                   })
                 } else {
@@ -414,6 +415,7 @@
         this.cengjiChange = false
         this.loginChange = false
         this.nextTodoId = 1
+        this.numId = 1
       }
     }
   }
