@@ -15,9 +15,6 @@
           clearable
           :options="typeList">
         </el-cascader>
-        <!-- <el-select filterable v-model="dataForm.type" placeholder="请选择策略场景" clearable>
-          <el-option v-for="item in typeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
-        </el-select> -->
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
