@@ -145,7 +145,7 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown } from '@/api/lexicon/strategy'
+  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown, weidushowStrategyDropDown } from '@/api/lexicon/strategy'
   export default {
     data () {
       return {
@@ -271,6 +271,7 @@
                 data.data.strategySetDetails.map(item => { return item.strategySort })) // 获取排序最大值
               this.numId = Math.max.apply(Math, data && data.data && data.data.strategySetDetails.length > 0 &&
                 data.data.strategySetDetails.map(item => { return item.id })) // 获取序号最大值
+  
               let arr1Ids = data.data.strategySetDetails.map(item => item.strategyDimension)
               const result = this.newAddTextList.filter(item => !arr1Ids.includes(item.baseName))
               this.newAddTextList = result
@@ -279,7 +280,6 @@
         })
       },
       addNewList () {
-      // console.log('llll', this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === bName, 1))
         this.$refs['dimensionForm'].validate((valid) => {
           if (valid) {
             this.lists.push({
@@ -300,6 +300,15 @@
               var i = this.lists.indexOf(item)
               this.lists.splice(i, 1)
             }
+          }
+        })
+        weidushowStrategyDropDown().then(({data}) => {
+          this.newAddTextList = data.data.strategyDimension
+          if (this.lists.length > 0) {
+            this.lists.forEach(item => { this.bName = item.strategyDimension })
+            this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
+          } else {
+            this.newAddTextList = data.data.strategyDimension
           }
         })
       },
