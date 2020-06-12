@@ -137,7 +137,9 @@
       this.init()
     },
     methods: {
-      init (id, value, type) {
+      init (id, value, type, testType) {
+        console.log(testType, 'testType')
+  
         this.dataForm.id = id || ''
         this.dataFormValue = value
         this.visible = true
