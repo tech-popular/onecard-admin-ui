@@ -4,66 +4,42 @@
       <div class="query-title"><span style="color:red">*</span>目前词组里的Query</div>
       <el-card shadow="never" class="query-card-content">
         <el-form inline>
-          <el-form-item>
-            <el-select
-              v-model="selectedQuery"
-              filterable
-              remote
-              multiple
-              :remote-method="remoteMethod"
-              :loading="loading"
+          <el-form-item class="item-form">
+            <el-input
+              clearable
+              v-model="query"
               placeholder="请输入搜索内容查询数据"
-              style="width: 500px"
-              @visible-change="visibleChange"
+              style="width: 400px"
               :disabled="tag === 'view'"
             >
-              <template v-for="group in queryList">
-                <el-option-group
-                  v-if="group.list.length > 0"
-                  :key="group.name"
-                  :label="queryTitleList[group.name]">
-                  <el-option
-                    v-for="(item, index) in group.list"
-                    :key="index"
-                    :label="item"
-                    :value="item">
-                  </el-option>
-                </el-option-group>
-              </template>
-            </el-select>
+            </el-input>
           </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="addQuery" size="small">确定</el-button>
+          <el-form-item class="item-form">
+            <el-button type="primary" @click="getWordNum" size="small">查询</el-button>
+            <span class="tip">该Query搜索到的产品数量：<b>{{num}}</b>个</span>
           </el-form-item>
         </el-form>
-        <query-tag-list :data="dynamicQuery" @tagChange="tagChangeEvent" @multiAdd="multiAddClick"></query-tag-list>
       </el-card>
+      <div class="button-add">
+        <el-button type="primary" @click="addQuery" size="small">新增至以下词组中</el-button>
+      </div>
       <query-table-list :data="tableData" :is-sort="true" @dataChange="tableDataChangeClick" :tag="tag"></query-table-list>
     </div>
   </div>
 </template>
 <script>
-import queryTagList from '../components/queryTagList'
 import queryTableList from '../components/queryTableList'
-import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
+// import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
       loading: false,
-      queryList: [],
-      dynamicQuery: [],
       tableData: [],
-      tableDataChecked: [],
-      selectedQuery: [], // 下拉选中的内容
-      query: '', // 搜索词
-      queryTitleList: {
-        bandNames: '商品品牌',
-        categoryNames: '商品分类',
-        productNames: '商品名称'
-      }
+      num: 0,
+      query: '' // 搜索词
     }
   },
-  components: { queryTagList, queryTableList },
+  components: { queryTableList },
   props: {
     data: {
       type: Array,
@@ -101,70 +77,18 @@ export default {
         })
       })
     },
-    remoteMethod (query) {
-      this.query = query
-      if (query !== '') {
-        this.loading = true
-        this.getNamesList(query)
-      }
+    getWordNum () { // 获取query的数量
+      console.log(this.query, 123)
     },
-    getNamesList (nameWord) {
-      let params = {
-        nameWord: nameWord,
-        needProductName: 1,
-        needBrandName: 1,
-        needCategoryName: 1
-      }
-      getBrandNamesAndCategoryNames(params).then(({data}) => {
-        this.loading = false
-        if (data.code !== 0) {
-          this.queryList = []
-        } else {
-          let arr = []
-          for (let item in data.data) {
-            if (data.data[item] !== null) {
-              let list = Array.from(new Set(data.data[item])).map(citem => {
-                return citem
-              })
-              arr.push({
-                name: item,
-                list: list
-              })
-            }
-          }
-          this.queryList = arr
-        }
-      })
-    },
-    visibleChange (flag) {
-      if (flag && this.query === '') {
-        this.queryList = []
-      }
-    },
-    tagChangeEvent (data) { // tag发生改变时，同步数据
-      this.dynamicQuery = data
-    },
-    addQuery () { // 手动添加query
-      this.selectedQuery.forEach(item => {
-        let isHas = this.dynamicQuery.filter(ditem => ditem.toLowerCase() === item.toLowerCase()).length
-        if (isHas === 0) {
-          this.dynamicQuery.push(item)
-        }
-      })
-      this.selectedQuery = []
-      this.query = ''
-    },
-    multiAddClick () { // 批量新增至以下词组中
-      this.dynamicQuery.forEach(item => {
+    addQuery () { // 新增至以下词组中
+      if (!this.query.trim().length) return
         // 判断上面手动添加的数据是否已经存在于表格中，不存在时再添加至表格，已存在则不添加
-        let isInArray = this.tableData.filter(ritem => ritem.name.toLowerCase() === item.toLowerCase()).length
-        if (isInArray === 0) { // 不存在
-          this.tableData.push({
-            name: item
-          })
-        }
-      })
-      this.dynamicQuery = []
+      let isInArray = this.tableData.filter(ritem => ritem.name.toLowerCase() === this.query.toLowerCase()).length
+      if (isInArray === 0) { // 不存在
+        this.tableData.push({
+          name: this.query
+        })
+      }
     },
     tableDataChangeClick (data) { // 表格数据改变时
       this.tableData = data
@@ -174,4 +98,16 @@ export default {
 </script>
 <style scoped>
   @import "../assets/style/update-base.css";
+  .item-form {
+    margin-bottom: 0
+  }
+  .item-form .tip {
+    float: right
+  }
+  .item-form b {
+    color: red
+  }
+  .button-add {
+    margin-top: 10px
+  }
 </style>
