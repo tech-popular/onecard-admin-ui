@@ -15,7 +15,7 @@ export default {
     return {
       dialogVisible: false,
       checkedCities: [],
-      aliUrl: 'https://www.baidu.com/'
+      aliUrl: 'https://error-center.aliyun.com/status/product/Ram?spm=a2c4g.11186623.2.13.32143215SY7Iiv'
     }
   },
   components: {
