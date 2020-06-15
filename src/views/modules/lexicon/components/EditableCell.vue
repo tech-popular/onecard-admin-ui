@@ -30,7 +30,6 @@ export default {
   inheritAttrs: false,
   props: {
     value: {
-      type: Number,
       default: ''
     },
     toolTipContent: {
@@ -97,10 +96,10 @@ export default {
     },
     onInputExit () {
       this.editMode = false
-    },
-    onInputChange (val) {
-      this.$emit('input', val)
     }
+    // onInputChange (val) {
+    //   this.$emit('input', val)
+    // }
   }
 }
 </script>

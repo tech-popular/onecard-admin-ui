@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="dataForm.id && dataFormValue ? '查看' : dataForm.id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
+  <el-dialog :title="dataFormValue === 'look' ? '查看' : id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
     <el-card shadow="never">
       <div slot="header" class="clearfix">
         <span>基本信息</span>
@@ -17,12 +17,12 @@
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild' v-if="disbild === false">
         <el-form-item label="策略" prop="experimentStrategyId">
           <el-select filterable v-model="dimensionForm.experimentStrategyId" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
-            <el-option v-for="item in strategyList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+            <el-option v-for="item in strategyList" :value="item.id" :key="item.id" :label="item.strategyName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="experimentGroupId">
           <el-select filterable v-model="dimensionForm.experimentGroupId" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
-            <el-option v-for="item in subgroupNameList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+            <el-option v-for="item in subgroupNameList" :value="item.groupId" :key="item.groupId" :label="item.groupName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
@@ -69,22 +69,15 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, selectStrategyBySceneId } from '@/api/lexicon/ABTest'
+  import { infoBeeTask, saveorupt, selectStrategyBySceneId, getDataApiGroupList } from '@/api/lexicon/ABTest'
   export default {
     data () {
       return {
         visible: false,
-        editModeEnabled: true,
-        props: {
-          multiple: false,
-          checkStrictly: false,
-          label: 'sceneName',
-          value: 'sceneType'
-        },
         dataForm: {
           id: '',
-          experimentStrategyId: '',
           experimentName: '',
+          experimentStrategyId: '',
           experimentSetDetails: []
         },
         dataFormValue: '',
@@ -109,14 +102,9 @@
             { required: true, message: '请输入占比', trigger: 'blur' }
           ]
         },
-        sceneList: [],
-        subgroupNameList: [
-          {id: 2, baseName: '分群1', baseValue: '1', baseType: 'strategyScene', baseLevel: 2, baseSort: 1},
-          {id: 1, baseName: '分群2', baseValue: '2', baseType: 'strategyScene', baseLevel: 1, baseSort: 2}
-        ],
+        subgroupNameList: [],
         examilId: '',
         strategyList: [],
-        loginTypeList: [],
         lists: [],
         nextTodoId: 1,
         disbild: false,
@@ -146,24 +134,24 @@
     },
     methods: {
       init (id, value, type, testType) {
-        this.dataForm.id = id || ''
+        this.id = id
         this.dataFormValue = value
         this.examilId = testType[0]
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         selectStrategyBySceneId(this.examilId).then(({data}) => {
-          console.log(data, 'data')
+          this.strategyList = data.data
         })
-        showStrategyDropDown().then(({data}) => {
-          this.loginTypeList = data.data.loginStatus
-          this.hierarchyList = data.data.strategyLevels
-          this.strategyList = data.data.strategyTypes
+        getDataApiGroupList().then(({data}) => {
+          this.subgroupNameList = data.data
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (id) {
-            const dataBody = this.dataForm.id
+            const dataBody = this.id
             infoBeeTask(dataBody).then(({data}) => {
+              this.lists = data.data.experimentSetDetails
+              this.dataForm.experimentName = data.data.experimentName
             })
           }
         })
@@ -213,8 +201,9 @@
           } else {
             if (valid) {
               this.dataForm.experimentSetDetails = this.lists
+              this.dataForm.experimentStrategyId = this.dimensionForm.experimentStrategyId
               const dataBody = this.dataForm
-              const dataUpdateId = this.dataForm.id
+              const dataUpdateId = this.id
               saveorupt(dataBody, dataUpdateId).then(({data}) => {
                 if (data && data.code === 0) {
                   this.$message({

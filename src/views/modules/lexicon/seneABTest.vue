@@ -34,10 +34,16 @@
         align="center"
         label="实验ID"/>
       <el-table-column
-        prop="strategyName"
+        prop="experimentName"
         header-align="center"
         align="center"
         label="实验名称"
+        width="150px"/>
+      <el-table-column
+        prop="experimentSceneId"
+        header-align="center"
+        align="center"
+        label="实验场景"
         width="150px"/>
       <el-table-column
         prop="enable"
@@ -45,17 +51,17 @@
         align="center"
         label="实验状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.loginStatus === '已登录'" size="small" >启用</el-tag>
+          <el-tag v-if="scope.row.experimentStatus === '启用'" size="small" >启用</el-tag>
           <el-tag v-else size="small" type="danger">停用</el-tag>
         </template>
       </el-table-column>
       <el-table-column
-        prop="createTime"
+        prop="onlineTime"
         header-align="center"
         align="center"
         label="实验启用时间"/>
       <el-table-column
-        prop="createTime"
+        prop="offlineTime"
         header-align="center"
         align="center"
         label="实验停用时间"/>
@@ -68,10 +74,10 @@
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
-            <el-button type="success" size="mini" icon="el-icon-view" circle @click="addOrUpdateHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
+            <el-button type="success" size="mini" icon="el-icon-view" circle @click="lookHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
-            <el-button type="primary" size="mini" icon="el-icon-document" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-document" circle @click="lookHandle(scope.row.id)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -188,6 +194,13 @@
               this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type)
             })
           }
+        })
+      },
+      // 查看
+      lookHandle (id, val, type) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type)
         })
       }
     }
