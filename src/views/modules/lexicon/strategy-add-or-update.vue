@@ -9,28 +9,22 @@
           <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
         </el-form-item>
         <el-form-item label="策略场景" prop="strategyName">
-          <el-cascader
-          style="width: 100%"
-          :props="props"
-          v-model="dataForm.strategyScene"
-          :key="id"
-          clearable
-          :options="sceneList">
+          <el-cascader style="width: 100%" :props="props" v-model="dataForm.strategyScene" :key="id" clearable :options="sceneList">
         </el-cascader>
         </el-form-item>
         <el-form-item label="策略层级" prop="strategyLevel">
-          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="selectChange()">
-            <el-option v-for="item in hierarchyList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%">
+            <el-option v-for="item in hierarchyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="策略类型" prop="strategyType">
           <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%" @change="typeClick">
-            <el-option v-for="item in typeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+            <el-option v-for="item in typeList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="登陆类型" prop="loginStatus">
-          <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择登陆类型" style="width:100%" @change="loginChangess">
-            <el-option v-for="item in loginTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+          <el-select filterable v-model="dataForm.loginStatus" placeholder="请选择登陆类型" style="width:100%">
+            <el-option v-for="item in loginTypeList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -60,15 +54,15 @@
             prop="strategyDimension"
             label="纬度"/>
           <el-table-column
-            v-if="paixudisbuld === 1"
+            v-if="paixudisbuld === '排序'"
             prop="strategyRecall"
             label="排序占比%"/>
           <el-table-column
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             prop="strategyRecall"
             label="召回占比%"/>
           <el-table-column
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             prop="strategySort"
             label="排序优先级"/>
         </el-table>
@@ -86,7 +80,7 @@
             label="排序占比%"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === 1"
+            v-if="paixudisbuld === '排序'"
             >
             <editable-cell
               slot-scope="scope"
@@ -99,7 +93,7 @@
             label="召回占比%"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             >
             <editable-cell 
               slot-scope="scope"
@@ -113,7 +107,7 @@
             label="排序优先级"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             >
             <editable-cell
               slot-scope="scope"
@@ -197,13 +191,7 @@
         numId: 1,
         newAddTextList: [],
         disbild: false,
-        typeChange: false,
-        cengjiChange: false,
-        loginChange: false,
         paixudisbuld: '',
-        strategyLevel: {},
-        strategyType: {},
-        loginStatus: {},
         bName: ''
       }
     },
@@ -231,29 +219,7 @@
         },
         deep: true,
         immediate: true
-      },
-      'typeChange': {
-        handler (newVal, oldVal) {
-          console.log(newVal, 'newVal')
-        },
-        deep: true,
-        immediate: true
-      },
-      'cengjiChange': {
-        handler (newVal, oldVal) {
-          console.log(newVal, 'newVal')
-        },
-        deep: true,
-        immediate: true
-      },
-      'loginChange': {
-        handler (newVal, oldVal) {
-          console.log(newVal, 'newVal')
-        },
-        deep: true,
-        immediate: true
       }
-  
     },
     mounted () {
       this.init()
@@ -278,7 +244,6 @@
             this.dataFormValue = value
           }
           this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
-
           if (id) {
             const dataBody = this.id
             infoBeeTask(dataBody).then(({data}) => { // 详情接口
@@ -286,17 +251,10 @@
               this.paixudisbuld = data.data.strategyType
               this.dataForm = data.data
               this.dataFormValue === 'look' ? this.dataForm.strategyName = data.data.strategyName : this.dataForm.strategyName = data.data.strategyName + '_复制'
-              this.strategyLevel = this.hierarchyList.find(item => { return item.baseValue == data.data.strategyLevel })
-              this.strategyType = this.typeList.find(item => { return item.baseValue == data.data.strategyType })
-              this.loginStatus = this.loginTypeList.find(item => { return item.baseValue == data.data.loginStatus })
-              this.dataForm.strategyLevel = this.strategyLevel.baseName
-              this.dataForm.strategyType = this.strategyType.baseName
-              this.dataForm.loginStatus = this.loginStatus.baseName
               this.nextTodoId = Math.max.apply(Math, data && data.data && data.data.strategySetDetails.length > 0 &&
                 data.data.strategySetDetails.map(item => { return item.strategySort })) // 获取排序最大值
               this.numId = Math.max.apply(Math, data && data.data && data.data.strategySetDetails.length > 0 &&
                 data.data.strategySetDetails.map(item => { return item.id })) // 获取序号最大值
-  
               let arr1Ids = data.data.strategySetDetails.map(item => item.strategyDimension)
               const result = this.newAddTextList.filter(item => !arr1Ids.includes(item.baseName))
               this.newAddTextList = result
@@ -347,20 +305,7 @@
       },
       // 类型
       typeClick (val) {
-        this.paixudisbuld = Number(val)
-        this.typeChange = true
-        this.cengjiChange = false
-        this.loginChange = false
-      },
-      selectChange () {
-        this.cengjiChange = true
-        this.typeChange = false
-        this.loginChange = false
-      },
-      loginChangess () {
-        this.typeChange = false
-        this.cengjiChange = false
-        this.loginChange = true
+        this.paixudisbuld = val
       },
       // 提交
       dataFormSubmit (form) {
@@ -391,40 +336,6 @@
             if (valid) {
               this.dataForm.strategySetDetails = this.lists
               const dataBody = this.dataForm
-              if (this.id && this.typeChange === true && this.cengjiChange === false && this.loginChange === false) {
-                this.dataForm.strategyType = this.dataForm.strategyType
-                this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
-                this.loginStatus = this.loginTypeList.find(item => { return item.baseName == this.dataForm.loginStatus })
-                this.dataForm.strategyLevel = this.strategyLevel.baseValue
-                this.dataForm.loginStatus = this.loginStatus.baseValue
-              }
-              if (this.id && this.typeChange === false && this.cengjiChange === true && this.loginChange === false) {
-                this.dataForm.strategyLevel = this.dataForm.strategyLevel
-                this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
-                this.loginStatus = this.loginTypeList.find(item => { return item.baseName == this.dataForm.loginStatus })
-                this.dataForm.strategyType = this.strategyType.baseValue
-                this.dataForm.loginStatus = this.loginStatus.baseValue
-              }
-              if (this.id && this.typeChange === false && this.cengjiChange === false && this.loginChange === true) {
-                this.dataForm.loginStatus = this.dataForm.loginStatus
-                this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
-                this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
-                this.dataForm.strategyLevel = this.strategyLevel.baseValue
-                this.dataForm.strategyType = this.strategyType.baseValue
-              }
-              if (this.id && this.typeChange === true && this.cengjiChange === true && this.loginChange === true) {
-                this.dataForm.strategyLevel = this.dataForm.strategyLevel
-                this.dataForm.strategyType = this.dataForm.strategyType
-                this.dataForm.loginStatus = this.dataForm.loginStatus
-              }
-              if (this.id && this.typeChange === false && this.cengjiChange === false && this.loginChange === false) {
-                this.strategyLevel = this.hierarchyList.find(item => { return item.baseName == this.dataForm.strategyLevel })
-                this.strategyType = this.typeList.find(item => { return item.baseName == this.dataForm.strategyType })
-                this.loginStatus = this.loginTypeList.find(item => { return item.baseName == this.dataForm.loginStatus })
-                this.dataForm.strategyLevel = this.strategyLevel.baseValue
-                this.dataForm.strategyType = this.strategyType.baseValue
-                this.dataForm.loginStatus = this.loginStatus.baseValue
-              }
               saveorupt(dataBody).then(({data}) => {
                 if (data && data.code === 0) {
                   this.$message({
@@ -439,9 +350,6 @@
                       this.dataForm.strategyScene = ''
                       this.dataFormValue = ''
                       this.lists = []
-                      this.typeChange = false
-                      this.cengjiChange = false
-                      this.loginChange = false
                       this.nextTodoId = 1
                       this.numId = 1
                       this.weidu = false
@@ -463,9 +371,6 @@
         this.paixudisbuld = ''
         this.lists = []
         this.dataFormValue = ''
-        this.typeChange = false
-        this.cengjiChange = false
-        this.loginChange = false
         this.nextTodoId = 1
         this.numId = 1
         this.weidu = false
