@@ -5,8 +5,8 @@
         <span>基本信息</span>
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled='disbild'>
-        <el-form-item label="实验名称" prop="strategyName">
-          <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
+        <el-form-item label="实验名称" prop="experimentName">
+          <el-input v-model="dataForm.experimentName" placeholder="请输入策略名称"/>
         </el-form-item>
       </el-form>
     </el-card>
@@ -16,17 +16,17 @@
       </div>
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild' v-if="disbild === false">
         <el-form-item label="策略" prop="strategy">
-          <el-select filterable v-model="dimensionForm.strategy" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
+          <el-select filterable v-model="dimensionForm.experimentStrategyId" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
             <el-option v-for="item in strategyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="subgroupName">
-          <el-select filterable v-model="dimensionForm.subgroupName" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
+          <el-select filterable v-model="dimensionForm.experimentGroupId" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
             <el-option v-for="item in subgroupNameList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="proportion" v-if="proportionDisbild === false" @change='proportionAddText'>
-          <el-input v-model="dimensionForm.proportion" placeholder="请输入占比"/>
+          <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比"/>
         </el-form-item>
         <el-form-item>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
@@ -83,11 +83,12 @@
         },
         dataForm: {
           id: '',
-          strategyName: ''
+          experimentName: '',
+          experimentSetDetails: []
         },
         dataFormValue: '',
         dataRule: {
-          strategyName: [
+          experimentName: [
             { required: true, message: '实验名称不能为空', trigger: 'blur' }
           ]
         },
@@ -205,7 +206,7 @@
             this.$message.error('占比和需等于100%')
           } else {
             if (valid) {
-              this.dataForm.strategySetDetails = this.lists
+              this.dataForm.experimentSetDetails = this.lists
               const dataBody = this.dataForm
               const dataUpdateId = this.dataForm.id
               saveorupt(dataBody, dataUpdateId).then(({data}) => {
