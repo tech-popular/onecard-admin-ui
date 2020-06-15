@@ -12,7 +12,7 @@
       </el-form-item>
       <el-form-item label="实验状态">
         <el-select filterable v-model="dataForm.testStatus" placeholder="请选择实验状态" style="width:100%">
-          <el-option v-for="item in loginTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+          <el-option v-for="item in testStatusTypeList" :value="item.id" :key="item.id" :label="item.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="实验名称">
@@ -34,10 +34,16 @@
         align="center"
         label="实验ID"/>
       <el-table-column
-        prop="strategyName"
+        prop="experimentName"
         header-align="center"
         align="center"
         label="实验名称"
+        width="150px"/>
+      <el-table-column
+        prop="experimentSceneId"
+        header-align="center"
+        align="center"
+        label="实验场景"
         width="150px"/>
       <el-table-column
         prop="enable"
@@ -45,17 +51,17 @@
         align="center"
         label="实验状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.loginStatus === '已登录'" size="small" >启用</el-tag>
+          <el-tag v-if="scope.row.experimentStatus === '启用'" size="small" >启用</el-tag>
           <el-tag v-else size="small" type="danger">停用</el-tag>
         </template>
       </el-table-column>
       <el-table-column
-        prop="createTime"
+        prop="onlineTime"
         header-align="center"
         align="center"
         label="实验启用时间"/>
       <el-table-column
-        prop="createTime"
+        prop="offlineTime"
         header-align="center"
         align="center"
         label="实验停用时间"/>
@@ -68,10 +74,10 @@
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
-            <el-button type="success" size="mini" icon="el-icon-view" circle @click="addOrUpdateHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
+            <el-button type="success" size="mini" icon="el-icon-view" circle @click="lookHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
-            <el-button type="primary" size="mini" icon="el-icon-document" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-document" circle @click="lookHandle(scope.row.id)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -91,7 +97,7 @@
 
 <script>
   import AddOrUpdate from './seneABTest-add-or-update'
-  import { beeTaskList, getSceneDropDown } from '@/api/lexicon/strategy'
+  import { beeTaskList, getSceneDropDown } from '@/api/lexicon/ABTest'
   export default {
     data () {
       return {
@@ -112,7 +118,10 @@
             { required: true, message: '请选择实验场景', trigger: 'blur' }
           ]
         },
-        loginTypeList: [],
+        testStatusTypeList: [
+          {id: 0, value: '禁用'},
+          {id: 1, value: '开启'}
+        ],
         typeList: [],
         dataList: [],
         pageNo: 1, // 当前页
@@ -185,6 +194,13 @@
               this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type)
             })
           }
+        })
+      },
+      // 查看
+      lookHandle (id, val, type) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type)
         })
       }
     }

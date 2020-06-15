@@ -1,12 +1,12 @@
 <template>
-  <el-dialog :title="dataForm.id && dataFormValue ? '查看' : dataForm.id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
+  <el-dialog :title="dataFormValue === 'look' ? '查看' : id ? '复制' : '新增'" :modal-append-to-body='false' :append-to-body="true" @close="taskDialgClose" :visible.sync="visible">
     <el-card shadow="never">
       <div slot="header" class="clearfix">
         <span>基本信息</span>
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled='disbild'>
-        <el-form-item label="实验名称" prop="strategyName">
-          <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
+        <el-form-item label="实验名称" prop="experimentName">
+          <el-input v-model="dataForm.experimentName" placeholder="请输入策略名称"/>
         </el-form-item>
       </el-form>
     </el-card>
@@ -15,18 +15,18 @@
         <span>流量参数配置</span><el-tag type="danger" style="margin-left:5px">各工具流量条件设置</el-tag>
       </div>
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild' v-if="disbild === false">
-        <el-form-item label="策略" prop="strategy">
-          <el-select filterable v-model="dimensionForm.strategy" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
-            <el-option v-for="item in strategyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+        <el-form-item label="策略" prop="experimentStrategyId">
+          <el-select filterable v-model="dimensionForm.experimentStrategyId" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
+            <el-option v-for="item in strategyList" :value="item.id" :key="item.id" :label="item.strategyName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="subgroupName">
-          <el-select filterable v-model="dimensionForm.subgroupName" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
-            <el-option v-for="item in subgroupNameList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+        <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="experimentGroupId">
+          <el-select filterable v-model="dimensionForm.experimentGroupId" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
+            <el-option v-for="item in subgroupNameList" :value="item.groupId" :key="item.groupId" :label="item.groupName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="占比" prop="proportion" v-if="proportionDisbild === false" @change='proportionAddText'>
-          <el-input v-model="dimensionForm.proportion" placeholder="请输入占比"/>
+        <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
+          <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/>
         </el-form-item>
         <el-form-item>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
@@ -41,15 +41,15 @@
             prop="strategySort"
             label="序号"/>
           <el-table-column
-            prop="strategy"
+            prop="experimentStrategyId"
             label="策略"/>
           <el-table-column
             v-if="subgroupNameDisbild === false"
-            prop="subgroupName"
+            prop="experimentGroupId"
             label="人群包"/>
           <el-table-column
             v-if="proportionDisbild === false"
-            prop="proportion"
+            prop="experimentPersent"
             label="占比%"/>
           <el-table-column header-align="center" align="center" width="200" label="操作">
             <template slot-scope="scope" v-if="disbild === false">
@@ -69,51 +69,42 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown } from '@/api/lexicon/strategy'
+  import { infoBeeTask, saveorupt, selectStrategyBySceneId, getDataApiGroupList } from '@/api/lexicon/ABTest'
   export default {
     data () {
       return {
         visible: false,
-        editModeEnabled: true,
-        props: {
-          multiple: false,
-          checkStrictly: false,
-          label: 'sceneName',
-          value: 'sceneType'
-        },
         dataForm: {
           id: '',
-          strategyName: ''
+          experimentName: '',
+          experimentStrategyId: '',
+          experimentSetDetails: []
         },
         dataFormValue: '',
         dataRule: {
-          strategyName: [
+          experimentName: [
             { required: true, message: '实验名称不能为空', trigger: 'blur' }
           ]
         },
         dimensionForm: {
-          strategy: '',
-          subgroupName: '',
-          proportion: ''
+          experimentStrategyId: '',
+          experimentGroupId: '',
+          experimentPersent: ''
         },
         dimensionRule: {
-          strategy: [
+          experimentStrategyId: [
             { required: true, message: '请选择策略', trigger: 'blur' }
           ],
-          subgroupName: [
+          experimentGroupId: [
             { required: true, message: '请选择分群名称', trigger: 'blur' }
           ],
-          proportion: [
+          experimentPersent: [
             { required: true, message: '请输入占比', trigger: 'blur' }
           ]
         },
-        sceneList: [],
-        subgroupNameList: [
-          {id: 2, baseName: '分群1', baseValue: '1', baseType: 'strategyScene', baseLevel: 2, baseSort: 1},
-          {id: 1, baseName: '分群2', baseValue: '2', baseType: 'strategyScene', baseLevel: 1, baseSort: 2}
-        ],
+        subgroupNameList: [],
+        examilId: '',
         strategyList: [],
-        loginTypeList: [],
         lists: [],
         nextTodoId: 1,
         disbild: false,
@@ -125,9 +116,14 @@
       EditableCell
     },
     watch: {
-      'dataFormValue': {
+      'proportionDisbild': {
         handler (newVal, oldVal) {
-          this.dataFormValue = newVal
+        },
+        deep: true,
+        immediate: true
+      },
+      'subgroupNameDisbild': {
+        handler (newVal, oldVal) {
         },
         deep: true,
         immediate: true
@@ -138,25 +134,24 @@
     },
     methods: {
       init (id, value, type, testType) {
-        console.log(testType, 'testType')
-  
-        this.dataForm.id = id || ''
+        this.id = id
         this.dataFormValue = value
+        this.examilId = testType[0]
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
-        getSceneDropDown().then(({data}) => {
-          this.sceneList = data.data
+        selectStrategyBySceneId(this.examilId).then(({data}) => {
+          this.strategyList = data.data
         })
-        showStrategyDropDown().then(({data}) => {
-          this.loginTypeList = data.data.loginStatus
-          this.hierarchyList = data.data.strategyLevels
-          this.strategyList = data.data.strategyTypes
+        getDataApiGroupList().then(({data}) => {
+          this.subgroupNameList = data.data
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (id) {
-            const dataBody = this.dataForm.id
+            const dataBody = this.id
             infoBeeTask(dataBody).then(({data}) => {
+              this.lists = data.data.experimentSetDetails
+              this.dataForm.experimentName = data.data.experimentName
             })
           }
         })
@@ -166,9 +161,9 @@
           if (valid) {
             this.lists.push({
               strategySort: this.nextTodoId++,
-              subgroupName: this.dimensionForm.subgroupName,
-              strategy: this.dimensionForm.strategy,
-              proportion: this.dimensionForm.proportion
+              experimentStrategyId: this.dimensionForm.experimentStrategyId,
+              experimentGroupId: this.dimensionForm.experimentGroupId,
+              experimentPersent: this.dimensionForm.experimentPersent
             })
           }
         })
@@ -184,10 +179,10 @@
         })
       },
       clickNewAddText (val) {
-        this.dimensionForm.strategy = val
+        this.dimensionForm.experimentStrategyId = val
       },
       subgroupNameAddText (val) {
-        this.dimensionForm.subgroupName = val
+        this.dimensionForm.experimentGroupId = val
         this.proportionDisbild = true
       },
       proportionAddText () {
@@ -205,9 +200,10 @@
             this.$message.error('占比和需等于100%')
           } else {
             if (valid) {
-              this.dataForm.strategySetDetails = this.lists
+              this.dataForm.experimentSetDetails = this.lists
+              this.dataForm.experimentStrategyId = this.dimensionForm.experimentStrategyId
               const dataBody = this.dataForm
-              const dataUpdateId = this.dataForm.id
+              const dataUpdateId = this.id
               saveorupt(dataBody, dataUpdateId).then(({data}) => {
                 if (data && data.code === 0) {
                   this.$message({
