@@ -144,9 +144,9 @@
         const dataBody = {
           'pageNo': this.pageNo,
           'pageSize': this.pageSize,
-          'id': this.dataForm.sacherId,
-          'strategyName': this.dataForm.sacherName,
-          'strategyScene': this.dataForm.type
+          'experimentName': this.dataForm.sacherName,
+          'experimentSceneId': this.dataForm.type[0],
+          'experimentStatus': this.dataForm.testStatus
         }
         beeTaskList(dataBody).then(({data}) => {
           if (data && data.code === 0) {
