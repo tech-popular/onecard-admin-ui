@@ -302,7 +302,7 @@
       },
       deletedlLists (val) {
         this.lists && this.lists.length > 0 && this.lists.forEach((item) => {
-          if (item.strategySort === val.strategySort) {
+          if (item.id === val.id) {
             if (this.lists.indexOf(item) > -1) {
               var i = this.lists.indexOf(item)
               this.lists.splice(i, 1)
