@@ -38,7 +38,7 @@
           :data="lists"
           style="width: 100%">
           <el-table-column
-            prop="strategySort"
+            prop="id"
             label="序号"/>
           <el-table-column
             prop="experimentStrategyId"
@@ -77,7 +77,7 @@
         dataForm: {
           id: '',
           experimentName: '',
-          experimentStrategyId: '',
+          experimentSceneId: '',
           experimentSetDetails: []
         },
         dataFormValue: '',
@@ -160,7 +160,7 @@
         this.$refs['dimensionForm'].validate((valid) => {
           if (valid) {
             this.lists.push({
-              strategySort: this.nextTodoId++,
+              id: this.nextTodoId++,
               experimentStrategyId: this.dimensionForm.experimentStrategyId,
               experimentGroupId: this.dimensionForm.experimentGroupId,
               experimentPersent: this.dimensionForm.experimentPersent
@@ -201,7 +201,7 @@
           } else {
             if (valid) {
               this.dataForm.experimentSetDetails = this.lists
-              this.dataForm.experimentStrategyId = this.dimensionForm.experimentStrategyId
+              this.dataForm.experimentSceneId = this.examilId
               const dataBody = this.dataForm
               const dataUpdateId = this.id
               saveorupt(dataBody, dataUpdateId).then(({data}) => {

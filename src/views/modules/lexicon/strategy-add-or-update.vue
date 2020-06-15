@@ -19,12 +19,8 @@
         </el-cascader>
         </el-form-item>
         <el-form-item label="策略层级" prop="strategyLevel">
-          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="cengjiChangess">
-            <el-option 
-              v-for="item in hierarchyList" 
-              :value="item.baseValue" 
-              :key="item.baseValue" 
-              :label="item.baseName"/>
+          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="selectChange()">
+            <el-option v-for="item in hierarchyList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="策略类型" prop="strategyType">
@@ -235,7 +231,29 @@
         },
         deep: true,
         immediate: true
+      },
+      'typeChange': {
+        handler (newVal, oldVal) {
+          console.log(newVal, 'newVal')
+        },
+        deep: true,
+        immediate: true
+      },
+      'cengjiChange': {
+        handler (newVal, oldVal) {
+          console.log(newVal, 'newVal')
+        },
+        deep: true,
+        immediate: true
+      },
+      'loginChange': {
+        handler (newVal, oldVal) {
+          console.log(newVal, 'newVal')
+        },
+        deep: true,
+        immediate: true
       }
+  
     },
     mounted () {
       this.init()
@@ -331,11 +349,17 @@
       typeClick (val) {
         this.paixudisbuld = Number(val)
         this.typeChange = true
+        this.cengjiChange = false
+        this.loginChange = false
       },
-      cengjiChangess () {
+      selectChange () {
         this.cengjiChange = true
+        this.typeChange = false
+        this.loginChange = false
       },
       loginChangess () {
+        this.typeChange = false
+        this.cengjiChange = false
         this.loginChange = true
       },
       // 提交
