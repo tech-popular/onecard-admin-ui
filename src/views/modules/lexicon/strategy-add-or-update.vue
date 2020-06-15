@@ -263,7 +263,7 @@
 
           if (id) {
             const dataBody = this.id
-            infoBeeTask(dataBody).then(({data}) => {
+            infoBeeTask(dataBody).then(({data}) => { // 详情接口
               this.lists = data.data.strategySetDetails
               this.paixudisbuld = data.data.strategyType
               this.dataForm = data.data
@@ -290,8 +290,8 @@
         this.$refs['dimensionForm'].validate((valid) => {
           if (valid) {
             this.lists.push({
-              id: this.id ? this.numId + 1 : this.numId++,
-              strategySort: this.id ? this.nextTodoId + 1 : this.nextTodoId++,
+              id: this.numId++,
+              strategySort: this.nextTodoId++,
               strategyDimension: this.dimensionForm.latitude
             })
             this.dimensionForm.latitude = ''
@@ -309,7 +309,7 @@
             }
           }
         })
-        weidushowStrategyDropDown().then(({data}) => {
+        weidushowStrategyDropDown().then(({data}) => { // 删除后增加或删除纬度的数据
           this.weidu = false
           this.newAddTextList = data.data.strategyDimension
           if (this.lists.length > 0) {
@@ -317,6 +317,10 @@
             this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           } else {
             this.newAddTextList = data.data.strategyDimension
+            if (this.id) {
+              this.nextTodoId = 1
+              this.numId = 1
+            }
           }
         })
       },
