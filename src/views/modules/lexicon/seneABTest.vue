@@ -12,7 +12,7 @@
       </el-form-item>
       <el-form-item label="实验状态">
         <el-select filterable v-model="dataForm.testStatus" placeholder="请选择实验状态" style="width:100%">
-          <el-option v-for="item in testStatusTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
+          <el-option v-for="item in testStatusTypeList" :value="item.id" :key="item.id" :label="item.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="实验名称">
@@ -91,7 +91,7 @@
 
 <script>
   import AddOrUpdate from './seneABTest-add-or-update'
-  import { beeTaskList, getSceneDropDown, showStrategyDropDown } from '@/api/lexicon/ABTest'
+  import { beeTaskList, getSceneDropDown } from '@/api/lexicon/ABTest'
   export default {
     data () {
       return {
@@ -112,7 +112,10 @@
             { required: true, message: '请选择实验场景', trigger: 'blur' }
           ]
         },
-        testStatusTypeList: [],
+        testStatusTypeList: [
+          {id: 0, value: '禁用'},
+          {id: 1, value: '开启'}
+        ],
         typeList: [],
         dataList: [],
         pageNo: 1, // 当前页
@@ -152,9 +155,6 @@
         })
         getSceneDropDown().then(({data}) => {
           this.typeList = data.data
-        })
-        showStrategyDropDown().then(({data}) => {
-          this.testStatusTypeList = data.data
         })
       },
       // 每页数

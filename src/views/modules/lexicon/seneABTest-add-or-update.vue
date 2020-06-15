@@ -69,7 +69,7 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown } from '@/api/lexicon/ABTest'
+  import { infoBeeTask, saveorupt, showStrategyDropDown, selectStrategyBySceneId } from '@/api/lexicon/ABTest'
   export default {
     data () {
       return {
@@ -114,6 +114,7 @@
           {id: 2, baseName: '分群1', baseValue: '1', baseType: 'strategyScene', baseLevel: 2, baseSort: 1},
           {id: 1, baseName: '分群2', baseValue: '2', baseType: 'strategyScene', baseLevel: 1, baseSort: 2}
         ],
+        examilId: '',
         strategyList: [],
         loginTypeList: [],
         lists: [],
@@ -145,14 +146,13 @@
     },
     methods: {
       init (id, value, type, testType) {
-        console.log(testType, 'testType')
-  
         this.dataForm.id = id || ''
         this.dataFormValue = value
+        this.examilId = testType[0]
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
-        getSceneDropDown().then(({data}) => {
-          this.sceneList = data.data
+        selectStrategyBySceneId(this.examilId).then(({data}) => {
+          console.log(data, 'data')
         })
         showStrategyDropDown().then(({data}) => {
           this.loginTypeList = data.data.loginStatus
