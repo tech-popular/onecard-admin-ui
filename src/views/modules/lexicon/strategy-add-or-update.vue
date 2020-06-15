@@ -18,7 +18,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="策略类型" prop="strategyType">
-          <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%">
+          <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%" @change="typeClick">
             <el-option v-for="item in typeList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
@@ -54,15 +54,15 @@
             prop="strategyDimension"
             label="纬度"/>
           <el-table-column
-            v-if="paixudisbuld === 1"
+            v-if="paixudisbuld === '排序'"
             prop="strategyRecall"
             label="排序占比%"/>
           <el-table-column
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             prop="strategyRecall"
             label="召回占比%"/>
           <el-table-column
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             prop="strategySort"
             label="排序优先级"/>
         </el-table>
@@ -80,7 +80,7 @@
             label="排序占比%"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === 1"
+            v-if="paixudisbuld === '排序'"
             >
             <editable-cell
               slot-scope="scope"
@@ -93,7 +93,7 @@
             label="召回占比%"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             >
             <editable-cell 
               slot-scope="scope"
@@ -107,7 +107,7 @@
             label="排序优先级"
             header-align="center" 
             align="center"
-            v-if="paixudisbuld === 0"
+            v-if="paixudisbuld === '召回'"
             >
             <editable-cell
               slot-scope="scope"
@@ -305,7 +305,7 @@
       },
       // 类型
       typeClick (val) {
-        this.paixudisbuld = Number(val)
+        this.paixudisbuld = val
       },
       // 提交
       dataFormSubmit (form) {
