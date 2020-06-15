@@ -23,3 +23,6 @@ export const templateDownload = http.adornUrl(da + 'data/group/template/download
 
 export const selectAllCataNew = () => httpGet('http://10.3.1.64:8085/dataCatalog/selectAllCataNew', {}, true, true)
 export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManager/value/candidate', params)
+
+export const overviewData = id => httpGet(`/tableShow/data/group/overview/${id}`)
+export const transferLogList = params => httpGet(`/tableShow/data/transferLog/listOnPage`, params)

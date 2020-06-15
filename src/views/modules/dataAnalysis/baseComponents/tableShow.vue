@@ -3,25 +3,30 @@
       :title="'【' + title + '】分群概览'"
       :visible.sync="dialogVisible"
       width="1200px"
+      v-loading="loading"
       :before-close="handleClose">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
-        <el-form-item label="分群用户数：">{{peopNum}}人，在<span class="channl">{{channl}}</span>中占比{{proportion}}</el-form-item>
-        <el-form-item label="最近计算时间：" style="margin-left: 30px;">{{lately}}</el-form-item>
+        <el-form-item label="分群用户数：">{{templateUserNum}}人，在<span class="channl">{{channelInfoNameList}}</span>渠道中占比{{userRateStr}}</el-form-item>
+        <el-form-item label="最近计算时间：" style="margin-left: 30px;">{{lastCalTime}}</el-form-item>
         <br/>
         <el-form-item prop="region" label="可视化筛选：">
-          <el-select v-model="ruleForm.region" placeholder="请选择" :disabled="isShow" multiple :multiple-limit="1" style="width:500px">
-            <el-option-group
-              v-for="group in selectList"
-              :key="group.label"
-              :label="group.label">
-              <el-option
-                v-for="item in group.children"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-option-group>
-          </el-select>
+          <Treeselect
+            :options="outParamsIndexList"
+            :disable-branch-nodes="true"
+            :show-count="true"
+            :multiple="true"
+            :disabled="isShow"
+            :load-options="loadOptions"
+            noChildrenText="暂无数据"
+            v-model="ruleForm.region"
+            :clearable="false"
+            :limit="10"
+            search-nested
+            placeholder="请选择"
+            class="base-pane-item"
+            @select="outParamsSelect"
+            @deselect="outParamsDeselect"
+          />
         </el-form-item>
         <el-form-item>
           <el-button @click="editTable" type="primary" size="small" v-if="isShow">编辑</el-button>
@@ -44,9 +49,9 @@
               {{scope.$index + 1}}
             </template>
           </el-table-column>
-          <el-table-column prop="computedTime" header-align="center" align="center" label="计算完成时间"></el-table-column>
-          <el-table-column prop="computedNum" header-align="center" align="center" label="分群用户数"></el-table-column>
-          <el-table-column prop="computedType" header-align="center" align="center" label="计算类型"></el-table-column>
+          <el-table-column prop="lastCalTime" header-align="center" align="center" label="计算完成时间"></el-table-column>
+          <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
+          <el-table-column prop="type" header-align="center" align="center" label="计算类型"></el-table-column>
         </el-table>
         <el-pagination
         @size-change="sizeChangeHandle"
@@ -65,17 +70,24 @@
 
 <script>
 import echarts from 'echarts'
+import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+import { selectAllCata, overviewData, transferLogList } from '@/api/dataAnalysis/dataInsightManage'
+import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
+import { pieJson, barJson } from '../dataAnalysisUtils/tableShowChartInit'
 export default {
   data () {
     return {
       dialogVisible: false,
       title: '',
-      peopNum: 1000,
-      channl: '万卡',
-      proportion: '3.4%',
-      lately: '2020-04-25',
+      loading: false,
+      outParamsIndexList: [],
+      outParams: [],
+      templateUserNum: 1000,
+      channelInfoNameList: '',
+      userRateStr: '3.4%',
+      lastCalTime: '2020-04-25',
       ruleForm: {
-        region: ['1.1', '2.1']
+        region: []
       },
       rules: {
         region: [
@@ -112,161 +124,93 @@ export default {
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalCount: 0,
-      dataListLoading: false,
-      pieJson: {
-        id: 0,
-        title: {
-          show: true,
-          text: ''
-        },
-        legend: {
-          orient: 'vertical',
-          right: '0',
-          top: '0',
-          itemGap: 10,
-          itemWidth: 10,
-          itemHeight: 10,
-          data: [],
-          textStyle: {
-            color: '#666'
-          }
-        },
-        tooltip: {
-          trigger: 'item',
-          axisPointer: {
-            type: 'cross',
-            crossStyle: {
-              color: '#fff'
-            }
-          },
-          formatter: '{b} : {c}  {d}%'
-        },
-        color: ['#FFC175', '#59CBDD', '#A3D47D', '#5C62E6'],
-        series: [],
-        yAxis: null
-      },
-      barJson: {
-        title: {
-          show: true,
-          text: ''
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        legend: {
-          right: '0',
-          top: '0',
-          itemWidth: 10,
-          itemHeight: 10,
-          textStyle: {
-            color: '#666'
-          }
-        },
-        grid: [
-          {
-            top: 100,
-            bottom: 101
-          },
-          {
-            height: 60,
-            bottom: 40
-          }
-        ],
-        xAxis: [{
-          type: 'category',
-          data: [],
-          gridIndex: 0,
-          axisLabel: {
-            color: '#333'
-          },
-          axisLine: {
-            lineStyle: {
-              color: '#e7e7e7'
-            }
-          },
-          axisTick: {
-            lineStyle: {
-              color: '#e7e7e7'
-            }
-          },
-          zlevel: 2
-        }, {
-          type: 'category',
-          gridIndex: 1,
-          axisLine: {
-            show: false
-          },
-          zlevel: 1
-        }],
-        yAxis: [{
-          type: 'value',
-          gridIndex: 0,
-          axisLabel: {
-            color: '#333'
-          },
-          splitLine: {
-            lineStyle: {
-              type: 'dashed'
-            }
-          },
-          axisLine: {
-            lineStyle: {
-              color: '#ccc'
-            }
-          },
-          axisTick: {
-            lineStyle: {
-              color: '#ccc'
-            }
-          }
-        }, {
-          type: 'value',
-          gridIndex: 1,
-          axisLabel: {
-            show: false
-          },
-          axisLine: {
-            show: false
-          },
-          splitLine: {
-            show: false
-          },
-          axisTick: {
-            show: false
-          }
-        }],
-        series: [{
-          type: 'bar',
-          data: [],
-          name: '',
-          label: {
-            show: true,
-            position: 'top',
-            textStyle: {
-              color: '#555'
-            }
-          },
-          itemStyle: {
-            normal: {
-              color: '#4150d8'
-            }
-          },
-          xAxisIndex: 0,
-          yAxisIndex: 0
-        }]
-      }
+      dataListLoading: false
     }
   },
-  components: {},
+  components: { Treeselect },
   methods: {
+    async loadOptions ({ action, parentNode, callback }) {
+      if (action === LOAD_CHILDREN_OPTIONS) {
+        callback()
+      }
+    },
+    getSelectAllCata (channelCode, fn) { // 获取所有指标
+      selectAllCata({ channelCode: channelCode, flag: '-1', type: ['number', 'enums'] }).then(({data}) => {
+        if (data.status !== '1') {
+          this.indexList = []
+        } else {
+          this.indexList = this.filterAllCata(data.data)
+        }
+        if (fn) {
+          fn(this.indexList)
+        }
+      })
+    },
+    filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
+      let arr = []
+      if (!!tree && tree.length !== 0) {
+        tree.forEach((item, index) => {
+          let obj = {}
+          if (item.fieldType) {
+            obj.id = item.id
+            obj.englishName = item.englishName
+            obj.label = item.chineseName
+          } else {
+            obj.id = item.id
+            obj.label = item.name
+          }
+          if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
+            obj.children = this.filterAllCata(item.dataCataLogList)
+            arr.push(obj)
+          } else {
+            if (!item.fieldType) {
+              obj.children = null
+            } else {
+              arr.push(obj)
+            }
+          }
+        })
+      }
+      return arr
+    },
+    outParamsSelect (node) { // 选中出参
+      this.outParams.push({
+        title: node.label,
+        value: node.englishName,
+        id: node.id
+      })
+      if (this.outParams.length) {
+        this.$refs.ruleForm.clearValidate('region')
+      }
+    },
+    outParamsDeselect (node) { // 删除出参
+      this.outParams = this.outParams.filter(item => item.id !== node.id)
+    },
+    updateOutParamsList (indexList) { // 获取出参默认展开列表
+      let indexListArr = deepClone(indexList)
+      if (this.ruleForm.region && this.ruleForm.region.length) {
+        this.ruleForm.region.forEach(item => {
+          let indexPath = findVueSelectItemIndex(indexListArr, item * 1) + ''
+          let indexPathArr = indexPath.split(',')
+          let a = indexListArr
+          indexPathArr.forEach((pitem, index) => {
+            if (index < indexPathArr.length - 1) {
+              a[pitem].isDefaultExpanded = true
+              a = a[pitem].children
+            }
+          })
+        })
+        return indexListArr
+      } else {
+        return indexListArr
+      }
+    },
     init (val) {
+      this.loading = true
       this.dialogVisible = true
       this.title = val.name
-      // lookAccout(val.id).then(({data}) => {
-      // })
+      this.getOverviewData(val.id, val.channelId.split(','))
+      this.getTranferLogData(val.id)
       let seriseData = [
         {
           id: '1',
@@ -311,7 +255,7 @@ export default {
       seriseData.map((item, index) => {
         let option = {}
         if (item.type === 'pie') {
-          option = JSON.parse(JSON.stringify(this.pieJson))
+          option = JSON.parse(JSON.stringify(pieJson))
           option.series = item
           option.legend.data = []
           item.data.forEach(item => {
@@ -343,7 +287,7 @@ export default {
             }
           }
         } else {
-          option = JSON.parse(JSON.stringify(this.barJson))
+          option = JSON.parse(JSON.stringify(barJson))
           option.xAxis[0].data = item.xAxisData
           option.series[0].data = item.series
           option.series[0].name = item.name
@@ -365,12 +309,46 @@ export default {
         }, 500)
       })
     },
+    getOverviewData (id, channelCode) {
+      overviewData(id).then(({data}) => {
+        if (data.status * 1 !== 1) {
+          return this.$message.error(data.message)
+        }
+        this.templateUserNum = data.data.templateUserNum
+        this.userRateStr = data.data.userRateStr
+        this.lastCalTime = data.data.lastCalTime
+        this.ruleForm.region = ['3', '4'] // data.data.lableValList
+        this.channelInfoNameList = data.data.channelInfoNameList.join('、')
+        this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
+        this.getSelectAllCata(channelCode, (indexList) => {
+          this.outParamsIndexList = this.updateOutParamsList(indexList)
+          this.$nextTick(() => {
+            this.loading = false
+          })
+        })
+      })
+    },
+    getTranferLogData (id) {
+      transferLogList({
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
+        templateId: id
+      }).then(({data}) => {
+        if (data.status !== '1' || !data.data.list || !data.data.list.length) {
+          this.totalCount = 0
+          this.dataList = []
+        } else {
+          this.totalCount = data.data.total
+          this.dataList = data.data.list
+        }
+      })
+    },
     // 编辑
     editTable () {
       this.isShow = false
     },
     saveTable () {
-      console.log(9)
+      console.log(this.ruleForm.region)
     },
     // 每页数
     sizeChangeHandle (page) {
@@ -402,5 +380,14 @@ export default {
 }
 .echart-content {
   border-bottom: 1px dashed #d8d8d8;
+}
+.base-pane-item {
+  width: 700px;
+  line-height: 38px;
+}
+.vue-treeselect {
+  min-height: 38px;
+  line-height: 24px;
+  max-width: 100%;
 }
 </style>>
