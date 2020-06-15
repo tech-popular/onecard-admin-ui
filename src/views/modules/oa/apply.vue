@@ -68,7 +68,8 @@
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
-          <el-button type="primary" icon="el-icon-view" size="small" @click="lookHandle(scope.row)">查看</el-button>
+          <el-button type="primary" icon="el-icon-view" size="small" @click="lookHandle(scope.row)">查&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;看</el-button>
+          <el-button v-if="scope.row.grantResult === '授权异常'" type="success" icon="el-icon-tickets" size="small" style="margin-left:0;margin-top:10px;" @click="applyDetailHandle(scope.row)">授权详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -84,11 +85,14 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
     <!-- 查看弹出框 -->
     <ApplyDetail v-if="applyDetailVisible" ref="applyDetail"/>
+    <!-- 授权详情 -->
+    <allApplyDetail v-if="allApplyDetailVisible" ref="allApplyDetail"/>
   </div>
 </template>
 <script>
 import AddOrUpdate from './apply-add-or-update'
 import ApplyDetail from './applyDetail'
+import AllApplyDetail from './allApplyDetail'
 import { myAccoutList, myAccoutSelect } from '@/api/oa/apply'
 
 export default {
@@ -109,12 +113,14 @@ export default {
       addOrUpdateVisible: false,
       newList: [],
       dialogVisible: false,
-      applyDetailVisible: false
+      applyDetailVisible: false,
+      allApplyDetailVisible: false
     }
   },
   components: {
     AddOrUpdate,
-    ApplyDetail
+    ApplyDetail,
+    AllApplyDetail
   },
   activated () {
     this.getDataList()
@@ -200,6 +206,13 @@ export default {
       this.applyDetailVisible = true
       this.$nextTick(() => {
         this.$refs.applyDetail.init(val)
+      })
+    },
+    // 授权详情
+    applyDetailHandle (val) {
+      this.allApplyDetailVisible = true
+      this.$nextTick(() => {
+        this.$refs.allApplyDetail.init(val)
       })
     }
   }
