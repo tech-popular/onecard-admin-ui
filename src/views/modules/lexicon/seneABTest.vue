@@ -144,7 +144,7 @@
         const dataBody = {
           'pageNo': this.pageNo,
           'pageSize': this.pageSize,
-          'experimentName': this.dataForm.sacherName,
+          'experimentName': this.dataForm.testName,
           'experimentSceneId': this.dataForm.type[0],
           'experimentStatus': this.dataForm.testStatus
         }
