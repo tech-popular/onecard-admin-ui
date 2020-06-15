@@ -15,18 +15,18 @@
         <span>流量参数配置</span><el-tag type="danger" style="margin-left:5px">各工具流量条件设置</el-tag>
       </div>
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild' v-if="disbild === false">
-        <el-form-item label="策略" prop="strategy">
+        <el-form-item label="策略" prop="experimentStrategyId">
           <el-select filterable v-model="dimensionForm.experimentStrategyId" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
-            <el-option v-for="item in strategyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in strategyList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="subgroupName">
+        <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="experimentGroupId">
           <el-select filterable v-model="dimensionForm.experimentGroupId" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
-            <el-option v-for="item in subgroupNameList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in subgroupNameList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="占比" prop="proportion" v-if="proportionDisbild === false" @change='proportionAddText'>
-          <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比"/>
+        <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
+          <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/>
         </el-form-item>
         <el-form-item>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
@@ -41,15 +41,15 @@
             prop="strategySort"
             label="序号"/>
           <el-table-column
-            prop="strategy"
+            prop="experimentStrategyId"
             label="策略"/>
           <el-table-column
             v-if="subgroupNameDisbild === false"
-            prop="subgroupName"
+            prop="experimentGroupId"
             label="人群包"/>
           <el-table-column
             v-if="proportionDisbild === false"
-            prop="proportion"
+            prop="experimentPersent"
             label="占比%"/>
           <el-table-column header-align="center" align="center" width="200" label="操作">
             <template slot-scope="scope" v-if="disbild === false">
@@ -69,7 +69,7 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown } from '@/api/lexicon/strategy'
+  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown } from '@/api/lexicon/ABTest'
   export default {
     data () {
       return {
@@ -83,6 +83,7 @@
         },
         dataForm: {
           id: '',
+          experimentStrategyId: '',
           experimentName: '',
           experimentSetDetails: []
         },
@@ -93,18 +94,18 @@
           ]
         },
         dimensionForm: {
-          strategy: '',
-          subgroupName: '',
-          proportion: ''
+          experimentStrategyId: '',
+          experimentGroupId: '',
+          experimentPersent: ''
         },
         dimensionRule: {
-          strategy: [
+          experimentStrategyId: [
             { required: true, message: '请选择策略', trigger: 'blur' }
           ],
-          subgroupName: [
+          experimentGroupId: [
             { required: true, message: '请选择分群名称', trigger: 'blur' }
           ],
-          proportion: [
+          experimentPersent: [
             { required: true, message: '请输入占比', trigger: 'blur' }
           ]
         },
@@ -126,9 +127,14 @@
       EditableCell
     },
     watch: {
-      'dataFormValue': {
+      'proportionDisbild': {
         handler (newVal, oldVal) {
-          this.dataFormValue = newVal
+        },
+        deep: true,
+        immediate: true
+      },
+      'subgroupNameDisbild': {
+        handler (newVal, oldVal) {
         },
         deep: true,
         immediate: true
@@ -167,9 +173,9 @@
           if (valid) {
             this.lists.push({
               strategySort: this.nextTodoId++,
-              subgroupName: this.dimensionForm.subgroupName,
-              strategy: this.dimensionForm.strategy,
-              proportion: this.dimensionForm.proportion
+              experimentStrategyId: this.dimensionForm.experimentStrategyId,
+              experimentGroupId: this.dimensionForm.experimentGroupId,
+              experimentPersent: this.dimensionForm.experimentPersent
             })
           }
         })
@@ -185,10 +191,10 @@
         })
       },
       clickNewAddText (val) {
-        this.dimensionForm.strategy = val
+        this.dimensionForm.experimentStrategyId = val
       },
       subgroupNameAddText (val) {
-        this.dimensionForm.subgroupName = val
+        this.dimensionForm.experimentGroupId = val
         this.proportionDisbild = true
       },
       proportionAddText () {
