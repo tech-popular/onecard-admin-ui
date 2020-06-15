@@ -4,7 +4,8 @@
       :visible.sync="dialogVisible"
       width="50%"
       :before-close="handleClose">
-      <p>{{checkedCities}}</p>
+      <p>失败原因：{{checkedCities}}</p>
+      <p @click="see(aliUrl)"><a style="cursor:pointer">点击查看错误码对照表</a></p>
     </el-dialog>
 </template>
 
@@ -13,7 +14,8 @@ export default {
   data () {
     return {
       dialogVisible: false,
-      checkedCities: []
+      checkedCities: [],
+      aliUrl: 'https://www.baidu.com/'
     }
   },
   components: {
@@ -21,10 +23,12 @@ export default {
   methods: {
     init (val) {
       this.dialogVisible = true
-      // this.checkedCities = val.grantResultJson.filter(item => item.type !== '项目空间添加用户')
       this.checkedCities = val.grantResultJson
     },
-
+    // 查看对照表
+    see (e) {
+      window.open(e, '_blank')
+    },
     // 弹窗状态
     handleClose () {
       this.dialogVisible = false
