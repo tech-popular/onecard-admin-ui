@@ -625,23 +625,20 @@ export default {
             obj.id = item.id
             obj.label = item.name
           }
-          if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-            obj.children = this.filterAllCata(item.dataCataLogList)
+          // if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
+          //   obj.children = this.filterAllCata(item.dataCataLogList)
+          //   arr.push(obj)
+          if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
+            obj.children = this.filterAllCata(item.dataCata) // 指标集合
+            arr.push(obj)
+          } else if (this.filterAllCata(item.dataIndex).length) {
+            obj.children = this.filterAllCata(item.dataIndex) // 指标集合
             arr.push(obj)
           } else {
             if (!item.fieldType) {
               obj.children = null
             } else {
               arr.push(obj)
-              // if (!this.allSelectedChannelCode.length) {
-              //   arr.push(obj)
-              // } else {
-              //   for (let i = 0; i < this.allSelectedChannelCode.length; i++) {
-              //     if (obj.channelCode && obj.channelCode == this.allSelectedChannelCode[i]) {
-              //       arr.push(obj)
-              //     }
-              //   }
-              // }
             }
           }
         })
