@@ -215,8 +215,6 @@ export default {
       this.title = val.name
       this.templateId = val.id
       this.getOverviewData(val.id, val.channelId.split(','))
-
-
       let seriseData = [
         {
           id: '3',
@@ -249,7 +247,7 @@ export default {
         this.templateUserNum = data.data.templateUserNum
         this.userRateStr = data.data.userRateStr
         this.lastCalTime = data.data.lastCalTime
-        this.ruleForm.region = data.data.lableValList || ['5486', '5590']
+        this.ruleForm.region = data.data.lableValList || [5486, 5590]
         this.getChartInfo()
         this.getTranferLogData(id)
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
