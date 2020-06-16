@@ -3,6 +3,7 @@
     <el-form :inline="true" :model="dataForm" :rules="dataRule" ref="dataForm">
       <el-form-item label="实验场景" prop="type">
         <el-cascader
+        @change="testSech"
           style="width: 100%"
           :props="props"
           v-model="dataForm.type"
@@ -76,9 +77,9 @@
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="lookHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
+          <!-- <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-document" circle @click="lookHandle(scope.row.id)"></el-button>
-          </el-tooltip>
+          </el-tooltip> -->
         </template>
       </el-table-column>
     </el-table>
@@ -111,7 +112,8 @@
         dataForm: {
           type: [],
           testStatus: '',
-          testName: ''
+          testName: '',
+          experimentSceneId: ''
         },
         dataRule: {
           type: [
@@ -145,7 +147,7 @@
           'pageNo': this.pageNo,
           'pageSize': this.pageSize,
           'experimentName': this.dataForm.testName,
-          'experimentSceneId': this.dataForm.type[0],
+          'experimentSceneId': this.dataForm.experimentSceneId,
           'experimentStatus': this.dataForm.testStatus
         }
         beeTaskList(dataBody).then(({data}) => {
@@ -162,6 +164,9 @@
         getSceneDropDown().then(({data}) => {
           this.typeList = data.data
         })
+      },
+      testSech (val) {
+        this.dataForm.experimentSceneId = val[0]
       },
       // 每页数
       sizeChangeHandle (val) {
