@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import { httpGet, httpPost } from '@/api'
 import http from '@/utils/httpRequest'
-// let base = '/lexicon/'
-let base = '/'
+let base = '/lexicon/'
+// let base = '/'
 export const wordTypeList = () => httpGet(base + 'word/wordTypeList') // 词组类型列表-
 export const wordList = params => httpPost(base + 'word/list', params) // 列表-
 export const changeWordsInfoStatus = (id, status, username) => httpPost(base + `word/changeWordsInfoStatus/${id}/${status}/${username}`) // 修改词组状态 启用停用
@@ -15,5 +15,5 @@ export const updateWordsInfo = params => httpPost(base + 'word/updateWordsInfo',
 export const getBrandNamesAndCategoryNames = params => httpPost(base + 'word/showBrandNamesAndCategoryNames', params) // 词组搜索词模糊查询
 // export const downLoadWordsTXT = type => httpGet(base + `/word/downLoadWordsTXT/${type}`)
 export const downLoadWordsTXT = type => http.adornUrl(base + 'word/downLoadWordsTXT/' + type + '?token=' + Vue.cookie.get('token'))
-
+export const searchKeyword = params => httpPost(base + 'word/searchKeyword', params) // 词组类型列表-
 // 场景推荐

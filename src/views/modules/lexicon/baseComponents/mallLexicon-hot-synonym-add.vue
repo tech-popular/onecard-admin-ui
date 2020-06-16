@@ -39,7 +39,7 @@
 <script>
 import leftTransferHot from '../components/leftTransferHot'
 import rightTransfer from '../components/rightTransfer'
-// import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
+import { searchKeyword } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
@@ -91,7 +91,11 @@ export default {
       this.getWordNum()
     },
     getWordNum () { // 获取query的数量
-      console.log(123, this.nameWord)
+      searchKeyword({
+        keyword: this.nameWord
+      }).then(({data}) => {
+        console.log(data)
+      })
     },
     addToRight () { // 添加到右侧
       if (!this.nameWord.trim().length) return

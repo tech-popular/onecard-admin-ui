@@ -9,7 +9,6 @@
     v-model="nameWord"
     size="small"
     :placeholder="placeholder"
-    @keyup.native="inputChange"
     style="width: 240px;display:inline-block"
     >
       <i slot="prefix" class="el-input__icon el-icon-search"></i>
