@@ -27,7 +27,21 @@ export const pieJson = {
     formatter: '{b} : {c}  {d}%'
   },
   color: ['#FFC175', '#59CBDD', '#A3D47D', '#5C62E6'],
-  series: [],
+  series: [
+    {
+      name: '',
+      type: 'pie',
+      radius: '50%',
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      },
+      data: []
+    }
+  ],
   yAxis: null
 }
 

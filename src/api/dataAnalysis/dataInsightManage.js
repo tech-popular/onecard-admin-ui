@@ -26,3 +26,4 @@ export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManage
 
 export const overviewData = id => httpGet(`/tableShow/data/group/overview/${id}`)
 export const transferLogList = params => httpGet(`/tableShow/data/transferLog/listOnPage`, params)
+export const chartInfo = params => httpGet(`/tableShow/data/group/chartInfo`, params)

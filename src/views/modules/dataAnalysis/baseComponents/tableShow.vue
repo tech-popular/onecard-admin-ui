@@ -15,12 +15,11 @@
             :disable-branch-nodes="true"
             :show-count="true"
             :multiple="true"
-            :disabled="isShow"
             :load-options="loadOptions"
             noChildrenText="暂无数据"
             v-model="ruleForm.region"
             :clearable="false"
-            :limit="10"
+            :disabled="isShow"
             search-nested
             placeholder="请选择"
             class="base-pane-item"
@@ -34,13 +33,16 @@
           <el-button @click="editTable" size="small" v-if="!isShow">取消</el-button>
         </el-form-item>
       </el-form>
-      <el-row :gutter="20" class="echart-content">
-        <el-col :span="12" v-for="item in 3" :key="item" class="order-echarts-col">
+      <el-row :gutter="20" class="echart-content" v-if="chartLen > 0">
+        <el-col :span="12" v-for="(item, index) in chartLen" :key="item" class="order-echarts-col">
           <el-card shadow="never" class="order-echarts-card">
-            <div :id="'echart-' + item" class="echart"></div>
+            <div :id="'echart-' + index" class="echart"></div>
           </el-card>
         </el-col>
       </el-row>
+      <div class="no-echart-content" v-else style="">
+        暂无图表数据
+      </div>
       <div class="custer-history">
         <p>分群历史情况：</p>
         <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -71,7 +73,7 @@
 <script>
 import echarts from 'echarts'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-import { selectAllCata, overviewData, transferLogList } from '@/api/dataAnalysis/dataInsightManage'
+import { selectAllCata, overviewData, transferLogList, chartInfo } from '@/api/dataAnalysis/dataInsightManage'
 import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import { pieJson, barJson } from '../dataAnalysisUtils/tableShowChartInit'
 export default {
@@ -86,6 +88,8 @@ export default {
       channelInfoNameList: '',
       userRateStr: '3.4%',
       lastCalTime: '2020-04-25',
+      templateId: '',
+      chartLen: 0,
       ruleForm: {
         region: []
       },
@@ -209,31 +213,11 @@ export default {
       this.loading = true
       this.dialogVisible = true
       this.title = val.name
+      this.templateId = val.id
       this.getOverviewData(val.id, val.channelId.split(','))
-      this.getTranferLogData(val.id)
+
+
       let seriseData = [
-        {
-          id: '1',
-          type: 'pie',
-          name: '性别',
-          radius: [0, 150],
-          data: [
-            {value: 20, percent: '30', name: '男'},
-            {value: 30, percent: '50', name: '女'}
-          ]
-        },
-        {
-          id: '2',
-          type: 'pie',
-          name: '会员等级',
-          radius: [0, 150],
-          data: [
-            {value: 20, percent: '20', name: '王者'},
-            {value: 30, percent: '30', name: '青铜'},
-            {value: 40, percent: '40', name: '白银'},
-            {value: 10, percent: '10', name: '黄金'}
-          ]
-        },
         {
           id: '3',
           type: 'bar',
@@ -252,72 +236,22 @@ export default {
           ]
         }
       ]
-      seriseData.map((item, index) => {
-        let option = {}
-        if (item.type === 'pie') {
-          option = JSON.parse(JSON.stringify(pieJson))
-          option.series = item
-          option.legend.data = []
-          item.data.forEach(item => {
-            option.legend.data.push(item.name)
-          })
-          option.series.label = {
-            normal: {
-              formatter: params => {
-                return (
-                  '{icon|●}{name|' + params.name + '}\n\n{value|' + params.value + '}\n\n{percent|' + params.percent + '%}'
-                )
-              },
-              textAlign: 'center',
-              rich: {
-                color: '#666',
-                name: {
-                  color: '#666',
-                  textAlign: 'left'
-                },
-                percent: {
-                  color: '#666',
-                  textAlign: 'left'
-                },
-                value: {
-                  color: '#666',
-                  textAlign: 'left'
-                }
-              }
-            }
-          }
-        } else {
-          option = JSON.parse(JSON.stringify(barJson))
-          option.xAxis[0].data = item.xAxisData
-          option.series[0].data = item.series
-          option.series[0].name = item.name
-          // option.legend.data = [item.name]
-        }
-        option.id = item.id
-        option.title.text = item.name
-        setTimeout(() => {
-          let chart = null
-          console.log(option.id)
-          const docu = document.getElementById(
-            'echart-' + option.id
-          )
-          chart = echarts.init(docu)
-          chart.setOption(option, true)
-          window.addEventListener('resize', () => {
-            chart.resize()
-          })
-        }, 500)
-      })
     },
     getOverviewData (id, channelCode) {
       overviewData(id).then(({data}) => {
         if (data.status * 1 !== 1) {
-          return this.$message.error(data.message)
+          this.loading = false
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
         }
         this.templateUserNum = data.data.templateUserNum
         this.userRateStr = data.data.userRateStr
         this.lastCalTime = data.data.lastCalTime
-        this.ruleForm.region = ['3', '4'] // data.data.lableValList
+        this.ruleForm.region = data.data.lableValList || ['5486', '5590']
+        this.getChartInfo()
+        this.getTranferLogData(id)
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
         this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
         this.getSelectAllCata(channelCode, (indexList) => {
@@ -325,6 +259,79 @@ export default {
           this.$nextTick(() => {
             this.loading = false
           })
+        })
+      })
+    },
+    getChartInfo () {
+      chartInfo({
+        templateId: this.templateId,
+        indicators: this.ruleForm.region.join(',')
+      }).then(({data}) => {
+        if (data.status !== '1' || !data.data || !data.data.pieChartDataList.length) {
+          this.chartLen = 0
+          return
+        }
+        console.log(123)
+        let seriseData = data.data.pieChartDataList
+        this.chartLen = data.data.pieChartDataList.length
+        seriseData.map((item, index) => {
+          let option = {}
+          option.id = index
+          if (item.indicatorsType === 'pie') {
+            option = JSON.parse(JSON.stringify(pieJson))
+            option.title.text = item.indicatorsName
+            option.series.name = item.indicatorsName
+            option.series.data = item.valList
+            option.legend.data = []
+            item.valList.forEach(item => {
+              option.legend.data.push(item.name)
+            })
+            option.series.label = {
+              normal: {
+                formatter: params => {
+                  return (
+                    '{icon|●}{name|' + params.name + '}\n\n{value|' + params.value + '}\n\n{percent|' + params.percent + '%}'
+                  )
+                },
+                textAlign: 'center',
+                rich: {
+                  color: '#666',
+                  name: {
+                    color: '#666',
+                    textAlign: 'left'
+                  },
+                  percent: {
+                    color: '#666',
+                    textAlign: 'left'
+                  },
+                  value: {
+                    color: '#666',
+                    textAlign: 'left'
+                  }
+                }
+              }
+            }
+          } else {
+            option = JSON.parse(JSON.stringify(barJson))
+            option.xAxis[0].data = item.xAxisData
+            option.series[0].data = item.series
+            option.series[0].name = item.name
+            // option.legend.data = [item.name]
+          }
+          option.id = item.id
+          option.title.text = item.name
+          setTimeout(() => {
+            let chart = null
+            console.log(option.id)
+            const docu = document.getElementById(
+              'echart-' + option.id
+            )
+            chart = echarts.init(docu)
+            chart.setOption(option, true)
+            window.addEventListener('resize', () => {
+              chart.resize()
+            })
+          }, 500)
         })
       })
     },
@@ -379,6 +386,12 @@ export default {
   margin-bottom: 20px;
 }
 .echart-content {
+  border-bottom: 1px dashed #d8d8d8;
+}
+.no-echart-content {
+  width: 100%;
+  padding: 30px 0;
+  text-align: center;
   border-bottom: 1px dashed #d8d8d8;
 }
 .base-pane-item {
