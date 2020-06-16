@@ -11,6 +11,11 @@
           :options="typeList">
         </el-cascader>
       </el-form-item>
+      <el-form-item label="策略类型" prop="strategyType">
+        <el-select filterable v-model="dataForm.strategyType" placeholder="请选择实验状态" style="width:100%">
+          <el-option v-for="item in strategyTypeList" :value="item.id" :key="item.id" :label="item.value"/>
+        </el-select>
+      </el-form-item>
       <el-form-item label="实验状态">
         <el-select filterable v-model="dataForm.testStatus" placeholder="请选择实验状态" style="width:100%">
           <el-option v-for="item in testStatusTypeList" :value="item.id" :key="item.id" :label="item.value"/>
@@ -111,6 +116,7 @@
         },
         dataForm: {
           type: [],
+          strategyType: '',
           testStatus: '',
           testName: '',
           experimentSceneId: ''
@@ -118,6 +124,9 @@
         dataRule: {
           type: [
             { required: true, message: '请选择实验场景', trigger: 'blur' }
+          ],
+          strategyType: [
+            { required: true, message: '请选择策略类型', trigger: 'blur' }
           ]
         },
         testStatusTypeList: [
