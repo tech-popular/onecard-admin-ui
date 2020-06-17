@@ -95,6 +95,11 @@ export default {
         keyword: this.nameWord
       }).then(({data}) => {
         console.log(data)
+        if (data.code !== 0) {
+          this.num = 0
+        } else {
+          this.num = data.data
+        }
       })
     },
     addToRight () { // 添加到右侧
