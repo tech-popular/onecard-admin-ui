@@ -46,14 +46,6 @@ export default {
       num: 0,
       leftData: [],
       rightData: [],
-      // dataForm: {
-      //   query: ''
-      // },
-      // dataRules: {
-      //   query: [
-      //     { required: true, message: '请选择', trigger: 'change' }
-      //   ]
-      // },
       leftChecked: [],
       nameWord: '',
       needType: {
@@ -95,6 +87,7 @@ export default {
         keyword: this.nameWord
       }).then(({data}) => {
         console.log(data)
+        this.$refs.leftTransfer.loadDataCompleted()
         if (data.code !== 0) {
           this.num = 0
         } else {

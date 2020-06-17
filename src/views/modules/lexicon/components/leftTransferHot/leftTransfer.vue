@@ -14,7 +14,7 @@
     >
       <i slot="prefix" class="el-input__icon el-icon-search"></i>
     </el-input>
-    <el-button type="primary" size="mini" @click="inputChange">查询</el-button>
+    <el-button :type="isLoading ? '' : 'primary'" size="mini" @click="inputChange" :disabled="isLoading">{{isLoading ? '查询中' : '查询'}}</el-button>
     <div class="data-list">
       <p class="el-transfer-panel__empty">请输入搜索内容查询数据</p>
     </div>
@@ -29,7 +29,8 @@ export default {
   data () {
     return {
       nameWord: '',
-      inputHover: false
+      inputHover: false,
+      isLoading: false
     }
   },
   props: {
@@ -42,6 +43,10 @@ export default {
   methods: {
     inputChange () {
       this.$emit('searchName', this.nameWord)
+      this.isLoading = true
+    },
+    loadDataCompleted () {
+      this.isLoading = false
     }
   }
 }

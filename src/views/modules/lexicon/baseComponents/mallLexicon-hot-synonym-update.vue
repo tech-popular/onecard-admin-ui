@@ -15,7 +15,7 @@
             </el-input>
           </el-form-item>
           <el-form-item class="item-form">
-            <el-button type="primary" @click="getWordNum" size="small">查询</el-button>
+            <el-button :type="isLoading ? '' : 'primary'" @click="getWordNum" size="small" :disabled="isLoading">{{isLoading ? '查询中' : '查询'}}</el-button>
             <span class="tip">该Query搜索到的产品数量：<b>{{num}}</b>个</span>
           </el-form-item>
         </el-form>
@@ -36,6 +36,7 @@ export default {
       loading: false,
       tableData: [],
       num: 0,
+      isLoading: false,
       query: '' // 搜索词
     }
   },
@@ -78,9 +79,11 @@ export default {
       })
     },
     getWordNum () { // 获取query的数量
+      this.isLoading = true
       searchKeyword({
         keyword: this.query
       }).then(({data}) => {
+        this.isLoading = false
         if (data.code !== 0) {
           this.num = 0
         } else {
