@@ -23,8 +23,8 @@
             search-nested
             placeholder="请选择"
             class="base-pane-item"
-            @select="outParamsSelect"
-            @deselect="outParamsDeselect"
+            @select="indexSelect"
+            @deselect="indexDeselect"
           />
         </el-form-item>
         <el-form-item>
@@ -83,7 +83,8 @@ export default {
       title: '',
       loading: false,
       outParamsIndexList: [],
-      outParams: [],
+      selectedIndex: [], // 选中的指标，实时
+      limitLen: 2, // 限制选中指标个数
       templateUserNum: 1000,
       channelInfoNameList: '',
       userRateStr: '3.4%',
@@ -99,31 +100,6 @@ export default {
         ]
       },
       isShow: true,
-      props: { multiple: true },
-      selectList: [
-        {
-          value: '1',
-          label: '用户属性',
-          children: [{
-            value: '1.1',
-            label: '渠道'
-          }, {
-            value: '1.2',
-            label: '性别'
-          }]
-        }, {
-          value: '2',
-          label: '用户交易',
-          children: [{
-            value: '2.1',
-            label: '7日内借款'
-          }, {
-            value: '2.2',
-            label: '其他'
-          }]
-        }
-      ],
-      detalListCaent: [{name: '渠道'}, {name: '性别'}],
       dataList: [],
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
@@ -163,8 +139,11 @@ export default {
             obj.id = item.id
             obj.label = item.name
           }
-          if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-            obj.children = this.filterAllCata(item.dataCataLogList)
+          if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
+            obj.children = this.filterAllCata(item.dataCata) // 指标集合
+            arr.push(obj)
+          } else if (this.filterAllCata(item.dataIndex).length) {
+            obj.children = this.filterAllCata(item.dataIndex) // 指标集合
             arr.push(obj)
           } else {
             if (!item.fieldType) {
@@ -177,18 +156,21 @@ export default {
       }
       return arr
     },
-    outParamsSelect (node) { // 选中出参
-      this.outParams.push({
-        title: node.label,
-        value: node.englishName,
-        id: node.id
-      })
-      if (this.outParams.length) {
-        this.$refs.ruleForm.clearValidate('region')
+    indexSelect (node) { // 选中出参
+      this.selectedIndex.push(node.id)
+      if (this.selectedIndex.length >= this.limitLen) {
+        let indexListArr = deepClone(this.indexList)
+        this.outParamsIndexList = this.disabledOutParamsList(this.selectedIndex.length, indexListArr)
       }
     },
-    outParamsDeselect (node) { // 删除出参
-      this.outParams = this.outParams.filter(item => item.id !== node.id)
+    indexDeselect (node) { // 删除出参
+      let originLen = this.selectedIndex.length // 删除之前的数据长度
+      this.selectedIndex = this.selectedIndex.filter(item => item !== node.id) // 删除数据
+      let newLen = this.selectedIndex.length // 删除后的数据长度
+      if (originLen === this.limitLen && newLen === this.limitLen - 1) {
+        let indexListArr = deepClone(this.indexList)
+        this.outParamsIndexList = this.disabledOutParamsList(newLen, indexListArr)
+      }
     },
     updateOutParamsList (indexList) { // 获取出参默认展开列表
       let indexListArr = deepClone(indexList)
@@ -204,8 +186,37 @@ export default {
             }
           })
         })
+        // 如果已选的指标已经等于限制个数时，默认其他的不可选
+        if (this.ruleForm.region.length >= this.limitLen) {
+          indexListArr = this.disabledOutParamsList(this.ruleForm.region.length, indexListArr)
+        }
         return indexListArr
       } else {
+        return indexListArr
+      }
+    },
+    disabledOutParamsList (len, indexListArr) { // 选择超出N个后，其他的禁选
+      if (len >= this.limitLen) { // 多于N条时，不可再选
+        indexListArr.forEach((citem, cindex) => {
+          if (citem.children && citem.children.length) {
+            this.disabledOutParamsList(len, citem.children)
+          } else {
+            if (!this.selectedIndex.includes(citem.id)) {
+              citem.isDisabled = true
+            } else {
+              citem.isDisabled = false
+            }
+          }
+        })
+        return indexListArr
+      } else { // 少于N条时，可以随便选
+        indexListArr.forEach((citem, cindex) => {
+          if (citem.children && citem.children.length) {
+            this.disabledOutParamsList(len, citem.children)
+          } else {
+            citem.isDisabled = false
+          }
+        })
         return indexListArr
       }
     },
@@ -248,6 +259,7 @@ export default {
         this.userRateStr = data.data.userRateStr
         this.lastCalTime = data.data.lastCalTime
         this.ruleForm.region = data.data.lableValList || [5486, 5590]
+        this.selectedIndex = this.ruleForm.region
         this.getChartInfo()
         this.getTranferLogData(id)
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
