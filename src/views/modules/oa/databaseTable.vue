@@ -2,17 +2,15 @@
   <div>
     <el-form :inline="true">
       <el-form-item label="空间显示状态">
-        <el-select placeholder="请选择" v-model="spaceStatus">
-          <el-option v-for="item in approvalStatus" :value="item.id" :key="item.id" :label="item.name"/>
+        <el-select placeholder="请选择" v-model="flag">
+          <el-option v-for="item in flagList" :value="item.id" :key="item.id" :label="item.name"/>
         </el-select>
       </el-form-item>
       <el-form-item label="空间名">
-        <el-input v-model="spaceName" placeholder="请输入词组ID" clearable />
+        <el-input v-model="name" placeholder="空间名" clearable />
       </el-form-item>
       <el-form-item label="负责部门">
-        <el-select v-model="dutyGroup" placeholder="请选择">
-          <el-option v-for="item in applyType" :value="item.id" :key="item.id" :label="item.name"/>
-        </el-select>
+        <el-input v-model="departmentName" placeholder="负责部门" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -78,19 +76,21 @@
 </template>
 <script>
 import AddOrUpdate from './databaseTable-add-or-update'
-import { myAccoutList, myAccoutSelect } from '@/api/oa/apply'
+import { databaseTableList } from '@/api/oa/apply'
 
 export default {
   data () {
     return {
-      name: '',
       applyType: [],
       applyTypeId: '',
       applyTypeValue: '',
-      approvalStatus: [],
-      spaceStatus: '',
-      spaceName: '',
-      dutyGroup: '',
+      flagList: [
+        {id: 0, name: '正常'},
+        {id: 1, name: '删除'}
+      ],
+      flag: '',
+      name: '',
+      departmentName: '',
       dataList: [],
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
@@ -111,19 +111,14 @@ export default {
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true
-      // 条件查询初始化
-      myAccoutSelect().then(({data}) => {
-        this.applyType = data.data.applyTypeList
-        this.approvalStatus = data.data.approvalStatusList
-      })
       const dataBody = {
-        spaceStatus: this.spaceStatus,
-        spaceName: this.spaceName,
-        dutyGroup: this.dutyGroup,
+        flag: this.flag,
+        name: this.name,
+        departmentName: this.departmentName,
         pageNum: this.pageNum,
         pageSize: this.pageSize
       }
-      myAccoutList(dataBody).then(({data}) => {
+      databaseTableList(dataBody).then(({data}) => {
         this.totalPage = data.data.total
         this.newList = data.data.rows
         this.dataListLoading = false
@@ -137,7 +132,7 @@ export default {
     selectable (row) {
       console.log(row, 'zhi')
 
-      if (row.approvalStatus === '审批通过') {
+      if (row.flagList === '审批通过') {
         return false// 禁用状态
       } else {
         return true// 非禁用状态
@@ -167,9 +162,9 @@ export default {
     /** 重置 */
     resetHandle () {
       this.pageNum = 1
-      this.spaceStatus = ''
+      this.flag = ''
       this.spaceName = ''
-      this.dutyGroup = ''
+      this.departmentName = ''
       this.getDataList()
     },
     // 新增 / 修改
