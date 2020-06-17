@@ -327,38 +327,71 @@
               hash[this.lists[i].strategyDimension] = true
             }
           }
-
-          if (this.weightSum > 100 || this.weightSum < 100) {
-            this.$message.error('占比和需等于100%')
-          } else if (this.weidu === true) {
-            this.$message.error('纬度不能重复')
+          if (this.paixudisbuld === '排序') {
+            if (this.weidu === true) {
+              this.$message.error('纬度不能重复')
+            } else {
+              if (valid) {
+                this.dataForm.strategySetDetails = this.lists
+                const dataBody = this.dataForm
+                saveorupt(dataBody).then(({data}) => {
+                  if (data && data.code === 0) {
+                    this.$message({
+                      message: '操作成功',
+                      type: 'success',
+                      duration: 1500,
+                      onClose: () => {
+                        this.visible = false
+                        this.$emit('refreshDataList')
+                        this.$refs['dataForm'].resetFields()
+                        this.$refs['dimensionForm'].resetFields()
+                        this.dataForm.strategyScene = ''
+                        this.dataFormValue = ''
+                        this.lists = []
+                        this.nextTodoId = 1
+                        this.numId = 1
+                        this.weidu = false
+                      }
+                    })
+                  } else {
+                    this.$message.error(data.msg)
+                  }
+                })
+              }
+            }
           } else {
-            if (valid) {
-              this.dataForm.strategySetDetails = this.lists
-              const dataBody = this.dataForm
-              saveorupt(dataBody).then(({data}) => {
-                if (data && data.code === 0) {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.$emit('refreshDataList')
-                      this.$refs['dataForm'].resetFields()
-                      this.$refs['dimensionForm'].resetFields()
-                      this.dataForm.strategyScene = ''
-                      this.dataFormValue = ''
-                      this.lists = []
-                      this.nextTodoId = 1
-                      this.numId = 1
-                      this.weidu = false
-                    }
-                  })
-                } else {
-                  this.$message.error(data.msg)
-                }
-              })
+            if (this.weightSum > 100 || this.weightSum < 100) {
+              this.$message.error('占比和需等于100%')
+            } else if (this.weidu === true) {
+              this.$message.error('纬度不能重复')
+            } else {
+              if (valid) {
+                this.dataForm.strategySetDetails = this.lists
+                const dataBody = this.dataForm
+                saveorupt(dataBody).then(({data}) => {
+                  if (data && data.code === 0) {
+                    this.$message({
+                      message: '操作成功',
+                      type: 'success',
+                      duration: 1500,
+                      onClose: () => {
+                        this.visible = false
+                        this.$emit('refreshDataList')
+                        this.$refs['dataForm'].resetFields()
+                        this.$refs['dimensionForm'].resetFields()
+                        this.dataForm.strategyScene = ''
+                        this.dataFormValue = ''
+                        this.lists = []
+                        this.nextTodoId = 1
+                        this.numId = 1
+                        this.weidu = false
+                      }
+                    })
+                  } else {
+                    this.$message.error(data.msg)
+                  }
+                })
+              }
             }
           }
         })
