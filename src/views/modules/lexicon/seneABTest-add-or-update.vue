@@ -16,13 +16,13 @@
       </div>
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild' v-if="disbild === false">
         <el-form-item label="策略" prop="experimentStrategyId">
-          <el-select filterable v-model="dimensionForm.experimentStrategyId" placeholder="请选择纬度" @change='clickNewAddText' style="width:100%">
-            <el-option v-for="item in strategyList" :value="item.id" :key="item.id" :label="item.strategyName"/>
+          <el-select filterable v-model="dimensionForm.experimentStrategyId" placeholder="请选择纬度" @change='clickNewAddText' ref="newText" style="width:100%">
+            <el-option v-for="item in strategyList" :value="item.strategyName" :key="item.id" :label="item.strategyName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="分群名称" v-if="subgroupNameDisbild === false" prop="experimentGroupId">
           <el-select filterable v-model="dimensionForm.experimentGroupId" placeholder="请选择纬度" @change='subgroupNameAddText' style="width:100%">
-            <el-option v-for="item in subgroupNameList" :value="item.groupId" :key="item.groupId" :label="item.groupName"/>
+            <el-option v-for="item in subgroupNameList" :value="item.groupName" :key="item.groupId" :label="item.groupName"/>
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
@@ -91,6 +91,7 @@
           experimentGroupId: '',
           experimentPersent: ''
         },
+        celueId: '',
         dimensionRule: {
           experimentStrategyId: [
             { required: true, message: '请选择策略', trigger: 'blur' }
@@ -104,7 +105,12 @@
         },
         subgroupNameList: [],
         examilId: '',
-        strategyList: [],
+        strategyList: [
+          {
+            id: 1,
+            strategyName: 'zhiming'
+          }
+        ],
         lists: [],
         nextTodoId: 1,
         disbild: false,
@@ -118,12 +124,14 @@
     watch: {
       'proportionDisbild': {
         handler (newVal, oldVal) {
+          console.log(newVal, 'fenquan')
         },
         deep: true,
         immediate: true
       },
       'subgroupNameDisbild': {
         handler (newVal, oldVal) {
+          console.log(newVal, 'zhanbi')
         },
         deep: true,
         immediate: true
@@ -136,7 +144,7 @@
       init (id, value, type, testType) {
         this.id = id
         this.dataFormValue = value
-        this.examilId = testType[0]
+        this.examilId = testType[1]
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         selectStrategyBySceneId(this.examilId).then(({data}) => {
@@ -147,11 +155,13 @@
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
+          this.lists = []
           if (id) {
             const dataBody = this.id
             infoBeeTask(dataBody).then(({data}) => {
               this.lists = data.data.experimentSetDetails
               this.dataForm.experimentName = data.data.experimentName
+              this.dataFormValue === 'look' && data.data.experimentSetDetails[0].experimentPersent ? this.subgroupNameDisbild = true : this.proportionDisbild = true
             })
           }
         })
@@ -159,10 +169,20 @@
       addNewList () {
         this.$refs['dimensionForm'].validate((valid) => {
           if (valid) {
+            // var strategyName = ''
+            // var peopName = ''
+            // this.strategyList.find(item => {
+            //   if (item.id == this.dimensionForm.experimentStrategyId) { strategyName = item.strategyName }
+            // })
+            // this.subgroupNameList.find(item => {
+            //   if (item.groupId == this.dimensionForm.experimentGroupId) { peopName = item.groupName }
+            // })
             this.lists.push({
               id: this.nextTodoId++,
               experimentStrategyId: this.dimensionForm.experimentStrategyId,
               experimentGroupId: this.dimensionForm.experimentGroupId,
+              // experimentStrategyId: strategyName,
+              // experimentGroupId: peopName,
               experimentPersent: this.dimensionForm.experimentPersent
             })
           }
@@ -191,13 +211,42 @@
       // 提交
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
-          var sum = 0
-          this.lists.forEach((val) => {
-            sum += Number(val.strategyRecall)
-            this.weightSum = sum
-          }, 0)
-          if (this.weightSum > 100 || this.weightSum < 100) {
-            this.$message.error('占比和需等于100%')
+          if (this.subgroupNameDisbild === true) {
+            var sum = 0
+            this.lists.forEach((val) => {
+              sum += Number(val.experimentPersent)
+              this.weightSum = sum
+            }, 0)
+            if (this.weightSum > 100 || this.weightSum < 100) {
+              this.$message.error('占比和需等于100%')
+            } else {
+              if (valid) {
+                this.dataForm.experimentSetDetails = this.lists
+                this.dataForm.experimentSceneId = this.examilId
+                const dataBody = this.dataForm
+                const dataUpdateId = this.id
+                saveorupt(dataBody, dataUpdateId).then(({data}) => {
+                  if (data && data.code === 0) {
+                    this.$message({
+                      message: '操作成功',
+                      type: 'success',
+                      duration: 1500,
+                      onClose: () => {
+                        this.visible = false
+                        this.$emit('refreshDataList')
+                        this.$refs['dataForm'].resetFields()
+                        this.$refs['dimensionForm'].resetFields()
+                        this.lists = []
+                        this.proportionDisbild = false
+                        this.subgroupNameDisbild = false
+                      }
+                    })
+                  } else {
+                    this.$message.error(data.msg)
+                  }
+                })
+              }
+            }
           } else {
             if (valid) {
               this.dataForm.experimentSetDetails = this.lists
@@ -230,8 +279,12 @@
       },
       taskDialgClose () {
         this.visible = false
-        this.$refs['dataForm'].resetFields()
-        this.$refs['dimensionForm'].resetFields()
+        if (this.dataFormValue === 'look') {
+          this.$refs['dataForm'].resetFields()
+        } else {
+          this.$refs['dataForm'].resetFields()
+          this.$refs['dimensionForm'].resetFields()
+        }
         this.lists = []
         this.proportionDisbild = false
         this.subgroupNameDisbild = false
