@@ -127,7 +127,7 @@
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
-import { selectOperate, selectAllCata, selectAllCataNew, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -443,7 +443,6 @@ export default {
       this.updateConditionId(this.ruleConfig)
     },
     getSelectAllCata (fn) { // 获取所有指标
-      console.log(selectAllCataNew)
       selectAllCata({
         channelCode: this.baseForm.channelId,
         flag: this.id ? '-1' : '1'
@@ -451,7 +450,6 @@ export default {
         if (data.status !== '1') {
           this.indexList = []
         } else {
-          // this.originIndexList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
         if (fn) {
@@ -459,20 +457,6 @@ export default {
         }
       })
     },
-    // getSelectAllCata (fn) { // 获取所有指标
-    //   console.log(selectAllCata)
-    //   selectAllCataNew().then(({data}) => {
-    //     if (data.status !== '1') {
-    //       this.indexList = []
-    //     } else {
-    //       // this.originIndexList = data.data
-    //       this.indexList = this.filterAllCata(data.data)
-    //     }
-    //     if (fn) {
-    //       fn(this.indexList)
-    //     }
-    //   })
-    // },
     filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
       let arr = []
       if (!!tree && tree.length !== 0) {
@@ -493,16 +477,17 @@ export default {
             obj.id = item.id
             obj.label = item.name
           }
-          if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-            obj.children = this.filterAllCata(item.dataCataLogList) // 指标集合
+          if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
+            obj.children = this.filterAllCata(item.dataCata) // 指标集合
+            arr.push(obj)
+          } else if (this.filterAllCata(item.dataIndex).length) {
+            obj.children = this.filterAllCata(item.dataIndex) // 指标集合
             arr.push(obj)
           } else { // 指标父级层
             if (!item.fieldType) {
               obj.children = null
             } else {
-              // if (obj.channelCode && obj.channelCode === this.baseForm.channelId) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
               arr.push(obj) // 每个指标都放在集合中
-              // }
             }
           }
         })
@@ -949,7 +934,11 @@ export default {
             params.flowId = this.flowId
           }
           let sysUuid = getQueryString('system_uuid')
-          if (sysUuid && sysUuid === 'ecf36297-37ea-489e-a350-045b1ab49f75') {
+          let sysArr = [
+            'ecf36297-37ea-489e-a350-045b1ab49f75', // 统一后台uuid
+            '95dd8c99-8c51-4394-b2f4-95ba472c2ef4' // 小鱼福卡uuid
+          ]
+          if (sysUuid && sysArr.includes(sysUuid)) {
             params.username = this.getQueryParams('username') || ''
           }
           this.loading = true
