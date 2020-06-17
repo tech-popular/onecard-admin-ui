@@ -29,7 +29,7 @@
 </template>
 <script>
 import queryTableList from '../components/queryTableList'
-// import { getBrandNamesAndCategoryNames } from '@/api/lexicon/mallLexiconList'
+import { searchKeyword } from '@/api/lexicon/mallLexiconList'
 export default {
   data () {
     return {
@@ -78,7 +78,15 @@ export default {
       })
     },
     getWordNum () { // 获取query的数量
-      console.log(this.query, 123)
+      searchKeyword({
+        keyword: this.query
+      }).then(({data}) => {
+        if (data.code !== 0) {
+          this.num = 0
+        } else {
+          this.num = data.data
+        }
+      })
     },
     addQuery () { // 新增至以下词组中
       if (!this.query.trim().length) return
@@ -102,7 +110,7 @@ export default {
     margin-bottom: 0
   }
   .item-form .tip {
-    float: right
+    padding-left: 20px;
   }
   .item-form b {
     color: red
