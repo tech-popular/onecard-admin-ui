@@ -508,21 +508,20 @@
               obj.id = item.id
               obj.label = item.name
             }
-            if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-              obj.children = this.filterAllCata(item.dataCataLogList)
+            // if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
+            //   obj.children = this.filterAllCata(item.dataCataLogList)
+            //   arr.push(obj)
+            if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
+              obj.children = this.filterAllCata(item.dataCata) // 指标集合
+              arr.push(obj)
+            } else if (this.filterAllCata(item.dataIndex).length) {
+              obj.children = this.filterAllCata(item.dataIndex) // 指标集合
               arr.push(obj)
             } else {
               if (!item.fieldType) {
                 obj.children = null
               } else {
                 arr.push(obj)
-                // if (!this.channelCode) { // 初始化时没选择分群时，展示全部指标
-                //   arr.push(obj)
-                // } else { // 选择分群时，展示对应的指标
-                //   if (obj.channelCode && obj.channelCode === this.channelCode) { // 在这里判断，进行过滤数据，对应渠道展示对应指标
-                //     arr.push(obj) // 每个指标都放在集合中
-                //   }
-                // }
               }
             }
           })
