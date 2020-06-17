@@ -148,7 +148,7 @@
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         selectStrategyBySceneId(this.examilId).then(({data}) => {
-          // this.strategyList = data.data
+          this.strategyList = data.data
         })
         getDataApiGroupList().then(({data}) => {
           this.subgroupNameList = data.data
@@ -161,7 +161,7 @@
             infoBeeTask(dataBody).then(({data}) => {
               this.lists = data.data.experimentSetDetails
               this.dataForm.experimentName = data.data.experimentName
-              data && data.data && data.data.experimentSetDetails[0].experimentPersent ? this.subgroupNameDisbild = true : this.proportionDisbild = true
+              this.dataFormValue === 'look' && data.data.experimentSetDetails[0].experimentPersent ? this.subgroupNameDisbild = true : this.proportionDisbild = true
             })
           }
         })
@@ -279,8 +279,12 @@
       },
       taskDialgClose () {
         this.visible = false
-        this.$refs['dataForm'].resetFields()
-        this.$refs['dimensionForm'].resetFields()
+        if (this.dataFormValue === 'look') {
+          this.$refs['dataForm'].resetFields()
+        } else {
+          this.$refs['dataForm'].resetFields()
+          this.$refs['dimensionForm'].resetFields()
+        }
         this.lists = []
         this.proportionDisbild = false
         this.subgroupNameDisbild = false

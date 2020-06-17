@@ -3,21 +3,20 @@
     <el-form :inline="true" :model="dataForm" :rules="dataRule" ref="dataForm">
       <el-form-item label="实验场景" prop="type">
         <el-cascader
-        @change="testSech"
+          @change="testSech"
           style="width: 100%"
           :props="props"
           v-model="dataForm.type"
-          clearable
           :options="typeList">
         </el-cascader>
       </el-form-item>
-      <el-form-item label="策略类型" prop="strategyType">
+      <!-- <el-form-item label="策略类型" prop="strategyType">
         <el-select filterable v-model="dataForm.strategyType" placeholder="请选择实验状态" style="width:100%">
           <el-option v-for="item in strategyTypeList" :value="item.id" :key="item.id" :label="item.value"/>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="实验状态">
-        <el-select filterable v-model="dataForm.testStatus" placeholder="请选择实验状态" style="width:100%">
+        <el-select filterable v-model="dataForm.testStatus" placeholder="请选择实验状态" style="width:100%" clearable>
           <el-option v-for="item in testStatusTypeList" :value="item.id" :key="item.id" :label="item.value"/>
         </el-select>
       </el-form-item>
@@ -57,7 +56,7 @@
         align="center"
         label="实验状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.experimentStatus === '启用'" size="small" >启用</el-tag>
+          <el-tag v-if="scope.row.experimentStatus === '开启'" size="small" >启用</el-tag>
           <el-tag v-else size="small" type="danger">停用</el-tag>
         </template>
       </el-table-column>
@@ -80,7 +79,7 @@
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
-            <el-button type="success" size="mini" icon="el-icon-view" circle @click="lookHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
+            <el-button type="success" size="mini" icon="el-icon-view" circle @click="lookHandle(scope.row.id,'look', scope.row.type)"></el-button>
           </el-tooltip>
           <!-- <el-tooltip class="item" effect="dark" content="查看数据报表" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-document" circle @click="lookHandle(scope.row.id)"></el-button>
@@ -123,18 +122,15 @@
         dataRule: {
           type: [
             { required: true, message: '请选择实验场景', trigger: 'blur' }
-          ],
-          strategyType: [
-            { required: true, message: '请选择策略类型', trigger: 'blur' }
           ]
         },
-        strategyTypeList: [
-          {id: 0, value: 'leixing1'},
-          {id: 1, value: 'leixing2'}
-        ],
+        // strategyTypeList: [
+        //   {id: 0, value: 'leixing1'},
+        //   {id: 1, value: 'leixing2'}
+        // ],
         testStatusTypeList: [
-          {id: 0, value: '禁用'},
-          {id: 1, value: '开启'}
+          {id: 0, value: '停用'},
+          {id: 1, value: '启用'}
         ],
         typeList: [],
         dataList: [],
@@ -178,7 +174,7 @@
         })
       },
       testSech (val) {
-        this.dataForm.experimentSceneId = val[0]
+        this.dataForm.experimentSceneId = val[1]
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -199,7 +195,10 @@
       /** 重置 */
       resetHandle () {
         this.pageNo = 1
-        this.dataForm = []
+        this.dataForm.type = []
+        this.dataForm.testName = ''
+        this.dataForm.experimentSceneId = ''
+        this.dataForm.testStatus = ''
         this.getDataList()
       },
       // 新增 / 修改
