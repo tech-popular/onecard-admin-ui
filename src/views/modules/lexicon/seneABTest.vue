@@ -109,10 +109,9 @@
       return {
         props: {
           multiple: false,
-          checkStrictly: true,
+          checkStrictly: false,
           label: 'sceneName',
-          value: 'sceneType',
-          children: ''
+          value: 'sceneType'
         },
         dataForm: {
           type: [],
@@ -129,6 +128,10 @@
             { required: true, message: '请选择策略类型', trigger: 'blur' }
           ]
         },
+        strategyTypeList: [
+          {id: 0, value: 'leixing1'},
+          {id: 1, value: 'leixing2'}
+        ],
         testStatusTypeList: [
           {id: 0, value: '禁用'},
           {id: 1, value: '开启'}

@@ -105,7 +105,12 @@
         },
         subgroupNameList: [],
         examilId: '',
-        strategyList: [],
+        strategyList: [
+          {
+            id: 1,
+            strategyName: 'zhiming'
+          }
+        ],
         lists: [],
         nextTodoId: 1,
         disbild: false,
@@ -139,11 +144,11 @@
       init (id, value, type, testType) {
         this.id = id
         this.dataFormValue = value
-        this.examilId = testType[0]
+        this.examilId = testType[1]
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         selectStrategyBySceneId(this.examilId).then(({data}) => {
-          this.strategyList = data.data
+          // this.strategyList = data.data
         })
         getDataApiGroupList().then(({data}) => {
           this.subgroupNameList = data.data
