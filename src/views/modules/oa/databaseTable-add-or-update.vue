@@ -65,7 +65,7 @@ export default {
             headName: this.dataForm.headName
           }
           savaOadatabase(newData).then(({ data }) => {
-            if (data && data.status === '1') {
+            if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
                 type: 'success',
