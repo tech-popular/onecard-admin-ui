@@ -167,6 +167,13 @@ export default {
     //   })
     // },
     sureEfiltHandle (val) {
+      var falgType = ''
+      if (val.flag === true) {
+        falgType = false
+      }
+      if (val.flag === false) {
+        falgType = true
+      }
       this.$confirm(`确定修改表空间状态?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -174,7 +181,7 @@ export default {
       }).then(() => {
         const dataBody = {
           id: val.id,
-          flag: val.flag
+          flag: falgType
         }
         updatedatabase(dataBody).then(({data}) => {
           if (data && data.code === 0) {
