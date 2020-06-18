@@ -8,7 +8,11 @@
       </div>
     </div>
     <div class="pane-right">
-      <div class="total">上架商品 <span>45678</span> 件</div>
+      <div class="total">
+        <el-button type="primary" @click="addArrUpdate">新建/修改必推坑位</el-button>
+        <el-button type="success" @click="caozuoRizhi">操作日志</el-button>
+      </div>
+      <!-- <div class="total">上架商品 <span>55555</span> 件</div> -->
       <el-form label-width="80px" :model="baseForm" :rules="baseFormRules" ref="baseForm" inline>
         <el-form-item label="SKU" prop="sku">
           <el-input v-model.trim="baseForm.sku" placeholder="sku" clearable />
@@ -21,11 +25,13 @@
         </el-form-item>
       </el-form>
       <el-table :data="dataList" border v-loading="loading" style="width: 100%;">
+        <el-table-column prop="sku" header-align="center" align="center" label="坑位号"></el-table-column>
         <el-table-column prop="sku" header-align="center" align="center" label="SKU"></el-table-column>
         <el-table-column prop="productName" header-align="center" align="center" label="商品名称"></el-table-column>
         <el-table-column prop="secondCategoryName" header-align="center" align="center" label="二级品类"></el-table-column>
         <el-table-column prop="salePrice" header-align="center" align="center" label="价格"></el-table-column>
-        <el-table-column prop="createTime" header-align="center" align="center" label="发布时间"></el-table-column>
+        <el-table-column prop="createTime" header-align="center" align="center" label="必推生效时间"></el-table-column>
+        <el-table-column prop="createTime" header-align="center" align="center" label="必推失效时间"></el-table-column>
       </el-table>
       <!-- <el-pagination
       @size-change="sizeChangeHandle"
@@ -71,6 +77,67 @@
         <el-table-column prop="offlineTime" header-align="center" align="center" label="失效时间"></el-table-column>
       </el-table>
     </div>
+    <!-- 新建/修改 -->
+    <el-dialog
+      title="新建/修改必推坑位"
+      :visible.sync="addArrUpdateBind"
+      width="50%"
+      :append-to-body="true"
+      :modal-append-to-body='false'>
+      <el-form :model="dataForm" ref="dataForm" label-width="23%">
+        <el-form-item label="场景名称">
+          <el-input v-model="boxname" disabled placeholder="场景名称"/>
+        </el-form-item>
+        <el-form-item label="必推坑位一">
+          <el-select v-model="dataForm.value1" placeholder="请选择">
+            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="必推坑位二">
+          <el-select v-model="dataForm.value2" placeholder="请选择">
+            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+          </el-select>
+        </el-form-item>
+        </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addArrUpdateBind = false">取 消</el-button>
+        <el-button type="primary" @click="addArrUpdateDataForm">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 操作日志 -->
+    <el-dialog
+      title="操作日志"
+      :visible.sync="caozuorizhiBind"
+      width="50%"
+      :append-to-body="true"
+      :modal-append-to-body='false'>
+      场景名称:<span  disabled placeholder="场景名称">{{boxname}}</span>
+      <el-table
+        :data="tableData"
+        style="width: 100%">
+        <el-table-column
+          prop="keng"
+          label="坑位号"/>
+        <el-table-column
+          prop="name"
+          label="sku"/>
+        <el-table-column
+          prop="address"
+          label="必推生效时间"/>
+        <el-table-column
+          prop="address"
+          label="必推失效时间"/>
+        <el-table-column
+          prop="address"
+          label="创建人"/>
+        <el-table-column
+          prop="address"
+          label="操作时间"/>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="caozuorizhiBind = false">取 消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -78,7 +145,8 @@ import { getSceneWillPushList, getSceneWillPushsByBoxId, addSceneWillPush, query
 
 export default {
   props: [
-    'boxId'
+    'boxId',
+    'boxname'
   ],
   data () {
     return {
@@ -109,9 +177,20 @@ export default {
       },
       skuList: [],
       showform: false,
+      addArrUpdateBind: false,
       pageNo: 1, // 当前页
       pageSize: 5, // 默认每页10条
-      totalPage: 0
+      totalPage: 0,
+      options: [
+        {id: 1, name: 'kengwei'}
+      ],
+      dataForm: {
+        name: '',
+        value1: '',
+        value2: ''
+      },
+      caozuorizhiBind: false,
+      tableData: []
     }
   },
   mounted () {
@@ -154,6 +233,25 @@ export default {
           })
         }
       })
+    },
+    // 新增/修改
+    addArrUpdate () {
+      this.addArrUpdateBind = true
+    },
+    addArrUpdateDataForm (done) {
+      this.$confirm('修改必推坑位，原坑位配置的商品将失效，是否确定？')
+          .then(_ => {
+            this.$refs.dataForm.validate((valid) => {
+              if (valid) {
+                console.log(this.dataForm)
+              }
+            })
+          })
+          .catch(_ => {})
+    },
+    // 操作日志
+    caozuoRizhi () {
+      this.caozuorizhiBind = true
     },
     // 每页数
     sizeChangeHandle (page) {
