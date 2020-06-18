@@ -22,3 +22,5 @@ export const mcCompute = (params) => httpPost(da + 'mcCompute/getDefaultApplyInf
 export const databaseTableList = (params) => httpGet(da + 'database/selectdatabase', params)
 // 库表空间配置保存
 export const savaOadatabase = (params) => httpPost(da + 'database/savaOadatabase', params)
+// 更改状态
+export const updatedatabase = (params) => httpPost(da + 'database/updatedatabase', params)

@@ -77,7 +77,7 @@ export default {
                 }
               })
             } else {
-              this.$message.error(data.message)
+              this.$message.error(data.msg)
             }
           })
         }

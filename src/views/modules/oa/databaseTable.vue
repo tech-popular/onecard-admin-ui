@@ -16,43 +16,42 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
         <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button type="info" @click="sureEfiltHandle()">确认修改</el-button>
+        <!-- <el-button type="info" @click="sureEfiltHandle()">确认修改</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
       :data="newList" border
       v-loading="dataListLoading"
       style="width: 100%;"
-      @select='onTableSelect'
-      @selection-change="handleSelectionChange">
+      ref="multipleTable"
+      @selection-change="handleSelectionChange"
       >
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
-        :selectable="selectable" 
         width="55">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
-        prop="title"
+        prop="id"
         header-align="center"
         align="center"
         label="空间ID"/>
       <el-table-column
-        prop="applyType"
+        prop="name"
         header-align="center"
         align="center"
         label="空间名"/>
       <el-table-column
-        prop="flow"
+        prop="departmentName"
         header-align="center"
         align="center"
         label="负责部门"/>
       <el-table-column
-        prop="flow"
+        prop="headName"
         header-align="center"
         align="center"
         label="负责人"/>
       <el-table-column
-        prop="flow"
+        prop="createUser"
         header-align="center"
         align="center"
         label="创建人"/>
@@ -61,6 +60,13 @@
         header-align="center"
         align="center"
         label="创建时间"/>
+      <el-table-column header-align="center" align="center" width="200" label="操作">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" content="修改空间状态" placement="top">
+            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="sureEfiltHandle(scope.row)"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -76,7 +82,7 @@
 </template>
 <script>
 import AddOrUpdate from './databaseTable-add-or-update'
-import { databaseTableList } from '@/api/oa/apply'
+import { databaseTableList, updatedatabase } from '@/api/oa/apply'
 
 export default {
   data () {
@@ -98,7 +104,9 @@ export default {
       dataListLoading: false,
       addOrUpdateVisible: false,
       newList: [],
-      dialogVisible: false
+      dialogVisible: false,
+      multipleSelection: [], // 存放表格选中项信息
+      ids: ''
     }
   },
   components: {
@@ -122,26 +130,57 @@ export default {
         this.totalPage = data.data.total
         this.newList = data.data.rows
         this.dataListLoading = false
+        data.data.rows.forEach((row, index) => {
+          if (row.flag != false) {
+            setTimeout(() => {
+              this.$refs.multipleTable.toggleRowSelection(this.newList[index])
+            }, 1)
+          }
+        })
       })
     },
-    onTableSelect (rows, row) {
-      let selected = rows.length && rows.indexOf(row) !== -1
-      console.log(selected)  // true就是选中，0或者false是取消选中
-    },
-    // 是否禁用
-    selectable (row) {
-      console.log(row, 'zhi')
-
-      if (row.flagList === '审批通过') {
-        return false// 禁用状态
-      } else {
-        return true// 非禁用状态
-      }
-    },
     handleSelectionChange (val) {
-      console.log(val, 'val')
-
       this.multipleSelection = val
+      // var idArr = []
+      // val.forEach((item) => {
+      //   idArr.push(item.id)
+      // })
+      // this.ids = idArr.join(',')
+    },
+    // sureEfiltHandle () {
+    //   const dataBody = {
+    //     id: this.ids,
+    //     flag: this.name
+    //   }
+    //   updatedatabase(dataBody).then(({data}) => {
+    //     console.log(data, 'ppp')
+    //   })
+    // },
+    sureEfiltHandle (val) {
+      this.$confirm(`确定修改表空间状态?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const dataBody = {
+          id: val.id,
+          flag: val.flag
+        }
+        updatedatabase(dataBody).then(({data}) => {
+          if (data && data.status === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      })
     },
     // 每页数
     sizeChangeHandle (val) {
