@@ -34,9 +34,9 @@
         </el-form-item>
       </el-form>
       <el-row :gutter="20" class="echart-content" v-if="chartLen > 0">
-        <el-col :span="12" v-for="(item, index) in chartLen" :key="item" class="order-echarts-col">
+        <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
           <el-card shadow="never" class="order-echarts-card">
-            <div :id="'echart-' + index" class="echart"></div>
+            <div :id="'echart-' + item.id" class="echart"></div>
           </el-card>
         </el-col>
       </el-row>
@@ -91,6 +91,7 @@ export default {
       lastCalTime: '2020-04-25',
       templateId: '',
       chartLen: 0,
+      seriesData: [],
       ruleForm: {
         region: []
       },
@@ -226,25 +227,6 @@ export default {
       this.title = val.name
       this.templateId = val.id
       this.getOverviewData(val.id, val.channelId.split(','))
-      let seriseData = [
-        {
-          id: '3',
-          type: 'bar',
-          name: '年龄',
-          xAxisData: [
-            '[1, 3)',
-            '[3, 8)',
-            '[8, 12)',
-            '[12, 15]'
-          ],
-          series: [
-            3,
-            5,
-            23,
-            19
-          ]
-        }
-      ]
     },
     getOverviewData (id, channelCode) {
       overviewData(id).then(({data}) => {
@@ -277,21 +259,23 @@ export default {
         templateId: this.templateId,
         indicators: this.ruleForm.region.join(',')
       }).then(({data}) => {
-        if (data.status !== '1' || !data.data || !data.data.pieChartDataList.length) {
+        console.log(data)
+        if (data.status !== '1' || !data.data.data || !data.data.data.length) {
           this.chartLen = 0
           return
         }
-        console.log(123)
-        let seriseData = data.data.pieChartDataList
-        this.chartLen = data.data.pieChartDataList.length
-        seriseData.map((item, index) => {
+        let resData = data.data.data
+        console.log(123, data.data.data)
+        this.seriesData = resData
+        this.chartLen = resData.length
+        this.seriesData.map((item, index) => {
           let option = {}
-          option.id = index
           if (item.indicatorsType === 'pie') {
             option = JSON.parse(JSON.stringify(pieJson))
+            option.id = item.id
             option.title.text = item.indicatorsName
-            option.series.name = item.indicatorsName
-            option.series.data = item.valList
+            option.series[0].name = item.indicatorsName
+            option.series[0].data = item.valList
             option.legend.data = []
             item.valList.forEach(item => {
               option.legend.data.push(item.name)
@@ -300,7 +284,7 @@ export default {
               normal: {
                 formatter: params => {
                   return (
-                    '{icon|●}{name|' + params.name + '}\n\n{value|' + params.value + '}\n\n{percent|' + params.percent + '%}'
+                    '{icon|●}{name|' + params.name + '}\n\n{value|' + params.value + '}\n\n{percentStr|' + params.percentStr + '}'
                   )
                 },
                 textAlign: 'center',
@@ -310,7 +294,7 @@ export default {
                     color: '#666',
                     textAlign: 'left'
                   },
-                  percent: {
+                  percentStr: {
                     color: '#666',
                     textAlign: 'left'
                   },
@@ -321,15 +305,15 @@ export default {
                 }
               }
             }
-          } else {
-            option = JSON.parse(JSON.stringify(barJson))
-            option.xAxis[0].data = item.xAxisData
-            option.series[0].data = item.series
-            option.series[0].name = item.name
-            // option.legend.data = [item.name]
           }
-          option.id = item.id
-          option.title.text = item.name
+          if (item.indicatorsType === 'bar') {
+            option = JSON.parse(JSON.stringify(barJson))
+            option.id = item.id
+            option.title.text = item.indicatorsName
+            option.series[0].name = item.indicatorsName
+            option.xAxis[0].data = item.xaxisData
+            option.series[0].data = item.series
+          }
           setTimeout(() => {
             let chart = null
             console.log(option.id)
@@ -371,12 +355,12 @@ export default {
     sizeChangeHandle (page) {
       this.pageSize = page
       this.pageNum = 1
-      this.getDataList()
+      this.getTranferLogData()
     },
     // 当前页
     currentChangeHandle (page) {
       this.pageNum = page
-      this.getDataList()
+      this.getTranferLogData()
     },
     // 弹窗状态
     handleClose () {
