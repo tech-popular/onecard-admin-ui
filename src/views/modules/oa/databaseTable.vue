@@ -41,6 +41,16 @@
         align="center"
         label="空间名"/>
       <el-table-column
+        prop="flag"
+        header-align="center"
+        align="center"
+        label="空间状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.flag === false" size="small" >启用</el-tag>
+          <el-tag v-else size="small" type="warning">禁用</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="departmentName"
         header-align="center"
         align="center"
@@ -91,8 +101,8 @@ export default {
       applyTypeId: '',
       applyTypeValue: '',
       flagList: [
-        {id: 0, name: '正常'},
-        {id: 1, name: '删除'}
+        {id: 0, name: '启用'},
+        {id: 1, name: '禁用'}
       ],
       flag: '',
       name: '',
