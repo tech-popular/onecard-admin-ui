@@ -177,7 +177,7 @@ export default {
           flag: val.flag
         }
         updatedatabase(dataBody).then(({data}) => {
-          if (data && data.status === 0) {
+          if (data && data.code === 0) {
             this.$message({
               message: '操作成功',
               type: 'success',
