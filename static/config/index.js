@@ -3,7 +3,6 @@
  */
 ;(function () {
   window.SITE_CONFIG = {}
-
   // api接口请求地址
   window.SITE_CONFIG['baseUrl'] = '//unify-manager.sk.9f.cn/canary-admin' // 开发环境
 
