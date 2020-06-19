@@ -296,7 +296,7 @@ export default {
               normal: {
                 formatter: params => {
                   return (
-                    '{icon|●}{name|' + params.name + '}\n\n{value|' + params.value + '}\n\n{percent|' + params.percent + '%}'
+                    '{icon|●}{name|' + params.name + '}：{value|' + params.value + '}{percent|，' + params.percent + '%}'
                   )
                 },
                 textAlign: 'center',
