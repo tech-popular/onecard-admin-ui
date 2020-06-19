@@ -59,7 +59,11 @@
           </el-table-column>
           <el-table-column prop="lastCalTime" header-align="center" align="center" label="计算完成时间"></el-table-column>
           <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
-          <el-table-column prop="type" header-align="center" align="center" label="计算类型"></el-table-column>
+          <el-table-column prop="type" header-align="center" align="center" label="计算类型">
+            <template slot-scope="scope">
+              <span>{{scope.row.type === 'static' ? '静态' : '动态'}}</span>
+            </template>
+          </el-table-column>
         </el-table>
         <el-pagination
         @size-change="sizeChangeHandle"
