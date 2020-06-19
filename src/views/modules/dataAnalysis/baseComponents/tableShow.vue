@@ -41,12 +41,18 @@
       </el-form>
       <el-row :gutter="20" class="echart-content" v-if="chartLen > 0" v-loading="echartLoading">
         <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
-          <el-card shadow="never" class="order-echarts-card">
+          <el-card shadow="never" class="order-echarts-card" v-if="(item.indicatorsType === 'pie' && item.valList) || (item.indicatorsType === 'bar' && item.series)">
             <div :id="'echart-' + item.id" class="echart"></div>
+          </el-card>
+          <el-card shadow="never" class="order-echarts-card" v-else>
+            <div class="echart">
+              <h3>{{item.indicatorsName}}</h3>
+              <p style="padding-top: 130px;text-align:center">暂无数据</p>
+            </div>
           </el-card>
         </el-col>
       </el-row>
-      <div class="no-echart-content" v-else style="">
+      <div class="no-echart-content" v-else>
         暂无图表数据
       </div>
       <div class="custer-history">
@@ -269,6 +275,10 @@ export default {
         indicators: this.ruleForm.region.join(',')
       }).then(({data}) => {
         if (data.status !== '1' || !data.data.data || !data.data.data.length) {
+          this.$message({
+            type: 'error',
+            message: data.message || '数据异常'
+          })
           this.chartLen = 0
           return
         }
@@ -281,6 +291,7 @@ export default {
             option = JSON.parse(JSON.stringify(pieJson))
             option.id = item.id
             option.title.text = item.indicatorsName
+            if (!item.valList || !item.valList.length) return
             option.series[0].name = item.indicatorsName
             option.series[0].data = item.valList
             option.legend.data = []
@@ -317,6 +328,7 @@ export default {
             option = JSON.parse(JSON.stringify(barJson))
             option.id = item.id
             option.title.text = item.indicatorsName
+            if (!item.series || !item.series.length) return
             option.series[0].name = item.indicatorsName
             option.xAxis[0].data = item.xaxisData
             option.series[0].data = item.series
@@ -343,6 +355,10 @@ export default {
         templateId: this.templateId
       }).then(({data}) => {
         if (data.status !== '1' || !data.data.list || !data.data.list.length) {
+          this.$message({
+            type: 'error',
+            message: data.message || '数据异常'
+          })
           this.totalCount = 0
           this.dataList = []
         } else {
@@ -357,9 +373,12 @@ export default {
       this.originRegion = this.ruleForm.region
     },
     saveTable () {
-      console.log(this.ruleForm.region)
-      this.getChartInfo()
-      this.isShow = true
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.getChartInfo()
+          this.isShow = true
+        }
+      })
     },
     cancelTable () {
       this.ruleForm.region = this.originRegion
