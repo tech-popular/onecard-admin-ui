@@ -26,7 +26,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
-          <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/>
+          <el-input-number v-model="dimensionForm.experimentPersent" @focus='proportionAddText' :min="1" :max="100" label="请输入占比"></el-input-number>
+          <!-- <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/> -->
         </el-form-item>
         <el-form-item>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
@@ -51,8 +52,8 @@
             v-if="proportionDisbild === false"
             prop="experimentPersent"
             label="占比%"/>
-          <el-table-column header-align="center" align="center" width="200" label="操作">
-            <template slot-scope="scope" v-if="disbild === false">
+          <el-table-column header-align="center" align="center" width="200" label="操作" v-if="disbild === false">
+            <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
                 <el-button type="danger" size="mini" icon="el-icon-minus" circle @click='deletedlLists(scope.row.id)'></el-button>
               </el-tooltip>
