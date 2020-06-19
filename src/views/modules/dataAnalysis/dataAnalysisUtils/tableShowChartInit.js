@@ -111,8 +111,9 @@ export const barJson = {
   yAxis: [{
     type: 'value',
     gridIndex: 0,
+    name: '用户数（人）',
     axisLabel: {
-      color: '#333'
+      color: '#606266'
     },
     splitLine: {
       lineStyle: {
