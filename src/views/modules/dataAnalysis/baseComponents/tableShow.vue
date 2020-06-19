@@ -52,6 +52,11 @@
       <div class="custer-history">
         <p>分群历史情况：</p>
         <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+          <el-table-column label="序号" header-align="center" align="center" width="100">
+            <template slot-scope="scope">
+              {{scope.$index + 1}}
+            </template>
+          </el-table-column>
           <el-table-column prop="lastCalTime" header-align="center" align="center" label="计算完成时间"></el-table-column>
           <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
           <el-table-column prop="type" header-align="center" align="center" label="计算类型">
@@ -287,11 +292,11 @@ export default {
             item.valList.forEach(item => {
               option.legend.data.push(item.name)
             })
-            option.series.label = {
+            option.series[0].label = {
               normal: {
                 formatter: params => {
                   return (
-                    '{icon|●}{name|' + params.name + '}\n\n{value|' + params.value + '}\n\n{percentStr|' + params.percentStr + '}'
+                    '{icon|●}{name|' + params.name + '}\n\n{value|' + params.value + '}\n\n{percent|' + params.percent + '%}'
                   )
                 },
                 textAlign: 'center',
@@ -301,13 +306,13 @@ export default {
                     color: '#666',
                     textAlign: 'left'
                   },
-                  percentStr: {
+                  percent: {
                     color: '#666',
                     textAlign: 'left'
                   },
                   value: {
                     color: '#666',
-                    textAlign: 'left'
+                    textAlign: 'center'
                   }
                 }
               }

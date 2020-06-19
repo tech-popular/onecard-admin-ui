@@ -24,7 +24,7 @@ export const pieJson = {
         color: '#fff'
       }
     },
-    formatter: '{b} : {c}  {d}%'
+    formatter: '{b} : {c},  {d}%'
   },
   // color: ['#FD866A', '#FFC175', '#59CBDD', '#A3D47D', '#5C62E6'],
   color: [
@@ -60,7 +60,8 @@ export const barJson = {
     trigger: 'axis',
     axisPointer: {
       type: 'shadow'
-    }
+    },
+    formatter: '{b} : {c}'
   },
   legend: {
     right: '0',
