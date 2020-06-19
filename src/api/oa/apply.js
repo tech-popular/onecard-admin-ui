@@ -18,3 +18,9 @@ export const lookAccout = (params) => httpGet(da + `oa/detail/${params}`, params
 export const saveDatabaseAuthApply = (params) => httpPost(da + 'oa/saveDatabaseAuthApply', params)
 // maxcomputer申请记录接口
 export const mcCompute = (params) => httpPost(da + 'mcCompute/getDefaultApplyInfo', params)
+// 库表空间配置列表
+export const databaseTableList = (params) => httpGet(da + 'database/selectdatabase', params)
+// 库表空间配置保存
+export const savaOadatabase = (params) => httpPost(da + 'database/savaOadatabase', params)
+// 更改状态
+export const updatedatabase = (params) => httpPost(da + 'database/updatedatabase', params)
