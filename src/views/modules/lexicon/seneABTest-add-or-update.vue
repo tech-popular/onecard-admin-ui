@@ -125,14 +125,12 @@
     watch: {
       'proportionDisbild': {
         handler (newVal, oldVal) {
-          console.log(newVal, 'fenquan')
         },
         deep: true,
         immediate: true
       },
       'subgroupNameDisbild': {
         handler (newVal, oldVal) {
-          console.log(newVal, 'zhanbi')
         },
         deep: true,
         immediate: true
@@ -240,6 +238,7 @@
                         this.lists = []
                         this.proportionDisbild = false
                         this.subgroupNameDisbild = false
+                        this.nextTodoId = 1
                       }
                     })
                   } else {
@@ -268,6 +267,7 @@
                       this.lists = []
                       this.proportionDisbild = false
                       this.subgroupNameDisbild = false
+                      this.nextTodoId = 1
                     }
                   })
                 } else {
@@ -289,6 +289,7 @@
         this.lists = []
         this.proportionDisbild = false
         this.subgroupNameDisbild = false
+        this.nextTodoId = 1
       }
     }
   }
