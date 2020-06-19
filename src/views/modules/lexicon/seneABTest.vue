@@ -10,11 +10,11 @@
           :options="typeList">
         </el-cascader>
       </el-form-item>
-      <!-- <el-form-item label="策略类型" prop="strategyType">
-        <el-select filterable v-model="dataForm.strategyType" placeholder="请选择实验状态" style="width:100%">
-          <el-option v-for="item in strategyTypeList" :value="item.id" :key="item.id" :label="item.value"/>
+      <el-form-item label="策略类型" prop="strategyType">
+        <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%">
+          <el-option v-for="item in strategyTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
         </el-select>
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item label="实验状态">
         <el-select filterable v-model="dataForm.testStatus" placeholder="请选择实验状态" style="width:100%" clearable>
           <el-option v-for="item in testStatusTypeList" :value="item.id" :key="item.id" :label="item.value"/>
@@ -102,7 +102,7 @@
 
 <script>
   import AddOrUpdate from './seneABTest-add-or-update'
-  import { beeTaskList, getSceneDropDown } from '@/api/lexicon/ABTest'
+  import { beeTaskList, getSceneDropDown, showStrategyDropDown } from '@/api/lexicon/ABTest'
   export default {
     data () {
       return {
@@ -122,12 +122,15 @@
         dataRule: {
           type: [
             { required: true, message: '请选择实验场景', trigger: 'blur' }
+          ],
+          strategyType: [
+            { required: true, message: '请选择策略类型', trigger: 'blur' }
           ]
         },
-        // strategyTypeList: [
-        //   {id: 0, value: 'leixing1'},
-        //   {id: 1, value: 'leixing2'}
-        // ],
+        strategyTypeList: [
+          {id: 0, value: 'leixing1'},
+          {id: 1, value: 'leixing2'}
+        ],
         testStatusTypeList: [
           {id: 0, value: '停用'},
           {id: 1, value: '启用'}
@@ -156,7 +159,8 @@
           'pageSize': this.pageSize,
           'experimentName': this.dataForm.testName,
           'experimentSceneId': this.dataForm.experimentSceneId,
-          'experimentStatus': this.dataForm.testStatus
+          'experimentStatus': this.dataForm.testStatu,
+          'strategyType': this.dataForm.strategyType
         }
         beeTaskList(dataBody).then(({data}) => {
           if (data && data.code === 0) {
@@ -171,6 +175,9 @@
         })
         getSceneDropDown().then(({data}) => {
           this.typeList = data.data
+        })
+        showStrategyDropDown().then(({data}) => {
+          this.strategyTypeList = data.data.strategyScenes
         })
       },
       testSech (val) {
@@ -207,7 +214,7 @@
           if (valid) {
             this.addOrUpdateVisible = true
             this.$nextTick(() => {
-              this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type)
+              this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type, this.dataForm.strategyType)
             })
           }
         })
