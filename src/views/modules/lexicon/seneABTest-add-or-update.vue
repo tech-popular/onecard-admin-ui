@@ -26,7 +26,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
-          <el-input-number v-model="dimensionForm.experimentPersent" @change='proportionAddText' :min="1" :max="100" label="请输入占比"></el-input-number>
+          <el-input-number v-model="dimensionForm.experimentPersent" @change='proportionAddText' :max="100" label="请输入占比"></el-input-number>
           <!-- <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/> -->
         </el-form-item>
         <el-form-item>
@@ -91,7 +91,7 @@
         dimensionForm: {
           experimentStrategyId: '',
           experimentGroupId: '',
-          experimentPersent: ''
+          experimentPersent: undefined
         },
         celueId: '',
         dimensionRule: {
@@ -127,12 +127,14 @@
     watch: {
       'proportionDisbild': {
         handler (newVal, oldVal) {
+          console.log('占比', newVal)
         },
         deep: true,
         immediate: true
       },
       'subgroupNameDisbild': {
         handler (newVal, oldVal) {
+          console.log('人群', newVal)
         },
         deep: true,
         immediate: true
@@ -163,7 +165,8 @@
             infoBeeTask(dataBody).then(({data}) => {
               this.lists = data.data.experimentSetDetails
               this.dataForm.experimentName = data.data.experimentName
-              this.dataFormValue === 'look' && data.data.experimentSetDetails[0].experimentPersent ? this.subgroupNameDisbild = true : this.proportionDisbild = true
+              this.dataFormValue === 'look' && data && data.data && data.data.experimentSetDetails.length > 0 && data.data.experimentSetDetails[0].experimentPersent ? this.subgroupNameDisbild = true : this.subgroupNameDisbild = false
+              this.dataFormValue === 'look' && data && data.data && data.data.experimentSetDetails.length > 0 && data.data.experimentSetDetails[0].experimentGroupId ? this.proportionDisbild = true : this.proportionDisbild = false
             })
           }
         })
