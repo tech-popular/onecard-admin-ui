@@ -21,3 +21,7 @@ export const vestPackAvailable = params => httpGet(da + 'vest/pack/select/availa
 export const custerAvailable = () => httpGet(da + `data/group/select/available`) // 分群ID
 export const templateDownload = http.adornUrl(da + 'data/group/template/download?token=' + Vue.cookie.get('token'))
 export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManager/value/candidate', params)
+
+export const overviewData = id => httpGet(da + `data/group/overview/${id}`)
+export const transferLogList = params => httpGet(da + `data/transferLog/listOnPage`, params)
+export const chartInfo = params => httpGet(da + `data/group/chartInfo`, params)
