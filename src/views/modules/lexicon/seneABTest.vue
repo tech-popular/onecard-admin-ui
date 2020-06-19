@@ -50,6 +50,12 @@
         align="center"
         label="实验场景"
         width="150px"/>
+       <el-table-column
+        prop="strategyType"
+        header-align="center"
+        align="center"
+        label="策略类型"
+        width="150px"/>
       <el-table-column
         prop="enable"
         header-align="center"
