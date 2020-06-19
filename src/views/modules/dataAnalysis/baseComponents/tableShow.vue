@@ -288,10 +288,10 @@ export default {
         this.seriesData.map((item, index) => {
           let option = {}
           if (item.indicatorsType === 'pie') {
+            if (!item.valList || !item.valList.length) return
             option = JSON.parse(JSON.stringify(pieJson))
             option.id = item.id
             option.title.text = item.indicatorsName
-            if (!item.valList || !item.valList.length) return
             option.series[0].name = item.indicatorsName
             option.series[0].data = item.valList
             option.legend.data = []
@@ -325,10 +325,10 @@ export default {
             }
           }
           if (item.indicatorsType === 'bar') {
+            if (!item.series || !item.series.length) return
             option = JSON.parse(JSON.stringify(barJson))
             option.id = item.id
             option.title.text = item.indicatorsName
-            if (!item.series || !item.series.length) return
             option.series[0].name = item.indicatorsName
             option.xAxis[0].data = item.xaxisData
             option.series[0].data = item.series
