@@ -28,12 +28,18 @@
           />
         </el-form-item>
         <el-form-item>
+          <el-tooltip placement="top">
+            <div slot="content">渠道多选时，图表显示指标所在渠道用户数据</div>
+            <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item>
           <el-button @click="editTable" type="primary" size="small" v-if="isShow">编辑</el-button>
           <el-button @click="saveTable" type="primary" size="small" v-if="!isShow">保存</el-button>
-          <el-button @click="editTable" size="small" v-if="!isShow">取消</el-button>
+          <el-button @click="cancelTable" size="small" v-if="!isShow">取消</el-button>
         </el-form-item>
       </el-form>
-      <el-row :gutter="20" class="echart-content" v-if="chartLen > 0">
+      <el-row :gutter="20" class="echart-content" v-if="chartLen > 0" v-loading="echartLoading">
         <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
           <el-card shadow="never" class="order-echarts-card">
             <div :id="'echart-' + item.id" class="echart"></div>
@@ -82,9 +88,10 @@ export default {
       dialogVisible: false,
       title: '',
       loading: false,
+      echartLoading: false,
       outParamsIndexList: [],
       selectedIndex: [], // 选中的指标，实时
-      limitLen: 2, // 限制选中指标个数
+      limitLen: 10, // 限制选中指标个数
       templateUserNum: 1000,
       channelInfoNameList: '',
       userRateStr: '3.4%',
@@ -92,6 +99,7 @@ export default {
       templateId: '',
       chartLen: 0,
       seriesData: [],
+      originRegion: [],
       ruleForm: {
         region: []
       },
@@ -224,6 +232,7 @@ export default {
     init (val) {
       this.loading = true
       this.dialogVisible = true
+      this.isShow = true
       this.title = val.name
       this.templateId = val.id
       this.getOverviewData(val.id, val.channelId.split(','))
@@ -240,10 +249,10 @@ export default {
         this.templateUserNum = data.data.templateUserNum
         this.userRateStr = data.data.userRateStr
         this.lastCalTime = data.data.lastCalTime
-        this.ruleForm.region = data.data.lableValList || [5486, 5590]
+        this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : [5486, 5590]
         this.selectedIndex = this.ruleForm.region
         this.getChartInfo()
-        this.getTranferLogData(id)
+        this.getTranferLogData()
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
         this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
         this.getSelectAllCata(channelCode, (indexList) => {
@@ -255,17 +264,16 @@ export default {
       })
     },
     getChartInfo () {
+      this.echartLoading = true
       chartInfo({
         templateId: this.templateId,
         indicators: this.ruleForm.region.join(',')
       }).then(({data}) => {
-        console.log(data)
         if (data.status !== '1' || !data.data.data || !data.data.data.length) {
           this.chartLen = 0
           return
         }
         let resData = data.data.data
-        console.log(123, data.data.data)
         this.seriesData = resData
         this.chartLen = resData.length
         this.seriesData.map((item, index) => {
@@ -316,12 +324,12 @@ export default {
           }
           setTimeout(() => {
             let chart = null
-            console.log(option.id)
             const docu = document.getElementById(
               'echart-' + option.id
             )
             chart = echarts.init(docu)
             chart.setOption(option, true)
+            this.echartLoading = false
             window.addEventListener('resize', () => {
               chart.resize()
             })
@@ -329,11 +337,11 @@ export default {
         })
       })
     },
-    getTranferLogData (id) {
+    getTranferLogData () {
       transferLogList({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
-        templateId: id
+        templateId: this.templateId
       }).then(({data}) => {
         if (data.status !== '1' || !data.data.list || !data.data.list.length) {
           this.totalCount = 0
@@ -347,9 +355,16 @@ export default {
     // 编辑
     editTable () {
       this.isShow = false
+      this.originRegion = this.ruleForm.region
     },
     saveTable () {
       console.log(this.ruleForm.region)
+      this.getChartInfo()
+      this.isShow = true
+    },
+    cancelTable () {
+      this.ruleForm.region = this.originRegion
+      this.isShow = true
     },
     // 每页数
     sizeChangeHandle (page) {
@@ -374,7 +389,7 @@ export default {
   color: #2093f7;
 }
 .echart {
-  height: 450px;
+  height: 400px;
 }
 .order-echarts-col {
   margin-bottom: 20px;

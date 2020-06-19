@@ -52,9 +52,9 @@ http.adornUrl = (actionName) => {
   if (actionName.indexOf('gongFeng') !== -1) {
     actionName = actionName.replace(/gongFeng\//, '')
     return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/gongFeng' : window.SITE_CONFIG.baseUrl) + actionName
-  } else if (actionName.indexOf('tableShow') !== -1) {
-    actionName = actionName.replace(/tableShow\//, '')
-    return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://anguangpu.sk.9f.cn' : window.SITE_CONFIG.baseUrl) + actionName
+  // } else if (actionName.indexOf('tableShow') !== -1) {
+  //   actionName = actionName.replace(/tableShow\//, '')
+  //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://anguangpu.sk.9f.cn' : window.SITE_CONFIG.baseUrl) + actionName
   // } else if (actionName.indexOf('lexicon') !== -1) {
   //   actionName = actionName.replace(/lexicon\//, '')
   //   return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://sku-clear-cache.sk.9f.cn/canary-admin' : window.SITE_CONFIG.baseUrl) + actionName

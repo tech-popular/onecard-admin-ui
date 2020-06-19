@@ -26,7 +26,13 @@ export const pieJson = {
     },
     formatter: '{b} : {c}  {d}%'
   },
-  color: ['#FFC175', '#59CBDD', '#A3D47D', '#5C62E6'],
+  // color: ['#FD866A', '#FFC175', '#59CBDD', '#A3D47D', '#5C62E6'],
+  color: [
+    '#e75840', '#929fff', '#50c48f', '#f7b13f', '#ffa897',
+    '#7dc3fe', '#af87fe', '#bb60b2', '#433e7c', '#f47a75',
+    '#009db2', '#024b51', '#0780cf', '#765005', '#26ccd8',
+    '#3685fe', '#9977ef', '#f5616f', '#f9e264', '#9de0ff'
+  ],
   series: [
     {
       name: '',
@@ -151,7 +157,7 @@ export const barJson = {
     },
     itemStyle: {
       normal: {
-        color: '#4150d8'
+        color: '#1F78B4'
       }
     },
     xAxisIndex: 0,
