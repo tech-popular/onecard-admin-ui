@@ -79,7 +79,8 @@
           id: '',
           experimentName: '',
           experimentSceneId: '',
-          experimentSetDetails: []
+          experimentSetDetails: [],
+          strategyType: ''
         },
         dataFormValue: '',
         dataRule: {
@@ -106,6 +107,7 @@
         },
         subgroupNameList: [],
         examilId: '',
+        strategyType: '',
         strategyList: [
           {
             id: 1,
@@ -140,10 +142,11 @@
       this.init()
     },
     methods: {
-      init (id, value, type, testType) {
+      init (id, value, type, testType, strategyType) {
         this.id = id
         this.dataFormValue = value
         this.examilId = testType[1]
+        this.strategyType = strategyType
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         selectStrategyBySceneId(this.examilId).then(({data}) => {
@@ -222,6 +225,7 @@
               if (valid) {
                 this.dataForm.experimentSetDetails = this.lists
                 this.dataForm.experimentSceneId = this.examilId
+                this.dataForm.strategyType = this.strategyType
                 const dataBody = this.dataForm
                 const dataUpdateId = this.id
                 saveorupt(dataBody, dataUpdateId).then(({data}) => {
@@ -251,6 +255,7 @@
             if (valid) {
               this.dataForm.experimentSetDetails = this.lists
               this.dataForm.experimentSceneId = this.examilId
+              this.dataForm.strategyType = this.strategyType
               const dataBody = this.dataForm
               const dataUpdateId = this.id
               saveorupt(dataBody, dataUpdateId).then(({data}) => {
