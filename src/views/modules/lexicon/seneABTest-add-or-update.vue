@@ -26,7 +26,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
-          <el-input-number v-model="dimensionForm.experimentPersent" @focus='proportionAddText' :min="1" :max="100" label="请输入占比"></el-input-number>
+          <el-input-number v-model="dimensionForm.experimentPersent" @change='proportionAddText' :min="1" :max="100" label="请输入占比"></el-input-number>
           <!-- <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/> -->
         </el-form-item>
         <el-form-item>
