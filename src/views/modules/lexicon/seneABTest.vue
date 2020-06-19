@@ -11,7 +11,7 @@
         </el-cascader>
       </el-form-item>
       <el-form-item label="策略类型" prop="strategyType">
-        <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%">
+        <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%" clearable>
           <el-option v-for="item in strategyTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
         </el-select>
       </el-form-item>
@@ -212,6 +212,7 @@
         this.dataForm.testName = ''
         this.dataForm.experimentSceneId = ''
         this.dataForm.testStatus = ''
+        this.dataForm.strategyType = ''
         this.getDataList()
       },
       // 新增 / 修改
