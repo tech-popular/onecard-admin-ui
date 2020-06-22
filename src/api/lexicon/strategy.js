@@ -8,3 +8,4 @@ export const infoBeeTask = (params) => httpPost(base + `strategySet/showStrategy
 export const saveorupt = (params) => httpPost(base + 'strategySet/addStrategySet', params) // 新增复制策略
 export const deleteBeeTask = (params) => httpPost(base + `strategySet/deleteStrategySetInfo/${params}`) // 删除
 export const getSceneDropDown = (params, flag) => httpPost(base + 'scene/getSceneDropDown', params, flag) // 场景下拉
+export const getDefaultSceneDropDown = (params, flag) => httpPost(base + 'scene/getDefaultSceneDropDown', params, flag) // 策略下拉
