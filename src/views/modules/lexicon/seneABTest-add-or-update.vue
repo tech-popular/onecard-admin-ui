@@ -26,8 +26,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
-          <el-input-number v-model="dimensionForm.experimentPersent" @change='proportionAddText' :max="100" label="请输入占比"></el-input-number>
-          <!-- <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/> -->
+          <el-input-number v-model="dimensionForm.experimentPersent" @change='proportionAddText' :min="1" :max="100" label="请输入占比"></el-input-number>
         </el-form-item>
         <el-form-item>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
@@ -145,8 +144,6 @@
     },
     methods: {
       init (id, value, type, testType, strategyType) {
-        console.log(strategyType, 'sss')
-  
         this.id = id
         this.dataFormValue = value
         this.examilId = testType[1]
