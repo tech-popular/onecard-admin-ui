@@ -4,6 +4,8 @@
       :visible.sync="dialogVisible"
       width="1200px"
       v-loading="loading"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       :before-close="handleClose">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
         <el-form-item label="分群用户数：">{{templateUserNum}}人，在<span class="channl">{{channelInfoNameList}}</span>渠道中占比{{userRateStr}}</el-form-item>
@@ -288,7 +290,11 @@ export default {
         this.seriesData.map((item, index) => {
           let option = {}
           if (item.indicatorsType === 'pie') {
-            if (!item.valList || !item.valList.length) return
+            console.log(!item.valList)
+            if (!item.valList || !item.valList.length) {
+              this.echartLoading = false
+              return
+            }
             option = JSON.parse(JSON.stringify(pieJson))
             option.id = item.id
             option.title.text = item.indicatorsName
@@ -325,7 +331,10 @@ export default {
             }
           }
           if (item.indicatorsType === 'bar') {
-            if (!item.series || !item.series.length) return
+            if (!item.series || !item.series.length) {
+              this.echartLoading = false
+              return
+            }
             option = JSON.parse(JSON.stringify(barJson))
             option.id = item.id
             option.title.text = item.indicatorsName
@@ -354,11 +363,14 @@ export default {
         pageSize: this.pageSize,
         templateId: this.templateId
       }).then(({data}) => {
-        if (data.status !== '1' || !data.data.list || !data.data.list.length) {
+        if (data.status !== '1') {
           this.$message({
             type: 'error',
             message: data.message || '数据异常'
           })
+          this.totalCount = 0
+          this.dataList = []
+        } else if (!data.data.list || !data.data.list.length) {
           this.totalCount = 0
           this.dataList = []
         } else {
@@ -408,6 +420,9 @@ export default {
 }
 .echart {
   height: 400px;
+}
+.echart h3 {
+  margin: 0;
 }
 .order-echarts-col {
   margin-bottom: 20px;
