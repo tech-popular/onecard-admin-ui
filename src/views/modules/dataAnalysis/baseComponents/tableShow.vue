@@ -4,6 +4,8 @@
       :visible.sync="dialogVisible"
       width="1200px"
       v-loading="loading"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       :before-close="handleClose">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
         <el-form-item label="分群用户数：">{{templateUserNum}}人，在<span class="channl">{{channelInfoNameList}}</span>渠道中占比{{userRateStr}}</el-form-item>
