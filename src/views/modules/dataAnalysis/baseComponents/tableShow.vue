@@ -290,7 +290,11 @@ export default {
         this.seriesData.map((item, index) => {
           let option = {}
           if (item.indicatorsType === 'pie') {
-            if (!item.valList || !item.valList.length) return
+            console.log(!item.valList)
+            if (!item.valList || !item.valList.length) {
+              this.echartLoading = false
+              return
+            }
             option = JSON.parse(JSON.stringify(pieJson))
             option.id = item.id
             option.title.text = item.indicatorsName
@@ -327,7 +331,10 @@ export default {
             }
           }
           if (item.indicatorsType === 'bar') {
-            if (!item.series || !item.series.length) return
+            if (!item.series || !item.series.length) {
+              this.echartLoading = false
+              return
+            }
             option = JSON.parse(JSON.stringify(barJson))
             option.id = item.id
             option.title.text = item.indicatorsName
