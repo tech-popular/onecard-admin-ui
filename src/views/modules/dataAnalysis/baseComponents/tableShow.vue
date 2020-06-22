@@ -412,6 +412,9 @@ export default {
 .echart {
   height: 400px;
 }
+.echart h3 {
+  margin: 0;
+}
 .order-echarts-col {
   margin-bottom: 20px;
 }
