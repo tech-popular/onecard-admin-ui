@@ -10,8 +10,8 @@
           :options="typeList">
         </el-cascader>
       </el-form-item>
-      <el-form-item label="策略类型" prop="strategyType">
-        <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%" clearable>
+      <el-form-item label="策略类型" prop="experimentStrategyType">
+        <el-select filterable v-model="dataForm.experimentStrategyType" placeholder="请选择策略类型" style="width:100%" clearable>
           <el-option v-for="item in strategyTypeList" :value="item.baseValue" :key="item.baseValue" :label="item.baseName"/>
         </el-select>
       </el-form-item>
@@ -51,7 +51,7 @@
         label="实验场景"
         width="150px"/>
        <el-table-column
-        prop="strategyType"
+        prop="experimentStrategyType"
         header-align="center"
         align="center"
         label="策略类型"
@@ -120,7 +120,7 @@
         },
         dataForm: {
           type: [],
-          strategyType: '',
+          experimentStrategyType: '',
           testStatus: '',
           testName: '',
           experimentSceneId: ''
@@ -129,7 +129,7 @@
           type: [
             { required: true, message: '请选择实验场景', trigger: 'blur' }
           ],
-          strategyType: [
+          experimentStrategyType: [
             { required: true, message: '请选择策略类型', trigger: 'blur' }
           ]
         },
@@ -166,7 +166,7 @@
           'experimentName': this.dataForm.testName,
           'experimentSceneId': this.dataForm.experimentSceneId,
           'experimentStatus': this.dataForm.testStatu,
-          'strategyType': this.dataForm.strategyType
+          'experimentStrategyType': this.dataForm.experimentStrategyType
         }
         beeTaskList(dataBody).then(({data}) => {
           if (data && data.code === 0) {
@@ -183,7 +183,7 @@
           this.typeList = data.data
         })
         showStrategyDropDown().then(({data}) => {
-          this.strategyTypeList = data.data.strategyScenes
+          this.strategyTypeList = data.data.strategyTypes
         })
       },
       testSech (val) {
@@ -212,7 +212,7 @@
         this.dataForm.testName = ''
         this.dataForm.experimentSceneId = ''
         this.dataForm.testStatus = ''
-        this.dataForm.strategyType = ''
+        this.dataForm.experimentStrategyType = ''
         this.getDataList()
       },
       // 新增 / 修改
