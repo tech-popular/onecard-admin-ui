@@ -145,6 +145,8 @@
     },
     methods: {
       init (id, value, type, testType, strategyType) {
+        console.log(strategyType, 'sss')
+  
         this.id = id
         this.dataFormValue = value
         this.examilId = testType[1]

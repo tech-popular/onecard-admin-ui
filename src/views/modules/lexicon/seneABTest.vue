@@ -221,7 +221,7 @@
           if (valid) {
             this.addOrUpdateVisible = true
             this.$nextTick(() => {
-              this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type, this.dataForm.strategyType)
+              this.$refs.addOrUpdate.init(id, val, type, this.dataForm.type, this.dataForm.experimentStrategyType)
             })
           }
         })
