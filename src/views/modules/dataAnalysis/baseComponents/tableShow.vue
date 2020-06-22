@@ -354,11 +354,14 @@ export default {
         pageSize: this.pageSize,
         templateId: this.templateId
       }).then(({data}) => {
-        if (data.status !== '1' || !data.data.list || !data.data.list.length) {
+        if (data.status !== '1') {
           this.$message({
             type: 'error',
             message: data.message || '数据异常'
           })
+          this.totalCount = 0
+          this.dataList = []
+        } else if (!data.data.list || !data.data.list.length) {
           this.totalCount = 0
           this.dataList = []
         } else {
