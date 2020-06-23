@@ -16,7 +16,7 @@
             </el-col>
             <el-col :span="16">
               <div class="box-right">
-                <p>场景名称：{{item.boxName}}</p>
+                <p>场景名称：{{item.sceneName}}</p>
                 <p>场景ID（boxid）：{{item.boxId}}</p>
               </div>
             </el-col>
