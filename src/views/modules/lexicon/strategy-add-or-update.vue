@@ -8,14 +8,13 @@
         <el-form-item label="策略名称" prop="strategyName">
           <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
         </el-form-item>
-        <el-form-item label="策略场景" prop="strategyName">
-          <el-cascader style="width: 100%" :props="props" v-model="dataForm.strategyScene" :key="id" clearable :options="sceneList">
-        </el-cascader>
-        </el-form-item>
         <el-form-item label="策略层级" prop="strategyLevel">
-          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%">
+          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="LevelClick">
             <el-option v-for="item in hierarchyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
+        </el-form-item>
+        <el-form-item label="策略场景" prop="strategyName">
+          <el-cascader style="width: 100%" :props="props" v-model="dataForm.strategyScene" :key="id" clearable :options="sceneList"></el-cascader>
         </el-form-item>
         <el-form-item label="策略类型" prop="strategyType">
           <el-select filterable v-model="dataForm.strategyType" placeholder="请选择策略类型" style="width:100%" @change="typeClick">
@@ -135,7 +134,7 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown, weidushowStrategyDropDown } from '@/api/lexicon/strategy'
+  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown, getDefaultSceneDropDown, weidushowStrategyDropDown } from '@/api/lexicon/strategy'
   export default {
     data () {
       return {
@@ -258,6 +257,11 @@
               let arr1Ids = data.data.strategySetDetails.map(item => item.strategyDimension)
               const result = this.newAddTextList.filter(item => !arr1Ids.includes(item.baseName))
               this.newAddTextList = result
+              if (data.data.strategyLevel === '默认策略') {
+                getDefaultSceneDropDown().then(({data}) => {
+                  this.sceneList = data.data
+                })
+              }
             })
           }
         })
@@ -307,6 +311,14 @@
       typeClick (val) {
         this.paixudisbuld = val
       },
+      // 层级
+      LevelClick (val) {
+        if (val === '默认策略') {
+          getDefaultSceneDropDown().then(({data}) => {
+            this.sceneList = data.data
+          })
+        }
+      },
       // 提交
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
@@ -345,7 +357,7 @@
                         this.$emit('refreshDataList')
                         this.$refs['dataForm'].resetFields()
                         this.$refs['dimensionForm'].resetFields()
-                        this.dataForm.strategyScene = ''
+                        this.dataForm.strategyScene = []
                         this.dataFormValue = ''
                         this.lists = []
                         this.nextTodoId = 1
@@ -360,8 +372,8 @@
               }
             }
           } else {
-            if (this.weightSum > 100 || this.weightSum < 100) {
-              this.$message.error('占比和需等于100%')
+            if (this.weightSum > 1 || this.weightSum < 1) {
+              this.$message.error('占比和需等于1%')
             } else if (this.weidu === true) {
               this.$message.error('纬度不能重复')
             } else {
@@ -379,7 +391,7 @@
                         this.$emit('refreshDataList')
                         this.$refs['dataForm'].resetFields()
                         this.$refs['dimensionForm'].resetFields()
-                        this.dataForm.strategyScene = ''
+                        this.dataForm.strategyScene = []
                         this.dataFormValue = ''
                         this.lists = []
                         this.nextTodoId = 1
@@ -400,7 +412,7 @@
         this.visible = false
         this.$refs['dataForm'].resetFields()
         this.$refs['dimensionForm'].resetFields()
-        this.dataForm.strategyScene = ''
+        this.dataForm.strategyScene = []
         this.paixudisbuld = ''
         this.lists = []
         this.dataFormValue = ''

@@ -16,7 +16,7 @@
             </el-col>
             <el-col :span="16">
               <div class="box-right">
-                <p>场景名称：{{item.boxName}}</p>
+                <p>场景名称：{{item.sceneName}}</p>
                 <p>场景ID（boxid）：{{item.boxId}}</p>
               </div>
             </el-col>
@@ -50,8 +50,9 @@
             <el-col :span="16">
               <div class="box-right">
                 <p>场景名称：{{item.sceneName}}</p>
-                <p>场景ID（boxid）：{{item.boxId}}</p>
-                <p>推荐类型：{{item.boxName}}</p>
+                <p>boxid：{{item.boxId}}</p>
+                <p>推荐类型：{{item.recommendTypeId}}</p>
+                <p>接口类型：{{item.interfaceType}}</p>
                 <!-- <p>状态：{{item.status}}</p> -->
               </div>
             </el-col>
@@ -175,7 +176,6 @@ export default {
   }
   .box-card {
     width: 320px;
-    height: 200px;
     float: left;
     margin: 0 50px 20px 0;
   }
