@@ -242,6 +242,8 @@ export default {
       this.isShow = true
       this.title = val.name
       this.templateId = val.id
+      this.seriesData = []
+      this.chartLen = 0
       this.getOverviewData(val.id, val.channelId.split(','))
     },
     getOverviewData (id, channelCode) {
