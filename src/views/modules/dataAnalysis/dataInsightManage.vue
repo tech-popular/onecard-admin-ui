@@ -16,9 +16,9 @@
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="分群ID"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="分群名称">
-        <template slot-scope="scope">
+        <!-- <template slot-scope="scope">
           <el-button type="text" size="small" @click="tableShowHandle(scope.row)">{{scope.row.name}}</el-button>
-        </template>
+        </template> -->
       </el-table-column>
       <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数" :formatter="templateUserNumFormat"></el-table-column>
       <el-table-column prop="lastCalTime" header-align="center" align="center" label="最近计算时间" :formatter="lastCalTimeFormat"></el-table-column>
