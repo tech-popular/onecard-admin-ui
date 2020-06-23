@@ -26,7 +26,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="占比" prop="experimentPersent" v-if="proportionDisbild === false">
-          <el-input v-model="dimensionForm.experimentPersent" placeholder="请输入占比" @focus='proportionAddText'/>
+          <el-input-number v-model="dimensionForm.experimentPersent" @change='proportionAddText' :min="1" :max="100" label="请输入占比"></el-input-number>
         </el-form-item>
         <el-form-item>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
@@ -51,8 +51,8 @@
             v-if="proportionDisbild === false"
             prop="experimentPersent"
             label="占比%"/>
-          <el-table-column header-align="center" align="center" width="200" label="操作">
-            <template slot-scope="scope" v-if="disbild === false">
+          <el-table-column header-align="center" align="center" width="200" label="操作" v-if="disbild === false">
+            <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
                 <el-button type="danger" size="mini" icon="el-icon-minus" circle @click='deletedlLists(scope.row.id)'></el-button>
               </el-tooltip>
@@ -78,7 +78,8 @@
           id: '',
           experimentName: '',
           experimentSceneId: '',
-          experimentSetDetails: []
+          experimentSetDetails: [],
+          strategyType: ''
         },
         dataFormValue: '',
         dataRule: {
@@ -89,7 +90,7 @@
         dimensionForm: {
           experimentStrategyId: '',
           experimentGroupId: '',
-          experimentPersent: ''
+          experimentPersent: undefined
         },
         celueId: '',
         dimensionRule: {
@@ -105,6 +106,7 @@
         },
         subgroupNameList: [],
         examilId: '',
+        strategyType: '',
         strategyList: [
           {
             id: 1,
@@ -124,14 +126,14 @@
     watch: {
       'proportionDisbild': {
         handler (newVal, oldVal) {
-          console.log(newVal, 'fenquan')
+          console.log('占比', newVal)
         },
         deep: true,
         immediate: true
       },
       'subgroupNameDisbild': {
         handler (newVal, oldVal) {
-          console.log(newVal, 'zhanbi')
+          console.log('人群', newVal)
         },
         deep: true,
         immediate: true
@@ -141,10 +143,11 @@
       this.init()
     },
     methods: {
-      init (id, value, type, testType) {
+      init (id, value, type, testType, strategyType) {
         this.id = id
         this.dataFormValue = value
         this.examilId = testType[1]
+        this.strategyType = strategyType
         this.visible = true
         this.dataFormValue === 'look' ? this.disbild = true : this.disbild = false
         selectStrategyBySceneId(this.examilId).then(({data}) => {
@@ -161,7 +164,8 @@
             infoBeeTask(dataBody).then(({data}) => {
               this.lists = data.data.experimentSetDetails
               this.dataForm.experimentName = data.data.experimentName
-              this.dataFormValue === 'look' && data.data.experimentSetDetails[0].experimentPersent ? this.subgroupNameDisbild = true : this.proportionDisbild = true
+              this.dataFormValue === 'look' && data && data.data && data.data.experimentSetDetails.length > 0 && data.data.experimentSetDetails[0].experimentPersent ? this.subgroupNameDisbild = true : this.subgroupNameDisbild = false
+              this.dataFormValue === 'look' && data && data.data && data.data.experimentSetDetails.length > 0 && data.data.experimentSetDetails[0].experimentGroupId ? this.proportionDisbild = true : this.proportionDisbild = false
             })
           }
         })
@@ -223,6 +227,7 @@
               if (valid) {
                 this.dataForm.experimentSetDetails = this.lists
                 this.dataForm.experimentSceneId = this.examilId
+                this.dataForm.strategyType = this.strategyType
                 const dataBody = this.dataForm
                 const dataUpdateId = this.id
                 saveorupt(dataBody, dataUpdateId).then(({data}) => {
@@ -239,6 +244,7 @@
                         this.lists = []
                         this.proportionDisbild = false
                         this.subgroupNameDisbild = false
+                        this.nextTodoId = 1
                       }
                     })
                   } else {
@@ -251,6 +257,7 @@
             if (valid) {
               this.dataForm.experimentSetDetails = this.lists
               this.dataForm.experimentSceneId = this.examilId
+              this.dataForm.strategyType = this.strategyType
               const dataBody = this.dataForm
               const dataUpdateId = this.id
               saveorupt(dataBody, dataUpdateId).then(({data}) => {
@@ -267,6 +274,7 @@
                       this.lists = []
                       this.proportionDisbild = false
                       this.subgroupNameDisbild = false
+                      this.nextTodoId = 1
                     }
                   })
                 } else {
@@ -288,6 +296,7 @@
         this.lists = []
         this.proportionDisbild = false
         this.subgroupNameDisbild = false
+        this.nextTodoId = 1
       }
     }
   }

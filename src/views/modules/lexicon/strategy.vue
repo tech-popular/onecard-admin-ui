@@ -81,7 +81,7 @@
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="addOrUpdateHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="scope.row.strategyLevel !== '默认策略'">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
           </el-tooltip>
         </template>
