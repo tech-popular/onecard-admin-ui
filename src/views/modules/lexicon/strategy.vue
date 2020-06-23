@@ -75,7 +75,7 @@
         label="创建时间"/>
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" content="复制" placement="top">
+          <el-tooltip class="item" effect="dark" content="复制" placement="top" v-if="scope.row.strategyLevel !== '默认策略'">
             <el-button type="primary" size="mini" icon="el-icon-document-copy" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
