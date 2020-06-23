@@ -242,6 +242,9 @@ export default {
       this.isShow = true
       this.title = val.name
       this.templateId = val.id
+      this.$nextTick(() => {
+        this.$refs.ruleForm.clearValidate()
+      })
       this.getOverviewData(val.id, val.channelId.split(','))
     },
     getOverviewData (id, channelCode) {
