@@ -55,7 +55,7 @@
         </el-col>
       </el-row>
       <div class="no-echart-content" v-else>
-        暂无图表数据
+        {{dataResultText}}
       </div>
       <div class="custer-history">
         <p>分群历史情况：</p>
@@ -103,6 +103,7 @@ export default {
       channelInfoNameList: '',
       userRateStr: '3.4%',
       lastCalTime: '2020-04-25',
+      dataResultText: '暂无图表数据',
       templateId: '',
       chartLen: 0,
       seriesData: [],
@@ -284,6 +285,7 @@ export default {
       this.seriesData = []
       this.chartLen = 0
       this.echartLoading = true
+      this.dataResultText = '数据加载中...'
       chartInfo({
         templateId: this.templateId,
         indicators: this.ruleForm.region.join(',')
@@ -293,19 +295,19 @@ export default {
             type: 'error',
             message: data.message || '数据异常'
           })
+          this.dataResultText = '图表数据异常'
           this.chartLen = 0
           return
         }
         let resData = data.data.data
         this.seriesData = resData
         this.chartLen = resData.length
-        console.log(12323, this.seriesData)
         this.seriesData.map((item, index) => {
           let option = {}
           if (item.indicatorsType === 'pie') {
-            console.log(!item.valList)
             if (!item.valList || !item.valList.length) {
               this.echartLoading = false
+              this.dataResultText = '暂无图表数据'
               return
             }
             option = JSON.parse(JSON.stringify(pieJson))
@@ -346,6 +348,7 @@ export default {
           if (item.indicatorsType === 'bar') {
             if (!item.series || !item.series.length) {
               this.echartLoading = false
+              this.dataResultText = '暂无图表数据'
               return
             }
             option = JSON.parse(JSON.stringify(barJson))
