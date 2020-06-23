@@ -43,10 +43,10 @@
       </el-form>
       <el-row :gutter="20" class="echart-content" v-if="chartLen > 0" v-loading="echartLoading">
         <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
-          <el-card shadow="never" class="order-echarts-card" v-if="(item.indicatorsType === 'pie' && item.valList) || (item.indicatorsType === 'bar' && item.series)">
+          <el-card shadow="never" class="order-echarts-card" v-if="isShowData(item)">
             <div :id="'echart-' + item.id" class="echart"></div>
           </el-card>
-          <el-card shadow="never" class="order-echarts-card" v-else>
+          <el-card shadow="never" class="order-echarts-card" v-if="!isShowData(item)">
             <div class="echart">
               <h3>{{item.indicatorsName}}</h3>
               <p style="padding-top: 130px;text-align:center">暂无数据</p>
@@ -242,8 +242,6 @@ export default {
       this.isShow = true
       this.title = val.name
       this.templateId = val.id
-      this.seriesData = []
-      this.chartLen = 0
       this.getOverviewData(val.id, val.channelId.split(','))
     },
     getOverviewData (id, channelCode) {
@@ -272,7 +270,16 @@ export default {
         })
       })
     },
+    isShowData (item) {
+      if ((item.indicatorsType === 'pie' && item.valList) || (item.indicatorsType === 'bar' && item.series)) {
+        return true
+      } else {
+        return false
+      }
+    },
     getChartInfo () {
+      this.seriesData = []
+      this.chartLen = 0
       this.echartLoading = true
       chartInfo({
         templateId: this.templateId,
@@ -289,6 +296,7 @@ export default {
         let resData = data.data.data
         this.seriesData = resData
         this.chartLen = resData.length
+        console.log(12323, this.seriesData)
         this.seriesData.map((item, index) => {
           let option = {}
           if (item.indicatorsType === 'pie') {
