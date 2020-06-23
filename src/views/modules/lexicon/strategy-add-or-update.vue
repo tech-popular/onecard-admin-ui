@@ -257,6 +257,11 @@
               let arr1Ids = data.data.strategySetDetails.map(item => item.strategyDimension)
               const result = this.newAddTextList.filter(item => !arr1Ids.includes(item.baseName))
               this.newAddTextList = result
+              if (data.data.strategyLevel === '默认策略') {
+                getDefaultSceneDropDown().then(({data}) => {
+                  this.sceneList = data.data
+                })
+              }
             })
           }
         })
@@ -352,7 +357,7 @@
                         this.$emit('refreshDataList')
                         this.$refs['dataForm'].resetFields()
                         this.$refs['dimensionForm'].resetFields()
-                        this.dataForm.strategyScene = ''
+                        this.dataForm.strategyScene = []
                         this.dataFormValue = ''
                         this.lists = []
                         this.nextTodoId = 1
@@ -386,7 +391,7 @@
                         this.$emit('refreshDataList')
                         this.$refs['dataForm'].resetFields()
                         this.$refs['dimensionForm'].resetFields()
-                        this.dataForm.strategyScene = ''
+                        this.dataForm.strategyScene = []
                         this.dataFormValue = ''
                         this.lists = []
                         this.nextTodoId = 1
@@ -407,7 +412,7 @@
         this.visible = false
         this.$refs['dataForm'].resetFields()
         this.$refs['dimensionForm'].resetFields()
-        this.dataForm.strategyScene = ''
+        this.dataForm.strategyScene = []
         this.paixudisbuld = ''
         this.lists = []
         this.dataFormValue = ''

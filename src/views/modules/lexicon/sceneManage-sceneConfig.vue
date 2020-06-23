@@ -50,8 +50,9 @@
             <el-col :span="16">
               <div class="box-right">
                 <p>场景名称：{{item.sceneName}}</p>
-                <p>场景ID（boxid）：{{item.boxId}}</p>
-                <p>推荐类型：{{item.boxName}}</p>
+                <p>boxid：{{item.boxId}}</p>
+                <p>推荐类型：{{item.recommendTypeId}}</p>
+                <p>接口类型：{{item.interfaceType}}</p>
                 <!-- <p>状态：{{item.status}}</p> -->
               </div>
             </el-col>
