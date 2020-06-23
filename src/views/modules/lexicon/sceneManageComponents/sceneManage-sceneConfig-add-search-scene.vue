@@ -29,8 +29,8 @@
             <el-radio
               v-for="(item, index) in interfaceList"
               :key="index"
-              :label="item.id"
-              @change="interfaceClisk(item.id)"
+              :label="item.baseValue"
+              @change="interfaceClisk(item.baseValue)"
             >
               {{item.baseName}}
             </el-radio>
