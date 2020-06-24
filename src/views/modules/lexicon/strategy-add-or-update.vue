@@ -30,12 +30,12 @@
     </el-card>
     <el-card shadow="never" style="margin-top:20px">
       <div slot="header" class="clearfix">
-        <span>详细配置</span><el-tag type="danger" style="margin-left:5px">占比和需等于100%</el-tag>
+        <span>详细配置</span><el-tag type="danger" style="margin-left:5px">占比和需等于1%</el-tag>
       </div>
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'> 
         <el-form-item label="纬度" v-if="disbild === false" prop="latitude">
           <el-select filterable v-model="dimensionForm.latitude" placeholder="请选择纬度" @change='clickNewAddText'>
-            <el-option v-for="item in newAddTextList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in newAddTextList" :value="item.dimensionName" :key="item.dimensionName" :label="item.dimensionName"/>
           </el-select>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-plus" circle @click='addNewList()' style="float: right;" ></el-button>
@@ -134,7 +134,7 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown, getDefaultSceneDropDown, weidushowStrategyDropDown } from '@/api/lexicon/strategy'
+  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown, getDefaultSceneDropDown, weidushowStrategyDropDown, weidushowStrategyDropDownTwo } from '@/api/lexicon/strategy'
   export default {
     data () {
       return {
@@ -191,7 +191,8 @@
         newAddTextList: [],
         disbild: false,
         paixudisbuld: '',
-        bName: ''
+        bName: '',
+        weiduId: ''
       }
     },
     components: {
@@ -235,7 +236,6 @@
           this.loginTypeList = data.data.loginStatus
           this.hierarchyList = data.data.strategyLevels
           this.typeList = data.data.strategyTypes
-          this.newAddTextList = data.data.strategyDimension
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -275,7 +275,7 @@
               strategyDimension: this.dimensionForm.latitude
             })
             this.dimensionForm.latitude = ''
-            this.lists.forEach(item => { this.bName = item.strategyDimension })
+            this.lists.forEach(item => { this.bName = item.dimensionName })
             this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           }
         })
@@ -289,14 +289,14 @@
             }
           }
         })
-        weidushowStrategyDropDown().then(({data}) => { // 删除后增加或删除纬度的数据
+        weidushowStrategyDropDownTwo(this.weiduId).then(({data}) => { // 删除后增加或删除纬度的数据
           this.weidu = false
-          this.newAddTextList = data.data.strategyDimension
+          this.newAddTextList = data.data
           if (this.lists.length > 0) {
-            this.lists.forEach(item => { this.bName = item.strategyDimension })
+            this.lists.forEach(item => { this.bName = item.dimensionName })
             this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           } else {
-            this.newAddTextList = data.data.strategyDimension
+            this.newAddTextList = data.data.dimensionName
             if (this.id) {
               this.nextTodoId = 1
               this.numId = 1
@@ -310,6 +310,14 @@
       // 类型
       typeClick (val) {
         this.paixudisbuld = val
+        var obj = {}
+        obj = this.typeList.find(function (item) {
+          return item.baseName === val
+        })
+        this.weiduId = obj.baseValue
+        weidushowStrategyDropDown(this.weiduId).then(({data}) => {
+          this.newAddTextList = data.data
+        })
       },
       // 层级
       LevelClick (val) {
