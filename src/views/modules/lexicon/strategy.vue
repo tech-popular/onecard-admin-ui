@@ -75,13 +75,13 @@
         label="创建时间"/>
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" content="复制" placement="top" v-if="scope.row.strategyLevel !== '默认策略'">
+          <el-tooltip class="item" effect="dark" content="复制" placement="top" v-if="scope.row.strategyLevel !== '默认策略' && scope.row.strategyLevel !== '失效默认策略'">
             <el-button type="primary" size="mini" icon="el-icon-document-copy" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="addOrUpdateHandle(scope.row.id,'look', scope.row.strategyType)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="scope.row.strategyLevel !== '默认策略'">
+          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="scope.row.strategyLevel !== '默认策略' && scope.row.strategyLevel !== '失效默认策略'">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
           </el-tooltip>
         </template>
