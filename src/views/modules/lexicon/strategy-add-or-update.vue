@@ -289,7 +289,13 @@
             }
           }
         })
-        weidushowStrategyDropDownTwo(this.weiduId).then(({data}) => { // 删除后增加或删除纬度的数据
+        if (this.dataForm.strategyType === '召回') {
+          this.stragId = 0
+        } else {
+          this.stragId = 1
+        }
+  
+        weidushowStrategyDropDownTwo(this.stragId).then(({data}) => { // 删除后增加或删除纬度的数据
           this.weidu = false
           this.newAddTextList = data.data
           if (this.lists.length > 0) {
