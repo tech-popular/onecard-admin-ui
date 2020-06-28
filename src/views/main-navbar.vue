@@ -28,7 +28,17 @@
             </el-badge>
           </template>
         </el-menu-item> -->
-
+        <el-menu-item class="site-navbar__avatar">
+          所属租户：
+          <el-select v-model="tenantId" placeholder="请选择">
+            <el-option
+              v-for="item in tenantList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-menu-item>
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
@@ -55,7 +65,26 @@
       return {
         updatePassowrdVisible: false,
         left: require('../assets/img/left1.png'),
-        right: require('../assets/img/right1.png')
+        right: require('../assets/img/right1.png'),
+        tenantId: '',
+        tenantList: [
+          {
+            id: 1,
+            name: '无'
+          },
+          {
+            id: 2,
+            name: '小鱼福卡项目'
+          },
+          {
+            id: 3,
+            name: '万卡项目'
+          },
+          {
+            id: 4,
+            name: '玖富商城项目'
+          }
+        ]
       }
     },
     components: {
