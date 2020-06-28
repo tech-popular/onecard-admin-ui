@@ -9,11 +9,11 @@
           <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
         </el-form-item>
         <el-form-item label="策略层级" prop="strategyLevel">
-          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="LevelClick">
+          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="LevelClick" :disabled='levelDisbild'>
             <el-option v-for="item in hierarchyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="策略场景" prop="strategyName">
+        <el-form-item label="策略场景" prop="strategyName" v-if="sceneDisbild === false">
           <el-cascader style="width: 100%" :props="props" v-model="dataForm.strategyScene" :key="id" clearable :options="sceneList"></el-cascader>
         </el-form-item>
         <el-form-item label="策略类型" prop="strategyType">
@@ -190,6 +190,8 @@
         numId: 1,
         newAddTextList: [],
         disbild: false,
+        levelDisbild: false,
+        sceneDisbild: false,
         paixudisbuld: '',
         bName: '',
         weiduId: ''
@@ -262,6 +264,9 @@
                   this.sceneList = data.data
                 })
               }
+              if (data.data.strategyLevel === '全局策略') {
+                this.levelDisbild = true
+              }
             })
           }
         })
@@ -332,6 +337,11 @@
             this.sceneList = data.data
           })
         }
+        if (val === '全局策略') {
+          this.sceneDisbild = true
+        } else {
+          this.sceneDisbild = false
+        }
       },
       // 提交
       dataFormSubmit (form) {
@@ -377,6 +387,8 @@
                         this.nextTodoId = 1
                         this.numId = 1
                         this.weidu = false
+                        this.levelDisbild = false
+                        this.sceneDisbild = false
                       }
                     })
                   } else {
@@ -411,6 +423,8 @@
                         this.nextTodoId = 1
                         this.numId = 1
                         this.weidu = false
+                        this.levelDisbild = false
+                        this.sceneDisbild = false
                       }
                     })
                   } else {
@@ -433,6 +447,8 @@
         this.nextTodoId = 1
         this.numId = 1
         this.weidu = false
+        this.levelDisbild = false
+        this.sceneDisbild = false
       }
     }
   }
