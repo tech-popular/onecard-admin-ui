@@ -33,10 +33,11 @@
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="操作">
+      <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'update')">编辑</el-button>
           <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button>
+          <el-button type="text" size="small" @click="tableShowHandle(scope.row)">分群概览</el-button>
         </template>
       </el-table-column>
     </el-table>
