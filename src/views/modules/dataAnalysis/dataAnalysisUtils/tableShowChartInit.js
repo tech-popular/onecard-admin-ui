@@ -82,7 +82,7 @@ export const barJson = {
       bottom: 40
     }
   ],
-  xAxis: [{
+  xAxis: {
     type: 'category',
     data: [],
     gridIndex: 0,
@@ -100,15 +100,8 @@ export const barJson = {
       }
     },
     zlevel: 2
-  }, {
-    type: 'category',
-    gridIndex: 1,
-    axisLine: {
-      show: false
-    },
-    zlevel: 1
-  }],
-  yAxis: [{
+  },
+  yAxis: {
     type: 'value',
     gridIndex: 0,
     name: '用户数（人）',
@@ -130,22 +123,7 @@ export const barJson = {
         color: '#ccc'
       }
     }
-  }, {
-    type: 'value',
-    gridIndex: 1,
-    axisLabel: {
-      show: false
-    },
-    axisLine: {
-      show: false
-    },
-    splitLine: {
-      show: false
-    },
-    axisTick: {
-      show: false
-    }
-  }],
+  },
   series: [{
     type: 'bar',
     data: [],
@@ -161,8 +139,6 @@ export const barJson = {
       normal: {
         color: '#1F78B4'
       }
-    },
-    xAxisIndex: 0,
-    yAxisIndex: 0
+    }
   }]
 }
