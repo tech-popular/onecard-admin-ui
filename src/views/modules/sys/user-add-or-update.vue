@@ -27,6 +27,34 @@
       <el-form-item label="阿里云账号" prop="mcAccount">
         <el-input v-model="dataForm.mcAccount" @input="change($event)" placeholder="阿里云账号"/>
       </el-form-item>
+      <el-form-item label="所属租户" prop="tenant">
+        <el-select v-model="dataForm.tenant" placeholder="所属租户" multiple filterable style="width: 100%;">
+          <el-option
+            v-for="item in tenantOptions"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="功能角色" prop="funcRole">
+        <el-select v-model="dataForm.funcRole" placeholder="功能角色" multiple filterable style="width: 100%;">
+          <el-option
+            v-for="item in funcRoleOptions"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="个人权限" prop="userPermission">
+        <el-tabs v-model="userPermissionActiveName" type="card">
+          <el-tab-pane label="功能权限" name="funcPermission"></el-tab-pane>
+          <el-tab-pane label="数据权限" name="dataPermission"></el-tab-pane>
+        </el-tabs>
+        <user-func-permission v-if="userPermissionActiveName === 'funcPermission'" ref="userFuncPermission"></user-func-permission>
+        <user-data-permission v-if="userPermissionActiveName === 'dataPermission'" ref="userDataPermission"></user-data-permission>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -37,7 +65,10 @@
 
 <script>
   import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
+  import userFuncPermission from './user-func-permission'
+  import userDataPermission from './user-data-permission'
   export default {
+    components: { userFuncPermission, userDataPermission },
     data () {
       return {
         visible: false,
@@ -48,16 +79,41 @@
           ismodifyPasswd: '',
           mobile: '',
           mcAccount: '',
-          department: ''
+          department: '',
+          tenant: ''
         },
         email: [],
         systenantList: [],
         jieshouren: [],
         emailGroup: [],
+        tenantOptions: [ // 租户列表
+          {
+            id: '1',
+            label: '租户1'
+          },
+          {
+            id: '2',
+            label: '租户2'
+          }
+        ],
+        funcRoleOptions: [ // 功能角色列表
+          {
+            id: '1',
+            label: '角色1'
+          },
+          {
+            id: '2',
+            label: '角色2'
+          }
+        ],
+        userPermissionActiveName: 'funcPermission',
         dataRule: {
-          // email: [
-          //   { validator: validateEmail, trigger: 'blur' }
-          // ]
+          tenant: [
+            { required: true, message: '请选择租户', trigger: 'change' }
+          ],
+          funcRole: [
+            { required: true, message: '请选择功能角色', trigger: 'change' }
+          ]
         }
       }
     },

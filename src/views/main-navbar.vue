@@ -28,9 +28,9 @@
             </el-badge>
           </template>
         </el-menu-item> -->
-        <el-menu-item class="site-navbar__avatar">
+        <el-menu-item class="site-navbar__tenant" index="1">
           所属租户：
-          <el-select v-model="tenantId" placeholder="请选择">
+          <el-select v-model="tenantId" placeholder="请选择" style="height: 40px; line-height: 36px;">
             <el-option
               v-for="item in tenantList"
               :key="item.id"
@@ -38,6 +38,7 @@
               :value="item.id">
             </el-option>
           </el-select>
+          <span class="site-navbar__apply" @click="applyPermission">申请</span>
         </el-menu-item>
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
@@ -66,7 +67,7 @@
         updatePassowrdVisible: false,
         left: require('../assets/img/left1.png'),
         right: require('../assets/img/right1.png'),
-        tenantId: '',
+        tenantId: 1,
         tenantList: [
           {
             id: 1,
@@ -133,6 +134,9 @@
             }
           })
         }).catch(() => {})
+      },
+      applyPermission () { // 申请租户权限
+
       }
     }
   }
@@ -140,5 +144,21 @@
 <style lang="scss">
 .site-navbar {
   background-color: #202b30;
+}
+.el-menu--horizontal>.site-navbar__tenant.is-active {
+  border: 0
+}
+.site-navbar--inverse .el-menu > .site-navbar__tenant:focus, .site-navbar--inverse .el-menu > .site-navbar__tenant:hover {
+  background: none;
+}
+.site-navbar--inverse .el-menu .site-navbar__tenant i {
+  color: #c0c4cc
+}
+.site-navbar__apply {
+  margin-left: 10px;
+  color: #2093f7;
+}
+.site-navbar__apply:hover {
+  border-bottom: 1px solid #2093f7
 }
 </style>

@@ -60,40 +60,30 @@
           <el-col :span="16">
             <el-card>
               <el-row>
-                <h4>去往其他系统</h4>
+                <h4><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“系统管理”版块</span></h4>
                 <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
-                <el-col :span="8">
+                <el-col :span="12" v-for="(item, index) in allSystemData" :key="index">
                   <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="~@/assets/img/fenghuang.png">
+                    <img width="100%" height="155px" :src="item.img">
                     <el-row style="padding:10px">
-                      <el-col :span="12" style="line-height: 38px;"><span>凤凰系统</span></el-col>
+                      <el-col :span="12" style="line-height: 38px;"><span>{{item.name}}</span></el-col>
                       <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="fhHandle(fenghuang)"></el-button>
+                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="gotoHandle(item.url)"></el-button>
                       </el-col>
                     </el-row>
                   </el-card>
                 </el-col>
-                <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="~@/assets/img/bi.jpg">
-                    <el-row style="padding:10px">
-                      <el-col :span="12" style="line-height: 38px;"><span>BI系统</span></el-col>
-                      <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="biHandle(bi)"></el-button>
-                      </el-col>
-                    </el-row>
-                  </el-card>
-                </el-col>
-                <!-- <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
-                    <el-row style="padding:10px">
-                      <el-col :span="12"><span>凤凰系统</span></el-col>
-                      <el-col :span="12" style="text-align: right;color: #2093f7;"><i class="el-icon-right"></i></el-col>
-                    </el-row>
-                  </el-card>
-                </el-col> -->
               </el-row>
+              <el-dialog
+                title="请选择租户"
+                :visible.sync="dialogVisible"
+                width="30%"
+                >
+                <span>请在页面上方选择租户，若无租户，请前往<a href="javascript:;" style="color:#2093f7" @click="applyPermission">申请</a></span>
+                <span slot="footer" class="dialog-footer">
+                  <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+                </span>
+              </el-dialog>
               <!-- <el-row>
                 <el-col :span="8">
                   <el-card :body-style="{ padding: '0px' }" style="margin:5px">
@@ -123,8 +113,30 @@ export default {
     return {
       value: new Date(),
       dataHoste: '',
-      fenghuang: originHost + '/phoenix/#/home',
-      bi: 'http://data.9fbank.com/plate.jsp'
+      userPermisson: false, // 用户是否有权限
+      dialogVisible: false,
+      allSystemData: [
+        {
+          name: '凤凰系统',
+          img: require('../../assets/img/fenghuang.png'),
+          url: originHost + '/phoenix/#/home'
+        },
+        {
+          name: 'BI系统',
+          img: require('../../assets/img/bi.jpg'),
+          url: 'http://data.9fbank.com/plate.jsp'
+        },
+        {
+          name: '数语系统',
+          img: require('../../assets/img/fenghuang.png'),
+          url: ''
+        },
+        {
+          name: '系统管理',
+          img: require('../../assets/img/fenghuang.png'),
+          url: ''
+        }
+      ]
     }
   },
   computed: {
@@ -161,11 +173,15 @@ export default {
     this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
   },
   methods: {
-    fhHandle (url) {
-      window.open(url, '_blank')
+    gotoHandle (url) {
+      if (!this.userPermisson) {
+        this.dialogVisible = true
+      } else {
+        window.open(url, '_blank')
+      }
     },
-    biHandle (url) {
-      window.open(url, '_blank')
+    applyPermission () {
+      console.log(123)
     }
   }
 }
@@ -221,5 +237,14 @@ export default {
       margin: 5px;
 
     }
+}
+.other-tips {
+  font-weight: normal;
+  font-size: 12px;
+  // padding-left: 10px;
+  i {
+    color: #faad14;
+    padding-right: 5px;
+  }
 }
 </style>
