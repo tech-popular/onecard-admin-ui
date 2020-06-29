@@ -266,6 +266,7 @@
               }
               if (data.data.strategyLevel === '全局策略') {
                 this.levelDisbild = true
+                this.sceneDisbild = true
               }
             })
           }
