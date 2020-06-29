@@ -94,7 +94,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="必推二">
-          <el-select v-model="dataForm.value2" placeholder="请选择" @change="bituiChange">
+          <el-select v-model="dataForm.value2" placeholder="请选择" @change="bituiChange2">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
         </el-form-item>
@@ -272,11 +272,45 @@ export default {
     },
     // 选择坑位
     bituiChange (val) {
-      console.log(val, 'ppp')
-      const screenArr = this.options.filter((item) => {
-        return val.includes(item.id)
+      this.lists = [
+        {id: 0, name: '不配置'},
+        {id: 1, name: '坑位一'},
+        {id: 2, name: '坑位二'},
+        {id: 3, name: '坑位三'},
+        {id: 4, name: '坑位四'},
+        {id: 5, name: '坑位五'},
+        {id: 6, name: '坑位六'}
+      ]
+      this.lists.forEach((item) => {
+        if (item.id === val) {
+          if (this.lists.indexOf(item) > -1) {
+            var i = this.lists.indexOf(item)
+            this.lists.splice(i, 1)
+          }
+        }
       })
-      console.log(screenArr, '[][][]')
+      this.options = this.lists
+    },
+     // 选择坑位
+    bituiChange2 (val) {
+      this.lists = [
+        {id: 0, name: '不配置'},
+        {id: 1, name: '坑位一'},
+        {id: 2, name: '坑位二'},
+        {id: 3, name: '坑位三'},
+        {id: 4, name: '坑位四'},
+        {id: 5, name: '坑位五'},
+        {id: 6, name: '坑位六'}
+      ]
+      this.lists.forEach((item) => {
+        if (item.id === val) {
+          if (this.lists.indexOf(item) > -1) {
+            var i = this.lists.indexOf(item)
+            this.lists.splice(i, 1)
+          }
+        }
+      })
+      this.options = this.lists
     },
     dataSubmit () {
       let uneffectTime = new Date(this.mustpushForm.date[1]).getTime()
