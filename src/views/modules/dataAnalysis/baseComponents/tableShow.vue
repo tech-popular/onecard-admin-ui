@@ -355,8 +355,17 @@ export default {
             option.id = item.id
             option.title.text = item.indicatorsName
             option.series[0].name = item.indicatorsName
-            option.xAxis[0].data = item.xaxisData
+            option.xAxis.data = item.xaxisData
             option.series[0].data = item.series
+            option.yAxis.axisLabel.formatter = value => {
+              if (value >= 10000) {
+                value = (value / 10000) + 'w'
+              }
+              if (value >= 1000) {
+                value = (value / 1000) + 'k'
+              }
+              return value
+            }
           }
           setTimeout(() => {
             let chart = null
