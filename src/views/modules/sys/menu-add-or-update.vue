@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
       <el-form-item label="类型" prop="type">
         <el-radio-group v-model="dataForm.type">
           <el-radio v-for="(type, index) in dataForm.typeList" :label="index" :key="index">{{ type }}</el-radio>
@@ -12,7 +12,7 @@
       <el-form-item :label="dataForm.typeList[dataForm.type] + '名称'" prop="name">
         <el-input v-model="dataForm.name" :placeholder="dataForm.typeList[dataForm.type] + '名称'"></el-input>
       </el-form-item>
-      <el-form-item label="上级菜单" prop="parentName">
+      <el-form-item :label="'所属' + (dataForm.type === 0 ? '版块' : dataForm.typeList[dataForm.type - 1])" prop="parentName">
         <el-popover
           ref="menuListPopover"
           placement="bottom-start"
@@ -29,21 +29,21 @@
             :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:menuListPopover :readonly="true" placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:menuListPopover :readonly="true" placeholder="点击选择所属版块" class="menu-list__input"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.type === 1" label="菜单路由" prop="url">
-        <el-input v-model="dataForm.url" placeholder="菜单路由"></el-input>
+      <el-form-item v-if="dataForm.type === 2" label="菜单路径" prop="url">
+        <el-input v-model="dataForm.url" placeholder="菜单路径"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.type !== 0" label="授权标识" prop="perms">
+      <el-form-item v-if="dataForm.type == 3" label="授权标识" prop="perms">
         <el-input v-model="dataForm.perms" placeholder="多个用逗号分隔, 如: user:list,user:create"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.type === 1" label="标记" prop="mark">
+      <!-- <el-form-item v-if="dataForm.type === 2" label="标记" prop="mark">
         <el-input v-model="dataForm.mark" placeholder="标记"></el-input>
+      </el-form-item> -->
+      <el-form-item v-if="dataForm.type !== 3" label="位置排序" prop="orderNum">
+        <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="位置排序"></el-input-number>
       </el-form-item>
-      <el-form-item v-if="dataForm.type !== 2" label="排序号" prop="orderNum">
-        <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="排序号"></el-input-number>
-      </el-form-item>
-      <el-form-item v-if="dataForm.type !== 2" label="菜单图标" prop="icon">
+      <el-form-item v-if="dataForm.type !== 3 && dataForm.type !== 0" :label="dataForm.typeList[dataForm.type] +  '图标'" prop="icon">
         <el-row>
           <el-col :span="22">
             <el-popover
@@ -65,6 +65,10 @@
           </el-col>
         </el-row>
       </el-form-item>
+      <el-form-item label="开放申请:" prop="isOpenApply" v-if="dataForm.type === 2">
+        <el-radio v-model="dataForm.isOpenApply" :label='1'>是</el-radio>
+        <el-radio v-model="dataForm.isOpenApply" :label='0'>否</el-radio>
+      </el-form-item>
       <el-form-item label="菜单状态:" prop="status">
         <el-radio v-model="dataForm.status" :label='1'>启用</el-radio>
         <el-radio v-model="dataForm.status" :label='0'>禁用</el-radio>
@@ -83,8 +87,8 @@
   export default {
     data () {
       var validateUrl = (rule, value, callback) => {
-        if (this.dataForm.type === 1 && !/\S/.test(value)) {
-          callback(new Error('菜单URL不能为空'))
+        if (this.dataForm.type === 2 && !/\S/.test(value)) {
+          callback(new Error('请输入'))
         } else {
           callback()
         }
@@ -94,7 +98,7 @@
         dataForm: {
           id: 0,
           type: 1,
-          typeList: ['目录', '菜单', '按钮'],
+          typeList: ['导航', '目录', '菜单', '按钮'],
           name: '',
           parentId: 0,
           parentName: '',
@@ -104,6 +108,7 @@
           mark: '',
           icon: '',
           iconList: [],
+          isOpenApply: 1,
           status: 1
         },
         dataRule: {
@@ -115,6 +120,18 @@
           ],
           url: [
             { validator: validateUrl, trigger: 'blur' }
+          ],
+          icon: [
+            { required: true, message: '请选择', trigger: 'change' }
+          ],
+          isOpenApply: [
+            { required: true, message: '请选择开放申请', trigger: 'change' }
+          ],
+          status: [
+            { required: true, message: '请选择状态', trigger: 'change' }
+          ],
+          orderNum: [
+            { required: true, message: '请输入', trigger: 'blur' }
           ]
         },
         menuList: [],

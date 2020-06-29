@@ -1,6 +1,19 @@
 <template>
   <div class="mod-menu">
     <el-form :inline="true" :model="dataForm">
+      <el-form-item label="级联选择: ">
+        <el-cascader
+          style="width: 300px;overflow:hidden"
+          v-model="dataForm.select"
+          :options="cascaderOptions"
+          clearable
+          filterable
+        >
+        </el-cascader>
+      </el-form-item>
+      <el-form-item label="名称: ">
+        <el-input v-model="dataForm.name" placeholder="名称" clearable></el-input>
+      </el-form-item>
       <el-form-item>
         <el-button v-if="isAuth('sys:menu:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
@@ -53,20 +66,32 @@
         prop="orderNum"
         header-align="center"
         align="center"
-        label="排序号">
+        label="当前层级排序">
       </el-table-column>
       <el-table-column
         prop="url"
         header-align="center"
         align="center"
         width="150"
-        label="菜单URL">
+        label="菜单路径">
         <template slot-scope="scope">
           <el-tooltip effect="dark" placement="top">
             <div v-html="toBreak(scope.row.url)" slot="content"></div>
             <div class="text-to-long-cut">{{scope.row.url}}</div>
           </el-tooltip>
         </template>
+      </el-table-column>
+      <el-table-column
+        prop="creator"
+        header-align="center"
+        align="center"
+        label="创建人">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        header-align="center"
+        align="center"
+        label="创建时间">
       </el-table-column>
       <el-table-column
         prop="status"
@@ -79,7 +104,7 @@
           <el-tag v-else size="small" type="danger">无效</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="perms"
         header-align="center"
         align="center"
@@ -91,15 +116,15 @@
             <div class="text-to-long-cut">{{scope.row.perms}}</div>
           </el-tooltip>
         </template>
-      </el-table-column>
-      <el-table-column
+      </el-table-column> -->
+      <!-- <el-table-column
         prop="mark"
         header-align="center"
         align="center"
         width="150"
         :show-overflow-tooltip="true"
         label="标记">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         fixed="right"
         header-align="center"
@@ -126,7 +151,74 @@
   export default {
     data () {
       return {
-        dataForm: {},
+        dataForm: {
+          name: '',
+          select: []
+        },
+        cascaderOptions: [{
+          value: 'zhinan',
+          label: '指南',
+          children: [{
+            value: 'shejiyuanze',
+            label: '设计原则',
+            children: [{
+              value: 'yizhi',
+              label: '一致'
+            }, {
+              value: 'fankui',
+              label: '反馈'
+            }, {
+              value: 'xiaolv',
+              label: '效率'
+            }, {
+              value: 'kekong',
+              label: '可控'
+            }, {
+              value: 'fankui1',
+              label: '反馈'
+            }, {
+              value: 'xiaolv2',
+              label: '效率'
+            }, {
+              value: 'kekong3',
+              label: '可控'
+            }]
+          }, {
+            value: 'daohang',
+            label: '导航',
+            children: [{
+              value: 'cexiangdaohang',
+              label: '侧向导航'
+            }, {
+              value: 'dingbudaohang',
+              label: '顶部导航'
+            }]
+          }]
+        },
+        {
+          value: 'zujian',
+          label: '组件',
+          children: [{
+            value: 'basic',
+            label: 'Basic',
+            children: [{
+              value: 'layout',
+              label: 'Layout 布局'
+            }, {
+              value: 'color',
+              label: 'Color 色彩'
+            }, {
+              value: 'typography',
+              label: 'Typography 字体'
+            }, {
+              value: 'icon',
+              label: 'Icon 图标'
+            }, {
+              value: 'button',
+              label: 'Button 按钮'
+            }]
+          }]
+        }],
         dataList: [],
         dataListLoading: false,
         addOrUpdateVisible: false
@@ -216,3 +308,14 @@
     }
   }
 </script>
+<style lang="scss">
+  .el-scrollbar {
+    overflow: hidden;
+  }
+  .el-cascader-menu {
+    height: 192px;
+  }
+  .el-scrollbar__wrap {
+    height: 204px;
+  }
+</style>
