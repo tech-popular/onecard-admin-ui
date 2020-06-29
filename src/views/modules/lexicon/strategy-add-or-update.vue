@@ -268,6 +268,15 @@
                 this.levelDisbild = true
                 this.sceneDisbild = true
               }
+              if (data.data.strategyType === '召回') {
+                this.stragId = 0
+              } else {
+                this.stragId = 1
+              }
+              weidushowStrategyDropDownTwo(this.stragId).then(({data}) => { // 删除后增加或删除纬度的数据
+                this.weidu = false
+                this.newAddTextList = data.data
+              })
             })
           }
         })
@@ -305,7 +314,7 @@
           this.weidu = false
           this.newAddTextList = data.data
           if (this.lists.length > 0) {
-            this.lists.forEach(item => { this.bName = item.dimensionName })
+            this.lists.forEach(item => { this.bName = item.strategyDimension })
             this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           } else {
             this.newAddTextList = data.data.dimensionName
