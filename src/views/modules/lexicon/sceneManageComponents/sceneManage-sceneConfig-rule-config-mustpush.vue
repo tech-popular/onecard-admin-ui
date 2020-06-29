@@ -88,12 +88,12 @@
         <el-form-item label="场景名称">
           <el-input v-model="boxname" disabled placeholder="场景名称"/>
         </el-form-item>
-        <el-form-item label="必推坑位一">
+        <el-form-item label="必推一">
           <el-select v-model="dataForm.value1" placeholder="请选择">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="必推坑位二">
+        <el-form-item label="必推二">
           <el-select v-model="dataForm.value2" placeholder="请选择">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
@@ -150,7 +150,7 @@ export default {
   ],
   data () {
     return {
-      'imgUrl': require('../assets/images/img_phone.jpg'),
+      'imgUrl': require('../assets/images/bitui.jpg'),
       loading: false,
       baseForm: {
         sku: '',
@@ -182,7 +182,13 @@ export default {
       pageSize: 5, // 默认每页10条
       totalPage: 0,
       options: [
-        {id: 1, name: 'kengwei'}
+        {id: 0, name: '不配置'},
+        {id: 1, name: '坑位一'},
+        {id: 2, name: '坑位二'},
+        {id: 3, name: '坑位三'},
+        {id: 4, name: '坑位四'},
+        {id: 5, name: '坑位五'},
+        {id: 6, name: '坑位六'}
       ],
       dataForm: {
         name: '',
