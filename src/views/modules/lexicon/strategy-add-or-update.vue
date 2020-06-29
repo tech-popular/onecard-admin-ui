@@ -359,7 +359,8 @@
           var sum = 0
           this.lists.forEach((val) => {
             sum += Number(val.strategyRecall)
-            this.weightSum = sum
+            this.weightSum = parseFloat((sum).toFixed(2))
+            console.log(this.weightSum, 'sum')
           }, 0)
           var hash = {}
           for (var i in this.lists) {
