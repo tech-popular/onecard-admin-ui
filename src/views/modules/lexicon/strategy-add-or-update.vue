@@ -317,7 +317,7 @@
             this.lists.forEach(item => { this.bName = item.strategyDimension })
             this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           } else {
-            this.newAddTextList = data.data.dimensionName
+            this.newAddTextList = data.data
             if (this.id) {
               this.nextTodoId = 1
               this.numId = 1
