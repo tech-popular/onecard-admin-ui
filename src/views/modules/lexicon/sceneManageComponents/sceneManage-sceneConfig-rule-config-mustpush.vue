@@ -89,12 +89,12 @@
           <el-input v-model="boxname" disabled placeholder="场景名称"/>
         </el-form-item>
         <el-form-item label="必推一">
-          <el-select v-model="dataForm.value1" placeholder="请选择">
+          <el-select v-model="dataForm.value1" placeholder="请选择" @change="bituiChange">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="必推二">
-          <el-select v-model="dataForm.value2" placeholder="请选择">
+          <el-select v-model="dataForm.value2" placeholder="请选择" @change="bituiChange">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
         </el-form-item>
@@ -269,6 +269,14 @@ export default {
     currentChangeHandle (page) {
       this.pageNo = page
       this.getDataList()
+    },
+    // 选择坑位
+    bituiChange (val) {
+      console.log(val, 'ppp')
+      const screenArr = this.options.filter((item) => {
+        return val.includes(item.id)
+      })
+      console.log(screenArr, '[][][]')
     },
     dataSubmit () {
       let uneffectTime = new Date(this.mustpushForm.date[1]).getTime()
