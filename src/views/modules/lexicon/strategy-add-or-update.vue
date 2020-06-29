@@ -413,6 +413,8 @@
               this.$message.error('占比和需等于1%')
             } else if (this.weidu === true) {
               this.$message.error('纬度不能重复')
+            } else if (!this.weightSum) {
+              this.$message.error('占比不能为空')
             } else {
               if (valid) {
                 this.dataForm.strategySetDetails = this.lists
