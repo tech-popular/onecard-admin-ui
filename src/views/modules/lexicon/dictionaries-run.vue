@@ -43,12 +43,7 @@
             <el-button type="success" @click="getCheckedNodes">新建子节点</el-button>
             <el-button type="danger" @click="getCheckedKeys">删除子节点</el-button>
             <el-button type="primary" @click="dataFormSubmit()">保存</el-button>
-            <!-- <el-button @click="resetChecked">清空</el-button> -->
           </div>
-          <!-- <div slot="footer" class="foot">
-            <el-button @click="visible = false">取消</el-button>
-            <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-          </div> -->
         </div>
       </el-col>
     </el-row>

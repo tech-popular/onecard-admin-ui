@@ -256,35 +256,43 @@ export default {
         this.$refs.dataForm.validate((valid) => {
           if (valid) {
             if (this.addUpd === false) {
-              const dataBody = {
-                boxId: this.boxId,
-                firstPit: this.dataForm.value1,
-                secondPit: this.dataForm.value2
-              }
-              addWillPushPit(dataBody).then(({data}) => {
-                if (data && data.code === 0) {
-                  this.addArrUpdateBind = false
-                  this.$message.success('新建成功')
-                  this.init()
-                } else {
-                  return this.$message.error(data.msg)
+              if (this.dataForm.value1 === this.dataForm.value2) {
+                return this.$message.error('必推坑位不能相同')
+              } else {
+                const dataBody = {
+                  boxId: this.boxId,
+                  firstPit: this.dataForm.value1,
+                  secondPit: this.dataForm.value2
                 }
-              })
+                addWillPushPit(dataBody).then(({data}) => {
+                  if (data && data.code === 0) {
+                    this.addArrUpdateBind = false
+                    this.$message.success('新建成功')
+                    this.init()
+                  } else {
+                    return this.$message.error(data.msg)
+                  }
+                })
+              }
             } else {
-              const dataBody = {
-                boxId: this.boxId,
-                firstPit: this.firstPitChange ? this.firstPitChange : this.firstPit,
-                secondPit: this.secondPitChange ? this.secondPitChange : this.secondPit
-              }
-              updateWillPushPitInfo(dataBody).then(({data}) => {
-                if (data && data.code === 0) {
-                  this.addArrUpdateBind = false
-                  this.$message.success('修改成功')
-                  this.init()
-                } else {
-                  return this.$message.error(data.msg)
+              if (this.firstPitChange === this.secondPitChange || this.firstPitChange === this.secondPit || this.secondPitChange === this.firstPit) {
+                return this.$message.error('必推坑位不能相同')
+              } else {
+                const dataBody = {
+                  boxId: this.boxId,
+                  firstPit: this.firstPitChange ? this.firstPitChange : this.firstPit,
+                  secondPit: this.secondPitChange ? this.secondPitChange : this.secondPit
                 }
-              })
+                updateWillPushPitInfo(dataBody).then(({data}) => {
+                  if (data && data.code === 0) {
+                    this.addArrUpdateBind = false
+                    this.$message.success('修改成功')
+                    this.init()
+                  } else {
+                    return this.$message.error(data.msg)
+                  }
+                })
+              }
             }
           }
         })
