@@ -11,7 +11,11 @@ export const selectFirstCategoryName = params => httpPost(base + 'productInfo/se
 export const getSceneDistinctList = params => httpPost(base + 'sceneRule/getSceneDistinctList', params) // 去重规则列表
 export const updateSceneDistinctInfo = params => httpPost(base + 'sceneRule/updateSceneDistinctInfo', params) // 修改去重规则
 export const getSceneWillPushList = params => httpPost(base + 'sceneRule/getSceneWillPushList', params) // 必推规则列表
-export const queryceneBoxinfoById = params => httpPost(base + `scene/queryceneBoxinfoById/${params}`, params) // 查看必推规则
 export const getSceneWillPushsByBoxId = params => httpPost(base + `sceneRule/getSceneWillPushsByBoxId/${params}`, params) // 查看必推规则
 export const addSceneWillPush = params => httpPost(base + 'sceneRule/addSceneWillPush', params) // 新增必推规则列表
 export const selectSecondCategoryName = params => httpPost(base + `productInfo/selectSecondCategoryName/${params}`, params) // 第二类别
+export const addWillPushPit = params => httpPost(base + 'willPushPit/addWillPushPit', params) // 新增坑位
+export const updateWillPushPitInfo = params => httpPost(base + 'willPushPit/updateWillPushPitInfo', params) // 更新坑位
+export const getWillPushPitInfo = params => httpPost(base + `willPushPit/getWillPushPitInfo/${params}`, params) // 查看坑位
+export const getWillPushPitLog = params => httpPost(base + `willPushPit/getWillPushPitLog/${params}`, params) // 必推日志
+export const getWillPushPitList = params => httpPost(base + `willPushPit/getWillPushPitList/${params}`, params) // 必推下啦
