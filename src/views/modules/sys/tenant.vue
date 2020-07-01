@@ -1,8 +1,8 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="角色名称: ">
-        <el-input v-model="dataForm.name" placeholder="角色名称" clearable></el-input>
+      <el-form-item label="租户名: ">
+        <el-input v-model="dataForm.name" placeholder="租户名" clearable></el-input>
       </el-form-item>
       <el-form-item label="状态: ">
         <el-select v-model="dataForm.status " filterable clearable placeholder="请选择">
@@ -13,7 +13,7 @@
       <el-form-item>
         <el-button @click="getDataList()" type="primary">查询</el-button>
         <el-button @click="resetHandle">重置</el-button>
-        <el-button type="success" @click="addOrUpdateHandle()">新建角色</el-button>
+        <el-button type="success" @click="addOrUpdateHandle()">新建租户</el-button>
         <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -40,13 +40,7 @@
         prop="name"
         header-align="center"
         align="center"
-        label="角色名称">
-      </el-table-column>
-      <el-table-column
-        prop="mark"
-        header-align="center"
-        align="center"
-        label="备注">
+        label="租户名">
       </el-table-column>
        <el-table-column
         prop="creator"
@@ -96,7 +90,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './funcRole-add-or-update'
+  import AddOrUpdate from './tenant-add-or-update'
   import { getRolesList } from '@/api/account'
   export default {
     data () {

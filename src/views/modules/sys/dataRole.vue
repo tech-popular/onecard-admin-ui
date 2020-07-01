@@ -77,7 +77,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -150,8 +150,6 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'username': this.dataForm.userName,
-            'email': this.dataForm.emailList,
             'name': this.dataForm.name,
             'status': this.dataForm.status
           })
@@ -198,7 +196,7 @@
       // 删除
       deleteHandle (id) {
         var userIds = id ? [id] : this.dataListSelections.map(item => {
-          return item.userId
+          return item.id
         })
         this.$confirm(`确定对[id=${userIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -206,7 +204,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/sys/user/delete'),
+            url: this.$http.adornUrl('/sys/user/delete1'),
             method: 'post',
             data: this.$http.adornData(userIds, false)
           }).then(({data}) => {
@@ -228,3 +226,8 @@
     }
   }
 </script>
+<style lang="scss">
+  .el-message-box__message p {
+    word-break: break-all;
+  }
+</style>

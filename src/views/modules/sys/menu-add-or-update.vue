@@ -4,7 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
-      <el-form-item label="类型" prop="type">
+      <el-form-item label="菜单类型" prop="type">
         <el-radio-group v-model="dataForm.type">
           <el-radio v-for="(type, index) in dataForm.typeList" :label="index" :key="index">{{ type }}</el-radio>
         </el-radio-group>
@@ -69,7 +69,7 @@
         <el-radio v-model="dataForm.isOpenApply" :label='1'>是</el-radio>
         <el-radio v-model="dataForm.isOpenApply" :label='0'>否</el-radio>
       </el-form-item>
-      <el-form-item label="菜单状态:" prop="status">
+      <el-form-item label="状态:" prop="status" v-if="dataForm.type !== 3">
         <el-radio v-model="dataForm.status" :label='1'>启用</el-radio>
         <el-radio v-model="dataForm.status" :label='0'>禁用</el-radio>
       </el-form-item>
@@ -88,7 +88,7 @@
     data () {
       var validateUrl = (rule, value, callback) => {
         if (this.dataForm.type === 2 && !/\S/.test(value)) {
-          callback(new Error('请输入'))
+          callback(new Error('请输入菜单路径'))
         } else {
           callback()
         }
@@ -119,10 +119,10 @@
             { required: true, message: '上级菜单不能为空', trigger: 'change' }
           ],
           url: [
-            { validator: validateUrl, trigger: 'blur' }
+            { required: true, validator: validateUrl, trigger: 'blur' }
           ],
           icon: [
-            { required: true, message: '请选择', trigger: 'change' }
+            { required: true, message: '请选择图标', trigger: 'change' }
           ],
           isOpenApply: [
             { required: true, message: '请选择开放申请', trigger: 'change' }
@@ -131,7 +131,10 @@
             { required: true, message: '请选择状态', trigger: 'change' }
           ],
           orderNum: [
-            { required: true, message: '请输入', trigger: 'blur' }
+            { required: true, message: '请输入位置排序', trigger: 'blur' }
+          ],
+          perms: [
+            { required: true, message: '请输入授权标识', trigger: 'blur' }
           ]
         },
         menuList: [],
