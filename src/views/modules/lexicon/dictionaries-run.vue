@@ -167,23 +167,29 @@
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.dataForm.id = this.dataForm.id
-            const dataBody = this.dataForm
-            const dataUpdateId = this.dataForm.id
-            saveorupt(dataBody, dataUpdateId).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$refs['dataForm'].resetFields()
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
+            this.$confirm(`是否更新子节点`, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.dataForm.id = this.dataForm.id
+              const dataBody = this.dataForm
+              const dataUpdateId = this.dataForm.id
+              saveorupt(dataBody, dataUpdateId).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$refs['dataForm'].resetFields()
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
             })
           }
         })
@@ -198,41 +204,53 @@
       },
       // 新建子节点
       getCheckedNodes () {
-        this.dataForm.id = this.dictionId
-        const dataBody = this.dataForm
-        addChildBaseDicdata(dataBody).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.visible = false
-                this.$refs['dataForm'].resetFields()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
+        this.$confirm(`是否新建子节点`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.dataForm.id = this.dictionId
+          const dataBody = this.dataForm
+          addChildBaseDicdata(dataBody).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$refs['dataForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
         })
       },
       // 删除子节点
       deleteCheckedKeys () {
-        const dataBody = this.dictionId
-        deleteBaseDicdataInfo(dataBody).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.visible = false
-                this.$refs['dataForm'].resetFields()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
+        this.$confirm(`是否删除子节点`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          const dataBody = this.dictionId
+          deleteBaseDicdataInfo(dataBody).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$refs['dataForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
         })
       }
     }
