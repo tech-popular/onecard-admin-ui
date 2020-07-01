@@ -90,7 +90,7 @@
             { required: true, validator: nullkongge, trigger: 'blur' }
           ],
           baseLevel: [
-            { required: true, validator: nullandnumber, trigger: 'blur' }
+            { required: true, validator: nullkongge, trigger: 'blur' }
           ],
           baseSort: [
             { required: true, validator: nullandnumber, trigger: 'blur' }

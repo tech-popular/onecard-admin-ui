@@ -70,7 +70,7 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
      <!-- 字典管理 -->
-    <dictionariesRun v-if="dictionariesRunVisible" ref="dictionariesRun" @refreshDataList="getDataList"/>
+    <dictionaries-run v-if="dictionariesRunVisible" ref="dictionariesRun" @refreshDataList="getDataList"/>
   </div>
 </template>
 
