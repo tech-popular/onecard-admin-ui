@@ -131,26 +131,55 @@
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            const dataBody = this.dataForm
-            const dataUpdateId = this.dataForm.id
-            saveorupt(dataBody, dataUpdateId).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                    this.$refs['dataForm'].resetFields()
-                    this.typeDisabled = false
-                    this.flowDisabled = true
+            if (this.dataForm.id) {
+              this.$confirm(`是否修改字典属性`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                const dataBody = this.dataForm
+                const dataUpdateId = this.dataForm.id
+                saveorupt(dataBody, dataUpdateId).then(({data}) => {
+                  if (data && data.code === 0) {
+                    this.$message({
+                      message: '操作成功',
+                      type: 'success',
+                      duration: 1500,
+                      onClose: () => {
+                        this.visible = false
+                        this.$emit('refreshDataList')
+                        this.$refs['dataForm'].resetFields()
+                        this.typeDisabled = false
+                        this.flowDisabled = true
+                      }
+                    })
+                  } else {
+                    this.$message.error(data.msg)
                   }
                 })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
+              })
+            } else {
+              const dataBody = this.dataForm
+              const dataUpdateId = this.dataForm.id
+              saveorupt(dataBody, dataUpdateId).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                      this.$refs['dataForm'].resetFields()
+                      this.typeDisabled = false
+                      this.flowDisabled = true
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
+            }
           }
         })
       }
