@@ -3,52 +3,48 @@
     <el-row :gutter="20">
       <el-col :span="8">
         <div class="grid-content bg-purple">
-          <el-tree
-            :data="data"
+          <!-- <el-tree
+            :data="dictionData"
             show-checkbox
             default-expand-all
             node-key="id"
             ref="tree"
             highlight-current
             :props="defaultProps">
-          </el-tree>
+          </el-tree> -->
+          <el-tree :data="dictionData" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
         </div>
       </el-col>
       <el-col :span="16">
         <div class="grid-content bg-purple">
           <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" :disabled="dataFormValue">
-            <el-form-item label="字典名称" prop="dictionariesName">
-              <el-input v-model="dataForm.dictionariesName" placeholder="字典名称"/>
+            <el-form-item label="字典名称" prop="baseName">
+              <el-input v-model="dataForm.baseName" placeholder="字典名称"/>
             </el-form-item>
-            <el-form-item label="字典值" prop="dictionariesValue">
-              <el-input v-model="dataForm.dictionariesValue" placeholder="字典值"/>
+            <el-form-item label="字典值" prop="baseValue">
+              <el-input v-model="dataForm.baseValue" placeholder="字典值"/>
             </el-form-item>
-            <el-form-item label="字典类型" prop="dictionariesType">
-              <el-input v-model="dataForm.dictionariesType" placeholder="字典类型" :disabled='typeDisabled'/>
+            <el-form-item label="字典类型" prop="baseType">
+              <el-input v-model="dataForm.baseType" placeholder="字典类型" :disabled='typeDisabled'/>
             </el-form-item>
-            <el-form-item label="层级" prop="dictionariesFlow">
-              <el-input v-model="dataForm.dictionariesFlow" placeholder="层级" :disabled='flowDisabled'/>
+            <el-form-item label="层级" prop="baseLevel">
+              <el-input v-model="dataForm.baseLevel" placeholder="层级" :disabled='flowDisabled'/>
             </el-form-item>
-            <el-form-item label="排序" prop="dictionariesSlot">
-              <el-input v-model="dataForm.dictionariesSlot" placeholder="排序"/>
+            <el-form-item label="排序" prop="baseSort">
+              <el-input v-model="dataForm.baseSort" placeholder="排序"/>
             </el-form-item>
             <el-form-item label="状态">
             <el-radio-group v-model="dataForm.status">
-              <el-radio :label="true">启用</el-radio>
-              <el-radio :label="false">禁用</el-radio>
+              <el-radio :label="1">启用</el-radio>
+              <el-radio :label="0">禁用</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-form>
           <div slot="footer" class="foot">
             <el-button type="success" @click="getCheckedNodes">新建子节点</el-button>
-            <el-button type="danger" @click="getCheckedKeys">删除子节点</el-button>
-            <el-button type="primary" @click="dataFormSubmit()">保存</el-button>
-            <!-- <el-button @click="resetChecked">清空</el-button> -->
+            <el-button type="danger" @click="deleteCheckedKeys">删除子节点</el-button>
+            <el-button type="primary" @click="dataFormSubmit()">更新</el-button>
           </div>
-          <!-- <div slot="footer" class="foot">
-            <el-button @click="visible = false">取消</el-button>
-            <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-          </div> -->
         </div>
       </el-col>
     </el-row>
@@ -57,7 +53,7 @@
 </template>
 
 <script>
-  import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
+  import { manageBaseDicdataInfo, getBaseDicdataInfo, addChildBaseDicdata, deleteBaseDicdataInfo, saveorupt } from '@/api/lexicon/dictionaries'
   export default {
     data () {
       var nullandnumber = (rule, value, callback) => {
@@ -96,29 +92,30 @@
       return {
         visible: false,
         dataForm: {
-          dictionariesName: '',
-          dictionariesValue: '',
-          dictionariesType: '',
-          dictionariesFlow: 1,
-          dictionariesSlot: '',
-          status: true
+          baseName: '',
+          baseValue: '',
+          baseType: '',
+          baseLevel: 1,
+          baseSort: '',
+          status: 1,
+          id: ''
         },
         dataFormValue: '',
         ruleTypeList: [],
         dataRule: {
-          dictionariesName: [
+          baseName: [
             { required: true, validator: nullkongge, trigger: 'blur' }
           ],
-          dictionariesValue: [
+          baseValue: [
             { required: true, validator: nullkongge, trigger: 'blur' }
           ],
-          dictionariesType: [
+          baseType: [
             { required: true, validator: nullkongge, trigger: 'blur' }
           ],
-          dictionariesFlow: [
+          baseLevel: [
             { required: true, validator: nullandnumber, trigger: 'blur' }
           ],
-          dictionariesSlot: [
+          baseSort: [
             { required: true, validator: nullandnumber, trigger: 'blur' }
           ],
           status: [
@@ -127,45 +124,12 @@
         },
         flowDisabled: true,
         typeDisabled: false,
-        data: [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2'
-          }]
-        }],
+        dictionData: [],
         defaultProps: {
           children: 'children',
           label: 'label'
-        }
+        },
+        dictionId: ''
       }
     },
     components: {
@@ -179,36 +143,42 @@
         this.dataForm.id = id || ''
         this.dataFormValue = value
         this.visible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (id) {
-            this.typeDisabled = true
-            this.flowDisabled = false
-            const dataBody = this.dataForm.id
-            infoBeeTask(dataBody).then(({data}) => {
-              this.dataForm = data.data
-            })
-          }
-        })
+        if (id) {
+          this.typeDisabled = true
+          this.flowDisabled = false
+          this.$nextTick(() => {
+            this.$refs['dataForm'].resetFields()
+            if (id) {
+              this.typeDisabled = true
+              this.flowDisabled = false
+              const dataBody = this.dataForm.id
+              getBaseDicdataInfo(dataBody).then(({data}) => {
+                this.dataForm = data.data
+                this.dataForm.status = Number(data.data.status)
+              })
+              manageBaseDicdataInfo(dataBody).then(({data}) => {
+                this.dictionData = [data.data]
+              })
+            }
+          })
+        }
       },
       // 弹窗状态
       dataFormSubmit (form) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.dataForm.id = this.dataForm.id
             const dataBody = this.dataForm
             const dataUpdateId = this.dataForm.id
             saveorupt(dataBody, dataUpdateId).then(({data}) => {
-              if (data && data.status === 0) {
+              if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
                     this.visible = false
-                    this.$emit('refreshDataList')
                     this.$refs['dataForm'].resetFields()
-                    this.typeDisabled = false
-                    this.flowDisabled = true
                   }
                 })
               } else {
@@ -218,14 +188,52 @@
           }
         })
       },
+      handleNodeClick (data) {
+        this.dictionId = data.id
+        const dataBody = data.id
+        getBaseDicdataInfo(dataBody).then(({data}) => {
+          this.dataForm = data.data
+          this.dataForm.status = Number(data.data.status)
+        })
+      },
+      // 新建子节点
       getCheckedNodes () {
-        console.log(this.$refs.tree.getCheckedNodes())
+        this.dataForm.id = this.dictionId
+        const dataBody = this.dataForm
+        addChildBaseDicdata(dataBody).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.visible = false
+                this.$refs['dataForm'].resetFields()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       },
-      getCheckedKeys () {
-        console.log(this.$refs.tree.getCheckedKeys())
-      },
-      resetChecked () {
-        this.$refs.tree.setCheckedKeys([])
+      // 删除子节点
+      deleteCheckedKeys () {
+        const dataBody = this.dictionId
+        deleteBaseDicdataInfo(dataBody).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.visible = false
+                this.$refs['dataForm'].resetFields()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       }
     }
   }
