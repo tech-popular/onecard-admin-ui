@@ -55,7 +55,7 @@
           <el-table-column
             v-if="paixudisbuld === '排序'"
             prop="strategyRecall"
-            label="排序占比%"/>
+            label="排序权重"/>
           <el-table-column
             v-if="paixudisbuld === '召回'"
             prop="strategyRecall"
@@ -76,7 +76,7 @@
             prop="strategyDimension"
             label="纬度"/>
           <el-table-column
-            label="排序占比%"
+            label="排序权重"
             header-align="center" 
             align="center"
             v-if="paixudisbuld === '排序'"
