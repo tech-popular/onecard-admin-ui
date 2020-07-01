@@ -1,25 +1,25 @@
 <template>
   <el-dialog :title="dataFormValue ? '查看字典' : dataForm.id ? '修改字典' : '新增字典'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="10%" :disabled="dataFormValue">
-      <el-form-item label="字典名称" prop="dictionariesName">
-        <el-input v-model="dataForm.dictionariesName" placeholder="字典名称"/>
+      <el-form-item label="字典名称" prop="baseName">
+        <el-input v-model="dataForm.baseName" placeholder="字典名称"/>
       </el-form-item>
-      <el-form-item label="字典值" prop="dictionariesValue">
-        <el-input v-model="dataForm.dictionariesValue" placeholder="字典值"/>
+      <el-form-item label="字典值" prop="baseValue">
+        <el-input v-model="dataForm.baseValue" placeholder="字典值"/>
       </el-form-item>
-      <el-form-item label="字典类型" prop="dictionariesType">
-        <el-input v-model="dataForm.dictionariesType" placeholder="字典类型" :disabled='typeDisabled'/>
+      <el-form-item label="字典类型" prop="baseType">
+        <el-input v-model="dataForm.baseType" placeholder="字典类型" :disabled='typeDisabled'/>
       </el-form-item>
-      <el-form-item label="层级" prop="dictionariesFlow">
-        <el-input v-model="dataForm.dictionariesFlow" placeholder="层级" :disabled='flowDisabled'/>
+      <el-form-item label="层级" prop="baseLevel">
+        <el-input v-model="dataForm.baseLevel" placeholder="层级" :disabled='flowDisabled'/>
       </el-form-item>
-      <el-form-item label="排序" prop="dictionariesSlot">
-        <el-input v-model="dataForm.dictionariesSlot" placeholder="排序"/>
+      <el-form-item label="排序" prop="baseSort">
+        <el-input v-model="dataForm.baseSort" placeholder="排序"/>
       </el-form-item>
       <el-form-item label="状态">
       <el-radio-group v-model="dataForm.status">
-        <el-radio :label="true">启用</el-radio>
-        <el-radio :label="false">禁用</el-radio>
+        <el-radio :label="1">启用</el-radio>
+        <el-radio :label="0">禁用</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-  import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
+  import { saveorupt, getBaseDicdataInfo } from '@/api/lexicon/dictionaries'
   export default {
     data () {
       var nullandnumber = (rule, value, callback) => {
@@ -70,29 +70,29 @@
       return {
         visible: false,
         dataForm: {
-          dictionariesName: '',
-          dictionariesValue: '',
-          dictionariesType: '',
-          dictionariesFlow: 1,
-          dictionariesSlot: '',
-          status: true
+          baseName: '',
+          baseValue: '',
+          baseType: '',
+          baseLevel: 1,
+          baseSort: '',
+          status: 1
         },
         dataFormValue: '',
         ruleTypeList: [],
         dataRule: {
-          dictionariesName: [
+          baseName: [
             { required: true, validator: nullkongge, trigger: 'blur' }
           ],
-          dictionariesValue: [
+          baseValue: [
             { required: true, validator: nullkongge, trigger: 'blur' }
           ],
-          dictionariesType: [
+          baseType: [
             { required: true, validator: nullkongge, trigger: 'blur' }
           ],
-          dictionariesFlow: [
+          baseLevel: [
             { required: true, validator: nullandnumber, trigger: 'blur' }
           ],
-          dictionariesSlot: [
+          baseSort: [
             { required: true, validator: nullandnumber, trigger: 'blur' }
           ],
           status: [
@@ -120,8 +120,9 @@
             this.typeDisabled = true
             this.flowDisabled = false
             const dataBody = this.dataForm.id
-            infoBeeTask(dataBody).then(({data}) => {
+            getBaseDicdataInfo(dataBody).then(({data}) => {
               this.dataForm = data.data
+              this.dataForm.status = Number(data.data.status)
             })
           }
         })
@@ -133,7 +134,7 @@
             const dataBody = this.dataForm
             const dataUpdateId = this.dataForm.id
             saveorupt(dataBody, dataUpdateId).then(({data}) => {
-              if (data && data.status === 0) {
+              if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
                   type: 'success',

@@ -25,8 +25,8 @@
             <el-col :span="24">
               <div class="box-bottom">
                 <el-button type="primary" size="mini" @click="ruleConfigClick(item.boxId,'sousuo')">规则配置</el-button>
-                <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
-                <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button>
+                <!-- <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
+                <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button> -->
               </div>
             </el-col>
           </el-row>
@@ -60,8 +60,8 @@
             <el-col :span="24">
               <div class="box-bottom">
                 <el-button type="primary" size="mini" @click="ruleConfigClick(item.boxId,item.sceneName)">规则配置</el-button>
-                <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
-                <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button>
+                <!-- <el-button type="default" size="mini" @click="statisticChartClick">统计分析</el-button>
+                <el-button type="warning" size="mini" @click="realTimestrategyClick">实时策略</el-button> -->
               </div>
             </el-col>
           </el-row>

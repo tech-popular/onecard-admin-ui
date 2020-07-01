@@ -42,7 +42,7 @@
           <div slot="footer" class="foot">
             <el-button type="success" @click="getCheckedNodes">新建子节点</el-button>
             <el-button type="danger" @click="getCheckedKeys">删除子节点</el-button>
-            <el-button type="primary" @click="dataFormSubmit()">保存</el-button>
+            <el-button type="primary" @click="dataFormSubmit()">更新</el-button>
           </div>
         </div>
       </el-col>

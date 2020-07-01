@@ -14,34 +14,34 @@
       v-loading="dataListLoading"
       style="width: 100%;">
       <el-table-column
-        prop="consumerName"
+        prop="baseName"
         header-align="center"
         align="center"
         label="字典名称"
         width="150px"/>
       <el-table-column
-        prop="topic"
+        prop="baseType"
         header-align="center"
         align="center"
         label="字典类型"/>
       <el-table-column
-        prop="groupId"
+        prop="baseValue"
         header-align="center"
         align="center"
         label="字典值"/>
       <el-table-column
-        prop="version"
+        prop="createTime"
         header-align="center"
         align="center"
         label="创建时间"
         width="150px"/>
-        <el-table-column
-        prop="enable"
+      <el-table-column
+        prop="status"
         header-align="center"
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === true" size="small" >启动</el-tag>
+          <el-tag v-if="scope.row.status === '启用'" size="small" >启动</el-tag>
           <el-tag v-else size="small" type="danger">停止</el-tag>
         </template>
       </el-table-column>
@@ -62,7 +62,7 @@
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
-      :current-page="pageNum"
+      :current-page="pageNo"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
       :total="totalPage"
@@ -77,13 +77,13 @@
 <script>
   import AddOrUpdate from './dictionaries-add-or-update'
   import DictionariesRun from './dictionaries-run'
-  import { beeTaskList } from '@/api/workerBee/kafka'
+  import { getBaseDicdataList } from '@/api/lexicon/dictionaries'
   export default {
     data () {
       return {
         dataList: [],
         dictionariesName: '',
-        pageNum: 1, // 当前页
+        pageNo: 1, // 当前页
         pageSize: 10, // 默认每页10条
         totalPage: 0,
         dataListLoading: false,
@@ -103,14 +103,14 @@
       getDataList () {
         this.dataListLoading = true
         const dataBody = {
-          'dictionariesName': this.dictionariesName,
-          'pageNum': this.pageNum,
+          'baseName': this.dictionariesName,
+          'pageNo': this.pageNo,
           'pageSize': this.pageSize
         }
-        beeTaskList(dataBody).then(({data}) => {
-          if (data && data.status === 0) {
-            this.dataList = data.list
-            this.totalPage = data.totalCount
+        getBaseDicdataList(dataBody).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.data.list
+            this.totalPage = data.data.totalCount
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -121,12 +121,17 @@
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
-        this.pageNum = 1
+        this.pageNo = 1
         this.getDataList()
       },
       // 当前页
       currentChangeHandle (val) {
-        this.pageNum = val
+        this.pageNo = val
+        this.getDataList()
+      },
+      // 查询
+      searchHandle () {
+        this.pageNo = 1
         this.getDataList()
       },
       // 新增 / 修改
