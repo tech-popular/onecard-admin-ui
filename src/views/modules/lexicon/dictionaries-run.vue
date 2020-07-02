@@ -3,15 +3,6 @@
     <el-row :gutter="20">
       <el-col :span="8">
         <div class="grid-content bg-purple">
-          <!-- <el-tree
-            :data="dictionData"
-            show-checkbox
-            default-expand-all
-            node-key="id"
-            ref="tree"
-            highlight-current
-            :props="defaultProps">
-          </el-tree> -->
           <el-tree :data="dictionData" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
         </div>
       </el-col>
@@ -124,6 +115,7 @@
         },
         flowDisabled: true,
         typeDisabled: false,
+        treeDisabld: false,
         dictionData: [],
         defaultProps: {
           children: 'children',
@@ -201,57 +193,66 @@
           this.dataForm = data.data
           this.dataForm.status = Number(data.data.status)
         })
+        this.treeDisabld = true
       },
       // 新建子节点
       getCheckedNodes () {
-        this.$confirm(`是否新建子节点`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.dataForm.id = this.dictionId
-          const dataBody = this.dataForm
-          addChildBaseDicdata(dataBody).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.visible = false
-                  this.$refs['dataForm'].resetFields()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
+        if (this.treeDisabld === true) {
+          this.$confirm(`是否新建子节点`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.dataForm.id = this.dictionId
+            const dataBody = this.dataForm
+            addChildBaseDicdata(dataBody).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$refs['dataForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
           })
-        })
+        } else {
+          this.$message.error('请先选择子节点')
+        }
       },
       // 删除子节点
       deleteCheckedKeys () {
-        this.$confirm(`是否删除子节点`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          const dataBody = this.dictionId
-          deleteBaseDicdataInfo(dataBody).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.visible = false
-                  this.$refs['dataForm'].resetFields()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
+        if (this.treeDisabld === true) {
+          this.$confirm(`是否删除子节点`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            const dataBody = this.dictionId
+            deleteBaseDicdataInfo(dataBody).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$refs['dataForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
           })
-        })
+        } else {
+          this.$message.error('请先选择子节点')
+        }
       }
     }
   }
