@@ -16,7 +16,7 @@
         <el-input v-model="dataForm.redisDb" placeholder="redisDb值"/>
       </el-form-item>
       <el-form-item label="缓存后缀" prop="flag">
-        <el-select filterable v-model="dataForm.flag" placeholder="请选择是否需要缓存后缀" style="width:100%" @change="typeClick">
+        <el-select filterable v-model="dataForm.flag" placeholder="请选择是否需要缓存后缀" style="width:100%">
           <el-option v-for="item in flagList" :value="item.id" :key="item.id" :label="item.name"/>
         </el-select>
       </el-form-item>
@@ -29,7 +29,8 @@
 </template>
 
 <script>
-  import { saveorupt } from '@/api/lexicon/strategy'
+  import { saveorupt } from '@/api/lexicon/cacheCleanup'
+
   export default {
     data () {
       return {
