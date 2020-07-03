@@ -61,7 +61,7 @@ export const api = {
         },
         {
           prop: 'flag',
-          label: '缓存key',
+          label: '是否缓存key',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
