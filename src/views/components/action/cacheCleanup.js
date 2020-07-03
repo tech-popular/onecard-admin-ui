@@ -65,8 +65,8 @@ export const api = {
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              props: {type: params.row.flag === 0 ? '' : 'warning'} // 组件的props
-            }, params.row.flag === 0 ? '需要' : '不需要')
+              props: {type: params.row.flag === 1 ? '' : 'warning'} // 组件的props
+            }, params.row.flag === 1 ? '需要' : '不需要')
           }
         },
         {
@@ -135,7 +135,7 @@ export const api = {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        if (val.flag === 0) {
+        if (val.flag === 1) {
           this.$prompt('请输入缓存key', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消'
