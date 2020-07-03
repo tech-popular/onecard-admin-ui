@@ -49,16 +49,16 @@
         })
       },
       // 删除
-      deleteHandle (id) {
-        this.$confirm(`确定删除操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          const dataBody = {'id': id.id}
-          this.getDeleted(dataBody)
-        })
-      },
+      // deleteHandle (id) {
+      //   this.$confirm(`确定删除操作?`, '提示', {
+      //     confirmButtonText: '确定',
+      //     cancelButtonText: '取消',
+      //     type: 'warning'
+      //   }).then(() => {
+      //     const dataBody = {'id': id.id}
+      //     this.getDeleted(dataBody)
+      //   })
+      // },
       // 每页数
       sizeChangeHandle (val) {
         const dataBody = {
