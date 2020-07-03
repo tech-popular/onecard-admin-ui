@@ -4,4 +4,5 @@ let base = '/'
 export const list = (params, flag) => httpGet(base + 'cachemanage/cachelist', params, flag) // 初始化列表
 export const saveorupt = (params) => httpPost(base + 'cachemanage/savacachemanage', params) // 新增
 export const deleted = (params) => httpPost(base + 'cachemanage/delcachemanage', params) // 删除
+export const implement = (params) => httpPost(base + 'cachemanage/execute', params) // 执行
 // export const deleted = (params) => httpPost(base + `cachemanage/delcachemanage /${params}`) // 删除

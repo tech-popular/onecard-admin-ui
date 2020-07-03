@@ -1,4 +1,4 @@
-import { list, deleted } from '@/api/lexicon/cacheCleanup'
+import { list, deleted, implement } from '@/api/lexicon/cacheCleanup'
 
 export const api = {
   data () {
@@ -19,6 +19,14 @@ export const api = {
       operates: [
         {
           id: 1,
+          label: '执行',
+          type: 'primary',
+          method: (id) => {
+            this.implementHandle(id)
+          }
+        },
+        {
+          id: 2,
           label: '删除',
           type: 'danger',
           method: (id) => {
@@ -52,6 +60,16 @@ export const api = {
           }
         },
         {
+          prop: 'flag',
+          label: '缓存key',
+          align: 'center',
+          render: (h, params) => {
+            return h('el-tag', {
+              props: {type: params.row.flag === 0 ? '' : 'warning'} // 组件的props
+            }, params.row.flag === 0 ? '需要' : '不需要')
+          }
+        },
+        {
           prop: 'lastUpdateTime',
           label: '最近一次清除时间',
           align: 'center'
@@ -82,29 +100,93 @@ export const api = {
       })
     },
     // 删除接口
-    getDeleted (dataBody) {
-      deleted(dataBody).then(({data}) => {
-        if (data && data.code === 0) {
-          this.$message({
-            message: '操作成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
-              const dataBody = {
-                'pageNum': this.pageNum,
-                'pageSize': this.pageSize
+    deleteHandle (id) {
+      const dataBody = {'id': id.id}
+      this.$confirm(`确定删除操作?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleted(dataBody).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                const dataBody = {
+                  'pageNum': this.pageNum,
+                  'pageSize': this.pageSize
+                }
+                this.getList(dataBody)
               }
-              this.getList(dataBody)
-            }
-          })
-        } else {
-          this.$message.error(data.msg)
-        }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       })
     },
-    // 更改数据
-    conter () {
-
+    // 执行数据
+    implementHandle (val) {
+      console.log(val, '222')
+      this.$confirm(`确定执行操作?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        if (val.flag === 0) {
+          this.$prompt('请输入缓存key', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+          }).then(({ value }) => {
+            const dataBody = {
+              'id': val.id,
+              'suffixKey': value
+            }
+            implement(dataBody).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    const dataBody = {
+                      'pageNum': this.pageNum,
+                      'pageSize': this.pageSize
+                    }
+                    this.getList(dataBody)
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          })
+        } else {
+          const dataBody = {
+            'id': val.id
+          }
+          implement(dataBody).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  const dataBody = {
+                    'pageNum': this.pageNum,
+                    'pageSize': this.pageSize
+                  }
+                  this.getList(dataBody)
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }
+      })
     }
   }
 }
