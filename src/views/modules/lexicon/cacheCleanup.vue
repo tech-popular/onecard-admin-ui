@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button type="primary" @click="addOrUpdateHandle()" style="margin-bottom:10px">新增</el-button>
+    <searchForm size='mini' labelWidth = '80px' :searchData = "searchData" :searchForm = "searchForm" :searchHandle="searchHandle"></searchForm>
     <tab :list="list" :columns="columns" :operates="operates"/>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -55,6 +55,23 @@
           'pageNum': val,
           'pageSize': this.pageSize
         }
+        this.getList(dataBody)
+      },
+       /** 查询 */
+      handleSearch () {
+        const dataBody = {
+          'pageNum': 1,
+          'pageSize': this.pageSize
+        }
+        this.getList(dataBody)
+      },
+    /** 重置 */
+      resetHandle () {
+        const dataBody = {
+          'pageNum': 1,
+          'pageSize': this.pageSize
+        }
+        this.dataForm = []
         this.getList(dataBody)
       }
     }

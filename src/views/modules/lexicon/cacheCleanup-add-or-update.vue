@@ -70,10 +70,6 @@
         imDeisblad: false
       }
     },
-    components: {
-    },
-    watch: {
-    },
     mounted () {
       this.init()
     },
