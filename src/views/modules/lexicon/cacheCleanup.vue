@@ -18,17 +18,10 @@
 <script>
   import AddOrUpdate from './cacheCleanup-add-or-update'
   import { api } from '../../components/action/cacheCleanup'
-  import tab from '../../components/table/table'
-
   export default {
     mixins: [api],
     components: {
-      AddOrUpdate,
-      tab
-    },
-    data () {
-      return {
-      }
+      AddOrUpdate
     },
     mounted () {
       this.init()
@@ -48,17 +41,6 @@
           this.$refs.addOrUpdate.init()
         })
       },
-      // 删除
-      // deleteHandle (id) {
-      //   this.$confirm(`确定删除操作?`, '提示', {
-      //     confirmButtonText: '确定',
-      //     cancelButtonText: '取消',
-      //     type: 'warning'
-      //   }).then(() => {
-      //     const dataBody = {'id': id.id}
-      //     this.getDeleted(dataBody)
-      //   })
-      // },
       // 每页数
       sizeChangeHandle (val) {
         const dataBody = {

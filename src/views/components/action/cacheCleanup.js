@@ -1,5 +1,4 @@
 import { list, deleted, implement } from '@/api/lexicon/cacheCleanup'
-
 export const api = {
   data () {
     return {
@@ -44,10 +43,6 @@ export const api = {
           prop: 'cacheName',
           label: '名称',
           align: 'center'
-          // render: (h, params) => {
-          //   return h('a', {
-          //   }, params.row.cacheName)
-          // }
         },
         {
           prop: 'cacheType',
@@ -129,7 +124,6 @@ export const api = {
     },
     // 执行数据
     implementHandle (val) {
-      console.log(val, '222')
       this.$confirm(`确定执行操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
