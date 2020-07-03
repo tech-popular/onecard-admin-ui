@@ -95,6 +95,7 @@
                   duration: 1500,
                   onClose: () => {
                     this.visible = false
+                    this.$emit('refreshDataList')
                     this.$refs['dataForm'].resetFields()
                   }
                 })

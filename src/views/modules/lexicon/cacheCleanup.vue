@@ -11,7 +11,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate"/> 
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init"/> 
   </div>
 </template>
 
@@ -31,13 +31,16 @@
       }
     },
     mounted () {
-      const dataBody = {
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }
-      this.getList(dataBody)
+      this.init()
     },
     methods: {
+      init () {
+        const dataBody = {
+          'pageNum': this.pageNum,
+          'pageSize': this.pageSize
+        }
+        this.getList(dataBody)
+      },
       // 新增 / 修改
       addOrUpdateHandle () {
         this.addOrUpdateVisible = true
