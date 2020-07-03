@@ -63,7 +63,7 @@
           <el-table-column
             v-if="paixudisbuld === '召回'"
             prop="strategySort"
-            label="排序优先级"/>
+            label="召回优先级"/>
         </el-table>
         <el-table
           v-else
@@ -103,7 +103,7 @@
             </editable-cell>
           </el-table-column>
           <el-table-column
-            label="排序优先级"
+            label="召回优先级"
             header-align="center" 
             align="center"
             v-if="paixudisbuld === '召回'"
