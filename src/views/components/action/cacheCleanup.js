@@ -1,6 +1,8 @@
 import { list, deleted, implement } from '@/api/lexicon/cacheCleanup'
 export const api = {
   data () {
+    // let sexs = [{label: '男', value: 'M'}, {label: '女', value: 'F'}]
+    // let sexProps = {label: 'label', value: 'value'}
     return {
       props: {
         multiple: false,
@@ -75,7 +77,21 @@ export const api = {
           align: 'center'
         }
       ],
-      list: []
+      list: [],
+      searchData: {
+        name: null,
+        age: null,
+        sex: null
+      },
+      searchForm: [
+        // {type: 'Input', label: '名称', prop: 'name', width: '180px', placeholder: '请输入名称'},
+        // {type: 'Select', label: '性别', prop: 'sex', width: '180px', options: sexs, props: sexProps, change: row => '', placeholder: '请选择性别'}
+      ],
+      searchHandle: [
+        // {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
+        // {label: '重置', type: '', handle: () => { this.resetHandle() }},
+        {label: '新增', type: 'primary', handle: () => { this.addOrUpdateHandle() }}
+      ]
     }
   },
   methods: {

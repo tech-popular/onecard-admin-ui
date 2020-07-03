@@ -14,6 +14,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import VueClipboard from 'vue-clipboard2'
 import VueCodemirror from 'vue-codemirror'
 import tab from './components/table/table'
+import searchForm from './components/form/searchForm'
 import 'codemirror/lib/codemirror.css'
 
 import G6 from '@antv/g6'
@@ -33,6 +34,7 @@ Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth     // 权限方法
 Vue.prototype.toBreak = toBreak     // 内容换行
 Vue.component('tab', tab) // 全局table组件
+Vue.component('searchForm', searchForm) // 全局查询form组件
 
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
