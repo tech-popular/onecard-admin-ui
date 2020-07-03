@@ -83,8 +83,6 @@ export const api = {
     },
     // 删除接口
     getDeleted (dataBody) {
-      console.log(dataBody)
-
       deleted(dataBody).then(({data}) => {
         if (data && data.code === 0) {
           this.$message({
