@@ -1,5 +1,5 @@
 import { list, deleted, implement } from '@/api/lexicon/cacheCleanup'
-export const api = {
+export const models = {
   data () {
     // let sexs = [{label: '男', value: 'M'}, {label: '女', value: 'F'}]
     // let sexProps = {label: 'label', value: 'value'}

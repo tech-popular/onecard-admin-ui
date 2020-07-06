@@ -17,9 +17,9 @@
 
 <script>
   import AddOrUpdate from './cacheCleanup-add-or-update'
-  import { api } from '../../components/action/cacheCleanup'
+  import { models } from '../../components/action/cacheCleanup'
   export default {
-    mixins: [api],
+    mixins: [models],
     components: {
       AddOrUpdate
     },
@@ -43,36 +43,23 @@
       },
       // 每页数
       sizeChangeHandle (val) {
-        const dataBody = {
-          'pageNum': 1,
-          'pageSize': val
-        }
-        this.getList(dataBody)
+        this.pageSize = val
+        this.init()
       },
       // 当前页
       currentChangeHandle (val) {
-        const dataBody = {
-          'pageNum': val,
-          'pageSize': this.pageSize
-        }
-        this.getList(dataBody)
+        this.pageNum = val
+        this.init()
       },
        /** 查询 */
       handleSearch () {
-        const dataBody = {
-          'pageNum': 1,
-          'pageSize': this.pageSize
-        }
-        this.getList(dataBody)
+        this.init()
       },
     /** 重置 */
       resetHandle () {
-        const dataBody = {
-          'pageNum': 1,
-          'pageSize': this.pageSize
-        }
+        this.pageNum = 1
         this.dataForm = []
-        this.getList(dataBody)
+        this.init()
       }
     }
   }
