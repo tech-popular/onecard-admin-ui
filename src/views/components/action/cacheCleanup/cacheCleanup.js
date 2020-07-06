@@ -138,7 +138,7 @@ export const models = {
         })
       })
     },
-    // 执行数据
+    // 执行接口
     implementHandle (val) {
       this.$confirm(`确定执行操作?`, '提示', {
         confirmButtonText: '确定',
