@@ -11,6 +11,7 @@
     </div>
     <div class="site-navbar__body clearfix">
       <el-menu
+        v-if="isFold"
         class="site-navbar__menu"
         mode="horizontal">
         <el-menu-item class="site-navbar__switch" index="0" @click="sidebarFold = !sidebarFold">
@@ -62,6 +63,12 @@
   import UpdatePassword from './main-navbar-update-password'
   import { clearLoginInfo } from '@/utils'
   export default {
+    props: {
+      isFold: {
+        type: Boolean,
+        default: true
+      }
+    },
     data () {
       return {
         updatePassowrdVisible: false,
