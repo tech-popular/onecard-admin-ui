@@ -94,7 +94,34 @@ export const models = {
       ]
     }
   },
+  mounted () {
+    this.init()
+  },
   methods: {
+    init () {
+      const dataBody = {
+        'pageNum': this.pageNum,
+        'pageSize': this.pageSize
+      }
+      this.getList(dataBody)
+    },
+    // 新增 / 修改
+    addOrUpdateHandle () {
+      this.addOrUpdateVisible = true
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.init()
+      })
+    },
+    // 每页数
+    sizeChangeHandle (val) {
+      this.pageSize = val
+      this.init()
+    },
+    // 当前页
+    currentChangeHandle (val) {
+      this.pageNum = val
+      this.init()
+    },
     // 列表接口
     getList (dataBody) {
       this.dataListLoading = true
