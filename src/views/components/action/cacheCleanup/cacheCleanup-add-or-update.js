@@ -12,7 +12,7 @@ export const addOrEdotModels = {
           label: '缓存名称'
         },
         key: {
-          type: 'number',
+          type: 'input',
           label: 'key'
         },
         cacheType: {
