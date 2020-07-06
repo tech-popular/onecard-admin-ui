@@ -1,5 +1,5 @@
 import { list, deleted, implement } from '@/api/lexicon/cacheCleanup'
-export const api = {
+export const models = {
   data () {
     // let sexs = [{label: '男', value: 'M'}, {label: '女', value: 'F'}]
     // let sexProps = {label: 'label', value: 'value'}
@@ -138,7 +138,7 @@ export const api = {
         })
       })
     },
-    // 执行数据
+    // 执行接口
     implementHandle (val) {
       this.$confirm(`确定执行操作?`, '提示', {
         confirmButtonText: '确定',

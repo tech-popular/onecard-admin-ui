@@ -16,8 +16,8 @@ import VueCodemirror from 'vue-codemirror'
 import tab from './components/table/table'
 import searchForm from './components/form/searchForm'
 import 'codemirror/lib/codemirror.css'
-
 import G6 from '@antv/g6'
+import EleForm from 'vue-ele-form'
 Vue.use(VueCodemirror)
 Vue.use(VueClipboard)
 Vue.use(VueCookie)
@@ -33,6 +33,7 @@ if (process.env.NODE_ENV !== 'production') {
 Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth     // 权限方法
 Vue.prototype.toBreak = toBreak     // 内容换行
+Vue.use(EleForm) // form二次封装
 Vue.component('tab', tab) // 全局table组件
 Vue.component('searchForm', searchForm) // 全局查询form组件
 
