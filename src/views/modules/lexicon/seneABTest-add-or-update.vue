@@ -224,7 +224,9 @@
             if (this.weightSum > 100 || this.weightSum < 100) {
               this.$message.error('占比和需等于100%')
             } else {
-              if (valid) {
+              if (this.lists.length === 0) {
+                this.$message.error('请添加流量参数配置')
+              } else if (valid) {
                 this.dataForm.experimentSetDetails = this.lists
                 this.dataForm.experimentSceneId = this.examilId
                 this.dataForm.strategyType = this.strategyType
@@ -254,7 +256,9 @@
               }
             }
           } else {
-            if (valid) {
+            if (this.lists.length === 0) {
+              this.$message.error('请添加流量参数配置')
+            } else if (valid) {
               this.dataForm.experimentSetDetails = this.lists
               this.dataForm.experimentSceneId = this.examilId
               this.dataForm.strategyType = this.strategyType

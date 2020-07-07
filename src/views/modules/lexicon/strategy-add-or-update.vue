@@ -9,11 +9,11 @@
           <el-input v-model="dataForm.strategyName" placeholder="请输入策略名称"/>
         </el-form-item>
         <el-form-item label="策略层级" prop="strategyLevel">
-          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="LevelClick">
+          <el-select filterable v-model="dataForm.strategyLevel" placeholder="请选择策略层级" style="width:100%" @change="LevelClick" :disabled='levelDisbild'>
             <el-option v-for="item in hierarchyList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="策略场景" prop="strategyName">
+        <el-form-item label="策略场景" prop="strategyName" v-if="sceneDisbild === false">
           <el-cascader style="width: 100%" :props="props" v-model="dataForm.strategyScene" :key="id" clearable :options="sceneList"></el-cascader>
         </el-form-item>
         <el-form-item label="策略类型" prop="strategyType">
@@ -30,12 +30,12 @@
     </el-card>
     <el-card shadow="never" style="margin-top:20px">
       <div slot="header" class="clearfix">
-        <span>详细配置</span><el-tag type="danger" style="margin-left:5px">占比和需等于100%</el-tag>
+        <span>详细配置</span><el-tag type="danger" style="margin-left:5px">占比和需等于1%</el-tag>
       </div>
       <el-form :model="dimensionForm" :rules="dimensionRule" ref="dimensionForm" label-width="80px" :disabled='disbild'> 
         <el-form-item label="纬度" v-if="disbild === false" prop="latitude">
           <el-select filterable v-model="dimensionForm.latitude" placeholder="请选择纬度" @change='clickNewAddText'>
-            <el-option v-for="item in newAddTextList" :value="item.baseName" :key="item.baseName" :label="item.baseName"/>
+            <el-option v-for="item in newAddTextList" :value="item.dimensionName" :key="item.dimensionName" :label="item.dimensionName"/>
           </el-select>
           <el-tooltip class="item" effect="dark" content="添加" placement="top">
             <el-button type="primary" size="mini" icon="el-icon-plus" circle @click='addNewList()' style="float: right;" ></el-button>
@@ -55,7 +55,7 @@
           <el-table-column
             v-if="paixudisbuld === '排序'"
             prop="strategyRecall"
-            label="排序占比%"/>
+            label="排序权重"/>
           <el-table-column
             v-if="paixudisbuld === '召回'"
             prop="strategyRecall"
@@ -63,7 +63,7 @@
           <el-table-column
             v-if="paixudisbuld === '召回'"
             prop="strategySort"
-            label="排序优先级"/>
+            label="召回优先级"/>
         </el-table>
         <el-table
           v-else
@@ -76,7 +76,7 @@
             prop="strategyDimension"
             label="纬度"/>
           <el-table-column
-            label="排序占比%"
+            label="排序权重"
             header-align="center" 
             align="center"
             v-if="paixudisbuld === '排序'"
@@ -103,7 +103,7 @@
             </editable-cell>
           </el-table-column>
           <el-table-column
-            label="排序优先级"
+            label="召回优先级"
             header-align="center" 
             align="center"
             v-if="paixudisbuld === '召回'"
@@ -134,7 +134,7 @@
 
 <script>
   import EditableCell from './components/EditableCell'
-  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown, getDefaultSceneDropDown, weidushowStrategyDropDown } from '@/api/lexicon/strategy'
+  import { infoBeeTask, saveorupt, showStrategyDropDown, getSceneDropDown, getDefaultSceneDropDown, weidushowStrategyDropDown, weidushowStrategyDropDownTwo } from '@/api/lexicon/strategy'
   export default {
     data () {
       return {
@@ -190,8 +190,11 @@
         numId: 1,
         newAddTextList: [],
         disbild: false,
+        levelDisbild: false,
+        sceneDisbild: false,
         paixudisbuld: '',
-        bName: ''
+        bName: '',
+        weiduId: ''
       }
     },
     components: {
@@ -235,7 +238,6 @@
           this.loginTypeList = data.data.loginStatus
           this.hierarchyList = data.data.strategyLevels
           this.typeList = data.data.strategyTypes
-          this.newAddTextList = data.data.strategyDimension
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -262,6 +264,19 @@
                   this.sceneList = data.data
                 })
               }
+              if (data.data.strategyLevel === '全局策略') {
+                this.levelDisbild = true
+                this.sceneDisbild = true
+              }
+              if (data.data.strategyType === '召回') {
+                this.stragId = 0
+              } else {
+                this.stragId = 1
+              }
+              weidushowStrategyDropDownTwo(this.stragId).then(({data}) => { // 删除后增加或删除纬度的数据
+                this.weidu = false
+                this.newAddTextList = data.data
+              })
             })
           }
         })
@@ -275,7 +290,7 @@
               strategyDimension: this.dimensionForm.latitude
             })
             this.dimensionForm.latitude = ''
-            this.lists.forEach(item => { this.bName = item.strategyDimension })
+            this.lists.forEach(item => { this.bName = item.dimensionName })
             this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           }
         })
@@ -289,14 +304,20 @@
             }
           }
         })
-        weidushowStrategyDropDown().then(({data}) => { // 删除后增加或删除纬度的数据
+        if (this.dataForm.strategyType === '召回') {
+          this.stragId = 0
+        } else {
+          this.stragId = 1
+        }
+  
+        weidushowStrategyDropDownTwo(this.stragId).then(({data}) => { // 删除后增加或删除纬度的数据
           this.weidu = false
-          this.newAddTextList = data.data.strategyDimension
+          this.newAddTextList = data.data
           if (this.lists.length > 0) {
             this.lists.forEach(item => { this.bName = item.strategyDimension })
             this.newAddTextList.splice(this.newAddTextList.findIndex(item => item.baseName === this.bName), 1)
           } else {
-            this.newAddTextList = data.data.strategyDimension
+            this.newAddTextList = data.data
             if (this.id) {
               this.nextTodoId = 1
               this.numId = 1
@@ -310,6 +331,14 @@
       // 类型
       typeClick (val) {
         this.paixudisbuld = val
+        var obj = {}
+        obj = this.typeList.find(function (item) {
+          return item.baseName === val
+        })
+        this.weiduId = obj.baseValue
+        weidushowStrategyDropDown(this.weiduId).then(({data}) => {
+          this.newAddTextList = data.data
+        })
       },
       // 层级
       LevelClick (val) {
@@ -318,6 +347,11 @@
             this.sceneList = data.data
           })
         }
+        if (val === '全局策略') {
+          this.sceneDisbild = true
+        } else {
+          this.sceneDisbild = false
+        }
       },
       // 提交
       dataFormSubmit (form) {
@@ -325,7 +359,8 @@
           var sum = 0
           this.lists.forEach((val) => {
             sum += Number(val.strategyRecall)
-            this.weightSum = sum
+            this.weightSum = parseFloat((sum).toFixed(2))
+            console.log(this.weightSum, 'sum')
           }, 0)
           var hash = {}
           for (var i in this.lists) {
@@ -363,6 +398,8 @@
                         this.nextTodoId = 1
                         this.numId = 1
                         this.weidu = false
+                        this.levelDisbild = false
+                        this.sceneDisbild = false
                       }
                     })
                   } else {
@@ -376,6 +413,8 @@
               this.$message.error('占比和需等于1%')
             } else if (this.weidu === true) {
               this.$message.error('纬度不能重复')
+            } else if (!this.weightSum) {
+              this.$message.error('占比不能为空')
             } else {
               if (valid) {
                 this.dataForm.strategySetDetails = this.lists
@@ -397,6 +436,8 @@
                         this.nextTodoId = 1
                         this.numId = 1
                         this.weidu = false
+                        this.levelDisbild = false
+                        this.sceneDisbild = false
                       }
                     })
                   } else {
@@ -419,6 +460,8 @@
         this.nextTodoId = 1
         this.numId = 1
         this.weidu = false
+        this.levelDisbild = false
+        this.sceneDisbild = false
       }
     }
   }
