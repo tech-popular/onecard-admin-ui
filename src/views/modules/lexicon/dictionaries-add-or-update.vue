@@ -185,6 +185,7 @@
       },
       taskDialgClose () {
         this.visible = false
+        this.flowDisabled = true
         this.typeDisabled = false
         this.$refs['dataForm'].resetFields()
       }
