@@ -28,6 +28,14 @@ export const models = {
         },
         {
           id: 2,
+          label: '查看',
+          type: 'success',
+          method: (id) => {
+            this.addOrUpdateHandle(id)
+          }
+        },
+        {
+          id: 3,
           label: '删除',
           type: 'danger',
           method: (id) => {
@@ -106,10 +114,10 @@ export const models = {
       this.getList(dataBody)
     },
     // 新增 / 修改
-    addOrUpdateHandle () {
+    addOrUpdateHandle (id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init()
+        this.$refs.addOrUpdate.init(id)
       })
     },
     // 每页数
