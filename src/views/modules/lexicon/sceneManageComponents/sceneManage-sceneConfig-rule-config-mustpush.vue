@@ -279,8 +279,6 @@ export default {
                 }
               })
             } else {
-              console.log(this.firstPitChange, '111', this.secondPitChange)
-
               const dataBody = {
                 boxId: this.boxId,
                 firstPit: this.firstPitChange ? this.firstPitChange : this.firstPit,
