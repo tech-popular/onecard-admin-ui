@@ -53,6 +53,7 @@
                 class="login-btn-submit"
                 type="primary"
                 @click="dataFormSubmit('dataForm')"
+                :loading="loadingVlaue"
               >登录</el-button>
             </el-form-item>
             <!-- <el-form-item>
@@ -193,6 +194,7 @@ export default {
     }
     return {
       ifTrueCaptcha: false,
+      loadingVlaue: false,
       type: true,
       if_code: false,
       dataElseForm: {
@@ -258,6 +260,7 @@ export default {
     dataFormSubmit (form) {
       this.$refs[form].validate(valid => {
         if (valid) {
+          this.loadingVlaue = true
           const params =
             form == 'dataForm'
               ? this.dataForm
@@ -270,9 +273,11 @@ export default {
             if (data && data.code === 0) {
               this.$cookie.set('token', data.token)
               this.$router.replace({ name: 'home' })
+              this.loadingVlaue = false
             } else {
               this.getCaptcha()
               this.$message.error(data.msg)
+              this.loadingVlaue = false
             }
           })
         }

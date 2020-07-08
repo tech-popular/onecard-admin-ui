@@ -15,7 +15,11 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="分群ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="分群名称"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="分群名称">
+        <!-- <template slot-scope="scope">
+          <el-button type="text" size="small" @click="tableShowHandle(scope.row)">{{scope.row.name}}</el-button>
+        </template> -->
+      </el-table-column>
       <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数" :formatter="templateUserNumFormat"></el-table-column>
       <el-table-column prop="lastCalTime" header-align="center" align="center" label="最近计算时间" :formatter="lastCalTimeFormat"></el-table-column>
       <el-table-column prop="desc" header-align="center" align="center" label="分群说明">
@@ -29,10 +33,11 @@
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="操作">
+      <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'update')">编辑</el-button>
           <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button>
+          <el-button type="text" size="small" @click="tableShowHandle(scope.row)">分群概览</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -45,12 +50,15 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper" />
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <tableShow v-if="tableShowVisible" ref="tableShow"/>
   </div>
 </template>
 
 <script>
   import { dataInsightManageList, deleteDataInfo } from '@/api/dataAnalysis/dataInsightManage'
   import AddOrUpdate from './baseComponents/dataInsightManage-add-or-update'
+  import TableShow from './baseComponents/tableShow'
+
   export default {
     data () {
       return {
@@ -63,11 +71,13 @@
         pageSize: 10, // 默认每页10条
         totalCount: 0,
         dataListLoading: false,
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        tableShowVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      TableShow
     },
     mounted () {
       this.getDataList()
@@ -90,6 +100,13 @@
           }
           this.dataList = data.data.list
           this.totalCount = data.data.total
+        })
+      },
+      // 分群概览
+      tableShowHandle (value) {
+        this.tableShowVisible = true
+        this.$nextTick(() => {
+          this.$refs.tableShow.init(value)
         })
       },
       // 新增 / 修改

@@ -1,0 +1,18 @@
+<template>
+  <ele-form-dialog
+      v-model="formData"
+      :formDesc="formDesc"
+      :request-fn="handleSubmit"
+      :rules="rules"
+      :visible.sync="visible"
+      @request-success="handleSuccess"
+      title="新增"
+    ></ele-form-dialog>
+</template>
+
+<script>
+  import { addOrEdotModels } from '../../components/action/cacheCleanup/cacheCleanup-add-or-update'
+  export default {
+    mixins: [addOrEdotModels]
+  }
+</script>

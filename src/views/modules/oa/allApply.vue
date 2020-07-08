@@ -48,7 +48,7 @@
         label="钉钉审批状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.approvalStatus === '审批通过'" size="small" >审批通过</el-tag>
-          <el-tag v-else-if="scope.row.approvalStatus === '审批失败'" size="small" type="danger">审批失败</el-tag>
+          <el-tag v-else-if="scope.row.approvalStatus === '审批拒绝'" size="small" type="danger">审批拒绝</el-tag>
           <el-tag v-else size="small" type="warning">审批中</el-tag>
         </template>
       </el-table-column>
