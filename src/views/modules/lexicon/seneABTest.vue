@@ -165,7 +165,7 @@
           'pageSize': this.pageSize,
           'experimentName': this.dataForm.testName,
           'experimentSceneId': this.dataForm.experimentSceneId,
-          'experimentStatus': this.dataForm.testStatu,
+          'experimentStatus': this.dataForm.testStatus,
           'experimentStrategyType': this.dataForm.experimentStrategyType
         }
         beeTaskList(dataBody).then(({data}) => {
