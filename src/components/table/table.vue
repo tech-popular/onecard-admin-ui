@@ -65,3 +65,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+  .el-button+.el-button{
+    margin: 5px !important;
+  }
+</style>

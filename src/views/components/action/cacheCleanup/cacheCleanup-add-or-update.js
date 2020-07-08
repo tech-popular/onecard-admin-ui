@@ -1,4 +1,4 @@
-import { saveorupt } from '@/api/lexicon/cacheCleanup'
+import { saveorupt, info } from '@/api/lexicon/cacheCleanup'
 export const addOrEdotModels = {
   data () {
     return {
@@ -56,43 +56,58 @@ export const addOrEdotModels = {
         redisDb: [
           { required: true, message: 'redisDb值不能为空', trigger: 'blur' }
         ]
-      }
+      },
+      id: ''
     }
   },
   methods: {
-    init () {
+    init (id) {
       this.visible = true
+      this.$nextTick(() => {
+        if (id) {
+          this.id = id.id
+          const dataBody = {id: this.id}
+          info(dataBody).then(({data}) => {
+            this.formData = data.data
+          })
+        }
+      })
     },
     handleCancel () {
       this.visible = false
       this.formData = {}
+      this.id = ''
     },
     handleSubmit (data) {
       this.formDesc = data
       return Promise.resolve()
     },
     // 提交
-    handleSuccess (form) {
-      console.log(form, '000')
-
-      const dataBody = this.formDesc
-      saveorupt(dataBody).then(({data}) => {
-        if (data && data.code === 0) {
-          this.$message({
-            message: '操作成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
-              this.visible = false
-              this.$emit('refreshDataList')
-              this.formData = {}
-            }
-          })
-        } else {
-          this.$message.error(data.msg)
-          this.visible = false
-        }
-      })
+    handleSuccess () {
+      if (this.id) {
+        this.visible = false
+        this.$emit('refreshDataList')
+        this.formData = {}
+      } else {
+        const dataBody = this.formDesc
+        saveorupt(dataBody).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.visible = false
+                this.$emit('refreshDataList')
+                this.formData = {}
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+            this.visible = false
+          }
+        })
+      }
     }
   }
 }

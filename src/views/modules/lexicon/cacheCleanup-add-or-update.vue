@@ -1,12 +1,12 @@
 <template>
-  <ele-form-dialog
+    <ele-form-dialog
       v-model="formData"
       :formDesc="formDesc"
       :request-fn="handleSubmit"
       :rules="rules"
       :visible.sync="visible"
       @request-success="handleSuccess"
-      title="新增"
+      :title="id ? '查看' : '新增'"
     ></ele-form-dialog>
 </template>
 
