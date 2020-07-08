@@ -225,6 +225,8 @@ export default {
             if (data && data.msg === 'success') {
               this.dataList = data.data.list
               this.totalPage = data.data.totalPage
+            } else {
+              return this.$message.error(data.msg)
             }
             if (data && data.data && data.data.list.length > 0) {
               this.showform = true
