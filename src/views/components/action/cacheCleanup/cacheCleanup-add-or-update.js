@@ -57,15 +57,16 @@ export const addOrEdotModels = {
           { required: true, message: 'redisDb值不能为空', trigger: 'blur' }
         ]
       },
-      id: ''
+      id: '',
+      dataBody: {}
     }
   },
   methods: {
     init (id) {
+      this.id = id ? id.id : ''
       this.visible = true
       this.$nextTick(() => {
         if (id) {
-          this.id = id.id
           const dataBody = {id: this.id}
           info(dataBody).then(({data}) => {
             this.formData = data.data
@@ -79,18 +80,18 @@ export const addOrEdotModels = {
       this.id = ''
     },
     handleSubmit (data) {
-      this.formDesc = data
-      return Promise.resolve()
+      if (this.id) {
+        this.handleCancel()
+        this.dataBody = {}
+      } else {
+        this.dataBody = data
+        return Promise.resolve()
+      }
     },
     // 提交
     handleSuccess () {
-      if (this.id) {
-        this.visible = false
-        this.$emit('refreshDataList')
-        this.formData = {}
-      } else {
-        const dataBody = this.formDesc
-        saveorupt(dataBody).then(({data}) => {
+      if (!this.dataBody) {
+        saveorupt(this.dataBody).then(({data}) => {
           if (data && data.code === 0) {
             this.$message({
               message: '操作成功',
