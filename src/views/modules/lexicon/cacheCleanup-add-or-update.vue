@@ -7,6 +7,7 @@
       :visible.sync="visible"
       @request-success="handleSuccess"
       :title="id ? '查看' : '新增'"
+      :isShowSubmitBtn="submitBtn"
     ></ele-form-dialog>
 </template>
 
