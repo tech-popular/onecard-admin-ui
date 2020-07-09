@@ -769,6 +769,7 @@ export default {
       this.$parent.addOrUpdateVisible = false
     },
     updateRulesConfig (arr) { // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
+      this.isSelectedUneffectIndex = []
       arr.rules.forEach(item => {
         if (!item.rules) {
           item.selectOperateList = item.selectOperateList.filter(sitem => sitem.code === item.func)
