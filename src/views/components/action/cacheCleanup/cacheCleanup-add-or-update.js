@@ -58,7 +58,8 @@ export const addOrEdotModels = {
         ]
       },
       id: '',
-      dataBody: {}
+      dataBody: {},
+      submitBtn: true
     }
   },
   methods: {
@@ -67,6 +68,8 @@ export const addOrEdotModels = {
       this.visible = true
       this.$nextTick(() => {
         if (id) {
+          console.log(this.submitBtn)
+          this.submitBtn = false
           const dataBody = {id: this.id}
           info(dataBody).then(({data}) => {
             this.formData = data.data
@@ -80,35 +83,28 @@ export const addOrEdotModels = {
       this.id = ''
     },
     handleSubmit (data) {
-      if (this.id) {
-        this.handleCancel()
-        this.dataBody = {}
-      } else {
-        this.dataBody = data
-        return Promise.resolve()
-      }
+      this.dataBody = data
+      return Promise.resolve()
     },
     // 提交
     handleSuccess () {
-      if (!this.dataBody) {
-        saveorupt(this.dataBody).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.visible = false
-                this.$emit('refreshDataList')
-                this.formData = {}
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-            this.visible = false
-          }
-        })
-      }
+      saveorupt(this.dataBody).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false
+              this.$emit('refreshDataList')
+              this.formData = {}
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+          this.visible = false
+        }
+      })
     }
   }
 }
