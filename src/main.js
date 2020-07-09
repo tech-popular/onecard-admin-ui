@@ -3,8 +3,6 @@ import App from '@/App'
 import router from '@/router'                 // api: https://github.com/vuejs/vue-router
 import store from '@/store'                   // api: https://github.com/vuejs/vuex
 import VueCookie from 'vue-cookie'            // api: https://github.com/alfhen/vue-cookie
-// import '@/element-ui'                        // api: https://github.com/ElemeFE/element
-// import 'element-ui/lib/theme-chalk/index.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/element-ui'                         // api: https://github.com/ElemeFE/element
 import '@/icons'                              // api: http://www.iconfont.cn/
@@ -15,9 +13,11 @@ import { isAuth, toBreak } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import VueClipboard from 'vue-clipboard2'
 import VueCodemirror from 'vue-codemirror'
+import tab from './components/table/table'
+import searchForm from './components/form/searchForm'
 import 'codemirror/lib/codemirror.css'
-
 import G6 from '@antv/g6'
+import EleForm from 'vue-ele-form'
 Vue.use(VueCodemirror)
 Vue.use(VueClipboard)
 Vue.use(VueCookie)
@@ -33,6 +33,9 @@ if (process.env.NODE_ENV !== 'production') {
 Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth     // 权限方法
 Vue.prototype.toBreak = toBreak     // 内容换行
+Vue.use(EleForm) // form二次封装
+Vue.component('tab', tab) // 全局table组件
+Vue.component('searchForm', searchForm) // 全局查询form组件
 
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
