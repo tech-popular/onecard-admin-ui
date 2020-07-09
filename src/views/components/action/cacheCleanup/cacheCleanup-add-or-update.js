@@ -1,4 +1,4 @@
-import { saveorupt } from '@/api/lexicon/cacheCleanup'
+import { saveorupt, info } from '@/api/lexicon/cacheCleanup'
 export const addOrEdotModels = {
   data () {
     return {
@@ -56,27 +56,39 @@ export const addOrEdotModels = {
         redisDb: [
           { required: true, message: 'redisDb值不能为空', trigger: 'blur' }
         ]
-      }
+      },
+      id: '',
+      dataBody: {},
+      submitBtn: true
     }
   },
   methods: {
-    init () {
+    init (id) {
+      this.id = id ? id.id : ''
       this.visible = true
+      this.$nextTick(() => {
+        if (id) {
+          console.log(this.submitBtn)
+          this.submitBtn = false
+          const dataBody = {id: this.id}
+          info(dataBody).then(({data}) => {
+            this.formData = data.data
+          })
+        }
+      })
     },
     handleCancel () {
       this.visible = false
       this.formData = {}
+      this.id = ''
     },
     handleSubmit (data) {
-      this.formDesc = data
+      this.dataBody = data
       return Promise.resolve()
     },
     // 提交
-    handleSuccess (form) {
-      console.log(form, '000')
-
-      const dataBody = this.formDesc
-      saveorupt(dataBody).then(({data}) => {
+    handleSuccess () {
+      saveorupt(this.dataBody).then(({data}) => {
         if (data && data.code === 0) {
           this.$message({
             message: '操作成功',

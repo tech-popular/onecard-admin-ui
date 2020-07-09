@@ -170,13 +170,13 @@ export default {
       pageSize: 5, // 默认每页10条
       totalPage: 0,
       options: [
-        {id: 0, name: '不配置'},
-        {id: 1, name: '坑位一'},
-        {id: 2, name: '坑位二'},
-        {id: 3, name: '坑位三'},
-        {id: 4, name: '坑位四'},
-        {id: 5, name: '坑位五'},
-        {id: 6, name: '坑位六'}
+        {id: '0', name: '不配置'},
+        {id: '1', name: '坑位一'},
+        {id: '2', name: '坑位二'},
+        {id: '3', name: '坑位三'},
+        {id: '4', name: '坑位四'},
+        {id: '5', name: '坑位五'},
+        {id: '6', name: '坑位六'}
       ],
       dataForm: {
         name: '',
@@ -225,6 +225,8 @@ export default {
             if (data && data.msg === 'success') {
               this.dataList = data.data.list
               this.totalPage = data.data.totalPage
+            } else {
+              return this.$message.error(data.msg)
             }
             if (data && data.data && data.data.list.length > 0) {
               this.showform = true
@@ -232,6 +234,14 @@ export default {
           })
         }
       })
+    },
+    // 选择坑位
+    bituiChange (val) {
+      this.firstPitChange = val
+    },
+     // 选择坑位
+    bituiChange2 (val) {
+      this.secondPitChange = val
     },
     // 新增/修改
     addArrUpdate () {
@@ -256,43 +266,35 @@ export default {
         this.$refs.dataForm.validate((valid) => {
           if (valid) {
             if (this.addUpd === false) {
-              if (this.dataForm.value1 === this.dataForm.value2) {
-                return this.$message.error('必推坑位不能相同')
-              } else {
-                const dataBody = {
-                  boxId: this.boxId,
-                  firstPit: this.dataForm.value1,
-                  secondPit: this.dataForm.value2
-                }
-                addWillPushPit(dataBody).then(({data}) => {
-                  if (data && data.code === 0) {
-                    this.addArrUpdateBind = false
-                    this.$message.success('新建成功')
-                    this.init()
-                  } else {
-                    return this.$message.error(data.msg)
-                  }
-                })
+              const dataBody = {
+                boxId: this.boxId,
+                firstPit: this.dataForm.value1,
+                secondPit: this.dataForm.value2
               }
+              addWillPushPit(dataBody).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.addArrUpdateBind = false
+                  this.$message.success('新建成功')
+                  this.init()
+                } else {
+                  return this.$message.error(data.msg)
+                }
+              })
             } else {
-              if (this.firstPitChange === this.secondPitChange || this.firstPitChange === this.secondPit || this.secondPitChange === this.firstPit) {
-                return this.$message.error('必推坑位不能相同')
-              } else {
-                const dataBody = {
-                  boxId: this.boxId,
-                  firstPit: this.firstPitChange ? this.firstPitChange : this.firstPit,
-                  secondPit: this.secondPitChange ? this.secondPitChange : this.secondPit
-                }
-                updateWillPushPitInfo(dataBody).then(({data}) => {
-                  if (data && data.code === 0) {
-                    this.addArrUpdateBind = false
-                    this.$message.success('修改成功')
-                    this.init()
-                  } else {
-                    return this.$message.error(data.msg)
-                  }
-                })
+              const dataBody = {
+                boxId: this.boxId,
+                firstPit: this.firstPitChange ? this.firstPitChange : this.firstPit,
+                secondPit: this.secondPitChange ? this.secondPitChange : this.secondPit
               }
+              updateWillPushPitInfo(dataBody).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.addArrUpdateBind = false
+                  this.$message.success('修改成功')
+                  this.init()
+                } else {
+                  return this.$message.error(data.msg)
+                }
+              })
             }
           }
         })
@@ -315,14 +317,6 @@ export default {
     currentChangeHandle (page) {
       this.pageNo = page
       this.getDataList()
-    },
-    // 选择坑位
-    bituiChange (val) {
-      this.firstPitChange = val
-    },
-     // 选择坑位
-    bituiChange2 (val) {
-      this.secondPitChange = val
     },
     // 坑位时间更改
     dataSubmit () {

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="dataFormValue ? '查看字典' : dataForm.id ? '修改字典' : '新增字典'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="dataFormValue ? '查看字典' : dataForm.id ? '修改字典' : '新增字典'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" @close="taskDialgClose" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="10%" :disabled="dataFormValue">
       <el-form-item label="字典名称" prop="baseName">
         <el-input v-model="dataForm.baseName" placeholder="字典名称"/>
@@ -24,7 +24,7 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="foot">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="taskDialgClose">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
   </el-dialog>
@@ -182,6 +182,12 @@
             }
           }
         })
+      },
+      taskDialgClose () {
+        this.visible = false
+        this.flowDisabled = true
+        this.typeDisabled = false
+        this.$refs['dataForm'].resetFields()
       }
     }
   }
