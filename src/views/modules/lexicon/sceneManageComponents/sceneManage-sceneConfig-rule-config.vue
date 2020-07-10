@@ -14,7 +14,7 @@
       </el-tabs>
       <rule-config-product v-if="activeName === '1'" :fatahVisible='visible' ref="ruleConfigProduct" :boxId='boxId'></rule-config-product>
       <rule-config-duplicate v-if="activeName === '2'" ref="ruleConfigDuplicate" :boxId='boxId'></rule-config-duplicate>
-      <rule-config-mustpush v-if="activeName === '3'" ref="ruleConfigMustpush" :boxId='boxId'></rule-config-mustpush>
+      <rule-config-mustpush v-if="activeName === '3'" ref="ruleConfigMustpush" :boxId='boxId' :boxname='sacherRule'></rule-config-mustpush>
     </div>
     <div class="footer">
       <el-button type="default" @click="drawerClose" size="small">关闭</el-button>
@@ -63,7 +63,7 @@ export default {
   methods: {
     init () {
       this.visible = true
-      if (this.sacherRule) {
+      if (this.sacherRule === 'sousuo') {
         this.tabsList = [
           {
             id: '1',
