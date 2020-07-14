@@ -110,6 +110,9 @@
         <el-form-item>
           <el-button @click="addDomain">新增输出数据源</el-button>
         </el-form-item>
+        <el-form-item label="SQL列" prop="sqlColumn">
+          <el-input v-model="dataForm.sqlColumn" placeholder="必须和SQL对应"></el-input>
+        </el-form-item>
         <el-form-item label="SQL" prop="sql">
           <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
         </el-form-item>
@@ -322,6 +325,7 @@ export default {
         name: '',
         inDatasource: '',
         computeType: '',
+        sqlColumn: '',
         sql: '',
         period: 0,
         transformerConfig: '',
@@ -388,7 +392,10 @@ export default {
           }
         ],
         period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
-        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
+        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }],
+        sqlColumn: [
+          { required: true, message: 'SQL列不能为空，且必须和SQL对应', trigger: 'blur', validator: validateNull }
+        ]
       },
       dataSql: {
         datasourceId: '',
@@ -672,6 +679,7 @@ export default {
               name: this.dataForm.name,
               inDatasource: this.dataForm.inDatasource,
               computeType: this.dataForm.computeType,
+              sqlColumn: this.dataForm.sqlColumn,
               sql: this.dataForm.sql,
               period: this.dataForm.period,
               transformerConfig: this.dataForm.transformerConfig,
