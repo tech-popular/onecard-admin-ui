@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { addOrEdotModels } from '../../components/actions/cacheCleanup/cacheCleanup-add-or-update'
+  import { addOrEdotModels } from '../../components/actions/dispatch/taskManag-add-or-update'
   export default {
     mixins: [addOrEdotModels]
   }
