@@ -1,6 +1,6 @@
 <template>
   <div>
-    <searchForm size='mini' labelWidth = '80px' :searchData = "searchData" :searchForm = "searchForm" :searchHandle="searchHandle"></searchForm>
+    <searchForm size='mini' labelWidth = '100px' :searchData = "searchData" :searchForm = "searchForm" :searchHandle="searchHandle"></searchForm>
     <tab :list="list" :columns="columns" :operates="operates"/>
     <el-pagination 
       @size-change="sizeChangeHandle" 

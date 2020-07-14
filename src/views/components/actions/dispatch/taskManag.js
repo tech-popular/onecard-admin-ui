@@ -1,8 +1,10 @@
 import { list, deleted, implement } from '@/api/lexicon/cacheCleanup'
 export const models = {
   data () {
-    // let sexs = [{label: '男', value: 'M'}, {label: '女', value: 'F'}]
-    // let sexProps = {label: 'label', value: 'value'}
+    let type = [{label: '全部', value: 1}, {label: '采集任务', value: 2}, {label: '计算任务', value: 3}, {label: '同步任务', value: 4}]
+    let typeProps = {label: 'label', value: 'value'}
+    let status = [{label: '全部', value: 1}, {label: '启用', value: 2}, {label: '停用', value: 3}]
+    let statusProps = {label: 'label', value: 'value'}
     return {
       props: {
         multiple: false,
@@ -20,7 +22,7 @@ export const models = {
       operates: [
         {
           id: 1,
-          label: '执行',
+          label: '编辑任务',
           type: 'primary',
           method: (id) => {
             this.implementHandle(id)
@@ -28,7 +30,7 @@ export const models = {
         },
         {
           id: 2,
-          label: '查看',
+          label: '调度配置',
           type: 'success',
           method: (id) => {
             this.addOrUpdateHandle(id)
@@ -36,6 +38,22 @@ export const models = {
         },
         {
           id: 3,
+          label: '依赖快照',
+          type: 'info',
+          method: (id) => {
+            this.addOrUpdateHandle(id)
+          }
+        },
+        {
+          id: 4,
+          label: '编辑依赖',
+          type: 'warning',
+          method: (id) => {
+            this.addOrUpdateHandle(id)
+          }
+        },
+        {
+          id: 5,
           label: '删除',
           type: 'danger',
           method: (id) => {
@@ -46,17 +64,17 @@ export const models = {
       columns: [
         {
           prop: 'id',
-          label: 'ID',
+          label: '任务ID',
           align: 'center'
         },
         {
           prop: 'cacheName',
-          label: '名称',
+          label: '任务名称',
           align: 'center'
         },
         {
           prop: 'cacheType',
-          label: '清除类型',
+          label: '任务类型',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
@@ -65,8 +83,18 @@ export const models = {
           }
         },
         {
+          prop: 'lastUpdateTime',
+          label: '任务创建时间',
+          align: 'center'
+        },
+        {
+          prop: 'createUser',
+          label: '创建人',
+          align: 'center'
+        },
+        {
           prop: 'flag',
-          label: '是否缓存key',
+          label: '调度起停状态',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
@@ -76,29 +104,31 @@ export const models = {
         },
         {
           prop: 'lastUpdateTime',
-          label: '最近一次清除时间',
-          align: 'center'
-        },
-        {
-          prop: 'createUser',
-          label: '清除人',
+          label: '有无依赖',
           align: 'center'
         }
       ],
       list: [],
       searchData: {
         name: null,
-        age: null,
-        sex: null
+        id: null,
+        type: null,
+        user: null,
+        status: null
       },
       searchForm: [
-        // {type: 'Input', label: '名称', prop: 'name', width: '180px', placeholder: '请输入名称'},
-        // {type: 'Select', label: '性别', prop: 'sex', width: '180px', options: sexs, props: sexProps, change: row => '', placeholder: '请选择性别'}
+        {type: 'Input', label: '任务ID', prop: 'id', width: '300px', placeholder: '任务ID'},
+        {type: 'Input', label: '任务名称', prop: 'name', width: '300px', placeholder: '请输入名称'},
+        {type: 'Select', label: '任务类型', prop: 'type', width: '300px', options: type, props: typeProps, change: row => '', placeholder: '请选择任务类型'},
+        {type: 'Input', label: '创建人', prop: 'user', width: '300px', placeholder: '创建人'},
+        {type: 'Select', label: '起停状态', prop: 'status', width: '300px', options: status, props: statusProps, change: row => '', placeholder: '请选择起停状态'}
       ],
       searchHandle: [
-        // {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
-        // {label: '重置', type: '', handle: () => { this.resetHandle() }},
-        {label: '新增', type: 'primary', handle: () => { this.addOrUpdateHandle() }}
+        {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
+        {label: '重置', type: '', handle: () => { this.resetHandle() }},
+        {label: '新增采集任务', type: 'primary', handle: () => { this.addOrUpdateHandle() }},
+        {label: '新增同步任务', type: 'warning', handle: () => { this.addOrUpdateHandle() }},
+        {label: '新增计算任务', type: 'info', handle: () => { this.addOrUpdateHandle() }}
       ]
     }
   },
@@ -109,9 +139,25 @@ export const models = {
     init () {
       const dataBody = {
         'pageNum': this.pageNum,
-        'pageSize': this.pageSize
+        'pageSize': this.pageSize,
+        'id': this.searchData.id,
+        'name': this.searchData.name,
+        'type': this.searchData.type,
+        'user': this.searchData.user,
+        'status': this.searchData.status
       }
       this.getList(dataBody)
+    },
+    // 查询
+    handleSearch () {
+      this.pageNum = 1
+      this.init()
+    },
+    // 重置
+    resetHandle () {
+      this.pageNum = 1
+      this.searchData = {}
+      this.init()
     },
     // 新增 / 修改
     addOrUpdateHandle (id) {

@@ -2,7 +2,7 @@
 <template>
 <div class="ces-search">
     <el-form :size="size" inline :label-width="labelWidth">
-        <el-form-item v-for='item in searchForm' :label="item.label" :key='item.prop'>
+        <el-form-item v-for='item in searchForm' :label="item.label" :key='item.prop'  :width="width">
             <!-- 输入框 -->
             <el-input v-if="item.type==='Input'" v-model="searchData[item.prop]" size="mini" ></el-input>
             <!-- 下拉框 -->
@@ -49,6 +49,10 @@ export default {
     labelWidth: {
       type: String,
       default: '100px'
+    },
+    width: {
+      type: String,
+      default: '300px'
     },
     size: {
       type: String,
