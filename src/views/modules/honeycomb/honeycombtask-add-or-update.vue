@@ -110,8 +110,8 @@
         <el-form-item>
           <el-button @click="addDomain">新增输出数据源</el-button>
         </el-form-item>
-        <el-form-item label="SQL列" prop="sqlColumn">
-          <el-input v-model="dataForm.sqlColumn" placeholder="必须和SQL对应"></el-input>
+        <el-form-item label="SQL列" prop="sqlFields">
+          <el-input v-model="dataForm.sqlFields" placeholder="必须和SQL对应"></el-input>
         </el-form-item>
         <el-form-item label="SQL" prop="sql">
           <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
@@ -325,7 +325,7 @@ export default {
         name: '',
         inDatasource: '',
         computeType: '',
-        sqlColumn: '',
+        sqlFields: '',
         sql: '',
         period: 0,
         transformerConfig: '',
@@ -393,7 +393,7 @@ export default {
         ],
         period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
         cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }],
-        sqlColumn: [
+        sqlFields: [
           { required: true, message: 'SQL列不能为空，且必须和SQL对应', trigger: 'blur', validator: validateNull }
         ]
       },
@@ -575,6 +575,7 @@ export default {
               this.dataForm.computeType =
                 data.honeycombTask.computeType == 'simple' ? '0' : '1'
               this.dataForm.sql = data.honeycombTask.sql
+              this.dataForm.sqlFields = data.honeycombTask.sqlFields
               this.dataForm.period = data.honeycombTask.period
               this.dataForm.transformerConfig =
                 data.honeycombTask.transformerConfig
@@ -679,7 +680,7 @@ export default {
               name: this.dataForm.name,
               inDatasource: this.dataForm.inDatasource,
               computeType: this.dataForm.computeType,
-              sqlColumn: this.dataForm.sqlColumn,
+              sqlFields: this.dataForm.sqlFields,
               sql: this.dataForm.sql,
               period: this.dataForm.period,
               transformerConfig: this.dataForm.transformerConfig,
