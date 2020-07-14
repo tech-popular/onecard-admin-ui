@@ -187,17 +187,16 @@ export default {
       },
       channelList: [],
       isSelectedUneffectIndex: [], // 选中的指标是否有无效指标
-      // originIndexList: [] // 没有处理过的指标列表数据
       subTimeSelects: [
         {
           code: 'DAYS', title: '天'
         },
         {
           code: 'HOURS', title: '小时'
-        },
-        {
-          code: 'MINUTES', title: '分钟'
         }
+        // {
+        //   code: 'MINUTES', title: '分钟'
+        // }
       ]
     }
   },
@@ -427,15 +426,20 @@ export default {
             if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
               item.subFunc = item.func
               item.func = 'relative_time'
-              item.dateDimension = item.dateDimension
+              item.subTimeSelects = this.subTimeSelects
+              if (!item.dateDimension) {
+                item.dateDimension = 'DAYS'
+              }
               this.getSelectOperateList(item.fieldType, (selectOperateList) => {
                 item.selectOperateList = selectOperateList
                 item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
-                item.subTimeSelects = this.subTimeSelects
               })
             }
-            if (item.func === 'relative_time_in') {
-              item.dateDimension = item.dateDimension
+            if (item.func === 'relative_time_in' || item.func === 'relative_time') {
+              item.subTimeSelects = this.subTimeSelects
+              if (!item.dateDimension) {
+                item.dateDimension = 'DAYS'
+              }
             }
             // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
             if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
@@ -606,6 +610,8 @@ export default {
           }
         }
       })
+      let rules1 = arr.rules[0]
+      arr.rules.splice(0, 1, rules1) // 强制更新一下数组
       this.ruleConfig = arr
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据

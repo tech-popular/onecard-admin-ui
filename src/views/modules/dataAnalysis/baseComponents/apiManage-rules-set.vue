@@ -109,12 +109,12 @@
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
                 </el-form-item>
-                <el-form-item prop="dateDimension" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-                  <el-select v-model="item.dateDimension" class="subSelect1">
+                <el-form-item prop="dateDimension">
+                  <el-select v-model="item.dateDimension" class="subSelect1" @change="data => updateDateDimension(data, item)">
                     <el-option v-for="(fitem, findex) in item.subTimeSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
                   </el-select>
                 </el-form-item>
-                <el-form-item prop="subFunc" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+                <el-form-item prop="subFunc">
                   <el-select v-model="item.subFunc" class="subSelect">
                     <el-option v-for="(fitem, findex) in item.subSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
                   </el-select>
@@ -126,8 +126,8 @@
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input v-model="item.params[0].value" :maxlength="10" class="itemIput-small" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)" :min="1"></el-input>
                 </el-form-item>
-                <el-form-item prop="dateDimension" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-                  <el-select v-model="item.dateDimension" class="subSelect1">
+                <el-form-item prop="dateDimension">
+                  <el-select v-model="item.dateDimension" class="subSelect1" @change="data => updateDateDimension(data, item)">
                     <el-option v-for="(fitem, findex) in item.subTimeSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
                   </el-select>
                 </el-form-item>
@@ -135,8 +135,8 @@
                 <el-form-item prop="params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-small" @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)" :min="1"></el-input>
                 </el-form-item>
-                <el-form-item prop="dateDimension" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-                  <el-select v-model="item.dateDimension" class="subSelect1">
+                <el-form-item prop="dateDimension">
+                  <el-select v-model="item.dateDimension" class="subSelect1" @change="data => updateDateDimension(data, item)">
                     <el-option v-for="(fitem, findex) in item.subTimeSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
                   </el-select>
                 </el-form-item>
@@ -216,12 +216,11 @@ export default {
       parent = parent.$parent
     }
     this.parent = parent
-    console.log('mounted', this.data)
   },
   components: { Treeselect, InputTag },
   methods: {
-    test (val) {
-      console.log(val)
+    updateDateDimension (val, ruleItem) {
+      this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, { dateDimension: val })
     },
     judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {

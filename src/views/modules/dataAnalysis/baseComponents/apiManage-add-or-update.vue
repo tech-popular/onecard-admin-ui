@@ -227,7 +227,18 @@ export default {
       curCusterInfo: {},
       custerLoading: false,
       filterCursterList: [], // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
-      allSelectedChannelCode: [] // 选中的分群名称中所包含的所有channelCode
+      allSelectedChannelCode: [], // 选中的分群名称中所包含的所有channelCode
+      subTimeSelects: [
+        {
+          code: 'DAYS', title: '天'
+        },
+        {
+          code: 'HOURS', title: '小时'
+        }
+        // {
+        //   code: 'MINUTES', title: '分钟'
+        // }
+      ]
       // originCataList: []
       // isHasOldChannel: false
     }
@@ -581,6 +592,12 @@ export default {
             }
           })
           item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
+          if (item.func === 'relative_time_in' || item.func === 'relative_time') {
+            item.subTimeSelects = this.subTimeSelects
+            if (!item.dateDimension) {
+              item.dateDimension = 'DAYS'
+            }
+          }
           // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
           if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
             if (!item.params[0].selectVal) {
