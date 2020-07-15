@@ -76,7 +76,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()" :disabled="submitFlag">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -95,6 +95,7 @@
       }
       return {
         visible: false,
+        submitFlag: false,
         dataForm: {
           id: 0,
           type: 1,
@@ -191,6 +192,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.submitFlag = true
             this.$http({
               url: this.$http.adornUrl(`/sys/menu/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
@@ -216,9 +218,11 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
+                    this.submitFlag = false
                   }
                 })
               } else {
+                this.submitFlag = false
                 this.$message.error(data.msg)
               }
             })
