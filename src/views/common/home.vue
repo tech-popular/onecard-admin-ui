@@ -117,6 +117,7 @@
 </template>
 
 <script>
+import http from '@/utils/httpRequest'
 export default {
   data () {
     let originHost = location.origin
@@ -159,6 +160,9 @@ export default {
     var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
     var seconds = Math.round(leave3 / 1000)
     this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
+    if (!sessionStorage.getItem('tableauUrl')) {
+      this.getTableauUrl()
+    }
   },
   methods: {
     fhHandle (url) {
@@ -166,6 +170,17 @@ export default {
     },
     biHandle (url) {
       window.open(url, '_blank')
+    },
+    getTableauUrl () {
+      http({
+        url: 'http://songxin.sk.9f.cn/dataSCInfo/selectSCInfoUrl', // http.adornUrl('/sys/menu/nav'),
+        method: 'get',
+        params: http.adornParams()
+      }).then(({data}) => {
+        console.log(data)
+        sessionStorage.setItem('tableauUrl', data.data)
+        // sessionStorage.setItem('tableauUrl', 'http://182.92.24.177:10080/t/9fbank_id/views/71/sheet36?:iid=1?:embed=yes&:toolbar=yes#1')
+      })
     }
   }
 }
