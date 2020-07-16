@@ -263,7 +263,6 @@ export default {
             userType: data.data.userType,
             type: data.data.type
           }
-          // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
           this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
@@ -723,7 +722,7 @@ export default {
         }
       })
     },
-    addChildreRules (data, citem) {
+    addChildreRules (data, citem) { // 添加子集
       let indexPath = findRuleIndex(data.rules, citem) + ''
       let indexPathArr = indexPath.split(',')
       if (indexPathArr.length === 1) {
