@@ -1,130 +1,132 @@
 <template>
+  <div>
+    <main-navbar :is-fold="false" />
     <!-- 欢迎使用utc后台管理系统 -->
-     <el-row :gutter="24" class="dash">
-          <el-col :span="8">
-            <el-card :body-style="{ padding: '0px' }">
-              <div style="padding: 14px;">
-                <el-row class="userAdmin">
-                  <el-col :span="24">
-                    <div class="images">
-                      <img src="~@/assets/img/avatar.png" class="imgs" :alt="userName"/>
-                    </div>
-                  </el-col>
-                  <el-col :span="24">{{ userName }}</el-col>
-                </el-row>
-                <el-row style="border-bottom:1px dashed #ccc;margin: 20px;"/>
-                <div class="bottom clearfix">
-                  <el-row>
-                    <el-col :span="24" class="orginName" style="margin: 5px;">
-                      <time class="time">
-                        <i class="el-icon-time" style="line-height: 25px;">  系统简介</i>
-                      </time>
-                    </el-col>
-                    <el-col :span="24" class="orginName" style="margin: 5px;">
-                      <time class="time">
-                        欢迎使用<span style="color: #2093f7;">数据中台系统，</span>本系统的主要板块：
-                        <p>
-                          <el-tag class="tagText">用户画像板块</el-tag>
-                          <el-tag class="tagText" type="success">审批板块</el-tag>
-                          <el-tag class="tagText" type="info">搜索推荐板块</el-tag>
-                          <el-tag class="tagText" type="warning">调度板块</el-tag>
-                          <el-tag class="tagText" type="danger">报警板块</el-tag>
-                          <el-tag class="tagText">凤凰系统</el-tag>
-                        </p>
-                      </time>
-                    </el-col>
-                    <el-col :span="24" class="orginName" style="margin: 5px;">
-                      <time class="time">
-                      <el-form>
-                        <i class="el-icon-setting" style="line-height: 25px;">  风格设置  </i>
-                        <el-form-item label="导航条类型">
-                          <el-radio-group v-model="navbarLayoutType" size="mini">
-                            <el-radio label="default" border>默认</el-radio>
-                            <el-radio label="inverse" border size="mini">全色</el-radio>
-                          </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="侧边栏皮肤">
-                          <el-radio-group v-model="sidebarLayoutSkin" size="mini">
-                            <el-radio label="dark" border>默认</el-radio>
-                            <!-- <el-radio label="light" border>白色</el-radio> -->
-                          </el-radio-group>
-                        </el-form-item>
-                      </el-form>
-                      </time>
-                    </el-col>
-                  </el-row>
+    <el-row :gutter="24" class="dash" style="margin: 80px 30px 0">
+      <el-col :span="8">
+        <el-card :body-style="{ padding: '0px' }">
+          <div style="padding: 14px;">
+            <el-row class="userAdmin">
+              <el-col :span="24">
+                <div class="images">
+                  <img src="~@/assets/img/avatar.png" class="imgs" :alt="userName"/>
                 </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="16">
-            <el-card>
+              </el-col>
+              <el-col :span="24">{{ userName }}</el-col>
+            </el-row>
+            <el-row style="border-bottom:1px dashed #ccc;margin: 20px;"/>
+            <div class="bottom clearfix">
               <el-row>
-                <h4>去往其他系统</h4>
-                <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
-                <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="~@/assets/img/fenghuang.png">
-                    <el-row style="padding:10px">
-                      <el-col :span="12" style="line-height: 38px;"><span>凤凰系统</span></el-col>
-                      <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="fhHandle(fenghuang)"></el-button>
-                      </el-col>
-                    </el-row>
-                  </el-card>
+                <el-col :span="24" class="orginName" style="margin: 5px;">
+                  <time class="time">
+                    <i class="el-icon-time" style="line-height: 25px;">  系统简介</i>
+                  </time>
                 </el-col>
-                <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="~@/assets/img/bi.jpg">
-                    <el-row style="padding:10px">
-                      <el-col :span="12" style="line-height: 38px;"><span>BI系统</span></el-col>
-                      <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="biHandle(bi)"></el-button>
-                      </el-col>
-                    </el-row>
-                  </el-card>
+                <el-col :span="24" class="orginName" style="margin: 5px;">
+                  <time class="time">
+                    欢迎使用<span style="color: #2093f7;">数据中台系统，</span>本系统的主要板块：
+                    <p>
+                      <el-tag class="tagText">用户画像板块</el-tag>
+                      <el-tag class="tagText" type="success">审批板块</el-tag>
+                      <el-tag class="tagText" type="info">搜索推荐板块</el-tag>
+                      <el-tag class="tagText" type="warning">调度板块</el-tag>
+                      <el-tag class="tagText" type="danger">报警板块</el-tag>
+                      <el-tag class="tagText">凤凰系统</el-tag>
+                    </p>
+                  </time>
                 </el-col>
-                <!-- <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
-                    <el-row style="padding:10px">
-                      <el-col :span="12"><span>凤凰系统</span></el-col>
-                      <el-col :span="12" style="text-align: right;color: #2093f7;"><i class="el-icon-right"></i></el-col>
-                    </el-row>
-                  </el-card>
-                </el-col> -->
+                <el-col :span="24" class="orginName" style="margin: 5px;">
+                  <time class="time">
+                  <el-form>
+                    <i class="el-icon-setting" style="line-height: 25px;">  风格设置  </i>
+                    <el-form-item label="导航条类型">
+                      <el-radio-group v-model="navbarLayoutType" size="mini">
+                        <el-radio label="default" border>默认</el-radio>
+                        <el-radio label="inverse" border size="mini">全色</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="侧边栏皮肤">
+                      <el-radio-group v-model="sidebarLayoutSkin" size="mini">
+                        <el-radio label="dark" border>默认</el-radio>
+                        <!-- <el-radio label="light" border>白色</el-radio> -->
+                      </el-radio-group>
+                    </el-form-item>
+                  </el-form>
+                  </time>
+                </el-col>
               </el-row>
-              <!-- <el-row>
-                <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
-                  </el-card>
-                </el-col>
-                <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
-                  </el-card>
-                </el-col>
-                <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
-                  </el-card>
-                </el-col>
-              </el-row> -->
-            </el-card>
-          </el-col>
-        </el-row>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="16">
+        <el-card>
+          <el-row>
+            <h4><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“系统管理”版块</span></h4>
+            <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
+            <el-col :span="12" v-for="(item, index) in allSystemData" :key="index">
+              <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                <img width="100%" height="155px" :src="item.img">
+                <el-row style="padding:10px">
+                  <el-col :span="12" style="line-height: 38px;"><span>{{item.name}}</span></el-col>
+                  <el-col :span="12" style="text-align: right;vertical-align: middle;">
+                    <el-button type="primary" icon="el-icon-right" size="mini" circle @click="gotoHandle(item)"></el-button>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
+          </el-row>
+          <el-dialog
+            title="请选择租户"
+            :visible.sync="dialogVisible"
+            width="30%"
+            >
+            <span>请在页面上方选择租户，若无租户，请前往<a href="javascript:;" style="color:#2093f7" @click="applyPermission">申请</a></span>
+            <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+            </span>
+          </el-dialog>
+        </el-card>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 
 <script>
+import MainNavbar from '../main-navbar'
 export default {
+  components: { MainNavbar },
   data () {
     let originHost = location.origin
     return {
       value: new Date(),
       dataHoste: '',
-      fenghuang: originHost + '/phoenix/#/home',
-      bi: 'http://data.9fbank.com/plate.jsp'
+      userPermisson: false, // 用户是否有权限
+      dialogVisible: false,
+      allSystemData: [
+        {
+          isRouter: true,
+          name: '数据服务',
+          img: require('../../assets/img/dataservice.jpg'),
+          url: sessionStorage.getItem('defaultPage')
+        },
+        {
+          name: 'BI系统',
+          img: require('../../assets/img/bi.jpg'),
+          url: 'http://data.9fbank.com/plate.jsp'
+        },
+        {
+          isRouter: true,
+          name: '系统管理',
+          img: require('../../assets/img/sysmanage.jpg'),
+          url: 'oa-apply'
+        },
+        {
+          name: '凤凰系统',
+          img: require('../../assets/img/fenghuang.jpg'),
+          url: originHost + '/phoenix/#/home'
+        }
+      ]
     }
   },
   computed: {
@@ -144,6 +146,9 @@ export default {
     }
   },
   mounted () {
+    if (!this.$cookie.get('token')) {
+      this.$router.push({ name: 'login' })
+    }
     var date1 = this.createTime.replace(/-/g, '/') // 开始时间
     var date2 = new Date() // 结束时间
     var date3 = date2.getTime() - new Date(date1).getTime() // 时间差的毫秒数
@@ -161,11 +166,19 @@ export default {
     this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
   },
   methods: {
-    fhHandle (url) {
-      window.open(url, '_blank')
+    gotoHandle (item) {
+      if (!this.userPermisson) { // 若无权限时，弹窗提示
+        this.dialogVisible = true
+      } else {
+        if (item.isRouter) { // 本项目功能时，直接路由跳转
+          this.$router.push({ name: item.url })
+        } else { // 外链系统，进行页面跳转
+          window.open(item.url, '_blank')
+        }
+      }
     },
-    biHandle (url) {
-      window.open(url, '_blank')
+    applyPermission () { // 跳转到申请权限页面
+      this.$router.push({ name: 'oa-apply' })
     }
   }
 }
@@ -221,5 +234,14 @@ export default {
       margin: 5px;
 
     }
+}
+.other-tips {
+  font-weight: normal;
+  font-size: 12px;
+  // padding-left: 10px;
+  i {
+    color: #faad14;
+    padding-right: 5px;
+  }
 }
 </style>

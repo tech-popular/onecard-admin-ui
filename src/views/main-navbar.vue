@@ -11,6 +11,7 @@
     </div>
     <div class="site-navbar__body clearfix">
       <el-menu
+        v-if="isFold"
         class="site-navbar__menu"
         mode="horizontal">
         <el-menu-item class="site-navbar__switch" index="0" @click="sidebarFold = !sidebarFold">
@@ -28,7 +29,18 @@
             </el-badge>
           </template>
         </el-menu-item> -->
-
+        <el-menu-item class="site-navbar__tenant" index="1">
+          所属租户：
+          <el-select v-model="tenantId" placeholder="请选择" style="height: 40px; line-height: 36px;">
+            <el-option
+              v-for="item in tenantList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+          <span class="site-navbar__apply" @click="applyPermission">申请</span>
+        </el-menu-item>
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
@@ -51,11 +63,36 @@
   import UpdatePassword from './main-navbar-update-password'
   import { clearLoginInfo } from '@/utils'
   export default {
+    props: {
+      isFold: {
+        type: Boolean,
+        default: true
+      }
+    },
     data () {
       return {
         updatePassowrdVisible: false,
         left: require('../assets/img/left1.png'),
-        right: require('../assets/img/right1.png')
+        right: require('../assets/img/right1.png'),
+        tenantId: 1,
+        tenantList: [
+          {
+            id: 1,
+            name: '无'
+          },
+          {
+            id: 2,
+            name: '小鱼福卡项目'
+          },
+          {
+            id: 3,
+            name: '万卡项目'
+          },
+          {
+            id: 4,
+            name: '玖富商城项目'
+          }
+        ]
       }
     },
     components: {
@@ -104,6 +141,9 @@
             }
           })
         }).catch(() => {})
+      },
+      applyPermission () { // 申请租户权限
+
       }
     }
   }
@@ -111,5 +151,21 @@
 <style lang="scss">
 .site-navbar {
   background-color: #202b30;
+}
+.el-menu--horizontal>.site-navbar__tenant.is-active {
+  border: 0
+}
+.site-navbar--inverse .el-menu > .site-navbar__tenant:focus, .site-navbar--inverse .el-menu > .site-navbar__tenant:hover {
+  background: none;
+}
+.site-navbar--inverse .el-menu .site-navbar__tenant i {
+  color: #c0c4cc
+}
+.site-navbar__apply {
+  margin-left: 10px;
+  color: #2093f7;
+}
+.site-navbar__apply:hover {
+  border-bottom: 1px solid #2093f7
 }
 </style>
