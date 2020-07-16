@@ -117,7 +117,6 @@
 </template>
 
 <script>
-import http from '@/utils/httpRequest'
 export default {
   data () {
     let originHost = location.origin
@@ -160,9 +159,6 @@ export default {
     var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
     var seconds = Math.round(leave3 / 1000)
     this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
-    if (!sessionStorage.getItem('tableauUrl')) {
-      this.getTableauUrl()
-    }
   },
   methods: {
     fhHandle (url) {
@@ -170,14 +166,6 @@ export default {
     },
     biHandle (url) {
       window.open(url, '_blank')
-    },
-    getTableauUrl () {
-      http({
-        url: http.adornUrl('/dataSCInfo/selectSCInfoUrl'),
-        method: 'get'
-      }).then(({data}) => {
-        sessionStorage.setItem('tableauUrl', data.data)
-      })
     }
   }
 }
