@@ -173,13 +173,10 @@ export default {
     },
     getTableauUrl () {
       http({
-        url: 'http://songxin.sk.9f.cn/dataSCInfo/selectSCInfoUrl', // http.adornUrl('/sys/menu/nav'),
-        method: 'get',
-        params: http.adornParams()
+        url: http.adornUrl('/dataSCInfo/selectSCInfoUrl'),
+        method: 'get'
       }).then(({data}) => {
-        console.log(data)
         sessionStorage.setItem('tableauUrl', data.data)
-        // sessionStorage.setItem('tableauUrl', 'http://182.92.24.177:10080/t/9fbank_id/views/71/sheet36?:iid=1?:embed=yes&:toolbar=yes#1')
       })
     }
   }

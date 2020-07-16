@@ -245,6 +245,7 @@ export default {
     }
   },
   created () {
+    sessionStorage.removeItem('tableauUrl')
     // const url = location.href.split('#')[0]
     this.getCaptcha()
     // this.getPhoneCaptcha()
