@@ -7,10 +7,30 @@
   </div>
 </template>
 <script>
+import http from '@/utils/httpRequest'
 export default {
   data () {
     return {
-      tableauUrl: sessionStorage.getItem('tableauUrl')
+      tableauUrl: ''
+    }
+  },
+  created () {
+    this.getTableauUrl()
+  },
+  methods: {
+    getTableauUrl () {
+      http({
+        url: http.adornUrl('/dataSCInfo/selectSCInfoUrl'),
+        method: 'get'
+      }).then(({data}) => {
+        if (data.status !== '1') {
+          return this.$message({
+            type: 'error',
+            message: data.message || '数据异常'
+          })
+        }
+        this.tableauUrl = data.data
+      })
     }
   }
 }
