@@ -15,8 +15,8 @@
 </template>
 
 <script>
-  import AddOrUpdate from './cacheCleanup-add-or-update'
-  import { models } from '../../components/actions/cacheCleanup/cacheCleanup'
+  import AddOrUpdate from './taskManag-add-or-update'
+  import { models } from '../../components/actions/dispatch/taskManag'
   export default {
     mixins: [models],
     components: {
