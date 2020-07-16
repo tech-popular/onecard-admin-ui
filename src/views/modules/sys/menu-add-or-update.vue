@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="130px">
       <el-form-item label="类型" prop="type">
         <el-radio-group v-model="dataForm.type">
           <el-radio v-for="(type, index) in dataForm.typeList" :label="index" :key="index">{{ type }}</el-radio>
@@ -69,10 +69,14 @@
         <el-radio v-model="dataForm.status" :label='1'>启用</el-radio>
         <el-radio v-model="dataForm.status" :label='0'>禁用</el-radio>
       </el-form-item>
+      <el-form-item label="是否开放OA申请:" prop="isAllowAuthor">
+        <el-radio v-model="dataForm.isAllowAuthor" :label='1'>启用</el-radio>
+        <el-radio v-model="dataForm.isAllowAuthor" :label='0'>禁用</el-radio>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()" :disabled="submitFlag">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -91,6 +95,7 @@
       }
       return {
         visible: false,
+        submitFlag: false,
         dataForm: {
           id: 0,
           type: 1,
@@ -104,7 +109,8 @@
           mark: '',
           icon: '',
           iconList: [],
-          status: 1
+          status: 1,
+          isAllowAuthor: 1
         },
         dataRule: {
           name: [
@@ -162,6 +168,7 @@
               this.dataForm.orderNum = data.menu.orderNum
               this.dataForm.icon = data.menu.icon
               this.dataForm.status = data.menu.status
+              this.dataForm.isAllowAuthor = data.menu.isAllowAuthor
               this.menuListTreeSetCurrentNode()
             })
           }
@@ -185,6 +192,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.submitFlag = true
             this.$http({
               url: this.$http.adornUrl(`/sys/menu/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
@@ -198,7 +206,8 @@
                 'mark': this.dataForm.mark,
                 'orderNum': this.dataForm.orderNum,
                 'icon': this.dataForm.icon,
-                'status': this.dataForm.status
+                'status': this.dataForm.status,
+                'isAllowAuthor': this.dataForm.isAllowAuthor
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -209,9 +218,11 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
+                    this.submitFlag = false
                   }
                 })
               } else {
+                this.submitFlag = false
                 this.$message.error(data.msg)
               }
             })
