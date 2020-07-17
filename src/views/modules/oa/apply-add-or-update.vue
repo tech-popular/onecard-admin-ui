@@ -8,6 +8,7 @@
   >
     <el-divider>请选择申请类别</el-divider>
     <el-tabs type="border-card" @tab-click="tabClick" v-model="actoveTab">
+      <!-- 账号 -->
       <el-tab-pane label="账号权限" name="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
@@ -36,10 +37,32 @@
           </el-form-item>
         </el-form>
         <div class="foot">
-          <el-button @click="applyDataFormCancel()">取消</el-button>
+          <el-button @click="cancel()">取消</el-button>
           <el-button type="primary" @click="dataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
+      <!-- 租户 -->
+      <el-tab-pane label="租户申请" name="租户申请">
+        <el-form :model="tenantForm" :rules="tenantRule" ref="dataForm" label-width="160px">
+          <el-form-item label="选择租户" prop="tenant">
+            <el-cascader
+              style="width: 100%"
+              :props="props"
+              v-model="tenantForm.tenant"
+              clearable
+              :options="systemmodelList">
+            </el-cascader>
+          </el-form-item>
+          <el-form-item label="申请理由" prop="reason">
+            <el-input type="textarea" v-model="tenantForm.reason"></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="foot">
+          <el-button @click="cancel()">取消</el-button>
+          <el-button type="primary" @click="tenantFormSubmit()" :loading="buttonloading">确定</el-button>
+        </div>
+      </el-tab-pane>
+      <!-- 库表 -->
       <el-tab-pane label="库表授权" name="库表授权">
         <el-form
           :model="severDataForm"
@@ -174,7 +197,7 @@
           </el-form-item>
         </el-form>
         <div class="foot">
-          <el-button @click="severDataFormCancel()">取消</el-button>
+          <el-button @click="cancel()">取消</el-button>
           <el-button type="primary" @click="severDataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
@@ -229,6 +252,20 @@ export default {
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
+      // 租户申请开始
+      tenantForm: {
+        tenant: '', // 租户
+        reason: '' // 申请理由
+      }, // 租户form
+      tenantRule: {
+        tenant: [
+          { required: true, message: '请选择租户', trigger: 'blur' }
+        ],
+        reason: [
+          { required: true, message: '申请理由不能为空', trigger: 'blur' }
+        ]
+      }, // 租户form 表单校验
+      // 租户申请结束
       // 库表授权开始
       severDataForm: {
         title: '', // 库表权限标题
@@ -389,6 +426,37 @@ export default {
         }
       })
     },
+    tenantFormSubmit (form) {
+      // 租户提交
+      this.$refs['tenantForm'].validate(valid => {
+        if (valid) {
+          this.buttonloading = true
+          let newData = {
+            applyReason: this.dataForm.reason,
+            systemId: this.tenantForm.system
+          }
+          saveAccountAuthApply(newData).then(({ data }) => {
+            if (data && data.status === '1') {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                  this.$refs['dataForm'].resetFields()
+                  this.buttonloading = false
+                  this.isShow = false
+                }
+              })
+            } else {
+              this.$message.error(data.message)
+              this.buttonloading = false
+            }
+          })
+        }
+      })
+    },
     // 账号选中系统数据处理
     testFunction (value) {
       this.systemmodelList = []
@@ -403,12 +471,6 @@ export default {
         var arr = [...b].filter(x => [...a].some(y => y.value === x.value))
         this.systemmodelList = arr
       })
-    },
-    // 账号取消
-    applyDataFormCancel () {
-      this.visible = false
-      this.isShow = false
-      this.$refs['dataForm'].resetFields()
     },
     severDataFormSubmit (form) {
       // 库表授权提交
@@ -527,13 +589,26 @@ export default {
       this.getStaffList()
     },
     // 库表取消
-    severDataFormCancel () {
+    // severDataFormCancel () {
+    //   this.visible = false
+    //   this.staffTemp.pageNum = 1
+    //   this.staffTemp.name = ''
+    //   this.selectedStaffList = []
+    //   this.$refs.staffTable.clearSelection()
+    //   this.actoveTab = '账号权限'
+    // },
+    // 取消
+    cancel () {
       this.visible = false
+      this.isShow = false
       this.staffTemp.pageNum = 1
       this.staffTemp.name = ''
       this.selectedStaffList = []
       this.$refs.staffTable.clearSelection()
       this.actoveTab = '账号权限'
+      this.$refs['dataForm'].resetFields()
+      this.$refs['tenantForm'].resetFields()
+      this.$refs['severDataForm'].resetFields()
     },
     // 当前页
     currentChangeHandle (val) {
