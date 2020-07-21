@@ -216,7 +216,8 @@ import {
   saveDatabaseAuthApply,
   tenantInif,
   saveTenant,
-  mcCompute
+  mcCompute,
+  tenantCrent
 } from '@/api/oa/apply'
 export default {
   data () {
@@ -352,6 +353,13 @@ export default {
         })
         tenantInif().then(({ data }) => {
           this.tenantList = data.data
+        })
+        var tenanName = []
+        tenantCrent().then(({ data }) => {
+          data.data.map(item => {
+            tenanName.push(item.id)
+            this.tenantForm.tenantIds = tenanName
+          })
         })
       })
     },

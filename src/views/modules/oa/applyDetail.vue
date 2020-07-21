@@ -163,6 +163,7 @@ export default {
     // 弹窗状态
     handleClose () {
       this.dialogVisible = false
+      this.tenantList = []
     }
   }
 }

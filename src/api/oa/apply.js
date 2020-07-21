@@ -26,6 +26,8 @@ export const savaOadatabase = (params) => httpPost(da + 'database/savaOadatabase
 export const updatedatabase = (params) => httpPost(da + 'database/updatedatabase', params)
 // 租户信息下啦
 export const tenantInif = (params) => httpPost(da + 'tenantManage/getTenantManageList', params)
+// 租户默认
+export const tenantCrent = (params) => httpPost(da + 'tenantManage/selectTenantIdsFromUser', params)
 // 租户详情
 export const tenantShow = (params) => httpPost(da + 'tenantManage/selectTenantIdsFromUser', params)
 // 租户保存
