@@ -24,7 +24,9 @@ export const databaseTableList = (params) => httpGet(da + 'database/selectdataba
 export const savaOadatabase = (params) => httpPost(da + 'database/savaOadatabase', params)
 // 更改状态
 export const updatedatabase = (params) => httpPost(da + 'database/updatedatabase', params)
-// 租户信息
-export const tenantInif = (params) => httpPost(da + 'oa/saveDatabaseAuthApply', params)
+// 租户信息下啦
+export const tenantInif = (params) => httpPost(da + 'tenantManage/getTenantManageList', params)
+// 租户详情
+export const tenantShow = (params) => httpPost(da + 'tenantManage/selectTenantIdsFromUser', params)
 // 租户保存
-export const saveTenant = (params) => httpPost(da + 'oa/saveDatabaseAuthApply', params)
+export const saveTenant = (params) => httpPost(da + 'oa/saveTenantAuthApply', params)

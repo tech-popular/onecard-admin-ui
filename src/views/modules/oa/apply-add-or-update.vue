@@ -48,9 +48,9 @@
             <el-select v-model="tenantForm.tenantIds" multiple placeholder="请选择" style="width:100%">
               <el-option
                 v-for="item in tenantList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
               </el-option>
             </el-select>
           </el-form-item>
@@ -255,22 +255,7 @@ export default {
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
-      tenantList: [{
-        value: 1,
-        label: '黄金糕'
-      }, {
-        value: 2,
-        label: '双皮奶'
-      }, {
-        value: 3,
-        label: '蚵仔煎'
-      }, {
-        value: 4,
-        label: '龙须面'
-      }, {
-        value: 5,
-        label: '北京烤鸭'
-      }],
+      tenantList: [],
       // 租户申请开始
       tenantForm: {
         tenantIds: [], // 租户
@@ -366,7 +351,7 @@ export default {
           this.severDataForm.applicantTel = data.data.applicantTel
         })
         tenantInif().then(({ data }) => {
-          // this.tenantList = data.data
+          this.tenantList = data.data
         })
       })
     },
