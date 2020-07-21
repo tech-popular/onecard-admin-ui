@@ -43,18 +43,19 @@
       </el-tab-pane>
       <!-- 租户 -->
       <el-tab-pane label="租户申请" name="租户申请">
-        <el-form :model="tenantForm" :rules="tenantRule" ref="dataForm" label-width="160px">
-          <el-form-item label="选择租户" prop="tenant">
-            <el-cascader
-              style="width: 100%"
-              :props="props"
-              v-model="tenantForm.tenant"
-              clearable
-              :options="systemmodelList">
-            </el-cascader>
+        <el-form :model="tenantForm" :rules="tenantRule" ref="tenantForm" label-width="160px">
+          <el-form-item label="选择租户" prop="tenantIds">
+            <el-select v-model="tenantForm.tenantIds" multiple placeholder="请选择" style="width:100%">
+              <el-option
+                v-for="item in tenantList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="申请理由" prop="reason">
-            <el-input type="textarea" v-model="tenantForm.reason"></el-input>
+          <el-form-item label="申请理由" prop="authApplyReason">
+            <el-input type="textarea" v-model="tenantForm.authApplyReason"></el-input>
           </el-form-item>
         </el-form>
         <div class="foot">
@@ -213,6 +214,8 @@ import {
   accoutAuthInitInfo,
   saveAccountAuthApply,
   saveDatabaseAuthApply,
+  tenantInif,
+  saveTenant,
   mcCompute
 } from '@/api/oa/apply'
 export default {
@@ -252,16 +255,32 @@ export default {
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
+      tenantList: [{
+        value: 1,
+        label: '黄金糕'
+      }, {
+        value: 2,
+        label: '双皮奶'
+      }, {
+        value: 3,
+        label: '蚵仔煎'
+      }, {
+        value: 4,
+        label: '龙须面'
+      }, {
+        value: 5,
+        label: '北京烤鸭'
+      }],
       // 租户申请开始
       tenantForm: {
-        tenant: '', // 租户
-        reason: '' // 申请理由
+        tenantIds: [], // 租户
+        authApplyReason: '' // 申请理由
       }, // 租户form
       tenantRule: {
-        tenant: [
+        tenantIds: [
           { required: true, message: '请选择租户', trigger: 'blur' }
         ],
-        reason: [
+        authApplyReason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ]
       }, // 租户form 表单校验
@@ -345,6 +364,9 @@ export default {
           this.touchActionlist = data.data.touchActionList
           this.severDataForm.applicantEmail = data.data.applicantName
           this.severDataForm.applicantTel = data.data.applicantTel
+        })
+        tenantInif().then(({ data }) => {
+          // this.tenantList = data.data
         })
       })
     },
@@ -432,10 +454,10 @@ export default {
         if (valid) {
           this.buttonloading = true
           let newData = {
-            applyReason: this.dataForm.reason,
-            systemId: this.tenantForm.system
+            tenantIds: this.tenantForm.tenantIds,
+            authApplyReason: this.tenantForm.authApplyReason
           }
-          saveAccountAuthApply(newData).then(({ data }) => {
+          saveTenant(newData).then(({ data }) => {
             if (data && data.status === '1') {
               this.$message({
                 message: '操作成功',
