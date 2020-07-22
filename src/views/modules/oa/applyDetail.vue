@@ -29,16 +29,6 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-        <!-- <el-form-item label="申请权限">
-          <el-checkbox-group v-model="checkedCities">
-            <el-checkbox
-              disabled
-              v-for="(item) in detalList.applyAuthTypeList"
-              :label="item.name"
-              :key="item.id"
-            >{{item.name}}</el-checkbox>
-          </el-checkbox-group>
-        </el-form-item> -->
         <el-form-item label="申请人姓名">
           <span>{{detalList.applicantName}}</span>
         </el-form-item>
@@ -51,19 +41,25 @@
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <!-- <el-form-item label="本次申请默认审批人">
-          <el-tag
-            style="margin-left:10px;"
-            v-for="tag in detalList.defaultApproverList"
-            :key="tag.name"
-            :type="tag.name"
-          >{{tag.name}}</el-tag>
-        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
       </el-form>
 
+      <el-form label-width="160px" v-else-if="quanxian === '租户授权'">
+        <el-form-item label="租户">
+          <span>{{detalList.title}}</span>
+          <el-tag
+            v-for="tag in tenantList"
+            :key="tag.name"
+            closable
+            :type="tag.id"
+            style="margin-left: 5px;"
+            >
+            {{tag.name}}
+          </el-tag>
+        </el-form-item>
+      </el-form>
       <el-form label-width="160px" v-else>
         <el-form-item label="标题">
           <span>{{detalList.title}}</span>
@@ -104,23 +100,12 @@
         <el-form-item label="申请人姓名">
           <span>{{detalList.applicantName}}</span>
         </el-form-item>
-        <!-- <el-form-item label="默认所属部门">
-          <span>{{detalList.department}}</span>
-        </el-form-item> -->
         <el-form-item label="申请人手机号">
           <span>{{detalList.applicantTel}}</span>
         </el-form-item>
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <!-- <el-form-item label="本次申请默认审批人">
-          <el-tag
-            style="margin-left:10px;"
-            v-for="tag in detalList.defaultApproverList"
-            :key="tag.name"
-            :type="tag.name"
-          >{{tag.name}}</el-tag>
-        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
@@ -129,7 +114,7 @@
 </template>
 
 <script>
-import {lookAccout} from '@/api/oa/apply'
+import {lookAccout, tenantShow} from '@/api/oa/apply'
 export default {
   data () {
     return {
@@ -138,16 +123,19 @@ export default {
       checkedCities: [],
       quanxian: '',
       sysment: [],
-      systemListcarrent: ''
+      systemListcarrent: '',
+      tenantList: []
     }
   },
   components: {},
   methods: {
     init (val) {
       this.quanxian = val.applyType
+      console.log(this.quanxian, 'this.quanxian')
       this.dialogVisible = true
       lookAccout(val.id).then(({data}) => {
         this.detalList = data.data
+        console.log(data.data, 'data')
         if (this.quanxian === '账号权限') {
           let a = [{selected: true}]
           let b = this.detalList.systemList
@@ -166,11 +154,16 @@ export default {
           })
         }
       })
+      tenantShow().then(({data}) => {
+        this.tenantList = data.data
+      }
+      )
     },
 
     // 弹窗状态
     handleClose () {
       this.dialogVisible = false
+      this.tenantList = []
     }
   }
 }
