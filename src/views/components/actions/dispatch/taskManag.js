@@ -126,7 +126,7 @@ export const models = {
       searchHandle: [
         {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
         {label: '重置', type: '', handle: () => { this.resetHandle() }},
-        {label: '新增采集任务', type: 'primary', handle: () => { this.addOrUpdateHandle() }},
+        // {label: '新增采集任务', type: 'primary', handle: () => { this.addOrUpdateHandle() }},
         {label: '新增同步任务', type: 'warning', handle: () => { this.addOrUpdateHandle() }},
         {label: '新增计算任务', type: 'info', handle: () => { this.addOrUpdateHandle() }}
       ]
