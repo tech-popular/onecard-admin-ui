@@ -190,6 +190,12 @@
           <el-form-item label="maxcomputer账号" prop="account">
             <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
           </el-form-item>
+          <el-form-item label="AccessKeyId" prop="accessKeyId">
+            <el-input v-model="severDataForm.accessKeyId" placeholder="AccessKeyId" />
+          </el-form-item>
+          <el-form-item label="AccessKeySecert" prop="accessKeySecert">
+            <el-input v-model="severDataForm.accessKeySecert" placeholder="AccessKeySecert" />
+          </el-form-item>
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
@@ -277,7 +283,9 @@ export default {
         applyAuthTypeList: [], // 申请权限
         applicantName: '', // 申请人姓名
         account: '', // maxcomputer账号
-        applyReason: '' // 申请理由
+        applyReason: '', // 申请理由
+        accessKeyId: '',
+        accessKeySecert: ''
       },
       severDataRule: {
         title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
@@ -292,6 +300,12 @@ export default {
         ],
         account: [
           {required: true, message: 'maxcomputer不能为空', trigger: 'blur'}
+        ],
+        accessKeyId: [
+          {required: true, message: 'accessKeyId不能为空', trigger: 'blur'}
+        ],
+        accessKeySecert: [
+          {required: true, message: 'accessKeySecert不能为空', trigger: 'blur'}
         ]
       }, // 库表权限表单校验
       dataFormValue: '',
@@ -502,7 +516,9 @@ export default {
               account: this.severDataForm.account,
               tables: this.selectedStaffList
             },
-            applyAuthTypeList: this.severDataForm.applyAuthTypeList
+            applyAuthTypeList: this.severDataForm.applyAuthTypeList,
+            accessKeySecert: this.severDataForm.accessKeySecert,
+            accessKeyId: this.severDataForm.accessKeyId
           }
           saveDatabaseAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {

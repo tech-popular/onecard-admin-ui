@@ -97,6 +97,12 @@
         <el-form-item label="maxcomputer账号">
           <span>{{detalList.account}}</span>
         </el-form-item>
+        <el-form-item label="accessKeyId">
+          <span>{{detalList.accessKeyId}}</span>
+        </el-form-item>
+        <el-form-item label="accessKeySecert">
+          <span>{{detalList.accessKeySecert}}</span>
+        </el-form-item>
         <el-form-item label="申请人姓名">
           <span>{{detalList.applicantName}}</span>
         </el-form-item>
