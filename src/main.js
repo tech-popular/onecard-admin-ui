@@ -19,6 +19,13 @@ import 'codemirror/lib/codemirror.css'
 import G6 from '@antv/g6'
 import EleForm from 'vue-ele-form'
 import EleFormJsonEditor from 'vue-ele-form-json-editor'
+import EleFormCodemirror from 'vue-ele-form-codemirror'
+// 以下仅为示例, 具体根据需要, 在局部或者全局引入相应的资源
+// 属性和引用资源参考: https://github.com/surmon-china/vue-codemirror
+// language js
+import 'codemirror/mode/javascript/javascript.js'
+// theme css
+import 'codemirror/theme/base16-dark.css'
 Vue.use(VueCodemirror)
 Vue.use(VueClipboard)
 Vue.use(VueCookie)
@@ -46,6 +53,24 @@ Vue.use(EleForm, {
 })
 // 注册 json 组件
 Vue.component('json-editor', EleFormJsonEditor)
+// 注册 codemirror 组件
+Vue.component('codemirror', EleFormCodemirror)
+
+// 注册 vue-ele-form
+Vue.use(EleForm, {
+  // 可以为编辑器配置全局属性, 每个实例都共享这个属性
+  // 属性请参考下面
+  codemirror: {
+    options: {
+      theme: 'base16-dark',
+      tabSize: 4,
+      mode: 'text/javascript',
+      lineNumbers: true,
+      line: true
+    }
+    // events: ['scroll', ...]
+  }
+})
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
 

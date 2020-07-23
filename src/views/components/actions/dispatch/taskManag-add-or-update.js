@@ -58,10 +58,12 @@ export const addOrEdotModels = {
           required: true
         },
         beforeStart: {
-          type: 'json-editor',
+          type: 'codemirror',
           label: '作业开始前SQL',
           attrs: {
-            height: 300
+            tabSize: 4,
+            lineNumbers: true,
+            line: true
           },
           required: true
         },
@@ -107,17 +109,21 @@ export const addOrEdotModels = {
           required: true
         },
         beforeTarget: {
-          type: 'json-editor',
-          label: '目标库前置处理SQL',
+          type: 'codemirror',
+          label: '作业开始前SQL',
           attrs: {
-            height: 300
+            tabSize: 4,
+            lineNumbers: true,
+            line: true
           }
         },
         afterTarget: {
-          type: 'json-editor',
-          label: '目标库后置处理SQL',
+          type: 'codemirror',
+          label: '作业开始前SQL',
           attrs: {
-            height: 300
+            tabSize: 4,
+            lineNumbers: true,
+            line: true
           }
         },
         issueSrart: {
