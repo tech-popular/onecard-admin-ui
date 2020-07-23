@@ -1,6 +1,6 @@
 import { saveorupt, info } from '@/api/lexicon/cacheCleanup'
 import DefaultValue from './components/defaultValue'
-import RoutGoPath2 from './components/routGoPath2'
+import RoutGoPath from './components/routGoPath'
 
 export const addOrEdotModels = {
   data () {
@@ -53,7 +53,7 @@ export const addOrEdotModels = {
           required: true
         },
         selectAcount: {
-          type: RoutGoPath2,
+          type: RoutGoPath,
           label: '账户',
           required: true
         },
