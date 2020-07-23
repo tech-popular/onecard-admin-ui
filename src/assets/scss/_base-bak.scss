@@ -124,7 +124,8 @@ img {
   z-index: 1030;
   height: 50px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
-  background-color: $navbar--background-color;
+  // background-color: $navbar--background-color;
+  background-color: rgb(185, 183, 183);
 
   &--inverse {
     .site-navbar__body {
@@ -159,14 +160,16 @@ img {
     position: relative;
     float: left;
     width: 230px;
-    height: 50px;
+    height: 60px;
+    line-height: 60px;
+    background: #202b30;
     overflow: hidden;
   }
   &__brand {
     display: table-cell;
     vertical-align: middle;
     width: 230px;
-    height: 50px;
+    height: 60px;
     margin: 0;
     line-height: 50px;
     font-size: 20px;
@@ -249,7 +252,7 @@ img {
 ------------------------------ */
 .site-sidebar {
   position: fixed;
-  top: 50px;
+  top: 110px;
   left: 0;
   bottom: 0;
   z-index: 1020;
@@ -317,12 +320,12 @@ img {
     background: $content--background-color;
   }
   &--tabs {
-    padding: 55px 0 0;
+    padding: 115px 0 0;
   }
   > .el-tabs {
     > .el-tabs__header {
       position: fixed;
-      top: 50px;
+      top: 110px;
       left: 230px;
       right: 0;
       z-index: 930;
@@ -340,7 +343,7 @@ img {
       padding: 0 15px 15px;
       > .site-tabs__tools {
         position: fixed;
-        top: 50px;
+        top: 110px;
         right: 0;
         z-index: 931;
         height: 40px;

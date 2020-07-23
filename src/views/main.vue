@@ -6,6 +6,7 @@
     element-loading-text="拼命加载中">
     <template v-if="!loading">
       <main-navbar />
+      <!-- <main-content-nav></main-content-nav> -->
       <main-sidebar />
       <div class="site-content__wrapper" :style="{ 'min-height': documentClientHeight + 'px' }">
         <main-content />
@@ -19,6 +20,7 @@
   import MainSidebar from './main-sidebar'
   import MainContent from './main-content'
   import watermark from '@/utils/watermark'
+  import MainContentNav from './main-content-nav'
 
   export default {
     data () {
@@ -29,7 +31,8 @@
     components: {
       MainNavbar,
       MainSidebar,
-      MainContent
+      MainContent,
+      MainContentNav
     },
     computed: {
       documentClientHeight: {

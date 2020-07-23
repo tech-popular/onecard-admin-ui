@@ -10,9 +10,8 @@
       :props="menuListTreeProps"
       node-key="menuId"
       ref="menuListTree"
-      :default-expand-all="true"
+      :default-expand-all="false"
       :filter-node-method="filterNode"
-      @check="getCheckedNodes"
     >
     </el-tree>
   </div>
@@ -43,10 +42,7 @@
     methods: {
       filterNode (value, data) {
         if (!value) return true
-        return data.label.indexOf(value) !== -1
-      },
-      getCheckedNodes (curNode, treeCheckedNodes) { // 获取当前节点对应的对象，树目前选中的所有对象
-        console.log(curNode, treeCheckedNodes)
+        return data.name.indexOf(value) !== -1
       }
     }
   }

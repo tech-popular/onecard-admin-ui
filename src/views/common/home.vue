@@ -64,7 +64,7 @@
           <el-row>
             <h4><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“系统管理”版块</span></h4>
             <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
-            <el-col :span="12" v-for="(item, index) in allSystemData" :key="index">
+            <el-col :span="12" v-for="(item, index) in plateList" :key="index">
               <el-card :body-style="{ padding: '0px' }" style="margin:5px">
                 <img width="100%" height="155px" :src="item.img">
                 <el-row style="padding:10px">
@@ -94,6 +94,7 @@
 
 <script>
 import MainNavbar from '../main-navbar'
+import { getPlateList, getNavList, getDownNoButtonMenu } from '@/api/sys/menu'
 export default {
   components: { MainNavbar },
   data () {
@@ -101,14 +102,17 @@ export default {
     return {
       value: new Date(),
       dataHoste: '',
-      userPermisson: false, // 用户是否有权限
+      userPermisson: true, // 用户是否有权限
       dialogVisible: false,
+      defaultPageUrl: '',
+      plateList: [],
       allSystemData: [
         {
           isRouter: true,
-          name: '数据服务',
+          name: '数据服务板块',
           img: require('../../assets/img/dataservice.jpg'),
-          url: sessionStorage.getItem('defaultPage')
+          url: sessionStorage.getItem('defaultPage'),
+          menuId: 405
         },
         {
           name: 'BI系统',
@@ -119,7 +123,8 @@ export default {
           isRouter: true,
           name: '系统管理',
           img: require('../../assets/img/sysmanage.jpg'),
-          url: 'oa-apply'
+          url: sessionStorage.getItem('defaultPage'),
+          menuId: 407
         },
         {
           name: '凤凰系统',
@@ -149,6 +154,7 @@ export default {
     if (!this.$cookie.get('token')) {
       this.$router.push({ name: 'login' })
     }
+    this.getPlateList()
     var date1 = this.createTime.replace(/-/g, '/') // 开始时间
     var date2 = new Date() // 结束时间
     var date3 = date2.getTime() - new Date(date1).getTime() // 时间差的毫秒数
@@ -166,12 +172,77 @@ export default {
     this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
   },
   methods: {
+    getPlateList () {
+      getPlateList().then(({data}) => {
+        this.plateList = []
+        if (data && data.code === 0) {
+          data.menuList.forEach(item => {
+            let tt = this.allSystemData.filter(aitem => aitem.menuId === item.menuId)[0]
+            this.plateList.push(tt)
+          })
+        } else {
+          this.plateList = []
+          return this.$message({
+            type: 'error',
+            message: data.msg || '获取数据异常'
+          })
+        }
+      })
+    },
+    httpNav (id, fn) { // 获取导航
+      getNavList(id).then(({data}) => {
+        if (data && data.code === 0) {
+          sessionStorage.setItem('navList', JSON.stringify(data.menuList || '[]'))
+          sessionStorage.setItem('activeNavIndex', data.menuList[0].menuId)
+          this.httpMenu()
+        } else {
+          sessionStorage.setItem('navList', '[]')
+          this.$message({
+            type: 'error',
+            message: data.msg || '数据异常'
+          })
+        }
+      }).catch((e) => {
+        console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
+        this.$router.push({ name: 'login' })
+      })
+    },
+    httpMenu () { // 获取菜单
+      getDownNoButtonMenu(sessionStorage.getItem('activeNavIndex')).then(({data}) => {
+        if (data && data.code === 0) {
+          sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
+          sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
+          this.findChildUrl(data.menuList)
+          this.$router.options.isAddDynamicMenuRoutes = false
+          sessionStorage.setItem('defaultPage', this.defaultPageUrl) // 默认打开第一个页面
+          this.$router.push({ name: this.defaultPageUrl })
+        } else {
+          sessionStorage.setItem('menuList', '[]')
+          sessionStorage.setItem('permissions', '[]')
+        }
+      }).catch((e) => {
+        console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
+        this.$router.push({ name: 'login' })
+      })
+    },
+    findChildUrl (arr) {
+      arr.forEach((item, index) => {
+        if (index === 0) {
+          if (item.list && item.list.length) {
+            this.findChildUrl(item.list)
+          } else {
+            this.defaultPageUrl = item.url.replace('/', '-')
+          }
+        }
+      })
+    },
     gotoHandle (item) {
       if (!this.userPermisson) { // 若无权限时，弹窗提示
         this.dialogVisible = true
       } else {
         if (item.isRouter) { // 本项目功能时，直接路由跳转
-          this.$router.push({ name: item.url })
+          console.log(item)
+          this.httpNav(item.menuId)
         } else { // 外链系统，进行页面跳转
           window.open(item.url, '_blank')
         }

@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.name" placeholder="租户名" clearable></el-input>
       </el-form-item>
       <el-form-item label="状态: ">
-        <el-select v-model="dataForm.status " filterable clearable placeholder="请选择">
+        <el-select v-model="dataForm.flag " filterable clearable placeholder="请选择">
           <el-option v-for="item in statusList" :key="item.id" :label="item.value" :value="item.id">
         </el-option>
         </el-select>
@@ -43,26 +43,26 @@
         label="租户名">
       </el-table-column>
        <el-table-column
-        prop="creator"
+        prop="createUserId"
         label="创建人"
         align="center"
         header-align="center">
       </el-table-column>
       <el-table-column
-        prop="createTime"
+        prop="createDate"
         label="创建时间"
         align="center"
         header-align="center">
       </el-table-column>
       <el-table-column
-        prop="status"
+        prop="flag"
         header-align="center"
         align="center"
         label="状态">
-        <template slot-scope="scope">
+        <!-- <template slot-scope="scope">
           <el-tag v-if="scope.row.status === '0'" size="small">正常</el-tag>
           <el-tag v-else size="small" type="danger">冻结</el-tag>
-        </template>
+        </template> -->
       </el-table-column>
       <el-table-column
         header-align="center"
@@ -91,13 +91,13 @@
 
 <script>
   import AddOrUpdate from './tenant-add-or-update'
-  import { getRolesList } from '@/api/account'
+  import { getTenantManagePage, deleteTenantManage } from '@/api/sys/tenant'
   export default {
     data () {
       return {
         dataForm: {
           name: '',
-          status: ''
+          flag: ''
         },
         dataList: [],
         statusList: [
@@ -121,38 +121,22 @@
     components: {
       AddOrUpdate
     },
-    activated () {
+    mounted () {
       this.getDataList()
     },
-    mounted () {
-      this.getRoles()
-    },
     methods: {
-      getRoles () {
-        getRolesList().then(({data}) => {
-          if (data && data.code == 0) {
-            this.roles = data.list
-          }
-        })
-      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/sys/user/list'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'username': this.dataForm.userName,
-            'email': this.dataForm.emailList,
-            'name': this.dataForm.name,
-            'status': this.dataForm.status
-          })
+        getTenantManagePage({
+          pageSize: this.pageSize,
+          pageNo: this.pageIndex,
+          'name': this.dataForm.name,
+          'flag': this.dataForm.flag
         }).then(({data}) => {
           if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
+            this.dataList = data.data.list
+            this.totalPage = data.data.totalCount
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -162,7 +146,7 @@
       },
       resetHandle () { // 重置
         this.dataForm.name = ''
-        this.dataForm.status = ''
+        this.dataForm.flag = ''
         this.pageSize = 10
         this.pageIndex = 1
         this.getDataList()
@@ -199,11 +183,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/sys/user/delete1'),
-            method: 'post',
-            data: this.$http.adornData(userIds, false)
-          }).then(({data}) => {
+          deleteTenantManage({ids: userIds}).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',

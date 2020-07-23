@@ -9,7 +9,6 @@ import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
 import { clearLoginInfo, getQueryString } from '@/utils'
-
 Vue.use(Router)
 console.log(getQueryString('tag'))
 // 开发环境不使用懒加载, 因为懒加载页面太多的话会造成webpack热更新太慢, 所以只有生产环境使用懒加载
@@ -79,38 +78,42 @@ router.beforeEach((to, from, next) => {
     ]
     if (sysUuid && sysArr.includes(sysUuid)) { // 嵌入统一后台的免登陆处理
       http.get(http.adornUrl('/data/login?systemUuid=' + sysUuid)).then(res => {
-        // Vue.cookie.set('isUnifyManage', 1) // isUnifyManage 为1时表示 是嵌入统一后台的页面，0 表示原系统
         Vue.cookie.set('token', res.data.token)
-        httpNav(to, from, next)
+        sessionStorage.setItem('isUnifiedAccount', '1')
+        specialHttpMenu(to, from, next)
       })
     } else {
-      // Vue.cookie.set('isUnifyManage', 0)
-      console.log(to)
-      if (to.name === 'home') { // 进入首页时，只有一个首页菜单
-        sessionStorage.setItem('menuList', '[]')
-        sessionStorage.setItem('permissions', '[]')
-        next()
-      } else {
-        httpNav(to, from, next)
-      }
+      httpMenu(to, from, next)
     }
   }
 })
 
-function httpNav (to, from, next) {
+function httpMenu (to, from, next) {
+  if (sessionStorage.getItem('menuList')) {
+    fnAddDynamicMenuRoutes(JSON.parse(sessionStorage.getItem('menuList')))
+    router.options.isAddDynamicMenuRoutes = true
+    next({ ...to, replace: true })
+  }
+}
+
+function specialHttpMenu (to, from, next) {
   http({
-    url: http.adornUrl('/sys/menu/nav'),
+    url: http.adornUrl('/sys/menu/selectDownNoButtonMenu/402'),
     method: 'get',
     params: http.adornParams()
   }).then(({data}) => {
     if (data && data.code === 0) {
-      console.log(data.menuList)
-      fnAddDynamicMenuRoutes(data.menuList)
-      router.options.isAddDynamicMenuRoutes = true
-      sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
-      sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
-      sessionStorage.setItem('defaultPage', data.menuList[0].list[0].url.replace('/', '-')) // 默认打开第一个页面
-      next({ ...to, replace: true })
+      if (!data.menuList.length) {
+        sessionStorage.setItem('menuList', '[]')
+        sessionStorage.setItem('permissions', '[]')
+        next()
+      } else {
+        fnAddDynamicMenuRoutes(data.menuList)
+        router.options.isAddDynamicMenuRoutes = true
+        sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
+        sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
+        next({ ...to, replace: true })
+      }
     } else {
       sessionStorage.setItem('menuList', '[]')
       sessionStorage.setItem('permissions', '[]')
@@ -118,7 +121,7 @@ function httpNav (to, from, next) {
     }
   }).catch((e) => {
     console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-    router.push({ name: 'login' })
+    this.$router.push({ name: 'login' })
   })
 }
 /**
@@ -186,5 +189,4 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
     sessionStorage.setItem('dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'))
   }
 }
-
 export default router

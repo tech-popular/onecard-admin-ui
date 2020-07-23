@@ -19,19 +19,32 @@
           <img :src="sidebarFold ? right : left" alt="">
         </el-menu-item>
       </el-menu>
+      <div style="flex: 1;overflow:hidden;position:relative;display:flex;flex-direction: row;" v-if="routerName !== 'home' && isUnifiedAccount !== '1'">
+        <el-menu
+          class="site-navbar__menu site-navbar__arrow"
+          mode="horizontal"
+        >
+            <i class="el-icon-d-arrow-left" style="color:#fff" @click="toPrev"></i>
+        </el-menu>
+        <div ref="navDiv" style="flex: 1;overflow:hidden;position:relative">
+          <el-menu :default-active="activeIndex" class="site-navbar__menu site-navbar__menu-nav" :style="{width: navListData.length * 110 + 'px', left: navBarLeft + 'px'}" mode="horizontal" background-color="#202b30" text-color="#fff" active-text-color="#ffd04b" @select="handleSelect">
+            <el-menu-item :index="item.menuId + ''" v-for="(item, index) in navListData" :key="index" style="width: 110px">{{item.name}}</el-menu-item>
+          </el-menu>
+        </div>
+        <el-menu
+          class="site-navbar__menu site-navbar__arrow"
+          mode="horizontal"
+        >
+          <i class="el-icon-d-arrow-right" style="color:#fff" @click="toNext"></i>
+        </el-menu>
+      </div>
+      <div style="flex: 1;" v-else></div>
       <el-menu
         class="site-navbar__menu site-navbar__menu--right"
         mode="horizontal">
-        <!-- <el-menu-item index="1" @click="$router.push({ name: 'theme' })">
-          <template slot="title">
-            <el-badge value="new">
-              <icon-svg name="shezhi" class="el-icon-setting"></icon-svg>
-            </el-badge>
-          </template>
-        </el-menu-item> -->
-        <el-menu-item class="site-navbar__tenant" index="1">
+        <el-menu-item class="site-navbar__tenant" index="1" v-if="routerName === 'home'">
           所属租户：
-          <el-select v-model="tenantId" placeholder="请选择" style="height: 40px; line-height: 36px;">
+          <el-select v-model="tenantId" placeholder="请选择" @change="tenantIdChange" style="width: 140px;height: 40px; line-height: 36px;">
             <el-option
               v-for="item in tenantList"
               :key="item.id"
@@ -62,6 +75,8 @@
 <script>
   import UpdatePassword from './main-navbar-update-password'
   import { clearLoginInfo } from '@/utils'
+  import { getTenantList, saveHomeTenantId } from '@/api/sys/tenant'
+  import { getDownNoButtonMenu } from '@/api/sys/menu'
   export default {
     props: {
       isFold: {
@@ -71,32 +86,23 @@
     },
     data () {
       return {
+        navBarLeft: 0,
         updatePassowrdVisible: false,
         left: require('../assets/img/left1.png'),
         right: require('../assets/img/right1.png'),
-        tenantId: 1,
-        tenantList: [
-          {
-            id: 1,
-            name: '无'
-          },
-          {
-            id: 2,
-            name: '小鱼福卡项目'
-          },
-          {
-            id: 3,
-            name: '万卡项目'
-          },
-          {
-            id: 4,
-            name: '玖富商城项目'
-          }
-        ]
+        tenantId: 0,
+        tenantList: [],
+        isNavbarBtnFlag: true,
+        isUnifiedAccount: sessionStorage.getItem('isUnifiedAccount')
       }
     },
     components: {
       UpdatePassword
+    },
+    mounted () {
+      if (this.routerName === 'home') {
+        this.getTenantList()
+      }
     },
     computed: {
       navbarLayoutType: {
@@ -112,14 +118,107 @@
       },
       userName: {
         get () { return this.$store.state.user.name }
+      },
+      routerName () {
+        return this.$route.name
+      },
+      navListData () {
+        if (!sessionStorage.getItem('navList')) return []
+        return JSON.parse(sessionStorage.getItem('navList'))
+      },
+      activeIndex: {
+        get () { return sessionStorage.getItem('activeNavIndex') || 0 },
+        set (val) { sessionStorage.setItem('activeNavIndex', val) }
       }
     },
     methods: {
+      getTenantList () { // 租户下拉列表
+        getTenantList().then(({data}) => {
+          if (data && data.code === 0) {
+            console.log(data)
+            this.tenantList = data.data
+            this.tenantId = this.tenantList[0].id
+          } else {
+            this.tenantList = []
+            this.tenantId = 0
+          }
+        })
+      },
+      tenantIdChange (val) { // 租户id改变时
+        saveHomeTenantId(val).then(({data}) => {
+          if (data && data.code !== 0) {
+            this.$message({
+              type: 'error',
+              message: data.msg || '租户信息保存异常'
+            })
+          }
+        })
+      },
+      handleSelect (index, indexPath) {
+        this.activeIndex = index
+        this.httpMenu()
+        console.log(this.$store.state.common.mainTabs)
+        this.$store.commit('common/updateMainTabs', []) // 切换导航时，把标签重置
+      },
+      toPrev () {
+        if (this.navBarLeft === 0) return
+        this.navBarLeft = this.navBarLeft + 110
+      },
+      toNext () {
+        if (this.$refs.navDiv.clientWidth - this.navBarLeft < this.navListData.length * 110) {
+          this.navBarLeft = this.navBarLeft - 110
+        }
+      },
+      // getNavBarBtnFlag () {
+      //   this.isNavbarBtnFlag = false
+      //   this.$nextTick(() => {
+      //     console.log(123, this.$refs.navDiv.clientWidth, this.navListData.length * 110)
+      //     if (this.$refs.navDiv.clientWidth >= this.navListData.length * 110 - 20) {
+      //       this.isNavbarBtnFlag = false
+      //     } else {
+      //       this.isNavbarBtnFlag = true
+      //     }
+      //   })
+      // },
       // 修改密码
       updatePasswordHandle () {
         this.updatePassowrdVisible = true
         this.$nextTick(() => {
           this.$refs.updatePassowrd.init()
+        })
+      },
+      httpMenu () {
+        getDownNoButtonMenu(sessionStorage.getItem('activeNavIndex')).then(({data}) => {
+          if (data && data.code === 0) {
+            if (!data.menuList.length) {
+              sessionStorage.setItem('menuList', '[]')
+              sessionStorage.setItem('permissions', '[]')
+            } else {
+              sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
+              sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
+              this.findChildUrl(data.menuList)
+              this.$router.options.isAddDynamicMenuRoutes = false
+              sessionStorage.setItem('defaultPage', this.defaultPageUrl) // 默认打开第一个页面
+              this.$router.push({ name: this.defaultPageUrl })
+            }
+          } else {
+            sessionStorage.setItem('menuList', '[]')
+            sessionStorage.setItem('permissions', '[]')
+          }
+        }).catch((e) => {
+          console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
+          this.$router.push({ name: 'login' })
+        })
+      },
+      findChildUrl (arr) {
+        arr.forEach((item, index) => {
+          if (index === 0) {
+            if (item.list && item.list.length) {
+              this.findChildUrl(item.list)
+            } else {
+              this.defaultPageUrl = item.url.replace('/', '-')
+            }
+          }
         })
       },
       // 退出
@@ -167,5 +266,21 @@
 }
 .site-navbar__apply:hover {
   border-bottom: 1px solid #2093f7
+}
+.site-navbar__body {
+  display: flex;
+  flex-direction: row;
+}
+.site-navbar__menu-nav {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition-duration: .3s;
+  text-align: center;
+}
+.site-navbar__arrow {
+  height: 51px;
+  line-height: 51px;
+  margin: 0 12px;
 }
 </style>

@@ -1,12 +1,19 @@
 <template>
   <div class="mod-role">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
+      <el-form-item label="角色名称: ">
         <el-input v-model="dataForm.roleName" placeholder="角色名称" clearable></el-input>
       </el-form-item>
+      <el-form-item label="状态: ">
+        <el-select v-model="dataForm.flag " filterable clearable placeholder="请选择">
+          <el-option v-for="item in statusList" :key="item.id" :label="item.value" :value="item.id">
+        </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('sys:role:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" @click="getDataList()">查询</el-button>
+        <el-button @click="resetHandle">重置</el-button>
+        <el-button v-if="isAuth('sys:role:save')" type="success" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('sys:role:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -42,11 +49,27 @@
         label="备注">
       </el-table-column>
       <el-table-column
+        prop="creator"
+        label="创建人"
+        align="center"
+        header-align="center">
+      </el-table-column>
+      <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
         width="180"
         label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="flag"
+        header-align="center"
+        align="center"
+        label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.flag === 0" size="small">正常</el-tag>
+          <el-tag v-else size="small" type="danger">冻结</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -55,7 +78,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('sys:role:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.roleId)">修改</el-button>
+          <el-button v-if="isAuth('sys:role:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
           <el-button v-if="isAuth('sys:role:delete')" type="text" size="small" @click="deleteHandle(scope.row.roleId)">删除</el-button>
         </template>
       </el-table-column>
@@ -76,11 +99,13 @@
 
 <script>
   import AddOrUpdate from './role-add-or-update'
+  import { getRoleList, getRoleDelete } from '@/api/sys/role'
   export default {
     data () {
       return {
         dataForm: {
-          roleName: ''
+          roleName: '',
+          flag: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -88,7 +113,20 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        statusList: [
+          {
+            id: '-1',
+            value: '全部'
+          },
+          {
+            id: '0',
+            value: '正常'
+          }, {
+            id: '1',
+            value: '冻结'
+          }
+        ]
       }
     },
     components: {
@@ -101,14 +139,11 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/sys/role/list'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'roleName': this.dataForm.roleName
-          })
+        getRoleList({
+          'page': this.pageIndex,
+          'limit': this.pageSize,
+          'roleName': this.dataForm.roleName,
+          'flag': this.dataForm.flag === '-1' ? '' : this.dataForm.flag
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.dataList = data.page.list
@@ -119,6 +154,13 @@
           }
           this.dataListLoading = false
         })
+      },
+      resetHandle () { // 重置
+        this.dataForm.roleName = ''
+        this.dataForm.flag = '-1'
+        this.pageSize = 10
+        this.pageIndex = 1
+        this.getDataList()
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -136,10 +178,10 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(row)
         })
       },
       // 删除
@@ -152,11 +194,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/sys/role/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({data}) => {
+          getRoleDelete(ids).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
