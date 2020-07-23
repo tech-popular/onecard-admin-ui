@@ -516,6 +516,7 @@ export default {
               account: this.severDataForm.account,
               tables: this.selectedStaffList
             },
+            applyAuthTypeList: this.severDataForm.applyAuthTypeList,
             accessKeySecert: this.severDataForm.accessKeySecert,
             accessKeyId: this.severDataForm.accessKeyId
           }
