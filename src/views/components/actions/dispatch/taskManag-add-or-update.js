@@ -1,4 +1,7 @@
 import { saveorupt, info } from '@/api/lexicon/cacheCleanup'
+import DefaultValue from './components/defaultValue'
+import RoutGoPath2 from './components/routGoPath2'
+
 export const addOrEdotModels = {
   data () {
     return {
@@ -8,58 +11,154 @@ export const addOrEdotModels = {
       // 标题字段
       formDesc: {
         cacheName: {
-          type: 'input',
-          label: '缓存名称'
+          type: DefaultValue,
+          label: '任务名称',
+          required: true
         },
         key: {
           type: 'input',
-          label: 'key'
+          label: '任务ID',
+          disabled: true
         },
         cacheType: {
           type: 'select',
-          label: '类型',
+          label: '所属系统',
           options: [
             { text: 'redis', value: 1 },
             { text: 'EhCahe', value: 0 }
-          ]
+          ],
+          required: true
         },
-        redisDb: {
-          type: 'number',
-          label: 'redisDb值',
-          vif (data) {
-            return data.cacheType === 1
+        infos: {
+          type: 'textarea',
+          label: '任务描述',
+          required: true
+        },
+        dataSources: {
+          type: 'select',
+          label: '数据来源',
+          options: [
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
+        },
+        dataName: {
+          type: 'select',
+          label: '数据源名称',
+          options: [
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
+        },
+        selectAcount: {
+          type: RoutGoPath2,
+          label: '账户',
+          required: true
+        },
+        beforeStart: {
+          type: 'json-editor',
+          label: '作业开始前SQL',
+          attrs: {
+            height: 300
+          },
+          required: true
+        },
+        outputField: {
+          type: 'tag',
+          label: '输出字段',
+          options: [
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
+        },
+        dataDestination: {
+          type: 'select',
+          label: '数据去向',
+          options: [
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
+        },
+        dataName2: {
+          type: 'select',
+          label: '数据源名称',
+          options: [
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
+        },
+        public: {
+          type: 'select',
+          label: '公共账户',
+          options: [
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
+        },
+        tableArrTopic: {
+          type: 'input',
+          label: '输入数据表/topic名称',
+          required: true
+        },
+        beforeTarget: {
+          type: 'json-editor',
+          label: '目标库前置处理SQL',
+          attrs: {
+            height: 300
           }
         },
-        flag: {
-          type: 'select',
-          label: '缓存后缀',
+        afterTarget: {
+          type: 'json-editor',
+          label: '目标库后置处理SQL',
+          attrs: {
+            height: 300
+          }
+        },
+        issueSrart: {
+          type: 'tag',
+          label: '下发类型',
           options: [
-          { text: '需要', value: 1 },
-          { text: '不需要', value: 0 }
-          ]
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
+        },
+        incrementRule: {
+          type: 'input',
+          label: '增量规则'
+        },
+        missionRequirementsMan: {
+          type: 'input',
+          label: '任务需求人',
+          required: true
+        },
+        stautus: {
+          type: 'tag',
+          label: '状态',
+          options: [
+            { text: 'redis', value: 1 },
+            { text: 'EhCahe', value: 0 }
+          ],
+          required: true
         }
-      },
-      // 表单校验
-      rules: {
-        cacheName: [
-          { required: true, message: '缓存名称不能为空', trigger: 'blur' }
-        ],
-        key: [
-          { required: true, message: 'key不能为空', trigger: 'blur' }
-        ],
-        cacheType: [
-          { required: true, message: '类型不能为空', trigger: 'blur' }
-        ],
-        flag: [
-          { required: true, message: '是否需要缓存后缀不能为空', trigger: 'blur' }
-        ],
-        redisDb: [
-          { required: true, message: 'redisDb值不能为空', trigger: 'blur' }
-        ]
       },
       id: '',
       dataBody: {},
-      submitBtn: true
+      submitBtn: true,
+      editUser: 'lvzhiming',
+      editTime: '2020-07-23',
+      options: [
+        {
+          label: 'wode',
+          value: 1
+        }
+      ]
     }
   },
   methods: {

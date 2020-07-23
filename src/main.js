@@ -18,6 +18,7 @@ import searchForm from './components/form/searchForm'
 import 'codemirror/lib/codemirror.css'
 import G6 from '@antv/g6'
 import EleForm from 'vue-ele-form'
+import EleFormJsonEditor from 'vue-ele-form-json-editor'
 Vue.use(VueCodemirror)
 Vue.use(VueClipboard)
 Vue.use(VueCookie)
@@ -36,7 +37,15 @@ Vue.prototype.toBreak = toBreak     // 内容换行
 Vue.use(EleForm) // form二次封装
 Vue.component('tab', tab) // 全局table组件
 Vue.component('searchForm', searchForm) // 全局查询form组件
-
+// 注册 ele-form
+Vue.use(EleForm, {
+  // 可以在这里设置全局的 json-editor 属性
+  'json-editor': {
+    height: 300
+  }
+})
+// 注册 json 组件
+Vue.component('json-editor', EleFormJsonEditor)
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
 
