@@ -18,6 +18,7 @@ export const models = {
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
+      computAddOrUpdateVisible: false,
       // 操作按钮
       operates: [
         {
@@ -128,7 +129,7 @@ export const models = {
         {label: '重置', type: '', handle: () => { this.resetHandle() }},
         // {label: '新增采集任务', type: 'primary', handle: () => { this.addOrUpdateHandle() }},
         {label: '新增同步任务', type: 'warning', handle: () => { this.addOrUpdateHandle() }},
-        {label: '新增计算任务', type: 'info', handle: () => { this.addOrUpdateHandle() }}
+        {label: '新增计算任务', type: 'info', handle: () => { this.computAddOrUpdateHandle() }}
       ]
     }
   },
@@ -164,6 +165,13 @@ export const models = {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
+      })
+    },
+    // 新增 / 修改
+    computAddOrUpdateHandle (id) {
+      this.computAddOrUpdateVisible = true
+      this.$nextTick(() => {
+        this.$refs.computAddOrUpdate.init(id)
       })
     },
     // 每页数
