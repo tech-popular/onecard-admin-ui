@@ -121,7 +121,7 @@ function specialHttpMenu (to, from, next) {
     }
   }).catch((e) => {
     console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-    this.$router.push({ name: 'login' })
+    router.push({ name: 'login' })
   })
 }
 /**

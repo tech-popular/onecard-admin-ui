@@ -105,7 +105,7 @@
       return {
         dataForm: {
           roleName: '',
-          flag: ''
+          flag: '-1'
         },
         dataList: [],
         pageIndex: 1,

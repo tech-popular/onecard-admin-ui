@@ -1,7 +1,7 @@
 <template>
   <nav class="site-navbar" :class="'site-navbar--' + navbarLayoutType">
     <div class="site-navbar__header">
-      <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
+      <h1 class="site-navbar__brand" @click="gotoHome">
         <a class="site-navbar__brand-lg" href="javascript:;">玖富数据中台</a>
         <a class="site-navbar__brand-mini" href="javascript:;">
           <!-- <icon-svg style="transform: scale(1.4, 1.4)" name="bird"></icon-svg> -->
@@ -46,11 +46,18 @@
           所属租户：
           <el-select v-model="tenantId" placeholder="请选择" @change="tenantIdChange" style="width: 140px;height: 40px; line-height: 36px;">
             <el-option
-              v-for="item in tenantList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
+              v-if="!tenantList.length"
+              label="无"
+              :value="-999">
             </el-option>
+            <template v-else>
+              <el-option
+                v-for="item in tenantList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </template>
           </el-select>
           <span class="site-navbar__apply" @click="applyPermission">申请</span>
         </el-menu-item>
@@ -76,7 +83,6 @@
   import UpdatePassword from './main-navbar-update-password'
   import { clearLoginInfo } from '@/utils'
   import { getTenantList, saveHomeTenantId } from '@/api/sys/tenant'
-  import { getDownNoButtonMenu } from '@/api/sys/menu'
   export default {
     props: {
       isFold: {
@@ -134,14 +140,15 @@
     methods: {
       getTenantList () { // 租户下拉列表
         getTenantList().then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 0 && data.data.length) {
             console.log(data)
             this.tenantList = data.data
             this.tenantId = this.tenantList[0].id
           } else {
             this.tenantList = []
-            this.tenantId = 0
+            this.tenantId = -999
           }
+          sessionStorage.setItem('tenantList', this.tenantList || [])
         })
       },
       tenantIdChange (val) { // 租户id改变时
@@ -156,9 +163,8 @@
       },
       handleSelect (index, indexPath) {
         this.activeIndex = index
-        this.httpMenu()
-        console.log(this.$store.state.common.mainTabs)
-        this.$store.commit('common/updateMainTabs', []) // 切换导航时，把标签重置
+        this.$store.dispatch('common/getMenuData')
+        // this.$store.commit('common/updateMainTabs', []) // 切换导航时，把标签重置
       },
       toPrev () {
         if (this.navBarLeft === 0) return
@@ -169,56 +175,11 @@
           this.navBarLeft = this.navBarLeft - 110
         }
       },
-      // getNavBarBtnFlag () {
-      //   this.isNavbarBtnFlag = false
-      //   this.$nextTick(() => {
-      //     console.log(123, this.$refs.navDiv.clientWidth, this.navListData.length * 110)
-      //     if (this.$refs.navDiv.clientWidth >= this.navListData.length * 110 - 20) {
-      //       this.isNavbarBtnFlag = false
-      //     } else {
-      //       this.isNavbarBtnFlag = true
-      //     }
-      //   })
-      // },
       // 修改密码
       updatePasswordHandle () {
         this.updatePassowrdVisible = true
         this.$nextTick(() => {
           this.$refs.updatePassowrd.init()
-        })
-      },
-      httpMenu () {
-        getDownNoButtonMenu(sessionStorage.getItem('activeNavIndex')).then(({data}) => {
-          if (data && data.code === 0) {
-            if (!data.menuList.length) {
-              sessionStorage.setItem('menuList', '[]')
-              sessionStorage.setItem('permissions', '[]')
-            } else {
-              sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
-              sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
-              this.findChildUrl(data.menuList)
-              this.$router.options.isAddDynamicMenuRoutes = false
-              sessionStorage.setItem('defaultPage', this.defaultPageUrl) // 默认打开第一个页面
-              this.$router.push({ name: this.defaultPageUrl })
-            }
-          } else {
-            sessionStorage.setItem('menuList', '[]')
-            sessionStorage.setItem('permissions', '[]')
-          }
-        }).catch((e) => {
-          console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-          this.$router.push({ name: 'login' })
-        })
-      },
-      findChildUrl (arr) {
-        arr.forEach((item, index) => {
-          if (index === 0) {
-            if (item.list && item.list.length) {
-              this.findChildUrl(item.list)
-            } else {
-              this.defaultPageUrl = item.url.replace('/', '-')
-            }
-          }
         })
       },
       // 退出
@@ -241,8 +202,15 @@
           })
         }).catch(() => {})
       },
-      applyPermission () { // 申请租户权限
-
+      gotoHome () {
+        if (this.$route.name === 'home') return
+        this.$router.push({ name: 'home' })
+        location.reload()
+      },
+      applyPermission () { // 申请租户权限 直接进入“我的申请”页面
+        this.$store.dispatch('common/getNavData', 407).then(() => {
+          this.$store.dispatch('common/getMenuData', 'apply')
+        })
       }
     }
   }

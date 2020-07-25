@@ -25,7 +25,6 @@
     <el-table
       :data="dataList"
       v-loading="dataListLoading"
-      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       border
       style="width: 100%;">
       <el-table-column
@@ -170,10 +169,10 @@
           // name: this.dataForm.name
         }).then(({data}) => {
           this.dataList = treeDataTranslate(data.data, 'menuId')
-          // this.$nextTick(() => {
-          //   document.getElementsByClassName('el-icon-caret-right')[0].click()
-          //   document.getElementsByClassName('el-icon-caret-right')[1].click()
-          // })
+          this.$nextTick(() => {
+            document.getElementsByClassName('el-icon-caret-right')[0].click()
+            // document.getElementsByClassName('el-icon-caret-right')[1].click()
+          })
           this.dataListLoading = false
         })
       },

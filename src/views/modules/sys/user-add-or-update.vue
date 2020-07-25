@@ -70,7 +70,7 @@
           <el-radio :label="0" v-model="dataForm.flag">正常</el-radio>
           <el-radio :label="1" v-model="dataForm.flag">冻结</el-radio>
         </el-form-item>
-        <!-- <el-form-item label="备注">
+        <el-form-item label="备注">
           <el-input
             type="textarea"
             :rows="4"
@@ -79,7 +79,7 @@
             show-word-limit
             v-model="dataForm.remark">
           </el-input>
-        </el-form-item> -->
+        </el-form-item>
       </el-form>
     </div>
     <span slot="footer" class="dialog-footer">
@@ -119,6 +119,7 @@
           tenantIds: [],
           roleIds: [],
           systemPlateId: '',
+          remark: '',
           // dataPermission: 'MaxCompute',
           flag: 0
         },
@@ -172,6 +173,7 @@
             this.dataForm.tenantIds = data.user.tenantIds || []
             this.dataForm.roleIds = data.user.roleIds || []
             this.dataForm.flag = data.user.user.flag
+            this.dataForm.remark = data.user.user.remark
             if (data.user.oaUserMenus && data.user.oaUserMenus.systemPlateId) {
               this.dataForm.systemPlateId = data.user.oaUserMenus.systemPlateId
             }
@@ -277,6 +279,7 @@
               'mcAccount': this.dataForm.mcAccount,
               'tenantIds': this.dataForm.tenantIds,
               'roleIds': this.dataForm.roleIds,
+              'remark': this.dataForm.remark,
               'oaUserMenus': {
                 'systemPlateId': this.dataForm.systemPlateId,
                 'menuIdList': menuIdList

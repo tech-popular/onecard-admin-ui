@@ -36,7 +36,7 @@
     <!-- 主入口标签页 e -->
     <el-card v-else :body-style="siteContentViewHeight">
       <keep-alive>
-        <router-view v-if="isRouterAlive" />
+        <router-view />
       </keep-alive>
     </el-card>
   </main>
@@ -76,6 +76,7 @@
     },
     mounted () {
       this.mainTabs = this.mainTabs.filter(item => item.name === this.mainTabsActiveName)
+      console.log(123)
     },
     methods: {
       // tabs, 选中tab

@@ -10,7 +10,7 @@
       :props="menuListTreeProps"
       node-key="menuId"
       ref="menuListTree"
-      :default-expand-all="false"
+      :default-expanded-keys="defaultExpandArr"
       :filter-node-method="filterNode"
     >
     </el-tree>
@@ -37,6 +37,17 @@
     watch: {
       filterText (val) {
         this.$refs.menuListTree.filter(val)
+      }
+    },
+    computed: {
+      defaultExpandArr () {
+        let arr = []
+        if (this.menuList.length) {
+          this.menuList.forEach((item, index) => {
+            arr.push(item.menuId)
+          })
+        }
+        return arr
       }
     },
     methods: {

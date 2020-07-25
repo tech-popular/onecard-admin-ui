@@ -118,6 +118,7 @@
       getMenuList () { // 获取版块下的菜单
         getMenuList(this.dataForm.systemPlateId).then(({data}) => {
           this.menuList = treeDataTranslate(data, 'menuId')
+          console.log(this.menuList)
           this.$nextTick(() => {
             this.loadFlag = false
             this.loadMenuFlag = false

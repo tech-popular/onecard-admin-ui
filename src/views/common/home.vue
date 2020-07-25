@@ -64,13 +64,13 @@
           <el-row>
             <h4><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“系统管理”版块</span></h4>
             <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
-            <el-col :span="12" v-for="(item, index) in plateList" :key="index">
+            <el-col :span="12" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)" style="cursor: pointer">
               <el-card :body-style="{ padding: '0px' }" style="margin:5px">
                 <img width="100%" height="155px" :src="item.img">
                 <el-row style="padding:10px">
                   <el-col :span="12" style="line-height: 38px;"><span>{{item.name}}</span></el-col>
                   <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                    <el-button type="primary" icon="el-icon-right" size="mini" circle @click="gotoHandle(item)"></el-button>
+                    <el-button type="primary" icon="el-icon-right" size="mini" circle ></el-button>
                   </el-col>
                 </el-row>
               </el-card>
@@ -86,15 +86,25 @@
               <el-button type="primary" @click="dialogVisible = false">确定</el-button>
             </span>
           </el-dialog>
+          <el-dialog
+            title="提示"
+            :visible.sync="dialogPermissionVisible"
+            width="30%"
+            >
+            <span>该用户没有权限，请自行前往“授权管理”中<a href="javascript:;" style="color:#2093f7" @click="applyPermission">申请</a></span>
+            <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="dialogPermissionVisible = false">确定</el-button>
+            </span>
+          </el-dialog>
         </el-card>
       </el-col>
     </el-row>
   </div>
 </template>
-
 <script>
+import watermark from '@/utils/watermark'
 import MainNavbar from '../main-navbar'
-import { getPlateList, getNavList, getDownNoButtonMenu } from '@/api/sys/menu'
+import { getPlateList } from '@/api/sys/menu'
 export default {
   components: { MainNavbar },
   data () {
@@ -102,8 +112,8 @@ export default {
     return {
       value: new Date(),
       dataHoste: '',
-      userPermisson: true, // 用户是否有权限
       dialogVisible: false,
+      dialogPermissionVisible: false,
       defaultPageUrl: '',
       plateList: [],
       allSystemData: [
@@ -143,12 +153,26 @@ export default {
       get () { return this.$store.state.common.sidebarLayoutSkin },
       set (val) { this.$store.commit('common/updateSidebarLayoutSkin', val) }
     },
+    userId: {
+      get () { return this.$store.state.user.id },
+      set (val) { this.$store.commit('user/updateId', val) }
+    },
     userName: {
-      get () { return this.$store.state.user.name }
+      get () { return this.$store.state.user.name },
+      set (val) {
+        this.$store.commit('user/updateName', val)
+        watermark.set(this.$store.state.user.name)
+      }
     },
     createTime: {
-      get () { return this.$store.state.user.datetime }
+      get () { return this.$store.state.user.datetime },
+      set (val) { this.$store.commit('user/createTime', val) }
     }
+  },
+  created () {
+    this.getUserInfo()
+    sessionStorage.setItem('menuList', '[]')
+    sessionStorage.setItem('permissions', '[]')
   },
   mounted () {
     if (!this.$cookie.get('token')) {
@@ -189,67 +213,41 @@ export default {
         }
       })
     },
-    httpNav (id, fn) { // 获取导航
-      getNavList(id).then(({data}) => {
-        if (data && data.code === 0) {
-          sessionStorage.setItem('navList', JSON.stringify(data.menuList || '[]'))
-          sessionStorage.setItem('activeNavIndex', data.menuList[0].menuId)
-          this.httpMenu()
-        } else {
-          sessionStorage.setItem('navList', '[]')
-          this.$message({
-            type: 'error',
-            message: data.msg || '数据异常'
-          })
-        }
-      }).catch((e) => {
-        console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-        this.$router.push({ name: 'login' })
-      })
-    },
-    httpMenu () { // 获取菜单
-      getDownNoButtonMenu(sessionStorage.getItem('activeNavIndex')).then(({data}) => {
-        if (data && data.code === 0) {
-          sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
-          sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
-          this.findChildUrl(data.menuList)
-          this.$router.options.isAddDynamicMenuRoutes = false
-          sessionStorage.setItem('defaultPage', this.defaultPageUrl) // 默认打开第一个页面
-          this.$router.push({ name: this.defaultPageUrl })
-        } else {
-          sessionStorage.setItem('menuList', '[]')
-          sessionStorage.setItem('permissions', '[]')
-        }
-      }).catch((e) => {
-        console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-        this.$router.push({ name: 'login' })
-      })
-    },
-    findChildUrl (arr) {
-      arr.forEach((item, index) => {
-        if (index === 0) {
-          if (item.list && item.list.length) {
-            this.findChildUrl(item.list)
-          } else {
-            this.defaultPageUrl = item.url.replace('/', '-')
-          }
-        }
-      })
-    },
     gotoHandle (item) {
-      if (!this.userPermisson) { // 若无权限时，弹窗提示
+      if (item.menuId === 405 && !sessionStorage.getItem('tenantList').length) { // 若无权限时，弹窗提示
         this.dialogVisible = true
       } else {
         if (item.isRouter) { // 本项目功能时，直接路由跳转
-          console.log(item)
-          this.httpNav(item.menuId)
+          this.$store.dispatch('common/getNavData', item.menuId).then(() => {
+            this.$store.dispatch('common/getMenuData').then((res) => {
+              if (!res.length) { // 若用户角色权限冻结时，数据服务中无内容，则弹窗提示
+                this.dialogPermissionVisible = true
+              }
+            })
+          })
         } else { // 外链系统，进行页面跳转
           window.open(item.url, '_blank')
         }
       }
     },
     applyPermission () { // 跳转到申请权限页面
-      this.$router.push({ name: 'oa-apply' })
+      this.$store.dispatch('common/getNavData', 407).then(() => {
+        this.$store.dispatch('common/getMenuData', 'apply')
+      })
+    },
+    // 获取当前管理员信息
+    getUserInfo () {
+      this.$http({
+        url: this.$http.adornUrl('/sys/user/info'),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.userId = data.user.userId
+          this.userName = data.user.username
+          this.createTime = data.user.createTime
+        }
+      })
     }
   }
 }
