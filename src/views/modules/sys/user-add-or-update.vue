@@ -49,14 +49,14 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="个人权限" prop="systemPlateId">
+        <el-form-item label="个人权限">
           <el-tabs v-model="userPermissionActiveName" type="card">
             <el-tab-pane label="功能权限" name="systemPlateId"></el-tab-pane>
             <!-- <el-tab-pane label="数据权限" name="dataPermission"></el-tab-pane> -->
           </el-tabs>
-          <el-radio-group v-model="dataForm.systemPlateId" @change="funcTypeChange" v-if="userPermissionActiveName === 'systemPlateId'">
+          <!-- <el-radio-group v-model="dataForm.systemPlateId" @change="funcTypeChange" v-if="userPermissionActiveName === 'systemPlateId'">
             <el-radio :label="item.menuId" v-for="(item, index) in plateList" :key="index">{{item.name}}</el-radio>
-          </el-radio-group>
+          </el-radio-group> -->
           <!-- <user-func-permission ref="userFuncPermission" :menu-list="menuList"></user-func-permission> -->
           <!-- <el-radio-group v-model="dataForm.dataPermission" @change="dataTypeChange" v-if="userPermissionActiveName === 'dataPermission'">
             <el-radio label="MaxCompute">MaxCompute</el-radio>
@@ -96,7 +96,7 @@
   import { getTenantList } from '@/api/sys/tenant'
   import { roleSelectList } from '@/api/sys/role'
   import { getUserInfoById, saveUserInfo, updateUserInfo } from '@/api/sys/user'
-  import { getPlateList, getMenuList } from '@/api/sys/menu'
+  import { getMenuAll } from '@/api/sys/menu'
   // import userDataPermission from './user-data-permission'
   export default {
     components: { userPermissionTree },
@@ -118,7 +118,7 @@
           department: '',
           tenantIds: [],
           roleIds: [],
-          systemPlateId: '',
+          // systemPlateId: '',
           remark: '',
           // dataPermission: 'MaxCompute',
           flag: 0
@@ -155,7 +155,8 @@
         this.dataForm.userid = val.userid
         this.getTenantList()
         this.getRoleSelectList()
-        this.getPlateList()
+        // this.getPlateList()
+        this.getMenuList()
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -174,9 +175,9 @@
             this.dataForm.roleIds = data.user.roleIds || []
             this.dataForm.flag = data.user.user.flag
             this.dataForm.remark = data.user.user.remark
-            if (data.user.oaUserMenus && data.user.oaUserMenus.systemPlateId) {
-              this.dataForm.systemPlateId = data.user.oaUserMenus.systemPlateId
-            }
+            // if (data.user.oaUserMenus && data.user.oaUserMenus.systemPlateId) {
+            //   this.dataForm.systemPlateId = data.user.oaUserMenus.systemPlateId
+            // }
             this.$nextTick(() => {
               if (data.user.oaUserMenus && data.user.oaUserMenus.menuIdList) {
                 var idx = data.user.oaUserMenus.menuIdList.indexOf(this.tempKey)
@@ -212,27 +213,27 @@
           }
         })
       },
-      getPlateList () { // 获取所有版块
-        getPlateList().then(({data}) => {
-          this.plateList = []
-          if (data && data.code === 0) {
-            this.plateList = data.menuList
-            this.dataForm.systemPlateId = this.plateList[0].menuId
-          } else {
-            this.plateList = []
-            this.dataForm.systemPlateId = ''
-            this.$message({
-              type: 'error',
-              message: data.msg || '获取数据异常'
-            })
-          }
-          console.log(this.dataForm.systemPlateId)
-          this.getMenuList()
-        })
-      },
+      // getPlateList () { // 获取所有版块
+      //   getPlateList().then(({data}) => {
+      //     this.plateList = []
+      //     if (data && data.code === 0) {
+      //       this.plateList = data.menuList
+      //       this.dataForm.systemPlateId = this.plateList[0].menuId
+      //     } else {
+      //       this.plateList = []
+      //       this.dataForm.systemPlateId = ''
+      //       this.$message({
+      //         type: 'error',
+      //         message: data.msg || '获取数据异常'
+      //       })
+      //     }
+      //     console.log(this.dataForm.systemPlateId)
+      //     this.getMenuList()
+      //   })
+      // },
       getMenuList () { // 获取版块下的菜单
         this.loadMenuFlag = true
-        getMenuList(this.dataForm.systemPlateId).then(({data}) => {
+        getMenuAll().then(({data}) => {
           this.menuList = treeDataTranslate(data, 'menuId')
           this.getUserInfo()
           this.$nextTick(() => {
@@ -241,10 +242,10 @@
         })
       },
       // 功能权限切换系统
-      funcTypeChange (val) {
-        console.log(val)
-        this.getMenuList()
-      },
+      // funcTypeChange (val) {
+      //   console.log(val)
+      //   this.getMenuList()
+      // },
       // 数据权限切换系统
       dataTypeChange (val) {
         console.log(val)
@@ -281,7 +282,7 @@
               'roleIds': this.dataForm.roleIds,
               'remark': this.dataForm.remark,
               'oaUserMenus': {
-                'systemPlateId': this.dataForm.systemPlateId,
+                // 'systemPlateId': this.dataForm.systemPlateId,
                 'menuIdList': menuIdList
               },
               'flag': this.dataForm.flag

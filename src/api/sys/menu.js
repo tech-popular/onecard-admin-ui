@@ -9,3 +9,4 @@ export const getSelectDown = () => httpGet(da + 'sys/menu/selectDown') // 级联
 export const getSelectUp = id => httpGet(da + `sys/menu/selectUp/${id}`)
 export const getMenuInfo = id => httpGet(da + `sys/menu/info/${id}`)
 export const getMenuList = id => httpGet(da + `sys/menu/menuList/${id}`) // 板块下的所有目录菜单-入参板块id
+export const getMenuAll = () => httpGet(da + `sys/menu/selectAllMenuList`) // 获取所有菜单，包含版块导航菜单按钮

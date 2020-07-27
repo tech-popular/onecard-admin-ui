@@ -9,10 +9,10 @@
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="dataForm.roleName" placeholder="角色名称"></el-input>
         </el-form-item>
-        <el-form-item label="菜单权限" prop="systemPlateId">
-          <el-radio-group v-model="dataForm.systemPlateId" @change="paneTypeChange">
+        <el-form-item label="菜单权限">
+          <!-- <el-radio-group v-model="dataForm.systemPlateId" @change="paneTypeChange">
             <el-radio :label="item.menuId" v-for="(item, index) in plateList" :key="index">{{item.name}}</el-radio>
-          </el-radio-group>
+          </el-radio-group> -->
           <div v-loading="loadMenuFlag">
             <user-permission-tree ref="userPermissionTree" :menu-list="menuList"></user-permission-tree>
           </div>
@@ -43,7 +43,7 @@
 <script>
   import { treeDataTranslate } from '@/utils'
   import userPermissionTree from './user-permission-tree'
-  import { getPlateList, getMenuList } from '@/api/sys/menu'
+  import { getMenuAll } from '@/api/sys/menu'
   import { getRoleInfo, updateRoleInfo, saveRoleInfo } from '@/api/sys/role'
   export default {
     components: { userPermissionTree },
@@ -59,13 +59,13 @@
           id: 0,
           roleName: '',
           remark: '',
-          systemPlateId: '',
+          // systemPlateId: '',
           flag: 0
         },
         dataRule: {
-          systemPlateId: [
-            { required: true, message: '请选择', trigger: 'change' }
-          ],
+          // systemPlateId: [
+          //   { required: true, message: '请选择', trigger: 'change' }
+          // ],
           roleName: [
             { required: true, message: '角色名称不能为空', trigger: 'blur' }
           ],
@@ -84,10 +84,11 @@
           this.dataForm.roleName = ''
           this.dataForm.flag = 0
           this.dataForm.remark = ''
-          this.dataForm.systemPlateId = ''
+          // this.dataForm.systemPlateId = ''
           this.menuList = []
           this.plateList = []
-          this.getPlateList()
+          // this.getPlateList()
+          this.getMenuList()
         } else {
           this.dataForm.id = val.roleId
           this.getRoleInfo()
@@ -98,25 +99,25 @@
           this.$refs.userPermissionTree.$refs.menuListTree.setCheckedKeys([])
         })
       },
-      getPlateList () { // 获取所有版块
-        getPlateList().then(({data}) => {
-          this.plateList = []
-          if (data && data.code === 0) {
-            this.plateList = data.menuList
-            this.dataForm.systemPlateId = this.plateList[0].menuId
-          } else {
-            this.plateList = []
-            this.dataForm.systemPlateId = ''
-            this.$message({
-              type: 'error',
-              message: data.msg || '获取数据异常'
-            })
-          }
-          this.getMenuList()
-        })
-      },
+      // getPlateList () { // 获取所有版块
+      //   getPlateList().then(({data}) => {
+      //     this.plateList = []
+      //     if (data && data.code === 0) {
+      //       this.plateList = data.menuList
+      //       this.dataForm.systemPlateId = this.plateList[0].menuId
+      //     } else {
+      //       this.plateList = []
+      //       this.dataForm.systemPlateId = ''
+      //       this.$message({
+      //         type: 'error',
+      //         message: data.msg || '获取数据异常'
+      //       })
+      //     }
+      //     this.getMenuList()
+      //   })
+      // },
       getMenuList () { // 获取版块下的菜单
-        getMenuList(this.dataForm.systemPlateId).then(({data}) => {
+        getMenuAll().then(({data}) => {
           this.menuList = treeDataTranslate(data, 'menuId')
           console.log(this.menuList)
           this.$nextTick(() => {
@@ -131,20 +132,21 @@
             this.dataForm.roleName = data.role.roleName
             this.dataForm.remark = data.role.remark
             this.dataForm.flag = data.role.flag
-            this.dataForm.systemPlateId = data.role.systemPlateId
+            // this.dataForm.systemPlateId = data.role.systemPlateId
             var idx = data.role.menuIdList.indexOf(this.tempKey)
             if (idx !== -1) {
               data.role.menuIdList.splice(idx, data.role.menuIdList.length - idx)
             }
             this.$refs.userPermissionTree.$refs.menuListTree.setCheckedKeys(data.role.menuIdList)
           }
-          this.getPlateList()
+          // this.getPlateList()
+          this.getMenuList()
         })
       },
-      paneTypeChange (val) { // 切换系统时
-        this.loadMenuFlag = true
-        this.getMenuList()
-      },
+      // paneTypeChange (val) { // 切换系统时
+      //   this.loadMenuFlag = true
+      //   this.getMenuList()
+      // },
       // 表单提交
       dataFormSubmit () {
         this.enable = true
@@ -161,7 +163,7 @@
             url({
               'roleId': this.dataForm.id || undefined,
               'roleName': this.dataForm.roleName,
-              'systemPlateId': this.dataForm.systemPlateId,
+              // 'systemPlateId': this.dataForm.systemPlateId,
               'remark': this.dataForm.remark,
               'flag': this.dataForm.flag,
               'menuIdList': menuIdList

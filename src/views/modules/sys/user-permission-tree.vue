@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-input
-      placeholder="搜索"
+      placeholder="可输入关键字进行搜索"
       v-model="filterText">
     </el-input>
     <el-tree
@@ -45,6 +45,9 @@
         if (this.menuList.length) {
           this.menuList.forEach((item, index) => {
             arr.push(item.menuId)
+            item.children.forEach((citem, cindex) => {
+              arr.push(citem.menuId)
+            })
           })
         }
         return arr
