@@ -1,11 +1,4 @@
 <template>
-  <!-- <el-dialog
-    :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增/编辑计算任务'"
-    :modal-append-to-body="false"
-    :append-to-body="true"
-    :close-on-click-modal="false"
-    :visible.sync="visible"
-  > -->
   <el-drawer
     :append-to-body="false"
     :visible.sync="visible"
@@ -19,23 +12,23 @@
       <h3>作业信息<span>最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
         <el-form-item label="任务名称" prop="taskName">
-          <el-input v-model="dataForm.taskName" placeholder="超时时间" />
+          <el-input v-model="dataForm.taskName" placeholder="任务名称" />
         </el-form-item>
         <el-form-item label="任务ID" prop="taskId">
           <el-input v-model="dataForm.taskId" placeholder="任务ID" disabled />
         </el-form-item>
-        <el-form-item label="所属属性" prop="taskProperty">
-          <el-select v-model="dataForm.taskProperty" placeholder="请选择偏移量重置机制">
+        <el-form-item label="所属系统" prop="taskSys">
+          <el-select v-model="dataForm.taskSys" placeholder="所属系统">
             <el-option label="earliest" value="earliest"></el-option>
             <el-option label="latest" value="latest"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="任务描述" prop="remark">
-          <el-input type="textarea" v-model="dataForm.remark" placeholder="kafka地址" />
+          <el-input type="textarea" v-model="dataForm.remark" placeholder="任务描述" />
         </el-form-item>
       </el-form>
       <div class="btn-code-continue">
-        <el-button type="success">代码连贯模式</el-button>
+        <el-button type="success" @click="mergeSql">代码连贯模式</el-button>
       </div>
       <div class="work-content" v-for="(item, index) in workForm" :key="index">
         <el-form :model="item" :rules="dataRule" ref="workForm" label-width="120px">
@@ -71,21 +64,23 @@
             </span>
           </el-form-item>
           <el-form-item label="作业描述" prop="workDesc">
-            <el-input type="textarea" v-model="workForm.workDesc" placeholder="kafka地址" />
+            <el-input type="textarea" v-model="item.workDesc" placeholder="kafka地址" />
           </el-form-item>
-          <el-form-item prop="sql" label="作业语句">
-            <codemirror
-              ref="mycode"
-              :value="workForm.sql"
-              :options="cmOptions"
-              @changes="changes"
-              class="code"
-              style="border:1px solid #dcdfe6; border-radius: 4px;"
-            ></codemirror>
+          <el-form-item prop="sql" label="作业语句" :ref="'mycode-' + index">
+            <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
+              <codemirror
+                v-model="item.sql"
+                :options="cmOptions"
+                @changes="changes(item.sql, 'mycode-' + index)"
+                class="code"
+                style="padding-bottom: 0"
+              ></codemirror>
+              <p style="text-align: right;position:absolute;bottom:0">变动行数：0行</p>
+            </div>
           </el-form-item>
           <div style="margin-bottom: 10px; text-align: right;">
-            <el-button type="primary">新增</el-button>
-            <el-button type="danger">删除</el-button>
+            <el-button type="primary" @click="addWork">新增</el-button>
+            <el-button type="danger" @click="deleteWork(index)">删除</el-button>
           </div>
         </el-form>
       </div>
@@ -94,6 +89,22 @@
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
+    <el-dialog
+      title="代码连贯查看"
+      :visible.sync="mergeCodeVisible"
+      :modal-append-to-body="false"
+      :close-on-click-modal="false"
+      :append-to-body="true"
+      width="50%"
+    >
+      <codemirror
+        v-model="allSql"
+        :options="allSqlOptions"
+        @changes="changes"
+        class="code"
+        style="border:1px solid #dcdfe6; border-radius: 4px;"
+      ></codemirror>
+    </el-dialog>
   </el-drawer>
 </template>
 
@@ -117,21 +128,14 @@ export default {
   data () {
     return {
       visible: false,
+      mergeCodeVisible: false,
       dataForm: {
         taskName: '',
         taskId: '',
-        taskProperty: '',
+        taskSys: '',
         remark: ''
       },
       workForm: [
-        {
-          workIndex: 1,
-          workType: '',
-          dataSource: '',
-          account: '',
-          workDesc: '',
-          sql: ''
-        },
         {
           workIndex: 1,
           workType: '',
@@ -146,8 +150,8 @@ export default {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
         ],
-        taskProperty: [
-          { required: true, message: '请选择任务属性', trigger: 'change' }
+        taskSys: [
+          { required: true, message: '请选择所属系统', trigger: 'change' }
         ],
         workIndex: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
@@ -162,7 +166,7 @@ export default {
           { required: true, message: '请选择帐户', trigger: 'change' }
         ],
         sql: [
-          { required: true, message: '请输入任务语句', trigger: 'blur' }
+          { required: true, message: '请输入任务语句', trigger: 'change' }
         ]
       },
       options: [{
@@ -188,6 +192,20 @@ export default {
         }]
       }],
       cmOptions: {
+        mode: 'text/x-mariadb',
+        indentWithTabs: true,
+        smartIndent: true,
+        lineNumbers: true,
+        line: true,
+        matchBrackets: true,
+        // autofocus: true,
+        extraKeys: { Ctrl: 'autocomplete' }, // 自定义快捷键
+        hintOptions: {
+          tables: {}
+        }
+      },
+      allSql: '',
+      allSqlOptions: {
         mode: 'text/x-mariadb',
         indentWithTabs: true,
         smartIndent: true,
@@ -224,33 +242,73 @@ export default {
     handleChange (val) {
       console.log(val)
     },
-    changes (val) {
-      console.log(val)
+    mergeSql () { // 代码连贯操作
+      this.mergeCodeVisible = true
+    },
+    changes (val, ref) { // 内容更新时，不为空时将报错信息去除
+      if (val !== '') {
+        this.$refs[ref][0].clearValidate()
+      }
+      console.log(val, val.match(/\n/ig).length)
+    },
+    addWork () { // 增加一条作业内容
+      this.workForm.push({
+        workIndex: '',
+        workType: '',
+        dataSource: '',
+        account: '',
+        workDesc: '',
+        sql: ''
+      })
+      this.updateWorkIndex()
+    },
+    deleteWork (index) { // 删除作业内容
+      this.workForm.splice(index, 1)
+      this.updateWorkIndex()
+    },
+    updateWorkIndex () { // 增加或删除时重新排序
+      this.workForm.forEach((item, index) => {
+        item.workIndex = index + 1
+      })
     },
     // 提交
     dataFormSubmit (form) {
+      let flag = true
       this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const dataBody = this.dataForm
-          const dataUpdateId = this.dataForm.id
-          saveorupt(dataBody, dataUpdateId).then(({ data }) => {
-            if (data && data.status === 0) {
-              this.$message({
-                message: '操作成功"',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.visible = false
-                  this.$emit('refreshDataList')
-                  this.$refs['dataForm'].resetFields()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
+        if (!valid) {
+          flag = false
         }
       })
+      this.$refs['workForm'].forEach(item => {
+        item.validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+      })
+      console.log(1, this.dataForm, this.workForm)
+      if (flag) {
+        console.log(this.dataForm, this.workForm)
+        console.log(saveorupt)
+        // const dataBody = this.dataForm
+        // const dataUpdateId = this.dataForm.id
+        // saveorupt(dataBody, dataUpdateId).then(({ data }) => {
+        //   if (data && data.status === 0) {
+        //     this.$message({
+        //       message: '操作成功"',
+        //       type: 'success',
+        //       duration: 1500,
+        //       onClose: () => {
+        //         this.visible = false
+        //         this.$emit('refreshDataList')
+        //         this.$refs['dataForm'].resetFields()
+        //       }
+        //     })
+        //   } else {
+        //     this.$message.error(data.msg)
+        //   }
+        // })
+      }
     }
   }
 }
