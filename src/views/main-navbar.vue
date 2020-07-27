@@ -206,7 +206,7 @@
         console.log('home', this.$route)
         if (this.$route.name === 'home') return
         this.$router.replace({ name: 'home' })
-        location.reload()
+        // location.reload()
       },
       applyPermission () { // 申请租户权限 直接进入“我的申请”页面
         this.$store.dispatch('common/getNavData', 407).then(() => {
