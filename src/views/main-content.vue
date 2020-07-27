@@ -76,7 +76,7 @@
     },
     mounted () {
       this.mainTabs = this.mainTabs.filter(item => item.name === this.mainTabsActiveName)
-      console.log(123)
+      console.log(123, this.$route)
     },
     methods: {
       // tabs, 选中tab

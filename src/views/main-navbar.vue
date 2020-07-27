@@ -203,6 +203,7 @@
         }).catch(() => {})
       },
       gotoHome () {
+        console.log('home', this.$route)
         if (this.$route.name === 'home') return
         this.$router.push({ name: 'home' })
         location.reload()
