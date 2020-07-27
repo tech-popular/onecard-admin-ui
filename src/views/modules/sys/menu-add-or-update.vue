@@ -56,9 +56,9 @@
           </el-col>
         </el-row>
       </el-form-item>
-      <el-form-item label="开放申请:" prop="isOpenApply" v-if="dataForm.type === 1">
-        <el-radio v-model="dataForm.isOpenApply" :label='1'>是</el-radio>
-        <el-radio v-model="dataForm.isOpenApply" :label='0'>否</el-radio>
+      <el-form-item label="是否开放OA申请:" prop="isAllowAuthor" v-if="dataForm.type === 1">
+        <el-radio v-model="dataForm.isAllowAuthor" :label='1'>启用</el-radio>
+        <el-radio v-model="dataForm.isAllowAuthor" :label='0'>禁用</el-radio>
       </el-form-item>
       <el-form-item label="状态:" prop="status" v-if="dataForm.type !== 2">
         <el-radio v-model="dataForm.status" :label='1'>显示</el-radio>
@@ -67,7 +67,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()" :disabled="enable">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()" :disabled="submitFlag">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -86,7 +86,7 @@
       }
       return {
         visible: false,
-        enable: false,
+        submitFlag: false,
         menuParentList: [], // 保留选中的级联中完整内容
         dataForm: {
           id: 0,
@@ -100,8 +100,8 @@
           mark: '',
           icon: '',
           iconList: [],
-          isOpenApply: 1,
-          status: 1
+          status: 1,
+          isAllowAuthor: 1
         },
         dataRule: {
           name: [
@@ -116,7 +116,7 @@
           icon: [
             { required: true, message: '请选择图标', trigger: 'change' }
           ],
-          isOpenApply: [
+          isAllowAuthor: [
             { required: true, message: '请选择开放申请', trigger: 'change' }
           ],
           status: [
@@ -197,7 +197,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.enable = true
+            this.submitFlag = true
             this.$http({
               url: this.$http.adornUrl(`/sys/menu/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
@@ -212,7 +212,8 @@
                 'orderNum': this.dataForm.orderNum,
                 'icon': this.dataForm.icon,
                 'status': this.dataForm.status,
-                'menuParentList': this.menuParentList
+                'menuParentList': this.menuParentList,
+                'isAllowAuthor': this.dataForm.isAllowAuthor
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -223,12 +224,12 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
-                    this.enable = false
+                    this.submitFlag = false
                   }
                 })
               } else {
+                this.submitFlag = false
                 this.$message.error(data.msg)
-                this.enable = false
               }
             })
           }

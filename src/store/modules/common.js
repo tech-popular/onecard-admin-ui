@@ -67,15 +67,11 @@ export default {
             resolve()
           } else {
             sessionStorage.setItem('navList', '[]')
-            this.$message({
-              type: 'error',
-              message: data.msg || '数据异常'
-            })
+            Message.error(data.msg || '数据异常')
           }
         }).catch((e) => {
           Message.error('数据获取失败')
           console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-          // router.push({ name: 'login' })
         })
       })
     },

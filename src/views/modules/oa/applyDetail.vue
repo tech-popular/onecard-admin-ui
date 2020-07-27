@@ -29,16 +29,6 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-        <!-- <el-form-item label="申请权限">
-          <el-checkbox-group v-model="checkedCities">
-            <el-checkbox
-              disabled
-              v-for="(item) in detalList.applyAuthTypeList"
-              :label="item.name"
-              :key="item.id"
-            >{{item.name}}</el-checkbox>
-          </el-checkbox-group>
-        </el-form-item> -->
         <el-form-item label="申请人姓名">
           <span>{{detalList.applicantName}}</span>
         </el-form-item>
@@ -51,19 +41,26 @@
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <!-- <el-form-item label="本次申请默认审批人">
-          <el-tag
-            style="margin-left:10px;"
-            v-for="tag in detalList.defaultApproverList"
-            :key="tag.name"
-            :type="tag.name"
-          >{{tag.name}}</el-tag>
-        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
       </el-form>
 
+      <el-form label-width="160px" :model="detalList" v-else-if="quanxian === '租户授权'">
+          <el-form-item label="选择租户" prop="tenantIds">
+            <el-select v-model="detalList.tenantIds" multiple placeholder="请选择" style="width:100%" disabled>
+              <el-option
+                v-for="item in tenantList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="申请理由" prop="reason">
+            <el-input type="textarea" v-model="detalList.reason" disabled></el-input>
+          </el-form-item>
+      </el-form>
       <el-form label-width="160px" v-else>
         <el-form-item label="标题">
           <span>{{detalList.title}}</span>
@@ -101,26 +98,21 @@
         <el-form-item label="maxcomputer账号">
           <span>{{detalList.account}}</span>
         </el-form-item>
+        <el-form-item label="accessKeyId">
+          <span>{{detalList.accessKeyId}}</span>
+        </el-form-item>
+        <el-form-item label="accessKeySecert">
+          <span>{{detalList.accessKeySecert}}</span>
+        </el-form-item>
         <el-form-item label="申请人姓名">
           <span>{{detalList.applicantName}}</span>
         </el-form-item>
-        <!-- <el-form-item label="默认所属部门">
-          <span>{{detalList.department}}</span>
-        </el-form-item> -->
         <el-form-item label="申请人手机号">
           <span>{{detalList.applicantTel}}</span>
         </el-form-item>
         <el-form-item label="申请人邮箱">
           <span>{{detalList.applicantEmail}}</span>
         </el-form-item>
-        <!-- <el-form-item label="本次申请默认审批人">
-          <el-tag
-            style="margin-left:10px;"
-            v-for="tag in detalList.defaultApproverList"
-            :key="tag.name"
-            :type="tag.name"
-          >{{tag.name}}</el-tag>
-        </el-form-item> -->
         <el-form-item label="申请理由">
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
@@ -129,7 +121,7 @@
 </template>
 
 <script>
-import {lookAccout} from '@/api/oa/apply'
+import {lookAccout, tenantInif} from '@/api/oa/apply'
 export default {
   data () {
     return {
@@ -138,7 +130,8 @@ export default {
       checkedCities: [],
       quanxian: '',
       sysment: [],
-      systemListcarrent: ''
+      systemListcarrent: '',
+      tenantList: []
     }
   },
   components: {},
@@ -147,8 +140,15 @@ export default {
       this.quanxian = val.applyType
       this.dialogVisible = true
       lookAccout(val.id).then(({data}) => {
-        this.detalList = data.data
+        this.detalList = []
+        if (data.status * 1 !== 1) {
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
         if (this.quanxian === '账号权限') {
+          this.detalList = data.data
           let a = [{selected: true}]
           let b = this.detalList.systemList
           let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
@@ -156,7 +156,10 @@ export default {
           this.sysment.map(item => {
             this.systemListcarrent = item.value
           })
+        } else if (this.quanxian === '租户授权') {
+          this.detalList = data.data
         } else {
+          this.detalList = data.data
           let c = [{selected: true}]
           let d = this.detalList.applyAuthTypeList
           let arr2 = [...d].filter(x => [...c].some(y => y.selected === x.selected))
@@ -166,11 +169,17 @@ export default {
           })
         }
       })
+      this.getTenantList()
     },
-
+    getTenantList () {
+      tenantInif().then(({ data }) => {
+        this.tenantList = data.data
+      })
+    },
     // 弹窗状态
     handleClose () {
       this.dialogVisible = false
+      this.tenantList = []
     }
   }
 }

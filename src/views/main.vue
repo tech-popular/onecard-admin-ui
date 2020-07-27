@@ -7,7 +7,6 @@
     <template v-if="!loading">
       <main-navbar />
       <main-sidebar />
-      1111111111111111111111111111
       <div class="site-content__wrapper" :style="{ 'min-height': documentClientHeight + 'px' }">
         <main-content />
       </div>
@@ -20,7 +19,7 @@
   import MainSidebar from './main-sidebar'
   import MainContent from './main-content'
   import MainContentNav from './main-content-nav'
-
+  import watermark from '@/utils/watermark'
   export default {
     data () {
       return {
@@ -44,6 +43,9 @@
     },
     mounted () {
       this.resetDocumentClientHeight()
+      this.$store.dispatch('user/getUserInfo').then((username) => {
+        watermark.set(username)
+      })
     },
     methods: {
       // 重置窗口可视高度

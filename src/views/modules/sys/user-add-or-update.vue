@@ -95,7 +95,7 @@
   import userPermissionTree from './user-permission-tree'
   import { getTenantList } from '@/api/sys/tenant'
   import { roleSelectList } from '@/api/sys/role'
-  import { getUserInfo, saveUserInfo, updateUserInfo } from '@/api/sys/user'
+  import { getUserInfoById, saveUserInfo, updateUserInfo } from '@/api/sys/user'
   import { getPlateList, getMenuList } from '@/api/sys/menu'
   // import userDataPermission from './user-data-permission'
   export default {
@@ -163,7 +163,7 @@
         })
       },
       getUserInfo () {
-        getUserInfo(this.dataForm.id).then(({data}) => {
+        getUserInfoById(this.dataForm.id).then(({data}) => {
           if (data && data.code === 0) {
             this.dataForm.name = data.user.user.name
             this.dataForm.userName = data.user.user.username

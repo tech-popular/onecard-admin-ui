@@ -116,6 +116,7 @@ export default {
       dialogPermissionVisible: false,
       defaultPageUrl: '',
       plateList: [],
+      userName: '',
       allSystemData: [
         {
           isRouter: true,
@@ -152,48 +153,52 @@ export default {
     sidebarLayoutSkin: {
       get () { return this.$store.state.common.sidebarLayoutSkin },
       set (val) { this.$store.commit('common/updateSidebarLayoutSkin', val) }
-    },
-    userId: {
-      get () { return this.$store.state.user.id },
-      set (val) { this.$store.commit('user/updateId', val) }
-    },
-    userName: {
-      get () { return this.$store.state.user.name },
-      set (val) {
-        this.$store.commit('user/updateName', val)
-        watermark.set(this.$store.state.user.name)
-      }
-    },
-    createTime: {
-      get () { return this.$store.state.user.datetime },
-      set (val) { this.$store.commit('user/createTime', val) }
     }
+    // userId: {
+    //   get () { return this.$store.state.user.id },
+    //   set (val) { this.$store.commit('user/updateId', val) }
+    // },
+    // userName: {
+    //   get () { return this.$store.state.user.name },
+    //   set (val) {
+    //     this.$store.commit('user/updateName', val)
+    //     watermark.set(this.$store.state.user.name)
+    //   }
+    // },
+    // createTime: {
+    //   get () { return this.$store.state.user.datetime },
+    //   set (val) { this.$store.commit('user/createTime', val) }
+    // }
   },
   created () {
-    this.getUserInfo()
+    // this.getUserInfo()
     sessionStorage.setItem('menuList', '[]')
     sessionStorage.setItem('permissions', '[]')
+    this.$store.dispatch('user/getUserInfo').then((username) => {
+      watermark.set(username)
+      this.userName = username
+    })
   },
   mounted () {
     if (!this.$cookie.get('token')) {
       this.$router.push({ name: 'login' })
     }
     this.getPlateList()
-    var date1 = this.createTime.replace(/-/g, '/') // 开始时间
-    var date2 = new Date() // 结束时间
-    var date3 = date2.getTime() - new Date(date1).getTime() // 时间差的毫秒数
-    // 计算出相差天数
-    var days = Math.floor(date3 / (24 * 3600 * 1000))
-    // 计算出小时数
-    var leave1 = date3 % (24 * 3600 * 1000) // 计算天数后剩余的毫秒数
-    var hours = Math.floor(leave1 / (3600 * 1000))
-    // 计算相差分钟数
-    var leave2 = leave1 % (3600 * 1000) // 计算小时数后剩余的毫秒数
-    var minutes = Math.floor(leave2 / (60 * 1000))
-    // 计算相差秒数
-    var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
-    var seconds = Math.round(leave3 / 1000)
-    this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
+    // var date1 = this.createTime.replace(/-/g, '/') // 开始时间
+    // var date2 = new Date() // 结束时间
+    // var date3 = date2.getTime() - new Date(date1).getTime() // 时间差的毫秒数
+    // // 计算出相差天数
+    // var days = Math.floor(date3 / (24 * 3600 * 1000))
+    // // 计算出小时数
+    // var leave1 = date3 % (24 * 3600 * 1000) // 计算天数后剩余的毫秒数
+    // var hours = Math.floor(leave1 / (3600 * 1000))
+    // // 计算相差分钟数
+    // var leave2 = leave1 % (3600 * 1000) // 计算小时数后剩余的毫秒数
+    // var minutes = Math.floor(leave2 / (60 * 1000))
+    // // 计算相差秒数
+    // var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
+    // var seconds = Math.round(leave3 / 1000)
+    // this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
   },
   methods: {
     getPlateList () {
@@ -234,21 +239,21 @@ export default {
       this.$store.dispatch('common/getNavData', 407).then(() => {
         this.$store.dispatch('common/getMenuData', 'apply')
       })
-    },
-    // 获取当前管理员信息
-    getUserInfo () {
-      this.$http({
-        url: this.$http.adornUrl('/sys/user/info'),
-        method: 'get',
-        params: this.$http.adornParams()
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          this.userId = data.user.userId
-          this.userName = data.user.username
-          this.createTime = data.user.createTime
-        }
-      })
     }
+    // 获取当前管理员信息
+    // getUserInfo () {
+    //   this.$http({
+    //     url: this.$http.adornUrl('/sys/user/info'),
+    //     method: 'get',
+    //     params: this.$http.adornParams()
+    //   }).then(({data}) => {
+    //     if (data && data.code === 0) {
+    //       this.userId = data.user.userId
+    //       this.userName = data.user.username
+    //       this.createTime = data.user.createTime
+    //     }
+    //   })
+    // }
   }
 }
 </script>
