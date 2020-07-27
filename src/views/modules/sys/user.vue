@@ -7,6 +7,9 @@
       <el-form-item label="用户名: ">
         <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
       </el-form-item>
+      <el-form-item label="手机号: ">
+        <el-input v-model="dataForm.mobile" placeholder="手机号" clearable></el-input>
+      </el-form-item>
       <el-form-item label="邮箱账号: ">
         <el-input v-model="dataForm.emailList" placeholder="邮箱账号" clearable></el-input>
       </el-form-item>
@@ -17,7 +20,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()" type="primary">查询</el-button>
+        <el-button @click="searchHandle()" type="primary">查询</el-button>
         <el-button @click="resetHandle()" type="default">重置</el-button>
         <!-- <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
         <!-- <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
@@ -140,6 +143,7 @@
         dataForm: {
           userName: '',
           emailList: '',
+          mobile: '',
           name: '',
           status: '-1'
         },
@@ -180,6 +184,7 @@
           'page': this.pageIndex,
           'limit': this.pageSize,
           'username': this.dataForm.userName,
+          'mobile': this.dataForm.mobile,
           'email': this.dataForm.emailList,
           'name': this.dataForm.name,
           'status': this.dataForm.status === '-1' ? '' : this.dataForm.status
@@ -199,9 +204,15 @@
         this.pageIndex = 1
         this.pageSize = 10
         this.dataForm.userName = ''
+        this.dataForm.mobile = ''
         this.dataForm.emailList = ''
         this.dataForm.name = ''
         this.dataForm.status = '-1'
+        this.getDataList()
+      },
+      searchHandle () {
+        this.pageIndex = 1
+        this.pageSize = 10
         this.getDataList()
       },
       // 每页数

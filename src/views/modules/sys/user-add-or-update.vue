@@ -93,8 +93,8 @@
   import { treeDataTranslate } from '@/utils'
   import { checkUserName, checkMobile, ifExistUser } from '@/api/account'
   import userPermissionTree from './user-permission-tree'
-  import { getTenantList } from '@/api/sys/tenant'
-  import { roleSelectList } from '@/api/sys/role'
+  import { selectAllTenantDown } from '@/api/sys/tenant'
+  import { getAllRoleList } from '@/api/sys/role'
   import { getUserInfoById, saveUserInfo, updateUserInfo } from '@/api/sys/user'
   import { getMenuAll } from '@/api/sys/menu'
   // import userDataPermission from './user-data-permission'
@@ -196,7 +196,7 @@
         })
       },
       getTenantList () { // 租户下拉列表
-        getTenantList().then(({data}) => {
+        selectAllTenantDown().then(({data}) => {
           if (data && data.code === 0) {
             this.tenantList = data.data
           } else {
@@ -205,7 +205,7 @@
         })
       },
       getRoleSelectList () { // 功能角色下拉选
-        roleSelectList().then(({data}) => {
+        getAllRoleList().then(({data}) => {
           if (data && data.code === 0) {
             this.funcRoleOptions = data.list
           } else {

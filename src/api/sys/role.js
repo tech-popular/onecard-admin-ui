@@ -7,3 +7,4 @@ export const getRoleInfo = id => httpGet(da + `sys/role/info/${id}`)
 export const updateRoleInfo = params => httpPost(da + `sys/role/update`, params)
 export const saveRoleInfo = params => httpPost(da + `sys/role/save`, params)
 export const roleSelectList = () => httpGet(da + 'sys/role/select') // 角色集合
+export const getAllRoleList = () => httpGet(da + 'sys/role/selectAllRole')

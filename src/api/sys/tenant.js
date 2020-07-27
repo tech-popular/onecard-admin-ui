@@ -1,4 +1,4 @@
-import { httpPost } from '@/api' // , httpGet,httpGetSeries, httpPost, httpPut
+import { httpPost, httpGet } from '@/api' // , httpGet,httpGetSeries, httpPost, httpPut
 // let da = '/permission/'
 let da = '/'
 export const getTenantList = () => httpPost(da + `tenantManage/selectTenantDown`) // 首页租户下拉
@@ -9,3 +9,4 @@ export const getTenantManageInfo = id => httpPost(da + `tenantManage/getTenantMa
 export const deleteTenantManage = id => httpPost(da + `tenantManage/deleteTenantManage`, id) // 删除租户信息
 export const updateTenantManage = params => httpPost(da + `tenantManage/updateTenantManage`, params) // 修改租户信息
 export const addTenantManage = params => httpPost(da + `tenantManage/addTenantManage`, params) // 新增租户信息
+export const selectAllTenantDown = () => httpGet(da + 'tenantManage/selectAllTenantDown')
