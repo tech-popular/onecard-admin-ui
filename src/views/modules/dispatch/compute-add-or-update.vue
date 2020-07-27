@@ -29,12 +29,44 @@
         <el-form-item label="作业序号" prop="consumerName">
           <el-input v-model="dataForm.consumerName" placeholder="消费者名字" />
         </el-form-item>
-        <el-form-item label="所属属性" prop="autoOffsetReset">
-          <el-select v-model="dataForm.autoOffsetReset" placeholder="请选择偏移量重置机制">
+        <el-form-item label="数据源" prop="autoOffsetReset">
+          <el-select v-model="dataForm.autoOffsetReset" placeholder="请选择选择数据源">
             <el-option label="earliest" value="earliest"></el-option>
             <el-option label="latest" value="latest"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="账户" prop="account">
+          <el-select v-model="newValue" placeholder="请选择" @change="handleChange">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option
+                v-for="item in group.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-option-group>
+          </el-select>
+          <span style="color:red;font-size:10px;">
+            （如需配置账户/无账户信息，请前往
+            <router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
+          </span>
+        </el-form-item>
+        <el-form-item label="作业描述" prop="bootstrapServers">
+          <el-input type="textarea" v-model="dataForm.bootstrapServers" placeholder="kafka地址" />
+        </el-form-item>
+        <el-form-item prop="sql" label="作业语句">
+          <codemirror
+            ref="mycode"
+            :value="dataForm.sql"
+            :options="cmOptions"
+            @changes="changes"
+            class="code"
+          ></codemirror>
+        </el-form-item>
+        <div style="margin-bottom: 10px; text-align: right;">
+          <el-button type="primary">新增</el-button>
+          <el-button type="danger">删除</el-button>
+        </div>
       </div>
     </el-form>
 
@@ -47,7 +79,21 @@
 
 <script>
 import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
+import { codemirror } from 'vue-codemirror'
+import 'codemirror/theme/ambiance.css'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/addon/hint/show-hint.css'
+require('codemirror/addon/edit/matchbrackets')
+require('codemirror/addon/selection/active-line')
+require('codemirror/mode/sql/sql')
+require('codemirror/addon/hint/show-hint')
+require('codemirror/addon/hint/sql-hint')
+
 export default {
+  name: 'codeMirror',
+  components: {
+    codemirror
+  },
   data () {
     return {
       visible: false,
@@ -60,14 +106,48 @@ export default {
         groupId: '',
         topic: '',
         version: '',
+        sql: '',
         enableAutoCommit: true
       },
       dataFormValue: '',
       ruleTypeList: [],
-      dataRule: {}
+      dataRule: {},
+      options: [{
+        label: '个人账号',
+        options: [{
+          value: 'Shanghai',
+          label: '个人一'
+        }, {
+          value: 'Beijing',
+          label: '个人二'
+        }]
+      }, {
+        label: '公共账号',
+        options: [{
+          value: 'Chengdu',
+          label: '北京账号'
+        }, {
+          value: 'Shenzhen',
+          label: '上海账号'
+        }, {
+          value: 'Guangzhou',
+          label: '广州账号'
+        }]
+      }],
+      cmOptions: {
+        mode: 'text/x-mariadb',
+        indentWithTabs: true,
+        smartIndent: true,
+        lineNumbers: true,
+        matchBrackets: true,
+        // autofocus: true,
+        extraKeys: { Ctrl: 'autocomplete' }, // 自定义快捷键
+        hintOptions: {
+          tables: {}
+        }
+      }
     }
   },
-  components: {},
   mounted () {
     this.init()
   },
@@ -112,3 +192,10 @@ export default {
   }
 }
 </script>
+<style>
+.codesql {
+  font-size: 11pt;
+  font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+}
+</style>
