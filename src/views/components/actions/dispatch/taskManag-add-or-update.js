@@ -1,10 +1,14 @@
-import { saveorupt, info } from '@/api/lexicon/cacheCleanup'
+import {
+  saveorupt,
+  info
+} from '@/api/lexicon/cacheCleanup'
 import DefaultValue from './components/defaultValue'
 import RoutGoPath from './components/routGoPath'
 
 export const addOrEdotModels = {
-  data () {
+  data() {
     return {
+      width: '70%',
       visible: false,
       // 表单数据
       formData: {},
@@ -13,19 +17,26 @@ export const addOrEdotModels = {
         cacheName: {
           type: DefaultValue,
           label: '任务名称',
-          required: true
+          required: true,
+          layout: 12
         },
         key: {
           type: 'input',
           label: '任务ID',
-          disabled: true
+          disabled: true,
+          layout: 12
         },
         cacheType: {
           type: 'select',
           label: '所属系统',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
@@ -37,18 +48,28 @@ export const addOrEdotModels = {
         dataSources: {
           type: 'select',
           label: '数据来源',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
         dataName: {
           type: 'select',
           label: '数据源名称',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
@@ -70,36 +91,56 @@ export const addOrEdotModels = {
         outputField: {
           type: 'tag',
           label: '输出字段',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
         dataDestination: {
           type: 'select',
           label: '数据去向',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
         dataName2: {
           type: 'select',
           label: '数据源名称',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
         public: {
           type: 'select',
           label: '公共账户',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
@@ -129,9 +170,14 @@ export const addOrEdotModels = {
         issueSrart: {
           type: 'tag',
           label: '下发类型',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         },
@@ -147,9 +193,14 @@ export const addOrEdotModels = {
         stautus: {
           type: 'tag',
           label: '状态',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
           required: true
         }
@@ -159,41 +210,45 @@ export const addOrEdotModels = {
       submitBtn: true,
       editUser: 'lvzhiming',
       editTime: '2020-07-23',
-      options: [
-        {
-          label: 'wode',
-          value: 1
-        }
-      ]
+      options: [{
+        label: 'wode',
+        value: 1
+      }]
     }
   },
   methods: {
-    init (id) {
+    init(id) {
       this.id = id ? id.id : ''
       this.visible = true
       this.$nextTick(() => {
         if (id) {
           console.log(this.submitBtn)
           this.submitBtn = false
-          const dataBody = {id: this.id}
-          info(dataBody).then(({data}) => {
+          const dataBody = {
+            id: this.id
+          }
+          info(dataBody).then(({
+            data
+          }) => {
             this.formData = data.data
           })
         }
       })
     },
-    handleCancel () {
+    handleCancel() {
       this.visible = false
       this.formData = {}
       this.id = ''
     },
-    handleSubmit (data) {
+    handleSubmit(data) {
       this.dataBody = data
       return Promise.resolve()
     },
     // 提交
-    handleSuccess () {
-      saveorupt(this.dataBody).then(({data}) => {
+    handleSuccess() {
+      saveorupt(this.dataBody).then(({
+        data
+      }) => {
         if (data && data.code === 0) {
           this.$message({
             message: '操作成功',

@@ -7,9 +7,12 @@
     @request-success="handleSuccess"
     :title="id ? '查看' : '新增/编辑同步任务'"
     :isShowSubmitBtn="submitBtn"
+    :width="width"
   >
     <el-row :gutter="24" style="margin-bottom: 15px;">
-      <el-col :span="6"><div class="grid-content bg-purple">作业信息</div></el-col>
+      <el-col :span="6">
+        <div class="grid-content bg-purple">作业信息</div>
+      </el-col>
       <el-col :span="18">
         <el-row :gutter="20">
           <el-col :span="10">
@@ -25,8 +28,8 @@
 </template>
 
 <script>
-  import { addOrEdotModels } from '../../components/actions/dispatch/taskManag-add-or-update'
-  export default {
-    mixins: [addOrEdotModels]
-  }
+import { addOrEdotModels } from '../../components/actions/dispatch/taskManag-add-or-update'
+export default {
+  mixins: [addOrEdotModels]
+}
 </script>
