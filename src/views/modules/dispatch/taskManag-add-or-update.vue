@@ -5,7 +5,7 @@
     :request-fn="handleSubmit"
     :visible.sync="visible"
     @request-success="handleSuccess"
-    :title="id ? '查看' : '新增/编辑同步任务'"
+    title="新增/编辑同步任务"
     :isShowSubmitBtn="submitBtn"
     :width="width"
   >

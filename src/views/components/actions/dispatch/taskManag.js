@@ -1,10 +1,41 @@
-import { list, deleted, implement } from '@/api/lexicon/cacheCleanup'
+import {
+  list,
+  deleted,
+  implement
+} from '@/api/lexicon/cacheCleanup'
 export const models = {
-  data () {
-    let type = [{label: '全部', value: 1}, {label: '采集任务', value: 2}, {label: '计算任务', value: 3}, {label: '同步任务', value: 4}]
-    let typeProps = {label: 'label', value: 'value'}
-    let status = [{label: '全部', value: 1}, {label: '启用', value: 2}, {label: '停用', value: 3}]
-    let statusProps = {label: 'label', value: 'value'}
+  data() {
+    let type = [{
+      label: '全部',
+      value: 1
+    }, {
+      label: '采集任务',
+      value: 2
+    }, {
+      label: '计算任务',
+      value: 3
+    }, {
+      label: '同步任务',
+      value: 4
+    }]
+    let typeProps = {
+      label: 'label',
+      value: 'value'
+    }
+    let status = [{
+      label: '全部',
+      value: 1
+    }, {
+      label: '启用',
+      value: 2
+    }, {
+      label: '停用',
+      value: 3
+    }]
+    let statusProps = {
+      label: 'label',
+      value: 'value'
+    }
     return {
       props: {
         multiple: false,
@@ -19,38 +50,39 @@ export const models = {
       dataListLoading: false,
       addOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
+      snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
+      editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
-      operates: [
-        {
+      operates: [{
           id: 1,
           label: '编辑任务',
           type: 'primary',
           method: (id) => {
-            this.implementHandle(id)
-          }
-        },
-        {
-          id: 2,
-          label: '调度配置',
-          type: 'success',
-          method: (id) => {
             this.addOrUpdateHandle(id)
           }
         },
+        // {
+        //   id: 2,
+        //   label: '调度配置',
+        //   type: 'success',
+        //   method: (id) => {
+        //     this.addOrUpdateHandle(id)
+        //   }
+        // },
         {
           id: 3,
           label: '依赖快照',
           type: 'info',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
+          method: (snapshot) => {
+            this.snapshotHandle(snapshot)
           }
         },
         {
           id: 4,
           label: '编辑依赖',
           type: 'warning',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
+          method: (editSnapshot) => {
+            this.editSnapshotHandle(editSnapshot)
           }
         },
         {
@@ -62,8 +94,7 @@ export const models = {
           }
         }
       ],
-      columns: [
-        {
+      columns: [{
           prop: 'id',
           label: '任务ID',
           align: 'center'
@@ -79,7 +110,9 @@ export const models = {
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              props: {type: params.row.cacheType === 0 ? '' : 'warning'} // 组件的props
+              props: {
+                type: params.row.cacheType === 0 ? '' : 'warning'
+              } // 组件的props
             }, params.row.cacheType === 0 ? 'EhCahe' : 'redis')
           }
         },
@@ -99,7 +132,9 @@ export const models = {
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              props: {type: params.row.flag === 1 ? '' : 'warning'} // 组件的props
+              props: {
+                type: params.row.flag === 1 ? '' : 'warning'
+              } // 组件的props
             }, params.row.flag === 1 ? '需要' : '不需要')
           }
         },
@@ -117,27 +152,85 @@ export const models = {
         user: null,
         status: null
       },
-      searchForm: [
-        {type: 'Input', label: '任务ID', prop: 'id', width: '300px', placeholder: '任务ID'},
-        {type: 'Input', label: '任务名称', prop: 'name', width: '300px', placeholder: '请输入名称'},
-        {type: 'Select', label: '任务类型', prop: 'type', width: '300px', options: type, props: typeProps, change: row => '', placeholder: '请选择任务类型'},
-        {type: 'Input', label: '创建人', prop: 'user', width: '300px', placeholder: '创建人'},
-        {type: 'Select', label: '起停状态', prop: 'status', width: '300px', options: status, props: statusProps, change: row => '', placeholder: '请选择起停状态'}
+      searchForm: [{
+          type: 'Input',
+          label: '任务ID',
+          prop: 'id',
+          width: '300px',
+          placeholder: '任务ID'
+        },
+        {
+          type: 'Input',
+          label: '任务名称',
+          prop: 'name',
+          width: '300px',
+          placeholder: '请输入名称'
+        },
+        {
+          type: 'Select',
+          label: '任务类型',
+          prop: 'type',
+          width: '300px',
+          options: type,
+          props: typeProps,
+          change: row => '',
+          placeholder: '请选择任务类型'
+        },
+        {
+          type: 'Input',
+          label: '创建人',
+          prop: 'user',
+          width: '300px',
+          placeholder: '创建人'
+        },
+        {
+          type: 'Select',
+          label: '起停状态',
+          prop: 'status',
+          width: '300px',
+          options: status,
+          props: statusProps,
+          change: row => '',
+          placeholder: '请选择起停状态'
+        }
       ],
-      searchHandle: [
-        {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
-        {label: '重置', type: '', handle: () => { this.resetHandle() }},
+      searchHandle: [{
+          label: '查询',
+          type: 'primary',
+          handle: () => {
+            this.handleSearch()
+          }
+        },
+        {
+          label: '重置',
+          type: '',
+          handle: () => {
+            this.resetHandle()
+          }
+        },
         // {label: '新增采集任务', type: 'primary', handle: () => { this.addOrUpdateHandle() }},
-        {label: '新增同步任务', type: 'warning', handle: () => { this.addOrUpdateHandle() }},
-        {label: '新增计算任务', type: 'info', handle: () => { this.computAddOrUpdateHandle() }}
+        {
+          label: '新增同步任务',
+          type: 'warning',
+          handle: () => {
+            this.addOrUpdateHandle()
+          }
+        },
+        {
+          label: '新增计算任务',
+          type: 'info',
+          handle: () => {
+            this.computAddOrUpdateHandle()
+          }
+        }
       ]
     }
   },
-  mounted () {
+  mounted() {
     this.init()
   },
   methods: {
-    init () {
+    init() {
       const dataBody = {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize,
@@ -150,44 +243,54 @@ export const models = {
       this.getList(dataBody)
     },
     // 查询
-    handleSearch () {
+    handleSearch() {
       this.pageNum = 1
       this.init()
     },
     // 重置
-    resetHandle () {
+    resetHandle() {
       this.pageNum = 1
       this.searchData = {}
       this.init()
     },
-    // 新增 / 修改
-    addOrUpdateHandle (id) {
+    // 新增 / 修改同步任务
+    addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })
     },
-    // 新增 / 修改
-    computAddOrUpdateHandle (id) {
+    // 新增 / 修改计算任务
+    computAddOrUpdateHandle(id) {
       this.computAddOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.computAddOrUpdate.init(id)
       })
     },
+    // 依赖快照
+    snapshotHandle(url) {
+      window.open(url, '_blank')
+    },
+    // 编辑依赖
+    editSnapshotHandle(url) {
+      window.open(url, '_blank')
+    },
     // 每页数
-    sizeChangeHandle (val) {
+    sizeChangeHandle(val) {
       this.pageSize = val
       this.init()
     },
     // 当前页
-    currentChangeHandle (val) {
+    currentChangeHandle(val) {
       this.pageNum = val
       this.init()
     },
     // 列表接口
-    getList (dataBody) {
+    getList(dataBody) {
       this.dataListLoading = true
-      list(dataBody).then(({data}) => {
+      list(dataBody).then(({
+        data
+      }) => {
         if (data && data.code === 0) {
           this.dataListLoading = false
           this.list = data.data.list
@@ -200,14 +303,18 @@ export const models = {
       })
     },
     // 删除接口
-    deleteHandle (id) {
-      const dataBody = {'id': id.id}
+    deleteHandle(id) {
+      const dataBody = {
+        'id': id.id
+      }
       this.$confirm(`确定删除操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleted(dataBody).then(({data}) => {
+        deleted(dataBody).then(({
+          data
+        }) => {
           if (data && data.code === 0) {
             this.$message({
               message: '操作成功',
@@ -228,7 +335,7 @@ export const models = {
       })
     },
     // 执行接口
-    implementHandle (val) {
+    implementHandle(val) {
       this.$confirm(`确定执行操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -238,12 +345,16 @@ export const models = {
           this.$prompt('请输入缓存key', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消'
-          }).then(({ value }) => {
+          }).then(({
+            value
+          }) => {
             const dataBody = {
               'id': val.id,
               'suffixKey': value
             }
-            implement(dataBody).then(({data}) => {
+            implement(dataBody).then(({
+              data
+            }) => {
               if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
@@ -266,7 +377,9 @@ export const models = {
           const dataBody = {
             'id': val.id
           }
-          implement(dataBody).then(({data}) => {
+          implement(dataBody).then(({
+            data
+          }) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
