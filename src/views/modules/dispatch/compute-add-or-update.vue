@@ -68,15 +68,15 @@
           </el-form-item>
           <el-form-item prop="sql" label="作业语句" :ref="'mycode-' + index">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
-              <!-- <codemirror
+              <codemirror
+                ref="mycode"
                 v-model="item.sql"
                 :options="cmOptions"
-                :placeholder="'请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'"
                 @changes="changes(item.sql, 'mycode-' + index)"
                 class="code"
                 style="padding-bottom: 0"
-              ></codemirror> -->
-              <textarea ref="mycode" class="codesql public_text" placeholder="ioppppp" v-model="item.sql"></textarea>
+              ></codemirror>
+              <span style="color:#6da7ff; position:absolute;left: 40px;top:4px;">{{placeholder}}</span>
               <p style="text-align: right;position:absolute;bottom:0">变动行数：0行</p>
             </div>
           </el-form-item>
@@ -112,8 +112,7 @@
 
 <script>
 import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
-// import { codemirror } from 'vue-codemirror'
-import CodeMirror from 'codemirror/lib/codemirror'
+import { codemirror } from 'vue-codemirror'
 import 'codemirror/theme/ambiance.css'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
@@ -125,9 +124,9 @@ require('codemirror/addon/hint/sql-hint')
 
 export default {
   name: 'codeMirror',
-  // components: {
-  //   codemirror
-  // },
+  components: {
+    codemirror
+  },
   data () {
     return {
       visible: false,
@@ -194,16 +193,20 @@ export default {
           label: '广州账号'
         }]
       }],
+      placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！',
       cmOptions: {
-        mode: 'text/x-mariadb',
+        mode: 'text/x-sql',
         indentWithTabs: true,
         smartIndent: true,
         lineNumbers: true,
-        line: true,
         matchBrackets: true,
-        // autofocus: true,
-        extraKeys: { Ctrl: 'autocomplete' }, // 自定义快捷键
+        autofocus: false,
+        styleActiveLine: true,
+        styleSelectedText: true,
+        lineWrapping: true,
+        extraKeys: {},
         hintOptions: {
+          completeSingle: true,
           tables: {}
         }
       },
@@ -224,53 +227,44 @@ export default {
   },
   mounted () {
     this.init()
-    this.editor = CodeMirror.fromTextArea(this.$refs.mycode, {
-        height: "300px",
-        mode: 'text/x-sql',
-        theme: "sqlstyle",
-        indentWithTabs: true,
-        smartIndent: true,
-        lineNumbers: true,
-        matchBrackets: true,
-        autofocus: false,
-        styleActiveLine: true,
-        styleSelectedText: true,
-        lineWrapping: true,
-        extraKeys: {
-          "'a'": completeAfter,
-          "'b'": completeAfter,
-          "'c'": completeAfter,
-          "'d'": completeAfter,
-          "'e'": completeAfter,
-          "'f'": completeAfter,
-          "'g'": completeAfter,
-          "'h'": completeAfter,
-          "'i'": completeAfter,
-          "'j'": completeAfter,
-          "'k'": completeAfter,
-          "'l'": completeAfter,
-          "'m'": completeAfter,
-          "'n'": completeAfter,
-          "'o'": completeAfter,
-          "'p'": completeAfter,
-          "'q'": completeAfter,
-          "'r'": completeAfter,
-          "'s'": completeAfter,
-          "'t'": completeAfter,
-          "'u'": completeAfter,
-          "'v'": completeAfter,
-          "'w'": completeAfter,
-          "'x'": completeAfter,
-          "'y'": completeAfter,
-          "'z'": completeAfter,
-          "'.'": completeAfter,
-          "'='": completeIfInTag,
-          "Ctrl-Enter": "autocomplete",
-          Tab: function(cm) {
-            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-            cm.replaceSelection(spaces);
+
+    this.$nextTick(() => {
+      console.log(this.$refs.mycode)
+      this.cmOptions.extraKeys = {
+        '"a"': this.completeAfter,
+        '"b"': this.completeAfter,
+        '"c"': this.completeAfter,
+        '"d"': this.completeAfter,
+        '"e"': this.completeAfter,
+        '"f"': this.completeAfter,
+        '"g"': this.completeAfter,
+        '"h"': this.completeAfter,
+        '"i"': this.completeAfter,
+        '"j"': this.completeAfter,
+        '"k"': this.completeAfter,
+        '"l"': this.completeAfter,
+        '"m"': this.completeAfter,
+        '"n"': this.completeAfter,
+        '"o"': this.completeAfter,
+        '"p"': this.completeAfter,
+        '"q"': this.completeAfter,
+        '"r"': this.completeAfter,
+        '"s"': this.completeAfter,
+        '"t"': this.completeAfter,
+        '"u"': this.completeAfter,
+        '"v"': this.completeAfter,
+        '"w"': this.completeAfter,
+        '"x"': this.completeAfter,
+        '"y"': this.completeAfter,
+        '"z"': this.completeAfter,
+        '"."': this.completeAfter,
+        '"="': this.completeIfInTag,
+        'Ctrl-Enter': 'autocomplete',
+        Tab: function(cm) {
+          var spaces = Array(cm.getOption('indentUnit') + 1).join(' ')
+          cm.replaceSelection(spaces)
         }
-        }
+      }
     })
   },
   methods: {
@@ -286,6 +280,29 @@ export default {
         }
       })
     },
+    // codemirror 自动补全
+    completeIfInTag (cm) {
+      return this.completeAfter(cm, () => {
+        let tok = cm.getTokenAt(cm.getCursor())
+        if (tok.type == 'string' && (!/['']/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false
+        let inner = this.$refs.mycode.innerMode(cm.getMode(), tok.state).state
+        return inner.tagName
+      })
+    },
+    completeAfter (cm, pred) {
+      // let cur = cm.getCursor()
+      console.log(cm, pred)
+      if (!pred || pred()) {
+        setTimeout(() => {
+          if (!cm.state.completionActive) {
+            cm.showHint({
+              completeSingle: false
+            })
+          }
+        }, 100)
+      }
+      return this.$refs.mycode.Pass
+    },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
       this.$parent.computAddOrUpdateVisible = false
@@ -299,8 +316,11 @@ export default {
     changes (val, ref) { // 内容更新时，不为空时将报错信息去除
       if (val !== '') {
         this.$refs[ref][0].clearValidate()
+        this.placeholder = ''
+      } else {
+        this.placeholder = '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
       }
-      console.log(val, val.match(/\n/ig).length)
+      // console.log(val, val.match(/\n/ig).length)
     },
     addWork () { // 增加一条作业内容
       this.workForm.push({
@@ -419,5 +439,8 @@ export default {
     text-align: right;
     box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
     z-index: 500;
+  }
+  .CodeMirror {
+    height: 300px
   }
 </style>
