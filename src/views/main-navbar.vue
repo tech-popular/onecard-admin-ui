@@ -148,6 +148,7 @@
             this.tenantList = []
             this.tenantId = -999
           }
+          this.tenantIdChange(this.tenantId)
           sessionStorage.setItem('tenantList', this.tenantList || [])
         })
       },
