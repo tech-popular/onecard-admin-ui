@@ -46,19 +46,20 @@
         </el-form-item>
       </el-form>
 
-      <el-form label-width="160px" v-else-if="quanxian === '租户授权'">
-        <el-form-item label="租户">
-          <span>{{detalList.title}}</span>
-          <el-tag
-            v-for="tag in tenantList"
-            :key="tag.name"
-            closable
-            :type="tag.id"
-            style="margin-left: 5px;"
-            >
-            {{tag.name}}
-          </el-tag>
-        </el-form-item>
+      <el-form label-width="160px" :model="detalList" v-else-if="quanxian === '租户授权'">
+          <el-form-item label="选择租户" prop="tenantIds">
+            <el-select v-model="detalList.tenantIds" multiple placeholder="请选择" style="width:100%" disabled>
+              <el-option
+                v-for="item in tenantList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="申请理由" prop="reason">
+            <el-input type="textarea" v-model="detalList.reason" disabled></el-input>
+          </el-form-item>
       </el-form>
       <el-form label-width="160px" v-else>
         <el-form-item label="标题">
@@ -120,7 +121,7 @@
 </template>
 
 <script>
-import {lookAccout, tenantShow} from '@/api/oa/apply'
+import {lookAccout, tenantInif} from '@/api/oa/apply'
 export default {
   data () {
     return {
@@ -137,12 +138,17 @@ export default {
   methods: {
     init (val) {
       this.quanxian = val.applyType
-      console.log(this.quanxian, 'this.quanxian')
       this.dialogVisible = true
       lookAccout(val.id).then(({data}) => {
-        this.detalList = data.data
-        console.log(data.data, 'data')
+        this.detalList = []
+        if (data.status * 1 !== 1) {
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
         if (this.quanxian === '账号权限') {
+          this.detalList = data.data
           let a = [{selected: true}]
           let b = this.detalList.systemList
           let arr = [...b].filter(x => [...a].some(y => y.selected === x.selected))
@@ -150,7 +156,10 @@ export default {
           this.sysment.map(item => {
             this.systemListcarrent = item.value
           })
+        } else if (this.quanxian === '租户授权') {
+          this.detalList = data.data
         } else {
+          this.detalList = data.data
           let c = [{selected: true}]
           let d = this.detalList.applyAuthTypeList
           let arr2 = [...d].filter(x => [...c].some(y => y.selected === x.selected))
@@ -160,12 +169,13 @@ export default {
           })
         }
       })
-      tenantShow().then(({data}) => {
-        this.tenantList = data.data
-      }
-      )
+      this.getTenantList()
     },
-
+    getTenantList () {
+      tenantInif().then(({ data }) => {
+        this.tenantList = data.data
+      })
+    },
     // 弹窗状态
     handleClose () {
       this.dialogVisible = false
