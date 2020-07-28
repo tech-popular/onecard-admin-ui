@@ -103,14 +103,18 @@
                 >
                 </el-date-picker>
               </el-form-item>
-              <!--相对时间-->
+              <!--相对当前时间点-->
               <div v-if="item.func === 'relative_time'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)" class="itemIput-small"></el-input>
                 </el-form-item>
-                天&nbsp;
-                <el-form-item prop="subFunc" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+                <el-form-item prop="dateDimension">
+                  <el-select v-model="item.dateDimension" class="subSelect1" @change="data => updateDateDimension(data, item)">
+                    <el-option v-for="(fitem, findex) in item.subTimeSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item prop="subFunc">
                   <el-select v-model="item.subFunc" class="subSelect">
                     <el-option v-for="(fitem, findex) in item.subSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
                   </el-select>
@@ -122,16 +126,25 @@
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input v-model="item.params[0].value" :maxlength="10" class="itemIput-small" @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)" @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)" :min="1"></el-input>
                 </el-form-item>
-                天&nbsp;到&nbsp;过去&nbsp;
+                <el-form-item prop="dateDimension">
+                  <el-select v-model="item.dateDimension" class="subSelect1" @change="data => updateDateDimension(data, item)">
+                    <el-option v-for="(fitem, findex) in item.subTimeSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
+                  </el-select>
+                </el-form-item>
+                到&nbsp;过去&nbsp;
                 <el-form-item prop="params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input v-model="item.params[1].value" :maxlength="10" class="itemIput-small" @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)" @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)" :min="1"></el-input>
                 </el-form-item>
-                天&nbsp;之内
+                <el-form-item prop="dateDimension">
+                  <el-select v-model="item.dateDimension" class="subSelect1" @change="data => updateDateDimension(data, item)">
+                    <el-option v-for="(fitem, findex) in item.subTimeSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
+                  </el-select>
+                </el-form-item>
+                之内
               </div>
             </div>
           </div>
           <el-form-item class="btn-group">
-            <!-- <i class="el-icon-edit cursor-pointer"></i> -->
             <el-tooltip v-if="item.func === 'relative_time_in' || item.func === 'relative_time'" placement="top">
               <div slot="content" v-html="tipsHtmlCont(item)" class="tips-content"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
@@ -182,9 +195,12 @@ export default {
       parent: null,
       selectOperateList: [],
       tips: {
-        'relative_within': '举例：若当前时间为02-26 12:10，则过去1天内为 [02-25 00:00, 02-25 23:59]，过去0天内为 [02-26 00:00, 02-26 12:10]',
-        'relative_before': '举例：若当前时间为02-26 12:10，则过去1天前为 ( 无穷小时间，02-24 23:59]，过去0天前为 ( 无穷小时间，02-25 23:59]',
-        'relative_time_in': '举例：若当前时间为02-26 12:10，则过去5天到过去1天之内为 [02-21 00:00, 02-25 23:59]，过去5天到过去0天内为 [02-21 00:00, 02-26 12:10]'
+        'relative_within_DAYS': '举例：若当前时间为02-26 12:10，则过去1天内为 [02-25 00:00, 02-25 23:59]，过去0天内为 [02-26 00:00, 02-26 12:10]',
+        'relative_before_DAYS': '举例：若当前时间为02-26 12:10，则过去1天前为 ( 无穷小时间，02-24 23:59]，过去0天前为 ( 无穷小时间，02-25 23:59]',
+        'relative_within_HOURS': '举例：若当前时间为02-26 12:10，则过去1小时内为 [02-26 11:10, 02-26 12:10]，过去0小时内为 [02-26 12:10，02-26 12:10]',
+        'relative_before_HOURS': '举例：若当前时间为02-26 12:10，则过去1小时前为 ( 无穷小时间，02-26 11:10]，过去0小时前为 ( 无穷小时间，02-26 12:10]',
+        'relative_time_in_DAYS': '举例：若当前时间为02-26 12:10，则过去5天到过去1天之内为 [02-21 00:00, 02-25 23:59]，过去5天到过去0天内为 [02-21 00:00, 02-26 12:10]',
+        'relative_time_in_HOURS': '举例：若当前时间为02-26 12:10，则过去5小时到过去1小时之内为 [02-26 07:10, 02-26 11:10]”，过去5小时到过去0小时内为 [02-26 07:10, 02-26 12:10]'
       }
     }
   },
@@ -200,12 +216,11 @@ export default {
       parent = parent.$parent
     }
     this.parent = parent
-    console.log('mounted', this.data)
   },
   components: { Treeselect, InputTag },
   methods: {
-    test (val) {
-      console.log(val)
+    updateDateDimension (val, ruleItem) {
+      this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, { dateDimension: val })
     },
     judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {
@@ -344,10 +359,10 @@ export default {
     // },
     tipsHtmlCont (item) {
       if (item.func === 'relative_time_in') {
-        return this.tips[item.func]
+        return this.tips[item.func + '_' + item.dateDimension]
       }
       if (item.func === 'relative_time') {
-        return this.tips[item.subFunc]
+        return this.tips[item.subFunc + '_' + item.dateDimension]
       }
     },
     isEmpty (item) { // 是否选择了空
@@ -426,11 +441,14 @@ export default {
   .subSelect {
     width: 140px;
   }
+   .subSelect1 {
+    width: 80px;
+  }
   .itemIput-big {
     width: 372px;
   }
   .itemIput-small {
-    width: 140px;
+    width: 110px;
   }
   .itemIput-number {
     width: 200px;

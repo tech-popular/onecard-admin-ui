@@ -4,7 +4,7 @@
     :visible.sync="visible"
     :show-close="false"
     :wrapperClosable="false"
-    size="1200px"
+    size="1250px"
     class="insight-manage-drawer"
   >
     <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
@@ -186,8 +186,18 @@ export default {
         'rules': []
       },
       channelList: [],
-      isSelectedUneffectIndex: [] // 选中的指标是否有无效指标
-      // originIndexList: [] // 没有处理过的指标列表数据
+      isSelectedUneffectIndex: [], // 选中的指标是否有无效指标
+      subTimeSelects: [
+        {
+          code: 'DAYS', title: '天'
+        },
+        {
+          code: 'HOURS', title: '小时'
+        }
+        // {
+        //   code: 'MINUTES', title: '分钟'
+        // }
+      ]
     }
   },
   components: { rulesSet, Treeselect, dataPreviewInfo },
@@ -253,7 +263,6 @@ export default {
             userType: data.data.userType,
             type: data.data.type
           }
-          // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
           this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
@@ -416,10 +425,20 @@ export default {
             if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
               item.subFunc = item.func
               item.func = 'relative_time'
+              item.subTimeSelects = this.subTimeSelects
+              if (!item.dateDimension) {
+                item.dateDimension = 'DAYS'
+              }
               this.getSelectOperateList(item.fieldType, (selectOperateList) => {
                 item.selectOperateList = selectOperateList
                 item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
               })
+            }
+            if (item.func === 'relative_time_in' || item.func === 'relative_time') {
+              item.subTimeSelects = this.subTimeSelects
+              if (!item.dateDimension) {
+                item.dateDimension = 'DAYS'
+              }
             }
             // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
             if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
@@ -514,6 +533,7 @@ export default {
         'selectOperateList': [], // 操作符下拉选
         'selectEnumsList': [], // 内容下拉选
         'subFunc': '',
+        'dateDimension': '',
         'strTips': [],
         'params': [{
           value: '',
@@ -589,6 +609,8 @@ export default {
           }
         }
       })
+      let rules1 = arr.rules[0]
+      arr.rules.splice(0, 1, rules1) // 强制更新一下数组
       this.ruleConfig = arr
     },
     getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
@@ -609,11 +631,19 @@ export default {
       }
       let subSelects = []
       let subFunc = ''
+      let subTimeSelects = []
+      let dateDimension = ''
       if (citem.func === 'relative_time') {
         subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
         subFunc = 'relative_before'
+        subTimeSelects = this.subTimeSelects
+        dateDimension = 'DAYS'
       }
-      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc })
+      if (citem.func === 'relative_time_in') {
+        subTimeSelects = this.subTimeSelects
+        dateDimension = 'DAYS'
+      }
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension })
     },
     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
       let newArr = []
@@ -657,11 +687,16 @@ export default {
           selectOperateList: selectOperateList,
           func: selectOperateList[0].code,
           subFunc: '',
+          dateDimension: '',
           strTips: [],
           params: [{ value: '', title: '' }]
         }
         if (params.func === 'relative_time') {
           params.subFunc = 'relative_before'
+          params.dateDimension = 'DAYS'
+        }
+        if (params.func === 'relative_time_in') {
+          params.dateDimension = 'DAYS'
         }
         Object.keys(obj).forEach(oitem => {
           params[oitem] = obj[oitem]
@@ -687,7 +722,7 @@ export default {
         }
       })
     },
-    addChildreRules (data, citem) {
+    addChildreRules (data, citem) { // 添加子集
       let indexPath = findRuleIndex(data.rules, citem) + ''
       let indexPathArr = indexPath.split(',')
       if (indexPathArr.length === 1) {
