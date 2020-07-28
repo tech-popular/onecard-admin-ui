@@ -12,14 +12,14 @@
         <el-radio label="0" v-model="dataForm.flag">正常</el-radio>
         <el-radio label="1" v-model="dataForm.flag">冻结</el-radio>
       </el-form-item>
-      <el-form-item label="备注" prop="mark">
+      <el-form-item label="备注" prop="remark">
         <el-input
           type="textarea"
           :rows="4"
           placeholder="请输入"
           maxlength="200"
           show-word-limit
-          v-model="dataForm.mark">
+          v-model="dataForm.remark">
         </el-input>
       </el-form-item>
     </el-form>
@@ -39,7 +39,7 @@
           id: '',
           name: '',
           flag: '0',
-          mark: ''
+          remark: ''
         },
         dataRule: {
           name: [
@@ -56,7 +56,7 @@
         this.dataForm.id = ''
         this.dataForm.name = ''
         this.dataForm.flag = '0'
-        this.dataForm.mark = ''
+        this.dataForm.remark = ''
         if (val && val.id) {
           this.dataForm.id = val.id
           this.getTenantManageInfo()
@@ -71,7 +71,7 @@
             }
             this.dataForm.name = data.data.name
             this.dataForm.flag = data.data.flag
-            this.dataForm.mark = data.data.mark
+            this.dataForm.remark = data.data.remark
           } else {
             this.$message.error(data.msg)
           }
@@ -85,7 +85,7 @@
             let params = {
               name: this.dataForm.name,
               flag: this.dataForm.flag,
-              mark: this.dataForm.mark
+              remark: this.dataForm.remark
             }
             if (this.dataForm.id) {
               url = updateTenantManage
