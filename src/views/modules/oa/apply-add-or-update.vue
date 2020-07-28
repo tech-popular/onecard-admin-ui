@@ -108,7 +108,7 @@
                   ref="staffTable"
                   v-loading="listLoading"
                   :data="staffList"
-                  :row-key="getRowKey" 
+                  :row-key="getRowKey"
                   fit
                   highlight-current-row
                   @selection-change="handleStaffChange"
@@ -159,7 +159,7 @@
                   v-loading="listLoading"
                   :data="selectedStaffList"
                   fit
-                  :row-key="getRowKey" 
+                  :row-key="getRowKey"
                   highlight-current-row
                   @selection-change="handleSelectedStaffChange"
                 >
@@ -346,6 +346,8 @@ export default {
     init (id, value) {
       this.dataForm.id = id || ''
       this.dataFormValue = value
+      this.tenantForm.tenantIds = []
+      this.tenantForm.authApplyReason = ''
       this.visible = true
       this.$nextTick(() => {
         this.$refs['severDataForm'].resetFields()
@@ -388,6 +390,9 @@ export default {
             this.severDataForm.account = data.data.mcAccount
           }
         })
+      } else if (this.actoveTab === '租户申请') {
+        this.tenantForm.tenantIds = []
+        this.tenantForm.authApplyReason = ''
       }
     },
     // 任务类型
