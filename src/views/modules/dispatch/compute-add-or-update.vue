@@ -72,12 +72,11 @@
                 ref="mycode"
                 v-model="item.sql"
                 :options="cmOptions"
-                @changes="changes(item.sql, 'mycode-' + index)"
+                @changes="changes(item, 'mycode-' + index, index)"
                 class="code"
-                style="padding-bottom: 0"
+                style="padding-bottom: 0px"
               ></codemirror>
-              <span style="color:#6da7ff; position:absolute;left: 40px;top:4px;">{{placeholder}}</span>
-              <p style="text-align: right;position:absolute;bottom:0">变动行数：0行</p>
+              <span style="color:#6da7ff; position:absolute;left: 40px;top:4px;">{{item.placeholder}}</span>
             </div>
           </el-form-item>
           <div style="margin-bottom: 10px; text-align: right;">
@@ -92,25 +91,35 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
     <el-dialog
-      title="代码连贯查看"
+      title="代码连贯模式"
       :visible.sync="mergeCodeVisible"
       :modal-append-to-body="false"
       :close-on-click-modal="false"
       :append-to-body="true"
       width="50%"
     >
-      <!-- <codemirror
-        v-model="allSql"
-        :options="allSqlOptions"
-        @changes="changes"
-        class="code"
-        style="border:1px solid #dcdfe6; border-radius: 4px;"
-      ></codemirror> -->
+      <div style="position:relative">
+        <codemirror
+          ref="previewSql"
+          v-model="previewSql"
+          :options="previewSqlOptions"
+          @changes="sqlPreviewChange"
+          @click.native="sqlPreviewFocus"
+          class="code"
+          style="border:1px solid #dcdfe6; border-radius: 4px;"
+        ></codemirror>
+        <span style="position:absolute;right: 20px;bottom:-30px;">变动行数: <b style="color:red;">{{updateRowNum}}</b>行</span>
+      </div>
+      <div slot="footer">
+        <el-button @click="mergeCodeVisible = false">取消</el-button>
+        <el-button type="primary" @click="previewSqlSubmit()">提交</el-button>
+      </div>
     </el-dialog>
   </el-drawer>
 </template>
 
 <script>
+import { deepClone } from '@/utils'
 import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/theme/ambiance.css'
@@ -144,7 +153,8 @@ export default {
           dataSource: '',
           account: '',
           workDesc: '',
-          sql: ''
+          sql: '',
+          placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
         }
       ],
       dataFormValue: '',
@@ -193,7 +203,7 @@ export default {
           label: '广州账号'
         }]
       }],
-      placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！',
+
       cmOptions: {
         mode: 'text/x-sql',
         indentWithTabs: true,
@@ -210,14 +220,18 @@ export default {
           tables: {}
         }
       },
-      allSql: '',
-      allSqlOptions: {
+      diffToCompare: window.diff.compare,
+      updateRowNum: 0,
+      originpreviewSql: '', // 保留一份原始的连贯数据，用于做对比
+      previewSql: '',
+      sqlLineDist: [],
+      sqlLineWorkIndex: [],
+      previewSqlOptions: {
         mode: 'text/x-mariadb',
         indentWithTabs: true,
         smartIndent: true,
         lineNumbers: true,
         matchBrackets: true,
-        // autofocus: true,
         extraKeys: { Ctrl: 'autocomplete' }, // 自定义快捷键
         hintOptions: {
           tables: {}
@@ -227,45 +241,11 @@ export default {
   },
   mounted () {
     this.init()
-
-    this.$nextTick(() => {
-      console.log(this.$refs.mycode)
-      this.cmOptions.extraKeys = {
-        '"a"': this.completeAfter,
-        '"b"': this.completeAfter,
-        '"c"': this.completeAfter,
-        '"d"': this.completeAfter,
-        '"e"': this.completeAfter,
-        '"f"': this.completeAfter,
-        '"g"': this.completeAfter,
-        '"h"': this.completeAfter,
-        '"i"': this.completeAfter,
-        '"j"': this.completeAfter,
-        '"k"': this.completeAfter,
-        '"l"': this.completeAfter,
-        '"m"': this.completeAfter,
-        '"n"': this.completeAfter,
-        '"o"': this.completeAfter,
-        '"p"': this.completeAfter,
-        '"q"': this.completeAfter,
-        '"r"': this.completeAfter,
-        '"s"': this.completeAfter,
-        '"t"': this.completeAfter,
-        '"u"': this.completeAfter,
-        '"v"': this.completeAfter,
-        '"w"': this.completeAfter,
-        '"x"': this.completeAfter,
-        '"y"': this.completeAfter,
-        '"z"': this.completeAfter,
-        '"."': this.completeAfter,
-        '"="': this.completeIfInTag,
-        'Ctrl-Enter': 'autocomplete',
-        Tab: function(cm) {
-          var spaces = Array(cm.getOption('indentUnit') + 1).join(' ')
-          cm.replaceSelection(spaces)
-        }
+  },
+  computed: {
+    previreCodemirror () {
+        return this.$refs.previewSql.codemirror
       }
-    })
   },
   methods: {
     init (id, value) {
@@ -280,29 +260,6 @@ export default {
         }
       })
     },
-    // codemirror 自动补全
-    completeIfInTag (cm) {
-      return this.completeAfter(cm, () => {
-        let tok = cm.getTokenAt(cm.getCursor())
-        if (tok.type == 'string' && (!/['']/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false
-        let inner = this.$refs.mycode.innerMode(cm.getMode(), tok.state).state
-        return inner.tagName
-      })
-    },
-    completeAfter (cm, pred) {
-      // let cur = cm.getCursor()
-      console.log(cm, pred)
-      if (!pred || pred()) {
-        setTimeout(() => {
-          if (!cm.state.completionActive) {
-            cm.showHint({
-              completeSingle: false
-            })
-          }
-        }, 100)
-      }
-      return this.$refs.mycode.Pass
-    },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
       this.$parent.computAddOrUpdateVisible = false
@@ -311,16 +268,97 @@ export default {
       console.log(val)
     },
     mergeSql () { // 代码连贯操作
+      this.previewSql = ''
+      let newWorkForm = deepClone(this.workForm) // 对数组进行排序
+      newWorkForm.sort((a, b) => {
+        return a.workIndex * 1 - b.workIndex * 1
+      })
+      newWorkForm.forEach((item, index) => {
+        let sqlLineTitle = '<作业序号:' + item.workIndex + ';作业类型:' + item.workType + '>'
+        this.sqlLineDist.push(sqlLineTitle)
+        this.sqlLineWorkIndex.push(item.workIndex)
+        let sqlJob = sqlLineTitle + '\n' + item.sql + '\n'
+        this.previewSql += sqlJob
+      })
+      this.originpreviewSql = this.previewSql
       this.mergeCodeVisible = true
     },
-    changes (val, ref) { // 内容更新时，不为空时将报错信息去除
-      if (val !== '') {
-        this.$refs[ref][0].clearValidate()
-        this.placeholder = ''
-      } else {
-        this.placeholder = '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
+    sqlPreviewChange (line) { // 连贯代码改变时
+      let originArr = this.originpreviewSql.split('\n')
+      let curArr = this.previewSql.split('\n')
+      let changeArry = []
+      let changeNum = 0
+      changeArry = this.diffToCompare(originArr, curArr)
+      let changeArryLen = changeArry.length
+      if (changeArryLen > 0) {
+        changeNum = changeArryLen
+        for (let i = 0, j = changeArryLen; i < j; i++) {
+          let tempnum = changeArry[i][2].length
+          if (tempnum > 1) {
+            changeNum = changeNum + tempnum - 1
+          }
+        }
       }
-      // console.log(val, val.match(/\n/ig).length)
+      this.updateRowNum = changeNum
+    },
+    sqlPreviewFocus () {
+      this.previewSqlDefaultRow()
+    },
+    previewSqlSubmit () { // 连贯代码提交
+      console.log(this.sqlLineDist)
+      let sqlValue = this.previewSql
+      let tempValStartIndex = 0
+      let tempValEndIndex = 0
+      let tempValue = null
+      let titleLength = 0
+      for (let i = 0, j = this.sqlLineDist.length; i < j; i++) {
+        titleLength = this.sqlLineDist[i].length + 1 // +1去掉回车
+        tempValStartIndex = sqlValue.indexOf(this.sqlLineDist[i])
+        if (this.sqlLineDist[i + 1] != undefined) {
+          tempValEndIndex = sqlValue.indexOf(this.sqlLineDist[i + 1])
+        } else {
+          tempValEndIndex = sqlValue.length
+        }
+        tempValue = sqlValue.substring(tempValStartIndex + titleLength, tempValEndIndex)
+        // if(this.workForm[i].sql != undefined){
+        //   codesList[i].setValue(tempValue)
+        // }
+        let index = this.findIndex(this.sqlLineWorkIndex[i])
+        console.log(index, tempValue, this.workForm)
+        this.workForm.splice(index, 1, { ...this.workForm[i], sql: tempValue })
+      }
+      this.mergeCodeVisible = false
+    },
+    findIndex (n) {
+      let i = 0
+      this.workForm.forEach((item, index) => {
+        if (item.workIndex === n) {
+          i = index
+        }
+      })
+      console.log(i)
+      return i
+    },
+    changes (item, ref, index) { // 内容更新时，不为空时将报错信息去除
+      let curSql = item.sql
+      if (curSql !== '') {
+        this.$refs[ref][0].clearValidate()
+        this.workForm.splice(index, 1, { ...item, placeholder: '' })
+      } else {
+        this.workForm.splice(index, 1, { ...item, placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！' })
+      }
+    },
+    previewSqlDefaultRow () { // 设置每个作业的title不可修改
+      let lineNum = 0
+      let sqlPreFormatArry = []
+      this.previreCodemirror.eachLine(line => {
+        if (line.text.indexOf('<作业序号') > -1) {
+          let strNum = line.text.length
+          this.previreCodemirror.markText({line: lineNum, ch: 0}, {line: lineNum, ch: strNum}, {className: 'styled-background', readOnly: true})
+        }
+        sqlPreFormatArry.push(line.text) // 记录最开始每一行
+        lineNum++
+      })
     },
     addWork () { // 增加一条作业内容
       this.workForm.push({
@@ -329,7 +367,8 @@ export default {
         dataSource: '',
         account: '',
         workDesc: '',
-        sql: ''
+        sql: '',
+        placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
       })
       this.updateWorkIndex()
     },
@@ -442,5 +481,8 @@ export default {
   }
   .CodeMirror {
     height: 300px
+  }
+  .styled-background {
+    color: red
   }
 </style>
