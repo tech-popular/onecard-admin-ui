@@ -17,7 +17,11 @@
           </el-form-item>
           <el-form-item label="申请系统" prop="system">
             <el-radio-group v-model="dataForm.system" @change="testFunction">
-              <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList">{{item.label}}</el-radio>
+              <el-radio
+                :label="item.value"
+                :key="item.value"
+                v-for="(item) in systemList"
+              >{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="申请系统模块" prop="systemmodel" v-if="isShow">
@@ -26,11 +30,14 @@
               :props="props"
               v-model="dataForm.systemmodel"
               clearable
-              :options="systemmodelList">
-            </el-cascader>
+              :options="systemmodelList"
+            ></el-cascader>
           </el-form-item>
           <el-form-item label="默认所属部门">
-            <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
+            <span v-for="(item, index) in departmentList" :key="index">
+              {{item}}
+              <br />
+            </span>
           </el-form-item>
           <el-form-item label="申请理由" prop="reason">
             <el-input type="textarea" v-model="dataForm.reason"></el-input>
@@ -50,8 +57,8 @@
                 v-for="item in tenantList"
                 :key="item.id"
                 :label="item.name"
-                :value="item.id">
-              </el-option>
+                :value="item.id"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="申请理由" prop="authApplyReason">
@@ -80,15 +87,26 @@
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
                 <el-form :inline="true" :model="staffTemp" size="mini">
                   <el-row :gutter="24" style="padding:5px;">
-                    <el-alert title="切换库后已选库表将会清空" show-icon type="warning" :closable="false" style="padding:0px;margin-bottom: 5px;padding-left:5px"></el-alert>
+                    <el-alert
+                      title="切换库后已选库表将会清空"
+                      show-icon
+                      type="warning"
+                      :closable="false"
+                      style="padding:0px;margin-bottom: 5px;padding-left:5px"
+                    ></el-alert>
                     <el-col :span="10" style="padding:0;">
                       <el-form-item prop="selectDbName" style="margin: 0;">
-                        <el-select v-model="staffTemp.project" placeholder="请选择数据库" @change="currentSel">
+                        <el-select
+                          v-model="staffTemp.project"
+                          placeholder="请选择数据库"
+                          @change="currentSel"
+                        >
                           <el-option
                             v-for="item in touchActionlist"
                             :key="item.value"
                             :label="item.value"
-                            :value="item.value"/>
+                            :value="item.value"
+                          />
                         </el-select>
                       </el-form-item>
                     </el-col>
@@ -197,7 +215,10 @@
             <el-input v-model="severDataForm.accessKeySecert" placeholder="AccessKeySecert" />
           </el-form-item>
           <el-form-item label="默认所属部门">
-            <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
+            <span v-for="(item, index) in departmentList" :key="index">
+              {{item}}
+              <br />
+            </span>
           </el-form-item>
           <el-form-item label="申请理由" prop="applyReason">
             <el-input type="textarea" v-model="severDataForm.applyReason" placeholder="申请理由"></el-input>
@@ -299,13 +320,13 @@ export default {
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ],
         account: [
-          {required: true, message: 'maxcomputer不能为空', trigger: 'blur'}
+          { required: true, message: 'maxcomputer不能为空', trigger: 'blur' }
         ],
         accessKeyId: [
-          {required: true, message: 'accessKeyId不能为空', trigger: 'blur'}
+          { required: true, message: 'accessKeyId不能为空', trigger: 'blur' }
         ],
         accessKeySecert: [
-          {required: true, message: 'accessKeySecert不能为空', trigger: 'blur'}
+          { required: true, message: 'accessKeySecert不能为空', trigger: 'blur' }
         ]
       }, // 库表权限表单校验
       dataFormValue: '',
@@ -387,6 +408,8 @@ export default {
         mcCompute(newData).then(({ data }) => {
           if (data && data.status === '1') {
             this.severDataForm.account = data.data.mcAccount
+            this.severDataForm.accessKeyId = data.data.accessKeyId
+            this.severDataForm.accessKeySecert = data.data.accessKeySecert
           }
         })
       }
@@ -496,7 +519,7 @@ export default {
         this.isShow = true
       }
       accoutAuthInitInfo().then(({ data }) => {
-        var a = [{value: value}]
+        var a = [{ value: value }]
         var b = data.data.systemList
         var arr = [...b].filter(x => [...a].some(y => y.value === x.value))
         this.systemmodelList = arr
@@ -600,7 +623,7 @@ export default {
       var arr = [...this.staffList, ...this.selectedStaffData]
       var hash = {}
       arr = arr.reduce(function (item, next) {
-          // eslint-disable-next-line no-unused-expressions
+        // eslint-disable-next-line no-unused-expressions
         hash[next.name] ? '' : hash[next.name] = true && item.push(next)
         return item
       }, [])
