@@ -100,12 +100,12 @@
         </template>
       </el-table-column> -->
       <el-table-column
-        prop="status"
+        prop="flag"
         header-align="center"
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === '0'" size="small">正常</el-tag>
+          <el-tag v-if="scope.row.flag === 0" size="small">正常</el-tag>
           <el-tag v-else size="small" type="danger">冻结</el-tag>
         </template>
       </el-table-column>
