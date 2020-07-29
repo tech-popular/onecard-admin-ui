@@ -62,7 +62,7 @@
       <el-col :span="16">
         <el-card>
           <!-- <el-row> -->
-            <h4 style="border-bottom:1px dashed #ccc;margin-bottom: 10px;padding-bottom: 20px"><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“系统管理”版块</span></h4>
+            <h4 style="border-bottom:1px dashed #ccc;margin-bottom: 10px;padding-bottom: 20px"><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“<i style="font-style:normal;font-size:15px;color:#2093f7;padding:0;cursor:pointer" @click="gotoApply">系统管理</i>”版块</span></h4>
             <!-- <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/> -->
             <!-- <el-col :span="12" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)" style="cursor: pointer"> -->
               <div class="card-pane">
@@ -227,6 +227,16 @@ export default {
           // })
         }
       })
+    },
+    gotoApply () {
+      let curItem = {
+        isRouter: true,
+        name: '系统管理',
+        img: require('../../assets/img/sysmanage.jpg'),
+        url: sessionStorage.getItem('defaultPage'),
+        menuId: 407
+      }
+      this.gotoHandle(curItem)
     },
     gotoHandle (item) {
       if (item.menuId === 405 && !sessionStorage.getItem('tenantList').length) { // 若无权限时，弹窗提示
