@@ -76,12 +76,15 @@ export default {
       })
     },
     getMenuData ({ commit }, type) { // 获取菜单数据
+      defaultPageUrl = ''
       return new Promise((resolve, reject) => {
         getDownNoButtonMenu(sessionStorage.getItem('activeNavIndex')).then(({data}) => {
           if (data && data.code === 0) {
             if (!data.menuList.length) {
+              sessionStorage.setItem('menuList', '[]')
+              sessionStorage.setItem('permissions', '[]')
               resolve([])
-              return
+              return Message.error('该导航下暂无菜单信息，请先申请再访问')
             }
             sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
             sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
@@ -90,9 +93,14 @@ export default {
               sessionStorage.setItem('defaultPage', 'oa-apply') // 默认 我的申请 页面
               router.push({ name: 'oa-apply' })
             } else {
-              findChildUrl(data.menuList)
-              sessionStorage.setItem('defaultPage', defaultPageUrl) // 默认打开第一个页面
-              router.push({ name: defaultPageUrl })
+              if (!data.menuList[0].list || !data.menuList[0].list.length) {
+                sessionStorage.setItem('defaultPage', 'noMenu') // 默认打开第一个页面
+                router.push({ name: 'noMenu' })
+              } else {
+                findChildUrl(data.menuList)
+                sessionStorage.setItem('defaultPage', defaultPageUrl) // 默认打开第一个页面
+                router.push({ name: defaultPageUrl })
+              }
             }
             resolve(data.menuList)
           } else {
@@ -102,7 +110,6 @@ export default {
         }).catch((e) => {
           Message.error('数据获取失败')
           console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-          // router.push({ name: 'login' })
         })
       })
     }

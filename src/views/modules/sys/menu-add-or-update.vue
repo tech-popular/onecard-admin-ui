@@ -176,6 +176,7 @@
           this.dataForm.orderNum = data.menu.orderNum
           this.dataForm.icon = data.menu.icon
           this.dataForm.status = data.menu.status
+          this.dataForm.isAllowAuthor = data.menu.isAllowAuthor
           this.getSelectUp()
         })
       },

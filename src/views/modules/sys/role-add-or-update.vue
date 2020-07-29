@@ -7,7 +7,7 @@
     <div v-loading="loadFlag">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="dataForm.roleName" placeholder="角色名称"></el-input>
+          <el-input v-model.trim="dataForm.roleName" placeholder="角色名称"></el-input>
         </el-form-item>
         <el-form-item label="菜单权限">
           <!-- <el-radio-group v-model="dataForm.systemPlateId" @change="paneTypeChange">

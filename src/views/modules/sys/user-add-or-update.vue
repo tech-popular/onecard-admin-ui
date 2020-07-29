@@ -115,6 +115,7 @@
           ismodifyPasswd: '',
           mobile: '',
           mcAccount: '',
+          emailList: '',
           department: '',
           tenantIds: [],
           roleIds: [],
@@ -131,12 +132,12 @@
         funcRoleOptions: [],
         userPermissionActiveName: 'systemPlateId',
         dataRule: {
-          tenantIds: [
-            { required: true, message: '请选择租户', trigger: 'change' }
-          ],
-          roleIds: [
-            { required: true, message: '请选择功能角色', trigger: 'change' }
-          ],
+          // tenantIds: [
+          //   { required: true, message: '请选择租户', trigger: 'change' }
+          // ],
+          // roleIds: [
+          //   { required: true, message: '请选择功能角色', trigger: 'change' }
+          // ],
           flag: [
             { required: true, message: '请选择账户状态', trigger: 'change' }
           ]
@@ -153,6 +154,7 @@
         this.email = val.emailList
         this.dataForm.id = val.id
         this.dataForm.userid = val.userid
+        this.dataForm.emailList = ''
         this.getTenantList()
         this.getRoleSelectList()
         // this.getPlateList()
