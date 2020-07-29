@@ -50,7 +50,8 @@
       </el-tab-pane>
       <!-- 租户 -->
       <el-tab-pane label="租户申请" name="租户申请">
-        <el-form :model="tenantForm" :rules="tenantRule" ref="tenantForm" label-width="160px">
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#e6a23c"></i>如选项中未包含期望申请的租户，请邮件&lt;<span style="color:#2093f7">datareq@9fbank.com.cn</span>&gt;进行新增申请</p>
+        <el-form :model="tenantForm" :rules="tenantRule" ref="tenantForm" label-width="100px">
           <el-form-item label="选择租户" prop="tenantIds">
             <el-select v-model="tenantForm.tenantIds" multiple placeholder="请选择" style="width:100%">
               <el-option

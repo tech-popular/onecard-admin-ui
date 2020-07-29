@@ -3,7 +3,7 @@
     <main-navbar :is-fold="false" />
     <!-- 欢迎使用utc后台管理系统 -->
     <el-row :gutter="24" class="dash" style="margin: 80px 30px 0">
-      <el-col :span="9">
+      <el-col :span="8">
         <el-card :body-style="{ padding: '0px' }">
           <div style="padding: 14px;">
             <el-row class="userAdmin">
@@ -59,15 +59,15 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="15">
+      <el-col :span="16">
         <el-card>
           <!-- <el-row> -->
             <h4 style="border-bottom:1px dashed #ccc;margin-bottom: 10px;padding-bottom: 20px"><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“系统管理”版块</span></h4>
             <!-- <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/> -->
             <!-- <el-col :span="12" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)" style="cursor: pointer"> -->
               <div class="card-pane">
-                <el-card :body-style="{ padding: '0px' }" style="margin:10px;width:440px" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)">
-                  <img width="440px" height="155px" :src="item.img">
+                <el-card :body-style="{ padding: '0px' }" style="margin:10px;width:400px" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)">
+                  <img width="400px" height="155px" :src="item.img">
                   <el-row style="padding:10px">
                     <el-col :span="12" style="line-height: 38px;"><span>{{item.name}}</span></el-col>
                     <el-col :span="12" style="text-align: right;vertical-align: middle;">
