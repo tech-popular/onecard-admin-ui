@@ -91,16 +91,14 @@ export const addOrEdotModels = {
   },
   methods: {
     init(id) {
+      console.log(id, 'ppp')
       this.id = id ? id.id : ''
       this.visible = true
       this.$nextTick(() => {
         if (id) {
           console.log(this.submitBtn)
           this.submitBtn = false
-          const dataBody = {
-            id: this.id
-          }
-          info(dataBody).then(({
+          info(id).then(({
             data
           }) => {
             this.formData = data.data

@@ -22,14 +22,11 @@ export const models = {
       value: 'value'
     }
     let status = [{
-      label: '全部',
+      label: '有效',
       value: 1
     }, {
-      label: '启用',
-      value: 2
-    }, {
-      label: '停用',
-      value: 3
+      label: '无效',
+      value: 0
     }]
     let statusProps = {
       label: 'label',
@@ -50,46 +47,44 @@ export const models = {
       addOrUpdateVisible: false,
       // 操作按钮
       operates: [{
-          id: 1,
-          label: '编辑',
-          type: 'primary',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
-          }
-        },
-        {
-          id: 2,
-          label: '删除',
-          type: 'danger',
-          method: (id) => {
-            this.deleteHandle(id)
-          }
+        id: 1,
+        label: '编辑',
+        type: 'primary',
+        method: (id) => {
+          this.addOrUpdateHandle(id)
         }
-      ],
+      }],
       columns: [{
           prop: 'id',
           label: '数据源ID',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceName',
           label: '数据源名称',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceIp',
           label: '服务器地址',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceName',
           label: '数据库名称',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceType',
           label: '数据源类型',
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('el-tag', {
+              props: {
+                type: params.row.flag === '1' ? '' : 'warning'
+              } // 组件的props
+            }, params.row.flag === '1' ? '计算任务' : '同步任务')
+          }
         },
         {
           prop: 'createUser',
@@ -97,7 +92,7 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'createTime',
           label: '任务创建时间',
           align: 'center'
         },
@@ -108,9 +103,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.flag === 1 ? '' : 'warning'
+                type: params.row.flag === '1' ? '' : 'warning'
               } // 组件的props
-            }, params.row.flag === 1 ? '需要' : '不需要')
+            }, params.row.flag === '1' ? '需要' : '不需要')
           }
         }
       ],
@@ -150,7 +145,7 @@ export const models = {
         {
           type: 'Select',
           label: '状态',
-          prop: 'status',
+          prop: 'dataSourceDisable',
           width: '300px',
           options: status,
           props: statusProps,
@@ -185,9 +180,10 @@ export const models = {
         'pageSize': this.pageSize,
         'id': this.searchData.id,
         'name': this.searchData.name,
+        'ip': this.searchData.ip,
+        'database': this.searchData.database,
         'type': this.searchData.type,
-        'user': this.searchData.user,
-        'status': this.searchData.status
+        'dataSourceDisable': this.searchData.dataSourceDisable
       }
       this.getList(dataBody)
     },
@@ -206,7 +202,7 @@ export const models = {
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id)
+        this.$refs.addOrUpdate.init(id.id)
       })
     },
     // 每页数
