@@ -4,21 +4,25 @@
     :visible.sync="visible"
     :show-close="false"
     :wrapperClosable="false"
-    size="1000px"
+    size="1100px"
     class="api-manage-drawer"
   >
     <div slot="title" class="drawer-title">{{dataFormValue ? '查看' : dataForm.id ? '修改' : '新增/编辑计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3>作业信息<span>最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
-        <el-form-item label="任务名称" prop="taskName">
-          <el-input v-model="dataForm.taskName" placeholder="任务名称" />
-        </el-form-item>
-        <el-form-item label="任务ID" prop="taskId">
-          <el-input v-model="dataForm.taskId" placeholder="任务ID" disabled />
-        </el-form-item>
+        <div class="work-type-pane">
+          <el-form-item label="任务名称" prop="taskName">
+            <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px">
+              <template slot="prepend">mc_sql</template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="任务ID" prop="taskId">
+            <el-input v-model="dataForm.taskId" placeholder="任务ID" disabled  style="width: 300px" />
+          </el-form-item>
+        </div>
         <el-form-item label="所属系统" prop="taskSys">
-          <el-select v-model="dataForm.taskSys" placeholder="所属系统">
+          <el-select v-model="dataForm.taskSys" placeholder="所属系统" style="width: 400px">
             <el-option label="earliest" value="earliest"></el-option>
             <el-option label="latest" value="latest"></el-option>
           </el-select>
@@ -31,48 +35,50 @@
         <el-button type="success" @click="mergeSql">代码连贯模式</el-button>
       </div>
       <div class="work-content" v-for="(item, index) in workForm" :key="index">
-        <el-form :model="item" :rules="dataRule" ref="workForm" label-width="120px">
-          <el-form-item label="作业序号" prop="workIndex">
-            <el-input v-model="item.workIndex" placeholder="作业序号" />
+        <el-form :model="item" :rules="dataRule" ref="workForm">
+          <el-form-item label="作业序号" prop="workIndex" label-width="120px">
+            <el-input-number v-model="item.workIndex" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
-          <el-form-item label="作业类型" prop="workType">
-            <el-select v-model="item.workType" placeholder="请选择作业类型">
-              <el-option label="earliest" value="earliest"></el-option>
-              <el-option label="latest" value="latest"></el-option>
-            </el-select>
+          <div class="work-type-pane">
+            <el-form-item label="作业类型" prop="workType" label-width="120px">
+              <el-select v-model="item.workType" placeholder="请选择数据源类型">
+                <el-option label="earliest" value="earliest"></el-option>
+                <el-option label="latest" value="latest"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item prop="dataSource" label-width="10px">
+              <el-select v-model="item.dataSource" placeholder="请选择数据源名称">
+                <el-option label="earliest" value="earliest"></el-option>
+                <el-option label="latest" value="latest"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item prop="account" label-width="10px">
+              <el-select v-model="item.account" placeholder="请选择账户" @change="handleChange">
+                <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+                  <el-option
+                    v-for="item in group.options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-option-group>
+              </el-select>
+              <span style="color:red;font-size:10px;">
+                （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
+              </span>
+            </el-form-item>
+          </div>
+          <el-form-item label="作业描述" prop="workDesc" label-width="120px">
+            <el-input type="textarea" v-model="item.workDesc" placeholder="作业描述" />
           </el-form-item>
-          <el-form-item label="数据源" prop="dataSource">
-            <el-select v-model="item.dataSource" placeholder="请选择数据源">
-              <el-option label="earliest" value="earliest"></el-option>
-              <el-option label="latest" value="latest"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="账户" prop="account">
-            <el-select v-model="item.account" placeholder="请选择" @change="handleChange">
-              <el-option-group v-for="group in options" :key="group.label" :label="group.label">
-                <el-option
-                  v-for="item in group.options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-option-group>
-            </el-select>
-            <span style="color:red;font-size:10px;">
-              （如需配置账户/无账户信息，请前往
-              <router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
-            </span>
-          </el-form-item>
-          <el-form-item label="作业描述" prop="workDesc">
-            <el-input type="textarea" v-model="item.workDesc" placeholder="kafka地址" />
-          </el-form-item>
-          <el-form-item prop="sql" label="作业语句" :ref="'mycode-' + index">
+          <el-form-item prop="sql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
-                ref="mycode"
+                :ref="'code-' + index"
                 v-model="item.sql"
                 :options="cmOptions"
-                @changes="changes(item, 'mycode-' + index, index)"
+                @changes="cm => workItemChanges(cm, item, 'mycode-' + index, index)"
+                @keydown.native="e => workItemKeyDown(e, index)"
                 class="code"
                 style="padding-bottom: 0px"
               ></codemirror>
@@ -93,18 +99,19 @@
     <el-dialog
       title="代码连贯模式"
       :visible.sync="mergeCodeVisible"
-      :modal-append-to-body="false"
+      :modal-append-to-body="true"
       :close-on-click-modal="false"
       :append-to-body="true"
       width="50%"
     >
-      <div style="position:relative">
+      <div style="position:relative;">
         <codemirror
           ref="previewSql"
           v-model="previewSql"
-          :options="previewSqlOptions"
+          :options="cmOptions"
           @changes="sqlPreviewChange"
           @click.native="sqlPreviewFocus"
+          @keydown.native="sqlPreviewKeyDown"
           class="code"
           style="border:1px solid #dcdfe6; border-radius: 4px;"
         ></codemirror>
@@ -122,15 +129,15 @@
 import { deepClone } from '@/utils'
 import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
 import { codemirror } from 'vue-codemirror'
-import 'codemirror/theme/ambiance.css'
 import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/idea.css'
 import 'codemirror/addon/hint/show-hint.css'
+import 'codemirror/addon/hint/anyword-hint.js'
 require('codemirror/addon/edit/matchbrackets')
 require('codemirror/addon/selection/active-line')
-require('codemirror/mode/sql/sql')
-require('codemirror/addon/hint/show-hint')
-require('codemirror/addon/hint/sql-hint')
-
+require('codemirror/mode/sql/sql.js')
+require('codemirror/addon/hint/show-hint.js')
+require('codemirror/addon/hint/sql-hint.js')
 export default {
   name: 'codeMirror',
   components: {
@@ -203,40 +210,44 @@ export default {
           label: '广州账号'
         }]
       }],
-
       cmOptions: {
-        mode: 'text/x-sql',
-        indentWithTabs: true,
-        smartIndent: true,
-        lineNumbers: true,
-        matchBrackets: true,
-        autofocus: false,
-        styleActiveLine: true,
-        styleSelectedText: true,
+        theme: 'idea',
+        mode: 'text/x-sparksql',
         lineWrapping: true,
-        extraKeys: {},
-        hintOptions: {
-          completeSingle: true,
-          tables: {}
-        }
+        lineNumbers: true,
+        autofocus: false,
+        smartIndent: false,
+        autocorrect: true,
+        spellcheck: true,
+        extraKeys: {
+          Tab: 'autocomplete'
+        },
+        lint: true,
+        gutters: [
+          'CodeMirror-lint-markers',
+          'CodeMirror-linenumbers',
+          'CodeMirror-foldgutter'
+        ],
+        foldGutter: true,
+        autoCloseBrackets: true,
+        autoCloseTags: true,
+        matchTags: { bothTags: true },
+        matchBrackets: true,
+        styleActiveLine: true,
+        autoRefresh: true,
+        highlightSelectionMatches: {
+          minChars: 2,
+          style: 'matchhighlight',
+          showToken: true
+        },
+        styleSelectedText: true
       },
       diffToCompare: window.diff.compare,
       updateRowNum: 0,
       originpreviewSql: '', // 保留一份原始的连贯数据，用于做对比
       previewSql: '',
-      sqlLineDist: [],
-      sqlLineWorkIndex: [],
-      previewSqlOptions: {
-        mode: 'text/x-mariadb',
-        indentWithTabs: true,
-        smartIndent: true,
-        lineNumbers: true,
-        matchBrackets: true,
-        extraKeys: { Ctrl: 'autocomplete' }, // 自定义快捷键
-        hintOptions: {
-          tables: {}
-        }
-      }
+      sqlLineDist: [], // 保存连贯代码时的各作业title
+      sqlLineWorkIndex: [] // 保存连贯排序后的作业序号，用来处理重新渲染时查找元素用
     }
   },
   mounted () {
@@ -244,8 +255,8 @@ export default {
   },
   computed: {
     previreCodemirror () {
-        return this.$refs.previewSql.codemirror
-      }
+      return this.$refs.previewSql.codemirror
+    }
   },
   methods: {
     init (id, value) {
@@ -268,7 +279,19 @@ export default {
       console.log(val)
     },
     mergeSql () { // 代码连贯操作
+      // 判断作业序号是否重复，若重复就报错，不然连贯后再渲染会有问题
+      let indexArr = []
+      this.workForm.forEach(item => {
+        indexArr.push(item.workIndex * 1)
+      })
+      let uniqueIndexArr = Array.from(new Set(indexArr))
+      if (uniqueIndexArr.length < indexArr.length) {
+        return this.$message.error('作业序号不可重复，请重新填写后再操作')
+      }
       this.previewSql = ''
+      this.sqlLineDist = []
+      this.sqlLineWorkIndex = []
+      this.updateRowNum = 0
       let newWorkForm = deepClone(this.workForm) // 对数组进行排序
       newWorkForm.sort((a, b) => {
         return a.workIndex * 1 - b.workIndex * 1
@@ -300,12 +323,29 @@ export default {
         }
       }
       this.updateRowNum = changeNum
+      // 输入提示
+      if (!this.previewSql) {
+        this.$nextTick(() => {
+          this.$refs.previewSql.codemirror.setOption('lint', false)
+        })
+        return
+      }
+      this.$refs.previewSql.codemirror.setOption('lint', false)
+      this.$nextTick(() => {
+        this.$refs.previewSql.codemirror.setOption('lint', true)
+      })
+    },
+    sqlPreviewKeyDown (event) {
+      const keyCode = event.keyCode || event.which || event.charCode
+      const keyCombination = event.ctrlKey || event.altKey || event.metaKey
+      if (!keyCombination && keyCode > 64 && keyCode < 123) {
+        this.$refs.previewSql.codemirror.showHint({ completeSingle: false })
+      }
     },
     sqlPreviewFocus () {
       this.previewSqlDefaultRow()
     },
     previewSqlSubmit () { // 连贯代码提交
-      console.log(this.sqlLineDist)
       let sqlValue = this.previewSql
       let tempValStartIndex = 0
       let tempValEndIndex = 0
@@ -320,32 +360,46 @@ export default {
           tempValEndIndex = sqlValue.length
         }
         tempValue = sqlValue.substring(tempValStartIndex + titleLength, tempValEndIndex)
-        // if(this.workForm[i].sql != undefined){
-        //   codesList[i].setValue(tempValue)
-        // }
         let index = this.findIndex(this.sqlLineWorkIndex[i])
-        console.log(index, tempValue, this.workForm)
-        this.workForm.splice(index, 1, { ...this.workForm[i], sql: tempValue })
+        let tempArr = tempValue.split('\n').filter(item => item !== '') // 把多余的回车去掉
+        this.workForm.splice(index, 1, { ...this.workForm[index], sql: tempArr.join('\n') })
       }
       this.mergeCodeVisible = false
     },
     findIndex (n) {
       let i = 0
       this.workForm.forEach((item, index) => {
-        if (item.workIndex === n) {
+        if (item.workIndex * 1 === n * 1) {
           i = index
         }
       })
-      console.log(i)
       return i
     },
-    changes (item, ref, index) { // 内容更新时，不为空时将报错信息去除
+    workItemChanges (cm, item, ref, index) { // 内容更新时，不为空时将报错信息去除
       let curSql = item.sql
       if (curSql !== '') {
         this.$refs[ref][0].clearValidate()
         this.workForm.splice(index, 1, { ...item, placeholder: '' })
       } else {
         this.workForm.splice(index, 1, { ...item, placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！' })
+      }
+      if (!curSql) {
+        this.$nextTick(() => {
+          this.$refs['code-' + index][0].codemirror.setOption('lint', false)
+        })
+      } else {
+        this.$refs['code-' + index][0].codemirror.setOption('lint', false)
+        this.$nextTick(() => {
+          this.$refs['code-' + index][0].codemirror.setOption('lint', true)
+        })
+      }
+    },
+    // 按下键盘事件处理函数
+    workItemKeyDown (event, index) {
+      const keyCode = event.keyCode || event.which || event.charCode
+      const keyCombination = event.ctrlKey || event.altKey || event.metaKey
+      if (!keyCombination && keyCode > 64 && keyCode < 123) {
+        this.$refs['code-' + index][0].codemirror.showHint({ completeSingle: false })
       }
     },
     previewSqlDefaultRow () { // 设置每个作业的title不可修改
@@ -423,7 +477,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style>
 .api-manage-drawer .wrap {
     padding: 0 20px 20px;
     margin-top: -12px;
@@ -480,9 +534,21 @@ export default {
     z-index: 500;
   }
   .CodeMirror {
-    height: 300px
+    height: 260px
   }
   .styled-background {
     color: red
+  }
+  .work-type-pane {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .CodeMirror-hints.xq-light, .CodeMirror-hints.idea {
+    position: absolute;
+    z-index: 9999;
+    display: block;
   }
 </style>

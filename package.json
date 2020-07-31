@@ -32,6 +32,7 @@
     "gulp-preprocess": "^3.0.2",
     "gulp-replace": "0.6.1",
     "gulp-shell": "0.6.5",
+    "jshint": "^2.11.2",
     "lodash": "4.17.5",
     "node-sass": "^4.9.0",
     "qs": "^6.9.0",
