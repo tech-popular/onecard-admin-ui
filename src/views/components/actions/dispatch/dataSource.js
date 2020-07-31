@@ -1,10 +1,37 @@
-import { list, deleted } from '@/api/lexicon/cacheCleanup'
+import {
+  list,
+  deleted
+} from '@/api/dispatch/dataSource'
 export const models = {
-  data () {
-    let type = [{label: '全部', value: 1}, {label: '采集任务', value: 2}, {label: '计算任务', value: 3}, {label: '同步任务', value: 4}]
-    let typeProps = {label: 'label', value: 'value'}
-    let status = [{label: '全部', value: 1}, {label: '启用', value: 2}, {label: '停用', value: 3}]
-    let statusProps = {label: 'label', value: 'value'}
+  data() {
+    let type = [{
+      label: '全部',
+      value: 1
+    }, {
+      label: '采集任务',
+      value: 2
+    }, {
+      label: '计算任务',
+      value: 3
+    }, {
+      label: '同步任务',
+      value: 4
+    }]
+    let typeProps = {
+      label: 'label',
+      value: 'value'
+    }
+    let status = [{
+      label: '有效',
+      value: 1
+    }, {
+      label: '无效',
+      value: 0
+    }]
+    let statusProps = {
+      label: 'label',
+      value: 'value'
+    }
     return {
       props: {
         multiple: false,
@@ -19,49 +46,45 @@ export const models = {
       dataListLoading: false,
       addOrUpdateVisible: false,
       // 操作按钮
-      operates: [
-        {
-          id: 1,
-          label: '编辑',
-          type: 'primary',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
-          }
-        },
-        {
-          id: 2,
-          label: '删除',
-          type: 'danger',
-          method: (id) => {
-            this.deleteHandle(id)
-          }
+      operates: [{
+        id: 1,
+        label: '编辑',
+        type: 'primary',
+        method: (id) => {
+          this.addOrUpdateHandle(id)
         }
-      ],
-      columns: [
-        {
+      }],
+      columns: [{
           prop: 'id',
           label: '数据源ID',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceName',
           label: '数据源名称',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceIp',
           label: '服务器地址',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceName',
           label: '数据库名称',
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'dataSourceType',
           label: '数据源类型',
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('el-tag', {
+              props: {
+                type: params.row.flag === '1' ? '' : 'warning'
+              } // 组件的props
+            }, params.row.flag === '1' ? '计算任务' : '同步任务')
+          }
         },
         {
           prop: 'createUser',
@@ -69,7 +92,7 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'createTime',
           label: '任务创建时间',
           align: 'center'
         },
@@ -79,81 +102,125 @@ export const models = {
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              props: {type: params.row.flag === 1 ? '' : 'warning'} // 组件的props
-            }, params.row.flag === 1 ? '需要' : '不需要')
+              props: {
+                type: params.row.flag === '1' ? '' : 'warning'
+              } // 组件的props
+            }, params.row.flag === '1' ? '需要' : '不需要')
           }
         }
       ],
       list: [],
-      searchData: {
-        name: null,
-        id: null,
-        type: null,
-        user: null,
-        status: null
-      },
-      searchForm: [
-        {type: 'Input', label: '数据源名称', prop: 'name', width: '300px', placeholder: '请输入名称'},
-        {type: 'Input', label: '服务器地址', prop: 'name', width: '300px', placeholder: '请输入名称'},
-        {type: 'Input', label: '数据库名称', prop: 'name', width: '300px', placeholder: '请输入名称'},
-        {type: 'Select', label: '数据源类型', prop: 'type', width: '300px', options: type, props: typeProps, change: row => '', placeholder: '请选择数据源类型'},
-        {type: 'Select', label: '状态', prop: 'status', width: '300px', options: status, props: statusProps, change: row => '', placeholder: '请选择状态'}
+      searchData: {},
+      searchForm: [{
+          type: 'Input',
+          label: '数据源名称',
+          prop: 'name',
+          width: '300px',
+          placeholder: '请输入名称'
+        },
+        {
+          type: 'Input',
+          label: '服务器地址',
+          prop: 'ip',
+          width: '300px',
+          placeholder: '请输入服务器地址'
+        },
+        {
+          type: 'Input',
+          label: '数据库名称',
+          prop: 'database',
+          width: '300px',
+          placeholder: '请输入数据库名称'
+        },
+        {
+          type: 'Select',
+          label: '数据源类型',
+          prop: 'type',
+          width: '300px',
+          options: type,
+          props: typeProps,
+          change: row => '',
+          placeholder: '请选择数据源类型'
+        },
+        {
+          type: 'Select',
+          label: '状态',
+          prop: 'dataSourceDisable',
+          width: '300px',
+          options: status,
+          props: statusProps,
+          change: row => '',
+          placeholder: '请选择状态'
+        }
       ],
-      searchHandle: [
-        {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
-        {label: '重置', type: '', handle: () => { this.resetHandle() }},
-        {label: '新增', type: 'primary', handle: () => { this.addOrUpdateHandle() }}
+      searchHandle: [{
+          label: '查询',
+          type: 'primary',
+          handle: () => {
+            this.handleSearch()
+          }
+        },
+        {
+          label: '重置',
+          type: '',
+          handle: () => {
+            this.resetHandle()
+          }
+        }
       ]
     }
   },
-  mounted () {
+  mounted() {
     this.init()
   },
   methods: {
-    init () {
+    init() {
       const dataBody = {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize,
         'id': this.searchData.id,
         'name': this.searchData.name,
+        'ip': this.searchData.ip,
+        'database': this.searchData.database,
         'type': this.searchData.type,
-        'user': this.searchData.user,
-        'status': this.searchData.status
+        'dataSourceDisable': this.searchData.dataSourceDisable
       }
       this.getList(dataBody)
     },
     // 查询
-    handleSearch () {
+    handleSearch() {
       this.pageNum = 1
       this.init()
     },
     // 重置
-    resetHandle () {
+    resetHandle() {
       this.pageNum = 1
       this.searchData = {}
       this.init()
     },
     // 新增 / 修改
-    addOrUpdateHandle (id) {
+    addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id)
+        this.$refs.addOrUpdate.init(id.id)
       })
     },
     // 每页数
-    sizeChangeHandle (val) {
+    sizeChangeHandle(val) {
       this.pageSize = val
       this.init()
     },
     // 当前页
-    currentChangeHandle (val) {
+    currentChangeHandle(val) {
       this.pageNum = val
       this.init()
     },
     // 列表接口
-    getList (dataBody) {
+    getList(dataBody) {
       this.dataListLoading = true
-      list(dataBody).then(({data}) => {
+      list(dataBody).then(({
+        data
+      }) => {
         if (data && data.code === 0) {
           this.dataListLoading = false
           this.list = data.data.list
@@ -166,14 +233,18 @@ export const models = {
       })
     },
     // 删除接口
-    deleteHandle (id) {
-      const dataBody = {'id': id.id}
+    deleteHandle(id) {
+      const dataBody = {
+        'id': id.id
+      }
       this.$confirm(`确定删除操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleted(dataBody).then(({data}) => {
+        deleted(dataBody).then(({
+          data
+        }) => {
           if (data && data.code === 0) {
             this.$message({
               message: '操作成功',
