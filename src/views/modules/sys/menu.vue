@@ -250,7 +250,7 @@
         }).catch(() => {})
       },
       resetHandle () { // 重置
-        // this.dataForm.name = ''
+        this.dataForm.select = ''
         this.dataForm.id = ''
         this.getDataList()
       }
