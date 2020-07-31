@@ -49,7 +49,6 @@ const mainRoutes = {
     { path: '/phoenix-spectaculars0', component: _import('modules/phoenix/spectaculars0'), name: 'phoenix-spectaculars0', meta: { title: '彩虹评级', isTab: true } }
   ],
   beforeEnter (to, from, next) {
-    console.log(to, from)
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       clearLoginInfo()
@@ -178,9 +177,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
       } else {
         try {
           route['component'] = _import(`modules/${menuList[i].url}`) || null
-        } catch (e) {
-          console.log(e)
-        }
+        } catch (e) {}
       }
       routes.push(route)
     }
