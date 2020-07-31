@@ -177,7 +177,9 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
       } else {
         try {
           route['component'] = _import(`modules/${menuList[i].url}`) || null
-        } catch (e) {}
+        } catch (e) {
+          console.log(e)
+        }
       }
       routes.push(route)
     }
