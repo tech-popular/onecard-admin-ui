@@ -68,7 +68,6 @@
     methods: {
       // 路由操作
       routeHandle (route) {
-        console.log(444, route)
         this.menuList = JSON.parse(sessionStorage.getItem('menuList') || '[]')
         this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
         if (route.meta.isTab) {
@@ -78,7 +77,6 @@
             if (route.meta.isDynamic) {
               route = this.dynamicMenuRoutes.filter(item => item.name === route.name)[0]
               if (!route) {
-                console.log(123, route)
                 return console.error('未能找到可用标签页!')
               }
             }
