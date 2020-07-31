@@ -77,6 +77,7 @@
             if (route.meta.isDynamic) {
               route = this.dynamicMenuRoutes.filter(item => item.name === route.name)[0]
               if (!route) {
+                console.log(123, route)
                 return this.$message.error('未能找到可用标签页!')
               }
             }
