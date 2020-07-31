@@ -49,6 +49,7 @@ const mainRoutes = {
     { path: '/phoenix-spectaculars0', component: _import('modules/phoenix/spectaculars0'), name: 'phoenix-spectaculars0', meta: { title: '彩虹评级', isTab: true } }
   ],
   beforeEnter (to, from, next) {
+    console.log(to, from)
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       clearLoginInfo()
