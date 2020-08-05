@@ -1,5 +1,5 @@
 import {
-  saveorupt,
+  saveAccount,
   info
 } from '@/api/dispatch/dataSource'
 export const addOrEdotModels = {
@@ -44,34 +44,56 @@ export const addOrEdotModels = {
           label: '数据库名称',
           disabled: true
         },
-        accountStatus: {
+        datasourceAccountType: {
           type: 'radio',
           label: '账户类型',
-          default: 1,
+          default: 0,
           options: [{
               text: '公共账户',
-              value: 1
+              value: 0
             },
             {
               text: '个人帐户',
-              value: 0
+              value: 1
             }
           ],
-          required: true
+          required: true,
+          on: {
+            change: (data) => {
+              if (this.formData.accountList) {
+                let filterArr = this.formData.accountList.filter(item => item.datasourceAccountType === this.formData.datasourceAccountType)
+                if (filterArr.length) {
+                  this.formData.datasourceUser = filterArr[0].datasourceUser
+                  this.formData.datasourcePasswd = filterArr[0].datasourcePasswd
+                  this.formData.accountDisable = filterArr[0].accountDisable
+                } else {
+                  this.formData.datasourceUser = ''
+                  this.formData.datasourcePasswd = ''
+                  this.formData.accountDisable = ''
+                }
+              }
+            }
+          }
         },
-        createUser: {
+        datasourceUser: {
           type: 'input',
           label: '用户名 / Access Key ID',
-          required: true
+          isReloadOptions: true,
+          required: true,
+          default: '',
+          autocomplete: 'off'
         },
-        password: {
+        datasourcePasswd: {
           type: 'password',
           label: '密码 / Access Key Secret',
-          required: true
+          isReloadOptions: true,
+          required: true,
+          autocomplete: 'off'
         },
-        flag: {
+        accountDisable: {
           type: 'radio',
           label: '状态',
+          isReloadOptions: true,
           default: 1,
           options: [{
               text: '有效',
@@ -89,19 +111,36 @@ export const addOrEdotModels = {
       dataBody: {}
     }
   },
+  computed: {
+    userName: {
+      get () { return this.$store.state.user.name }
+    }
+  },
   methods: {
     init(id) {
-      console.log(id, 'ppp')
-      this.id = id ? id.id : ''
+      if (id) {
+        this.id = id
+      }
       this.visible = true
       this.$nextTick(() => {
         if (id) {
-          console.log(this.submitBtn)
           this.submitBtn = false
           info(id).then(({
             data
           }) => {
             this.formData = data.data
+            // 初始化一下账户信息，默认取数组第一条
+            if (data.data.accountList.length) {
+              this.formData.datasourceAccountType = data.data.accountList[0].datasourceAccountType
+              this.formData.datasourceUser = data.data.accountList[0].datasourceUser
+              this.formData.datasourcePasswd = data.data.accountList[0].datasourcePasswd
+              this.formData.accountDisable = data.data.accountList[0].accountDisable
+            } else {
+              this.formData.datasourceAccountType = ''
+              this.formData.datasourceUser = ''
+              this.formData.datasourcePasswd = ''
+              this.formData.accountDisable = ''
+            }
           })
         }
       })
@@ -117,7 +156,15 @@ export const addOrEdotModels = {
     },
     // 提交
     handleSuccess() {
-      saveorupt(this.dataBody).then(({
+      let params = {
+          'dataSourceId': this.id,
+          'datasourceAccountType': this.dataBody.datasourceAccountType,
+          'datasourceUser': this.dataBody.datasourceUser,
+          'datasourcePasswd': this.dataBody.datasourcePasswd,
+          'accountDisable': this.dataBody.accountDisable,
+          'createUser': this.userName
+      }
+      saveAccount(params).then(({
         data
       }) => {
         if (data && data.code === 0) {
