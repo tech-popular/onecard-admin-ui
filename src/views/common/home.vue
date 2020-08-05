@@ -122,7 +122,7 @@ export default {
       allSystemData: [
         {
           isRouter: true,
-          name: '数据服务板块',
+          name: '数据服务',
           img: require('../../assets/img/dataservice.jpg'),
           url: sessionStorage.getItem('defaultPage'),
           menuId: 405
