@@ -121,6 +121,8 @@ export const addOrEdotModels = {
       if (id) {
         this.id = id
       }
+      this.formData.datasourceUser = ''
+      this.formData.datasourcePasswd = ''
       this.visible = true
       this.$nextTick(() => {
         if (id) {
@@ -143,6 +145,7 @@ export const addOrEdotModels = {
             }
           })
         }
+        console.log(this.formData.datasourceUser)
       })
     },
     handleCancel() {
@@ -157,7 +160,7 @@ export const addOrEdotModels = {
     // 提交
     handleSuccess() {
       let params = {
-          'dataSourceId': this.id,
+          'datasourceId': this.id,
           'datasourceAccountType': this.dataBody.datasourceAccountType,
           'datasourceUser': this.dataBody.datasourceUser,
           'datasourcePasswd': this.dataBody.datasourcePasswd,

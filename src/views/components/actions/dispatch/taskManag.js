@@ -1,22 +1,17 @@
 import {
-  list,
-  deleted,
-  implement
-} from '@/api/lexicon/cacheCleanup'
+  list
+} from '@/api/dispatch/taskManag'
 export const models = {
   data() {
     let type = [{
       label: '全部',
-      value: 1
+      value: -1
     }, {
       label: '采集任务',
-      value: 2
+      value: 'ACQUISITION'
     }, {
       label: '计算任务',
-      value: 3
-    }, {
-      label: '同步任务',
-      value: 4
+      value: 'CALCULATE'
     }]
     let typeProps = {
       label: 'label',
@@ -24,13 +19,13 @@ export const models = {
     }
     let status = [{
       label: '全部',
-      value: 1
+      value: -1
     }, {
       label: '启用',
-      value: 2
+      value: 1
     }, {
       label: '停用',
-      value: 3
+      value: 0
     }]
     let statusProps = {
       label: 'label',
@@ -84,14 +79,6 @@ export const models = {
           method: (editSnapshot) => {
             this.editSnapshotHandle(editSnapshot)
           }
-        },
-        {
-          id: 5,
-          label: '删除',
-          type: 'danger',
-          method: (id) => {
-            this.deleteHandle(id)
-          }
         }
       ],
       columns: [{
@@ -100,24 +87,24 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'taskName',
           label: '任务名称',
           align: 'center'
         },
         {
-          prop: 'cacheType',
+          prop: 'taskType',
           label: '任务类型',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              props: {
-                type: params.row.cacheType === 0 ? '' : 'warning'
-              } // 组件的props
-            }, params.row.cacheType === 0 ? 'EhCahe' : 'redis')
+              // props: {
+              //   type: params.row.cacheType === 0 ? '' : 'warning'
+              // } // 组件的props
+            }, params.row.taskType)
           }
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'createTime',
           label: '任务创建时间',
           align: 'center'
         },
@@ -127,30 +114,30 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'flag',
+          prop: 'dispatchStatus',
           label: '调度起停状态',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.flag === 1 ? '' : 'warning'
+                type: params.row.dispatchStatus === 1 ? '' : 'warning'
               } // 组件的props
-            }, params.row.flag === 1 ? '需要' : '不需要')
+            }, params.row.dispatchStatus === 1 ? '启用' : '停用')
           }
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'dependence',
           label: '有无依赖',
           align: 'center'
         }
       ],
       list: [],
       searchData: {
-        name: null,
-        id: null,
-        type: null,
-        user: null,
-        status: null
+        name: '',
+        id: '',
+        type: -1,
+        user: '',
+        status: -1
       },
       searchForm: [{
           type: 'Input',
@@ -236,9 +223,9 @@ export const models = {
         'pageSize': this.pageSize,
         'id': this.searchData.id,
         'name': this.searchData.name,
-        'type': this.searchData.type,
+        'type': this.searchData.type === -1 ? '' : this.searchData.type,
         'user': this.searchData.user,
-        'status': this.searchData.status
+        'status': this.searchData.status === -1 ? '' : this.searchData.status
       }
       this.getList(dataBody)
     },
@@ -301,104 +288,104 @@ export const models = {
           this.$message.error(data.msg)
         }
       })
-    },
-    // 删除接口
-    deleteHandle(id) {
-      const dataBody = {
-        'id': id.id
-      }
-      this.$confirm(`确定删除操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleted(dataBody).then(({
-          data
-        }) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                const dataBody = {
-                  'pageNum': this.pageNum,
-                  'pageSize': this.pageSize
-                }
-                this.getList(dataBody)
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      })
-    },
-    // 执行接口
-    implementHandle(val) {
-      this.$confirm(`确定执行操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        if (val.flag === 1) {
-          this.$prompt('请输入缓存key', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消'
-          }).then(({
-            value
-          }) => {
-            const dataBody = {
-              'id': val.id,
-              'suffixKey': value
-            }
-            implement(dataBody).then(({
-              data
-            }) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    const dataBody = {
-                      'pageNum': this.pageNum,
-                      'pageSize': this.pageSize
-                    }
-                    this.getList(dataBody)
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          })
-        } else {
-          const dataBody = {
-            'id': val.id
-          }
-          implement(dataBody).then(({
-            data
-          }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  const dataBody = {
-                    'pageNum': this.pageNum,
-                    'pageSize': this.pageSize
-                  }
-                  this.getList(dataBody)
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }
-      })
     }
+    // // 删除接口
+    // deleteHandle(id) {
+    //   const dataBody = {
+    //     'id': id.id
+    //   }
+    //   this.$confirm(`确定删除操作?`, '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   }).then(() => {
+    //     deleted(dataBody).then(({
+    //       data
+    //     }) => {
+    //       if (data && data.code === 0) {
+    //         this.$message({
+    //           message: '操作成功',
+    //           type: 'success',
+    //           duration: 1500,
+    //           onClose: () => {
+    //             const dataBody = {
+    //               'pageNum': this.pageNum,
+    //               'pageSize': this.pageSize
+    //             }
+    //             this.getList(dataBody)
+    //           }
+    //         })
+    //       } else {
+    //         this.$message.error(data.msg)
+    //       }
+    //     })
+    //   })
+    // },
+    // 执行接口
+    // implementHandle(val) {
+    //   this.$confirm(`确定执行操作?`, '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   }).then(() => {
+    //     if (val.flag === 1) {
+    //       this.$prompt('请输入缓存key', '提示', {
+    //         confirmButtonText: '确定',
+    //         cancelButtonText: '取消'
+    //       }).then(({
+    //         value
+    //       }) => {
+    //         const dataBody = {
+    //           'id': val.id,
+    //           'suffixKey': value
+    //         }
+    //         implement(dataBody).then(({
+    //           data
+    //         }) => {
+    //           if (data && data.code === 0) {
+    //             this.$message({
+    //               message: '操作成功',
+    //               type: 'success',
+    //               duration: 1500,
+    //               onClose: () => {
+    //                 const dataBody = {
+    //                   'pageNum': this.pageNum,
+    //                   'pageSize': this.pageSize
+    //                 }
+    //                 this.getList(dataBody)
+    //               }
+    //             })
+    //           } else {
+    //             this.$message.error(data.msg)
+    //           }
+    //         })
+    //       })
+    //     } else {
+    //       const dataBody = {
+    //         'id': val.id
+    //       }
+    //       implement(dataBody).then(({
+    //         data
+    //       }) => {
+    //         if (data && data.code === 0) {
+    //           this.$message({
+    //             message: '操作成功',
+    //             type: 'success',
+    //             duration: 1500,
+    //             onClose: () => {
+    //               const dataBody = {
+    //                 'pageNum': this.pageNum,
+    //                 'pageSize': this.pageSize
+    //               }
+    //               this.getList(dataBody)
+    //             }
+    //           })
+    //         } else {
+    //           this.$message.error(data.msg)
+    //         }
+    //       })
+    //     }
+    //   })
+    // }
   }
 }
