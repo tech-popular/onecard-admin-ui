@@ -63,36 +63,38 @@
                 <h4>去往其他系统</h4>
                 <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
                 <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px; cursor:pointer" @click.native="gotoHandle(fenghuang)">
                     <img width="100%" height="155px" src="~@/assets/img/fenghuang.png">
                     <el-row style="padding:10px">
                       <el-col :span="12" style="line-height: 38px;"><span>凤凰系统</span></el-col>
                       <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="fhHandle(fenghuang)"></el-button>
+                       <el-button type="primary" icon="el-icon-right" size="mini" circle></el-button>
                       </el-col>
                     </el-row>
                   </el-card>
                 </el-col>
                 <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px; cursor:pointer" @click.native="gotoHandle(bi)">
                     <img width="100%" height="155px" src="~@/assets/img/bi.jpg">
                     <el-row style="padding:10px">
                       <el-col :span="12" style="line-height: 38px;"><span>BI系统</span></el-col>
                       <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                       <el-button type="primary" icon="el-icon-right" size="mini" circle @click="biHandle(bi)"></el-button>
+                       <el-button type="primary" icon="el-icon-right" size="mini" circle></el-button>
                       </el-col>
                     </el-row>
                   </el-card>
                 </el-col>
-                <!-- <el-col :span="8">
-                  <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                    <img width="100%" height="155px" src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png">
+                <el-col :span="8">
+                  <el-card :body-style="{ padding: '0px' }" style="margin:5px; cursor:pointer" @click.native="gotoHandle(shuyu)">
+                    <img width="100%" height="155px" src="~@/assets/img/shuyu.png">
                     <el-row style="padding:10px">
-                      <el-col :span="12"><span>凤凰系统</span></el-col>
-                      <el-col :span="12" style="text-align: right;color: #2093f7;"><i class="el-icon-right"></i></el-col>
+                      <el-col :span="12" style="line-height: 38px;"><span>数语系统</span></el-col>
+                      <el-col :span="12" style="text-align: right;vertical-align: middle;">
+                        <el-button type="primary" icon="el-icon-right" size="mini" circle></el-button>
+                      </el-col>
                     </el-row>
                   </el-card>
-                </el-col> -->
+                </el-col>
               </el-row>
               <!-- <el-row>
                 <el-col :span="8">
@@ -124,7 +126,8 @@ export default {
       value: new Date(),
       dataHoste: '',
       fenghuang: originHost + '/phoenix/#/home',
-      bi: 'http://data.9fbank.com/plate.jsp'
+      bi: 'http://data.9f.cn/login.jsp',
+      shuyu: 'http://datablau.9f.cn/dam/login.jsp'
     }
   },
   computed: {
@@ -161,10 +164,7 @@ export default {
     this.dataHoste = days + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒'
   },
   methods: {
-    fhHandle (url) {
-      window.open(url, '_blank')
-    },
-    biHandle (url) {
+    gotoHandle (url) {
       window.open(url, '_blank')
     }
   }
