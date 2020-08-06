@@ -8,10 +8,10 @@
         active-text-color="#fff"
         text-color="#fff"
         class="site-sidebar__menu">
-        <el-menu-item index="home" @click="$router.push({ name: 'home' })">
+        <!-- <el-menu-item index="home" @click="$router.push({ name: 'home' })">
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">首页</span>
-        </el-menu-item>
+        </el-menu-item> -->
         <sub-menu
           v-for="menu in menuList"
           :key="menu.menuId"
@@ -63,13 +63,13 @@
       $route: 'routeHandle'
     },
     created () {
-      this.menuList = JSON.parse(sessionStorage.getItem('menuList') || '[]')
-      this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
       this.routeHandle(this.$route)
     },
     methods: {
       // 路由操作
       routeHandle (route) {
+        this.menuList = JSON.parse(sessionStorage.getItem('menuList') || '[]')
+        this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
         if (route.meta.isTab) {
           // tab选中, 不存在先添加
           var tab = this.mainTabs.filter(item => item.name === route.name)[0]

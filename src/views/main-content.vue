@@ -74,6 +74,9 @@
         return { minHeight: height + 'px' }
       }
     },
+    mounted () {
+      this.mainTabs = this.mainTabs.filter(item => item.name === this.mainTabsActiveName)
+    },
     methods: {
       // tabs, 选中tab
       selectedTabHandle (tab) {

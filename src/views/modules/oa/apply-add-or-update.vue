@@ -8,6 +8,7 @@
   >
     <el-divider>请选择申请类别</el-divider>
     <el-tabs type="border-card" @tab-click="tabClick" v-model="actoveTab">
+      <!-- 账号 -->
       <el-tab-pane label="账号权限" name="账号权限">
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
@@ -36,10 +37,34 @@
           </el-form-item>
         </el-form>
         <div class="foot">
-          <el-button @click="applyDataFormCancel()">取消</el-button>
+          <el-button @click="cancel()">取消</el-button>
           <el-button type="primary" @click="dataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
+      <!-- 租户 -->
+      <el-tab-pane label="租户申请" name="租户申请">
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#e6a23c"></i>如选项中未包含期望申请的租户，请邮件&lt;<span style="color:#2093f7">datareq@9fbank.com.cn</span>&gt;进行新增申请</p>
+        <el-form :model="tenantForm" :rules="tenantRule" ref="tenantForm" label-width="100px">
+          <el-form-item label="选择租户" prop="tenantIds">
+            <el-select v-model="tenantForm.tenantIds" multiple placeholder="请选择" style="width:100%">
+              <el-option
+                v-for="item in tenantList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="申请理由" prop="authApplyReason">
+            <el-input type="textarea" v-model="tenantForm.authApplyReason"></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="foot">
+          <el-button @click="cancel()">取消</el-button>
+          <el-button type="primary" @click="tenantFormSubmit()" :loading="buttonloading">确定</el-button>
+        </div>
+      </el-tab-pane>
+      <!-- 库表 -->
       <el-tab-pane label="库表授权" name="库表授权">
         <el-form
           :model="severDataForm"
@@ -84,7 +109,7 @@
                   ref="staffTable"
                   v-loading="listLoading"
                   :data="staffList"
-                  :row-key="getRowKey" 
+                  :row-key="getRowKey"
                   fit
                   highlight-current-row
                   @selection-change="handleStaffChange"
@@ -135,7 +160,7 @@
                   v-loading="listLoading"
                   :data="selectedStaffList"
                   fit
-                  :row-key="getRowKey" 
+                  :row-key="getRowKey"
                   highlight-current-row
                   @selection-change="handleSelectedStaffChange"
                 >
@@ -166,6 +191,12 @@
           <el-form-item label="maxcomputer账号" prop="account">
             <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
           </el-form-item>
+          <el-form-item label="AccessKeyId" prop="accessKeyId">
+            <el-input v-model="severDataForm.accessKeyId" placeholder="AccessKeyId" />
+          </el-form-item>
+          <el-form-item label="AccessKeySecert" prop="accessKeySecert">
+            <el-input v-model="severDataForm.accessKeySecert" placeholder="AccessKeySecert" />
+          </el-form-item>
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
@@ -174,7 +205,7 @@
           </el-form-item>
         </el-form>
         <div class="foot">
-          <el-button @click="severDataFormCancel()">取消</el-button>
+          <el-button @click="cancel()">取消</el-button>
           <el-button type="primary" @click="severDataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
@@ -190,7 +221,10 @@ import {
   accoutAuthInitInfo,
   saveAccountAuthApply,
   saveDatabaseAuthApply,
-  mcCompute
+  tenantInif,
+  saveTenant,
+  mcCompute,
+  tenantCrent
 } from '@/api/oa/apply'
 export default {
   data () {
@@ -229,13 +263,30 @@ export default {
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
+      tenantList: [],
+      // 租户申请开始
+      tenantForm: {
+        tenantIds: [], // 租户
+        authApplyReason: '' // 申请理由
+      }, // 租户form
+      tenantRule: {
+        tenantIds: [
+          { required: true, message: '请选择租户', trigger: 'blur' }
+        ],
+        authApplyReason: [
+          { required: true, message: '申请理由不能为空', trigger: 'blur' }
+        ]
+      }, // 租户form 表单校验
+      // 租户申请结束
       // 库表授权开始
       severDataForm: {
         title: '', // 库表权限标题
         applyAuthTypeList: [], // 申请权限
         applicantName: '', // 申请人姓名
         account: '', // maxcomputer账号
-        applyReason: '' // 申请理由
+        applyReason: '', // 申请理由
+        accessKeyId: '',
+        accessKeySecert: ''
       },
       severDataRule: {
         title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
@@ -250,6 +301,12 @@ export default {
         ],
         account: [
           {required: true, message: 'maxcomputer不能为空', trigger: 'blur'}
+        ],
+        accessKeyId: [
+          {required: true, message: 'accessKeyId不能为空', trigger: 'blur'}
+        ],
+        accessKeySecert: [
+          {required: true, message: 'accessKeySecert不能为空', trigger: 'blur'}
         ]
       }, // 库表权限表单校验
       dataFormValue: '',
@@ -290,6 +347,7 @@ export default {
     init (id, value) {
       this.dataForm.id = id || ''
       this.dataFormValue = value
+      this.tenantForm.authApplyReason = ''
       this.visible = true
       this.$nextTick(() => {
         this.$refs['severDataForm'].resetFields()
@@ -308,6 +366,16 @@ export default {
           this.touchActionlist = data.data.touchActionList
           this.severDataForm.applicantEmail = data.data.applicantName
           this.severDataForm.applicantTel = data.data.applicantTel
+        })
+        tenantInif().then(({ data }) => {
+          this.tenantList = data.data
+        })
+        var tenanName = []
+        tenantCrent().then(({ data }) => {
+          data.data.map(item => {
+            tenanName.push(item.id)
+            this.tenantForm.tenantIds = tenanName
+          })
         })
       })
     },
@@ -389,6 +457,37 @@ export default {
         }
       })
     },
+    tenantFormSubmit (form) {
+      // 租户提交
+      this.$refs['tenantForm'].validate(valid => {
+        if (valid) {
+          this.buttonloading = true
+          let newData = {
+            tenantIds: this.tenantForm.tenantIds,
+            authApplyReason: this.tenantForm.authApplyReason
+          }
+          saveTenant(newData).then(({ data }) => {
+            if (data && data.status === '1') {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                  this.$refs['dataForm'].resetFields()
+                  this.buttonloading = false
+                  this.isShow = false
+                }
+              })
+            } else {
+              this.$message.error(data.message)
+              this.buttonloading = false
+            }
+          })
+        }
+      })
+    },
     // 账号选中系统数据处理
     testFunction (value) {
       this.systemmodelList = []
@@ -403,12 +502,6 @@ export default {
         var arr = [...b].filter(x => [...a].some(y => y.value === x.value))
         this.systemmodelList = arr
       })
-    },
-    // 账号取消
-    applyDataFormCancel () {
-      this.visible = false
-      this.isShow = false
-      this.$refs['dataForm'].resetFields()
     },
     severDataFormSubmit (form) {
       // 库表授权提交
@@ -425,7 +518,9 @@ export default {
               account: this.severDataForm.account,
               tables: this.selectedStaffList
             },
-            applyAuthTypeList: this.severDataForm.applyAuthTypeList
+            applyAuthTypeList: this.severDataForm.applyAuthTypeList,
+            accessKeySecert: this.severDataForm.accessKeySecert,
+            accessKeyId: this.severDataForm.accessKeyId
           }
           saveDatabaseAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {
@@ -527,13 +622,26 @@ export default {
       this.getStaffList()
     },
     // 库表取消
-    severDataFormCancel () {
+    // severDataFormCancel () {
+    //   this.visible = false
+    //   this.staffTemp.pageNum = 1
+    //   this.staffTemp.name = ''
+    //   this.selectedStaffList = []
+    //   this.$refs.staffTable.clearSelection()
+    //   this.actoveTab = '账号权限'
+    // },
+    // 取消
+    cancel () {
       this.visible = false
+      this.isShow = false
       this.staffTemp.pageNum = 1
       this.staffTemp.name = ''
       this.selectedStaffList = []
       this.$refs.staffTable.clearSelection()
       this.actoveTab = '账号权限'
+      this.$refs['dataForm'].resetFields()
+      this.$refs['tenantForm'].resetFields()
+      this.$refs['severDataForm'].resetFields()
     },
     // 当前页
     currentChangeHandle (val) {
