@@ -1,26 +1,47 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
+      <el-form-item>
+        <el-radio-group v-model="dataForm.status" @change="statusChange">
+          <el-radio-button :label="1">按报表</el-radio-button>
+          <el-radio-button :label="0">按用户</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item label="任务ID: ">
         <el-date-picker
           v-model="dataForm.date"
           type="daterange"
-          range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期">
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd"
+          style="width: 320px"
+        >
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="IP: ">
+      <el-form-item label="系统">
+        <el-select v-model="dataForm.templateName">
+          <el-option value="-1" label="全部"></el-option>
+          <el-option value="BI" label="BI系统"></el-option>
+          <el-option value="凤凰" label="凤凰系统"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="筛选报表" v-if="dataForm.status === 1">
         <el-input
-          v-model="dataForm.ipAddress"
-          placeholder="请输入IP"
+          v-model="dataForm.menuName"
+          placeholder="请输入报表名称"
           class="input-with-select"
-          @keyup.enter.native="getDataList()"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="筛选用户" v-else>
+        <el-input
+          v-model="dataForm.name"
+          placeholder="请输入用户名称"
+          class="input-with-select"
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="getDataList()">查询</el-button>
-        <el-button>下载</el-button>
+        <el-button type="primary" @click="searchHandle">查询</el-button>
+        <!-- <el-button>下载</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
@@ -30,8 +51,13 @@
       style="width: 100%;"
     >
       <el-table-column prop="id" header-align="center" align="center" label="序号"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="报表名称"></el-table-column>
-      <el-table-column prop="ipAddress" header-align="center" align="center" label="访问次数"></el-table-column>
+      <el-table-column prop="menuName" header-align="center" align="center" label="报表名称" v-if="dataForm.status === 1"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="用户名称" v-else></el-table-column>
+      <el-table-column prop="accessCount" header-align="center" align="center" label="访问次数">
+        <template slot-scope="scope">
+          <span style="color:#2093f7;cursor:pointer" @click="viewCountHandle(scope.row.name || scope.row.menuName)">{{scope.row.accessCount}}</span>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -43,74 +69,75 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
+    <report-log-count v-if="reportLogCountVisible" ref="reportLogCount"></report-log-count>
   </div>
 </template>
 <script>
+import { selectAccessLog } from '@/api/sys/reportlog'
+import reportLogCount from './reportlog-count'
 export default {
   data () {
     return {
       dataForm: {
-        key: '',
-        id: '',
-        ipAddress: ''
+        status: 1,
+        date: '',
+        name: '',
+        menuName: '',
+        templateName: '-1'
       },
-      restaurants: [],
       dataList: [],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
-      dataListLoading: false
+      dataListLoading: false,
+      reportLogCountVisible: false
     }
   },
-  activated () {
+  components: { reportLogCount },
+  mounted () {
     this.getDataList()
   },
-  mounted () {
-    this.loadAll()
-  },
   methods: {
-    loadAll () {
-      if (this.dataForm.key) {
-        this.$http({
-          url: this.$http.adornUrl(
-            '/honeycomb/honeycombtask/search/' + this.dataForm.key
-          ),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.restaurants = data.searchData
-          }
-        })
-      }
-    },
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('/honeycomb/honeycombtask/list'),
-        method: 'get',
-        params: this.$http.adornParams({
-          page: this.pageIndex,
-          limit: this.pageSize,
-          key: this.dataForm.key,
-          id: this.dataForm.id,
-          ipAddress: this.dataForm.ipAddress
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.page.list
-          this.dataList.map(item => {
-            item.ipAddress = item.ipAddress == 'null' ? '' : item.ipAddress
-          })
-          this.totalPage = data.page.totalCount
+      let params = {
+        page: this.pageIndex,
+        limit: this.pageSize,
+        status: this.dataForm.status,
+        startTime: this.dataForm.date.length ? this.dataForm.date[0] : '',
+        endTime: this.dataForm.date.length ? this.dataForm.date[1] : '',
+        templateName: this.dataForm.templateName === '-1' ? '' : this.dataForm.templateName
+      }
+      if (this.dataForm.status === 0) {
+        params.name = this.dataForm.name
+      } else {
+        params.menuName = this.dataForm.menuName
+      }
+      selectAccessLog(params).then(({ data }) => {
+        if (data && data.status * 1 === 1) {
+          this.dataList = data.data.list
+          this.totalPage = data.data.totalCount
         } else {
           this.dataList = []
           this.totalPage = 0
         }
         this.dataListLoading = false
       })
+    },
+    viewCountHandle (name) {
+      this.reportLogCountVisible = true
+      this.$nextTick(() => {
+        this.$refs.reportLogCount.init(this.dataForm, name)
+      })
+    },
+    statusChange () {
+      this.pageIndex = 1
+      this.getDataList()
+    },
+    searchHandle () {
+      this.pageIndex = 1
+      this.getDataList()
     },
     // 每页数
     sizeChangeHandle (val) {
