@@ -21,10 +21,9 @@
             <el-input v-model="dataForm.id" placeholder="任务ID" disabled  style="width: 300px" />
           </el-form-item>
         </div>
-        <el-form-item label="所属系统" prop="taskSys">
-          <el-select v-model="dataForm.taskSys" placeholder="所属系统" style="width: 400px">
-            <el-option label="earliest" value="earliest"></el-option>
-            <el-option label="latest" value="latest"></el-option>
+        <el-form-item label="所属系统" prop="projectId">
+          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px">
+            <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="任务描述" prop="remark">
@@ -144,8 +143,8 @@
                 <el-radio label="add">增量</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="增量规则：" prop="workType" label-width="200px">
-              <el-input v-model="dispatchAcquisitionTask.workType" placeholder="增量规则" style="width: 300px" />
+            <el-form-item label="增量规则：" prop="addRuleFields" label-width="200px">
+              <el-input v-model="dispatchAcquisitionTask.addRuleFields" placeholder="增量规则" style="width: 300px" />
             </el-form-item>
           </div>
         </el-form>
@@ -173,7 +172,7 @@
 
 <script>
 // import { deepClone } from '@/utils'
-import { info } from '@/api/dispatch/taskManag'
+import { info, projectAll, dataSourceAll, accountAll } from '@/api/dispatch/taskManag'
 import InputTag from '../dataAnalysis/components/InputTag'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -198,7 +197,7 @@ export default {
       dataForm: {
         taskName: '',
         id: '',
-        taskSys: '',
+        projectId: '',
         taskDiscribe: '',
         dispatchStatus: '',
         requestedUser: ''
@@ -213,7 +212,8 @@ export default {
         outDataTable: '', // 输出数据表
         outBeforeSql: '', // 输出前处理sql
         outAfterSql: '', // 输出后处理sql
-        addDataRule: '' // 采集规则（ALL-全量，ADD-增量）
+        addDataRule: '', // 采集规则（ALL-全量，ADD-增量）
+        addRuleFields: ''
       },
       dataRule: {
         taskName: [
@@ -253,6 +253,8 @@ export default {
           { required: true, message: '请输入需求提出人', trigger: 'blur' }
         ]
       },
+      allSystemList: [],
+      allAccountList: [],
       options: [{
         label: '个人账号',
         options: [{
@@ -318,6 +320,8 @@ export default {
     init (id) {
       this.id = id ? id.id : ''
       this.visible = true
+      this.getAllSystem()
+      this.getAllDatasource()
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         this.$refs['dispatchAcquisitionTask'].resetFields()
@@ -340,6 +344,26 @@ export default {
             }
           })
         }
+      })
+    },
+    getAllSystem () {
+      projectAll().then(({data}) => {
+        console.log(data)
+        this.allSystemList = data.data
+      })
+    },
+    getAllDatasource () {
+      dataSourceAll().then(({data}) => {
+        console.log(data)
+        // this.allSystemList = data.data
+      })
+    },
+    getAllAccount () {
+      accountAll({
+        id: ''
+      }).then(({data}) => {
+        console.log(data)
+        this.allAccountList = data.data
       })
     },
     drawerClose () { // 关闭抽屉弹窗
