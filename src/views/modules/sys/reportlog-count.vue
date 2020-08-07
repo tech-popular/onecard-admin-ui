@@ -31,6 +31,9 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
+    <div class="footer">
+      <el-button type="primary" @click="visible = false" size="small">确定</el-button>
+    </div>
     <report-log-count2 v-if="reportLogCount2Visible" ref="reportLogCount2"></report-log-count2>
   </el-dialog>
 </template>
@@ -48,6 +51,8 @@ export default {
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
+      userName: '',
+      menuName: '',
       dataListLoading: false,
       reportLogCount2Visible: false
     }
@@ -60,7 +65,12 @@ export default {
     viewCountHandle (name) {
       this.reportLogCount2Visible = true
       this.$nextTick(() => {
-        this.$refs.reportLogCount2.init(this.dataForm, name, this.title)
+        if (this.dataForm.status === 1) {
+          this.userName = name
+        } else {
+          this.menuName = name
+        }
+        this.$refs.reportLogCount2.init(this.dataForm, this.userName, this.menuName, this.title)
       })
     },
     init (dataForm, name) {
@@ -68,8 +78,10 @@ export default {
       this.name = name
       if (dataForm.status === 1) {
         this.title = `报表：${name}`
+        this.menuName = name
       } else {
         this.title = `姓名：${name}`
+        this.userName = name
       }
       this.visible = true
       this.getDataList()
@@ -117,5 +129,9 @@ export default {
   .drawer-down {
     float: right;
     margin-right: 50px;
+  }
+  .footer {
+    text-align: right;
+    margin-top: 20px;
   }
 </style>

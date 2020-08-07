@@ -29,6 +29,9 @@
       style="margin-top:10px;text-align:right"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
+    <div class="footer">
+      <el-button type="primary" @click="visible = false" size="small">确定</el-button>
+    </div>
     <report-log-count2 v-if="reportLogCount2Visible" ref="reportLogCount2"></report-log-count2>
   </el-dialog>
 </template>
@@ -46,6 +49,7 @@ export default {
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
+      menuName: '',
       dataListLoading: false,
       reportLogCount2Visible: false
     }
@@ -61,11 +65,12 @@ export default {
         this.$refs.reportLogCount2.init(this.dataForm, name)
       })
     },
-    init (dataForm, name, title) {
+    init (dataForm, userName, menuName, title) {
       this.dataForm = dataForm
       this.title = title
       this.visible = true
-      this.name = name
+      this.name = userName
+      this.menuName = menuName
       this.getDataList()
     },
     getDataList () {
@@ -73,14 +78,11 @@ export default {
       let params = {
         page: this.pageIndex,
         limit: this.pageSize,
+        name: this.name,
+        menuName: this.menuName,
         // status: this.dataForm.status,
         startTime: this.dataForm.date.length ? this.dataForm.date[0] : '',
         endTime: this.dataForm.date.length ? this.dataForm.date[1] : ''
-      }
-      if (this.dataForm.status === 1) {
-        params.name = this.name
-      } else {
-        params.menuName = this.name
       }
       queryAccessList(params).then(({ data }) => {
         if (data && data.status * 1 === 1) {
@@ -111,5 +113,9 @@ export default {
   .drawer-down {
     float: right;
     margin-right: 50px;
+  }
+  .footer {
+    text-align: right;
+    margin-top: 20px;
   }
 </style>
