@@ -81,9 +81,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.flag === '1' ? '' : 'warning'
+                type: params.row.dataSourceType === '1' ? '' : 'warning'
               } // 组件的props
-            }, params.row.flag === '1' ? '计算任务' : '同步任务')
+            }, params.row.dataSourceType === '1' ? '计算任务' : '同步任务')
           }
         },
         {
@@ -97,15 +97,15 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'flag',
+          prop: 'dataSourceDisable',
           label: '状态',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.flag === '1' ? '' : 'warning'
+                type: params.row.dataSourceDisable === '1' ? '' : 'warning'
               } // 组件的props
-            }, params.row.flag === '1' ? '需要' : '不需要')
+            }, params.row.dataSourceDisable === '1' ? '有效' : '无效')
           }
         }
       ],
