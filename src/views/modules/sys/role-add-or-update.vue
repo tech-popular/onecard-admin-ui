@@ -184,6 +184,8 @@
                 this.enable = false
               }
             })
+          } else {
+            this.enable = false
           }
         })
       }
