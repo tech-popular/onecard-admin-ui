@@ -10,72 +10,69 @@
     <div slot="title" class="drawer-title">{{dataFormValue ? '查看' : dataForm.id ? '修改' : '新增/编辑计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3>作业信息<span>最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px">
-              <template slot="prepend">mc_sql</template>
+              <template slot="prepend">{{formDs}}_</template>
             </el-input>
           </el-form-item>
-          <el-form-item label="任务ID" prop="taskId">
-            <el-input v-model="dataForm.taskId" placeholder="任务ID" disabled  style="width: 300px" />
+          <el-form-item label="任务ID" prop="id">
+            <el-input v-model="dataForm.id" placeholder="任务ID" disabled  style="width: 300px" />
           </el-form-item>
         </div>
-        <el-form-item label="所属系统" prop="taskSys">
-          <el-select v-model="dataForm.taskSys" placeholder="所属系统" style="width: 400px">
-            <el-option label="earliest" value="earliest"></el-option>
-            <el-option label="latest" value="latest"></el-option>
+        <el-form-item label="所属系统" prop="projectId">
+          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px">
+            <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="任务描述" prop="remark">
-          <el-input type="textarea" v-model="dataForm.remark" placeholder="任务描述" />
+        <el-form-item label="任务描述" prop="taskDescribe">
+          <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" />
         </el-form-item>
       </el-form>
       <div class="btn-code-continue">
         <el-button type="success" @click="mergeSql">代码连贯模式</el-button>
       </div>
-      <div class="work-content" v-for="(item, index) in workForm" :key="index">
-        <el-form :model="item" :rules="dataRule" ref="workForm">
-          <el-form-item label="作业序号" prop="workIndex" label-width="120px">
-            <el-input-number v-model="item.workIndex" placeholder="作业序号" :min="1"></el-input-number>
+      <div class="work-content" v-for="(item, index) in calculateTasks" :key="index">
+        <el-form :model="item" :rules="dataRule" ref="calculateTasks">
+          <el-form-item label="作业序号" prop="jobNo" label-width="120px">
+            <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
           <div class="work-type-pane">
-            <el-form-item label="作业类型" prop="workType" label-width="120px">
-              <el-select v-model="item.workType" placeholder="请选择数据源类型">
-                <el-option label="earliest" value="earliest"></el-option>
-                <el-option label="latest" value="latest"></el-option>
+            <el-form-item label="作业类型" prop="jobType" label-width="120px">
+              <el-select v-model="item.jobType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange(index, val)">
+                <el-option :label="citem.name" :value="citem.name" v-for="(citem, cindex) in allDatasourceList" :key="cindex"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="dataSource" label-width="10px">
-              <el-select v-model="item.dataSource" placeholder="请选择数据源名称">
-                <el-option label="earliest" value="earliest"></el-option>
-                <el-option label="latest" value="latest"></el-option>
+            <el-form-item prop="datasourceId" label-width="10px">
+              <el-select v-model="item.datasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange(index, val)">
+                <el-option :label="citem.dataSourceName" :value="citem.id" v-for="(citem, cindex) in item.allDatasourceNameList" :key="cindex"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="account" label-width="10px">
-              <el-select v-model="item.account" placeholder="请选择账户" @change="handleChange">
-                <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+            <el-form-item prop="accountId" label-width="10px">
+              <el-select v-model="item.accountId" placeholder="请选择账户">
+                <el-option-group v-for="group in item.allAccountList" :key="group.id" :label="group.name">
                   <el-option
-                    v-for="item in group.options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in group.children"
+                    :key="item.id"
+                    :label="item.datasourceUser"
+                    :value="item.id"
                   ></el-option>
                 </el-option-group>
               </el-select>
               <span style="color:red;font-size:10px;">
-                （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
+                （如需配置账户，请<router-link :to="{name:'dispatch-datasourceId'}">点击</router-link>）
               </span>
             </el-form-item>
           </div>
-          <el-form-item label="作业描述" prop="workDesc" label-width="120px">
-            <el-input type="textarea" v-model="item.workDesc" placeholder="作业描述" />
+          <el-form-item label="作业描述" prop="jobDescribe" label-width="120px">
+            <el-input type="textarea" v-model="item.jobDescribe" placeholder="作业描述" />
           </el-form-item>
-          <el-form-item prop="sql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
+          <el-form-item prop="jobSql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
                 :ref="'code-' + index"
-                v-model="item.sql"
+                v-model="item.jobSql"
                 :options="cmOptions"
                 @changes="cm => workItemChanges(cm, item, 'mycode-' + index, index)"
                 @keydown.native="e => workItemKeyDown(e, index)"
@@ -91,6 +88,19 @@
           </div>
         </el-form>
       </div>
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px">
+        <div class="work-type-pane">
+          <el-form-item label="状态：" prop="dispatchStatus" label-width="120px">
+            <el-radio-group v-model="dataForm.dispatchStatus">
+              <el-radio :label="0">有效</el-radio>
+              <el-radio :label="1">无效</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="任务需求人：" prop="requestedUser" label-width="200px">
+            <el-input v-model="dataForm.requestedUser" placeholder="任务需求人" />
+          </el-form-item>
+        </div>
+      </el-form>
     </div>
     <div class="footer">
       <el-button @click="visible = false">取消</el-button>
@@ -127,7 +137,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { infoBeeTask, saveorupt } from '@/api/workerBee/kafka'
+import { info, save, update, projectAll, dataSourceAll, accountAll } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/idea.css'
@@ -147,20 +157,25 @@ export default {
     return {
       visible: false,
       mergeCodeVisible: false,
+      formDs: '',
       dataForm: {
         taskName: '',
-        taskId: '',
-        taskSys: '',
-        remark: ''
+        id: '',
+        projectId: '',
+        taskDescribe: '',
+        dispatchStatus: '',
+        requestedUser: ''
       },
-      workForm: [
+      calculateTasks: [
         {
-          workIndex: 1,
-          workType: '',
-          dataSource: '',
-          account: '',
-          workDesc: '',
-          sql: '',
+          jobNo: 1,
+          jobType: '',
+          datasourceId: '',
+          accountId: '',
+          jobDescribe: '',
+          jobSql: '',
+          allDatasourceNameList: [],
+          allAccountList: [],
           placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
         }
       ],
@@ -169,47 +184,27 @@ export default {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
         ],
-        taskSys: [
+        projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
         ],
-        workIndex: [
+        jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
-        workType: [
+        jobType: [
           { required: true, message: '请输入作业类型', trigger: 'change' }
         ],
-        dataSource: [
+        datasourceId: [
           { required: true, message: '请选择数据源', trigger: 'change' }
         ],
-        account: [
+        accountId: [
           { required: true, message: '请选择帐户', trigger: 'change' }
         ],
-        sql: [
+        jobSql: [
           { required: true, message: '请输入任务语句', trigger: 'change' }
         ]
       },
-      options: [{
-        label: '个人账号',
-        options: [{
-          value: 'Shanghai',
-          label: '个人一'
-        }, {
-          value: 'Beijing',
-          label: '个人二'
-        }]
-      }, {
-        label: '公共账号',
-        options: [{
-          value: 'Chengdu',
-          label: '北京账号'
-        }, {
-          value: 'Shenzhen',
-          label: '上海账号'
-        }, {
-          value: 'Guangzhou',
-          label: '广州账号'
-        }]
-      }],
+      allSystemList: [],
+      allDatasourceList: [],
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
@@ -262,13 +257,62 @@ export default {
     init (id, value) {
       this.dataForm.id = id || ''
       this.dataFormValue = value
+      this.getAllSystem()
+      this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         if (id) {
-          const dataBody = this.dataForm.id
-          infoBeeTask(dataBody).then(({ data }) => { })
+          info(this.id).then(({data}) => {
+            if (data.code !== 0) {
+              return this.$message.error(data.msg || '获取数据异常')
+            }
+            this.dataForm.taskName = data.data.taskName
+            this.dataForm.id = data.data.id
+            this.dataForm.taskDescribe = data.data.taskDescribe
+            this.dataForm.projectId = data.data.projectId
+            this.dataForm.dispatchStatus = data.data.dispatchStatus
+            this.dataForm.requestedUser = data.data.requestedUser
+            this.calculateTasks = data.data.calculateTasks
+          })
         }
+      })
+    },
+    getAllSystem () {
+      projectAll().then(({data}) => {
+        this.allSystemList = data.data
+      })
+    },
+    getAllDatasource () {
+      dataSourceAll().then(({data}) => {
+        this.allDatasourceList = data.data.filter(item => item.name === 'MAX_COMPUTE')
+      })
+    },
+    dataSourceTypeChange (index, val) {
+      this.calculateTasks.datasourceId = ''
+      let filterArr = this.allDatasourceList.filter(item => item.name === val)[0]
+      this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], datasourceId: '', allDatasourceNameList: filterArr.source })
+      if (index === 0) {
+        this.formDs = filterArr.alias
+      }
+    },
+    dataSourceNameChange (index, val) {
+      this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], accountId: '' })
+      this.getAllAccount(index, val)
+    },
+    getAllAccount (index, id) {
+      accountAll({
+        id: id
+      }).then(({data}) => {
+        let arr = []
+        for (let [key, value] of Object.entries(data.data)) {
+          arr.push({
+            id: key,
+            name: key == 0 ? '公共账号' : '个人账号',
+            children: value
+          })
+        }
+        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], allAccountList: arr })
       })
     },
     drawerClose () { // 关闭抽屉弹窗
@@ -281,8 +325,8 @@ export default {
     mergeSql () { // 代码连贯操作
       // 判断作业序号是否重复，若重复就报错，不然连贯后再渲染会有问题
       let indexArr = []
-      this.workForm.forEach(item => {
-        indexArr.push(item.workIndex * 1)
+      this.calculateTasks.forEach(item => {
+        indexArr.push(item.jobNo * 1)
       })
       let uniqueIndexArr = Array.from(new Set(indexArr))
       if (uniqueIndexArr.length < indexArr.length) {
@@ -292,15 +336,15 @@ export default {
       this.sqlLineDist = []
       this.sqlLineWorkIndex = []
       this.updateRowNum = 0
-      let newWorkForm = deepClone(this.workForm) // 对数组进行排序
+      let newWorkForm = deepClone(this.calculateTasks) // 对数组进行排序
       newWorkForm.sort((a, b) => {
-        return a.workIndex * 1 - b.workIndex * 1
+        return a.jobNo * 1 - b.jobNo * 1
       })
       newWorkForm.forEach((item, index) => {
-        let sqlLineTitle = '<作业序号:' + item.workIndex + ';作业类型:' + item.workType + '>'
+        let sqlLineTitle = '<作业序号:' + item.jobNo + ';作业类型:' + item.jobType + '>'
         this.sqlLineDist.push(sqlLineTitle)
-        this.sqlLineWorkIndex.push(item.workIndex)
-        let sqlJob = sqlLineTitle + '\n' + item.sql + '\n'
+        this.sqlLineWorkIndex.push(item.jobNo)
+        let sqlJob = sqlLineTitle + '\n' + item.jobSql + '\n'
         this.previewSql += sqlJob
       })
       this.originpreviewSql = this.previewSql
@@ -362,26 +406,26 @@ export default {
         tempValue = sqlValue.substring(tempValStartIndex + titleLength, tempValEndIndex)
         let index = this.findIndex(this.sqlLineWorkIndex[i])
         let tempArr = tempValue.split('\n').filter(item => item !== '') // 把多余的回车去掉
-        this.workForm.splice(index, 1, { ...this.workForm[index], sql: tempArr.join('\n') })
+        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], jobSql: tempArr.join('\n') })
       }
       this.mergeCodeVisible = false
     },
     findIndex (n) {
       let i = 0
-      this.workForm.forEach((item, index) => {
-        if (item.workIndex * 1 === n * 1) {
+      this.calculateTasks.forEach((item, index) => {
+        if (item.jobNo * 1 === n * 1) {
           i = index
         }
       })
       return i
     },
     workItemChanges (cm, item, ref, index) { // 内容更新时，不为空时将报错信息去除
-      let curSql = item.sql
+      let curSql = item.jobSql
       if (curSql !== '') {
         this.$refs[ref][0].clearValidate()
-        this.workForm.splice(index, 1, { ...item, placeholder: '' })
+        this.calculateTasks.splice(index, 1, { ...item, placeholder: '' })
       } else {
-        this.workForm.splice(index, 1, { ...item, placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！' })
+        this.calculateTasks.splice(index, 1, { ...item, placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！' })
       }
       if (!curSql) {
         this.$nextTick(() => {
@@ -415,24 +459,24 @@ export default {
       })
     },
     addWork () { // 增加一条作业内容
-      this.workForm.push({
-        workIndex: '',
-        workType: '',
-        dataSource: '',
-        account: '',
-        workDesc: '',
-        sql: '',
+      this.calculateTasks.push({
+        jobNo: '',
+        jobType: '',
+        datasourceId: '',
+        accountId: '',
+        jobDescribe: '',
+        jobSql: '',
         placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
       })
       this.updateWorkIndex()
     },
     deleteWork (index) { // 删除作业内容
-      this.workForm.splice(index, 1)
+      this.calculateTasks.splice(index, 1)
       this.updateWorkIndex()
     },
     updateWorkIndex () { // 增加或删除时重新排序
-      this.workForm.forEach((item, index) => {
-        item.workIndex = index + 1
+      this.calculateTasks.forEach((item, index) => {
+        item.jobNo = index + 1
       })
     },
     // 提交
@@ -443,35 +487,43 @@ export default {
           flag = false
         }
       })
-      this.$refs['workForm'].forEach(item => {
+      this.$refs['calculateTasks'].forEach(item => {
         item.validate((valid) => {
           if (!valid) {
             flag = false
           }
         })
       })
-      console.log(1, this.dataForm, this.workForm)
+      console.log(1, this.dataForm, this.calculateTasks)
       if (flag) {
-        console.log(this.dataForm, this.workForm)
-        console.log(saveorupt)
-        // const dataBody = this.dataForm
-        // const dataUpdateId = this.dataForm.id
-        // saveorupt(dataBody, dataUpdateId).then(({ data }) => {
-        //   if (data && data.status === 0) {
-        //     this.$message({
-        //       message: '操作成功"',
-        //       type: 'success',
-        //       duration: 1500,
-        //       onClose: () => {
-        //         this.visible = false
-        //         this.$emit('refreshDataList')
-        //         this.$refs['dataForm'].resetFields()
-        //       }
-        //     })
-        //   } else {
-        //     this.$message.error(data.msg)
-        //   }
-        // })
+        console.log(this.dataForm, this.calculateTasks)
+        this.calculateTasks.forEach(item => {
+          item.allDatasourceNameList = []
+          item.allAccountList = []
+        })
+        let url = save
+        if (this.dataForm.id) {
+          url = update
+        }
+        url({
+          ...this.dataForm,
+          taskName: `${this.formDs}_${this.dataForm.taskName}`,
+          taskType: 'CALCULATE',
+          calculateTasks: this.calculateTasks
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: data.msg || '操作成功"',
+              type: 'success',
+              onClose: () => {
+                this.visible = false
+                this.$emit('refreshDataList')
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       }
     }
   }

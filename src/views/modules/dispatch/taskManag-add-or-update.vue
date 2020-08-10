@@ -8,13 +8,13 @@
     class="api-manage-drawer"
   >
     <div slot="title" class="drawer-title">{{!!id ? '修改' : '新增/编辑同步任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
-    <div class="wrap">
-      <h3>作业信息<span>最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
+    <div class="wrap" v-loading="loading">
+      <h3>作业信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px">
-              <template slot="prepend">mc_sql</template>
+              <template slot="prepend">{{formDs}}_to_{{toDs}}</template>
             </el-input>
           </el-form-item>
           <el-form-item label="任务ID" prop="id">
@@ -26,38 +26,39 @@
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="任务描述" prop="remark">
-          <el-input type="textarea" v-model="dataForm.remark" placeholder="任务描述" />
+        <el-form-item label="任务描述" prop="taskDescribe">
+          <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" />
         </el-form-item>
       </el-form>
-      <div class="work-content">
-        <el-form :model="dispatchAcquisitionTask" :rules="dataRule" ref="dispatchAcquisitionTask">
+      <div class="work-content-1">
+        <el-form :model="acquisitionTask" :rules="dataRule" ref="acquisitionTask">
           <div class="work-type-pane">
-            <el-form-item label="数据来源" prop="workType" label-width="120px">
-              <el-select v-model="dispatchAcquisitionTask.workType" placeholder="请选择数据源类型">
-                <el-option label="earliest" value="earliest"></el-option>
-                <el-option label="latest" value="latest"></el-option>
+            <el-form-item label="数据来源" prop="inDatasourceType" label-width="120px">
+              <el-select v-model="acquisitionTask.inDatasourceType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange('in', val)">
+                <el-option :label="item.name" :value="item.name" v-for="(item, index) in getAllinDatasourceList" :key="index"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="inDatasourceId" label-width="10px">
-              <el-select v-model="dispatchAcquisitionTask.inDatasourceId" placeholder="请选择数据源名称">
-                <el-option label="earliest" value="earliest"></el-option>
-                <el-option label="latest" value="latest"></el-option>
+              <el-select v-model="acquisitionTask.inDatasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange('in', val)">
+                <el-option :label="item.dataSourceName" :value="item.id" v-for="(item, index) in getAllinDatasourceNameList" :key="index"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="inAccountId" label-width="10px">
-              <el-select v-model="dispatchAcquisitionTask.inAccountId" placeholder="请选择账户" @change="handleChange">
-                <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-select v-model="acquisitionTask.inAccountId" placeholder="请选择账户">
+                <el-option-group v-for="group in allinAccountList" :key="group.id" :label="group.name">
                   <el-option
-                    v-for="item in group.options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in group.children"
+                    :key="item.id"
+                    :label="item.datasourceUser"
+                    :value="item.id"
                   ></el-option>
                 </el-option-group>
               </el-select>
-              <span style="color:red;font-size:10px;">
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && allinAccountList.length">
                 （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
+              </span>
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && !allinAccountList.length">
+                （无账户信息，请前往<router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
               </span>
             </el-form-item>
           </div>
@@ -65,9 +66,9 @@
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
                 ref="workBeginSql"
-                v-model="dispatchAcquisitionTask.inDataSql"
+                v-model="acquisitionTask.inDataSql"
                 :options="cmOptions"
-                @changes="cm => workItemChanges(cm, dispatchAcquisitionTask.inDataSql, 'workBeginSqlForm', 'workBeginSql')"
+                @changes="cm => workItemChanges(cm, acquisitionTask.inDataSql, 'workBeginSqlForm', 'workBeginSql')"
                 @keydown.native="e => workItemKeyDown(e, 'workBeginSql')"
                 class="code"
                 style="padding-bottom: 0px"
@@ -75,48 +76,49 @@
             </div>
           </el-form-item>
           <el-form-item prop="sqlField" label-width="120px" label="输出字段" ref="sqlFieldEl">
-            <input-tag v-model="dispatchAcquisitionTask.sqlField" @change="inputTagChange" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="itemIput inputTag" style="display: inline-block;" placeholder="可用回车输入多条"></input-tag>
+            <input-tag v-model="acquisitionTask.sqlField" @change="inputTagChange" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="itemIput inputTag" style="display: inline-block;" placeholder="可用回车输入多条"></input-tag>
             <el-button type="primary" size="mini">SQL解析</el-button>
           </el-form-item>
           <div class="work-type-pane">
-            <el-form-item label="数据去向" prop="workType" label-width="120px">
-              <el-select v-model="dispatchAcquisitionTask.workType" placeholder="请选择数据源类型">
-                <el-option label="earliest" value="earliest"></el-option>
-                <el-option label="latest" value="latest"></el-option>
+            <el-form-item label="数据去向" prop="outDatasourceType" label-width="120px">
+              <el-select v-model="acquisitionTask.outDatasourceType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange('out', val)">
+                <el-option :label="item.name" :value="item.name" v-for="(item, index) in getAlloutDatasourceList" :key="index"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="outDatasourceId" label-width="10px">
-              <el-select v-model="dispatchAcquisitionTask.outDatasourceId" placeholder="请选择数据源名称">
-                <el-option label="earliest" value="earliest"></el-option>
-                <el-option label="latest" value="latest"></el-option>
+              <el-select v-model="acquisitionTask.outDatasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange('out', val)">
+                <el-option :label="item.dataSourceName" :value="item.id" v-for="(item, index) in getAlloutDatasourceNameList" :key="index"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="outAccountId" label-width="10px">
-              <el-select v-model="dispatchAcquisitionTask.outAccountId" placeholder="请选择账户" @change="handleChange">
-                <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-select v-model="acquisitionTask.outAccountId" placeholder="请选择账户">
+                <el-option-group v-for="group in alloutAccountList" :key="group.id" :label="group.name">
                   <el-option
-                    v-for="item in group.options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in group.children"
+                    :key="item.id"
+                    :label="item.datasourceUser"
+                    :value="item.id"
                   ></el-option>
                 </el-option-group>
               </el-select>
-              <span style="color:red;font-size:10px;">
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && alloutAccountList.length">
                 （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
+              </span>
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && !alloutAccountList.length">
+                （无账户信息，请前往<router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
               </span>
             </el-form-item>
           </div>
           <el-form-item prop="outDataTable" label-width="120px" style="width:700px">
-            <el-input v-model="dispatchAcquisitionTask.outDataTable" placeholder="输入数据表/topic名称" />
+            <el-input v-model="acquisitionTask.outDataTable" placeholder="输入数据表/topic名称" />
           </el-form-item>
           <el-form-item prop="outBeforeSql" label="目标库前置处理SQL：" label-width="120px" ref="workBeginSqlForm2">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
                 ref="workBeginSql2"
-                v-model="dispatchAcquisitionTask.outBeforeSql"
+                v-model="acquisitionTask.outBeforeSql"
                 :options="cmOptions"
-                @changes="cm => workItemChanges(cm, dispatchAcquisitionTask.outBeforeSql, 'workBeginSqlForm2', 'workBeginSql2')"
+                @changes="cm => workItemChanges(cm, acquisitionTask.outBeforeSql, 'workBeginSqlForm2', 'workBeginSql2')"
                 @keydown.native="e => workItemKeyDown(e, 'workBeginSql2')"
                 class="code"
                 style="padding-bottom: 0px"
@@ -127,9 +129,9 @@
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
                 ref="workBeginSql3"
-                v-model="dispatchAcquisitionTask.outAfterSql"
+                v-model="acquisitionTask.outAfterSql"
                 :options="cmOptions"
-                @changes="cm => workItemChanges(cm, dispatchAcquisitionTask.outAfterSql, 'workBeginSqlForm3', 'workBeginSql3')"
+                @changes="cm => workItemChanges(cm, acquisitionTask.outAfterSql, 'workBeginSqlForm3', 'workBeginSql3')"
                 @keydown.native="e => workItemKeyDown(e, 'workBeginSql3')"
                 class="code"
                 style="padding-bottom: 0px"
@@ -138,13 +140,13 @@
           </el-form-item>
           <div class="work-type-pane">
             <el-form-item label="下发类型：" prop="addDataRule" label-width="120px">
-              <el-radio-group v-model="dispatchAcquisitionTask.addDataRule">
+              <el-radio-group v-model="acquisitionTask.addDataRule">
                 <el-radio label="all">全量</el-radio>
                 <el-radio label="add">增量</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="增量规则：" prop="addRuleFields" label-width="200px">
-              <el-input v-model="dispatchAcquisitionTask.addRuleFields" placeholder="增量规则" style="width: 300px" />
+            <el-form-item label="增量规则：" prop="addRuleFields" label-width="200px" v-if="acquisitionTask.addDataRule === 'add'">
+              <el-input v-model="acquisitionTask.addRuleFields" placeholder="增量规则" style="width: 300px" />
             </el-form-item>
           </div>
         </el-form>
@@ -153,8 +155,8 @@
         <div class="work-type-pane">
           <el-form-item label="状态：" prop="dispatchStatus" label-width="120px">
             <el-radio-group v-model="dataForm.dispatchStatus">
-              <el-radio :label="1">有效</el-radio>
-              <el-radio :label="0">无效</el-radio>
+              <el-radio :label="0">有效</el-radio>
+              <el-radio :label="1">无效</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="任务需求人：" prop="requestedUser" label-width="200px">
@@ -171,8 +173,7 @@
 </template>
 
 <script>
-// import { deepClone } from '@/utils'
-import { info, projectAll, dataSourceAll, accountAll } from '@/api/dispatch/taskManag'
+import { info, save, update, projectAll, dataSourceAll, accountAll } from '@/api/dispatch/taskManag'
 import InputTag from '../dataAnalysis/components/InputTag'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -193,26 +194,33 @@ export default {
   data () {
     return {
       visible: false,
+      loading: false,
       id: '',
+      formDs: '',
+      toDs: '',
+      updateUser: '',
+      updateTime: '',
       dataForm: {
         taskName: '',
         id: '',
         projectId: '',
-        taskDiscribe: '',
-        dispatchStatus: '',
+        taskDescribe: '',
+        dispatchStatus: 0,
         requestedUser: ''
       },
-      dispatchAcquisitionTask: {
-        inDatasourceId: 1,
+      acquisitionTask: {
+        inDatasourceType: '',
+        inDatasourceId: '',
         inAccountId: '',
         inDataSql: '',
         sqlField: [], // 输入sql所对应的字段
+        outDatasourceType: '',
         outDatasourceId: '', // 输出数据源Id
         outAccountId: '', // 输出数据源对应帐户Id
         outDataTable: '', // 输出数据表
         outBeforeSql: '', // 输出前处理sql
         outAfterSql: '', // 输出后处理sql
-        addDataRule: '', // 采集规则（ALL-全量，ADD-增量）
+        addDataRule: 'all', // 采集规则（ALL-全量，ADD-增量）
         addRuleFields: ''
       },
       dataRule: {
@@ -254,29 +262,13 @@ export default {
         ]
       },
       allSystemList: [],
+      getAllinDatasourceList: [],
+      getAllinDatasourceNameList: [],
+      getAlloutDatasourceList: [],
+      getAlloutDatasourceNameList: [],
       allAccountList: [],
-      options: [{
-        label: '个人账号',
-        options: [{
-          value: 'Shanghai',
-          label: '个人一'
-        }, {
-          value: 'Beijing',
-          label: '个人二'
-        }]
-      }, {
-        label: '公共账号',
-        options: [{
-          value: 'Chengdu',
-          label: '北京账号'
-        }, {
-          value: 'Shenzhen',
-          label: '上海账号'
-        }, {
-          value: 'Guangzhou',
-          label: '广州账号'
-        }]
-      }],
+      allinAccountList: [],
+      alloutAccountList: '',
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
@@ -319,51 +311,84 @@ export default {
   methods: {
     init (id) {
       this.id = id ? id.id : ''
-      this.visible = true
       this.getAllSystem()
       this.getAllDatasource()
+      this.visible = true
       this.$nextTick(() => {
-        this.$refs['dataForm'].resetFields()
-        this.$refs['dispatchAcquisitionTask'].resetFields()
         if (id) {
-          // const dataBody = this.id
-          info(this.id).then(({data}) => {
-            if (data.code !== 0) {
-              return this.$message.error(data.msg || '获取数据异常')
-            }
-            console.log(data)
-            // this.formData = data.data
-            this.dataForm.taskName = data.data.taskName
-            this.dataForm.id = data.data.id
-            this.dataForm.taskDiscribe = data.data.taskDiscribe
-            this.dataForm.dispatchStatus = data.data.dispatchStatus
-            this.dataForm.requestedUser = data.data.requestedUser
-            this.dispatchAcquisitionTask = data.data.dispatchAcquisitionTask
-            if (typeof (this.dispatchAcquisitionTask.sqlField) === 'string') {
-              this.dispatchAcquisitionTask.sqlField = [ this.dispatchAcquisitionTask.sqlField ]
-            }
-          })
+          this.getInfo()
         }
+        this.$refs['dataForm1'].resetFields()
+        this.$refs['dataForm2'].resetFields()
+        this.$refs['acquisitionTask'].resetFields()
+      })
+    },
+    getInfo () {
+      this.loading = true
+      info(this.id).then(({data}) => {
+        if (data.code !== 0) {
+          return this.$message.error(data.msg || '获取数据异常')
+        }
+        this.updateUser = data.data.updateUser
+        this.updateTime = data.data.updateTime
+        this.dataForm.id = data.data.id
+        this.dataForm.projectId = data.data.projectId
+        this.dataForm.taskDescribe = data.data.taskDescribe
+        this.dataForm.dispatchStatus = data.data.dispatchStatus
+        this.dataForm.requestedUser = data.data.requestedUser
+        this.acquisitionTask = data.data.acquisitionTask
+        this.acquisitionTask.sqlField = this.acquisitionTask.sqlField.split(',')
+        let filterInArr = this.getAllinDatasourceList.filter(item => item.name === this.acquisitionTask.inDatasourceType)[0]
+        let filterOutArr = this.getAlloutDatasourceList.filter(item => item.name === this.acquisitionTask.outDatasourceType)[0]
+        this.getAllinDatasourceNameList = filterInArr.source
+        this.getAlloutDatasourceNameList = filterOutArr.source
+        this.formDs = filterInArr.alias
+        this.toDs = filterOutArr.alias
+        let strLen = this.formDs.length + this.toDs.length + 5
+        this.dataForm.taskName = data.data.taskName.substr(strLen)
+        this.getAllAccount('in', data.data.acquisitionTask.inDatasourceId)
+        this.getAllAccount('out', data.data.acquisitionTask.outDatasourceId)
+        this.loading = false
       })
     },
     getAllSystem () {
       projectAll().then(({data}) => {
-        console.log(data)
         this.allSystemList = data.data
       })
     },
     getAllDatasource () {
       dataSourceAll().then(({data}) => {
-        console.log(data)
-        // this.allSystemList = data.data
+        this.getAllinDatasourceList = data.data.filter(item => item.name === 'MAX_COMPUTE')
+        this.getAlloutDatasourceList = data.data.filter(item => item.name === 'MAX_COMPUTE')
       })
     },
-    getAllAccount () {
+    dataSourceTypeChange (type, val) {
+      this.acquisitionTask[`${type}DatasourceId`] = ''
+      let filterArr = this[`getAll${type}DatasourceList`].filter(item => item.name === val)[0]
+      this[`getAll${type}DatasourceNameList`] = filterArr.source
+      if (type === 'in') { // 根据数据源类型，决定任务名称的前缀
+        this.formDs = filterArr.alias
+      } else {
+        this.toDs = filterArr.alias
+      }
+    },
+    dataSourceNameChange (type, val) {
+      this.acquisitionTask[`${type}AccountId`] = ''
+      this.getAllAccount(type, val)
+    },
+    getAllAccount (type, id) {
       accountAll({
-        id: ''
+        id: id
       }).then(({data}) => {
-        console.log(data)
-        this.allAccountList = data.data
+        let arr = []
+        for (let [key, value] of Object.entries(data.data)) {
+          arr.push({
+            id: key,
+            name: key == 0 ? '公共账号' : '个人账号',
+            children: value
+          })
+        }
+        this[`all${type}AccountList`] = arr
       })
     },
     drawerClose () { // 关闭抽屉弹窗
@@ -371,12 +396,9 @@ export default {
       this.$parent.computAddOrUpdateVisible = false
     },
     inputTagChange () {
-      if (this.dispatchAcquisitionTask.sqlField.length) { // 如果已经有输入的值则清空报错提示
+      if (this.acquisitionTask.sqlField.length) { // 如果已经有输入的值则清空报错提示
         this.$refs.sqlFieldEl.clearValidate()
       }
-    },
-    handleChange (val) {
-      console.log(val)
     },
     workItemChanges (cm, sql, refForm, selfRef) { // 内容更新时，不为空时将报错信息去除
       if (sql !== '') {
@@ -404,37 +426,46 @@ export default {
     // 提交
     dataFormSubmit (form) {
       let flag = true
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataForm1'].validate((valid) => {
         if (!valid) {
           flag = false
         }
       })
-      this.$refs['dispatchAcquisitionTask'].validate((valid) => {
+      this.$refs['dataForm2'].validate((valid) => {
         if (!valid) {
           flag = false
         }
       })
-      console.log(1, this.dataForm, this.dispatchAcquisitionTask)
+      this.$refs['acquisitionTask'].validate((valid) => {
+        if (!valid) {
+          flag = false
+        }
+      })
       if (flag) {
-        console.log(this.dataForm, this.dispatchAcquisitionTask)
-        // const dataBody = this.dataForm
-        // const dataUpdateId = this.dataForm.id
-        // saveorupt(dataBody, dataUpdateId).then(({ data }) => {
-        //   if (data && data.status === 0) {
-        //     this.$message({
-        //       message: '操作成功"',
-        //       type: 'success',
-        //       duration: 1500,
-        //       onClose: () => {
-        //         this.visible = false
-        //         this.$emit('refreshDataList')
-        //         this.$refs['dataForm'].resetFields()
-        //       }
-        //     })
-        //   } else {
-        //     this.$message.error(data.msg)
-        //   }
-        // })
+        console.log(this.dataForm, this.acquisitionTask)
+        let url = save
+        if (this.dataForm.id) {
+          url = update
+        }
+        url({
+          ...this.dataForm,
+          taskName: `${this.formDs}_to_${this.toDs}_${this.dataForm.taskName}`,
+          taskType: 'ACQUISITION',
+          acquisitionTask: { ...this.acquisitionTask, sqlField: this.acquisitionTask.sqlField.join(',') }
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: data.msg || '操作成功',
+              type: 'success',
+              onClose: () => {
+                this.visible = false
+                this.$emit('refreshDataList')
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       }
     }
   }
@@ -480,7 +511,7 @@ export default {
   .btn-code-continue {
     text-align: right;
   }
-  .work-content {
+  .work-content-1 {
     border-top: 1px #cccccc dashed;
     padding: 20px 20px 10px 0;
     margin-top: 20px;

@@ -9,5 +9,5 @@ export const info = (params) => httpGet(base + `dispatch/task/info/${params}`) /
 export const update = (params) => httpPost(base + 'dispatch/task/update', params) // 修改
 export const save = (params) => httpPost(base + 'dispatch/task/save', params) // 新增
 export const dataSourceAll = () => httpPost(base + 'dispatch/datasource/selectall')
-export const accountAll = () => httpPost(base + 'dispatch/account/selectall')
+export const accountAll = params => httpPost(base + 'dispatch/account/selectall', params)
 export const projectAll = () => httpPost(base + 'dispatch/project/selectall')
