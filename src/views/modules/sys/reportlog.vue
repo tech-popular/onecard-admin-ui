@@ -29,14 +29,12 @@
         <el-input
           v-model="dataForm.menuName"
           placeholder="请输入报表名称"
-          class="input-with-select"
         ></el-input>
       </el-form-item>
       <el-form-item label="筛选用户" v-else>
         <el-input
           v-model="dataForm.name"
           placeholder="请输入用户名称"
-          class="input-with-select"
         ></el-input>
       </el-form-item>
       <el-form-item>
@@ -51,9 +49,9 @@
       style="width: 100%;"
     >
       <el-table-column prop="id" header-align="center" align="center" label="序号"></el-table-column>
-      <el-table-column prop="menuName" header-align="center" align="center" label="报表名称" v-if="dataForm.status === 1"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="用户名称" v-else></el-table-column>
-      <el-table-column prop="accessCount" header-align="center" align="center" label="访问次数">
+      <el-table-column prop="menuName" header-align="center" align="center" label="报表名称" v-if="dataForm.status === 1" sortable></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="用户名称" v-else sortable></el-table-column>
+      <el-table-column prop="accessCount" header-align="center" align="center" label="访问次数" sortable>
         <template slot-scope="scope">
           <span style="color:#2093f7;cursor:pointer" @click="viewCountHandle(scope.row.name || scope.row.menuName)">{{scope.row.accessCount}}</span>
         </template>
@@ -73,6 +71,7 @@
   </div>
 </template>
 <script>
+import { getDate } from '@/utils'
 import { selectAccessLog } from '@/api/sys/reportlog'
 import reportLogCount from './reportlog-count'
 export default {
@@ -80,7 +79,7 @@ export default {
     return {
       dataForm: {
         status: 1,
-        date: '',
+        date: [getDate(new Date().getTime() - 1000 * 60 * 60 * 24 * 6, 'day'), getDate(new Date().getTime(), 'day')],
         name: '',
         menuName: '',
         templateName: '-1'
