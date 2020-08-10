@@ -7,7 +7,7 @@
           <el-radio-button :label="0">按用户</el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="任务ID: ">
+      <el-form-item label="日期: ">
         <el-date-picker
           v-model="dataForm.date"
           type="daterange"
