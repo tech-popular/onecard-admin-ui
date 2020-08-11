@@ -157,7 +157,8 @@
               url = updateRoleInfo
             }
             let menuIdList = [].concat(this.$refs.userPermissionTree.$refs.menuListTree.getCheckedKeys(), [this.tempKey], this.$refs.userPermissionTree.$refs.menuListTree.getHalfCheckedKeys())
-            if (!menuIdList.length) {
+            if (menuIdList.length === 1 && menuIdList.includes(this.tempKey)) {
+              this.enable = false
               return this.$message.error('请选择菜单！')
             }
             url({
