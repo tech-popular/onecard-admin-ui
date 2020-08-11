@@ -53,7 +53,11 @@ export const models = {
           label: '编辑任务',
           type: 'primary',
           method: (id) => {
-            this.addOrUpdateHandle(id)
+            if (id.taskType === 'CALCULATE') {
+              this.computAddOrUpdateHandle(id)
+            } else {
+              this.addOrUpdateHandle(id)
+            }
           }
         },
         // {
@@ -89,7 +93,19 @@ export const models = {
         {
           prop: 'taskName',
           label: '任务名称',
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('a', {
+              style: {
+                cursor: 'pointer'
+              },
+              on: {
+                click: () => {
+                  console.log('点击事件', params)
+                }
+              }
+            }, params.row.taskName)
+          }
         },
         {
           prop: 'taskType',
@@ -97,10 +113,10 @@ export const models = {
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              // props: {
-              //   type: params.row.cacheType === 0 ? '' : 'warning'
-              // } // 组件的props
-            }, params.row.taskType)
+              props: {
+                type: params.row.taskType === 'CALCULATE' ? '' : 'warning'
+              } // 组件的props
+            }, params.row.taskType === 'CALCULATE' ? '计算任务' : '同步任务')
           }
         },
         {
@@ -120,9 +136,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.dispatchStatus === 1 ? '' : 'warning'
+                type: params.row.dispatchStatus === 0 ? '' : 'warning'
               } // 组件的props
-            }, params.row.dispatchStatus === 1 ? '启用' : '停用')
+            }, params.row.dispatchStatus === 0 ? '启用' : '停用')
           }
         },
         {

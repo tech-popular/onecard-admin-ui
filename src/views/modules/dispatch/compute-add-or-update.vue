@@ -7,7 +7,7 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{dataFormValue ? '查看' : dataForm.id ? '修改' : '新增/编辑计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{dataForm.id ? '编辑计算任务' : '新增计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3>作业信息<span>最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
@@ -157,13 +157,14 @@ export default {
     return {
       visible: false,
       mergeCodeVisible: false,
-      formDs: '',
+      id: '',
+      formDs: 'mc',
       dataForm: {
         taskName: '',
         id: '',
         projectId: '',
         taskDescribe: '',
-        dispatchStatus: '',
+        dispatchStatus: 0,
         requestedUser: ''
       },
       calculateTasks: [
@@ -179,7 +180,6 @@ export default {
           placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
         }
       ],
-      dataFormValue: '',
       dataRule: {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
@@ -201,6 +201,12 @@ export default {
         ],
         jobSql: [
           { required: true, message: '请输入任务语句', trigger: 'change' }
+        ],
+        requestedUser: [
+          { required: true, message: '请输入任务需求人', trigger: 'blur' }
+        ],
+        dispatchStatus: [
+          { required: true, message: '请选择状态', trigger: 'change' }
         ]
       },
       allSystemList: [],
@@ -245,35 +251,40 @@ export default {
       sqlLineWorkIndex: [] // 保存连贯排序后的作业序号，用来处理重新渲染时查找元素用
     }
   },
-  mounted () {
-    this.init()
-  },
   computed: {
     previreCodemirror () {
       return this.$refs.previewSql.codemirror
     }
   },
   methods: {
-    init (id, value) {
-      this.dataForm.id = id || ''
-      this.dataFormValue = value
+    init (id) {
+      this.id = id ? id.id : ''
       this.getAllSystem()
       this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
-        this.$refs['dataForm'].resetFields()
+        this.$refs['dataForm1'].resetFields()
+        this.$refs['dataForm2'].resetFields()
         if (id) {
           info(this.id).then(({data}) => {
             if (data.code !== 0) {
               return this.$message.error(data.msg || '获取数据异常')
             }
-            this.dataForm.taskName = data.data.taskName
+            // this.dataForm.taskName = data.data.taskName
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
             this.dataForm.dispatchStatus = data.data.dispatchStatus
             this.dataForm.requestedUser = data.data.requestedUser
             this.calculateTasks = data.data.calculateTasks
+            this.calculateTasks.forEach((item, index) => {
+              let filterArr = this.allDatasourceList.filter(citem => citem.name === item.jobType)[0]
+              item.allDatasourceNameList = filterArr.source
+              this.getAllAccount(index, data.data.calculateTasks.datasourceId)
+            })
+            let filterInArr = this.allDatasourceList.filter(item => item.name === this.calculateTasks[0].jobType)[0]
+            this.formDs = filterInArr.alias
+            this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
           })
         }
       })
@@ -281,6 +292,7 @@ export default {
     getAllSystem () {
       projectAll().then(({data}) => {
         this.allSystemList = data.data
+        console.log(890)
       })
     },
     getAllDatasource () {
@@ -482,7 +494,12 @@ export default {
     // 提交
     dataFormSubmit (form) {
       let flag = true
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataForm1'].validate((valid) => {
+        if (!valid) {
+          flag = false
+        }
+      })
+      this.$refs['dataForm2'].validate((valid) => {
         if (!valid) {
           flag = false
         }
@@ -496,6 +513,14 @@ export default {
       })
       console.log(1, this.dataForm, this.calculateTasks)
       if (flag) {
+        let indexArr = []
+        this.calculateTasks.forEach(item => {
+          indexArr.push(item.jobNo * 1)
+        })
+        let uniqueIndexArr = Array.from(new Set(indexArr))
+        if (uniqueIndexArr.length < indexArr.length) {
+          return this.$message.error('作业序号不可重复，请重新填写后再操作')
+        }
         console.log(this.dataForm, this.calculateTasks)
         this.calculateTasks.forEach(item => {
           item.allDatasourceNameList = []
@@ -572,7 +597,7 @@ export default {
   .work-content {
     border: 1px #cccccc dashed;
     padding: 20px 20px 10px 0;
-    margin-top: 20px;
+    margin: 20px 0;
   }
   .footer {
     position: absolute;

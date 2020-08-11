@@ -7,7 +7,7 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{!!id ? '修改' : '新增/编辑同步任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{!!id ? '编辑同步任务' : '新增同步任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <h3>作业信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
@@ -77,7 +77,7 @@
           </el-form-item>
           <el-form-item prop="sqlField" label-width="120px" label="输出字段" ref="sqlFieldEl">
             <input-tag v-model="acquisitionTask.sqlField" @change="inputTagChange" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="itemIput inputTag" style="display: inline-block;" placeholder="可用回车输入多条"></input-tag>
-            <el-button type="primary" size="mini">SQL解析</el-button>
+            <el-button type="primary" size="mini" @click="sqlParseClick">SQL解析</el-button>
           </el-form-item>
           <div class="work-type-pane">
             <el-form-item label="数据去向" prop="outDatasourceType" label-width="120px">
@@ -173,7 +173,7 @@
 </template>
 
 <script>
-import { info, save, update, projectAll, dataSourceAll, accountAll } from '@/api/dispatch/taskManag'
+import { info, save, update, projectAll, dataSourceAll, accountAll, sqlParse } from '@/api/dispatch/taskManag'
 import InputTag from '../dataAnalysis/components/InputTag'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -389,6 +389,27 @@ export default {
           })
         }
         this[`all${type}AccountList`] = arr
+      })
+    },
+    sqlParseClick () {
+      if (!this.acquisitionTask.inDatasourceType) {
+        return this.$message.error('数据源类型不能为空！')
+      }
+      if (!this.acquisitionTask.inDataSql) {
+        return this.$message.error('作业开始前SQL不能为空！')
+      }
+      let data = new FormData()
+      data.append('sql', this.acquisitionTask.inDataSql)
+      data.append('dataSourceType', this.acquisitionTask.inDatasourceType)
+      sqlParse(data).then(({data}) => {
+        if (data && data.code === 0) {
+          if (!data.data.length) {
+            return this.$message.error('解析失败')
+          }
+          this.acquisitionTask.sqlField = data.data
+        } else {
+          this.$message.error(data.msg)
+        }
       })
     },
     drawerClose () { // 关闭抽屉弹窗

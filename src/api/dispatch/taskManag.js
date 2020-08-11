@@ -1,6 +1,7 @@
 import {
   httpGet,
-  httpPost
+  httpPost,
+  httpPostFile
 } from '@/api'
 let base = '/'
 // 缓存清除
@@ -11,3 +12,4 @@ export const save = (params) => httpPost(base + 'dispatch/task/save', params) //
 export const dataSourceAll = () => httpPost(base + 'dispatch/datasource/selectall')
 export const accountAll = params => httpPost(base + 'dispatch/account/selectall', params)
 export const projectAll = () => httpPost(base + 'dispatch/project/selectall')
+export const sqlParse = params => httpPostFile(base + 'dispatch/task/sql/parse', params)
