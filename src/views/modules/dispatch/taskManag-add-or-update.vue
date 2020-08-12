@@ -45,19 +45,19 @@
             </el-form-item>
             <el-form-item prop="inAccountId" label-width="10px">
               <el-select v-model="acquisitionTask.inAccountId" placeholder="请选择账户">
-                <el-option-group v-for="group in allinAccountList" :key="group.id" :label="group.name">
+                <el-option-group v-for="(val, key, i) in allinAccountList" :key="i" :label="key * 1 === 0 ? '公共账号' : '个人帐号'">
                   <el-option
-                    v-for="item in group.children"
+                    v-for="item in val"
                     :key="item.id"
                     :label="item.datasourceUser"
                     :value="item.id"
                   ></el-option>
                 </el-option-group>
               </el-select>
-              <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && allinAccountList.length">
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && Object.keys(allinAccountList).length">
                 （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
               </span>
-              <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && !allinAccountList.length">
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && !Object.keys(allinAccountList).length">
                 （无账户信息，请前往<router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
               </span>
             </el-form-item>
@@ -92,19 +92,19 @@
             </el-form-item>
             <el-form-item prop="outAccountId" label-width="10px">
               <el-select v-model="acquisitionTask.outAccountId" placeholder="请选择账户">
-                <el-option-group v-for="group in alloutAccountList" :key="group.id" :label="group.name">
+                <el-option-group v-for="(val, key, i) in alloutAccountList" :key="i" :label="key * 1 === 0 ? '公共账号' : '个人帐号'">
                   <el-option
-                    v-for="item in group.children"
+                    v-for="item in val"
                     :key="item.id"
                     :label="item.datasourceUser"
                     :value="item.id"
                   ></el-option>
                 </el-option-group>
               </el-select>
-              <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && alloutAccountList.length">
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && Object.keys(alloutAccountList).length">
                 （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
               </span>
-              <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && !alloutAccountList.length">
+              <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && !Object.keys(alloutAccountList).length">
                 （无账户信息，请前往<router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
               </span>
             </el-form-item>
@@ -380,15 +380,7 @@ export default {
       accountAll({
         id: id
       }).then(({data}) => {
-        let arr = []
-        for (let [key, value] of Object.entries(data.data)) {
-          arr.push({
-            id: key,
-            name: key == 0 ? '公共账号' : '个人账号',
-            children: value
-          })
-        }
-        this[`all${type}AccountList`] = arr
+        this[`all${type}AccountList`] = data.data
       })
     },
     sqlParseClick () {

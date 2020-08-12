@@ -22,10 +22,10 @@ export const models = {
       value: -1
     }, {
       label: '启用',
-      value: 1
+      value: 0
     }, {
       label: '停用',
-      value: 0
+      value: 1
     }]
     let statusProps = {
       label: 'label',
@@ -101,7 +101,7 @@ export const models = {
               },
               on: {
                 click: () => {
-                  console.log('点击事件', params)
+                  this.gotoTaskBatchHandle(params)
                 }
               }
             }, params.row.taskName)
@@ -269,6 +269,11 @@ export const models = {
       this.$nextTick(() => {
         this.$refs.computAddOrUpdate.init(id)
       })
+    },
+    // 点击名称跳转到批次
+    gotoTaskBatchHandle (params) {
+      console.log(params)
+      this.$router.push({ name: 'dispatch-taskBatch', query: { name: params.row.taskName } })
     },
     // 依赖快照
     snapshotHandle(url) {

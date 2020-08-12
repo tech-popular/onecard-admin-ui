@@ -51,9 +51,9 @@
             </el-form-item>
             <el-form-item prop="accountId" label-width="10px">
               <el-select v-model="item.accountId" placeholder="请选择账户">
-                <el-option-group v-for="group in item.allAccountList" :key="group.id" :label="group.name">
+                <el-option-group v-for="(val, key, i) in item.allAccountList" :key="i" :label="key * 1 === 0 ? '公共账号' : '个人帐号'">
                   <el-option
-                    v-for="item in group.children"
+                    v-for="item in val"
                     :key="item.id"
                     :label="item.datasourceUser"
                     :value="item.id"
@@ -292,7 +292,6 @@ export default {
     getAllSystem () {
       projectAll().then(({data}) => {
         this.allSystemList = data.data
-        console.log(890)
       })
     },
     getAllDatasource () {
@@ -316,15 +315,7 @@ export default {
       accountAll({
         id: id
       }).then(({data}) => {
-        let arr = []
-        for (let [key, value] of Object.entries(data.data)) {
-          arr.push({
-            id: key,
-            name: key == 0 ? '公共账号' : '个人账号',
-            children: value
-          })
-        }
-        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], allAccountList: arr })
+        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], allAccountList: data.data })
       })
     },
     drawerClose () { // 关闭抽屉弹窗

@@ -60,6 +60,7 @@ export const addOrEdotModels = {
           required: true,
           on: {
             change: (data) => {
+              console.log(63333, data)
               if (this.formData.accountList) {
                 let filterArr = this.formData.accountList.filter(item => item.datasourceAccountType === this.formData.datasourceAccountType)
                 if (filterArr.length) {
@@ -88,7 +89,20 @@ export const addOrEdotModels = {
           label: '密码 / Access Key Secret',
           isReloadOptions: true,
           required: true,
+          default: (data) => {
+            console.log(data, this.formData.datasourcePasswd)
+            return ''
+          },
           autocomplete: 'off'
+          // value: {
+          //   type: data => {
+          //     if (data.datasourcePasswd) {
+          //       return 'password'
+          //     } else {
+          //       return 'input'
+          //     }
+          //   }
+          // }
         },
         accountDisable: {
           type: 'radio',
@@ -121,8 +135,6 @@ export const addOrEdotModels = {
       if (id) {
         this.id = id
       }
-      this.formData.datasourceUser = ''
-      this.formData.datasourcePasswd = ''
       this.visible = true
       this.$nextTick(() => {
         if (id) {
@@ -134,8 +146,8 @@ export const addOrEdotModels = {
             // 初始化一下账户信息，默认取数组第一条
             if (data.data.accountList.length) {
               this.formData.datasourceAccountType = data.data.accountList[0].datasourceAccountType
-              this.formData.datasourceUser = data.data.accountList[0].datasourceUser
-              this.formData.datasourcePasswd = data.data.accountList[0].datasourcePasswd
+              this.formData.datasourceUser = data.data.accountList[0].datasourceUser || ''
+              this.formData.datasourcePasswd = data.data.accountList[0].datasourcePasswd || ''
               this.formData.accountDisable = data.data.accountList[0].accountDisable
             } else {
               this.formData.datasourceAccountType = ''
@@ -143,9 +155,10 @@ export const addOrEdotModels = {
               this.formData.datasourcePasswd = ''
               this.formData.accountDisable = ''
             }
+            console.log(this.formData.datasourceUser, this.formData.datasourcePasswd)
           })
         }
-        console.log(this.formData.datasourceUser)
+        console.log(this.formData.datasourceUser, this.formData.datasourcePasswd)
       })
     },
     handleCancel() {

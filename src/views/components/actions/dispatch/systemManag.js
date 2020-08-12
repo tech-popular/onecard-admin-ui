@@ -1,7 +1,7 @@
 import { list } from '@/api/dispatch/systemManag'
 export const models = {
   data () {
-    let status = [{label: '全部', value: -1}, {label: '有效', value: 1}, {label: '无效', value: 0}]
+    let status = [{label: '全部', value: -1}, {label: '有效', value: 0}, {label: '无效', value: 1}]
     let statusProps = {label: 'label', value: 'value'}
     return {
       props: {
@@ -54,8 +54,8 @@ export const models = {
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              props: {type: params.row.projectDisable === 1 ? '' : 'warning'} // 组件的props
-            }, params.row.projectDisable === 1 ? '有效' : '无效')
+              props: {type: params.row.projectDisable === 0 ? '' : 'warning'} // 组件的props
+            }, params.row.projectDisable === 0 ? '有效' : '无效')
           }
         }
       ],

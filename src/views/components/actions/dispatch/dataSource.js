@@ -6,27 +6,27 @@ export const models = {
   data() {
     let type = [{
       label: '全部',
-      value: 1
-    }, {
-      label: '采集任务',
-      value: 2
+      value: '-1'
     }, {
       label: '计算任务',
-      value: 3
+      value: 'CALCULATE'
     }, {
       label: '同步任务',
-      value: 4
+      value: 'ACQUISITION'
     }]
     let typeProps = {
       label: 'label',
       value: 'value'
     }
     let status = [{
+      label: '全部',
+      value: '-1'
+    }, {
       label: '有效',
-      value: 1
+      value: 0
     }, {
       label: '无效',
-      value: 0
+      value: 1
     }]
     let statusProps = {
       label: 'label',
@@ -81,9 +81,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.dataSourceType === '1' ? '' : 'warning'
+                type: params.row.dataSourceType === 'CALCULATE' ? '' : 'warning'
               } // 组件的props
-            }, params.row.dataSourceType === '1' ? '计算任务' : '同步任务')
+            }, params.row.dataSourceType === 'CALCULATE' ? '计算任务' : '同步任务')
           }
         },
         {
@@ -103,14 +103,20 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.dataSourceDisable === '1' ? '' : 'warning'
+                type: params.row.dataSourceDisable === '0' ? '' : 'warning'
               } // 组件的props
-            }, params.row.dataSourceDisable === '1' ? '有效' : '无效')
+            }, params.row.dataSourceDisable === '0' ? '有效' : '无效')
           }
         }
       ],
       list: [],
-      searchData: {},
+      searchData: {
+        name: '',
+        ip: '',
+        database: '',
+        type: '-1',
+        disable: '-1'
+      },
       searchForm: [{
           type: 'Input',
           label: '数据源名称',
@@ -137,6 +143,7 @@ export const models = {
           label: '数据源类型',
           prop: 'type',
           width: '300px',
+          default: '-1',
           options: type,
           props: typeProps,
           change: row => '',
@@ -145,9 +152,10 @@ export const models = {
         {
           type: 'Select',
           label: '状态',
-          prop: 'dataSourceDisable',
+          prop: 'disable',
           width: '300px',
           options: status,
+          default: '-1',
           props: statusProps,
           change: row => '',
           placeholder: '请选择状态'
@@ -182,8 +190,8 @@ export const models = {
         'name': this.searchData.name,
         'ip': this.searchData.ip,
         'database': this.searchData.database,
-        'type': this.searchData.type,
-        'dataSourceDisable': this.searchData.dataSourceDisable
+        'type': this.searchData.type === '-1' ? '' : this.searchData.type,
+        'disable': this.searchData.disable === '-1' ? '' : this.searchData.disable
       }
       this.getList(dataBody)
     },
