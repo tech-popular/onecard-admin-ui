@@ -18,7 +18,7 @@
           </template>
         </el-table-column>
       </template>
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" :width="operatesWidth">
         <template slot-scope="scope">
           <el-button size="mini" v-for="(btn,index) in operates" :type="btn.type" :key="index" @click.native.prevent="btn.method(scope.row)">{{btn.label}}</el-button>
         </template>
@@ -38,7 +38,11 @@ export default {
       type: Array,
       default: []
     },
-    operates: {}
+    operates: {},
+    operatesWidth: {
+      type: String,
+      default: ''
+    }
   },
   // 组件
   components: {

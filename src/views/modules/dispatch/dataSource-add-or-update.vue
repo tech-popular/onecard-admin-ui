@@ -43,8 +43,8 @@
       <el-form-item label="密码 / Access Key Secret" prop="datasourcePasswd" v-else>
         <el-input v-model="dataForm.datasourcePasswd" placeholder="密码 / Access Key Secret" />
       </el-form-item>
-      <el-form-item label="状态" prop="dataSourceDisable">
-        <el-radio-group v-model="dataForm.dataSourceDisable">
+      <el-form-item label="状态" prop="accountDisable">
+        <el-radio-group v-model="dataForm.accountDisable">
           <el-radio label="0">有效</el-radio>
           <el-radio label="1">无效</el-radio>
         </el-radio-group>
@@ -81,7 +81,7 @@ export default {
         datasourceAccountType: 0,
         datasourceUser: '',
         datasourcePasswd: '',
-        dataSourceDisable: '0'
+        accountDisable: '0'
       },
       dataRule: {
         datasourceAccountType: [
@@ -93,7 +93,7 @@ export default {
         datasourcePasswd: [
           { required: true, message: '请输入密码', trigger: 'blur' }
         ],
-        dataSourceDisable: [
+        accountDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ]
       }
@@ -122,13 +122,14 @@ export default {
             this.dataForm.dataSourceDescribe = data.data.dataSourceDescribe
             this.dataForm.dataSourceIp = data.data.dataSourceIp
             this.dataForm.dataSourceDatabase = data.data.dataSourceDatabase
-            this.dataForm.dataSourceDisable = data.data.dataSourceDisable
             // 初始化一下账户信息，默认取数组第一条
             this.accountList = data.data.accountList
             if (data.data.accountList.length) {
               this.dataForm.datasourceAccountType = data.data.accountList[0].datasourceAccountType
               this.dataForm.datasourceUser = data.data.accountList[0].datasourceUser || ''
               this.dataForm.datasourcePasswd = data.data.accountList[0].datasourcePasswd || ''
+              this.dataForm.accountDisable = data.data.accountList[0].accountDisable
+              this.dataForm.id = data.data.accountList[0].id
             }
           })
         }
@@ -140,9 +141,13 @@ export default {
         if (filterArr.length) {
           this.dataForm.datasourceUser = filterArr[0].datasourceUser
           this.dataForm.datasourcePasswd = filterArr[0].datasourcePasswd
+          this.dataForm.accountDisable = filterArr[0].accountDisable
+          this.dataForm.id = filterArr[0].id
         } else {
           this.dataForm.datasourceUser = ''
           this.dataForm.datasourcePasswd = ''
+          this.dataForm.accountDisable = ''
+          this.dataForm.id = ''
         }
       }
     },
@@ -152,10 +157,11 @@ export default {
     handleSubmit () {
       let params = {
         'datasourceId': this.id,
+        'id': this.dataForm.id,
         'datasourceAccountType': this.dataForm.datasourceAccountType,
         'datasourceUser': this.dataForm.datasourceUser,
         'datasourcePasswd': this.dataForm.datasourcePasswd,
-        'dataSourceDisable': this.dataForm.dataSourceDisable,
+        'accountDisable': this.dataForm.accountDisable,
         'createUser': this.userName
       }
       saveAccount(params).then(({

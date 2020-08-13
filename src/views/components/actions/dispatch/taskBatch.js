@@ -20,6 +20,7 @@ export const models = {
       dataListLoading: false,
       addOrUpdateVisible: false,
       // 操作按钮
+      operatesWidth: '220px',
       operates: [
         {
           id: 1,
@@ -56,7 +57,7 @@ export const models = {
         {
           id: 5,
           label: '杀死任务',
-          type: 'warning',
+          type: 'info',
           method: (id) => {
             this.addOrUpdateHandle(id)
           }
@@ -74,6 +75,7 @@ export const models = {
         {
           prop: 'taskId',
           label: '任务ID',
+          width: '80px',
           align: 'center'
         },
         {

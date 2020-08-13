@@ -10,3 +10,4 @@ export const saveAccount = (params) => httpPost(base + 'dispatch/account/save', 
 export const deleted = (params) => httpPost(base + 'cachemanage/delcachemanage', params) // 删除
 export const implement = (params) => httpPost(base + 'cachemanage/execute', params) // 执行
 export const info = (params) => httpGet(base + `dispatch/datasource/info/${params}`, params) // 详情
+export const commonDatasourceItem = () => httpGet(base + 'dispatch/common/items/datasource')

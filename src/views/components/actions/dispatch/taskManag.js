@@ -1,5 +1,6 @@
 import {
-  list
+  list,
+  taskExecute
 } from '@/api/dispatch/taskManag'
 export const models = {
   data() {
@@ -48,6 +49,7 @@ export const models = {
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
+      operatesWidth: '220px',
       operates: [{
           id: 1,
           label: '编辑任务',
@@ -60,16 +62,24 @@ export const models = {
             }
           }
         },
-        // {
-        //   id: 2,
-        //   label: '调度配置',
-        //   type: 'success',
-        //   method: (id) => {
-        //     this.addOrUpdateHandle(id)
-        //   }
-        // },
+        {
+          id: 2,
+          label: '调试配置',
+          type: 'success',
+          method: (id) => {
+            this.taskExecuteHandle(id)
+          }
+        },
         {
           id: 3,
+          label: '执行任务',
+          type: 'default',
+          method: (id) => {
+            this.taskExecuteHandle(id)
+          }
+        },
+        {
+          id: 4,
           label: '依赖快照',
           type: 'info',
           method: (snapshot) => {
@@ -77,18 +87,27 @@ export const models = {
           }
         },
         {
-          id: 4,
+          id: 5,
           label: '编辑依赖',
           type: 'warning',
           method: (editSnapshot) => {
             this.editSnapshotHandle(editSnapshot)
           }
         }
+        // {
+        //   id: 6,
+        //   label: '删除',
+        //   type: 'success',
+        //   method: (id) => {
+        //     this.taskExecuteHandle(id)
+        //   }
+        // }
       ],
       columns: [{
           prop: 'id',
           label: '任务ID',
-          align: 'center'
+          align: 'center',
+          width: '100px'
         },
         {
           prop: 'taskName',
@@ -127,11 +146,13 @@ export const models = {
         {
           prop: 'createUser',
           label: '创建人',
+          width: '150px',
           align: 'center'
         },
         {
           prop: 'dispatchStatus',
           label: '调度起停状态',
+          width: '120px',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
@@ -144,6 +165,7 @@ export const models = {
         {
           prop: 'dependence',
           label: '有无依赖',
+          width: '120px',
           align: 'center'
         }
       ],
@@ -255,6 +277,16 @@ export const models = {
       this.pageNum = 1
       this.searchData = {}
       this.init()
+    },
+    // 执行任务
+    taskExecuteHandle (id) {
+      taskExecute(id.id).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success(data.msg || '执行成功')
+        } else {
+          this.$message.error(data.msg || '执行失败')
+        }
+      })
     },
     // 新增 / 修改同步任务
     addOrUpdateHandle(id) {

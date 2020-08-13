@@ -1,6 +1,7 @@
 import {
   httpGet,
   httpPost,
+  httpPut,
   httpPostFile
 } from '@/api'
 let base = '/'
@@ -14,3 +15,4 @@ export const accountAll = params => httpPost(base + 'dispatch/account/selectall'
 export const projectAll = () => httpPost(base + 'dispatch/project/selectall')
 export const sqlParse = params => httpPostFile(base + 'dispatch/task/sql/parse', params)
 export const taskBatchList = params => httpGet(base + 'dispatch/task/instance/listOnPage', params)
+export const taskExecute = id => httpPut(base + `dispatch/task/${id}/execute`) // 任务执行

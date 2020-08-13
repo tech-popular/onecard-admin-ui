@@ -1,21 +1,12 @@
 import {
   list,
-  deleted
+  deleted,
+  commonDatasourceItem
 } from '@/api/dispatch/dataSource'
 export const models = {
   data() {
-    let type = [{
-      label: '全部',
-      value: '-1'
-    }, {
-      label: '计算任务',
-      value: 'CALCULATE'
-    }, {
-      label: '同步任务',
-      value: 'ACQUISITION'
-    }]
     let typeProps = {
-      label: 'label',
+      label: 'text',
       value: 'value'
     }
     let status = [{
@@ -48,7 +39,7 @@ export const models = {
       // 操作按钮
       operates: [{
         id: 1,
-        label: '编辑',
+        label: '编辑帐户',
         type: 'primary',
         method: (id) => {
           this.addOrUpdateHandle(id)
@@ -144,7 +135,7 @@ export const models = {
           prop: 'type',
           width: '300px',
           default: '-1',
-          options: type,
+          options: [],
           props: typeProps,
           change: row => '',
           placeholder: '请选择数据源类型'
@@ -183,6 +174,7 @@ export const models = {
   },
   methods: {
     init() {
+      this.getDatasourceList()
       const dataBody = {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize,
@@ -194,6 +186,12 @@ export const models = {
         'disable': this.searchData.disable === '-1' ? '' : this.searchData.disable
       }
       this.getList(dataBody)
+    },
+    getDatasourceList () {
+      commonDatasourceItem().then(({data}) => {
+        let all = [ { text: '全部', value: '-1' }, ...data.data ]
+        this.searchForm.splice(3, 1, { ...this.searchForm[3], options: all })
+      })
     },
     // 查询
     handleSearch() {
