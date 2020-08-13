@@ -49,7 +49,7 @@
         label="备注">
       </el-table-column>
       <el-table-column
-        prop="creator"
+        prop="userName"
         label="创建人"
         align="center"
         header-align="center">
