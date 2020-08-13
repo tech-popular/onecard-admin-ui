@@ -61,44 +61,46 @@
       </el-col>
       <el-col :span="16">
         <el-card>
-          <el-row>
-            <h4><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“系统管理”版块</span></h4>
-            <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/>
-            <el-col :span="12" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)" style="cursor: pointer">
-              <el-card :body-style="{ padding: '0px' }" style="margin:5px">
-                <img width="100%" height="155px" :src="item.img">
-                <el-row style="padding:10px">
-                  <el-col :span="12" style="line-height: 38px;"><span>{{item.name}}</span></el-col>
-                  <el-col :span="12" style="text-align: right;vertical-align: middle;">
-                    <el-button type="primary" icon="el-icon-right" size="mini" circle ></el-button>
-                  </el-col>
-                </el-row>
-              </el-card>
-            </el-col>
-          </el-row>
-          <el-dialog
-            title="请选择租户"
-            :visible.sync="dialogVisible"
-            width="30%"
-            >
-            <span>请在页面上方选择租户，若无租户，请前往<a href="javascript:;" style="color:#2093f7" @click="applyPermission">申请</a></span>
-            <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="dialogVisible = false">确定</el-button>
-            </span>
-          </el-dialog>
-          <el-dialog
-            title="提示"
-            :visible.sync="dialogPermissionVisible"
-            width="30%"
-            >
-            <span>该用户没有权限，请自行前往“授权管理”中<a href="javascript:;" style="color:#2093f7" @click="applyPermission">申请</a></span>
-            <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="dialogPermissionVisible = false">确定</el-button>
-            </span>
-          </el-dialog>
+          <!-- <el-row> -->
+            <h4 style="border-bottom:1px dashed #ccc;margin-bottom: 10px;padding-bottom: 20px"><span class="other-tips"><i class="el-icon-warning"></i>功能权限与数据权限自助申请，请点击“<i style="font-style:normal;font-size:15px;color:#2093f7;padding:0;cursor:pointer" @click="gotoApply">系统管理</i>”版块</span></h4>
+            <!-- <el-row style="border-bottom:1px dashed #ccc;margin: 20px 0;"/> -->
+            <!-- <el-col :span="12" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)" style="cursor: pointer"> -->
+              <div class="card-pane">
+                <el-card :body-style="{ padding: '0px' }" style="margin:10px;width:400px" v-for="(item, index) in plateList" :key="index" @click.native="gotoHandle(item)">
+                  <img width="400px" height="155px" :src="item.img">
+                  <el-row style="padding:10px">
+                    <el-col :span="12" style="line-height: 38px;"><span>{{item.name}}</span></el-col>
+                    <el-col :span="12" style="text-align: right;vertical-align: middle;">
+                      <el-button type="primary" icon="el-icon-right" size="mini" circle ></el-button>
+                    </el-col>
+                  </el-row>
+                </el-card>
+              </div>
+            <!-- </el-col> -->
+          <!-- </el-row> -->
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog
+      title="请选择租户"
+      :visible.sync="dialogVisible"
+      width="30%"
+      >
+      <span>请在页面上方选择租户，若无租户，请前往<a href="javascript:;" style="color:#2093f7" @click="applyPermission">申请</a></span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogPermissionVisible"
+      width="30%"
+      >
+      <span>该用户没有权限，请自行前往“授权管理”中<a href="javascript:;" style="color:#2093f7" @click="applyPermission">申请</a></span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogPermissionVisible = false">确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -120,15 +122,10 @@ export default {
       allSystemData: [
         {
           isRouter: true,
-          name: '数据服务板块',
+          name: '数据服务',
           img: require('../../assets/img/dataservice.jpg'),
           url: sessionStorage.getItem('defaultPage'),
           menuId: 405
-        },
-        {
-          name: 'BI系统',
-          img: require('../../assets/img/bi.jpg'),
-          url: 'http://data.9fbank.com/plate.jsp'
         },
         {
           isRouter: true,
@@ -136,11 +133,23 @@ export default {
           img: require('../../assets/img/sysmanage.jpg'),
           url: sessionStorage.getItem('defaultPage'),
           menuId: 407
+        }
+      ],
+      otherSys: [
+        {
+          name: 'BI系统',
+          img: require('../../assets/img/bi.jpg'),
+          url: 'http://data.9f.cn/login.jsp'
         },
         {
           name: '凤凰系统',
           img: require('../../assets/img/fenghuang.jpg'),
           url: originHost + '/phoenix/#/home'
+        },
+        {
+          name: '数语系统',
+          img: require('../../assets/img/shuyu.png'),
+          url: 'http://datablau.9f.cn/dam/login.jsp '
         }
       ]
     }
@@ -209,14 +218,25 @@ export default {
             let tt = this.allSystemData.filter(aitem => aitem.menuId === item.menuId)[0]
             this.plateList.push(tt)
           })
+          this.plateList = this.plateList.concat(this.otherSys)
         } else {
-          this.plateList = []
-          return this.$message({
-            type: 'error',
-            message: data.msg || '获取数据异常'
-          })
+          this.plateList = this.otherSys
+          // return this.$message({
+          //   type: 'error',
+          //   message: data.msg || '获取数据异常'
+          // })
         }
       })
+    },
+    gotoApply () {
+      let curItem = {
+        isRouter: true,
+        name: '系统管理',
+        img: require('../../assets/img/sysmanage.jpg'),
+        url: sessionStorage.getItem('defaultPage'),
+        menuId: 407
+      }
+      this.gotoHandle(curItem)
     },
     gotoHandle (item) {
       if (item.menuId === 405 && !sessionStorage.getItem('tenantList').length) { // 若无权限时，弹窗提示
@@ -265,6 +285,14 @@ export default {
 .el-form-item--medium .el-form-item__content, .el-form-item--medium .el-form-item__label{
   font-size: 14px;
     color: #999;
+}
+.card-pane {
+  cursor: pointer;
+  display:flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
 }
 .userAdmin{
   line-height: 40px;

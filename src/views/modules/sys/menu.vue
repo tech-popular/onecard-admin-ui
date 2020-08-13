@@ -169,17 +169,16 @@
           // name: this.dataForm.name
         }).then(({data}) => {
           this.dataList = treeDataTranslate(data.data, 'menuId')
-          this.$nextTick(() => {
-            document.getElementsByClassName('el-icon-caret-right')[0].click()
+          // this.$nextTick(() => {
+            // document.getElementsByClassName('el-icon-caret-right')[0].click()
             // document.getElementsByClassName('el-icon-caret-right')[1].click()
-          })
+          // })
           this.dataListLoading = false
         })
       },
       getSelectDown () {
         getSelectDown().then(({data}) => {
           if (data && data.code === 0) {
-            console.log(data)
             this.cascaderOptions = JSON.parse(data.menuList)
           } else {
             this.cascaderOptions = []
@@ -251,7 +250,7 @@
         }).catch(() => {})
       },
       resetHandle () { // 重置
-        // this.dataForm.name = ''
+        this.dataForm.select = ''
         this.dataForm.id = ''
         this.getDataList()
       }

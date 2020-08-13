@@ -36,6 +36,7 @@ const mainRoutes = {
     // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
     // { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
     { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } },
+    { path: '/noMenu', component: _import('common/noMenu'), name: 'noMenu', meta: { title: '暂无菜单' } },
     { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
     { path: '/demo-eventChoose', component: _import('demo/eventChoose'), name: 'demo-eventChoose', meta: { title: 'demo-eventChoose', isTab: true } },
@@ -152,10 +153,14 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
       temp = temp.concat(menuList[i].list)
     } else if (menuList[i].url && /\S/.test(menuList[i].url)) {
       menuList[i].url = menuList[i].url.replace(/^\//, '')
+      let itemUrl = menuList[i].url
+      if (menuList[i].url[0] === '/') { // 若第一个字符为“/”时。去掉，不然会有问题
+        itemUrl = menuList[i].url.substr(1)
+      }
       var route = {
-        path: menuList[i].url.replace('/', '-'),
+        path: itemUrl.replace('/', '-'),
         component: null,
-        name: menuList[i].url.replace('/', '-'),
+        name: itemUrl.replace('/', '-'),
         meta: {
           menuId: menuList[i].menuId,
           title: menuList[i].name,

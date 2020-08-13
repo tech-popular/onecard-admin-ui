@@ -141,13 +141,13 @@
       getTenantList () { // 租户下拉列表
         getTenantList().then(({data}) => {
           if (data && data.code === 0 && data.data.length) {
-            console.log(data)
             this.tenantList = data.data
             this.tenantId = this.tenantList[0].id
           } else {
             this.tenantList = []
             this.tenantId = -999
           }
+          this.tenantIdChange(this.tenantId)
           sessionStorage.setItem('tenantList', this.tenantList || [])
         })
       },

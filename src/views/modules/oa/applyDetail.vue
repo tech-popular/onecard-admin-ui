@@ -140,7 +140,7 @@ export default {
       this.quanxian = val.applyType
       this.dialogVisible = true
       lookAccout(val.id).then(({data}) => {
-        this.detalList = []
+        this.detalList = {}
         if (data.status * 1 !== 1) {
           return this.$message({
             type: 'error',
