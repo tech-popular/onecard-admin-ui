@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('honeycomb:honeycombmaxcomputemergetask:save')" type="primary" @click="addHandle()">新增</el-button>
+        <!-- <el-button v-if="isAuth('honeycomb:honeycombmaxcomputemergetask:save')" type="primary" @click="addHandle()">新增</el-button> -->
         <el-button v-if="isAuth('honeycomb:honeycombmaxcomputemergetask:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
       <el-form-item>
@@ -106,7 +106,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="updateHandle(scope.row.tableName)">修改</el-button>
+          <!-- <el-button type="text" size="small" @click="updateHandle(scope.row.tableName)">修改</el-button> -->
           <el-button type="text" size="small" @click="deleteHandle(scope.row.tableName)">删除</el-button>
         </template>
       </el-table-column>
