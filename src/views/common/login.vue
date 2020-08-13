@@ -247,6 +247,7 @@ export default {
   created () {
     // const url = location.href.split('#')[0]
     this.getCaptcha()
+    sessionStorage.clear()
     // this.getPhoneCaptcha()
     // this.url = url + '#/resetPassword'\
     // this.$message({

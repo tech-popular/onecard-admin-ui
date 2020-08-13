@@ -1,11 +1,14 @@
 <template>
   <div class="mod-user">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">   
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="姓名: ">
         <el-input v-model="dataForm.name" placeholder="姓名" clearable></el-input>
       </el-form-item>
       <el-form-item label="用户名: ">
         <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="手机号: ">
+        <el-input v-model="dataForm.mobile" placeholder="手机号" clearable></el-input>
       </el-form-item>
       <el-form-item label="邮箱账号: ">
         <el-input v-model="dataForm.emailList" placeholder="邮箱账号" clearable></el-input>
@@ -17,9 +20,10 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()" type="primary">查询</el-button>
+        <el-button @click="searchHandle()" type="primary">查询</el-button>
+        <el-button @click="resetHandle()" type="default">重置</el-button>
         <!-- <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
-        <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <!-- <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
     <el-alert
@@ -34,12 +38,12 @@
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="id"
         header-align="center"
@@ -74,19 +78,16 @@
         align="center"
         label="手机号">
       </el-table-column> -->
-      <!-- <el-table-column
-        prop="roleName"
+      <el-table-column
+        prop="roleNames"
         header-align="center"
         align="center"
         label="功能角色">
         <template slot-scope="scope">
-          <el-tooltip effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.roleName)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.roleName}}</div>
-          </el-tooltip>
+          <div v-html="scope.row.roleNames.join(',<br/>')"></div>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="roleName"
         header-align="center"
         align="center"
@@ -99,12 +100,12 @@
         </template>
       </el-table-column> -->
       <el-table-column
-        prop="status"
+        prop="flag"
         header-align="center"
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === '0'" size="small">正常</el-tag>
+          <el-tag v-if="scope.row.flag === 0" size="small">正常</el-tag>
           <el-tag v-else size="small" type="danger">冻结</el-tag>
         </template>
       </el-table-column>
@@ -135,18 +136,23 @@
 
 <script>
   import AddOrUpdate from './user-add-or-update'
-  import { getRolesList } from '@/api/account'
+  import { getUserList } from '@/api/sys/user'
   export default {
     data () {
       return {
         dataForm: {
           userName: '',
           emailList: '',
+          mobile: '',
           name: '',
-          status: ''
+          status: '-1'
         },
         dataList: [],
         statusList: [
+          {
+            id: '-1',
+            value: '全部'
+          },
           {
             id: '0',
             value: '正常'
@@ -155,7 +161,6 @@
             value: '冻结'
           }
         ],
-        roles: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -171,31 +176,18 @@
     activated () {
       this.getDataList()
     },
-    mounted () {
-      this.getRoles()
-    },
     methods: {
-      getRoles () {
-        getRolesList().then(({data}) => {
-          if (data && data.code == 0) {
-            this.roles = data.list
-          }
-        })
-      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/sys/user/list'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'username': this.dataForm.userName,
-            'email': this.dataForm.emailList,
-            'name': this.dataForm.name,
-            'status': this.dataForm.status
-          })
+        getUserList({
+          'page': this.pageIndex,
+          'limit': this.pageSize,
+          'username': this.dataForm.userName,
+          'mobile': this.dataForm.mobile,
+          'email': this.dataForm.emailList,
+          'name': this.dataForm.name,
+          'status': this.dataForm.status === '-1' ? '' : this.dataForm.status
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.dataList = data.page.list
@@ -207,6 +199,21 @@
           }
           this.dataListLoading = false
         })
+      },
+      resetHandle () {
+        this.pageIndex = 1
+        this.pageSize = 10
+        this.dataForm.userName = ''
+        this.dataForm.mobile = ''
+        this.dataForm.emailList = ''
+        this.dataForm.name = ''
+        this.dataForm.status = '-1'
+        this.getDataList()
+      },
+      searchHandle () {
+        this.pageIndex = 1
+        this.pageSize = 10
+        this.getDataList()
       },
       // 每页数
       sizeChangeHandle (val) {
