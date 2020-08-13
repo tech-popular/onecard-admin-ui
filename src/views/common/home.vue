@@ -139,7 +139,7 @@ export default {
         {
           name: 'BI系统',
           img: require('../../assets/img/bi.jpg'),
-          url: 'http://data.9fbank.com/plate.jsp'
+          url: 'http://data.9f.cn/login.jsp'
         },
         {
           name: '凤凰系统',
@@ -149,7 +149,7 @@ export default {
         {
           name: '数语系统',
           img: require('../../assets/img/shuyu.png'),
-          url: 'http://datablau.9fbank.com/dam/login.jsp'
+          url: 'http://datablau.9f.cn/dam/login.jsp '
         }
       ]
     }
