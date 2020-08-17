@@ -45,6 +45,7 @@ export const models = {
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
+      dispatchConfigAddOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
@@ -64,10 +65,10 @@ export const models = {
         },
         {
           id: 2,
-          label: '调试配置',
+          label: '调度配置',
           type: 'success',
           method: (id) => {
-            this.taskExecuteHandle(id)
+            this.addOrUpdateDispatchConfig(id)
           }
         },
         {
@@ -278,6 +279,13 @@ export const models = {
       this.searchData = {}
       this.init()
     },
+    // 调度配置
+    addOrUpdateDispatchConfig (id) {
+      this.dispatchConfigAddOrUpdateVisible = true
+      this.$nextTick(() => {
+        this.$refs.dispatchConfigAddOrUpdate.init(id)
+      })
+    },
     // 执行任务
     taskExecuteHandle (id) {
       taskExecute(id.id).then(({data}) => {
@@ -333,7 +341,7 @@ export const models = {
       }) => {
         if (data && data.code === 0) {
           this.dataListLoading = false
-          this.list = data.data.list
+          this.list = data.data.records
           this.totalPage = data.data.totalCount
         } else {
           this.list = []

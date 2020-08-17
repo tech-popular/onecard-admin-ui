@@ -25,18 +25,22 @@
       ref="computAddOrUpdate"
       @refreshDataList="init"
     />
+    <!--调度配置-->
+    <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
   </div>
 </template>
 
 <script>
 import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
+import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import { models } from '../../components/actions/dispatch/taskManag'
 export default {
   mixins: [models],
   components: {
     AddOrUpdate,
-    ComputAddOrUpdate
+    ComputAddOrUpdate,
+    dispatchConfigAddOrUpdate
   }
 }
 </script>
