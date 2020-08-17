@@ -79,7 +79,7 @@ export default {
         page: this.pageIndex,
         limit: this.pageSize,
         name: this.name,
-        menuName: this.menuName,
+        menuName: encodeURIComponent(this.menuName),
         // status: this.dataForm.status,
         startTime: this.dataForm.date.length ? this.dataForm.date[0] : '',
         endTime: this.dataForm.date.length ? this.dataForm.date[1] : ''
