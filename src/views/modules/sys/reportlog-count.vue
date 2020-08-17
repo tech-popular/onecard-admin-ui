@@ -92,13 +92,14 @@ export default {
         page: this.pageIndex,
         limit: this.pageSize,
         status: this.dataForm.status,
+        templateName: this.dataForm.templateName === '-1' ? '' : this.dataForm.templateName,
         startTime: this.dataForm.date.length ? this.dataForm.date[0] : '',
         endTime: this.dataForm.date.length ? this.dataForm.date[1] : ''
       }
       if (this.dataForm.status === 0) {
         params.name = this.name
       } else {
-        params.menuName = this.name
+        params.menuName = encodeURIComponent(this.name)
       }
       selectAccessLogPage(params).then(({ data }) => {
         if (data && data.status * 1 === 1) {

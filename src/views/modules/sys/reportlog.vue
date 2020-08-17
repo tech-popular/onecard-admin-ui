@@ -29,12 +29,14 @@
         <el-input
           v-model="dataForm.menuName"
           placeholder="请输入报表名称"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item label="筛选用户" v-else>
         <el-input
           v-model="dataForm.name"
           placeholder="请输入用户名称"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item>
@@ -111,7 +113,7 @@ export default {
       if (this.dataForm.status === 0) {
         params.name = this.dataForm.name
       } else {
-        params.menuName = this.dataForm.menuName
+        params.menuName = encodeURIComponent(this.dataForm.menuName)
       }
       selectAccessLog(params).then(({ data }) => {
         if (data && data.status * 1 === 1) {
