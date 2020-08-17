@@ -19,7 +19,7 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="系统">
-        <el-select v-model="dataForm.templateName">
+        <el-select v-model="dataForm.templateName" @change="templateNameChange">
           <el-option value="-1" label="全部"></el-option>
           <el-option value="BI" label="BI系统"></el-option>
           <el-option value="凤凰" label="凤凰系统"></el-option>
@@ -29,12 +29,14 @@
         <el-input
           v-model="dataForm.menuName"
           placeholder="请输入报表名称"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item label="筛选用户" v-else>
         <el-input
           v-model="dataForm.name"
           placeholder="请输入用户名称"
+          clearable
         ></el-input>
       </el-form-item>
       <el-form-item>
@@ -109,9 +111,10 @@ export default {
         templateName: this.dataForm.templateName === '-1' ? '' : this.dataForm.templateName
       }
       if (this.dataForm.status === 0) {
+        console.log(this.dataForm.name)
         params.name = this.dataForm.name
       } else {
-        params.menuName = this.dataForm.menuName
+        params.menuName = encodeURIComponent(this.dataForm.menuName)
       }
       selectAccessLog(params).then(({ data }) => {
         if (data && data.status * 1 === 1) {
@@ -131,6 +134,10 @@ export default {
       })
     },
     statusChange () {
+      this.pageIndex = 1
+      this.getDataList()
+    },
+    templateNameChange () {
       this.pageIndex = 1
       this.getDataList()
     },
