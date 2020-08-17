@@ -74,6 +74,8 @@ export default {
       })
     },
     init (dataForm, name) {
+      this.pageIndex = 1
+      this.pageSize = 10
       this.dataForm = dataForm
       this.name = name
       if (dataForm.status === 1) {

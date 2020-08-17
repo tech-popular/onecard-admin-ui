@@ -66,6 +66,8 @@ export default {
       })
     },
     init (dataForm, userName, menuName, title) {
+      this.pageIndex = 1
+      this.pageSize = 10
       this.dataForm = dataForm
       this.title = title
       this.visible = true
