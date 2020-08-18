@@ -23,7 +23,7 @@ export const addOrEdotModels = {
           ],
           required: true
         },
-        discribe: {
+        describe: {
           type: 'textarea',
           label: '备注',
           required: true
