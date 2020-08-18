@@ -112,6 +112,10 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         if (id) {
+          this.dataForm.datasourceAccountType = ''
+          this.dataForm.datasourceUser = ''
+          this.dataForm.datasourcePasswd = ''
+          this.dataForm.accountDisable = ''
           info(id).then(({
             data
           }) => {
