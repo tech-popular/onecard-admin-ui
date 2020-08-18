@@ -16,7 +16,7 @@ export const addOrEdotModels = {
         projectDisable: {
           type: 'radio',
           label: '系统状态',
-          default: 1,
+          default: 0,
           options: [
             { text: '有效', value: 0 },
             { text: '无效', value: 1 }
