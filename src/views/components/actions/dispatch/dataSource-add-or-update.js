@@ -1,67 +1,122 @@
-import { saveorupt, info } from '@/api/lexicon/cacheCleanup'
+import {
+  saveAccount,
+  info
+} from '@/api/dispatch/dataSource'
 export const addOrEdotModels = {
-  data () {
+  data() {
     return {
       visible: false,
       // 表单数据
       formData: {},
       // 标题字段
       formDesc: {
-        name: {
+        dataSourceName: {
           type: 'input',
           label: '数据源名称',
-          required: true
+          disabled: true
         },
-        cacheType: {
+        dataSourceType: {
           type: 'select',
           label: '数据源类型',
-          options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+          options: [{
+              text: 'redis',
+              value: 1
+            },
+            {
+              text: 'EhCahe',
+              value: 0
+            }
           ],
-          required: true
+          disabled: true
         },
-        infos: {
+        dataSourceDescribe: {
           type: 'textarea',
-          label: '数据源描述'
+          label: '数据源描述',
+          disabled: true
         },
-        severAdis: {
+        dataSourceIp: {
           type: 'input',
           label: '服务器地址',
-          required: true
+          disabled: true
         },
-        severName: {
+        dataSourceDatabase: {
           type: 'input',
           label: '数据库名称',
-          required: true
+          disabled: true
         },
-        accountStatus: {
+        datasourceAccountType: {
           type: 'radio',
           label: '账户类型',
-          default: 1,
-          options: [
-          { text: '公共账户', value: 1 },
-          { text: '个人帐户', value: 0 }
+          default: 0,
+          options: [{
+              text: '公共账户',
+              value: 0
+            },
+            {
+              text: '个人帐户',
+              value: 1
+            }
           ],
-          required: true
+          required: true,
+          on: {
+            change: (data) => {
+              console.log(63333, data)
+              if (this.formData.accountList) {
+                let filterArr = this.formData.accountList.filter(item => item.datasourceAccountType === this.formData.datasourceAccountType)
+                if (filterArr.length) {
+                  this.formData.datasourceUser = filterArr[0].datasourceUser
+                  this.formData.datasourcePasswd = filterArr[0].datasourcePasswd
+                  this.formData.accountDisable = filterArr[0].accountDisable
+                } else {
+                  this.formData.datasourceUser = ''
+                  this.formData.datasourcePasswd = ''
+                  this.formData.accountDisable = ''
+                }
+              }
+            }
+          }
         },
-        userName: {
+        datasourceUser: {
           type: 'input',
           label: '用户名 / Access Key ID',
-          required: true
+          isReloadOptions: true,
+          required: true,
+          default: '',
+          autocomplete: 'off'
         },
-        password: {
+        datasourcePasswd: {
           type: 'password',
           label: '密码 / Access Key Secret',
-          required: true
+          isReloadOptions: true,
+          required: true,
+          default: (data) => {
+            console.log(data, this.formData.datasourcePasswd)
+            return ''
+          },
+          autocomplete: 'off'
+          // value: {
+          //   type: data => {
+          //     if (data.datasourcePasswd) {
+          //       return 'password'
+          //     } else {
+          //       return 'input'
+          //     }
+          //   }
+          // }
         },
-        flag: {
+        accountDisable: {
           type: 'radio',
           label: '状态',
+          isReloadOptions: true,
           default: 1,
-          options: [
-          { text: '有效', value: 1 },
-          { text: '无效', value: 0 }
+          options: [{
+              text: '有效',
+              value: 1
+            },
+            {
+              text: '无效',
+              value: 0
+            }
           ],
           required: true
         }
@@ -70,33 +125,64 @@ export const addOrEdotModels = {
       dataBody: {}
     }
   },
+  computed: {
+    userName: {
+      get () { return this.$store.state.user.name }
+    }
+  },
   methods: {
-    init (id) {
-      this.id = id ? id.id : ''
+    init(id) {
+      if (id) {
+        this.id = id
+      }
       this.visible = true
       this.$nextTick(() => {
         if (id) {
-          console.log(this.submitBtn)
           this.submitBtn = false
-          const dataBody = {id: this.id}
-          info(dataBody).then(({data}) => {
+          info(id).then(({
+            data
+          }) => {
             this.formData = data.data
+            // 初始化一下账户信息，默认取数组第一条
+            if (data.data.accountList.length) {
+              this.formData.datasourceAccountType = data.data.accountList[0].datasourceAccountType
+              this.formData.datasourceUser = data.data.accountList[0].datasourceUser || ''
+              this.formData.datasourcePasswd = data.data.accountList[0].datasourcePasswd || ''
+              this.formData.accountDisable = data.data.accountList[0].accountDisable
+            } else {
+              this.formData.datasourceAccountType = ''
+              this.formData.datasourceUser = ''
+              this.formData.datasourcePasswd = ''
+              this.formData.accountDisable = ''
+            }
+            console.log(this.formData.datasourceUser, this.formData.datasourcePasswd)
           })
         }
+        console.log(this.formData.datasourceUser, this.formData.datasourcePasswd)
       })
     },
-    handleCancel () {
+    handleCancel() {
       this.visible = false
       this.formData = {}
       this.id = ''
     },
-    handleSubmit (data) {
+    handleSubmit(data) {
       this.dataBody = data
       return Promise.resolve()
     },
     // 提交
-    handleSuccess () {
-      saveorupt(this.dataBody).then(({data}) => {
+    handleSuccess() {
+      let params = {
+          'datasourceId': this.id,
+          'datasourceAccountType': this.dataBody.datasourceAccountType,
+          'datasourceUser': this.dataBody.datasourceUser,
+          'datasourcePasswd': this.dataBody.datasourcePasswd,
+          'accountDisable': this.dataBody.accountDisable,
+          'createUser': this.userName
+      }
+      saveAccount(params).then(({
+        data
+      }) => {
         if (data && data.code === 0) {
           this.$message({
             message: '操作成功',

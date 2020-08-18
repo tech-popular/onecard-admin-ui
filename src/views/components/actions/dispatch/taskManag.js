@@ -1,22 +1,18 @@
 import {
   list,
-  deleted,
-  implement
-} from '@/api/lexicon/cacheCleanup'
+  taskExecute
+} from '@/api/dispatch/taskManag'
 export const models = {
   data() {
     let type = [{
       label: '全部',
-      value: 1
+      value: -1
     }, {
       label: '采集任务',
-      value: 2
+      value: 'ACQUISITION'
     }, {
       label: '计算任务',
-      value: 3
-    }, {
-      label: '同步任务',
-      value: 4
+      value: 'CALCULATE'
     }]
     let typeProps = {
       label: 'label',
@@ -24,13 +20,13 @@ export const models = {
     }
     let status = [{
       label: '全部',
-      value: 1
+      value: -1
     }, {
       label: '启用',
-      value: 2
+      value: 0
     }, {
       label: '停用',
-      value: 3
+      value: 1
     }]
     let statusProps = {
       label: 'label',
@@ -49,28 +45,42 @@ export const models = {
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
+      dispatchConfigAddOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
+      operatesWidth: '220px',
       operates: [{
           id: 1,
           label: '编辑任务',
           type: 'primary',
           method: (id) => {
-            this.addOrUpdateHandle(id)
+            if (id.taskType === 'CALCULATE') {
+              this.computAddOrUpdateHandle(id)
+            } else {
+              this.addOrUpdateHandle(id)
+            }
           }
         },
-        // {
-        //   id: 2,
-        //   label: '调度配置',
-        //   type: 'success',
-        //   method: (id) => {
-        //     this.addOrUpdateHandle(id)
-        //   }
-        // },
+        {
+          id: 2,
+          label: '调度配置',
+          type: 'success',
+          method: (id) => {
+            this.addOrUpdateDispatchConfig(id)
+          }
+        },
         {
           id: 3,
+          label: '执行任务',
+          type: 'default',
+          method: (id) => {
+            this.taskExecuteHandle(id)
+          }
+        },
+        {
+          id: 4,
           label: '依赖快照',
           type: 'info',
           method: (snapshot) => {
@@ -78,79 +88,95 @@ export const models = {
           }
         },
         {
-          id: 4,
+          id: 5,
           label: '编辑依赖',
           type: 'warning',
           method: (editSnapshot) => {
             this.editSnapshotHandle(editSnapshot)
           }
-        },
-        {
-          id: 5,
-          label: '删除',
-          type: 'danger',
-          method: (id) => {
-            this.deleteHandle(id)
-          }
         }
+        // {
+        //   id: 6,
+        //   label: '删除',
+        //   type: 'success',
+        //   method: (id) => {
+        //     this.taskExecuteHandle(id)
+        //   }
+        // }
       ],
       columns: [{
           prop: 'id',
           label: '任务ID',
-          align: 'center'
+          align: 'center',
+          width: '100px'
         },
         {
-          prop: 'cacheName',
+          prop: 'taskName',
           label: '任务名称',
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('a', {
+              style: {
+                cursor: 'pointer'
+              },
+              on: {
+                click: () => {
+                  this.gotoTaskBatchHandle(params)
+                }
+              }
+            }, params.row.taskName)
+          }
         },
         {
-          prop: 'cacheType',
+          prop: 'taskType',
           label: '任务类型',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.cacheType === 0 ? '' : 'warning'
+                type: params.row.taskType === 'CALCULATE' ? '' : 'warning'
               } // 组件的props
-            }, params.row.cacheType === 0 ? 'EhCahe' : 'redis')
+            }, params.row.taskType === 'CALCULATE' ? '计算任务' : '同步任务')
           }
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'createTime',
           label: '任务创建时间',
           align: 'center'
         },
         {
           prop: 'createUser',
           label: '创建人',
+          width: '150px',
           align: 'center'
         },
         {
-          prop: 'flag',
+          prop: 'dispatchStatus',
           label: '调度起停状态',
+          width: '120px',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.flag === 1 ? '' : 'warning'
+                type: params.row.dispatchStatus === 0 ? '' : 'warning'
               } // 组件的props
-            }, params.row.flag === 1 ? '需要' : '不需要')
+            }, params.row.dispatchStatus === 0 ? '启用' : '停用')
           }
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'dependence',
           label: '有无依赖',
+          width: '120px',
           align: 'center'
         }
       ],
       list: [],
       searchData: {
-        name: null,
-        id: null,
-        type: null,
-        user: null,
-        status: null
+        name: '',
+        id: '',
+        type: -1,
+        user: '',
+        status: -1
       },
       searchForm: [{
           type: 'Input',
@@ -236,9 +262,9 @@ export const models = {
         'pageSize': this.pageSize,
         'id': this.searchData.id,
         'name': this.searchData.name,
-        'type': this.searchData.type,
+        'type': this.searchData.type === -1 ? '' : this.searchData.type,
         'user': this.searchData.user,
-        'status': this.searchData.status
+        'status': this.searchData.status === -1 ? '' : this.searchData.status
       }
       this.getList(dataBody)
     },
@@ -253,6 +279,23 @@ export const models = {
       this.searchData = {}
       this.init()
     },
+    // 调度配置
+    addOrUpdateDispatchConfig (id) {
+      this.dispatchConfigAddOrUpdateVisible = true
+      this.$nextTick(() => {
+        this.$refs.dispatchConfigAddOrUpdate.init(id)
+      })
+    },
+    // 执行任务
+    taskExecuteHandle (id) {
+      taskExecute(id.id).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success(data.msg || '执行成功')
+        } else {
+          this.$message.error(data.msg || '执行失败')
+        }
+      })
+    },
     // 新增 / 修改同步任务
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
@@ -266,6 +309,11 @@ export const models = {
       this.$nextTick(() => {
         this.$refs.computAddOrUpdate.init(id)
       })
+    },
+    // 点击名称跳转到批次
+    gotoTaskBatchHandle (params) {
+      console.log(params)
+      this.$router.push({ name: 'dispatch-taskBatch', query: { name: params.row.taskName } })
     },
     // 依赖快照
     snapshotHandle(url) {
@@ -293,7 +341,7 @@ export const models = {
       }) => {
         if (data && data.code === 0) {
           this.dataListLoading = false
-          this.list = data.data.list
+          this.list = data.data.records
           this.totalPage = data.data.totalCount
         } else {
           this.list = []
@@ -301,104 +349,104 @@ export const models = {
           this.$message.error(data.msg)
         }
       })
-    },
-    // 删除接口
-    deleteHandle(id) {
-      const dataBody = {
-        'id': id.id
-      }
-      this.$confirm(`确定删除操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleted(dataBody).then(({
-          data
-        }) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                const dataBody = {
-                  'pageNum': this.pageNum,
-                  'pageSize': this.pageSize
-                }
-                this.getList(dataBody)
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      })
-    },
-    // 执行接口
-    implementHandle(val) {
-      this.$confirm(`确定执行操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        if (val.flag === 1) {
-          this.$prompt('请输入缓存key', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消'
-          }).then(({
-            value
-          }) => {
-            const dataBody = {
-              'id': val.id,
-              'suffixKey': value
-            }
-            implement(dataBody).then(({
-              data
-            }) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    const dataBody = {
-                      'pageNum': this.pageNum,
-                      'pageSize': this.pageSize
-                    }
-                    this.getList(dataBody)
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          })
-        } else {
-          const dataBody = {
-            'id': val.id
-          }
-          implement(dataBody).then(({
-            data
-          }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  const dataBody = {
-                    'pageNum': this.pageNum,
-                    'pageSize': this.pageSize
-                  }
-                  this.getList(dataBody)
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }
-      })
     }
+    // // 删除接口
+    // deleteHandle(id) {
+    //   const dataBody = {
+    //     'id': id.id
+    //   }
+    //   this.$confirm(`确定删除操作?`, '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   }).then(() => {
+    //     deleted(dataBody).then(({
+    //       data
+    //     }) => {
+    //       if (data && data.code === 0) {
+    //         this.$message({
+    //           message: '操作成功',
+    //           type: 'success',
+    //           duration: 1500,
+    //           onClose: () => {
+    //             const dataBody = {
+    //               'pageNum': this.pageNum,
+    //               'pageSize': this.pageSize
+    //             }
+    //             this.getList(dataBody)
+    //           }
+    //         })
+    //       } else {
+    //         this.$message.error(data.msg)
+    //       }
+    //     })
+    //   })
+    // },
+    // 执行接口
+    // implementHandle(val) {
+    //   this.$confirm(`确定执行操作?`, '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   }).then(() => {
+    //     if (val.flag === 1) {
+    //       this.$prompt('请输入缓存key', '提示', {
+    //         confirmButtonText: '确定',
+    //         cancelButtonText: '取消'
+    //       }).then(({
+    //         value
+    //       }) => {
+    //         const dataBody = {
+    //           'id': val.id,
+    //           'suffixKey': value
+    //         }
+    //         implement(dataBody).then(({
+    //           data
+    //         }) => {
+    //           if (data && data.code === 0) {
+    //             this.$message({
+    //               message: '操作成功',
+    //               type: 'success',
+    //               duration: 1500,
+    //               onClose: () => {
+    //                 const dataBody = {
+    //                   'pageNum': this.pageNum,
+    //                   'pageSize': this.pageSize
+    //                 }
+    //                 this.getList(dataBody)
+    //               }
+    //             })
+    //           } else {
+    //             this.$message.error(data.msg)
+    //           }
+    //         })
+    //       })
+    //     } else {
+    //       const dataBody = {
+    //         'id': val.id
+    //       }
+    //       implement(dataBody).then(({
+    //         data
+    //       }) => {
+    //         if (data && data.code === 0) {
+    //           this.$message({
+    //             message: '操作成功',
+    //             type: 'success',
+    //             duration: 1500,
+    //             onClose: () => {
+    //               const dataBody = {
+    //                 'pageNum': this.pageNum,
+    //                 'pageSize': this.pageSize
+    //               }
+    //               this.getList(dataBody)
+    //             }
+    //           })
+    //         } else {
+    //           this.$message.error(data.msg)
+    //         }
+    //       })
+    //     }
+    //   })
+    // }
   }
 }

@@ -1,27 +1,29 @@
-import { saveorupt, info } from '@/api/lexicon/cacheCleanup'
+import { save, info, update } from '@/api/dispatch/systemManag'
 export const addOrEdotModels = {
   data () {
     return {
       visible: false,
       // 表单数据
       formData: {},
+      createUser: '',
       // 标题字段
       formDesc: {
-        cacheName: {
+        projectSystemName: {
           type: 'input',
           label: '系统名称',
           required: true
         },
-        cacheType: {
-          type: 'select',
+        projectDisable: {
+          type: 'radio',
           label: '系统状态',
+          default: 1,
           options: [
-            { text: 'redis', value: 1 },
-            { text: 'EhCahe', value: 0 }
+            { text: '有效', value: 1 },
+            { text: '无效', value: 0 }
           ],
           required: true
         },
-        infos: {
+        discribe: {
           type: 'textarea',
           label: '备注',
           required: true
@@ -31,14 +33,19 @@ export const addOrEdotModels = {
       dataBody: {}
     }
   },
+  computed: {
+    userName: {
+      get () { return this.$store.state.user.name }
+    }
+  },
   methods: {
     init (id) {
       this.id = id ? id.id : ''
       this.visible = true
       this.$nextTick(() => {
         if (id) {
-          const dataBody = {id: this.id}
-          info(dataBody).then(({data}) => {
+          // const dataBody = {id: this.id}
+          info(this.id).then(({data}) => {
             this.formData = data.data
           })
         }
@@ -55,7 +62,12 @@ export const addOrEdotModels = {
     },
     // 提交
     handleSuccess () {
-      saveorupt(this.dataBody).then(({data}) => {
+      let url = update
+      if (!this.id) {
+        url = save
+        this.dataBody.createUser = this.userName
+      }
+      url(this.dataBody).then(({data}) => {
         if (data && data.code === 0) {
           this.$message({
             message: '操作成功',
@@ -69,7 +81,6 @@ export const addOrEdotModels = {
           })
         } else {
           this.$message.error(data.msg)
-          this.visible = false
         }
       })
     }

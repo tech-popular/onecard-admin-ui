@@ -1,7 +1,7 @@
-import { list, deleted } from '@/api/lexicon/cacheCleanup'
+import { list } from '@/api/dispatch/systemManag'
 export const models = {
   data () {
-    let status = [{label: '全部', value: 1}, {label: '启用', value: 2}, {label: '停用', value: 3}]
+    let status = [{label: '全部', value: -1}, {label: '有效', value: 0}, {label: '无效', value: 1}]
     let statusProps = {label: 'label', value: 'value'}
     return {
       props: {
@@ -25,14 +25,6 @@ export const models = {
           method: (id) => {
             this.addOrUpdateHandle(id)
           }
-        },
-        {
-          id: 2,
-          label: '删除',
-          type: 'danger',
-          method: (id) => {
-            this.deleteHandle(id)
-          }
         }
       ],
       columns: [
@@ -42,7 +34,7 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'cacheName',
+          prop: 'projectSystemName',
           label: '系统名称',
           align: 'center'
         },
@@ -52,28 +44,28 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'createTime',
           label: '任务创建时间',
           align: 'center'
         },
         {
-          prop: 'flag',
+          prop: 'projectDisable',
           label: '状态',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
-              props: {type: params.row.flag === 1 ? '' : 'warning'} // 组件的props
-            }, params.row.flag === 1 ? '需要' : '不需要')
+              props: {type: params.row.projectDisable === 0 ? '' : 'warning'} // 组件的props
+            }, params.row.projectDisable === 0 ? '有效' : '无效')
           }
         }
       ],
       list: [],
       searchData: {
-        name: null,
+        name: '',
         id: null,
         type: null,
         user: null,
-        status: null
+        status: -1
       },
       searchForm: [
         {type: 'Input', label: '系统名称', prop: 'name', width: '300px', placeholder: '请输入名称'},
@@ -95,7 +87,7 @@ export const models = {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize,
         'name': this.searchData.name,
-        'status': this.searchData.status
+        'disable': this.searchData.status === -1 ? '' : this.searchData.status
       }
       this.getList(dataBody)
     },
@@ -133,41 +125,13 @@ export const models = {
       list(dataBody).then(({data}) => {
         if (data && data.code === 0) {
           this.dataListLoading = false
-          this.list = data.data.list
+          this.list = data.data.records
           this.totalPage = data.data.totalCount
         } else {
           this.list = []
           this.totalPage = 0
           this.$message.error(data.msg)
         }
-      })
-    },
-    // 删除接口
-    deleteHandle (id) {
-      const dataBody = {'id': id.id}
-      this.$confirm(`确定删除操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleted(dataBody).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                const dataBody = {
-                  'pageNum': this.pageNum,
-                  'pageSize': this.pageSize
-                }
-                this.getList(dataBody)
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
       })
     }
   }

@@ -1,7 +1,9 @@
 import {
-  saveorupt,
-  info
-} from '@/api/lexicon/cacheCleanup'
+  info,
+  save,
+  update,
+  dataSourceAll
+} from '@/api/dispatch/taskManag'
 import DefaultValue from './components/defaultValue'
 import RoutGoPath from './components/routGoPath'
 
@@ -14,19 +16,19 @@ export const addOrEdotModels = {
       formData: {},
       // 标题字段
       formDesc: {
-        cacheName: {
+        taskName: {
           type: DefaultValue,
           label: '任务名称',
           required: true,
           layout: 12
         },
-        key: {
+        id: {
           type: 'input',
           label: '任务ID',
           disabled: true,
           layout: 12
         },
-        cacheType: {
+        projectId: {
           type: 'select',
           label: '所属系统',
           options: [{
@@ -40,12 +42,12 @@ export const addOrEdotModels = {
           ],
           required: true
         },
-        infos: {
+        taskDiscribe: {
           type: 'textarea',
           label: '任务描述',
           required: true
         },
-        dataSources: {
+        inDatasourceId: {
           type: 'select',
           label: '数据来源',
           options: [{
@@ -59,7 +61,7 @@ export const addOrEdotModels = {
           ],
           required: true
         },
-        dataName: {
+        dataSourceName: {
           type: 'select',
           label: '数据源名称',
           options: [{
@@ -219,20 +221,23 @@ export const addOrEdotModels = {
   methods: {
     init(id) {
       this.id = id ? id.id : ''
+      this.getDataSourceAll()
       this.visible = true
       this.$nextTick(() => {
         if (id) {
           console.log(this.submitBtn)
           this.submitBtn = false
-          const dataBody = {
-            id: this.id
-          }
-          info(dataBody).then(({
+          info(this.id).then(({
             data
           }) => {
             this.formData = data.data
           })
         }
+      })
+    },
+    getDataSourceAll () {
+      dataSourceAll().then(({data}) => {
+        console.log(data)
       })
     },
     handleCancel() {
@@ -246,7 +251,11 @@ export const addOrEdotModels = {
     },
     // 提交
     handleSuccess() {
-      saveorupt(this.dataBody).then(({
+      let url = update
+      if (!this.id) {
+        url = save
+      }
+      url(this.dataBody).then(({
         data
       }) => {
         if (data && data.code === 0) {
