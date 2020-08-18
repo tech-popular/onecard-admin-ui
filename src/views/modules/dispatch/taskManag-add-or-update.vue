@@ -358,8 +358,8 @@ export default {
     },
     getAllDatasource () {
       dataSourceAll().then(({data}) => {
-        this.getAllinDatasourceList = data.data.filter(item => item.name === 'MAX_COMPUTE')
-        this.getAlloutDatasourceList = data.data.filter(item => item.name === 'MAX_COMPUTE')
+        this.getAllinDatasourceList = data.data.filter(item => item.name === 'MAXCOMPUTE')
+        this.getAlloutDatasourceList = data.data.filter(item => item.name === 'MAXCOMPUTE')
       })
     },
     dataSourceTypeChange (type, val) {
