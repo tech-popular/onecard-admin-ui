@@ -45,26 +45,24 @@
       </el-form-item>
       <el-form-item label="状态" prop="accountDisable">
         <el-radio-group v-model="dataForm.accountDisable">
-          <el-radio label="0">有效</el-radio>
-          <el-radio label="1">无效</el-radio>
+          <el-radio :label="0">有效</el-radio>
+          <el-radio :label="1">无效</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
     <div slot="footer">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="handleSubmit()">确定</el-button>
+      <el-button type="success" @click="handleTest()">连接测试</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-// import { addOrEdotModels } from '../../components/actions/dispatch/dataSource-add-or-update'
-// export default {
-//   mixins: [addOrEdotModels]
-// }
 import {
   saveAccount,
-  info
+  info,
+  accountConnect
 } from '@/api/dispatch/dataSource'
 export default {
   data () {
@@ -81,7 +79,7 @@ export default {
         datasourceAccountType: 0,
         datasourceUser: '',
         datasourcePasswd: '',
-        accountDisable: '0'
+        accountDisable: 0
       },
       dataRule: {
         datasourceAccountType: [
@@ -136,6 +134,7 @@ export default {
               this.dataForm.id = data.data.accountList[0].id
             }
           })
+          this.$refs['dataForm'].resetFields()
         }
       })
     },
@@ -143,6 +142,7 @@ export default {
       if (this.accountList.length) {
         let filterArr = this.accountList.filter(item => item.datasourceAccountType === val)
         if (filterArr.length) {
+          console.log(filterArr[0])
           this.dataForm.datasourceUser = filterArr[0].datasourceUser
           this.dataForm.datasourcePasswd = filterArr[0].datasourcePasswd
           this.dataForm.accountDisable = filterArr[0].accountDisable
@@ -155,36 +155,63 @@ export default {
         }
       }
     },
+    handleTest () {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          accountConnect({
+            'datasourceId': this.id,
+            'datasourceUser': this.dataForm.datasourceUser,
+            'datasourcePasswd': this.dataForm.datasourcePasswd
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: data.msg,
+                type: 'success'
+              })
+            } else {
+              this.$message({
+                message: data.msg,
+                type: 'error'
+              })
+            }
+          })
+        }
+      })
+    },
     handleCancel () {
       this.visible = false
     },
     handleSubmit () {
-      let params = {
-        'datasourceId': this.id,
-        'id': this.dataForm.id,
-        'datasourceAccountType': this.dataForm.datasourceAccountType,
-        'datasourceUser': this.dataForm.datasourceUser,
-        'datasourcePasswd': this.dataForm.datasourcePasswd,
-        'accountDisable': this.dataForm.accountDisable,
-        'createUser': this.userName
-      }
-      saveAccount(params).then(({
-        data
-      }) => {
-        if (data && data.code === 0) {
-          this.$message({
-            message: '操作成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          let params = {
+            'datasourceId': this.id,
+            'id': this.dataForm.id,
+            'datasourceAccountType': this.dataForm.datasourceAccountType,
+            'datasourceUser': this.dataForm.datasourceUser,
+            'datasourcePasswd': this.dataForm.datasourcePasswd,
+            'accountDisable': this.dataForm.accountDisable,
+            'createUser': this.userName
+          }
+          saveAccount(params).then(({
+            data
+          }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                  this.formData = {}
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
               this.visible = false
-              this.$emit('refreshDataList')
-              this.formData = {}
             }
           })
-        } else {
-          this.$message.error(data.msg)
-          this.visible = false
         }
       })
     }

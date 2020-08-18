@@ -25,8 +25,7 @@ export const addOrEdotModels = {
         },
         describe: {
           type: 'textarea',
-          label: '备注',
-          required: true
+          label: '备注'
         }
       },
       id: '',
