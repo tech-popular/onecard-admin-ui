@@ -262,6 +262,7 @@ export default {
       this.getAllSystem()
       this.getAllDatasource()
       this.visible = true
+      console.log(1234)
       this.$nextTick(() => {
         this.$refs['dataForm1'].resetFields()
         this.$refs['dataForm2'].resetFields()
@@ -296,7 +297,7 @@ export default {
     },
     getAllDatasource () {
       dataSourceAll().then(({data}) => {
-        this.allDatasourceList = data.data.filter(item => item.name === 'MAX_COMPUTE')
+        this.allDatasourceList = data.data.filter(item => item.name === 'MAXCOMPUTE')
       })
     },
     dataSourceTypeChange (index, val) {
