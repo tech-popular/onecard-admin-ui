@@ -18,8 +18,8 @@ export const addOrEdotModels = {
           label: '系统状态',
           default: 1,
           options: [
-            { text: '有效', value: 1 },
-            { text: '无效', value: 0 }
+            { text: '有效', value: 0 },
+            { text: '无效', value: 1 }
           ],
           required: true
         },
