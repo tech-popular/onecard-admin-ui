@@ -139,6 +139,7 @@
 import { deepClone } from '@/utils'
 import { info, save, update, projectAll, dataSourceAll, accountAll } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
+import diff from '@/assets/js/diff.min.js'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/idea.css'
 import 'codemirror/addon/hint/show-hint.css'
@@ -243,7 +244,6 @@ export default {
         },
         styleSelectedText: true
       },
-      diffToCompare: window.diff.compare,
       updateRowNum: 0,
       originpreviewSql: '', // 保留一份原始的连贯数据，用于做对比
       previewSql: '',
@@ -359,7 +359,7 @@ export default {
       let curArr = this.previewSql.split('\n')
       let changeArry = []
       let changeNum = 0
-      changeArry = this.diffToCompare(originArr, curArr)
+      changeArry = diff(originArr, curArr)
       let changeArryLen = changeArry.length
       if (changeArryLen > 0) {
         changeNum = changeArryLen
