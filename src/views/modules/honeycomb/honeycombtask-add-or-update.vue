@@ -291,7 +291,7 @@
 <script>
 import cron from '@/components/cron'
 import { codemirror } from 'vue-codemirror'
-import { getDate } from '@/utils'
+import { getDate, deepClone } from '@/utils'
 import 'codemirror/theme/ambiance.css'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
@@ -320,7 +320,7 @@ export default {
       visible: false,
       sqlVisible: false,
       activeNames: 2,
-      dataForm: {
+      dataFormOrigin: {
         id: 0,
         name: '',
         inDatasource: '',
@@ -363,6 +363,7 @@ export default {
           }
         ]
       },
+      dataForm: {},
       datasourceoptions: [],
       tenantoptions: [],
       computeTypeoptions: [],
@@ -483,6 +484,9 @@ export default {
       ]
     }
   },
+  created () {
+    this.dataForm = deepClone(this.dataFormOrigin)
+  },
   computed: {
     codemirror () {
       return this.$refs.mycode.codemirror
@@ -514,6 +518,7 @@ export default {
     },
     init (id) {
       this.redisListData = []
+      this.dataForm = deepClone(this.dataFormOrigin)
       // 数据源权限tenant
       this.$http({
         url: this.$http.adornUrl(`/sys/systenant/getTenantInfoByUser`),
