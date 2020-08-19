@@ -61,7 +61,7 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'dataSourceName',
+          prop: 'dataSourceDatabase',
           label: '数据库名称',
           align: 'center'
         },
