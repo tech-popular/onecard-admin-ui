@@ -14,10 +14,10 @@ export const models = {
       value: '-1'
     }, {
       label: '有效',
-      value: 0
+      value: '0'
     }, {
       label: '无效',
-      value: 1
+      value: '1'
     }]
     let statusProps = {
       label: 'label',
@@ -68,14 +68,7 @@ export const models = {
         {
           prop: 'dataSourceType',
           label: '数据源类型',
-          align: 'center',
-          render: (h, params) => {
-            return h('el-tag', {
-              props: {
-                type: params.row.dataSourceType === 'CALCULATE' ? '' : 'warning'
-              } // 组件的props
-            }, params.row.dataSourceType === 'CALCULATE' ? '计算任务' : '同步任务')
-          }
+          align: 'center'
         },
         {
           prop: 'createUser',
