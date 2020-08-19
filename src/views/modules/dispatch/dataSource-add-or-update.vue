@@ -45,8 +45,8 @@
       </el-form-item>
       <el-form-item label="数据源状态" prop="dataSourceDisable">
         <el-radio-group v-model="dataForm.dataSourceDisable">
-          <el-radio label="0">有效</el-radio>
-          <el-radio label="1">无效</el-radio>
+          <el-radio :label="0">有效</el-radio>
+          <el-radio :label="1">无效</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -79,7 +79,7 @@ export default {
         datasourceAccountType: 0,
         datasourceUser: '',
         datasourcePasswd: '',
-        dataSourceDisable: '0'
+        dataSourceDisable: 0
       },
       dataRule: {
         datasourceAccountType: [
@@ -113,7 +113,7 @@ export default {
           this.dataForm.datasourceAccountType = ''
           this.dataForm.datasourceUser = ''
           this.dataForm.datasourcePasswd = ''
-          this.dataForm.dataSourceDisable = ''
+          this.dataForm.dataSourceDisable = 0
           info(id).then(({
             data
           }) => {

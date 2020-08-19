@@ -14,10 +14,10 @@ export const models = {
       value: '-1'
     }, {
       label: '有效',
-      value: '0'
+      value: 0
     }, {
       label: '无效',
-      value: '1'
+      value: 1
     }]
     let statusProps = {
       label: 'label',
@@ -87,9 +87,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.dataSourceDisable === '0' ? '' : 'warning'
+                type: params.row.dataSourceDisable === 0 ? '' : 'warning'
               } // 组件的props
-            }, params.row.dataSourceDisable === '0' ? '有效' : '无效')
+            }, params.row.dataSourceDisable === 0 ? '有效' : '无效')
           }
         }
       ],
