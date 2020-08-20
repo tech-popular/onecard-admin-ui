@@ -130,7 +130,8 @@
           <cron v-if="showCronBox" v-model="dataForm.cron"></cron>
         </el-form-item>
         <el-form-item label="cron表达式" prop="cron">
-          <el-input v-model="dataForm.cron" auto-complete="off">
+          <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input>
+          <!-- <el-input v-model="dataForm.cron" auto-complete="off">
             <el-button
               slot="append"
               v-if="!showCronBox"
@@ -145,7 +146,7 @@
               @click="showCronBox = false"
               title="关闭图形配置"
             ></el-button>
-          </el-input>
+          </el-input> -->
         </el-form-item>
         <el-form-item label="数据权限" prop="tenantId">
           <el-select v-model="dataForm.tenantId" placeholder="请选择,默认为所有人查看">
