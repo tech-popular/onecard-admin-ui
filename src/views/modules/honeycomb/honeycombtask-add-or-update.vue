@@ -130,7 +130,8 @@
           <cron v-if="showCronBox" v-model="dataForm.cron"></cron>
         </el-form-item>
         <el-form-item label="cron表达式" prop="cron">
-          <el-input v-model="dataForm.cron" auto-complete="off">
+          <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input>
+          <!-- <el-input v-model="dataForm.cron" auto-complete="off">
             <el-button
               slot="append"
               v-if="!showCronBox"
@@ -145,7 +146,7 @@
               @click="showCronBox = false"
               title="关闭图形配置"
             ></el-button>
-          </el-input>
+          </el-input> -->
         </el-form-item>
         <el-form-item label="数据权限" prop="tenantId">
           <el-select v-model="dataForm.tenantId" placeholder="请选择,默认为所有人查看">
@@ -242,9 +243,9 @@
         </el-collapse>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button>
+        <!-- <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button> -->
         <el-button @click="visible = false">取消</el-button>
-        <el-button type="primary" @click="dataFormSubmit()" v-if="!dataForm.id">确定</el-button>
+        <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
     </el-dialog>
     <!-- 测试 sql -->
@@ -291,7 +292,7 @@
 <script>
 import cron from '@/components/cron'
 import { codemirror } from 'vue-codemirror'
-import { getDate } from '@/utils'
+import { getDate, deepClone } from '@/utils'
 import 'codemirror/theme/ambiance.css'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
@@ -320,7 +321,7 @@ export default {
       visible: false,
       sqlVisible: false,
       activeNames: 2,
-      dataForm: {
+      dataFormOrigin: {
         id: 0,
         name: '',
         inDatasource: '',
@@ -363,6 +364,7 @@ export default {
           }
         ]
       },
+      dataForm: {},
       datasourceoptions: [],
       tenantoptions: [],
       computeTypeoptions: [],
@@ -483,6 +485,9 @@ export default {
       ]
     }
   },
+  created () {
+    this.dataForm = deepClone(this.dataFormOrigin)
+  },
   computed: {
     codemirror () {
       return this.$refs.mycode.codemirror
@@ -514,6 +519,7 @@ export default {
     },
     init (id) {
       this.redisListData = []
+      this.dataForm = deepClone(this.dataFormOrigin)
       // 数据源权限tenant
       this.$http({
         url: this.$http.adornUrl(`/sys/systenant/getTenantInfoByUser`),
