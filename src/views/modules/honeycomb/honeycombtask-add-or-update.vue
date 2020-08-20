@@ -242,7 +242,7 @@
         </el-collapse>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button>
+        <!-- <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button> -->
         <el-button @click="visible = false">取消</el-button>
         <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
