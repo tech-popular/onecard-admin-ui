@@ -150,6 +150,11 @@ export default {
           name: '数语系统',
           img: require('../../assets/img/shuyu.png'),
           url: 'http://datablau.9f.cn/dam/login.jsp '
+        },
+        {
+          name: '神策系统',
+          img: require('../../assets/img/shence.jpg'),
+          url: 'http://sensors.9f.cn/login/index.html'
         }
       ]
     }
