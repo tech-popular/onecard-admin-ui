@@ -21,7 +21,7 @@
               @selection-change="handleLeftSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
             <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskSys" label="所属系统"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
           </el-table>
           <el-pagination
             @size-change="sizeChangeHandle"
@@ -66,44 +66,52 @@
   </el-dialog>
 </template>
 <script>
+import {
+  taskBaseList,
+  taskDependenceAdd
+} from '@/api/dispatch/taskManag'
 export default {
   data () {
     return {
       visible: false,
+      taskId: '',
       pageNo: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalCount: 0,
       leftSearchText: '',
       leftSelectedData: [],
       rightSelectedData: [],
-      leftTableData: [
-        {
-          taskName: 'mc_sqp_t_mal',
-          taskSys: '大数据项目'
-        },
-        {
-          taskName: 'mc_sqp_t_mal11',
-          taskSys: '大数据项目1'
-        },
-        {
-          taskName: 'mc_sqp_t_mal2',
-          taskSys: '大数据项目2'
-        },
-        {
-          taskName: 'mc_sqp_t_mal13',
-          taskSys: '大数据项目3'
-        }
-      ],
+      leftTableData: [],
       rightTableData: []
     }
   },
   methods: {
-    init () {
+    init (id) {
+      this.taskId = id
       this.visible = true
+      this.getTaskBaseList()
+    },
+    getTaskBaseList () {
+      taskBaseList({
+        taskId: this.taskId,
+        taskName: this.leftSearchText,
+        pageNum: this.pageNo,
+        pageSize: this.pageSize
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.leftTableData = data.data.records
+          this.totalCount = data.data.total
+        } else {
+          this.leftTableData = []
+          this.totalCount = []
+        }
+      })
     },
     // 左侧搜索功能
     searchTableHandle () {
       console.log(this.leftSearchText)
+      this.pageNo = 1
+      this.getTaskBaseList()
     },
     handleLeftSelectChange (val) {
       this.leftSelectedData = val
@@ -134,25 +142,44 @@ export default {
     // 取两个对象数组的并集且去重
     unique (arr) {
       const res = new Map()
-      return arr.filter((arr) => !res.has(arr.taskName) && res.set(arr.taskName, 1))
+      return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, 1))
     },
     // 从一个对象数组中过滤过另一个对象数组的内容
     filterArr (a, b) {
-      return [...b].filter(x => [...a].every(y => y.taskName !== x.taskName))
+      return [...b].filter(x => [...a].every(y => y.id !== x.id))
     },
     dataFormSubmit () {
       console.log(this.rightTableData)
+      let params = []
+      this.rightTableData.forEach(item => {
+        params.push({
+          taskId: this.taskId,
+          depTaskId: item.id,
+          depProjectId: item.projectId
+        })
+      })
+      taskDependenceAdd({
+        list: params
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success(data.msg || '提交成功')
+          this.$emit('refreshTaskDependence')
+          this.visible = false
+        } else {
+          this.$message.error(data.msg || '提交异常')
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (page) {
       this.pageSize = page
       this.pageNo = 1
-      this.getDataList()
+      this.getTaskBaseList()
     },
     // 当前页
     currentChangeHandle (page) {
       this.pageNo = page
-      this.getDataList()
+      this.getTaskBaseList()
     }
   }
 }

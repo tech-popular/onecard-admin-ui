@@ -21,10 +21,8 @@
             <el-input v-model="dataForm.id" placeholder="任务ID" disabled  style="width: 300px" />
           </el-form-item>
         </div>
-        <el-form-item label="所属系统：" prop="projectId">
-          <el-select v-model="dataForm.projectId" placeholder="所属系统" disabled style="width: 400px">
-            <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
-          </el-select>
+        <el-form-item label="所属系统：" prop="projectSystemName">
+          <el-input v-model="dataForm.projectSystemName" placeholder="所属系统" disabled  style="width: 300px" />
         </el-form-item>
         <el-form-item label="任务描述：" prop="taskDescribe">
           <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" disabled />
@@ -32,7 +30,7 @@
       </el-form>
       <div class="work-content-1">
         <h3 style="overflow:hidden">任务依赖
-          <el-button style="float:right" type="danger">批量删除</el-button>
+          <el-button style="float:right" type="danger" @click="deleteDependenceHandle">批量删除</el-button>
           <el-button style="float:right;margin-right:20px" type="primary" @click="addDependenceHandle">新增依赖</el-button>
         </h3>
         <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
@@ -40,152 +38,21 @@
           <el-table
             style="flex:1;"
             ref="multipleTable"
-            :data="tableData"
+            :data="dataForm.selectedDpendeceList"
             border
             @selection-change="handleSelectDependenceChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
             <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskSys" label="所属系统"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
-                <a style="cursor: pointer" @click="deleteDependenceHandle(scope.$index, scope.row)">删除</a>
+                <a style="cursor: pointer" @click="deleteDependenceHandle(scope.row)">删除</a>
               </template>
             </el-table-column>
           </el-table>
         </div>
       </div>
-      <div class="work-content-1">
-        <h3 style="overflow:hidden">调度时间</h3>
-        <el-form label-width="110px" :model="dispatchTimeForm" :rules="dataRule" ref="dispatchTimeForm" class="base-form">
-          <el-form-item label="周期：" prop="jobType">
-              <template>
-                <el-radio-group v-model="dispatchTimeForm.jobType">
-                  <el-radio :label="1">运行一次</el-radio>
-                  <el-radio :label="2">周期运行</el-radio>
-                </el-radio-group>
-              </template>
-            </el-form-item>
-            <!-- 运行一次 -->
-            <el-row v-if="dispatchTimeForm.jobType === 1">
-              <el-col :span="16">
-                <div>
-                  <el-form-item label="运行时间：">
-                    <el-date-picker
-                      v-model="dispatchTimeForm.onceRunTime"
-                      type="datetime"
-                      format="yyyy-MM-dd HH:mm:ss"
-                      value-format="timestamp"
-                      placeholder="选择日期时间">
-                    </el-date-picker>
-                    （未指定运行时间，默认立即下发）
-                  </el-form-item>
-                </div>
-              </el-col>
-            </el-row>
-            <!-- 周期运行 -->
-            <div class="work-type-pane" v-if="dispatchTimeForm.jobType === 2">
-              <el-form-item label="调度周期：" prop="runCycle">
-                <el-select v-model="dispatchTimeForm.runCycle" placeholder="请选择" style="width:220px;" @change="disTimeTurnOff (dispatchTimeForm.runCycle)">
-                  <el-option
-                    v-for="item in dispatchCycleList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="具体时间："  prop="dayOfWeeks" v-if="dispatchTimeForm.runCycle === 'WEEK'">
-                <el-select
-                  v-model= "dispatchTimeForm.dayOfWeeks"
-                  multiple
-                  collapse-tags
-                  placeholder="请选择">
-                  <el-option
-                    v-for="item in dayOfWeeksList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="具体时间：" prop="dayOfMonths" v-if="dispatchTimeForm.runCycle === 'MONTH'">
-                <el-select
-                  v-model="dispatchTimeForm.dayOfMonths"
-                  multiple
-                  collapse-tags
-                  placeholder="请选择">
-                  <el-option
-                    v-for="item in dayOfMonthsList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item class="label-remove-margin" prop="runTime" label-width="30px" v-if="dispatchTimeForm.runCycle === 'MONTH' || dispatchTimeForm.runCycle === 'WEEK' || dispatchTimeForm.runCycle === 'DAY'">
-                <el-time-picker
-                  v-model="dispatchTimeForm.runTime"
-                  value-format="timestamp"
-                  placeholder="时:分:秒">
-                </el-time-picker>
-              </el-form-item>
-              <el-form-item class="label-remove-margin" prop="cron" label-width="30px" v-if="dispatchTimeForm.runCycle === 'CRON'">
-                <el-input v-model="dispatchTimeForm.cron" placeholder="请输CRON表达式" style="width:300px"/>
-              </el-form-item>
-            </div>
-            <div class="work-type-pane" v-if="dispatchTimeForm.jobType === 2 && (dispatchTimeForm.runCycle === 'MINUTE' || dispatchTimeForm.runCycle === 'HOUR')">
-              <el-form-item label="开始时间：" prop="startTime">
-                <el-time-picker
-                  v-model="dispatchTimeForm.startTime"
-                  :clearable=false
-                  value-format="timestamp"
-                  format="HH:mm"
-                  placeholder="时:分">
-                </el-time-picker>
-              </el-form-item>
-              <el-form-item label="时间间隔：" prop="timeInterval">
-                <el-select v-model="dispatchTimeForm.timeInterval" placeholder="请选择">
-                  <el-option
-                    v-for="item in timeIntervalList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-                <span>{{ disIntervalMess }}</span>
-              </el-form-item>
-              <el-form-item label="结束时间：" prop="endTime">
-                <el-time-picker
-                  v-model="dispatchTimeForm.endTime"
-                  :clearable=false
-                  value-format="timestamp"
-                  format="HH:mm"
-                  placeholder="时:分">
-                </el-time-picker>
-              </el-form-item>
-            </div>
-            <el-form-item label="最晚完成时间：" prop="lastFinishTime" v-if="dispatchTimeForm.runCycle !== 'MINUTE' && dispatchTimeForm.runCycle !== 'HOUR' && dispatchTimeForm.runCycle !== 'CRON'">
-              <el-time-picker
-                v-model="dispatchTimeForm.lastFinishTime"
-                :clearable=false
-                value-format="timestamp"
-                format="HH:mm"
-                placeholder="时:分">
-              </el-time-picker>
-            </el-form-item>
-            <div class="work-type-pane">
-              <el-form-item label="失败重跑：" prop="isRunAgain">
-                <el-radio-group v-model="dispatchTimeForm.isRunAgain">
-                  <el-radio :label="0">是</el-radio>
-                  <el-radio :label="1">否</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item prop="runNum" label-width="60px" v-if="dispatchTimeForm.isRunAgain === 0">
-                重跑<el-input-number v-model="dispatchTimeForm.runNum" style="width:160px;margin: 0 10px" :min="0" />次
-              </el-form-item>
-            </div>
-        </el-form>
-      </div>
+      <dispatch-config-period ref="dispatchConfigPeriod" :id="id" :data="dispatchConfigPeriodData" :dispatch-status="dispatchStatusForm"></dispatch-config-period>
       <div class="work-content-1">
         <h3>调度报警</h3>
         <el-form label-width="110px" :model="dispatchWarningForm" :rules="dataRule" ref="dispatchWarningForm">
@@ -215,16 +82,16 @@
       </div>
       <div class="work-content-1">
         <h3>调度启停</h3>
-        <el-form label-width="110px" :model="dataForm" :rules="dataRule" ref="dataForm2">
+        <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus">
           <div class="work-type-pane">
             <el-form-item label="状态：" prop="dispatchStatus" label-width="100px">
-              <el-radio-group v-model="dataForm.dispatchStatus">
+              <el-radio-group v-model="dispatchStatusForm.dispatchStatus">
                 <el-radio :label="0">有效</el-radio>
                 <el-radio :label="1">无效</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="任务责任人：" prop="requestedUser" label-width="200px">
-              <el-input v-model="dataForm.requestedUser" placeholder="任务责任人" style="width: 300px" />
+            <el-form-item label="任务责任人：" prop="dutyUser" label-width="200px">
+              <el-input v-model="dispatchStatusForm.dutyUser" placeholder="任务责任人" style="width: 300px" />
             </el-form-item>
           </div>
         </el-form>
@@ -234,44 +101,27 @@
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
-    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent"></dispatch-config-task-dependent>
+    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence"></dispatch-config-task-dependent>
   </el-drawer>
 </template>
 
 <script>
 import {
-  info,
   save,
   update,
-  projectAll,
   taskBaseInfo,
-  taskDependenceAdd,
-  taskBaseList,
   taskDependenceDelete,
-  taskSelectDependence
+  taskSelectDependence,
+  taskPeriodInfo
 } from '@/api/dispatch/taskManag'
 import dispatchConfigTaskDependent from './dispatchConfig-task-dependent'
+import dispatchConfigPeriod from './dispatchConfig-time-period'
 export default {
   components: {
-    dispatchConfigTaskDependent
+    dispatchConfigTaskDependent,
+    dispatchConfigPeriod
   },
   data () {
-    let validateTime = (rule, value, callback) => {
-      let tempTime1 = new Date(this.dispatchTimeForm.startTime)
-      let tempTime2 = new Date(this.dispatchTimeForm.endTime)
-      let hour1 = tempTime1.getHours()
-      let minute1 = tempTime1.getMinutes()
-      let hour2 = tempTime2.getHours()
-      let minute2 = tempTime2.getMinutes()
-      let tempDate = new Date()
-      if (tempDate.setHours(hour1, minute1) >= tempDate.setHours(hour2, minute2)) {
-        callback(new Error('开始时间大于等于结束时间'))
-      } else {
-        this.$refs.dispatchTimeForm.clearValidate('startTime')
-        this.$refs.dispatchTimeForm.clearValidate('endTime')
-        callback()
-      }
-    }
     return {
       visible: false,
       loading: false,
@@ -280,29 +130,29 @@ export default {
       toDs: '',
       updateUser: '',
       updateTime: '',
+      selectedDpendeceData: [],
       dataForm: {
         taskName: '',
         id: '',
-        projectId: '',
+        projectSystemName: '',
         taskDescribe: '',
-        selectedDpendece: '',
-        dispatchStatus: 0,
-        requestedUser: ''
+        selectedDpendeceList: [
+          {
+            id: 1,
+            taskName: '1',
+            taskSys: 'maxcompute1'
+          },
+          {
+            id: 2,
+            taskName: '2',
+            taskSys: 'maxcompute'
+          }
+        ]
       },
-      dispatchTimeForm: {
-        jobType: 1, // 周期
-        onceRunTime: '', // 运行一次运行时间
-        runTime: '', // 周期运行具体时间
-        runCycle: 'MINUTE', // 调度周期
-        timeInterval: '',
-        startTime: '',
-        endTime: '',
-        lastFinishTime: '',
-        cron: '',
-        dayOfWeeks: [], // 周
-        dayOfMonths: [], // 月
-        runNum: '',
-        isRunAgain: 1
+      dispatchConfigPeriodData: {},
+      dispatchStatusForm: {
+        dispatchStatus: 0,
+        dutyUser: ''
       },
       dispatchWarningForm: {
         warningCause: [1],
@@ -320,55 +170,7 @@ export default {
           value: 'wangyi'
         }
       ],
-      disIntervalMess: '分钟',
-      timeIntervalList: [],
-      dispatchCycleList: [
-        {value: 'MINUTE', label: '分钟'},
-        {value: 'HOUR', label: '小时'},
-        {value: 'DAY', label: '日'},
-        {value: 'WEEK', label: '周'},
-        {value: 'MONTH', label: '月'},
-        {value: 'CRON', label: 'CRON表达式'}
-      ],
-      dayOfWeeksList: [
-        {value: '1', label: '周日'},
-        {value: '2', label: '周一'},
-        {value: '3', label: '周二'},
-        {value: '4', label: '周三'},
-        {value: '5', label: '周四'},
-        {value: '6', label: '周五'},
-        {value: '7', label: '周六'}
-      ],
-      dayOfMonthsList: [
-      ],
       dataRule: {
-        jobType: [
-          {required: true, message: '请选择周期', trigger: 'change'}
-        ],
-        runCycle: [
-          { required: true, message: '请选择调度周期', trigger: 'change' }
-        ],
-        runTime: [
-          {type: 'date', required: true, message: '请选择时间', trigger: 'change'}
-        ],
-        dayOfWeeks: [
-          {type: 'array', required: true, message: '请选择具体时间', trigger: 'change'}
-        ],
-        dayOfMonths: [
-          {type: 'array', required: true, message: '请选择具体时间', trigger: 'change'}
-        ],
-        startTime: [
-          { required: true, validator: validateTime }
-        ],
-        timeInterval: [
-          {type: 'number', required: true, message: '请选择间隔时间', trigger: 'change'}
-        ],
-        endTime: [
-          { required: true, validator: validateTime }
-        ],
-        isRunAgain: [
-          {required: true, message: '请选择', trigger: 'change'}
-        ],
         warningCause: [
           { required: true, message: '请选择报警原因', trigger: 'change' }
         ],
@@ -384,21 +186,10 @@ export default {
         dispatchStatus: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ],
-        requestedUser: [
+        dutyUser: [
           { required: true, message: '请输入任务责任人', trigger: 'blur' }
         ]
       },
-      tableData: [
-        {
-          taskName: '1232323',
-          taskSys: 'maxcompute'
-        },
-        {
-          taskName: '1232323',
-          taskSys: 'maxcompute'
-        }
-      ],
-      allSystemList: [],
       dispatchConfigTaskDependentVisible: false
     }
   },
@@ -406,114 +197,113 @@ export default {
     init (id) {
       this.id = id ? id.id : ''
       this.visible = true
-      this.getAllSystem()
-      this.dataAssembly()
-      this.disTimeTurnOff('MINUTE')
       this.$nextTick(() => {
+        console.log(this)
+        this.$refs.dispatchConfigPeriod.dataAssembly()
+        this.$refs.dispatchConfigPeriod.disTimeTurnOff('MINUTE')
         if (id) {
-          // this.getInfo()
+          this.getTaskBaseInfo()
+          this.getTaskSelectDependence()
+          this.getTaskPeriodInfo()
         }
         this.$refs['dataForm1'].resetFields()
       })
     },
-    getInfo () {
-      this.loading = true
-      info(this.id).then(({data}) => {
+    // 基础信息
+    getTaskBaseInfo () {
+      taskBaseInfo(this.id).then(({data}) => {
         if (data.code !== 0) {
           return this.$message.error(data.msg || '获取数据异常')
         }
-        this.updateUser = data.data.updateUser
-        this.updateTime = data.data.updateTime
         this.dataForm.id = data.data.id
-        this.dataForm.projectId = data.data.projectId
+        this.dataForm.projectSystemName = data.data.projectSystemName
         this.dataForm.taskDescribe = data.data.taskDescribe
-        this.dataForm.dispatchStatus = data.data.dispatchStatus
-        this.dataForm.requestedUser = data.data.requestedUser
-        this.acquisitionTask = data.data.acquisitionTask
-        this.acquisitionTask.sqlField = this.acquisitionTask.sqlField.split(',')
-        let filterInArr = this.getAllinDatasourceList.filter(item => item.name === this.acquisitionTask.inDatasourceType)[0]
-        let filterOutArr = this.getAlloutDatasourceList.filter(item => item.name === this.acquisitionTask.outDatasourceType)[0]
-        this.getAllinDatasourceNameList = filterInArr.source
-        this.getAlloutDatasourceNameList = filterOutArr.source
-        this.formDs = filterInArr.alias
-        this.toDs = filterOutArr.alias
-        let strLen = this.formDs.length + this.toDs.length + 5
-        this.dataForm.taskName = data.data.taskName.substr(strLen)
-        this.getAllAccount('in', data.data.acquisitionTask.inDatasourceId)
-        this.getAllAccount('out', data.data.acquisitionTask.outDatasourceId)
-        this.loading = false
+        let name = data.data.taskName.split('_')
+        this.formDs = name[0]
+        this.toDs = name[2]
+        this.dataForm.taskName = name.slice(3).join('_')
       })
     },
-    getAllSystem () {
-      projectAll().then(({data}) => {
-        this.allSystemList = data.data
+    // 任务依赖列表
+    getTaskSelectDependence () {
+      taskSelectDependence(this.id).then(({data}) => {
+        if (data.code !== 0) {
+          return this.$message.error(data.msg || '获取数据异常')
+        }
+        this.dataForm.selectedDpendeceList = data.data
+      })
+    },
+    // 获取周期信息 & 状态信息
+    getTaskPeriodInfo () {
+      taskPeriodInfo(this.id).then(({data}) => {
+        console.log(data)
+        if (data && data.code === 0) {
+          if (data.data !== null) {
+            this.dispatchConfigPeriodData = data.data
+            this.dispatchStatusForm.dispatchStatus = data.data.dispatchStatus
+            this.dispatchStatusForm.dutyUser = data.data.dutyUser
+          } else {
+            this.dispatchConfigPeriodData = null
+          }
+        } else {
+          this.$message.error(data.msg)
+        }
       })
     },
     // 已选依赖选中操作
     handleSelectDependenceChange (val) {
       console.log(val)
+      this.selectedDpendeceData = val
     },
     // 删除所选依赖
-    deleteDependenceHandle () {
-
+    deleteDependenceHandle (row) {
+      let arr = []
+      if (row.id) { // 单个删除
+        arr = [row.id]
+      } else { // 批量删除
+        if (!this.selectedDpendeceData.length) return
+        this.selectedDpendeceData.forEach(item => {
+          arr.push(item.id)
+        })
+      }
+      taskDependenceDelete(arr).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success(data.msg)
+          this.getTaskSelectDependence()
+        } else {
+          this.$message.error(data.msg || '删除失败')
+        }
+      })
     },
     // 新增依赖
     addDependenceHandle () {
       this.dispatchConfigTaskDependentVisible = true
       this.$nextTick(() => {
-        this.$refs.dispatchConfigTaskDependent.init()
+        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id)
       })
-    },
-    //  调度周期 月 数据组装
-    dataAssembly () {
-      let tempArry = []
-      for (let i = 1, j = 32; i < j; i++) {
-        tempArry.push({value: i.toString(), label: '每月' + i + '号'})
-      }
-      tempArry.push({value: '-1', label: '每月最后一天'})
-      this.dayOfMonthsList = tempArry
-    },
-    //  调度 时间间隔 数据切换
-    disTimeTurnOff (disType) {
-      let tempArry = []
-      if (disType === 'MINUTE') {
-        for (let i = 5, j = 60; i < j; i += 5) {
-          tempArry.push({value: i, label: i})
-        }
-        this.disIntervalMess = '分钟'
-      } else if (disType === 'HOUR') {
-        for (let i = 1, j = 24; i < j; i++) {
-          tempArry.push({value: i, label: i})
-        }
-        this.disIntervalMess = '小时'
-      }
-      this.dispatchTimeForm.timeInterval = ''
-      this.timeIntervalList = tempArry
     },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
       this.$parent.computAddOrUpdateVisible = false
     },
+
     // 提交
     dataFormSubmit (form) {
       let flag = true
-      this.$refs['dataForm1'].validate((valid) => {
+      flag = this.$refs.dispatchConfigPeriod.validateForm()
+      this.$refs['dispatchStatus'].validate((valid) => {
         if (!valid) {
           flag = false
         }
       })
-      this.$refs['dataForm2'].validate((valid) => {
-        if (!valid) {
-          flag = false
-        }
-      })
-      this.$refs['acquisitionTask'].validate((valid) => {
+      this.$refs['dispatchWarningForm'].validate((valid) => {
         if (!valid) {
           flag = false
         }
       })
       if (flag) {
-        console.log(this.dataForm, this.acquisitionTask)
+        // 提交周期及状态信息数据
+        this.$refs.dispatchConfigPeriod.submitData()
         let url = save
         if (this.dataForm.id) {
           url = update

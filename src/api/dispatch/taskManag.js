@@ -18,6 +18,9 @@ export const taskBatchList = params => httpGet(base + 'dispatch/task/instance/li
 export const taskExecute = id => httpPut(base + `dispatch/task/${id}/execute`) // 任务执行
 export const taskBaseInfo = id => httpGet(base + `dispatch/task/infoTask/${id}`) // 基础任务回显
 export const taskDependenceAdd = params => httpPost(base + 'dispatch/task/dependence/insertBatch', params) // 依赖任务批量新增
-export const taskBaseList = () => httpGet(base + 'dispatch/task/listOnPage') // 基础任务分页列表
-export const taskDependenceDelete = params => httpPost(base + 'dispatch/task/dependence/delete', params) // 依赖任务批量删除
+export const taskBaseList = params => httpPost(base + 'dispatch/task/listOnPage', params) // 基础任务分页列表
+export const taskDependenceDelete = params => httpPostFile(base + 'dispatch/task/dependence/delete', params) // 依赖任务批量删除
 export const taskSelectDependence = id => httpGet(base + `dispatch/task/dependence/selectDependence/${id}`) // 已选依赖列表
+export const taskPeriodInfo = id => httpGet(base + `dispatch/task/period/info/${id}`) // 调度周期信息回显接口
+export const taskPeriodSave = params => httpPost(base + 'dispatch/task/period/save', params) // 周期保存接口
+export const taskPeriodUpdate = params => httpPost(base + 'dispatch/task/period/update') // 周期更新接口

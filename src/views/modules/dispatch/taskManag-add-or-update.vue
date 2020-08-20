@@ -9,7 +9,7 @@
   >
     <div slot="title" class="drawer-title">{{!!id ? '编辑同步任务' : '新增同步任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
-      <h3>作业信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
+      <h3 id="title">作业信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
@@ -315,6 +315,7 @@ export default {
       this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
+        document.getElementById('title').scrollIntoView()
         if (id) {
           this.getInfo()
         }
