@@ -239,7 +239,17 @@
 </template>
 
 <script>
-import { info, save, update, projectAll } from '@/api/dispatch/taskManag'
+import {
+  info,
+  save,
+  update,
+  projectAll,
+  taskBaseInfo,
+  taskDependenceAdd,
+  taskBaseList,
+  taskDependenceDelete,
+  taskSelectDependence
+} from '@/api/dispatch/taskManag'
 import dispatchConfigTaskDependent from './dispatchConfig-task-dependent'
 export default {
   components: {
