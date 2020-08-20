@@ -191,12 +191,12 @@
           <el-form-item label="maxcomputer账号" prop="account">
             <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
           </el-form-item>
-          <!-- <el-form-item label="AccessKeyId" prop="accessKeyId">
+          <el-form-item label="AccessKeyId" prop="accessKeyId">
             <el-input v-model="severDataForm.accessKeyId" placeholder="AccessKeyId" />
           </el-form-item>
           <el-form-item label="AccessKeySecert" prop="accessKeySecert">
             <el-input v-model="severDataForm.accessKeySecert" placeholder="AccessKeySecert" />
-          </el-form-item> -->
+          </el-form-item>
           <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">{{item}}<br></span>
           </el-form-item>
@@ -518,9 +518,9 @@ export default {
               account: this.severDataForm.account,
               tables: this.selectedStaffList
             },
-            applyAuthTypeList: this.severDataForm.applyAuthTypeList
-            // accessKeySecert: this.severDataForm.accessKeySecert,
-            // accessKeyId: this.severDataForm.accessKeyId
+            applyAuthTypeList: this.severDataForm.applyAuthTypeList,
+            accessKeySecert: this.severDataForm.accessKeySecert,
+            accessKeyId: this.severDataForm.accessKeyId
           }
           saveDatabaseAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {
