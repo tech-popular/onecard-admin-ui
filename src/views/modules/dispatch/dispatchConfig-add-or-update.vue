@@ -9,7 +9,7 @@
   >
     <div slot="title" class="drawer-title">{{!!id ? '编辑调度配置' : '新增调度配置'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
-      <h3>基础信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
+      <h3 id="title">基础信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="110px">
         <div class="work-type-pane">
           <el-form-item label="任务名称：" prop="taskName">
@@ -52,8 +52,8 @@
           </el-table>
         </div>
       </div>
-      <dispatch-config-period ref="dispatchConfigPeriod" :id="id" :data="dispatchConfigPeriodData" :dispatch-status="dispatchStatusForm"></dispatch-config-period>
-      <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id"></dispatch-config-alert>
+      <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" @getStatus="getDispatchStatus"></dispatch-config-period>
+      <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id" @refreshList="refreshListhandle"></dispatch-config-alert>
       <div class="work-content-1">
         <h3>调度启停</h3>
         <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus">
@@ -81,12 +81,9 @@
 
 <script>
 import {
-  save,
-  update,
   taskBaseInfo,
   taskDependenceDelete,
-  taskSelectDependence,
-  taskPeriodInfo
+  taskSelectDependence
 } from '@/api/dispatch/taskManag'
 import dispatchConfigTaskDependent from './dispatch-config-dependent'
 import dispatchConfigPeriod from './dispatch-config-period'
@@ -112,20 +109,8 @@ export default {
         id: '',
         projectSystemName: '',
         taskDescribe: '',
-        selectedDpendeceList: [
-          {
-            id: 1,
-            taskName: '1',
-            taskSys: 'maxcompute1'
-          },
-          {
-            id: 2,
-            taskName: '2',
-            taskSys: 'maxcompute'
-          }
-        ]
+        selectedDpendeceList: []
       },
-      dispatchConfigPeriodData: {},
       dispatchStatusForm: {
         dispatchStatus: 0,
         dutyUser: ''
@@ -144,17 +129,25 @@ export default {
   methods: {
     init (id) {
       this.id = id ? id.id : ''
+      this.dispatchStatusForm = {
+        dispatchStatus: 0,
+        dutyUser: ''
+      }
       this.visible = true
       this.$nextTick(() => {
-        console.log(this)
+        document.getElementById('title').scrollIntoView()
         if (id) {
+          this.loading = true
           this.$refs.dispatchConfigPeriod.init()
           this.$refs.dispatchConfigAlert.init()
           this.getTaskBaseInfo()
           this.getTaskSelectDependence()
-          this.getTaskPeriodInfo()
         }
         this.$refs['dataForm1'].resetFields()
+        this.$refs['dispatchStatus'].resetFields()
+        setTimeout(() => {
+          this.loading = false
+        }, 300)
       })
     },
     // 基础信息
@@ -181,22 +174,10 @@ export default {
         this.dataForm.selectedDpendeceList = data.data
       })
     },
-    // 获取周期信息 & 状态信息
-    getTaskPeriodInfo () {
-      taskPeriodInfo(this.id).then(({data}) => {
-        console.log(data)
-        if (data && data.code === 0) {
-          if (data.data !== null) {
-            this.dispatchConfigPeriodData = data.data
-            this.dispatchStatusForm.dispatchStatus = data.data.dispatchStatus
-            this.dispatchStatusForm.dutyUser = data.data.dutyUser
-          } else {
-            this.dispatchConfigPeriodData = null
-          }
-        } else {
-          this.$message.error(data.msg)
-        }
-      })
+    // 获取状态数据
+    getDispatchStatus (data) {
+      this.dispatchStatusForm.dispatchStatus = data.dispatchStatus
+      this.dispatchStatusForm.dutyUser = data.dutyUser
     },
     // 已选依赖选中操作
     handleSelectDependenceChange (val) {
@@ -234,7 +215,10 @@ export default {
       this.visible = false
       this.$parent.computAddOrUpdateVisible = false
     },
-
+    refreshListhandle () {
+      this.visible = false
+      this.$emit('refreshDataList')
+    },
     // 提交
     dataFormSubmit (form) {
       let flag = true
@@ -247,30 +231,8 @@ export default {
       })
       if (flag) {
         // 提交周期及状态信息数据
-        this.$refs.dispatchConfigPeriod.submitData()
-        this.$refs.dispatchConfigAlert.submitData()
-        let url = save
-        if (this.dataForm.id) {
-          url = update
-        }
-        url({
-          ...this.dataForm,
-          taskName: `${this.formDs}_to_${this.toDs}_${this.dataForm.taskName}`,
-          taskType: 'ACQUISITION',
-          acquisitionTask: { ...this.acquisitionTask, sqlField: this.acquisitionTask.sqlField.join(',') }
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: data.msg || '操作成功',
-              type: 'success',
-              onClose: () => {
-                this.visible = false
-                this.$emit('refreshDataList')
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
+        this.$refs.dispatchConfigPeriod.submitData(() => {
+          this.$refs.dispatchConfigAlert.submitData()
         })
       }
     }

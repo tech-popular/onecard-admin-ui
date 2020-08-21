@@ -50,7 +50,7 @@ export const models = {
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
-      operatesWidth: '220px',
+      operatesWidth: '320px',
       operates: [{
           id: 1,
           label: '编辑任务',
@@ -78,23 +78,23 @@ export const models = {
           method: (id) => {
             this.taskExecuteHandle(id)
           }
-        },
-        {
-          id: 4,
-          label: '依赖快照',
-          type: 'info',
-          method: (snapshot) => {
-            this.snapshotHandle(snapshot)
-          }
-        },
-        {
-          id: 5,
-          label: '编辑依赖',
-          type: 'warning',
-          method: (editSnapshot) => {
-            this.editSnapshotHandle(editSnapshot)
-          }
         }
+        // {
+        //   id: 4,
+        //   label: '依赖快照',
+        //   type: 'info',
+        //   method: (snapshot) => {
+        //     this.snapshotHandle(snapshot)
+        //   }
+        // },
+        // {
+        //   id: 5,
+        //   label: '编辑依赖',
+        //   type: 'warning',
+        //   method: (editSnapshot) => {
+        //     this.editSnapshotHandle(editSnapshot)
+        //   }
+        // }
         // {
         //   id: 6,
         //   label: '删除',
