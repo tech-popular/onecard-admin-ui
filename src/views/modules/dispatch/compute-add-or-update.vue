@@ -9,7 +9,7 @@
   >
     <div slot="title" class="drawer-title">{{dataForm.id ? '编辑计算任务' : '新增计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
-      <h3>作业信息<span>最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
+      <h3 id="title">作业信息<span v-if="!!dataForm.id">最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
@@ -262,8 +262,8 @@ export default {
       this.getAllSystem()
       this.getAllDatasource()
       this.visible = true
-      console.log(1234)
       this.$nextTick(() => {
+        document.getElementById('title').scrollIntoView()
         this.$refs['dataForm1'].resetFields()
         this.$refs['dataForm2'].resetFields()
         if (id) {
@@ -296,8 +296,8 @@ export default {
       })
     },
     getAllDatasource () {
-      dataSourceAll().then(({data}) => {
-        this.allDatasourceList = data.data.filter(item => item.name === 'MAXCOMPUTE')
+      dataSourceAll('CALCULATE', 'IN').then(({data}) => {
+        this.allDatasourceList = data.data
       })
     },
     dataSourceTypeChange (index, val) {
@@ -359,7 +359,7 @@ export default {
       let curArr = this.previewSql.split('\n')
       let changeArry = []
       let changeNum = 0
-      changeArry = diff(originArr, curArr)
+      changeArry = diff.compare(originArr, curArr)
       let changeArryLen = changeArry.length
       if (changeArryLen > 0) {
         changeNum = changeArryLen

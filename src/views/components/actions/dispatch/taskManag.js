@@ -8,7 +8,7 @@ export const models = {
       label: '全部',
       value: -1
     }, {
-      label: '采集任务',
+      label: '同步任务',
       value: 'ACQUISITION'
     }, {
       label: '计算任务',
@@ -244,7 +244,7 @@ export const models = {
         },
         {
           label: '新增计算任务',
-          type: 'info',
+          type: 'success',
           handle: () => {
             this.computAddOrUpdateHandle()
           }
