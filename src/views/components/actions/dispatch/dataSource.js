@@ -194,7 +194,13 @@ export const models = {
     // 重置
     resetHandle() {
       this.pageNum = 1
-      this.searchData = {}
+      this.searchData = {
+        name: '',
+        ip: '',
+        database: '',
+        type: '-1',
+        disable: '-1'
+      }
       this.init()
     },
     // 新增 / 修改

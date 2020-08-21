@@ -323,6 +323,7 @@ export default {
         this.$refs['dataForm1'].resetFields()
         this.$refs['dataForm2'].resetFields()
         this.$refs['acquisitionTask'].resetFields()
+        this.loading = false
       })
     },
     getInfo () {
@@ -340,6 +341,8 @@ export default {
         this.dataForm.requestedUser = data.data.requestedUser
         this.acquisitionTask = data.data.acquisitionTask
         this.acquisitionTask.sqlField = this.acquisitionTask.sqlField.split(',')
+        console.log(this.getAllinDatasourceList, this.acquisitionTask.inDatasourceType)
+        console.log(this.getAlloutDatasourceList, this.acquisitionTask.outDatasourceType)
         let filterInArr = this.getAllinDatasourceList.filter(item => item.name === this.acquisitionTask.inDatasourceType)[0]
         let filterOutArr = this.getAlloutDatasourceList.filter(item => item.name === this.acquisitionTask.outDatasourceType)[0]
         this.getAllinDatasourceNameList = filterInArr.source
