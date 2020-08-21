@@ -53,33 +53,7 @@
         </div>
       </div>
       <dispatch-config-period ref="dispatchConfigPeriod" :id="id" :data="dispatchConfigPeriodData" :dispatch-status="dispatchStatusForm"></dispatch-config-period>
-      <div class="work-content-1">
-        <h3>调度报警</h3>
-        <el-form label-width="110px" :model="dispatchWarningForm" :rules="dataRule" ref="dispatchWarningForm">
-          <el-form-item prop="warningCause" label="报警原因：">
-            <el-checkbox-group v-model="dispatchWarningForm.warningCause">
-              <el-checkbox :label="0">失败</el-checkbox>
-              <el-checkbox :label="1">超时</el-checkbox>
-              <el-checkbox :label="2">成功</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item prop="warningType" label="报警方式：">
-            <el-checkbox-group v-model="dispatchWarningForm.warningType">
-              <el-checkbox label="dingding">钉钉</el-checkbox>
-              <el-checkbox label="tel">电话</el-checkbox>
-              <el-checkbox label="mail">邮件</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item prop="warningAccessUser" label="接收人：">
-            <el-select v-model="dispatchWarningForm.warningAccessUser" multiple filterable style="width: 400px">
-              <el-option :value="item.value" :label="item.name" v-for="item in warningAccessUserList" :key="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item prop="ddQunToken" label="钉钉群报警：">
-            <el-input v-model="dispatchWarningForm.ddQunToken" style="width: 400px" placeholder="请输入token"/>
-          </el-form-item>
-        </el-form>
-      </div>
+      <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id"></dispatch-config-alert>
       <div class="work-content-1">
         <h3>调度启停</h3>
         <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus">
@@ -114,12 +88,14 @@ import {
   taskSelectDependence,
   taskPeriodInfo
 } from '@/api/dispatch/taskManag'
-import dispatchConfigTaskDependent from './dispatchConfig-task-dependent'
-import dispatchConfigPeriod from './dispatchConfig-time-period'
+import dispatchConfigTaskDependent from './dispatch-config-dependent'
+import dispatchConfigPeriod from './dispatch-config-period'
+import dispatchConfigAlert from './dispatch-config-alert'
 export default {
   components: {
     dispatchConfigTaskDependent,
-    dispatchConfigPeriod
+    dispatchConfigPeriod,
+    dispatchConfigAlert
   },
   data () {
     return {
@@ -154,35 +130,7 @@ export default {
         dispatchStatus: 0,
         dutyUser: ''
       },
-      dispatchWarningForm: {
-        warningCause: [1],
-        warningType: ['dingding'],
-        warningAccessUser: ['zhangbing'],
-        ddQunToken: ''
-      },
-      warningAccessUserList: [
-        {
-          name: '章冰',
-          value: 'zhangbing'
-        },
-        {
-          name: '王一',
-          value: 'wangyi'
-        }
-      ],
       dataRule: {
-        warningCause: [
-          { required: true, message: '请选择报警原因', trigger: 'change' }
-        ],
-        warningType: [
-          { required: true, message: '请选择报警方式', trigger: 'change' }
-        ],
-        warningAccessUser: [
-          { required: true, message: '请选择报警接收人', trigger: 'change' }
-        ],
-        ddQunToken: [
-          { required: true, message: '请输入报警群', trigger: 'blur' }
-        ],
         dispatchStatus: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ],
@@ -199,9 +147,9 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         console.log(this)
-        this.$refs.dispatchConfigPeriod.dataAssembly()
-        this.$refs.dispatchConfigPeriod.disTimeTurnOff('MINUTE')
         if (id) {
+          this.$refs.dispatchConfigPeriod.init()
+          this.$refs.dispatchConfigAlert.init()
           this.getTaskBaseInfo()
           this.getTaskSelectDependence()
           this.getTaskPeriodInfo()
@@ -291,12 +239,8 @@ export default {
     dataFormSubmit (form) {
       let flag = true
       flag = this.$refs.dispatchConfigPeriod.validateForm()
+      flag = this.$refs.dispatchConfigAlert.validateForm()
       this.$refs['dispatchStatus'].validate((valid) => {
-        if (!valid) {
-          flag = false
-        }
-      })
-      this.$refs['dispatchWarningForm'].validate((valid) => {
         if (!valid) {
           flag = false
         }
@@ -304,6 +248,7 @@ export default {
       if (flag) {
         // 提交周期及状态信息数据
         this.$refs.dispatchConfigPeriod.submitData()
+        this.$refs.dispatchConfigAlert.submitData()
         let url = save
         if (this.dataForm.id) {
           url = update

@@ -1,7 +1,7 @@
 import { list } from '@/api/dispatch/systemManag'
 export const models = {
   data () {
-    let status = [{label: '全部', value: -1}, {label: '有效', value: 0}, {label: '无效', value: 1}]
+    let status = [{label: '全部', value: '-1'}, {label: '有效', value: 0}, {label: '无效', value: 1}]
     let statusProps = {label: 'label', value: 'value'}
     return {
       props: {
@@ -65,7 +65,7 @@ export const models = {
         id: null,
         type: null,
         user: null,
-        status: -1
+        status: '-1'
       },
       searchForm: [
         {type: 'Input', label: '系统名称', prop: 'name', width: '300px', placeholder: '请输入名称'},
@@ -87,7 +87,7 @@ export const models = {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize,
         'name': this.searchData.name,
-        'disable': this.searchData.status === -1 ? '' : this.searchData.status
+        'disable': this.searchData.status === '-1' ? '' : this.searchData.status
       }
       this.getList(dataBody)
     },
@@ -99,7 +99,10 @@ export const models = {
     // 重置
     resetHandle () {
       this.pageNum = 1
-      this.searchData = {}
+      this.searchData = {
+        name: '',
+        status: '-1'
+      }
       this.init()
     },
     // 新增 / 修改

@@ -234,6 +234,10 @@ export default {
     }
   },
   methods: {
+    init () {
+      this.dataAssembly()
+      this.disTimeTurnOff('MINUTE')
+    },
     //  调度周期 月 数据组装
     dataAssembly () {
       let tempArry = []

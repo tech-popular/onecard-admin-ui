@@ -276,7 +276,13 @@ export const models = {
     // 重置
     resetHandle() {
       this.pageNum = 1
-      this.searchData = {}
+      this.searchData = {
+        id: '',
+        name: '',
+        type: -1,
+        user: '',
+        status: -1
+      }
       this.init()
     },
     // 调度配置

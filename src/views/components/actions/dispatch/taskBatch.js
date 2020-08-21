@@ -187,7 +187,14 @@ export const models = {
     // 重置
     resetHandle () {
       this.pageNum = 1
-      this.searchData = {}
+      this.searchData = {
+        taskId: '',
+        taskName: '',
+        taskType: '-1',
+        dispatchLeader: '',
+        projectId: '-1',
+        runStatus: '-1'
+      }
       this.init()
     },
     // 每页数
