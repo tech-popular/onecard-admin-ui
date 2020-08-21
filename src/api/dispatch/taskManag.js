@@ -10,7 +10,7 @@ export const list = (params) => httpPost(base + 'dispatch/task/select', params) 
 export const info = (params) => httpGet(base + `dispatch/task/info/${params}`) // 详情
 export const update = (params) => httpPost(base + 'dispatch/task/update', params) // 修改
 export const save = (params) => httpPost(base + 'dispatch/task/save', params) // 新增
-export const dataSourceAll = () => httpPost(base + 'dispatch/datasource/selectall')
+export const dataSourceAll = (type, flow) => httpGet(base + `dispatch/datasource/supports?taskType=${type}&dataFlow=${flow}`) // 同步及计算任务中的殴打让你源类型下选
 export const accountAll = params => httpPost(base + 'dispatch/account/selectall', params)
 export const projectAll = () => httpPost(base + 'dispatch/project/selectall')
 export const sqlParse = params => httpPostFile(base + 'dispatch/task/sql/parse', params)

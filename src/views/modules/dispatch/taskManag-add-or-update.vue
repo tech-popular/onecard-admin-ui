@@ -312,7 +312,8 @@ export default {
     init (id) {
       this.id = id ? id.id : ''
       this.getAllSystem()
-      this.getAllDatasource()
+      this.getAllDatasource('ACQUISITION', 'IN')
+      this.getAllDatasource('ACQUISITION', 'OUT')
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
@@ -357,10 +358,13 @@ export default {
         this.allSystemList = data.data
       })
     },
-    getAllDatasource () {
-      dataSourceAll().then(({data}) => {
-        this.getAllinDatasourceList = data.data.filter(item => item.name === 'MAXCOMPUTE')
-        this.getAlloutDatasourceList = data.data.filter(item => item.name === 'MAXCOMPUTE')
+    getAllDatasource (type, flow) {
+      dataSourceAll(type, flow).then(({data}) => {
+        if (flow === 'IN') {
+          this.getAllinDatasourceList = data.data
+        } else {
+          this.getAlloutDatasourceList = data.data
+        }
       })
     },
     dataSourceTypeChange (type, val) {

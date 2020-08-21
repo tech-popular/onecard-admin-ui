@@ -296,8 +296,8 @@ export default {
       })
     },
     getAllDatasource () {
-      dataSourceAll().then(({data}) => {
-        this.allDatasourceList = data.data.filter(item => item.name === 'MAXCOMPUTE')
+      dataSourceAll('CALCULATE', 'IN').then(({data}) => {
+        this.allDatasourceList = data.data
       })
     },
     dataSourceTypeChange (index, val) {
@@ -359,7 +359,7 @@ export default {
       let curArr = this.previewSql.split('\n')
       let changeArry = []
       let changeNum = 0
-      changeArry = diff(originArr, curArr)
+      changeArry = diff.compare(originArr, curArr)
       let changeArryLen = changeArry.length
       if (changeArryLen > 0) {
         changeNum = changeArryLen
