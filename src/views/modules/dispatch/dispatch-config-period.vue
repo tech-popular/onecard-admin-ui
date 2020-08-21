@@ -18,8 +18,7 @@
                 <el-date-picker
                   v-model="dispatchTimeForm.onceRunTime"
                   type="datetime"
-                  format="yyyy-MM-dd HH:mm:ss"
-                  value-format="timestamp"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   placeholder="选择日期时间">
                 </el-date-picker>
                 （未指定运行时间，默认立即下发）
@@ -67,10 +66,11 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item class="label-remove-margin" prop="runTime" label-width="30px" v-if="dispatchTimeForm.runCycle === 'MONTH' || dispatchTimeForm.runCycle === 'WEEK' || dispatchTimeForm.runCycle === 'DAY'">
+          <el-form-item class="label-remove-margin" prop="execTime" label-width="30px" v-if="dispatchTimeForm.runCycle === 'MONTH' || dispatchTimeForm.runCycle === 'WEEK' || dispatchTimeForm.runCycle === 'DAY'">
             <el-time-picker
-              v-model="dispatchTimeForm.runTime"
-              value-format="timestamp"
+              v-model="dispatchTimeForm.execTime"
+              format="HH:mm:ss"
+              value-format="HH:mm:ss"
               placeholder="时:分:秒">
             </el-time-picker>
           </el-form-item>
@@ -83,13 +83,13 @@
             <el-time-picker
               v-model="dispatchTimeForm.startTime"
               :clearable=false
-              value-format="timestamp"
               format="HH:mm"
+              value-format="HH:mm"
               placeholder="时:分">
             </el-time-picker>
           </el-form-item>
-          <el-form-item label="时间间隔：" prop="timeInterval">
-            <el-select v-model="dispatchTimeForm.timeInterval" placeholder="请选择">
+          <el-form-item label="时间间隔：" prop="interval">
+            <el-select v-model="dispatchTimeForm.interval" placeholder="请选择">
               <el-option
                 v-for="item in timeIntervalList"
                 :key="item.value"
@@ -103,19 +103,19 @@
             <el-time-picker
               v-model="dispatchTimeForm.endTime"
               :clearable=false
-              value-format="timestamp"
               format="HH:mm"
+              value-format="HH:mm"
               placeholder="时:分">
             </el-time-picker>
           </el-form-item>
         </div>
-        <el-form-item label="最晚完成时间：" prop="latestTime" v-if="dispatchTimeForm.runCycle !== 'MINUTE' && dispatchTimeForm.runCycle !== 'HOUR' && dispatchTimeForm.runCycle !== 'CRON'">
+        <el-form-item label="最晚完成时间：" prop="latestTime" v-if="dispatchTimeForm.jobType === 2 && dispatchTimeForm.runCycle !== 'MINUTE' && dispatchTimeForm.runCycle !== 'HOUR' && dispatchTimeForm.runCycle !== 'CRON'">
           <el-time-picker
             v-model="dispatchTimeForm.latestTime"
             :clearable=false
-            value-format="timestamp"
-            format="HH:mm"
-            placeholder="时:分">
+            format="HH:mm:ss"
+            value-format="HH:mm:ss"
+            placeholder="时:分:秒">
           </el-time-picker>
         </el-form-item>
         <div class="work-type-pane">
@@ -126,7 +126,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item prop="failRepeatTrigger" label-width="60px" v-if="dispatchTimeForm.isRunAgain === 0">
-            重跑<el-input-number v-model="dispatchTimeForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="0" />次
+            重跑<el-input-number v-model="dispatchTimeForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
           </el-form-item>
         </div>
     </el-form>
@@ -134,12 +134,12 @@
 </template>
 <script>
 import {
-  taskPeriodUpdate
+  taskPeriodInfo,
+  taskPeriodSaveOrUpdate
 } from '@/api/dispatch/taskManag'
 export default {
   props: {
-    id: Number,
-    data: Object,
+    taskId: Number,
     dispatchStatus: Object
   },
   data () {
@@ -163,9 +163,9 @@ export default {
       dispatchTimeForm: {
         jobType: 1, // 周期
         onceRunTime: '', // 运行一次运行时间
-        runTime: '', // 周期运行具体时间
+        execTime: '', // 周期运行具体时间
         runCycle: 'MINUTE', // 调度周期
-        timeInterval: '',
+        interval: '',
         startTime: '',
         endTime: '',
         latestTime: '',
@@ -203,8 +203,8 @@ export default {
         runCycle: [
           { required: true, message: '请选择调度周期', trigger: 'change' }
         ],
-        runTime: [
-          {type: 'date', required: true, message: '请选择时间', trigger: 'change'}
+        execTime: [
+          {required: true, message: '请选择时间', trigger: 'change'}
         ],
         dayOfWeeks: [
           {type: 'array', required: true, message: '请选择具体时间', trigger: 'change'}
@@ -215,7 +215,7 @@ export default {
         startTime: [
           { required: true, validator: validateTime }
         ],
-        timeInterval: [
+        interval: [
           {type: 'number', required: true, message: '请选择间隔时间', trigger: 'change'}
         ],
         endTime: [
@@ -235,8 +235,61 @@ export default {
   },
   methods: {
     init () {
+      this.dispatchTimeForm.onceRunTime = ''
+      this.$refs['dispatchTimeForm'].resetFields()
       this.dataAssembly()
       this.disTimeTurnOff('MINUTE')
+      this.getTaskPeriodInfo()
+    },
+    // 获取周期信息 & 状态信息
+    getTaskPeriodInfo () {
+      taskPeriodInfo(this.taskId).then(({data}) => {
+        if (data && data.code === 0) {
+          if (data.data !== null) {
+            this.dispatchConfigPeriodData = data.data
+            this.$emit('getStatus', {
+              dispatchStatus: data.data.dispatchStatus,
+              dutyUser: data.data.dutyUser
+            })
+            let jobType = data.data.jobType
+            if (jobType === 'ONCE_ONLY') {
+              this.dispatchTimeForm.jobType = 1
+              this.dispatchTimeForm.onceRunTime = data.data.execTime
+            } else {
+              this.dispatchTimeForm.jobType = 2
+              this.dispatchTimeForm.runCycle = jobType
+              if (jobType === 'MINUTE' || jobType === 'HOUR') {
+                this.dispatchTimeForm.startTime = data.data.startTime
+                this.dispatchTimeForm.endTime = data.data.endTime
+                this.dispatchTimeForm.interval = data.data.interval
+              } else if (jobType === 'DAY') {
+                this.dispatchTimeForm.execTime = data.data.execTime
+                this.dispatchTimeForm.latestTime = data.data.latestTime
+              } else if (jobType === 'WEEK' || jobType === 'MONTH') {
+                this.dispatchTimeForm.execTime = data.data.execTime
+                this.dispatchTimeForm.latestTime = data.data.latestTime
+              }
+              // dayOfWeeks
+              if (jobType === 'WEEK') {
+                this.dispatchTimeForm.dayOfWeeks = data.data.jobValue.split(',')
+              }
+              if (jobType === 'MONTH') {
+                this.dispatchTimeForm.dayOfMonths = data.data.jobValue.split(',')
+              }
+            }
+            // 是否重跑判断
+            if (data.data.failRepeatTrigger !== 0) {
+              this.dispatchTimeForm.isRunAgain = 0
+              this.dispatchTimeForm.failRepeatTrigger = data.data.failRepeatTrigger
+            } else {
+              this.dispatchTimeForm.isRunAgain = 1
+              this.dispatchTimeForm.failRepeatTrigger = 0
+            }
+          }
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
     },
     //  调度周期 月 数据组装
     dataAssembly () {
@@ -261,26 +314,51 @@ export default {
         }
         this.disIntervalMess = '小时'
       }
-      this.dispatchTimeForm.timeInterval = ''
+      this.dispatchTimeForm.interval = ''
       this.timeIntervalList = tempArry
     },
     formatDispatchTime (data) {
       let postData = {}
-      postData.taskScheduleConfig = {}
-      postData.taskScheduleConfig.isRunAgain = data.isRunAgain
-      if (data.isRunAgain === 0) {
-        postData.taskScheduleConfig.failRepeatTrigger = data.failRepeatTrigger
-      } else {
-        postData.taskScheduleConfig.failRepeatTrigger = 0
-      }
-      let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
-      let year = tempTime.getFullYear().toString()
-      let month = (tempTime.getMonth() + 1) < 10 ? '0' + (tempTime.getMonth() + 1) : tempTime.getMonth().toString()
-      let day = tempTime.getDate() < 10 ? '0' + tempTime.getDate() : tempTime.getDate().toString()
-      let hour = tempTime.getHours() < 10 ? '0' + tempTime.getHours() : tempTime.getHours().toString()
-      let minute = tempTime.getMinutes() < 10 ? '0' + tempTime.getMinutes() : tempTime.getMinutes().toString()
-      let second = tempTime.getSeconds() < 10 ? '0' + tempTime.getSeconds() : tempTime.getSeconds().toString()
+      // 组织外层数据
       if (data.jobType == 1) {
+        postData.jobType = 'ONCE_ONLY'
+        postData.execTime = data.onceRunTime
+      } else {
+        postData.jobType = data.runCycle
+        if (data.runCycle == 'MINUTE' || data.runCycle == 'HOUR') {
+          postData.startTime = data.startTime
+          postData.endTime = data.endTime
+          postData.interval = data.interval
+        } else if (data.runCycle == 'DAY') {
+          postData.execTime = data.execTime
+          postData.latestTime = data.latestTime
+        } else if (data.runCycle === 'WEEK') {
+          postData.jobValue = data.dayOfWeeks.join(',')
+          postData.execTime = data.execTime
+          postData.latestTime = data.latestTime
+        } else if (data.runCycle === 'MONTH') {
+          postData.jobValue = data.dayOfMonths.join(',')
+          postData.execTime = data.execTime
+          postData.latestTime = data.latestTime
+        } else {
+          postData.cron = data.cron
+        }
+      }
+      if (data.isRunAgain === 0) {
+        postData.failRepeatTrigger = data.failRepeatTrigger
+      } else {
+        postData.failRepeatTrigger = 0
+      }
+      // 组织内层数据
+      postData.taskScheduleConfig = {}
+      if (data.jobType == 1) {
+        let tempTime = new Date(data.onceRunTime)
+        let year = tempTime.getFullYear().toString()
+        let month = (tempTime.getMonth() + 1) < 10 ? '0' + (tempTime.getMonth() + 1) : tempTime.getMonth().toString()
+        let day = tempTime.getDate() < 10 ? '0' + tempTime.getDate() : tempTime.getDate().toString()
+        let hour = tempTime.getHours() < 10 ? '0' + tempTime.getHours() : tempTime.getHours().toString()
+        let minute = tempTime.getMinutes() < 10 ? '0' + tempTime.getMinutes() : tempTime.getMinutes().toString()
+        let second = tempTime.getSeconds() < 10 ? '0' + tempTime.getSeconds() : tempTime.getSeconds().toString()
         postData.taskScheduleConfig.jobType = 'ONCE_ONLY'
         if (data.onceRunTime !== '') {
           let obgExec = {
@@ -294,42 +372,37 @@ export default {
           postData.taskScheduleConfig.execTime = obgExec
         }
       } else {
+        let tempTime = data.execTime.split(':')
+        let hour = tempTime[0]
+        let minute = tempTime[1]
+        let second = tempTime[2]
         postData.taskScheduleConfig.jobType = data.runCycle
         if (data.runCycle == 'WEEK') {
           postData.taskScheduleConfig.jobValue = data.dayOfWeeks.join(',')
         } else if (data.runCycle == 'MONTH') {
           postData.taskScheduleConfig.jobValue = data.dayOfMonths.join(',')
         } else if (data.runCycle == 'MINUTE' || data.runCycle == 'HOUR') {
-          let startTime = new Date(typeof data.startTime === 'object' ? data.startTime : parseInt(data.startTime))
-          let startHour = startTime.getHours() < 10 ? '0' + startTime.getHours() : startTime.getHours().toString()
-          let startMinute = startTime.getMinutes() < 10 ? '0' + startTime.getMinutes() : startTime.getMinutes().toString()
-          let endTime = new Date(typeof data.endTime === 'object' ? data.endTime : parseInt(data.endTime))
-          let endHour = endTime.getHours() < 10 ? '0' + endTime.getHours() : endTime.getHours().toString()
-          let endMinute = endTime.getMinutes() < 10 ? '0' + endTime.getMinutes() : endTime.getMinutes().toString()
           let obgStart = {
-            hour: startHour,
-            minute: startMinute
+            hour: data.startTime && data.startTime.split(':')[0],
+            minute: data.startTime && data.startTime.split(':')[1]
           }
           let obgEnd = {
-            hour: endHour,
-            minute: endMinute
+            hour: data.endTime && data.endTime.split(':')[0],
+            minute: data.endTime && data.endTime.split(':')[1]
           }
           postData.taskScheduleConfig.startTime = obgStart
           postData.taskScheduleConfig.endTime = obgEnd
-          postData.taskScheduleConfig.interval = data.timeInterval
+          postData.taskScheduleConfig.interval = data.interval
         } else if (data.runCycle == 'CRON') {
           postData.taskScheduleConfig.cron = data.cron
         }
-        if ((data.runCycle !== 'WEEK' || data.runCycle !== 'MONTH' || data.runCycle !== 'CRON') && data.runTime !== '') {
+        if ((data.runCycle == 'WEEK' || data.runCycle == 'MONTH' || data.runCycle == 'DAY') && data.execTime !== '') {
           let obgExec = {
             hour: hour,
             minute: minute,
             second: second
           }
           postData.taskScheduleConfig.execTime = obgExec
-        }
-        if ((data.runCycle !== 'MINUTE' || data.runCycle !== 'HOUR' || data.runCycle !== 'CRON') && data.runTime !== '') {
-          postData.taskScheduleConfig.latestTime = data.latestTime
         }
       }
       return postData
@@ -343,12 +416,13 @@ export default {
       })
       return flag
     },
-    submitData () {
-      let params = { ...this.dispatchStatus, ...this.formatDispatchTime(this.dispatchTimeForm) }
-      console.log(params)
-      taskPeriodUpdate(params).then(({data}) => {
+    submitData (fn) {
+      let params = { ...this.dispatchStatus, ...this.formatDispatchTime(this.dispatchTimeForm), taskId: this.taskId }
+      taskPeriodSaveOrUpdate(params).then(({data}) => {
         if (data && data.code === 0) {
-          console.log(data)
+          fn()
+        } else {
+          this.$message.error(data.msg)
         }
       })
     }

@@ -22,54 +22,54 @@ export const models = {
       // 操作按钮
       operatesWidth: '220px',
       operates: [
-        {
-          id: 1,
-          label: '查看日志',
-          type: 'primary',
-          method: (id) => {
-            this.implementHandle(id)
-          }
-        },
-        {
-          id: 2,
-          label: '依赖快照',
-          type: 'success',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
-          }
-        },
-        {
-          id: 3,
-          label: '执行测试',
-          type: 'warning',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
-          }
-        },
-        {
-          id: 4,
-          label: '立即执行',
-          type: 'warning',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
-          }
-        },
-        {
-          id: 5,
-          label: '杀死任务',
-          type: 'info',
-          method: (id) => {
-            this.addOrUpdateHandle(id)
-          }
-        },
-        {
-          id: 6,
-          label: '耗时统计',
-          type: 'danger',
-          method: (id) => {
-            this.deleteHandle(id)
-          }
-        }
+        // {
+        //   id: 1,
+        //   label: '查看日志',
+        //   type: 'primary',
+        //   method: (id) => {
+        //     this.implementHandle(id)
+        //   }
+        // },
+        // {
+        //   id: 2,
+        //   label: '依赖快照',
+        //   type: 'success',
+        //   method: (id) => {
+        //     this.addOrUpdateHandle(id)
+        //   }
+        // },
+        // {
+        //   id: 3,
+        //   label: '执行测试',
+        //   type: 'warning',
+        //   method: (id) => {
+        //     this.addOrUpdateHandle(id)
+        //   }
+        // },
+        // {
+        //   id: 4,
+        //   label: '立即执行',
+        //   type: 'warning',
+        //   method: (id) => {
+        //     this.addOrUpdateHandle(id)
+        //   }
+        // },
+        // {
+        //   id: 5,
+        //   label: '杀死任务',
+        //   type: 'info',
+        //   method: (id) => {
+        //     this.addOrUpdateHandle(id)
+        //   }
+        // },
+        // {
+        //   id: 6,
+        //   label: '耗时统计',
+        //   type: 'danger',
+        //   method: (id) => {
+        //     this.deleteHandle(id)
+        //   }
+        // }
       ],
       columns: [
         {

@@ -22,13 +22,13 @@ export const taskDependenceAdd = params => httpPost(base + 'dispatch/task/depend
 export const taskBaseList = params => httpPost(base + 'dispatch/task/listOnPage', params) // 基础任务分页列表
 export const taskDependenceDelete = params => httpPostFile(base + 'dispatch/task/dependence/delete', params) // 依赖任务批量删除
 export const taskSelectDependence = id => httpGet(base + `dispatch/task/dependence/selectDependence/${id}`) // 已选依赖列表
+// 调度周期
 export const taskPeriodInfo = id => httpGet(base + `dispatch/task/period/info/${id}`) // 调度周期信息回显接口
-export const taskPeriodSave = params => httpPost(base + 'dispatch/task/period/save', params) // 周期保存接口
-export const taskPeriodUpdate = params => httpPost(base + 'dispatch/task/period/update', params) // 周期更新接口
+export const taskPeriodSaveOrUpdate = params => httpPost(base + 'dispatch/task/period/saveOrUpdate', params) // 周期保存接口
 // 调度报警
 export const taskAlertInit = () => httpGet(base + 'dispatch/task/alert/init')
 export const taskAlertReceiverList = params => httpPost(base + 'dispatch/task/alert/receiverList', params) // 通过username或name查询用户
-export const taskAlertSave = () => httpPost(base + 'dispatch/task/alert/save') // 保存
-export const taskAlertUpdate = () => httpPost(base + 'dispatch/task/alert/update') // 更新
+export const taskAlertSave = params => httpPost(base + 'dispatch/task/alert/save', params) // 保存
+export const taskAlertUpdate = params => httpPost(base + 'dispatch/task/alert/update', params) // 更新
 export const taskAlertInfo = id => httpGet(base + `dispatch/task/alert/${id}`) // 详情
 export const taskAlertDelete = id => httpDelete(base + `dispatch/task/alert/delete/${id}`) // 删除

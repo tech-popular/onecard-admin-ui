@@ -125,7 +125,7 @@
               ></codemirror>
             </div>
           </el-form-item>
-          <el-form-item prop="outAfterSql" label="目标库前置处理SQL：" label-width="120px" ref="workBeginSqlForm3">
+          <el-form-item prop="outAfterSql" label="目标库后置处理SQL：" label-width="120px" ref="workBeginSqlForm3">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
                 ref="workBeginSql3"
@@ -227,8 +227,17 @@ export default {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
         ],
-        taskSys: [
+        projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
+        ],
+        inDatasourceType: [
+          { required: true, message: '请选择数据源类型', trigger: 'change' }
+        ],
+        inDatasourceId: [
+          { required: true, message: '请选择数据源名称', trigger: 'change' }
+        ],
+        inAccountId: [
+          { required: true, message: '请选择帐户', trigger: 'change' }
         ],
         inDataSql: [
           { required: true, message: '请输入作业开始前SQL', trigger: 'change' }
@@ -237,19 +246,16 @@ export default {
           { required: true, message: '请选择输出字段', trigger: 'change' }
         ],
         outAccountId: [
-          { required: true, message: '请选择数据源', trigger: 'change' }
+          { required: true, message: '请选择帐户', trigger: 'change' }
+        ],
+        outDatasourceType: [
+          { required: true, message: '请选择数据源类型', trigger: 'change' }
         ],
         outDatasourceId: [
-          { required: true, message: '请选择帐户', trigger: 'change' }
+          { required: true, message: '请选择数据源名称', trigger: 'change' }
         ],
         outDataTable: [
           { required: true, message: '请输入输出数据表', trigger: 'blur' }
-        ],
-        outBeforeSql: [
-          { required: true, message: '请输入目标库前置处理SQL', trigger: 'change' }
-        ],
-        outAfterSql: [
-          { required: true, message: '请输入目标库后置处理SQL', trigger: 'change' }
         ],
         addDataRule: [
           { required: true, message: '请选择下发类型', trigger: 'change' }

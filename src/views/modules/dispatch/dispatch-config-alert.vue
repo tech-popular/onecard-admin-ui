@@ -4,20 +4,17 @@
     <el-form label-width="110px" :model="dispatchWarningForm" :rules="dataRule" ref="dispatchWarningForm">
       <el-form-item prop="alertReasonList" label="报警原因：">
         <el-checkbox-group v-model="dispatchWarningForm.alertReasonList">
-          <el-checkbox :label="0">失败</el-checkbox>
-          <el-checkbox :label="1">超时</el-checkbox>
-          <el-checkbox :label="2">成功</el-checkbox>
+          <el-checkbox :label="item.value" v-for="item in alertReasonList" :key="item.value">{{item.text}}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item prop="alertMethodList" label="报警方式：">
         <el-checkbox-group v-model="dispatchWarningForm.alertMethodList">
-          <el-checkbox label="dingding">钉钉</el-checkbox>
-          <el-checkbox label="tel">电话</el-checkbox>
-          <el-checkbox label="mail">邮件</el-checkbox>
+          <el-checkbox :label="item.value" v-for="item in alertMethodList" :key="item.value">{{item.text}}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item prop="receiverList" label="接收人：">
         <el-select
+          ref="receiver"
           v-model="dispatchWarningForm.receiverList"
           multiple
           filterable
@@ -25,8 +22,10 @@
           :remote-method="remoteMethod"
           :loading="loading"
           style="width: 400px"
+          @change="receiverChange"
+          @focus="receiverFocus"
         >
-          <el-option :value="item.value" :label="item.name" v-for="item in warningAccessUserList" :key="item.value"></el-option>
+          <el-option :value="item.id" :label="item.name" v-for="item in warningAccessUserList" :key="item.id" v-show="!item.isNotShow"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item prop="dingToken" label="钉钉群报警：">
@@ -51,22 +50,17 @@ export default {
     return {
       id: '',
       loading: false,
+      alertReasonList: [],
+      alertMethodList: [],
       dispatchWarningForm: {
-        alertReasonList: [1],
-        alertMethodList: ['dingding'],
-        receiverList: ['zhangbing'],
+        alertReasonList: [],
+        alertMethodList: [],
+        receiverList: [],
         dingToken: ''
       },
-      warningAccessUserList: [
-        {
-          name: '章冰',
-          value: 'zhangbing'
-        },
-        {
-          name: '王一',
-          value: 'wangyi'
-        }
-      ],
+      warningAccessUserList: [],
+      cacheOption: [],
+      receiverOrigin: [],
       dataRule: {
         alertReasonList: [
           { required: true, message: '请选择报警原因', trigger: 'change' }
@@ -74,8 +68,8 @@ export default {
         alertMethodList: [
           { required: true, message: '请选择报警方式', trigger: 'change' }
         ],
-        warningAccessUser: [
-          { required: true, message: '请选择报警接收人', trigger: 'change' }
+        receiverList: [
+          { required: true, message: '请选择接收人', trigger: 'change' }
         ],
         dingToken: [
           { required: true, message: '请输入报警群', trigger: 'blur' }
@@ -85,19 +79,71 @@ export default {
   },
   methods: {
     init () {
+      this.cacheOption = []
+      this.dispatchWarningForm = []
+      this.receiverOrigin = []
+      this.dispatchWarningForm = {
+        alertReasonList: [],
+        alertMethodList: [],
+        receiverList: [],
+        dingToken: ''
+      }
       this.getAlertInit()
       this.getAlertInfo()
     },
     getAlertInfo () {
       taskAlertInfo(this.taskId).then(({data}) => {
-        console.log(data)
-        this.id = data.data.id
+        if (data && data.code === 0) {
+          if (data.data.id) { // 修改
+            this.id = data.data.id
+            this.dispatchWarningForm = data.data
+            this.warningAccessUserList = data.data.receiverList
+            this.cacheOption = data.data.receiverList
+            let arr = []
+            data.data.receiverList.forEach(item => {
+              arr.push(item.id)
+            })
+            this.dispatchWarningForm.receiverList = arr
+          } else {
+            this.id = ''
+          }
+        } else {
+          this.$message.error(data.msg)
+        }
+        this.$refs['dispatchWarningForm'].resetFields()
       })
     },
     getAlertInit () {
       taskAlertInit().then(({data}) => {
-        console.log(data)
+        if (data && data.code === 0) {
+          this.alertReasonList = data.data.alertReasonList
+          this.alertMethodList = data.data.alertMethodList
+        } else {
+          this.alertReasonList = []
+          this.alertMethodList = []
+        }
       })
+    },
+    // 交集
+    filterArr (arr1, arr2) {
+      return arr1.filter(function (val) { return arr2.indexOf(val.id) > -1 })
+    },
+    // 取两个对象数组的并集且去重
+    unique (arr) {
+      const res = new Map()
+      return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, 1))
+    },
+    receiverChange (val) { // 把已选中的内容也添加到下拉选中，但要隐藏其显示
+      if (this.receiverOrigin.length < val.length) { // 添加了一个
+        this.cacheOption.push({ ...this.warningAccessUserList.filter(citem => citem.id === val[val.length - 1])[0], isNotShow: true })
+      } else {
+        this.cacheOption = this.filterArr(this.cacheOption, val)
+        this.warningAccessUserList = this.cacheOption
+      }
+      this.receiverOrigin = val
+    },
+    receiverFocus (e) {
+      if (!e.srcElement.value) return false
     },
     remoteMethod (query) {
       if (query !== '') {
@@ -111,7 +157,7 @@ export default {
       taskAlertReceiverList({
         text: query
       }).then(({data}) => {
-        console.log(data)
+        this.warningAccessUserList = this.unique(data.data.concat(this.cacheOption))
         this.loading = false
       })
     },
@@ -126,7 +172,8 @@ export default {
     },
     submitData () {
       let url = taskAlertSave
-      let params = {}
+      let params = { ...this.dispatchWarningForm, receiverList: this.cacheOption }
+      params.taskId = this.taskId
       if (this.id) {
         url = taskAlertUpdate
         params.id = this.id
@@ -134,7 +181,10 @@ export default {
       console.log(params)
       url(params).then(({data}) => {
         if (data && data.code === 0) {
-          console.log(data)
+          this.$message.success(data.msg)
+          this.$emit('refreshList')
+        } else {
+          this.$message.error(data.msg || '调度报警保存失败')
         }
       })
     }

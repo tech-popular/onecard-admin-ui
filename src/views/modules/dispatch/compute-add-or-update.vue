@@ -61,7 +61,7 @@
                 </el-option-group>
               </el-select>
               <span style="color:red;font-size:10px;">
-                （如需配置账户，请<router-link :to="{name:'dispatch-datasourceId'}">点击</router-link>）
+                （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
               </span>
             </el-form-item>
           </div>

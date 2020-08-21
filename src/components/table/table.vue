@@ -18,7 +18,7 @@
           </template>
         </el-table-column>
       </template>
-      <el-table-column label="操作" align="center" :width="operatesWidth">
+      <el-table-column label="操作" align="center" :width="operatesWidth" v-if="operates.length">
         <template slot-scope="scope">
           <el-button size="mini" v-for="(btn,index) in operates" :type="btn.type" :key="index" @click.native.prevent="btn.method(scope.row)">{{btn.label}}</el-button>
         </template>
