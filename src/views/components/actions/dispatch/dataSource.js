@@ -41,6 +41,9 @@ export const models = {
         id: 1,
         label: '编辑帐户',
         type: 'primary',
+        isShow: (id) => {
+          return id.dataSourceType !== 'KAFKA' && id.dataSourceType !== 'REDIS'
+        },
         method: (id) => {
           this.addOrUpdateHandle(id)
         }
