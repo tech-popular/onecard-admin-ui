@@ -90,8 +90,8 @@
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px">
         <div class="work-type-pane">
-          <el-form-item label="状态：" prop="dispatchStatus" label-width="120px">
-            <el-radio-group v-model="dataForm.dispatchStatus">
+          <el-form-item label="状态：" prop="taskDisable" label-width="120px">
+            <el-radio-group v-model="dataForm.taskDisable">
               <el-radio :label="0">有效</el-radio>
               <el-radio :label="1">无效</el-radio>
             </el-radio-group>
@@ -165,7 +165,7 @@ export default {
         id: '',
         projectId: '',
         taskDescribe: '',
-        dispatchStatus: 0,
+        taskDisable: 0,
         requestedUser: ''
       },
       calculateTasks: [
@@ -206,7 +206,7 @@ export default {
         requestedUser: [
           { required: true, message: '请输入任务需求人', trigger: 'blur' }
         ],
-        dispatchStatus: [
+        taskDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ]
       },
@@ -275,7 +275,7 @@ export default {
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
-            this.dataForm.dispatchStatus = data.data.dispatchStatus
+            this.dataForm.taskDisable = data.data.taskDisable
             this.dataForm.requestedUser = data.data.requestedUser
             this.calculateTasks = data.data.calculateTasks
             this.calculateTasks.forEach((item, index) => {
