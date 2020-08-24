@@ -22,7 +22,7 @@
           </el-form-item>
         </div>
         <el-form-item label="所属系统" prop="projectId">
-          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px">
+          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px" filterable>
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
@@ -34,17 +34,17 @@
         <el-form :model="acquisitionTask" :rules="dataRule" ref="acquisitionTask">
           <div class="work-type-pane">
             <el-form-item label="数据来源" prop="inDatasourceType" label-width="120px">
-              <el-select v-model="acquisitionTask.inDatasourceType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange('in', val)">
+              <el-select v-model="acquisitionTask.inDatasourceType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange('in', val)" filterable>
                 <el-option :label="item.name" :value="item.name" v-for="(item, index) in getAllinDatasourceList" :key="index"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="inDatasourceId" label-width="10px">
-              <el-select v-model="acquisitionTask.inDatasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange('in', val)">
+              <el-select v-model="acquisitionTask.inDatasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange('in', val)" filterable>
                 <el-option :label="item.dataSourceName" :value="item.id" v-for="(item, index) in getAllinDatasourceNameList" :key="index"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="inAccountId" label-width="10px">
-              <el-select v-model="acquisitionTask.inAccountId" placeholder="请选择账户">
+            <el-form-item prop="inAccountId" label-width="10px" v-if="acquisitionTask.inDatasourceType !== 'KAFKA' && acquisitionTask.inDatasourceType !== 'REDIS'">
+              <el-select v-model="acquisitionTask.inAccountId" placeholder="请选择账户" filterable>
                 <el-option-group v-for="(val, key, i) in allinAccountList" :key="i" :label="key * 1 === 0 ? '公共账号' : '个人帐号'">
                   <el-option
                     v-for="item in val"
@@ -55,10 +55,10 @@
                 </el-option-group>
               </el-select>
               <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && Object.keys(allinAccountList).length">
-                （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
+                （如需配置账户，请<i style="font-style: normal;color:blue;cursor:pointer" @click="gotoDataSource">点击</i>）
               </span>
               <span style="color:red;font-size:10px;" v-if="acquisitionTask.inDatasourceId && !Object.keys(allinAccountList).length">
-                （无账户信息，请前往<router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
+                （无账户信息，请前往<i style="font-style: normal;color:blue;cursor:pointer" @click="gotoDataSource">配置</i>）
               </span>
             </el-form-item>
           </div>
@@ -81,17 +81,17 @@
           </el-form-item>
           <div class="work-type-pane">
             <el-form-item label="数据去向" prop="outDatasourceType" label-width="120px">
-              <el-select v-model="acquisitionTask.outDatasourceType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange('out', val)">
+              <el-select v-model="acquisitionTask.outDatasourceType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange('out', val)" filterable>
                 <el-option :label="item.name" :value="item.name" v-for="(item, index) in getAlloutDatasourceList" :key="index"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="outDatasourceId" label-width="10px">
-              <el-select v-model="acquisitionTask.outDatasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange('out', val)">
+              <el-select v-model="acquisitionTask.outDatasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange('out', val)" filterable>
                 <el-option :label="item.dataSourceName" :value="item.id" v-for="(item, index) in getAlloutDatasourceNameList" :key="index"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="outAccountId" label-width="10px">
-              <el-select v-model="acquisitionTask.outAccountId" placeholder="请选择账户">
+            <el-form-item prop="outAccountId" label-width="10px" v-if="acquisitionTask.outDatasourceType !== 'KAFKA' && acquisitionTask.outDatasourceType !== 'REDIS'">
+              <el-select v-model="acquisitionTask.outAccountId" placeholder="请选择账户" filterable>
                 <el-option-group v-for="(val, key, i) in alloutAccountList" :key="i" :label="key * 1 === 0 ? '公共账号' : '个人帐号'">
                   <el-option
                     v-for="item in val"
@@ -102,10 +102,10 @@
                 </el-option-group>
               </el-select>
               <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && Object.keys(alloutAccountList).length">
-                （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
+                （如需配置账户，请<i style="font-style: normal;color:blue;cursor:pointer" @click="gotoDataSource">点击</i>）
               </span>
               <span style="color:red;font-size:10px;" v-if="acquisitionTask.outDatasourceId && !Object.keys(alloutAccountList).length">
-                （无账户信息，请前往<router-link :to="{name:'dispatch-dataSource'}">配置</router-link>）
+                （无账户信息，请前往<i style="font-style: normal;color:blue;cursor:pointer" @click="gotoDataSource">配置</i>）
               </span>
             </el-form-item>
           </div>
@@ -418,9 +418,14 @@ export default {
         }
       })
     },
+    gotoDataSource () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
+      this.$router.push({ name: 'dispatch-dataSource' })
+    },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
-      this.$parent.computAddOrUpdateVisible = false
+      this.$parent.addOrUpdateVisible = false
     },
     inputTagChange () {
       if (this.acquisitionTask.sqlField.length) { // 如果已经有输入的值则清空报错提示

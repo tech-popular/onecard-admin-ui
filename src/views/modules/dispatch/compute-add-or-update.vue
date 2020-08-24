@@ -22,7 +22,7 @@
           </el-form-item>
         </div>
         <el-form-item label="所属系统" prop="projectId">
-          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px">
+          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px" filterable>
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
@@ -40,17 +40,17 @@
           </el-form-item>
           <div class="work-type-pane">
             <el-form-item label="作业类型" prop="jobType" label-width="120px">
-              <el-select v-model="item.jobType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange(index, val)">
+              <el-select v-model="item.jobType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange(index, val)" filterable>
                 <el-option :label="citem.name" :value="citem.name" v-for="(citem, cindex) in allDatasourceList" :key="cindex"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="datasourceId" label-width="10px">
-              <el-select v-model="item.datasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange(index, val)">
+              <el-select v-model="item.datasourceId" placeholder="请选择数据源名称" @change="val => dataSourceNameChange(index, val)" filterable>
                 <el-option :label="citem.dataSourceName" :value="citem.id" v-for="(citem, cindex) in item.allDatasourceNameList" :key="cindex"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="accountId" label-width="10px">
-              <el-select v-model="item.accountId" placeholder="请选择账户">
+            <el-form-item prop="accountId" label-width="10px" v-if="item.jobType !== 'KAFKA' && item.jobType !== 'REDIS'">
+              <el-select v-model="item.accountId" placeholder="请选择账户" filterable>
                 <el-option-group v-for="(val, key, i) in item.allAccountList" :key="i" :label="key * 1 === 0 ? '公共账号' : '个人帐号'">
                   <el-option
                     v-for="item in val"
@@ -61,7 +61,7 @@
                 </el-option-group>
               </el-select>
               <span style="color:red;font-size:10px;">
-                （如需配置账户，请<router-link :to="{name:'dispatch-dataSource'}">点击</router-link>）
+                （如需配置账户，请<i style="font-style: normal;color:blue;cursor:pointer" @click="gotoDataSource">点击</i>）
               </span>
             </el-form-item>
           </div>
@@ -318,6 +318,11 @@ export default {
       }).then(({data}) => {
         this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], allAccountList: data.data })
       })
+    },
+    gotoDataSource () {
+      this.visible = false
+      this.$parent.computAddOrUpdateVisible = false
+      this.$router.push({ name: 'dispatch-dataSource' })
     },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
