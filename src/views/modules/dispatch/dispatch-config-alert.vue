@@ -29,7 +29,7 @@
         </el-select>
       </el-form-item>
       <el-form-item prop="dingToken" label="钉钉群报警：">
-        <el-input v-model="dispatchWarningForm.dingToken" style="width: 400px" placeholder="请输入token"/>
+        <el-input v-model="dispatchWarningForm.dingToken" style="width: 400px" placeholder="可输入多个钉钉群token，以逗号分隔"/>
       </el-form-item>
     </el-form>
   </div>
@@ -72,7 +72,7 @@ export default {
           { required: true, message: '请选择接收人', trigger: 'change' }
         ],
         dingToken: [
-          { required: true, message: '请输入报警群', trigger: 'blur' }
+          { required: true, message: '请输入报警群，以逗号分隔', trigger: 'blur' }
         ]
       }
     }
