@@ -126,7 +126,7 @@ export default {
     return {
       isPreviewShow: true,
       loading: false,
-      id: '',
+      id: 0,
       flowId: '',
       tag: '',
       drawerTitle: '',
@@ -169,7 +169,7 @@ export default {
   components: { userAttrRulePane, Treeselect, dataPreviewInfo },
   methods: {
     init (row, tag) {
-      this.id = ''
+      this.id = 0
       this.tag = ''
       this.flowId = ''
       this.loading = true
@@ -372,7 +372,7 @@ export default {
       }).then(() => { // 确认创建分群时的操作
         this.drawerTitle = '新建'
         this.baseForm.name = '复制' + this.baseForm.name
-        this.id = ''
+        this.id = 0
         this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
       }).catch(() => {
         console.log('cancel')
