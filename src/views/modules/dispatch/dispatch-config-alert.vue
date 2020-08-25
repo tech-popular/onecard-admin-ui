@@ -62,18 +62,18 @@ export default {
       cacheOption: [],
       receiverOrigin: [],
       dataRule: {
-        alertReasonList: [
-          { required: true, message: '请选择报警原因', trigger: 'change' }
-        ],
-        alertMethodList: [
-          { required: true, message: '请选择报警方式', trigger: 'change' }
-        ],
-        receiverList: [
-          { required: true, message: '请选择接收人', trigger: 'change' }
-        ],
-        dingToken: [
-          { required: true, message: '请输入报警群，以逗号分隔', trigger: 'blur' }
-        ]
+        // alertReasonList: [
+        //   { required: true, message: '请选择报警原因', trigger: 'change' }
+        // ],
+        // alertMethodList: [
+        //   { required: true, message: '请选择报警方式', trigger: 'change' }
+        // ],
+        // receiverList: [
+        //   { required: true, message: '请选择接收人', trigger: 'change' }
+        // ],
+        // dingToken: [
+        //   { required: true, message: '请输入报警群，以逗号分隔', trigger: 'blur' }
+        // ]
       }
     }
   },
