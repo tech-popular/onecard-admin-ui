@@ -224,6 +224,9 @@ export default {
         isRunAgain: [
           {required: true, message: '请选择', trigger: 'change'}
         ],
+        failRepeatTrigger: [
+          {required: true, message: '请输入重跑次数', trigger: 'change'}
+        ],
         latestTime: [
           {required: true, message: '请选择', trigger: 'change'}
         ],

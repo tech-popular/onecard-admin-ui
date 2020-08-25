@@ -160,6 +160,8 @@ export default {
         this.dataForm.id = data.data.id
         this.dataForm.projectSystemName = data.data.projectSystemName
         this.dataForm.taskDescribe = data.data.taskDescribe
+        this.updateTime = data.data.updateTime
+        this.updateUser = data.data.updateUser
         let name = data.data.taskName.split('_')
         if (this.taskType === 'ACQUISITION') {
           this.preDs = `${name[0]}_to_${name[2]}_`
