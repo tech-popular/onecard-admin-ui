@@ -80,7 +80,7 @@ export const models = {
         },
         {
           prop: 'createTime',
-          label: '任务创建时间',
+          label: '创建时间',
           align: 'center'
         },
         {
