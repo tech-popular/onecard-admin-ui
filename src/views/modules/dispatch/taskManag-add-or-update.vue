@@ -14,7 +14,7 @@
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px">
-              <template slot="prepend">{{formDs}}_to_{{toDs}}</template>
+              <template slot="prepend">{{formDs}}_to_{{toDs}}_</template>
             </el-input>
           </el-form-item>
           <el-form-item label="任务ID" prop="id">
