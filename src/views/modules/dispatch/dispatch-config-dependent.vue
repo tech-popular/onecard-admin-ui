@@ -61,7 +61,7 @@
     </el-row>
     <div slot="footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">提交</el-button>
     </div>
   </el-dialog>
 </template>
@@ -89,6 +89,7 @@ export default {
     init (id) {
       this.taskId = id
       this.visible = true
+      this.rightTableData = []
       this.getTaskBaseList()
     },
     getTaskBaseList () {
@@ -109,7 +110,6 @@ export default {
     },
     // 左侧搜索功能
     searchTableHandle () {
-      console.log(this.leftSearchText)
       this.pageNo = 1
       this.getTaskBaseList()
     },
@@ -149,7 +149,9 @@ export default {
       return [...b].filter(x => [...a].every(y => y.id !== x.id))
     },
     dataFormSubmit () {
-      console.log(this.rightTableData)
+      if (!this.rightTableData.length) {
+        return this.$message.error('没有选择任何依赖！')
+      }
       let params = []
       this.rightTableData.forEach(item => {
         params.push({
