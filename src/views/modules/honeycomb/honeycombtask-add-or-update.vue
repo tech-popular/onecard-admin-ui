@@ -70,7 +70,7 @@
           </el-row>
           <div v-if="redisListData[index] && redisListData[index].show" class='redis-config' style="marginLeft: -130px">
             <el-form-item class="el-redis-item" label="redis数据格式">
-              <el-select v-model="redisListData[index].name" placeholder="redis数据格式" clearable>
+              <el-select v-model="redisListData[index].name" placeholder="redis数据格式" clearable @change="val => redisNameChange(val, index)">
                 <el-option
                   v-for="item in redisNames"
                   :key="item.value"
@@ -81,6 +81,12 @@
             </el-form-item>
             <el-form-item class="el-redis-item" label="redisKey">
               <el-input v-model="redisListData[index].key" placeholder="redisKey" clearable></el-input>
+            </el-form-item>
+            <el-form-item class="el-redis-item" :label="redisListData[index].label + 'Value'">
+              <el-input v-model="redisListData[index].value" :placeholder="redisListData[index].label + 'Value'" clearable></el-input>
+            </el-form-item>
+            <el-form-item class="el-redis-item" label="score" v-if="redisListData[index].name === 'redisTypeZSet'">
+              <el-input v-model="redisListData[index].score" placeholder="score" clearable></el-input>
             </el-form-item>
             <el-form-item class="el-redis-item" label="key拼接时间">
               <el-select v-model="redisListData[index].type" placeholder="key拼接时间" clearable>
@@ -517,6 +523,10 @@ export default {
       }
       this.redisListData.splice(i, 1)
     },
+    redisNameChange (val, index) {
+      let label = this.redisNames.filter(item => item.value === val)[0].label
+      this.redisListData.splice(index, 1, { ...this.redisListData[index], label: label })
+    },
     init (id) {
       this.redisListData = []
       this.dataForm = deepClone(this.dataFormOrigin)
@@ -608,6 +618,9 @@ export default {
                 this.$set(this.redisListData, i, {
                   name: '',
                   key: '',
+                  value: '',
+                  label: '',
+                  score: '',
                   time: '',
                   type: '',
                   unit: '1'
@@ -618,12 +631,16 @@ export default {
                 )
                 if (datasource[0].datasourceType == 'redis' || datasource[0].datasourceType == 'singleRedis') {
                   let arr = val.outTableName.split('#')
+                  let label = this.redisNames.filter(item => item.value === arr[0])[0].label
                   this.$set(this.redisListData, i, {
                     show: true,
                     name: arr[0],
                     key: arr[1],
                     type: arr[2] || '',
                     time: arr[3] || '',
+                    label: label,
+                    value: arr[4],
+                    score: arr[5] || '',
                     unit: '1'
                   })
                 } else {
@@ -847,6 +864,9 @@ export default {
       this.$set(this.redisListData, index, {
         name: '',
         key: '',
+        value: '',
+        label: '',
+        score: '',
         time: '',
         type: '',
         unit: '1'
@@ -909,12 +929,17 @@ export default {
               (item.type ? item.type : ' ') +
               '#' +
               (time || ' ') +
+              '#' +
+              item.value +
+              '#' +
+              (item.score ? item.score : ' ') +
               '#'
             this.$set(
               this.dataForm.honeycombOutDatasourceEntitys[index],
               'outTableName',
               outTableName
             )
+            console.log(this.dataForm.honeycombOutDatasourceEntitys)
           }
         })
       },
