@@ -265,6 +265,9 @@ export default {
         ],
         requestedUser: [
           { required: true, message: '请输入需求提出人', trigger: 'blur' }
+        ],
+        addRuleFields: [
+           { required: true, message: '请输入增量规则', trigger: 'blur' }
         ]
       },
       allSystemList: [],

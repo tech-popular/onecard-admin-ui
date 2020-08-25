@@ -14,7 +14,7 @@
         <div class="work-type-pane">
           <el-form-item label="任务名称：" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" disabled style="width: 400px">
-              <template slot="prepend">{{formDs}}_to_{{toDs}}</template>
+              <template slot="prepend">{{preDs}}</template>
             </el-input>
           </el-form-item>
           <el-form-item label="任务ID：" prop="id">
@@ -99,8 +99,8 @@ export default {
       visible: false,
       loading: false,
       id: '',
-      formDs: '',
-      toDs: '',
+      taskType: '',
+      preDs: '',
       updateUser: '',
       updateTime: '',
       selectedDpendeceData: [],
@@ -137,6 +137,7 @@ export default {
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
         if (id) {
+          this.taskType = id.taskType
           this.loading = true
           this.$refs.dispatchConfigPeriod.init()
           this.$refs.dispatchConfigAlert.init()
@@ -160,9 +161,13 @@ export default {
         this.dataForm.projectSystemName = data.data.projectSystemName
         this.dataForm.taskDescribe = data.data.taskDescribe
         let name = data.data.taskName.split('_')
-        this.formDs = name[0]
-        this.toDs = name[2]
-        this.dataForm.taskName = name.slice(3).join('_')
+        if (this.taskType === 'ACQUISITION') {
+          this.preDs = `${name[0]}_to_${name[2]}_`
+          this.dataForm.taskName = name.slice(3).join('_')
+        } else {
+          this.preDs = `${name[0]}_`
+          this.dataForm.taskName = name.slice(1).join('_')
+        }
       })
     },
     // 任务依赖列表
