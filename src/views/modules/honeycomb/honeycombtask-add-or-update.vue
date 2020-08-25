@@ -82,7 +82,7 @@
             <el-form-item class="el-redis-item" label="redisKey">
               <el-input v-model="redisListData[index].key" placeholder="redisKey" clearable></el-input>
             </el-form-item>
-            <el-form-item class="el-redis-item" :label="redisListData[index].label + 'Value'">
+            <el-form-item class="el-redis-item" :label="redisListData[index].label + 'Value'" v-if="!!redisListData[index].name">
               <el-input v-model="redisListData[index].value" :placeholder="redisListData[index].label + 'Value'" clearable></el-input>
             </el-form-item>
             <el-form-item class="el-redis-item" label="score" v-if="redisListData[index].name === 'redisTypeZSet'">
