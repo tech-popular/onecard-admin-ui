@@ -151,16 +151,16 @@ export const models = {
           align: 'center'
         },
         {
-          prop: 'taskStatus',
+          prop: 'taskDisable',
           label: '任务状态',
           width: '120px',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.taskStatus === 0 ? '' : 'warning'
+                type: params.row.taskDisable === 0 ? '' : 'warning'
               } // 组件的props
-            }, params.row.taskStatus === 0 ? '有效' : '无效')
+            }, params.row.taskDisable === 0 ? '有效' : '无效')
           }
         },
         {
