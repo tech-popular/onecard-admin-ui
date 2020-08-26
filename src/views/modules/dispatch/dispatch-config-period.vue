@@ -172,7 +172,7 @@ export default {
         cron: '',
         dayOfWeeks: [], // 周
         dayOfMonths: [], // 月
-        failRepeatTrigger: '',
+        failRepeatTrigger: 3,
         isRunAgain: 1
       },
       disIntervalMess: '分钟',
@@ -286,7 +286,7 @@ export default {
               this.dispatchTimeForm.failRepeatTrigger = data.data.failRepeatTrigger
             } else {
               this.dispatchTimeForm.isRunAgain = 1
-              this.dispatchTimeForm.failRepeatTrigger = 0
+              this.dispatchTimeForm.failRepeatTrigger = 3
             }
           }
         } else {
