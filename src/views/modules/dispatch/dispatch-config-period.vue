@@ -363,7 +363,7 @@ export default {
         let minute = tempTime.getMinutes() < 10 ? '0' + tempTime.getMinutes() : tempTime.getMinutes().toString()
         let second = tempTime.getSeconds() < 10 ? '0' + tempTime.getSeconds() : tempTime.getSeconds().toString()
         postData.taskScheduleConfig.jobType = 'ONCE_ONLY'
-        if (data.onceRunTime !== '') {
+        if (data.onceRunTime) {
           let obgExec = {
             year: year,
             month: month,
