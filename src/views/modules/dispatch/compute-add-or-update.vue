@@ -9,7 +9,7 @@
   >
     <div slot="title" class="drawer-title">{{dataForm.id ? '编辑计算任务' : '新增计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
-      <h3 id="title">作业信息<span v-if="!!dataForm.id">最近修改人：<i>admin</i> 最近修改时间：<i>2020-07-20</i></span></h3>
+      <h3 id="title">作业信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
@@ -160,6 +160,8 @@ export default {
       mergeCodeVisible: false,
       id: '',
       formDs: 'mc',
+      updateUser: '',
+      updateTime: '',
       dataForm: {
         taskName: '',
         id: '',
@@ -271,7 +273,8 @@ export default {
             if (data.code !== 0) {
               return this.$message.error(data.msg || '获取数据异常')
             }
-            // this.dataForm.taskName = data.data.taskName
+            this.updateUser = data.data.updateUser
+            this.updateTime = data.data.updateTime
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
