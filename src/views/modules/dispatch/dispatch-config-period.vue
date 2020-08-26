@@ -14,14 +14,14 @@
         <el-row v-if="dispatchTimeForm.jobType === 1">
           <el-col :span="16">
             <div>
-              <el-form-item label="运行时间：">
+              <el-form-item label="运行时间：" prop="onceRunTime">
                 <el-date-picker
                   v-model="dispatchTimeForm.onceRunTime"
                   type="datetime"
                   value-format="yyyy-MM-dd HH:mm:ss"
                   placeholder="选择日期时间">
                 </el-date-picker>
-                （未指定运行时间，默认立即下发）
+                <!-- （未指定运行时间，默认立即下发） -->
               </el-form-item>
             </div>
           </el-col>
@@ -204,6 +204,9 @@ export default {
           { required: true, message: '请选择调度周期', trigger: 'change' }
         ],
         execTime: [
+          {required: true, message: '请选择时间', trigger: 'change'}
+        ],
+        onceRunTime: [
           {required: true, message: '请选择时间', trigger: 'change'}
         ],
         dayOfWeeks: [
