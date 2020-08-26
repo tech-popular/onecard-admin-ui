@@ -151,6 +151,19 @@ export const models = {
           align: 'center'
         },
         {
+          prop: 'taskStatus',
+          label: '任务状态',
+          width: '120px',
+          align: 'center',
+          render: (h, params) => {
+            return h('el-tag', {
+              props: {
+                type: params.row.taskStatus === 0 ? '' : 'warning'
+              } // 组件的props
+            }, params.row.taskStatus === 0 ? '有效' : '无效')
+          }
+        },
+        {
           prop: 'dispatchStatus',
           label: '调度起停状态',
           width: '120px',
