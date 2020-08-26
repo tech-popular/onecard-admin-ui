@@ -180,7 +180,10 @@ export const models = {
           prop: 'dependence',
           label: '有无依赖',
           width: '120px',
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('span', params.row.dependence === 0 ? '有' : '无')
+          }
         }
       ],
       list: [],
