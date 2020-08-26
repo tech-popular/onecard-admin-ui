@@ -97,12 +97,14 @@ export default {
           if (data.data.id) { // 修改
             this.id = data.data.id
             this.dispatchWarningForm = data.data
-            this.warningAccessUserList = data.data.receiverList
-            this.cacheOption = data.data.receiverList
+            this.warningAccessUserList = data.data.receiverList || []
+            this.cacheOption = data.data.receiverList || []
             let arr = []
-            data.data.receiverList.forEach(item => {
-              arr.push(item.id)
-            })
+            if (data.data.receiverList) {
+              data.data.receiverList.forEach(item => {
+                arr.push(item.id)
+              })
+            }
             this.dispatchWarningForm.receiverList = arr
           } else {
             this.id = ''
@@ -130,6 +132,7 @@ export default {
     },
     // 取两个对象数组的并集且去重
     unique (arr) {
+      console.log(arr)
       const res = new Map()
       return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, 1))
     },
@@ -157,7 +160,7 @@ export default {
       taskAlertReceiverList({
         text: query
       }).then(({data}) => {
-        this.warningAccessUserList = this.unique(data.data.concat(this.cacheOption))
+        this.warningAccessUserList = this.cacheOption.length ? this.unique(data.data.concat(this.cacheOption)) : data.data
         this.loading = false
       })
     },
