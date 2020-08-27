@@ -230,9 +230,9 @@ export default {
       isPreviewShow: true,
       loading: false,
       id: 0,
-      flowId: "",
-      tag: "",
-      drawerTitle: "",
+      flowId: '',
+      tag: '',
+      drawerTitle: '',
       visible: false,
       fileData: {
         fileList: []
@@ -275,12 +275,12 @@ export default {
     dataPreviewInfo
   },
   methods: {
-    init(row, tag) {
-      this.id = 0;
-      this.tag = "";
-      this.flowId = "";
-      this.loading = true;
-      this.visible = true;
+    init (row, tag) {
+      this.id = 0
+      this.tag = ''
+      this.flowId = ''
+      this.loading = true
+      this.visible = true
       // this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getVestPackAvailable();
       this.getChannelsList();
@@ -487,12 +487,18 @@ export default {
       }
       return null;
     },
-    copyHandle() {
-      // 复制功能
-      this.$confirm("分群已复制，点击“确定”开始编辑新分群", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+    copyHandle () { // 复制功能
+      this.$confirm('分群已复制，点击“确定”开始编辑新分群', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => { // 确认创建分群时的操作
+        this.drawerTitle = '新建'
+        this.baseForm.name = '复制' + this.baseForm.name
+        this.id = 0
+        this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+      }).catch(() => {
+        console.log('cancel')
       })
         .then(() => {
           // 确认创建分群时的操作
