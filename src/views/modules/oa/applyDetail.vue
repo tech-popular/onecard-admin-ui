@@ -2,7 +2,7 @@
   <el-dialog
       title="查看"
       :visible.sync="dialogVisible"
-      width="60%"
+      width="900px"
       :before-close="handleClose">
       <el-form label-width="160px" v-if="quanxian === '账号权限'">
         <el-form-item label="标题">
@@ -10,7 +10,7 @@
         </el-form-item>
         <el-form-item label="申请系统">
           <el-radio-group  v-model="systemListcarrent">
-            <el-radio :label="item.value" :key="item.value" v-for="(item) in detalList.systemList" disabled>{{item.label}}</el-radio>
+            <el-radio :label="item.value" :key="item.value" v-for="(item) in detalList.systemList" disabled style="margin-left:0">{{item.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="申请模块">
