@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <el-form :inline="true">
-      <el-form-item label="用户属性与用户交易满足："  label-width="200px">
+  <div style="margin-left:15px">
+    <el-form :inline="true" label-position="left">
+      <el-form-item label="用户属性与用户交易满足："  label-width="180px">
         <el-input v-model="expression" disabled style="width: 800px" />
       </el-form-item>
       <el-form-item style="float:right">
