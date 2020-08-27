@@ -85,7 +85,7 @@
           剔除用户名单
         </h3>
         <div>
-          <el-form label-width="80px" :model="rejectForm">
+          <el-form label-width="80px" :model="rejectForm" :rules="baseRule" ref="rejectForm">
             <el-form-item label="分群包：">
               <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
                 <el-option
@@ -110,6 +110,31 @@
                 <i class="el-icon-warning cursor-pointer"></i>
               </el-tooltip>
             </el-form-item>
+            <el-form-item label="撞库包：">
+              <el-select v-model="rejectForm.zkIds" filterable @change="zkIdsChange" placeholder="请选择撞库包" class="reject-pane-item">
+                <el-option
+                  v-for="item in custerNameList"
+                  :key="item.value"
+                  :label="item.text"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <div style="display:flex" v-if="rejectForm.zkIds">
+              <el-form-item :label="zkLabel + '撞库包：'" style="padding-left:80px" prop="zkchannel" label-width="140px">
+                <input-tag v-model="rejectForm.zkchannel" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag" placeholder="请输入渠道，可用回车输入多条"></input-tag>
+              </el-form-item>
+              <el-form-item label-width="20px" prop="zkType">
+                <el-select v-model="rejectForm.zkType" filterable placeholder="请选择设备类型" style="width:200px">
+                  <el-option
+                    v-for="item in custerNameList"
+                    :key="item.value"
+                    :label="item.text"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
           </el-form>
         </div>
       </div>
@@ -127,6 +152,7 @@
 import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
+import InputTag from '../components/InputTag'
 import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -161,9 +187,13 @@ export default {
         channelId: ['2001'],
         desc: ''
       },
+      zkLabel: '',
       rejectForm: {
         rejectGroupPackageIds: [],
-        vestPackCode: []
+        vestPackCode: [],
+        zkIds: '',
+        zkchannel: [],
+        zkType: ''
       },
       baseRule: { // 基本信息校验规则
         name: [
@@ -177,6 +207,12 @@ export default {
         ],
         channelId: [
           { required: true, message: '请选择用户所属渠道', trigger: 'change' }
+        ],
+        zkchannel: [
+          { required: true, message: '请输入渠道', trigger: 'change' }
+        ],
+        zkType: [
+          { required: true, message: '请选择设备类型', trigger: 'change' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -200,7 +236,7 @@ export default {
       ]
     }
   },
-  components: { rulesSet, Treeselect, dataPreviewInfo },
+  components: { rulesSet, Treeselect, dataPreviewInfo, InputTag },
   methods: {
     init (row, tag) {
       this.id = ''
@@ -844,6 +880,9 @@ export default {
       }
       return null
     },
+    zkIdsChange (val) {
+      this.zkLabel = this.custerNameList.filter(item => item.value === val)[0].text
+    },
     copyHandle () { // 复制功能
       this.$confirm('分群已复制，点击“确定”开始编辑新分群', '提示', {
         confirmButtonText: '确定',
@@ -867,50 +906,59 @@ export default {
           })
           return
         }
+        let flag = true
         this.$refs.baseForm.validate((valid) => {
-          if (valid) {
-            let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
-            data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
-            data.append('name', this.baseForm.name)
-            data.append('type', this.baseForm.type)
-            data.append('userType', this.baseForm.userType)
-            data.append('desc', this.baseForm.desc)
-            data.append('channelId', this.baseForm.channelId)
-            data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
-            this.rejectForm.rejectGroupPackageIds.forEach(item => {
-              data.append('rejectGroupPackageIds', item)
-            })
-            let flag = 0
-            if (this.rejectForm.rejectGroupPackageIds.length) {
-              flag = 1
-            }
-            data.append('rejectGroupPackCode', flag)
-            if (this.id) {
-              data.append('id', this.id)
-            }
-            this.loading = true
-            importExcelFile(data).then(res => {
-              if (res.data.status * 1 !== 1) {
-                this.$message({
-                  type: 'error',
-                  message: res.data.message || '保存失败'
-                })
-                this.loading = false
-              } else {
-                this.$message({
-                  type: 'success',
-                  message: res.data.message || '保存成功'
-                })
-                this.loading = false
-                this.visible = false
-                this.$parent.addOrUpdateVisible = false
-                this.$nextTick(() => {
-                  this.$parent.getDataList()
-                })
-              }
-            })
+          if (!valid) {
+            flag = false
           }
         })
+        this.$refs.rejectForm.validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+        if (flag) {
+          let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
+          data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
+          data.append('name', this.baseForm.name)
+          data.append('type', this.baseForm.type)
+          data.append('userType', this.baseForm.userType)
+          data.append('desc', this.baseForm.desc)
+          data.append('channelId', this.baseForm.channelId)
+          data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
+          this.rejectForm.rejectGroupPackageIds.forEach(item => {
+            data.append('rejectGroupPackageIds', item)
+          })
+          let flag = 0
+          if (this.rejectForm.rejectGroupPackageIds.length) {
+            flag = 1
+          }
+          data.append('rejectGroupPackCode', flag)
+          if (this.id) {
+            data.append('id', this.id)
+          }
+          this.loading = true
+          importExcelFile(data).then(res => {
+            if (res.data.status * 1 !== 1) {
+              this.$message({
+                type: 'error',
+                message: res.data.message || '保存失败'
+              })
+              this.loading = false
+            } else {
+              this.$message({
+                type: 'success',
+                message: res.data.message || '保存成功'
+              })
+              this.loading = false
+              this.visible = false
+              this.$parent.addOrUpdateVisible = false
+              this.$nextTick(() => {
+                this.$parent.getDataList()
+              })
+            }
+          })
+        }
         return
       }
       if (!this.ruleConfig.rules.length) {
@@ -926,6 +974,11 @@ export default {
       this.$nextTick(() => { // 待页面中的isRequired = true后再执行校验
         let flag = true
         this.$refs.baseForm.validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+        this.$refs.rejectForm.validate((valid) => {
           if (!valid) {
             flag = false
           }
@@ -1123,5 +1176,12 @@ export default {
   }
   .insight-manage-drawer .reject-pane-item {
     width:50%
+  }
+  .inputTag {
+    display: inline-block;
+    border-radius: 4px;
+    width: 340px;
+    line-height: 22px;
+    border: 1px solid #dcdfe6
   }
 </style>
