@@ -137,6 +137,7 @@ import {
   taskPeriodInfo,
   taskPeriodSaveOrUpdate
 } from '@/api/dispatch/taskManag'
+import { deepClone } from '@/utils'
 export default {
   props: {
     taskId: Number,
@@ -160,7 +161,8 @@ export default {
       }
     }
     return {
-      dispatchTimeForm: {
+      dispatchTimeForm: {},
+      tempForm: {
         jobType: 1, // 周期
         onceRunTime: '', // 运行一次运行时间
         execTime: '', // 周期运行具体时间
@@ -241,7 +243,7 @@ export default {
   },
   methods: {
     init () {
-      this.dispatchTimeForm.onceRunTime = ''
+      this.dispatchTimeForm = deepClone(this.tempForm)
       this.$refs['dispatchTimeForm'].resetFields()
       this.dataAssembly()
       this.disTimeTurnOff('MINUTE')
@@ -264,6 +266,7 @@ export default {
             } else {
               this.dispatchTimeForm.jobType = 2
               this.dispatchTimeForm.runCycle = jobType
+              this.dispatchTimeForm.cron = data.data.cron
               if (jobType === 'MINUTE' || jobType === 'HOUR') {
                 this.dispatchTimeForm.startTime = data.data.startTime
                 this.dispatchTimeForm.endTime = data.data.endTime
