@@ -76,7 +76,7 @@
             </div>
           </el-form-item>
           <el-form-item prop="sqlField" label-width="120px" label="输出字段" ref="sqlFieldEl">
-            <input-tag v-model="acquisitionTask.sqlField" @change="inputTagChange" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="itemIput inputTag" style="display: inline-block;" placeholder="可用回车输入多条"></input-tag>
+            <input-tag v-model="acquisitionTask.sqlField" @change="inputTagChange" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="itemIput inputTag" style="display: inline-block;" placeholder="可用回车输入多条，字段顺序请与SQL保持一致"></input-tag>
             <el-button type="primary" size="mini" @click="sqlParseClick">SQL解析</el-button>
           </el-form-item>
           <div class="work-type-pane">
