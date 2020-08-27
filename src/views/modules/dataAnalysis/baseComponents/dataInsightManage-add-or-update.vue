@@ -111,26 +111,24 @@
               </el-tooltip>
             </el-form-item>
             <el-form-item label="撞库包：">
-              <el-select v-model="rejectForm.zkIds" filterable @change="zkIdsChange" placeholder="请选择撞库包" class="reject-pane-item">
+              <el-select v-model="rejectForm.collisionPackId" filterable @change="collisionPackIdChange" placeholder="请选择撞库包" class="reject-pane-item">
                 <el-option
-                  v-for="item in custerNameList"
+                  v-for="item in collisionList"
                   :key="item.value"
                   :label="item.text"
                   :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
-            <div style="display:flex" v-if="rejectForm.zkIds">
-              <el-form-item :label="zkLabel + '撞库包：'" style="padding-left:80px" prop="zkchannel" label-width="140px">
-                <input-tag v-model="rejectForm.zkchannel" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag" placeholder="请输入渠道，可用回车输入多条"></input-tag>
-              </el-form-item>
-              <el-form-item label-width="20px" prop="zkType">
-                <el-select v-model="rejectForm.zkType" filterable placeholder="请选择设备类型" style="width:200px">
+            <div style="display:flex" v-if="rejectForm.collisionData.length">
+              <el-form-item :label="item.paramTitle" :prop="item.paramName" label-width="140px" v-for="(item, index) in collisionData" :key="index">
+                <input-tag v-model="rejectForm[item.paramName]" v-if="item.allowMulti && !item.isEnum" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag" :placeholder="`请输入${item.paramTitle}，可用回车输入多条`" :rules="{ required: true, message: `请输入${item.paramTitle}，可用回车输入多条`, trigger: 'change' }"></input-tag>
+                <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle" style="width:200px" :rules="{ required: true, message: '请选择' + item.paramTitle, trigger: 'change' }">
                   <el-option
-                    v-for="item in custerNameList"
-                    :key="item.value"
-                    :label="item.text"
-                    :value="item.value">
+                    v-for="citem in item.options"
+                    :key="citem.value"
+                    :label="citem.text"
+                    :value="citem.value">
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -153,7 +151,7 @@ import rulesSet from './apiManage-rules-set'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
 import InputTag from '../components/InputTag'
-import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, savaDataInfo, updateDataInfo, viewDataInfo, importExcelFile, templateDownload, vestPackAvailable, channelsList, custerAvailable, dataIndexManagerCandidate, collisionList, collisionParams } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -179,6 +177,8 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
+      collisionData: [],
+      collisionList: [],
       // allCusterNameList: [],
       baseForm: {
         name: '',
@@ -191,9 +191,7 @@ export default {
       rejectForm: {
         rejectGroupPackageIds: [],
         vestPackCode: [],
-        zkIds: '',
-        zkchannel: [],
-        zkType: ''
+        collisionPackId: ''
       },
       baseRule: { // 基本信息校验规则
         name: [
@@ -207,12 +205,6 @@ export default {
         ],
         channelId: [
           { required: true, message: '请选择用户所属渠道', trigger: 'change' }
-        ],
-        zkchannel: [
-          { required: true, message: '请输入渠道', trigger: 'change' }
-        ],
-        zkType: [
-          { required: true, message: '请选择设备类型', trigger: 'change' }
         ]
       },
       ruleConfig: { // 规则数据
@@ -413,6 +405,24 @@ export default {
         this.custerNameList = data.data
         // this.allCusterNameList = data.data
         // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
+      })
+    },
+    getCollisionList () {
+      collisionList().then(({data}) => {
+        this.collisionList = data.data || []
+      })
+    },
+    collisionPackIdChange (val) {
+      this.zkLabel = this.custerNameList.filter(item => item.value === val)[0].text
+    },
+    getCollisionParams () {
+      collisionParams(this.rejectForm.collisionPackId, this.rejectForm.groupId).then(({data}) => {
+        if (data && data.status === 1) {
+          this.collisionData = data.data
+          data.data.forEach(item => {
+            this.rejectForm[item.paramName] = ''
+          })
+        }
       })
     },
     radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
@@ -879,9 +889,6 @@ export default {
         return decodeURI(r[2])
       }
       return null
-    },
-    zkIdsChange (val) {
-      this.zkLabel = this.custerNameList.filter(item => item.value === val)[0].text
     },
     copyHandle () { // 复制功能
       this.$confirm('分群已复制，点击“确定”开始编辑新分群', '提示', {
