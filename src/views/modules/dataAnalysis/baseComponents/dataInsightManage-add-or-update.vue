@@ -931,6 +931,7 @@ export default {
       })
     },
     saveCollision () {
+      console.log(2222222, this.id)
       let url = collisionSave
       let params = this.collisionData
       params.forEach(item => {
@@ -1007,16 +1008,8 @@ export default {
               })
               this.loading = false
             } else {
-              // this.$message({
-              //   type: 'success',
-              //   message: res.data.message || '保存成功'
-              // })
-              // this.loading = false
-              // this.visible = false
-              // this.$parent.addOrUpdateVisible = false
-              // this.$nextTick(() => {
-              //   this.$parent.getDataList()
-              // })
+              this.id = res.data.data
+              this.saveCollision()
             }
           })
         }
@@ -1100,17 +1093,8 @@ export default {
                 message: data.message || '数据异常'
               })
             } else {
+              this.id = data.data
               this.saveCollision()
-              // this.$message({
-              //   type: 'success',
-              //   message: data.message
-              // })
-              // this.loading = false
-              // this.visible = false
-              // this.$parent.addOrUpdateVisible = false
-              // this.$nextTick(() => {
-              //   this.$parent.getDataList()
-              // })
             }
           })
         }
