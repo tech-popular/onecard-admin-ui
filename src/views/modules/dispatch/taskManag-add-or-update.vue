@@ -372,6 +372,7 @@ export default {
     },
     getAllDatasource (type, flow) {
       dataSourceAll(type, flow).then(({data}) => {
+        console.log(data)
         if (flow === 'IN') {
           this.getAllinDatasourceList = data.data
         } else {
