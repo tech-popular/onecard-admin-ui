@@ -158,6 +158,12 @@ export const models = {
     }
     this.init()
   },
+  watch: {
+    '$route.query.name' (val) {
+      this.searchData.taskName = val
+      this.init()
+    }
+  },
   methods: {
     init () {
       const dataBody = {

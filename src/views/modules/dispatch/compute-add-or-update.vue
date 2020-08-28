@@ -162,7 +162,8 @@ export default {
       formDs: 'mc',
       updateUser: '',
       updateTime: '',
-      dataForm: {
+      dataForm: {},
+      tempDataForm: {
         taskName: '',
         id: '',
         projectId: '',
@@ -170,7 +171,8 @@ export default {
         taskDisable: 0,
         requestedUser: ''
       },
-      calculateTasks: [
+      calculateTasks: [],
+      tempCalculateTasks: [
         {
           jobNo: 1,
           jobType: '',
@@ -261,6 +263,8 @@ export default {
   methods: {
     init (id) {
       this.id = id ? id.id : ''
+      this.dataForm = deepClone(this.tempDataForm)
+      this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
       this.getAllDatasource()
       this.visible = true
@@ -272,6 +276,9 @@ export default {
           info(this.id).then(({data}) => {
             if (data.code !== 0) {
               return this.$message.error(data.msg || '获取数据异常')
+            }
+            if (!data.data.calculateTasks.length) {
+              return this.$message.error('获取数据异常')
             }
             this.updateUser = data.data.updateUser
             this.updateTime = data.data.updateTime
