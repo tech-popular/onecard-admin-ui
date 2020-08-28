@@ -207,11 +207,11 @@
   </el-drawer>
 </template>
 <script>
-import userAttrRulePane from "./userAttr-rule-pane";
-import userActionRulePane from "./userAction-rule-pane";
+import userAttrRulePane from './userAttr-rule-pane'
+import userActionRulePane from './userAction-rule-pane'
 // import userBehaviorRulePane from './userBehavior-rule-pane'
-import dataPreviewInfo from "./data-preview-info";
-import { getQueryString } from "@/utils";
+import dataPreviewInfo from './data-preview-info'
+import { getQueryString } from '@/utils'
 import {
   savaDataInfo,
   updateDataInfo,
@@ -221,11 +221,11 @@ import {
   vestPackAvailable,
   channelsList,
   custerAvailable
-} from "@/api/dataAnalysis/dataInsightManage";
-import Treeselect, { LOAD_CHILDREN_OPTIONS } from "@riophae/vue-treeselect";
-import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+} from '@/api/dataAnalysis/dataInsightManage'
+import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
-  data() {
+  data () {
     return {
       isPreviewShow: true,
       loading: false,
@@ -237,16 +237,16 @@ export default {
       fileData: {
         fileList: []
       },
-      excelFile: "",
+      excelFile: '',
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
       baseForm: {
-        name: "",
-        userType: "indicator",
-        type: "dynamic",
-        channelId: ["2001"],
-        desc: ""
+        name: '',
+        userType: 'indicator',
+        type: 'dynamic',
+        channelId: ['2001'],
+        desc: ''
       },
       rejectForm: {
         rejectGroupPackageIds: [],
@@ -254,19 +254,19 @@ export default {
       },
       baseRule: {
         // 基本信息校验规则
-        name: [{ required: true, message: "请输入分群名称", trigger: "blur" }],
+        name: [{ required: true, message: '请输入分群名称', trigger: 'blur' }],
         userType: [
-          { required: true, message: "请选择分群类型", trigger: "change" }
+          { required: true, message: '请选择分群类型', trigger: 'change' }
         ],
         type: [
-          { required: true, message: "请选择计算类型", trigger: "change" }
+          { required: true, message: '请选择计算类型', trigger: 'change' }
         ],
         channelId: [
-          { required: true, message: "请选择用户所属渠道", trigger: "change" }
+          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
         ]
       },
       channelList: []
-    };
+    }
   },
   components: {
     userAttrRulePane,
@@ -282,211 +282,211 @@ export default {
       this.loading = true
       this.visible = true
       // this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
-      this.getVestPackAvailable();
-      this.getChannelsList();
-      this.getCusterList();
+      this.getVestPackAvailable()
+      this.getChannelsList()
+      this.getCusterList()
       this.$nextTick(() => {
         // 默认将基本信息的错误提示消除
-        this.$refs.baseForm.clearValidate();
-      });
-      this.tag = tag;
+        this.$refs.baseForm.clearValidate()
+      })
+      this.tag = tag
       if (!tag) {
-        this.loading = false;
-        this.drawerTitle = "新增";
+        this.loading = false
+        this.drawerTitle = '新增'
 
-        this.initEmptyData();
+        this.initEmptyData()
       } else {
-        this.id = row.id;
-        this.drawerTitle = tag === "view" ? "查看" : "编辑";
-        this.getDataInfo(row.id);
+        this.id = row.id
+        this.drawerTitle = tag === 'view' ? '查看' : '编辑'
+        this.getDataInfo(row.id)
       }
     },
-    async loadOptions({ action, parentNode, callback }) {
+    async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
-        callback();
+        callback()
       }
     },
-    initEmptyData() {
+    initEmptyDat () {
       // 当数据异常时，初始化数据
       this.baseForm = {
-        name: "",
-        userType: "indicator",
-        type: "dynamic",
-        channelId: ["2001"],
-        desc: ""
-      };
+        name: '',
+        userType: 'indicator',
+        type: 'dynamic',
+        channelId: ['2001'],
+        desc: ''
+      }
       this.$nextTick(() => {
-        console.log(this.$refs);
-        this.$refs.userAttrRule.init();
-         this.$refs.userActionRule.init();
-      });
+        console.log(this.$refs)
+        this.$refs.userAttrRule.init()
+        this.$refs.userActionRule.init()
+      })
     },
-    getDataInfo(id) {
+    getDataInfo (id) {
       // 查看及编辑时请求数据
       viewDataInfo(id).then(({ data }) => {
-        if (data.status !== "1") {
-          this.initEmptyData();
-          this.loading = false;
+        if (data.status !== '1') {
+          this.initEmptyData()
+          this.loading = false
           return this.$message({
             message: data.message,
-            type: "error"
-          });
+            type: 'error'
+          })
         } else {
-          this.flowId = data.data.flowId;
+          this.flowId = data.data.flowId
           this.baseForm = {
             name: data.data.name,
             desc: data.data.desc,
             userType: data.data.userType,
             type: data.data.type
-          };
+          }
           this.rejectForm.rejectGroupPackageIds =
-            data.data.rejectGroupPackageIds || [];
+            data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
-            this.rejectForm.vestPackCode = [];
+            this.rejectForm.vestPackCode = []
           } else {
             this.rejectForm.vestPackCode = data.data.vestPackCode
-              .split(",")
-              .filter(item => item != "");
+              .split(',')
+              .filter(item => item != '')
           }
-          if (data.data.userType === "excel") {
-            this.excelFile = data.data.excelFile;
-            this.baseForm.channelId = data.data.channelId;
-            this.loading = false;
-            return;
+          if (data.data.userType === 'excel') {
+            this.excelFile = data.data.excelFile
+            this.baseForm.channelId = data.data.channelId
+            this.loading = false
+            return
           }
           this.baseForm.channelId = data.data.channelId
-            .split(",")
-            .filter(item => item != "");
+            .split(',')
+            .filter(item => item != '')
           if (!data.data.configJson) {
-            this.initEmptyData();
-            this.loading = false;
+            this.initEmptyData()
+            this.loading = false
             return this.$message({
-              message: "数据异常",
-              type: "error"
-            });
+              message: '数据异常',
+              type: 'error'
+            })
           }
           this.$refs.userAttrRule.renderData(
             data.data.configJson,
             this.baseForm.channelId
-          );
+          )
         }
-      });
+      })
     },
-    renderEnd() {
-      this.loading = false;
+    renderEnd () {
+      this.loading = false
     },
-    getChannelsList() {
+    getChannelsList () {
       channelsList().then(res => {
         if (res.data.status * 1 !== 1) {
-          this.channelList = [];
-          return;
+          this.channelList = []
+          return
         }
         this.channelList = res.data.data.map(item => {
-          if (item.value === "0000") {
-            item.disabled = true;
+          if (item.value === '0000') {
+            item.disabled = true
           } else {
-            item.disabled = false;
+            item.disabled = false
           }
-          return item;
-        });
-      });
+          return item
+        })
+      })
     },
-    channelIdChange() {
+    channelIdChange () {
       // 用户渠道改变时，重新过滤指标数据
       if (this.baseForm.channelId.length === 0) {
         this.channelList.forEach(item => {
-          item.disabled = false;
-        });
+          item.disabled = false
+        })
       }
       if (this.baseForm.channelId.length === 1) {
         this.channelList.forEach(item => {
-          if (this.baseForm.channelId[0] === "0000") {
-            if (item.value === "0000") {
-              item.disabled = false;
+          if (this.baseForm.channelId[0] === '0000') {
+            if (item.value === '0000') {
+              item.disabled = false
             } else {
-              item.disabled = true;
+              item.disabled = true
             }
           } else {
-            if (item.value === "0000") {
-              item.disabled = true;
+            if (item.value === '0000') {
+              item.disabled = true
             } else {
-              item.disabled = false;
+              item.disabled = false
             }
           }
-        });
+        })
       }
-      this.$refs.userAttrRule.channelIdChangeUpdate();
-      this.rejectForm.rejectGroupPackageIds = [];
+      this.$refs.userAttrRule.channelIdChangeUpdate()
+      this.rejectForm.rejectGroupPackageIds = []
     },
-    getVestPackAvailable() {
+    getVestPackAvailable () {
       vestPackAvailable().then(res => {
         if (res.data.status * 1 !== 1) {
-          this.vestPackList = [];
+          this.vestPackList = []
           return this.$message({
-            type: "error",
-            message: res.message || "数据异常"
-          });
+            type: 'error',
+            message: res.message || '数据异常'
+          })
         }
-        this.vestPackList = res.data.data;
-      });
+        this.vestPackList = res.data.data
+      })
     },
     // 获取分群名称
-    getCusterList() {
+    getCusterList () {
       custerAvailable().then(({ data }) => {
-        if (data.status !== "1") {
-          this.custerNameList = [];
+        if (data.status !== '1') {
+          this.custerNameList = []
           return this.$message({
-            type: "error",
-            message: data.message || "数据异常"
-          });
+            type: 'error',
+            message: data.message || '数据异常'
+          })
         }
-        this.custerNameList = data.data;
-      });
+        this.custerNameList = data.data
+      })
     },
-    radioTypeChange(val) {
+    radioTypeChange (val) {
       // 当选择指标筛选时，上传文件置空
-      if (val === "indicator") {
-        this.fileData.fileList = [];
-        this.excelFile = "";
-        this.baseForm.type = "dynamic";
+      if (val === 'indicator') {
+        this.fileData.fileList = []
+        this.excelFile = ''
+        this.baseForm.type = 'dynamic'
       } else {
-        this.baseForm.type = "static";
+        this.baseForm.type = 'static'
       }
     },
-    handleChange(file, fileList) {
+    handleChange (file, fileList) {
       // 上传文件变化时
       if (fileList.length > 0) {
-        this.fileData.fileList = [fileList[fileList.length - 1]]; // 这一步，是展示最后一次选择的文件
-        this.excelFile = this.fileData.fileList[0].name;
+        this.fileData.fileList = [fileList[fileList.length - 1]] // 这一步，是展示最后一次选择的文件
+        this.excelFile = this.fileData.fileList[0].name
       }
     },
-    beforeUpload(file) {
+    beforeUpload (file) {
       // 上传文件之前的事件
-      let that = this;
-      let fileName = file.name.substring(file.name.lastIndexOf(".") + 1); // 文件类型
-      if (fileName != "xls" && fileName != "xlsx") {
+      let that = this
+      let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
+      if (fileName != 'xls' && fileName != 'xlsx') {
         that.$message({
-          type: "error",
-          message: "文件类型不是.xls文件!"
-        });
-        return false;
+          type: 'error',
+          message: '文件类型不是.xls文件!'
+        })
+        return false
       }
     },
-    previewHandle() {
-      this.isPreviewShow = true;
+    previewHandle () {
+      this.isPreviewShow = true
       this.$nextTick(() => {
-        this.$refs.dataPreviewInfo.init();
-      });
+        this.$refs.dataPreviewInfo.init()
+      })
     },
-    getQueryParams(name) {
-      let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    getQueryParams (name) {
+      let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
       let params =
-        window.location.search.substr(1) || window.location.href.split("?")[1];
-      let r = params && params.match(reg);
+        window.location.search.substr(1) || window.location.href.split('?')[1]
+      let r = params && params.match(reg)
       if (r != null) {
-        return decodeURI(r[2]);
+        return decodeURI(r[2])
       }
-      return null;
+      return null
     },
     copyHandle () { // 复制功能
       this.$confirm('分群已复制，点击“确定”开始编辑新分群', '提示', {
@@ -503,164 +503,164 @@ export default {
       })
         .then(() => {
           // 确认创建分群时的操作
-          this.drawerTitle = "新建";
-          this.baseForm.name = "复制" + this.baseForm.name;
-          this.id = 0;
-          this.$refs.baseTitle.scrollIntoView(); // 滚动到页面最上面
+          this.drawerTitle = '新建'
+          this.baseForm.name = '复制' + this.baseForm.name
+          this.id = 0
+          this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
         })
         .catch(() => {
-          console.log("cancel");
-        });
+          console.log('cancel')
+        })
     },
-    saveHandle(type) {
-      if (this.baseForm.userType === "excel") {
+    saveHandle (type) {
+      if (this.baseForm.userType === 'excel') {
         if (!this.excelFile) {
           this.$message({
-            type: "error",
-            message: "请选择要上传的文件"
-          });
-          return;
+            type: 'error',
+            message: '请选择要上传的文件'
+          })
+          return
         }
         this.$refs.baseForm.validate(valid => {
           if (valid) {
-            let data = new FormData(); // 上传文件使用new formData();可以实现表单提交;
+            let data = new FormData() // 上传文件使用new formData()可以实现表单提交
             data.append(
-              "file",
+              'file',
               this.fileData.fileList.length ? this.fileData.fileList[0].raw : {}
-            );
-            data.append("name", this.baseForm.name);
-            data.append("type", this.baseForm.type);
-            data.append("userType", this.baseForm.userType);
-            data.append("desc", this.baseForm.desc);
-            data.append("channelId", this.baseForm.channelId);
-            data.append("vestPackCode", this.rejectForm.vestPackCode.join(","));
+            )
+            data.append('name', this.baseForm.name)
+            data.append('type', this.baseForm.type)
+            data.append('userType', this.baseForm.userType)
+            data.append('desc', this.baseForm.desc)
+            data.append('channelId', this.baseForm.channelId)
+            data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
             this.rejectForm.rejectGroupPackageIds.forEach(item => {
-              data.append("rejectGroupPackageIds", item);
-            });
-            let flag = 0;
+              data.append('rejectGroupPackageIds', item)
+            })
+            let flag = 0
             if (this.rejectForm.rejectGroupPackageIds.length) {
-              flag = 1;
+              flag = 1
             }
-            data.append("rejectGroupPackCode", flag);
+            data.append('rejectGroupPackCode', flag)
             if (this.id) {
-              data.append("id", this.id);
+              data.append('id', this.id)
             }
-            this.loading = true;
+            this.loading = true
             importExcelFile(data).then(res => {
               if (res.data.status * 1 !== 1) {
                 this.$message({
-                  type: "error",
-                  message: res.data.message || "保存失败"
-                });
-                this.loading = false;
+                  type: 'error',
+                  message: res.data.message || '保存失败'
+                })
+                this.loading = false
               } else {
                 this.$message({
-                  type: "success",
-                  message: res.data.message || "保存成功"
-                });
-                this.loading = false;
-                this.visible = false;
-                this.$parent.addOrUpdateVisible = false;
+                  type: 'success',
+                  message: res.data.message || '保存成功'
+                })
+                this.loading = false
+                this.visible = false
+                this.$parent.addOrUpdateVisible = false
                 this.$nextTick(() => {
-                  this.$parent.getDataList();
-                });
+                  this.$parent.getDataList()
+                })
               }
-            });
+            })
           }
-        });
-        return;
+        })
+        return
       }
       // 用户属性 数据校验
-      this.$refs.userAttrRule.ruleValidate();
-      this.$refs.userAttrRule.isRequired = true;
-      let ruleFormArr = this.$refs.userAttrRule.getRuleForm();
+      this.$refs.userAttrRule.ruleValidate()
+      this.$refs.userAttrRule.isRequired = true
+      let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
       this.$nextTick(() => {
         // 待页面中的isRequired = true后再执行校验
-        let flag = true;
+        let flag = true
         this.$refs.baseForm.validate(valid => {
           if (!valid) {
-            flag = false;
+            flag = false
           }
-        });
+        })
         ruleFormArr.forEach(item => {
           item.validate(valid => {
             if (!valid) {
-              flag = false;
+              flag = false
             }
-          });
-        });
+          })
+        })
         if (!flag) {
-          this.$refs.userAttrRule.isRequired = false;
+          this.$refs.userAttrRule.isRequired = false
         } else {
           // 全部校验通过后，可保存数据
-          this.$refs.userAttrRule.uneffectIndexValidate();
-          let code = 0;
+          this.$refs.userAttrRule.uneffectIndexValidate()
+          let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
-            code = 1;
+            code = 1
           }
           let params = {
             ...this.baseForm,
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
             ...this.rejectForm,
             rejectGroupPackCode: code
-          };
-          params.channelId = params.channelId.join(",");
-          if (type === "preview") {
-            this.isPreviewShow = true;
+          }
+          params.channelId = params.channelId.join(',')
+          if (type === 'preview') {
+            this.isPreviewShow = true
             this.$nextTick(() => {
-              this.$refs.dataPreviewInfo.init(params);
-            });
-            return;
+              this.$refs.dataPreviewInfo.init(params)
+            })
+            return
           }
-          params.vestPackCode = params.vestPackCode.join(",");
-          let url = savaDataInfo;
+          params.vestPackCode = params.vestPackCode.join(',')
+          let url = savaDataInfo
           if (this.id) {
-            url = updateDataInfo;
-            params.id = this.id;
-            params.flowId = this.flowId;
+            url = updateDataInfo
+            params.id = this.id
+            params.flowId = this.flowId
           }
-          let sysUuid = getQueryString("system_uuid");
+          let sysUuid = getQueryString('system_uuid')
           let sysArr = [
-            "ecf36297-37ea-489e-a350-045b1ab49f75", // 统一后台uuid
-            "95dd8c99-8c51-4394-b2f4-95ba472c2ef4" // 小鱼福卡uuid
-          ];
+            'ecf36297-37ea-489e-a350-045b1ab49f75', // 统一后台uuid
+            '95dd8c99-8c51-4394-b2f4-95ba472c2ef4' // 小鱼福卡uuid
+          ]
           if (sysUuid && sysArr.includes(sysUuid)) {
-            params.username = this.getQueryParams("username") || "";
+            params.username = this.getQueryParams('username') || ''
           }
-          this.loading = true;
+          this.loading = true
           url(params).then(({ data }) => {
-            if (data.status !== "1") {
-              this.loading = false;
+            if (data.status !== '1') {
+              this.loading = false
               return this.$message({
-                type: "error",
-                message: data.message || "数据异常"
-              });
+                type: 'error',
+                message: data.message || '数据异常'
+              })
             } else {
               this.$message({
-                type: "success",
+                type: 'success',
                 message: data.message
-              });
-              this.loading = false;
-              this.visible = false;
-              this.$parent.addOrUpdateVisible = false;
+              })
+              this.loading = false
+              this.visible = false
+              this.$parent.addOrUpdateVisible = false
               this.$nextTick(() => {
-                this.$parent.getDataList();
-              });
+                this.$parent.getDataList()
+              })
             }
-          });
+          })
         }
-      });
+      })
     },
-    drawerClose() {
-      this.visible = false;
-      this.$parent.addOrUpdateVisible = false;
+    drawerClose () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
     },
-    cancelHandle() {
-      this.visible = false;
-      this.$parent.addOrUpdateVisible = false;
+    cancelHandle () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
     }
   }
-};
+}
 </script>
 <style>
 .insight-manage-drawer .wrap {

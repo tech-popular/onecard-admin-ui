@@ -331,10 +331,10 @@
   </div>
 </template>
 <script>
-import Treeselect, { LOAD_CHILDREN_OPTIONS } from "@riophae/vue-treeselect";
-import InputTag from "../components/InputTag";
+import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+import InputTag from '../components/InputTag'
 export default {
-  name: "rulesSet",
+  name: 'rulesSet',
   props: {
     data: {
       type: Object
@@ -352,189 +352,189 @@ export default {
     },
     from: {
       type: String,
-      default: ""
+      default: ''
     }
   },
-  data() {
+  data () {
     return {
       ttt: [],
       multipleList: [],
       parent: null,
       selectOperateList: [
-        { code: "eq", title: "等于", subSelects: null },
-        { code: "neq", title: "不等于", subSelects: null },
-        { code: "gt", title: "大于", subSelects: null },
-        { code: "lt", title: "小于", subSelects: null },
-        { code: "ge", title: "大于等于", subSelects: null },
-        { code: "le", title: "小于等于", subSelects: null },
-        { code: "between", title: "介于", subSelects: null },
+        { code: 'eq', title: '等于', subSelects: null },
+        { code: 'neq', title: '不等于', subSelects: null },
+        { code: 'gt', title: '大于', subSelects: null },
+        { code: 'lt', title: '小于', subSelects: null },
+        { code: 'ge', title: '大于等于', subSelects: null },
+        { code: 'le', title: '小于等于', subSelects: null },
+        { code: 'between', title: '介于', subSelects: null },
         {
-          code: "relative_time",
+          code: 'relative_time',
           subSelects: [
-            { code: "relative_before", title: "之前", subSelects: null },
-            { code: "relative_within", title: "之内", subSelects: null }
+            { code: 'relative_before', title: '之前', subSelects: null },
+            { code: 'relative_within', title: '之内', subSelects: null }
           ],
-          title: "相对当前时间点"
+          title: '相对当前时间点'
         },
         {
-          code: "relative_time_in",
-          title: "相对当前时间区间",
+          code: 'relative_time_in',
+          title: '相对当前时间区间',
           subSelects: null
         },
-        { code: "null", title: "NULL", subSelects: null },
-        { code: "not_null", title: "NOT NULL", subSelects: null }
+        { code: 'null', title: 'NULL', subSelects: null },
+        { code: 'not_null', title: 'NOT NULL', subSelects: null }
       ],
       tips: {
         relative_within_DAYS:
-          "举例：若当前时间为02-26 12:10，则过去1天内为 [02-25 00:00, 02-25 23:59]，过去0天内为 [02-26 00:00, 02-26 12:10]",
+          '举例：若当前时间为02-26 12:10，则过去1天内为 [02-25 00:00, 02-25 23:59]，过去0天内为 [02-26 00:00, 02-26 12:10]',
         relative_before_DAYS:
-          "举例：若当前时间为02-26 12:10，则过去1天前为 ( 无穷小时间，02-24 23:59]，过去0天前为 ( 无穷小时间，02-25 23:59]",
+          '举例：若当前时间为02-26 12:10，则过去1天前为 ( 无穷小时间，02-24 23:59]，过去0天前为 ( 无穷小时间，02-25 23:59]',
         relative_within_HOURS:
-          "举例：若当前时间为02-26 12:10，则过去1小时内为 [02-26 11:10, 02-26 12:10]，过去0小时内为 [02-26 12:10，02-26 12:10]",
+          '举例：若当前时间为02-26 12:10，则过去1小时内为 [02-26 11:10, 02-26 12:10]，过去0小时内为 [02-26 12:10，02-26 12:10]',
         relative_before_HOURS:
-          "举例：若当前时间为02-26 12:10，则过去1小时前为 ( 无穷小时间，02-26 11:10]，过去0小时前为 ( 无穷小时间，02-26 12:10]",
+          '举例：若当前时间为02-26 12:10，则过去1小时前为 ( 无穷小时间，02-26 11:10]，过去0小时前为 ( 无穷小时间，02-26 12:10]',
         relative_time_in_DAYS:
-          "举例：若当前时间为02-26 12:10，则过去5天到过去1天之内为 [02-21 00:00, 02-25 23:59]，过去5天到过去0天内为 [02-21 00:00, 02-26 12:10]",
+          '举例：若当前时间为02-26 12:10，则过去5天到过去1天之内为 [02-21 00:00, 02-25 23:59]，过去5天到过去0天内为 [02-21 00:00, 02-26 12:10]',
         relative_time_in_HOURS:
-          "举例：若当前时间为02-26 12:10，则过去5小时到过去1小时之内为 [02-26 07:10, 02-26 11:10]”，过去5小时到过去0小时内为 [02-26 07:10, 02-26 12:10]"
+          '举例：若当前时间为02-26 12:10，则过去5小时到过去1小时之内为 [02-26 07:10, 02-26 11:10]”，过去5小时到过去0小时内为 [02-26 07:10, 02-26 12:10]'
       }
-    };
+    }
   },
   computed: {
-    isRequired() {
+    isRequired () {
       // 校验规则初始为false,只有在提交时统一校验
-      return this.isRequire;
+      return this.isRequire
     }
   },
-  mounted() {
+  mounted () {
     // 获取父节点
-    let parent = this.$parent;
+    let parent = this.$parent
     while (parent && !parent.isTreeRoot) {
-      parent = parent.$parent;
+      parent = parent.$parent
     }
-    this.parent = parent;
+    this.parent = parent
   },
   components: { Treeselect, InputTag },
   methods: {
-    updateDateDimension(val, ruleItem) {
+    updateDateDimension (val, ruleItem) {
       this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, {
         dateDimension: val
-      });
+      })
     },
-    judgeDateTwoInput(rule, value, callback, params) {
+    judgeDateTwoInput (rule, value, callback, params) {
       // 数值时间区间判断
-      if (value === "") {
-        callback(new Error("请输入"));
+      if (value === '') {
+        callback(new Error('请输入'))
       } else if (params[0].value * 1 < params[1].value * 1) {
-        callback(new Error("起始数值应大于等于终止数值"));
+        callback(new Error('起始数值应大于等于终止数值'))
       } else {
-        callback();
+        callback()
       }
     },
-    judgeNumberTwoInput(rule, value, callback, params) {
+    judgeNumberTwoInput (rule, value, callback, params) {
       // 数值介于判断
-      if (value === "") {
-        callback(new Error("请输入"));
+      if (value === '') {
+        callback(new Error('请输入'))
       } else if (params[0].value * 1 >= params[1].value * 1) {
-        callback(new Error("起始数值应小于终止数值"));
+        callback(new Error('起始数值应小于终止数值'))
       } else {
-        callback();
+        callback()
       }
     },
-    keyupNumberInput(val) {
+    keyupNumberInput (val) {
       // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
-      if (val === ".") {
+      if (val === '.') {
         // 开头不能是小数点
-        val = val.replace(".", "");
+        val = val.replace('.', '')
       }
-      if (val.split(".").length > 2) {
+      if (val.split('.').length > 2) {
         // 不可输入第二个小数点
-        val = val.substring(0, val.length - 1);
+        val = val.substring(0, val.length - 1)
       }
-      if (val.length > 1 && val[val.length - 1] === "-") {
+      if (val.length > 1 && val[val.length - 1] === '-') {
         // 只能有一个’-‘
-        val = val.substring(0, val.length - 1);
+        val = val.substring(0, val.length - 1)
       }
-      val = val.replace(/[^-.\d]/g, ""); // 清除“数字”和“.”以外的字符  [^.\d]
-      console.log(999444, val);
-      return val;
+      val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
+      console.log(999444, val)
+      return val
     },
-    keyupDateNumberInput(val) {
+    keyupDateNumberInput (val) {
       // 日期输入框，输入内容 要求 只能输入 正整数
-      val = val.replace(/^0(0+)|[^\d]+/g, "");
-      return val;
+      val = val.replace(/^0(0+)|[^\d]+/g, '')
+      return val
     },
-    blurDateNumberInput(val) {
+    blurDateNumberInput (val) {
       // 日期输入框，失去焦点时判断输入内容是否符合要求
-      let reg = /^([0]|[1-9][0-9]*)$/;
+      let reg = /^([0]|[1-9][0-9]*)$/
       if (!reg.test(val)) {
-        val = "";
+        val = ''
       }
-      return val;
+      return val
     },
-    blurNumberInput(val) {
+    blurNumberInput (val) {
       // 失去焦点时判断输入内容是否符合要求
-      console.log(323, val);
-      val = val + ""; // 数据转为字符串
-      if (val[val.length - 1] === ".") {
+      console.log(323, val)
+      val = val + '' // 数据转为字符串
+      if (val[val.length - 1] === '.') {
         // 最后一位为小数点时，则删除小数点
-        val = val.substring(0, val.length - 1);
+        val = val.substring(0, val.length - 1)
       }
-      let reg = /^(-)?\d+(\.\d+)?$/g; // 只能输入 -. 及数字 不符合要求则置空
+      let reg = /^(-)?\d+(\.\d+)?$/g // 只能输入 -. 及数字 不符合要求则置空
       if (!reg.test(val)) {
-        val = "";
+        val = ''
       }
-      val = val.replace(/^0+\./, "0."); // 000.8999  -> 0.889
-      val = val.replace(/^(-0+)\./, "-0."); // -000.899  -> -0.889
-      val = val.replace(/^0+([0-9])/, "$1"); // 009.9 00099999  -> 9.9  999999
-      val = val.replace(/^-0+([0-9])/, "-$1"); // -009.9 -00099999 -> -9.9  -999999
-      return val;
+      val = val.replace(/^0+\./, '0.') // 000.8999  -> 0.889
+      val = val.replace(/^(-0+)\./, '-0.') // -000.899  -> -0.889
+      val = val.replace(/^0+([0-9])/, '$1') // 009.9 00099999  -> 9.9  999999
+      val = val.replace(/^-0+([0-9])/, '-$1') // -009.9 -00099999 -> -9.9  -999999
+      return val
     },
-    pramasNumBlur(item, val) {
+    pramasNumBlur (item, val) {
       // 数值 介于的判断
-      let params = item.params;
+      let params = item.params
       if (params[0].value * 1 < params[1].value * 1) {
-        this.$refs["paramsl" + item.ruleCode][0].clearValidate();
-        this.$refs["paramsr" + item.ruleCode][0].clearValidate();
+        this.$refs['paramsl' + item.ruleCode][0].clearValidate()
+        this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
-      return this.blurNumberInput(val); // 返回一下处理过的值 用于赋值
+      return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
     },
-    pramasDateBlur(item, val) {
+    pramasDateBlur (item, val) {
       // 时间 区间的判断
-      let params = item.params;
+      let params = item.params
       if (params[0].value * 1 >= params[1].value * 1) {
-        this.$refs["paramsl" + item.ruleCode][0].clearValidate();
-        this.$refs["paramsr" + item.ruleCode][0].clearValidate();
+        this.$refs['paramsl' + item.ruleCode][0].clearValidate()
+        this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
-      return this.blurDateNumberInput(val); // 返回一下处理过的值 用于赋值
+      return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
-    async loadOptions({ action, parentNode, callback }) {
+    async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
-        callback();
+        callback()
       }
     },
-    deleteChildrenRules(data, item, index) {
+    deleteChildrenRules (data, item, index) {
       // 删除条件
       this.parent.deleteChildrenRules(
         this.parent.ruleConfig,
         data,
         item,
         index
-      );
+      )
     },
-    switchSymbol(ruleCode) {
+    switchSymbol (ruleCode) {
       // 切换且或
-      this.parent.switchSymbol(ruleCode, this.parent.ruleConfig);
+      this.parent.switchSymbol(ruleCode, this.parent.ruleConfig)
     },
-    fieldCodeChange(node, ruleItem) {
-      ruleItem.label = node.label;
-      ruleItem.englishName = node.englishName;
-      ruleItem.fieldType = node.fieldType;
-      ruleItem.enumTypeNum = node.enumTypeNum;
-      ruleItem.sourceTable = node.sourceTable;
-      ruleItem.fieldId = node.fieldId;
-      ruleItem.format = node.dataStandar;
-      ruleItem.enable = node.enable;
+    fieldCodeChange (node, ruleItem) {
+      ruleItem.label = node.label
+      ruleItem.englishName = node.englishName
+      ruleItem.fieldType = node.fieldType
+      ruleItem.enumTypeNum = node.enumTypeNum
+      ruleItem.sourceTable = node.sourceTable
+      ruleItem.fieldId = node.fieldId
+      ruleItem.format = node.dataStandar
+      ruleItem.enable = node.enable
       // 指标改变时，对应的操作符也更新
       this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, {
         label: node.label,
@@ -545,18 +545,18 @@ export default {
         fieldId: node.fieldId,
         format: node.dataStandar,
         enable: node.enable
-      });
+      })
     },
-    selectOperateChange(val, ruleItem) {
+    selectOperateChange (val, ruleItem) {
       // 操作符改变时，数据清空，重新输入
-      this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem);
-      if (ruleItem.fieldType === "date") {
+      this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
+      if (ruleItem.fieldType === 'date') {
         // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
-        this.$refs["datetime" + ruleItem.ruleCode][0].clearValidate();
-        this.$refs["datetimerange" + ruleItem.ruleCode][0].clearValidate();
+        this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
+        this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
       }
     },
-    selectOperateVisible(val, ruleItem) {
+    selectOperateVisible (val, ruleItem) {
       // 当操作符下拉框打开时，重新下拉请求数据
       if (val) {
         // 打开下拉框时
@@ -565,65 +565,65 @@ export default {
           selectOperateList => {
             this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, {
               selectOperateList: selectOperateList
-            });
+            })
           }
-        );
+        )
       }
     },
-    selectEnumsVisible(val, ruleItem) {
+    selectEnumsVisible (val, ruleItem) {
       // 当下拉框打开时，重新请求数据
       if (val) {
         // 打开下拉框时
-        this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem);
+        this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem)
       }
     },
-    selectEnumsChange(val, ruleItem) {
+    selectEnumsChange (val, ruleItem) {
       // 处理一下多选的数据
-      this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem);
+      this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem)
     },
-    selectDateTimeChange(val, ruleItem) {
+    selectDateTimeChange (val, ruleItem) {
       // 处理一下时间数据
-      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem);
+      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem)
     },
-    inputTagChange(ruleItem, type) {
+    inputTagChange (ruleItem, type) {
       if (ruleItem.params[0].selectVal.length) {
         // 如果已经有输入的值则清空报错提示
-        this.$refs[type + "MultiVal" + ruleItem.ruleCode][0].clearValidate();
+        this.$refs[type + 'MultiVal' + ruleItem.ruleCode][0].clearValidate()
       }
-      this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem);
+      this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem)
     },
-    isDateSingleShow(item) {
+    isDateSingleShow (item) {
       // 单时间日期是否显示
-      let showSingleArr = ["eq", "neq", "gt", "lt", "ge", "le"];
-      if (item.fieldType === "date" && showSingleArr.includes(item.func)) {
-        return true;
+      let showSingleArr = ['eq', 'neq', 'gt', 'lt', 'ge', 'le']
+      if (item.fieldType === 'date' && showSingleArr.includes(item.func)) {
+        return true
       } else {
-        return false;
+        return false
       }
     },
     // strTipCont (item) {
     //   console.log(item)
     //   return '输入示例：' + item.strTips
     // },
-    tipsHtmlCont(item) {
-      if (item.func === "relative_time_in") {
-        return this.tips[item.func + "_" + item.dateDimension];
+    tipsHtmlCont (item) {
+      if (item.func === 'relative_time_in') {
+        return this.tips[item.func + '_' + item.dateDimension]
       }
-      if (item.func === "relative_time") {
-        return this.tips[item.subFunc + "_" + item.dateDimension];
+      if (item.func === 'relative_time') {
+        return this.tips[item.subFunc + '_' + item.dateDimension]
       }
     },
-    isEmpty(item) {
+    isEmpty (item) {
       // 是否选择了空
-      let emptyArr = ["null", "not_null", "not_empty", "empty"];
+      let emptyArr = ['null', 'not_null', 'not_empty', 'empty']
       if (!emptyArr.includes(item.func)) {
-        return true;
+        return true
       } else {
-        return false;
+        return false
       }
     }
   }
-};
+}
 </script>
 <style scoped>
 .cursor-pointer {

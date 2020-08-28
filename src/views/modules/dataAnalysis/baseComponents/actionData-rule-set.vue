@@ -210,11 +210,11 @@
   </div>
 </template>
 <script>
-import actionDataRulesSet3 from "./actionData-rules-set3";
-import Treeselect, { LOAD_CHILDREN_OPTIONS } from "@riophae/vue-treeselect";
-import InputTag from "../components/InputTag";
+import actionDataRulesSet3 from './actionData-rules-set3'
+import Treeselect from '@riophae/vue-treeselect'
+import InputTag from '../components/InputTag'
 export default {
-  name: "rulesSet",
+  name: 'rulesSet',
   props: {
     data: {
       type: Object
@@ -229,10 +229,10 @@ export default {
     },
     from: {
       type: String,
-      default: ""
+      default: ''
     }
   },
-  data() {
+  data () {
     return {
       ttt: [],
       multipleList: [],
@@ -240,111 +240,110 @@ export default {
       selectOperateList: [],
       fileList: [
         {
-          value: "data",
-          lable: "绝对时间"
+          value: 'data',
+          lable: '绝对时间'
         },
         {
-          value: "relative_time",
-          lable: "相对当前时间点"
+          value: 'relative_time',
+          lable: '相对当前时间点'
         },
         {
-          value: "relative_times",
-          lable: "相对当前时间区间"
+          value: 'relative_times',
+          lable: '相对当前时间区间'
         }
-			],
-			havedoSelects: [
-				{
-          code: "yes",
-          title: "做过"
+      ],
+      havedoSelects: [
+        {
+          code: 'yes',
+          title: '做过'
         },
         {
-          code: "no",
-          title: "没做过"
+          code: 'no',
+          title: '没做过'
         }
-			],
+      ],
       subTimeSelects: [
         {
-          code: "DAYS",
-          title: "天"
+          code: 'DAYS',
+          title: '天'
         },
         {
-          code: "HOURS",
-          title: "小时"
+          code: 'HOURS',
+          title: '小时'
         }
       ],
       subSelects: [
         {
-          code: "relative_before",
-          title: "之内"
+          code: 'relative_before',
+          title: '之内'
         },
         {
-          code: "relative_after",
-          title: "之外"
+          code: 'relative_after',
+          title: '之外'
         }
       ]
-    };
+    }
   },
   computed: {
-    isRequired() {
+    isRequired () {
       // 校验规则初始为false,只有在提交时统一校验
-      return this.isRequire;
+      return this.isRequire
     }
   },
-  mounted() {
+  mounted () {
     // 获取父节点
-    let parent = this.$parent;
+    let parent = this.$parent
     while (parent && !parent.isTreeRoot) {
-      parent = parent.$parent;
+      parent = parent.$parent
     }
-    this.parent = parent;
+    this.parent = parent
   },
   components: { actionDataRulesSet3, Treeselect, InputTag },
   methods: {
-    updateDateDimension(val, ruleItem) {
+    updateDateDimension (val, ruleItem) {
       this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, {
         dateDimension: val
-      });
+      })
     },
 
-    keyupDateNumberInput(val) {
+    keyupDateNumberInput (val) {
       // 日期输入框，输入内容 要求 只能输入 正整数
-      val = val.replace(/^0(0+)|[^\d]+/g, "");
-      return val;
+      val = val.replace(/^0(0+)|[^\d]+/g, '')
+      return val
     },
-    blurDateNumberInput(val) {
+    blurDateNumberInput (val) {
       // 日期输入框，失去焦点时判断输入内容是否符合要求
-      let reg = /^([0]|[1-9][0-9]*)$/;
+      let reg = /^([0]|[1-9][0-9]*)$/
       if (!reg.test(val)) {
-        val = "";
+        val = ''
       }
-      return val;
+      return val
     },
-    pramasDateBlur(item, val) {
+    pramasDateBlur (item, val) {
       // 时间 区间的判断
-      let params = item.params;
+      let params = item.params
       if (params[0].value1 && params[0].value2 && params[0].value1 * 1 <= params[0].value2 * 1) {
-        this.$refs["paramsl" + item.ruleCode][0].clearValidate();
-        this.$refs["paramsr" + item.ruleCode][0].clearValidate();
+        this.$refs['paramsl' + item.ruleCode][0].clearValidate()
+        this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
-      return this.blurDateNumberInput(val); // 返回一下处理过的值 用于赋值
+      return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
-    selectOperateChange (val, ruleItem) { //时间区间改变时，数据清空，重新输入
-    this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
-        // this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
-				// this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
+    selectOperateChange (val, ruleItem) { // 时间区间改变时，数据清空，重新输入
+      this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
+      // this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
+      // this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
     },
-     judgeDataTwoISelect (rule, value, callback, params) { // 日期介于判断
+    judgeDataTwoISelect (rule, value, callback, params) { // 日期介于判断
       if (!value) {
         callback(new Error('请输入'))
-      }
-      else if ( params[0].datetimeStart && params[0].datetimeEnd && params[0].datetimeStart  >=  params[0].datetimeEnd ) {
+      } else if (params[0].datetimeStart && params[0].datetimeEnd && params[0].datetimeStart >= params[0].datetimeEnd) {
         callback(new Error('起始日期应小于终止日期'))
       } else {
         callback()
       }
     },
     judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
-      if (!value ) {
+      if (!value) {
         callback(new Error('请输入'))
       } else if (params[0].value1 && params[0].value2 && params[0].value1 * 1 >= params[0].value2 * 1) {
         callback(new Error('起始数值应小于等于终止数值'))
@@ -352,30 +351,28 @@ export default {
         callback()
       }
     },
-    addChildrenRules(item) {
+    addChildrenRules (item) {
       // 添加子条件
-      this.parent.addChildreRules(this.parent.ruleConfig, item);
+      this.parent.addChildreRules(this.parent.ruleConfig, item)
     },
-    deleteRules(item) {
+    deleteRules (item) {
       // 删除条件
-      this.parent.deleteRules(this.parent.ruleConfig, item);
+      this.parent.deleteRules(this.parent.ruleConfig, item)
     },
-    
-    addThirdChildrenRules(item) {
-      //添加三级子条件
-      this.parent.addThirdChildrenRules(this.parent.ruleConfig, item);
+    addThirdChildrenRules (item) {
+      //  添加三级子条件
+      this.parent.addThirdChildrenRules(this.parent.ruleConfig, item)
     },
-    switchSymbol(ruleCode) {
+    switchSymbol (ruleCode) {
       // 切换且或
-      this.parent.switchSymbol(ruleCode, this.parent.ruleConfig);
+      this.parent.switchSymbol(ruleCode, this.parent.ruleConfig)
     },
-
-    selectDateTimeChange(val, ruleItem) {
+    selectDateTimeChange (val, ruleItem) {
       // 处理一下时间数据
-      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem);
-    },
-	}
-};
+      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem)
+    }
+  }
+}
 </script>
 <style scoped>
 .cursor-pointer {
