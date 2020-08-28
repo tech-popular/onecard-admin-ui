@@ -28,5 +28,5 @@ export const chartInfo = params => httpGet(da + `data/group/chartInfo`, params, 
 
 export const collisionList = () => httpGet(da + 'data/collision/list')
 export const collisionParams = (collisionPackId, groupId) => httpGet(da + `data/collision/params?collisionPackId=${collisionPackId}&groupId=${groupId}`)
-export const collisionSave = (params, collisionPackId) => httpPost(da + `data/collision/config/group?collisionPackId=${collisionPackId}`, params)
-export const collisionUpdate = (params, collisionPackId, groupId) => httpPut(da + `data/collision/config/group?groupId=${groupId}&collisionPackId=${collisionPackId}`, params)
+export const collisionSave = (params, collisionPackId) => httpPost(da + `data/collision/config/group?collisionPackId=${collisionPackId}`, params, false)
+export const collisionUpdate = (params, collisionPackId, groupId) => httpPut(da + `data/collision/config/group?groupId=${groupId}&collisionPackId=${collisionPackId}`, params, false)
