@@ -318,11 +318,11 @@ export default {
     }
   },
   methods: {
-    init (id) {
+    async init (id) {
       this.id = id ? id.id : ''
       this.getAllSystem()
-      this.getAllDatasource('ACQUISITION', 'IN')
-      this.getAllDatasource('ACQUISITION', 'OUT')
+      await this.getAllDatasource('ACQUISITION', 'IN')
+      await this.getAllDatasource('ACQUISITION', 'OUT')
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
