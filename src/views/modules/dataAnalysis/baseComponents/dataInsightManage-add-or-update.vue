@@ -122,8 +122,8 @@
             </el-form-item>
             <!-- <div style="display:flex" v-if="collisionData.length"> -->
             <el-form-item :label="item.paramTitle" :prop="item.paramName" v-for="(item, index) in collisionData" :key="index" :rules="{ required: true, message: item.allowMulti && !item.isEnum ? `请输入${item.paramTitle}，可用回车输入多条` : '请选择' + item.paramTitle, trigger: 'change' }">
-              <input-tag v-model="rejectForm[item.paramName]" v-if="item.allowMulti && !item.isEnum" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag" :placeholder="`请输入${item.paramTitle}，可用回车输入多条`"></input-tag>
-              <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle" style="width:200px">
+              <input-tag v-model="rejectForm[item.paramName]" v-if="item.allowMulti && !item.isEnum" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag reject-pane-item" :placeholder="`请输入${item.paramTitle}，可用回车输入多条`"></input-tag>
+              <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle"  class="reject-pane-item">
                 <el-option
                   v-for="citem in item.options"
                   :key="citem.value"
@@ -440,14 +440,14 @@ export default {
       collisionParams(this.rejectForm.collisionPackId, this.id).then(({data}) => {
         if (data && data.status * 1 === 1) {
           this.collisionData = data.data
+          this.rejectForm.collisionPackId = data.data[0].collisionPackId
           data.data.forEach(item => {
             if (item.allowMulti && !item.isEnum) {
-              this.$set(this.rejectForm, item.paramName, item.value.split(','))
+              this.$set(this.rejectForm, item.paramName, item.value ? item.value.split(',') : '')
             } else {
               this.$set(this.rejectForm, item.paramName, item.value || '')
             }
           })
-          console.log(this.rejectForm)
         }
       })
     },
@@ -936,7 +936,6 @@ export default {
       params.forEach(item => {
         item.collisionPackId = this.rejectForm.collisionPackId
         if (item.allowMulti && !item.isEnum) {
-          console.log(this.rejectForm[item.paramName])
           item.value_bk = this.rejectForm[item.paramName]
           item.value = this.rejectForm[item.paramName].join(',')
         } else {
@@ -946,11 +945,10 @@ export default {
       if (this.id) {
         url = collisionUpdate
       }
-      console.log(params)
       url(params, this.rejectForm.collisionPackId, this.id).then(({data}) => {
         this.loading = false
-        if (data && data.status * 1 !== 1) {
-          return this.$message.error(data.message)
+        if ((data && data.status * 1 !== 1) || (data.code && data.code === 500)) {
+          return this.$message.error(data.message || data.msg || '提交失败')
         }
         this.$message.success(data.message)
         this.visible = false
