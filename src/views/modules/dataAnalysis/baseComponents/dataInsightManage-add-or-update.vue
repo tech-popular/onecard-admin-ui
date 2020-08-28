@@ -439,6 +439,7 @@ export default {
     getCollisionParams () {
       collisionParams(this.rejectForm.collisionPackId, this.id).then(({data}) => {
         if (data && data.status * 1 === 1) {
+          if (!data.data.length) return
           this.collisionData = data.data
           this.rejectForm.collisionPackId = data.data[0].collisionPackId
           data.data.forEach(item => {
