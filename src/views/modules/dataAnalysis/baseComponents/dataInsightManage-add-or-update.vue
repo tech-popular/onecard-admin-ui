@@ -318,6 +318,7 @@ export default {
       this.$nextTick(() => {
         console.log(this.$refs);
         this.$refs.userAttrRule.init();
+         this.$refs.userActionRule.init();
       });
     },
     getDataInfo(id) {

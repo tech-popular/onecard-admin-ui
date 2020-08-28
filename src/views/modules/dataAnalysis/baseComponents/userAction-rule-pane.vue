@@ -81,6 +81,7 @@ export default {
   },
   methods: {
     init() {
+      this.getSelectAllCata()
       this.ruleConfig = {
         // 规则数据
         ruleCode: "rule_all",
@@ -91,6 +92,152 @@ export default {
       this.expression = "";
       this.expressionTemplate = "";
       this.isRequired = false; // 默认为false,不设置的话，保存后再进入会变
+    },
+    getSelectAllCata(fn) {
+      // 获取所有指标
+      selectAllCata({
+        channelCode: this.channelId,
+        flag: this.id ? "-1" : "1"
+      }).then(({ data }) => {
+        if (data.status !== "1") {
+          this.indexList = [];
+        } else {
+          this.indexList = this.filterAllCata(data.data);
+        }
+        if (fn) {
+          fn(this.indexList);
+        }
+      });
+    },
+    channelIdChangeUpdate() {
+      this.getSelectAllCata(indexList => {
+        if (indexList.length === 0) {
+          this.setInitRulesConfig(this.indexList);
+        } else {
+          this.ruleConfig = this.updateInitRulesConfig(
+            this.ruleConfig,
+            indexList
+          );
+          this.setInitRulesConfig(this.indexList);
+        }
+      });
+    },
+
+    filterAllCata(tree) {
+      // 清洗数据，按selectVue的格式重新组织指标数据
+      let arr = [];
+      if (!!tree && tree.length !== 0) {
+        tree.forEach((item, index) => {
+          let obj = {};
+          if (item.fieldType) {
+            obj.id = item.englishName + "-" + item.id;
+            obj.englishName = item.englishName;
+            obj.label = item.chineseName;
+            obj.fieldType = item.fieldType;
+            obj.enumTypeNum = item.enumTypeNum;
+            obj.sourceTable = item.sourceTable;
+            obj.dataStandar = item.dataStandar;
+            obj.fieldId = item.id;
+            obj.channelCode = item.channelCode;
+            obj.enable = item.enable;
+          } else {
+            obj.id = item.id;
+            obj.label = item.name;
+          }
+          if (this.filterAllCata(item.dataCata).length) {
+            // 指标层 ，无children
+            obj.children = this.filterAllCata(item.dataCata); // 指标集合
+            arr.push(obj);
+          } else if (this.filterAllCata(item.dataIndex).length) {
+            obj.children = this.filterAllCata(item.dataIndex); // 指标集合
+            arr.push(obj);
+          } else {
+            // 指标父级层
+            if (!item.fieldType) {
+              obj.children = null;
+            } else {
+              arr.push(obj); // 每个指标都放在集合中
+            }
+          }
+        });
+      }
+      return arr;
+    },
+    async loadOptions({ action, parentNode, callback }) {
+      if (action === LOAD_CHILDREN_OPTIONS) {
+        callback();
+      }
+    },
+    setInitRulesConfig(indexList) {
+      // 将规则初始化
+      this.indexList = indexList;
+      if (this.ruleConfig.rules.length) {
+        this.ruleConfig.rules = [];
+        this.ruleConfig.rules.push(this.getRuleTemplateItem());
+      }
+      this.updateConditionId(this.ruleConfig);
+    },
+    updateInitRulesConfig(arr, indexList) {
+      // 获取指标默认展开列表
+      arr.rules.forEach(item => {
+        if (!item.rules) {
+          let indexListArr = deepClone(indexList);
+          let indexPath =
+            findVueSelectItemIndex(indexListArr, item.fieldCode) + "";
+          let indexPathArr = indexPath.split(",");
+          let a = indexListArr;
+          if (indexPath) {
+            indexPathArr.forEach((fitem, findex) => {
+              if (findex < indexPathArr.length - 1) {
+                a[fitem].isDefaultExpanded = true;
+                a = a[fitem].children;
+              } else {
+                item.enable = a[fitem].enable;
+              }
+            });
+            item.indexList = indexListArr; // 给每一行规则都加上一个指标列表，同时展示选中项
+            if (
+              item.func === "relative_within" ||
+              item.func === "relative_before"
+            ) {
+              // 兼容老数据
+              item.subFunc = item.func;
+              item.func = "relative_time";
+              item.subTimeSelects = this.subTimeSelects;
+              if (!item.dateDimension) {
+                item.dateDimension = "DAYS";
+              }
+              this.getSelectOperateList(item.fieldType, selectOperateList => {
+                item.selectOperateList = selectOperateList;
+                item.subSelects = item.selectOperateList.filter(
+                  sitem => sitem.code === item.func
+                )[0].subSelects;
+              });
+            }
+            if (
+              item.func === "relative_time_in" ||
+              item.func === "relative_time"
+            ) {
+              item.subTimeSelects = this.subTimeSelects;
+              if (!item.dateDimension) {
+                item.dateDimension = "DAYS";
+              }
+            }
+            // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+            if (
+              (item.fieldType === "string" || item.fieldType === "number") &&
+              (item.func === "eq" || item.func === "neq")
+            ) {
+              if (!item.params[0].selectVal) {
+                item.params[0].selectVal = [item.params[0].value];
+              }
+            }
+          }
+        } else {
+          this.updateInitRulesConfig(item, indexList);
+        }
+      });
+      return arr;
     },
     renderData(data, channelId) {
       this.channelId = channelId;
@@ -123,8 +270,68 @@ export default {
       }
       this.updateConditionId(this.ruleConfig);
     },
+      fieldCodeChange (data, citem, obj) { // rxs更新数据
+      this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
+        let params = {
+          selectOperateList: selectOperateList,
+          func: selectOperateList[0].code,
+          subFunc: '',
+          dateDimension: '',
+          strTips: [],
+          params: [{ value: '', title: '' }]
+        }
+        if (params.func === 'relative_time') {
+          params.subFunc = 'relative_before'
+          params.dateDimension = 'DAYS'
+        }
+        if (params.func === 'relative_time_in') {
+          params.dateDimension = 'DAYS'
+        }
+        Object.keys(obj).forEach(oitem => {
+          params[oitem] = obj[oitem]
+        })
+        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+        }
+        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
+          params.params = [{ value: [], title: '' }]
+          let res = data
+          dataIndexManagerCandidate({ // 字符串提示输入示例
+            sourceTable: obj.sourceTable,
+            fieldName: obj.englishName,
+            count: 10
+          }).then(({data}) => {
+            if (data.status * 1 === 1 && data.data.length) {
+              params.strTips = data.data
+            }
+            this.updateRulesArr(res, citem, params)
+          })
+        } else {
+          this.updateRulesArr(data, citem, params)
+        }
+      })
+    },
+     updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
+      let newArr = []
+      if (citem.params[0].selectVal === null || !citem.params[0].selectVal.length) {
+        newArr = [{
+          value: '',
+          title: '',
+          selectVal: []
+        }]
+      } else {
+        citem.params[0].selectVal.forEach(item => {
+          newArr.push({
+            value: item,
+            title: ''
+          })
+        })
+        newArr.splice(0, 1, { ...newArr[0], selectVal: citem.params[0].selectVal })
+      }
+      this.updateRulesArr(data, citem, { params: newArr })
+    },
     getRuleTemplateItem() {
-      // 条件模板
+      //一级 二级条件模板
       return {
         type: "rule",
         func: "", //选择的时间类型
@@ -134,6 +341,33 @@ export default {
         eventType: "", //事件类型
         funcType: "", //总次数比较类型
         sumtimes: "", //总次数
+        childrenRules: [], //第三层数组
+        params: [
+          {
+            value: "",
+            title: ""
+          }
+        ]
+      };
+    },
+    getThirdRuleTemplateItem() {
+      // 三级条件模板
+      return {
+        type: "children_rule",
+        fieldType: "",
+        fieldCode: null,
+        format: "",
+        func: "",
+        sourceTable: "",
+        fieldId: "",
+        englishName: "",
+        indexList: this.indexList, // 指标下拉选
+        enumTypeNum: "",
+        selectOperateList: [], // 操作符下拉选
+        selectEnumsList: [], // 内容下拉选
+        subFunc: "",
+        dateDimension: "",
+        strTips: [],
         params: [
           {
             value: "",
@@ -150,28 +384,23 @@ export default {
       var expStrTemp = "";
       let relation = arr.relation;
       function _find(arr, position) {
+        var temp = "";
         var exp = [];
         var expTemp = [];
-        var temp = "";
-        var extArr = [];
         arr.rules.forEach((item, index) => {
           if (position != undefined) {
             temp = position + "_" + index;
           } else {
             temp = index + "";
           }
-          item.temp = temp;
           if (!item.rules) {
-            extArr = extArr.concat(item);
             if (!type || type !== "switch") {
               // 切换且或时，不需要再重新赋值
-              let id = "";
-              extArr.forEach((extitem, extindex) => {
-                if (item.temp === extitem.temp) {
-                  id = getAbc(extindex);
-                  item.ruleCode = id;
-                }
-              });
+              let tempArr = temp.split("_");
+              let id =
+                getAbc(tempArr[0]) +
+                tempArr.join("").substring(tempArr[0].length);
+              item.ruleCode = id;
             }
             // 获取表达式
             if (position != undefined) {
@@ -197,22 +426,16 @@ export default {
             }
             // 获取表达式end
           } else {
-						extArr = extArr.concat(item.rules);
-            let id = "";
-            extArr.forEach((extitem, extindex) => {
-              item.rules.forEach((itemRules, indexRules) => {
-                if (itemRules.temp === extitem.temp) {
-                  id = getAbc(extindex);
-									itemRules.ruleCode = id;
-                }
-              });
-						});
-						temp = _find(item, temp);
+            let tempArr = temp.split("_");
+            let id =
+              getAbc(tempArr[0]) +
+              tempArr.join("").substring(tempArr[0].length);
+            item.ruleCode = id;
+            temp = _find(item, temp);
           }
         });
       }
-			_find(arr, position);
-			console.log('arr: ', arr);
+      _find(arr, position);
       this.expression = expStr;
       this.expressionTemplate = expStrTemp;
       if (type !== "switch") {
@@ -235,6 +458,27 @@ export default {
       let rules1 = arr.rules[0];
       arr.rules.splice(0, 1, rules1); // 强制更新一下数组
       this.ruleConfig = arr;
+    },
+     updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
+      let params = [{ value: '', title: '' }]
+      if (citem.func === 'between' || citem.func === 'relative_time_in') {
+        params.push({ value: '', title: '' })
+      }
+      let subSelects = []
+      let subFunc = ''
+      let subTimeSelects = []
+      let dateDimension = ''
+      if (citem.func === 'relative_time') {
+        // subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
+        subFunc = 'relative_before'
+        // subTimeSelects = this.subTimeSelects
+        dateDimension = 'DAYS'
+      }
+      if (citem.func === 'relative_times') {
+        // subTimeSelects = this.subTimeSelects
+        dateDimension = 'DAYS'
+      }
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension })
     },
     updateDateTimeChange(data, citem) {
       // 处理一下时间内容，时间插件v-show后与其他输入框不能共用一个参数
@@ -275,6 +519,20 @@ export default {
       }
       this.updateConditionId(this.ruleConfig);
     },
+    addThirdChildrenRules(data, citem) {
+      //添加三级子条件
+      let indexPath = findRuleIndex(data.rules, citem) + "";
+      let indexPathArr = indexPath.split(",");
+      if (indexPathArr.length === 1) {
+        data.rules[indexPathArr[0]].childrenRules.push(
+          this.getThirdRuleTemplateItem()
+        );
+      } else {
+        data.rules[indexPathArr[0]].rules[indexPathArr[1]].childrenRules.push(
+          this.getThirdRuleTemplateItem()
+        );
+      }
+    },
     deleteRules(data, citem) {
       // 删除规则
       let indexPath = findRuleIndex(data.rules, citem) + "";
@@ -290,6 +548,18 @@ export default {
         }
       }
       this.updateConditionId(this.ruleConfig);
+    },
+    deleteChildrenRules(data, childrenRules, citem, cindex) {
+      let indexPath = findRuleIndex(data.rules, childrenRules) + "";
+      let indexPathArr = indexPath.split(",");
+      if (indexPathArr.length === 1) {
+        data.rules[indexPathArr[0]].childrenRules.splice(cindex, 1);
+      } else {
+        data.rules[indexPathArr[0]].rules[indexPathArr[1]].childrenRules.splice(
+          cindex,
+          1
+        );
+      }
     },
     switchSymbol(ruleCode, data) {
       // 切换且或
