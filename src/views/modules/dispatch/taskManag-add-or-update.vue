@@ -329,7 +329,7 @@ export default {
         if (id) {
           setTimeout(() => {
             this.getInfo()
-          }, 200)
+          }, 500)
         }
         this.$refs['dataForm1'].resetFields()
         this.$refs['dataForm2'].resetFields()
