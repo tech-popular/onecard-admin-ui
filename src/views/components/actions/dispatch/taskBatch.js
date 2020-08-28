@@ -96,7 +96,7 @@ export const models = {
           }
         },
         {
-          prop: 'taskNo',
+          prop: 'dolphinInstanceId',
           label: '任务批次',
           align: 'center'
         },

@@ -318,16 +318,18 @@ export default {
     }
   },
   methods: {
-    async init (id) {
+    init (id) {
       this.id = id ? id.id : ''
       this.getAllSystem()
-      await this.getAllDatasource('ACQUISITION', 'IN')
-      await this.getAllDatasource('ACQUISITION', 'OUT')
+      this.getAllDatasource('ACQUISITION', 'IN')
+      this.getAllDatasource('ACQUISITION', 'OUT')
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
         if (id) {
-          this.getInfo()
+          setTimeout(() => {
+            this.getInfo()
+          }, 200)
         }
         this.$refs['dataForm1'].resetFields()
         this.$refs['dataForm2'].resetFields()

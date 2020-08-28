@@ -75,6 +75,12 @@ export const models = {
           id: 3,
           label: '执行任务',
           type: 'default',
+          disabled: (id) => {
+            if (id.dispatchStatus === 1) {
+              return true
+            }
+            return false
+          },
           method: (id) => {
             this.taskExecuteHandle(id)
           }
