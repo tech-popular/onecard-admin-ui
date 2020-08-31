@@ -120,19 +120,22 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <!-- <div style="display:flex" v-if="collisionData.length"> -->
-            <el-form-item :label="item.paramTitle" :prop="item.paramName" v-for="(item, index) in collisionData" :key="index" :rules="{ required: true, message: item.allowMulti && !item.isEnum ? `请输入${item.paramTitle}，可用回车输入多条` : '请选择' + item.paramTitle, trigger: 'change' }">
-              <input-tag v-model="rejectForm[item.paramName]" v-if="item.allowMulti && !item.isEnum" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag reject-pane-item" :placeholder="`请输入${item.paramTitle}，可用回车输入多条`"></input-tag>
-              <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle"  class="reject-pane-item">
-                <el-option
-                  v-for="citem in item.options"
-                  :key="citem.value"
-                  :label="citem.text"
-                  :value="citem.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <!-- </div> -->
+            <div style="display:flex;width:100%" v-if="collisionData.length">
+              <div style="width:160px;text-align:right;padding-right:10px;">{{collisionPackText}}</div>
+              <el-card class="box-card" shadow="never" style="width:560px">
+                <el-form-item :label="item.paramTitle" :prop="item.paramName" v-for="(item, index) in collisionData" :key="index" :rules="{ required: true, message: item.allowMulti && !item.isEnum ? `请输入${item.paramTitle}，可用回车输入多条` : '请选择' + item.paramTitle, trigger: 'change' }">
+                  <input-tag v-model="rejectForm[item.paramName]" v-if="item.allowMulti && !item.isEnum" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag reject-pane-item1" :placeholder="`请输入${item.paramTitle}，可用回车输入多条`"></input-tag>
+                  <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle"  class="reject-pane-item1">
+                    <el-option
+                      v-for="citem in item.options"
+                      :key="citem.value"
+                      :label="citem.text"
+                      :value="citem.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-card>
+            </div>
           </el-form>
         </div>
       </div>
@@ -209,6 +212,7 @@ export default {
         vestPackCode: [],
         collisionPackId: ''
       },
+      collisionPackText: '',
       baseRule: { // 基本信息校验规则
         name: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
@@ -434,6 +438,7 @@ export default {
       })
     },
     collisionPackIdChange (val) {
+      this.collisionPackText = this.collisionList.filter(item => item.value === val)[0].text
       this.getCollisionParams()
     },
     getCollisionParams () {
@@ -442,6 +447,7 @@ export default {
           if (!data.data.length) return
           this.collisionData = data.data
           this.rejectForm.collisionPackId = data.data[0].collisionPackId
+          this.collisionPackText = this.collisionList.filter(item => item.value === this.rejectForm.collisionPackId)[0].text
           data.data.forEach(item => {
             if (item.allowMulti && !item.isEnum) {
               this.$set(this.rejectForm, item.paramName, item.value ? item.value.split(',') : '')
@@ -932,7 +938,6 @@ export default {
       })
     },
     saveCollision () {
-      console.log(2222222, this.id)
       let url = collisionSave
       let params = this.collisionData
       params.forEach(item => {
@@ -1223,6 +1228,9 @@ export default {
   }
   .insight-manage-drawer .reject-pane-item {
     width:50%
+  }
+  .insight-manage-drawer .reject-pane-item1 {
+    width:80%
   }
   .inputTag {
     display: inline-block;
