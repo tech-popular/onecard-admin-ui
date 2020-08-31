@@ -184,6 +184,7 @@
 </template>
 
 <script>
+import { deepClone } from '@/utils'
 import { info, save, update, projectAll, dataSourceAll, accountAll, sqlParse } from '@/api/dispatch/taskManag'
 import InputTag from '../dataAnalysis/components/InputTag'
 import { codemirror } from 'vue-codemirror'
@@ -211,7 +212,8 @@ export default {
       toDs: '',
       updateUser: '',
       updateTime: '',
-      dataForm: {
+      dataForm: {},
+      tempDataForm: {
         taskName: '',
         id: '',
         projectId: '',
@@ -339,6 +341,7 @@ export default {
   methods: {
     init (id) {
       this.id = id ? id.id : ''
+      this.dataForm = deepClone(this.tempDataForm)
       this.getAllSystem()
       this.getAllDatasource('ACQUISITION', 'IN')
       this.getAllDatasource('ACQUISITION', 'OUT')
