@@ -306,7 +306,7 @@ export default {
         callback()
       }
     },
-    initEmptyDat () {
+    initEmptyData () {
       // 当数据异常时，初始化数据
       this.baseForm = {
         name: '',
