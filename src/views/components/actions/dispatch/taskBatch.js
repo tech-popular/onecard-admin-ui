@@ -115,11 +115,11 @@ export const models = {
           label: '任务状态',
           align: 'center'
         },
-        {
-          prop: 'dispatchLeader',
-          label: '调度负责人',
-          align: 'center'
-        },
+        // {
+        //   prop: 'dispatchLeader',
+        //   label: '调度负责人',
+        //   align: 'center'
+        // },
         {
           prop: 'dispatcherIp',
           label: '触发机器',
@@ -131,7 +131,7 @@ export const models = {
         taskName: '',
         taskId: '',
         taskType: '-1',
-        dispatchLeader: '',
+        // dispatchLeader: '',
         projectId: '-1',
         runStatus: '-1'
       },
@@ -139,7 +139,7 @@ export const models = {
         {type: 'Input', label: '任务ID', prop: 'taskId', width: '300px', placeholder: '任务ID'},
         {type: 'Input', label: '任务名称', prop: 'taskName', width: '300px', placeholder: '请输入名称'},
         {type: 'Select', label: '任务类型', prop: 'taskType', width: '300px', options: type, props: defaultProps, change: row => '', placeholder: '请选择任务类型'},
-        {type: 'Input', label: '调度负责人', prop: 'dispatchLeader', width: '300px', placeholder: '创建人'},
+        // {type: 'Input', label: '调度负责人', prop: 'dispatchLeader', width: '300px', placeholder: '创建人'},
         {type: 'Select', label: '所属项目/平台', prop: 'projectId', width: '300px', options: projectProps, props: projectProps, change: row => '', placeholder: '请选择起停状态'},
         {type: 'Select', label: '任务状态', prop: 'runStatus', width: '300px', options: status, props: defaultProps, change: row => '', placeholder: '请选择起停状态'}
       ],
@@ -172,7 +172,7 @@ export const models = {
         'taskId': this.searchData.taskId,
         'taskName': this.searchData.taskName,
         'taskType': this.searchData.taskType === '-1' ? '' : this.searchData.taskType,
-        'dispatchLeader': this.searchData.dispatchLeader,
+        // 'dispatchLeader': this.searchData.dispatchLeader,
         'projectId': this.searchData.projectId === '-1' ? '' : this.searchData.projectId,
         'runStatus': this.searchData.runStatus === '-1' ? '' : this.searchData.runStatus
       }
@@ -181,7 +181,8 @@ export const models = {
     getAllSystem () {
       projectAll().then(({data}) => {
         this.allSystemList = [ { projectSystemName: '全部', id: '-1' }, ...data.data ]
-        this.searchForm.splice(4, 1, { ...this.searchForm[4], options: this.allSystemList })
+        let curIndex = this.searchForm.findIndex(item => item.prop === 'projectId')
+        this.searchForm.splice(curIndex, 1, { ...this.searchForm[curIndex], options: this.allSystemList })
         console.log(this.searchForm, this.allSystemList)
       })
     },
@@ -197,7 +198,7 @@ export const models = {
         taskId: '',
         taskName: '',
         taskType: '-1',
-        dispatchLeader: '',
+        // dispatchLeader: '',
         projectId: '-1',
         runStatus: '-1'
       }

@@ -90,6 +90,17 @@
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px">
         <div class="work-type-pane">
+          <el-form-item label="失败重跑：" prop="isRunAgain">
+            <el-radio-group v-model="dataForm.isRunAgain">
+              <el-radio :label="0">是</el-radio>
+              <el-radio :label="1">否</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item prop="failRepeatTrigger" label-width="120px" v-if="dataForm.isRunAgain === 0">
+            重跑：<el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
+          </el-form-item>
+        </div>
+        <div class="work-type-pane">
           <el-form-item label="状态：" prop="taskDisable" label-width="120px">
             <el-radio-group v-model="dataForm.taskDisable">
               <el-radio :label="0">有效</el-radio>
@@ -169,7 +180,9 @@ export default {
         projectId: '',
         taskDescribe: '',
         taskDisable: 0,
-        requestedUser: ''
+        requestedUser: '',
+        failRepeatTrigger: 3,
+        isRunAgain: 1
       },
       calculateTasks: [],
       tempCalculateTasks: [
@@ -212,6 +225,12 @@ export default {
         ],
         taskDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
+        ],
+        isRunAgain: [
+          {required: true, message: '请选择', trigger: 'change'}
+        ],
+        failRepeatTrigger: [
+          {required: true, message: '请输入重跑次数', trigger: 'change'}
         ]
       },
       allSystemList: [],
@@ -287,6 +306,14 @@ export default {
             this.dataForm.projectId = data.data.projectId
             this.dataForm.taskDisable = data.data.taskDisable
             this.dataForm.requestedUser = data.data.requestedUser
+            // 是否重跑判断
+            if (data.data.failRepeatTrigger !== 0) {
+              this.dataForm.isRunAgain = 0
+              this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
+            } else {
+              this.dataForm.isRunAgain = 1
+              this.dataForm.failRepeatTrigger = 3
+            }
             this.calculateTasks = data.data.calculateTasks
             this.calculateTasks.forEach((item, index) => {
               let filterArr = this.allDatasourceList.filter(citem => citem.name === item.jobType)[0]
@@ -537,12 +564,18 @@ export default {
         if (this.dataForm.id) {
           url = update
         }
-        url({
+        let params = {
           ...this.dataForm,
           taskName: `${this.formDs}_${this.dataForm.taskName}`,
           taskType: 'CALCULATE',
           calculateTasks: this.calculateTasks
-        }).then(({data}) => {
+        }
+        if (params.isRunAgain === 0) {
+          params.failRepeatTrigger = params.failRepeatTrigger
+        } else {
+          params.failRepeatTrigger = 0
+        }
+        url(params).then(({data}) => {
           if (data && data.code === 0) {
             this.$message({
               message: data.msg || '操作成功"',

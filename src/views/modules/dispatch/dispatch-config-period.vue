@@ -118,7 +118,7 @@
             placeholder="时:分:秒">
           </el-time-picker>
         </el-form-item>
-        <div class="work-type-pane">
+        <!-- <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
             <el-radio-group v-model="dispatchTimeForm.isRunAgain">
               <el-radio :label="0">是</el-radio>
@@ -128,7 +128,7 @@
           <el-form-item prop="failRepeatTrigger" label-width="60px" v-if="dispatchTimeForm.isRunAgain === 0">
             重跑<el-input-number v-model="dispatchTimeForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
           </el-form-item>
-        </div>
+        </div> -->
     </el-form>
   </div>
 </template>
@@ -173,9 +173,9 @@ export default {
         latestTime: '',
         cron: '',
         dayOfWeeks: [], // 周
-        dayOfMonths: [], // 月
-        failRepeatTrigger: 3,
-        isRunAgain: 1
+        dayOfMonths: [] // 月
+        // failRepeatTrigger: 3,
+        // isRunAgain: 1
       },
       disIntervalMess: '分钟',
       timeIntervalList: [],
@@ -226,12 +226,12 @@ export default {
         endTime: [
           { required: true, validator: validateTime }
         ],
-        isRunAgain: [
-          {required: true, message: '请选择', trigger: 'change'}
-        ],
-        failRepeatTrigger: [
-          {required: true, message: '请输入重跑次数', trigger: 'change'}
-        ],
+        // isRunAgain: [
+        //   {required: true, message: '请选择', trigger: 'change'}
+        // ],
+        // failRepeatTrigger: [
+        //   {required: true, message: '请输入重跑次数', trigger: 'change'}
+        // ],
         latestTime: [
           {required: true, message: '请选择', trigger: 'change'}
         ],
@@ -287,13 +287,13 @@ export default {
               }
             }
             // 是否重跑判断
-            if (data.data.failRepeatTrigger !== 0) {
-              this.dispatchTimeForm.isRunAgain = 0
-              this.dispatchTimeForm.failRepeatTrigger = data.data.failRepeatTrigger
-            } else {
-              this.dispatchTimeForm.isRunAgain = 1
-              this.dispatchTimeForm.failRepeatTrigger = 3
-            }
+            // if (data.data.failRepeatTrigger !== 0) {
+            //   this.dispatchTimeForm.isRunAgain = 0
+            //   this.dispatchTimeForm.failRepeatTrigger = data.data.failRepeatTrigger
+            // } else {
+            //   this.dispatchTimeForm.isRunAgain = 1
+            //   this.dispatchTimeForm.failRepeatTrigger = 3
+            // }
           }
         } else {
           this.$message.error(data.msg)
@@ -353,11 +353,11 @@ export default {
           postData.cron = data.cron
         }
       }
-      if (data.isRunAgain === 0) {
-        postData.failRepeatTrigger = data.failRepeatTrigger
-      } else {
-        postData.failRepeatTrigger = 0
-      }
+      // if (data.isRunAgain === 0) {
+      //   postData.failRepeatTrigger = data.failRepeatTrigger
+      // } else {
+      //   postData.failRepeatTrigger = 0
+      // }
       // 组织内层数据
       postData.taskScheduleConfig = {}
       if (data.jobType == 1) {

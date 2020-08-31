@@ -153,6 +153,17 @@
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px">
         <div class="work-type-pane">
+          <el-form-item label="失败重跑：" prop="isRunAgain">
+            <el-radio-group v-model="dataForm.isRunAgain">
+              <el-radio :label="0">是</el-radio>
+              <el-radio :label="1">否</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item prop="failRepeatTrigger" label-width="120px" v-if="dataForm.isRunAgain === 0">
+            重跑：<el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
+          </el-form-item>
+        </div>
+        <div class="work-type-pane">
           <el-form-item label="状态：" prop="taskDisable" label-width="120px">
             <el-radio-group v-model="dataForm.taskDisable">
               <el-radio :label="0">有效</el-radio>
@@ -206,7 +217,9 @@ export default {
         projectId: '',
         taskDescribe: '',
         taskDisable: 0,
-        requestedUser: ''
+        requestedUser: '',
+        failRepeatTrigger: 3,
+        isRunAgain: 1
       },
       acquisitionTask: {
         inDatasourceType: '',
@@ -268,6 +281,12 @@ export default {
         ],
         addRuleFields: [
            { required: true, message: '请输入增量规则', trigger: 'blur' }
+        ],
+        isRunAgain: [
+          {required: true, message: '请选择', trigger: 'change'}
+        ],
+        failRepeatTrigger: [
+          {required: true, message: '请输入重跑次数', trigger: 'change'}
         ]
       },
       allSystemList: [],
@@ -341,7 +360,12 @@ export default {
       this.loading = true
       info(this.id).then(({data}) => {
         if (data.code !== 0) {
+          this.loading = false
           return this.$message.error(data.msg || '获取数据异常')
+        }
+        if (!data.data.acquisitionTask) {
+          this.loading = false
+          return this.$message.error('获取数据异常')
         }
         this.updateUser = data.data.updateUser
         this.updateTime = data.data.updateTime
@@ -350,10 +374,16 @@ export default {
         this.dataForm.taskDescribe = data.data.taskDescribe
         this.dataForm.taskDisable = data.data.taskDisable
         this.dataForm.requestedUser = data.data.requestedUser
+        // 是否重跑判断
+        if (data.data.failRepeatTrigger !== 0) {
+          this.dataForm.isRunAgain = 0
+          this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
+        } else {
+          this.dataForm.isRunAgain = 1
+          this.dataForm.failRepeatTrigger = 3
+        }
         this.acquisitionTask = data.data.acquisitionTask
         this.acquisitionTask.sqlField = this.acquisitionTask.sqlField.split(',')
-        console.log(this.getAllinDatasourceList, this.acquisitionTask.inDatasourceType)
-        console.log(this.getAlloutDatasourceList, this.acquisitionTask.outDatasourceType)
         let filterInArr = this.getAllinDatasourceList.filter(item => item.name === this.acquisitionTask.inDatasourceType)[0]
         let filterOutArr = this.getAlloutDatasourceList.filter(item => item.name === this.acquisitionTask.outDatasourceType)[0]
         this.getAllinDatasourceNameList = filterInArr.source
@@ -485,12 +515,18 @@ export default {
         if (this.dataForm.id) {
           url = update
         }
-        url({
+        let params = {
           ...this.dataForm,
           taskName: `${this.formDs}_to_${this.toDs}_${this.dataForm.taskName}`,
           taskType: 'ACQUISITION',
           acquisitionTask: { ...this.acquisitionTask, sqlField: this.acquisitionTask.sqlField.join(',') }
-        }).then(({data}) => {
+        }
+        if (params.isRunAgain === 0) {
+          params.failRepeatTrigger = params.failRepeatTrigger
+        } else {
+          params.failRepeatTrigger = 0
+        }
+        url(params).then(({data}) => {
           if (data && data.code === 0) {
             this.$message({
               message: data.msg || '操作成功',
