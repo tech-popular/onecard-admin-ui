@@ -293,7 +293,6 @@ export default {
       if (!tag) {
         this.loading = false
         this.drawerTitle = '新增'
-
         this.initEmptyData()
       } else {
         this.id = row.id
@@ -591,9 +590,11 @@ export default {
         })
         if (!flag) {
           this.$refs.userAttrRule.isRequired = false
+          this.$refs.userActionRule.isRequired = false
         } else {
           // 全部校验通过后，可保存数据
           this.$refs.userAttrRule.uneffectIndexValidate()
+          this.$refs.userActionRule.uneffectIndexValidate()
           let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
             code = 1
@@ -601,6 +602,7 @@ export default {
           let params = {
             ...this.baseForm,
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
+            // ...this.$refs.userActionRule.lastSubmitRuleConfig,
             ...this.rejectForm,
             rejectGroupPackCode: code
           }

@@ -22,7 +22,7 @@
               :load-options="loadOptions"
               noChildrenText="暂无数据"
               placeholder="请选择指标"
-              @select="node => fieldCodeChange(node, item)"
+              @select="node => fieldCodeChange(node, item, index)"
               class="tree-select"
               :disabled="from === 'api'"
             />
@@ -34,11 +34,11 @@
             <el-select
               v-model="item.func"
               class="itemOperateIput"
-              @change="data => selectOperateChange(data, item)"
+              @change="data => selectOperateChange(data, item, index)"
               @visible-change="data => selectOperateVisible(data, item)"
             >
               <el-option
-                v-for="(fitem, findex) in selectOperateList"
+                v-for="(fitem, findex) in item.selectOperateList"
                 :value="fitem.code"
                 :key="findex"
                 :label="fitem.title"
@@ -321,7 +321,7 @@
             <span v-if="from !== 'api'">
               <i
                 class="el-icon-close cursor-pointer"
-                @click="deleteChildrenRules(data,item, index)"
+                @click="deleteChildrenRules(data, item, index)"
               ></i>
             </span>
           </el-form-item>
@@ -334,7 +334,7 @@
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import InputTag from '../components/InputTag'
 export default {
-  name: 'rulesSet',
+  name: 'thirdRulesSet',
   props: {
     data: {
       type: Object
@@ -360,30 +360,7 @@ export default {
       ttt: [],
       multipleList: [],
       parent: null,
-      selectOperateList: [
-        { code: 'eq', title: '等于', subSelects: null },
-        { code: 'neq', title: '不等于', subSelects: null },
-        { code: 'gt', title: '大于', subSelects: null },
-        { code: 'lt', title: '小于', subSelects: null },
-        { code: 'ge', title: '大于等于', subSelects: null },
-        { code: 'le', title: '小于等于', subSelects: null },
-        { code: 'between', title: '介于', subSelects: null },
-        {
-          code: 'relative_time',
-          subSelects: [
-            { code: 'relative_before', title: '之前', subSelects: null },
-            { code: 'relative_within', title: '之内', subSelects: null }
-          ],
-          title: '相对当前时间点'
-        },
-        {
-          code: 'relative_time_in',
-          title: '相对当前时间区间',
-          subSelects: null
-        },
-        { code: 'null', title: 'NULL', subSelects: null },
-        { code: 'not_null', title: 'NOT NULL', subSelects: null }
-      ],
+      selectOperateList: [],
       tips: {
         relative_within_DAYS:
           '举例：若当前时间为02-26 12:10，则过去1天内为 [02-25 00:00, 02-25 23:59]，过去0天内为 [02-26 00:00, 02-26 12:10]',
@@ -417,7 +394,7 @@ export default {
   components: { Treeselect, InputTag },
   methods: {
     updateDateDimension (val, ruleItem) {
-      this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, {
+      this.parent.updateRulesArr(this.parent.actionRuleConfig, ruleItem, {
         dateDimension: val
       })
     },
@@ -516,7 +493,7 @@ export default {
     deleteChildrenRules (data, item, index) {
       // 删除条件
       this.parent.deleteChildrenRules(
-        this.parent.ruleConfig,
+        this.parent.actionRuleConfig,
         data,
         item,
         index
@@ -524,19 +501,11 @@ export default {
     },
     switchSymbol (ruleCode) {
       // 切换且或
-      this.parent.switchSymbol(ruleCode, this.parent.ruleConfig)
+      this.parent.switchSymbol(ruleCode, this.parent.actionRuleConfig)
     },
-    fieldCodeChange (node, ruleItem) {
-      ruleItem.label = node.label
-      ruleItem.englishName = node.englishName
-      ruleItem.fieldType = node.fieldType
-      ruleItem.enumTypeNum = node.enumTypeNum
-      ruleItem.sourceTable = node.sourceTable
-      ruleItem.fieldId = node.fieldId
-      ruleItem.format = node.dataStandar
-      ruleItem.enable = node.enable
+    fieldCodeChange (node, ruleItem, index) {
       // 指标改变时，对应的操作符也更新
-      this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, {
+      this.parent.fieldCodeChange(this.data, ruleItem, {
         label: node.label,
         englishName: node.englishName,
         fieldType: node.fieldType,
@@ -545,11 +514,11 @@ export default {
         fieldId: node.fieldId,
         format: node.dataStandar,
         enable: node.enable
-      })
+      }, index)
     },
-    selectOperateChange (val, ruleItem) {
+    selectOperateChange (val, ruleItem, index) {
       // 操作符改变时，数据清空，重新输入
-      this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
+      this.parent.updateChildrenOperateChange(this.data, ruleItem, index)
       if (ruleItem.fieldType === 'date') {
         // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
         this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
@@ -563,7 +532,7 @@ export default {
         this.parent.getSelectOperateList(
           ruleItem.fieldType,
           selectOperateList => {
-            this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, {
+            this.parent.updateRulesArr(this.parent.actionRuleConfig, ruleItem, {
               selectOperateList: selectOperateList
             })
           }
@@ -574,23 +543,23 @@ export default {
       // 当下拉框打开时，重新请求数据
       if (val) {
         // 打开下拉框时
-        this.parent.getRulesEnumsList(this.parent.ruleConfig, ruleItem)
+        this.parent.getRulesEnumsList(this.parent.actionRuleConfig, ruleItem)
       }
     },
     selectEnumsChange (val, ruleItem) {
       // 处理一下多选的数据
-      this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem)
+      this.parent.updateEnumsChange(this.parent.actionRuleConfig, ruleItem)
     },
     selectDateTimeChange (val, ruleItem) {
       // 处理一下时间数据
-      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem)
+      this.parent.updateDateTimeChange(this.parent.actionRuleConfig, ruleItem)
     },
     inputTagChange (ruleItem, type) {
       if (ruleItem.params[0].selectVal.length) {
         // 如果已经有输入的值则清空报错提示
         this.$refs[type + 'MultiVal' + ruleItem.ruleCode][0].clearValidate()
       }
-      this.parent.updateEnumsChange(this.parent.ruleConfig, ruleItem)
+      this.parent.updateEnumsChange(this.parent.actionRuleConfig, ruleItem)
     },
     isDateSingleShow (item) {
       // 单时间日期是否显示
@@ -632,7 +601,7 @@ export default {
 .pane-rules-content {
   position: relative;
   display: flex;
-  margin-left: 100px;
+  margin-left: 80px;
 }
 .pane-rules-content .el-form-item {
   margin-bottom: 25px;
@@ -693,7 +662,7 @@ export default {
   user-select: none;
 }
 .tree-select {
-  width: 290px;
+  width: 280px;
   line-height: 38px;
 }
 .pane-rules-inline {
@@ -710,19 +679,19 @@ export default {
   width: 140px;
 }
 .subSelect1 {
-  width: 80px;
+  width: 70px;
 }
 .itemIput-big {
   width: 372px;
 }
 .itemIput-small {
-  width: 110px;
+  width: 70px;
 }
 .itemIput-number {
   width: 200px;
 }
 .itemOperateIput {
-  width: 180px;
+  width: 160px;
 }
 .pane-rules-datetime {
   position: relative;

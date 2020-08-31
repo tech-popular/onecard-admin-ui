@@ -6,16 +6,16 @@
           <!-- <div slot="content"  class="tips-content"></div> -->
           <i class="el-icon-info cursor-pointer" style="color:#409eff; margin-right:60px;"></i>
         </el-tooltip>
-        <el-input v-model="expression" disabled style="width: 800px" />
+        <el-input v-model="actionExpression" disabled style="width: 800px" />
       </el-form-item>
       <el-form-item style="float:right">
         <i class="el-icon-circle-plus cursor-pointer" @click="addRules" v-if="from !== 'api'">添加</i>
       </el-form-item>
     </el-form>
-    <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
+    <div v-if="actionRuleConfig.rules && actionRuleConfig.rules.length > 0">
       <action-data-rules-set
-        :data="ruleConfig"
-        ref="rulesSet"
+        :data="actionRuleConfig"
+        ref="actionRulesSet"
         :is-require="isRequired"
         :from="from"
       ></action-data-rules-set>
@@ -51,9 +51,9 @@ export default {
     return {
       isTreeRoot: true, // 父根节点
       channelId: '',
-      expression: '',
-      expressionTemplate: '',
-      ruleConfig: {
+      actionExpression: '',
+      actionExpressionTemplate: '',
+      actionRuleConfig: {
         // 规则数据
         ruleCode: 'rule_all',
         type: 'rules_function',
@@ -63,34 +63,34 @@ export default {
       isRequired: true,
       indexList: [],
       isSelectedUneffectIndex: [],
-      lastSubmitRuleConfig: {}
-      // subTimeSelects: [
-      //   {
-      //     code: 'DAYS',
-      //     title: '天'
-      //   },
-      //   {
-      //     code: 'HOURS',
-      //     title: '小时'
-      //   }
-      //   // {
-      //   //   code: 'MINUTES', title: '分钟'
-      //   // }
-      // ]
+      lastSubmitRuleConfig: {},
+      subTimeSelects: [
+        {
+          code: 'DAYS',
+          title: '天'
+        },
+        {
+          code: 'HOURS',
+          title: '小时'
+        }
+        // {
+        //   code: 'MINUTES', title: '分钟'
+        // }
+      ]
     }
   },
   methods: {
     init () {
       this.getSelectAllCata()
-      this.ruleConfig = {
+      this.actionRuleConfig = {
         // 规则数据
         ruleCode: 'rule_all',
         type: 'rules_function',
         relation: 'and',
         rules: []
       }
-      this.expression = ''
-      this.expressionTemplate = ''
+      this.actionExpression = ''
+      this.actionExpressionTemplate = ''
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
     },
     getSelectAllCata (fn) {
@@ -114,15 +114,14 @@ export default {
         if (indexList.length === 0) {
           this.setInitRulesConfig(this.indexList)
         } else {
-          this.ruleConfig = this.updateInitRulesConfig(
-            this.ruleConfig,
+          this.actionRuleConfig = this.updateInitRulesConfig(
+            this.actionRuleConfig,
             indexList
           )
           this.setInitRulesConfig(this.indexList)
         }
       })
     },
-
     filterAllCata (tree) {
       // 清洗数据，按selectVue的格式重新组织指标数据
       let arr = []
@@ -171,11 +170,11 @@ export default {
     setInitRulesConfig (indexList) {
       // 将规则初始化
       this.indexList = indexList
-      if (this.ruleConfig.rules.length) {
-        this.ruleConfig.rules = []
-        this.ruleConfig.rules.push(this.getRuleTemplateItem())
+      if (this.actionRuleConfig.rules.length) {
+        this.actionRuleConfig.rules = []
+        this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
       }
-      this.updateConditionId(this.ruleConfig)
+      this.updateConditionId(this.actionRuleConfig)
     },
     updateInitRulesConfig (arr, indexList) {
       // 获取指标默认展开列表
@@ -242,9 +241,9 @@ export default {
     renderData (data, channelId) {
       this.channelId = channelId
       let configJson = JSON.parse(data)
-      this.ruleConfig = configJson.ruleConfig
-      this.expression = configJson.expression
-      this.expressionTemplate = configJson.expressionTemplate
+      this.actionRuleConfig = configJson.actionRuleConfig
+      this.actionExpression = configJson.actionExpression
+      this.actionExpressionTemplate = configJson.actionExpressionTemplate
       this.$nextTick(() => {
         // 默认将验证错误信息全部清除
         let ruleFormArr = this.getRuleForm()
@@ -254,10 +253,10 @@ export default {
       })
     },
     renderApiData (data) {
-      this.ruleConfig = data.ruleConfig
-      this.expression = data.expression
+      this.actionRuleConfig = data.actionRuleConfig
+      this.actionExpression = data.actionExpression
     },
-    fieldCodeChange (data, citem, obj) { // rxs更新数据
+    fieldCodeChange (data, citem, obj, index) { // rxs更新数据
       this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
         let params = {
           selectOperateList: selectOperateList,
@@ -291,10 +290,10 @@ export default {
             if (data.status * 1 === 1 && data.data.length) {
               params.strTips = data.data
             }
-            this.updateRulesArr(res, citem, params)
+            this.updateChildrenRulesArr(res, citem, params, index)
           })
         } else {
-          this.updateRulesArr(data, citem, params)
+          this.updateChildrenRulesArr(data, citem, params, index)
         }
       })
     },
@@ -364,7 +363,7 @@ export default {
       }
     },
     updateConditionId (arr, position, type) {
-      // 每次增删时，遍历一下ruleConfig,更改每个条件的ruleCode   type:增，删，切换且或
+      // 每次增删时，遍历一下actionRuleConfig,更改每个条件的ruleCode   type:增，删，切换且或
       var expArr = []
       var expStr = ''
       var expArrTemp = []
@@ -423,10 +422,10 @@ export default {
         })
       }
       _find(arr, position)
-      this.expression = expStr
-      this.expressionTemplate = expStrTemp
+      this.actionExpression = expStr
+      this.actionExpressionTemplate = expStrTemp
       if (type !== 'switch') {
-        this.ruleConfig = arr
+        this.actionRuleConfig = arr
       }
     },
     updateRulesArr (arr, citem, obj) {
@@ -444,7 +443,7 @@ export default {
       })
       let rules1 = arr.rules[0]
       arr.rules.splice(0, 1, rules1) // 强制更新一下数组
-      this.ruleConfig = arr
+      this.actionRuleConfig = arr
     },
     updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
       let params = [{ value: '', title: '' }]
@@ -461,14 +460,41 @@ export default {
         // subTimeSelects = this.subTimeSelects
         dateDimension = 'DAYS'
       }
-      if (citem.func === 'relative_times') {
+      if (citem.func === 'relative_time_in') {
         // subTimeSelects = this.subTimeSelects
         dateDimension = 'DAYS'
       }
       this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension })
     },
+    updateChildrenOperateChange (data, citem, index) {
+      let params = [{ value: '', title: '' }]
+      if (citem.func === 'between' || citem.func === 'relative_time_in') {
+        params.push({ value: '', title: '' })
+      }
+      let subSelects = []
+      let subFunc = ''
+      let subTimeSelects = []
+      let dateDimension = ''
+      if (citem.func === 'relative_time') {
+        subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
+        subFunc = 'relative_before'
+        subTimeSelects = this.subTimeSelects
+        dateDimension = 'DAYS'
+      }
+      if (citem.func === 'relative_time_in') {
+        subTimeSelects = this.subTimeSelects
+        dateDimension = 'DAYS'
+      }
+      this.updateChildrenRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension }, index)
+    },
+    updateChildrenRulesArr (data, citem, obj, index) {
+      Object.keys(obj).forEach(oitem => {
+        citem[oitem] = obj[oitem]
+      })
+      data.childrenRules.splice(index, 1, citem)
+    },
     updateDateTimeChange (data, citem) {
-      // 处理一下时间内容，时间插件v-show后与其他输入框不能共用一个参数
+      // 处理一下绝对时间内容，时间插件v-show后与其他输入框不能共用一个参数
       let newArr = []
       if (!citem.params[0].datetime) {
         newArr = [
@@ -504,7 +530,7 @@ export default {
       } else {
         data.rules[indexPathArr[0]].rules.push(this.getRuleTemplateItem())
       }
-      this.updateConditionId(this.ruleConfig)
+      this.updateConditionId(this.actionRuleConfig)
     },
     addThirdChildrenRules (data, citem) {
       //  添加三级子条件
@@ -534,7 +560,7 @@ export default {
           data.rules.splice(indexPathArr[0], 1, oldObj)
         }
       }
-      this.updateConditionId(this.ruleConfig)
+      this.updateConditionId(this.actionRuleConfig)
     },
     deleteChildrenRules (data, childrenRules, citem, cindex) {
       let indexPath = findRuleIndex(data.rules, childrenRules) + ''
@@ -551,7 +577,7 @@ export default {
     switchSymbol (ruleCode, data) {
       // 切换且或
       if (data.ruleCode === ruleCode) {
-        data.relation = this.ruleConfig.relation === 'and' ? 'or' : 'and'
+        data.relation = this.actionRuleConfig.relation === 'and' ? 'or' : 'and'
       } else {
         data.rules.forEach((item, index) => {
           if (item.relation && item.ruleCode === ruleCode) {
@@ -560,12 +586,12 @@ export default {
           }
         })
       }
-      this.updateConditionId(this.ruleConfig, undefined, 'switch')
+      this.updateConditionId(this.actionRuleConfig, undefined, 'switch')
     },
     addRules () {
       // 添加一级条件
-      this.ruleConfig.rules.push(this.getRuleTemplateItem())
-      this.updateConditionId(this.ruleConfig)
+      this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
+      this.updateConditionId(this.actionRuleConfig)
     },
     getSelectOperateList (type, fn) {
       if (!type) {
@@ -586,7 +612,7 @@ export default {
     },
     getRuleForm () {
       // 获取所有的$refs.ruleForm,用于统一校验数据
-      let ruleSet = this.$refs.rulesSet
+      let ruleSet = this.$refs.actionRulesSet
       let ruleArr = []
       ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
       ruleSet.$children.forEach(item => {
@@ -600,35 +626,71 @@ export default {
       // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
       this.isSelectedUneffectIndex = []
       arr.rules.forEach(item => {
-        if (!item.rules) {
-          item.selectOperateList = item.selectOperateList.filter(
-            sitem => sitem.code === item.func
+        if (item.children) {
+          item.children.forEach(citem => {
+            citem.selectOperateList = citem.selectOperateList.filter(
+            sitem => sitem.code === citem.func
           )
-          let selectEnumsArr = []
-          item.selectEnumsList.forEach(sitem => {
-            item.params.forEach(pitem => {
-              if (sitem.childrenNum === pitem.value) {
-                selectEnumsArr.push(sitem)
-              }
+            let selectEnumsArr = []
+            citem.selectEnumsList.forEach(sitem => {
+              citem.params.forEach(pitem => {
+                if (sitem.childrenNum === pitem.value) {
+                  selectEnumsArr.push(sitem)
+                }
+              })
             })
+            citem.selectEnumsList = selectEnumsArr
+            citem.indexList = []
+            if (citem.label && !citem.enable) {
+              this.isSelectedUneffectIndex.push(citem.label)
+            }
           })
-          item.selectEnumsList = selectEnumsArr
-          item.indexList = []
-          if (item.label && !item.enable) {
-            this.isSelectedUneffectIndex.push(item.label)
-          }
-        } else {
-          if (item.rules) {
-            this.updateRulesConfig(item)
-          }
         }
+        // if (!item.rules) {
+        //   item.selectOperateList = item.selectOperateList.filter(
+        //     sitem => sitem.code === item.func
+        //   )
+        //   let selectEnumsArr = []
+        //   item.selectEnumsList.forEach(sitem => {
+        //     item.params.forEach(pitem => {
+        //       if (sitem.childrenNum === pitem.value) {
+        //         selectEnumsArr.push(sitem)
+        //       }
+        //     })
+        //   })
+        //   item.selectEnumsList = selectEnumsArr
+        //   item.indexList = []
+        //   if (item.label && !item.enable) {
+        //     this.isSelectedUneffectIndex.push(item.label)
+        //   }
+        // } else {
+        //   if (item.rules) {
+        //     this.updateRulesConfig(item)
+        //   }
+        // }
       })
       return arr
     },
     ruleValidate () {
-      if (!this.ruleConfig.rules.length) {
+      if (!this.actionRuleConfig.rules.length) {
         return this.$message({
           message: '请配置用户规则信息',
+          type: 'error',
+          center: true
+        })
+      }
+    },
+    uneffectIndexValidate () { // 无效指标提示
+      this.lastSubmitRuleConfig = { // 过滤数据
+        actionRuleConfig: this.updateRulesConfig(deepClone(this.actionRuleConfig)),
+        actionExpression: this.actionExpression,
+        actionExpressionTemplate: this.actionExpressionTemplate
+      }
+      console.log(' this.lastSubmitRuleConfig:', this.lastSubmitRuleConfig)
+      this.isSelectedUneffectIndex = Array.from(new Set(this.isSelectedUneffectIndex))
+      if (this.isSelectedUneffectIndex.length) {
+        return this.$message({
+          message: `【${this.isSelectedUneffectIndex.join('，')}】为无效指标，请重新选择`,
           type: 'error',
           center: true
         })

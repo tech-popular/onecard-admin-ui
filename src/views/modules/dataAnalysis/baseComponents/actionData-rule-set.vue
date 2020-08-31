@@ -32,7 +32,7 @@
             <!--时间-->
             <div class="pane-rules-inline pane-rules-datetime">
               <!--绝对时间-->
-              <div v-if=" !item.func || item.func === 'data'" class="pane-rules-inline">
+              <div v-if=" !item.func || item.func === 'between'" class="pane-rules-inline">
                 <el-form-item prop="params[0].datetimeStart" :ref="'datetimeStart' + item.ruleCode"  :rules="{required: isRequired, validator: (rule, value, callback) => judgeDataTwoISelect(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-date-picker
                     style="width:200px"
@@ -41,6 +41,7 @@
                     placeholder="选择日期时间"
                     format="yyyy-MM-dd HH:mm:ss"
                     value-format="yyyy-MM-dd HH:mm:ss"
+                     @change="data => selectDateTimeChange(data, item)"
                     class="itemIput"
                   ></el-date-picker>
                 </el-form-item>&nbsp; ~ &nbsp;
@@ -52,6 +53,7 @@
                     placeholder="选择日期时间"
                     format="yyyy-MM-dd HH:mm:ss"
                     value-format="yyyy-MM-dd HH:mm:ss"
+                    @change="data => selectDateTimeChange(data, item)"
                     class="itemIput"
                   ></el-date-picker>
                 </el-form-item>
@@ -97,15 +99,15 @@
                 </el-form-item>
               </div>
               <!--相对当前时间点区间-->
-              <div v-if="item.func === 'relative_times'" class="pane-rules-inline">
+              <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
                 在&nbsp;过去&nbsp;
-                <el-form-item prop = "params[0].value1" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
+                <el-form-item prop = "params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                  <el-input
                     style="width: 50px;"
-                    v-model="item.params[0].value1"
+                    v-model="item.params[0].value"
                     :maxlength="10"
-                    @input="item.params[0].value1 = keyupDateNumberInput(item.params[0].value1)"
-                    @blur="item.params[0].value1 = pramasDateBlur(item, item.params[0].value1)"
+                    @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
+                    @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)"
                   ></el-input>
                 </el-form-item>
                 <el-form-item prop="dateDimension">
@@ -122,13 +124,13 @@
                     />
                   </el-select>
                 </el-form-item>到&nbsp;过去&nbsp;
-                <el-form-item prop = "params[0].value1" :ref="'paramsr' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
+                <el-form-item prop = "params[1].value" :ref="'paramsr' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input
                     style="width: 50px;"
-                    v-model="item.params[0].value2"
+                    v-model="item.params[1].value"
                     :maxlength="10"
-                    @input="item.params[0].value2 = keyupDateNumberInput(item.params[0].value2)"
-                    @blur="item.params[0].value2 = pramasDateBlur(item, item.params[0].value2)"
+                    @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)"
+                    @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)"
                   ></el-input>
                 </el-form-item>
                 <el-form-item prop="dateDimension"  :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
@@ -181,12 +183,12 @@
             <i class="el-icon-close cursor-pointer" @click="deleteRules(item, index)"></i>
           </el-form-item>
           <div>
-					  <action-data-rules-set3 :data="item" ref="rulesSet" :is-require="isRequired" :from="from"></action-data-rules-set3>
+					  <action-data-rules-set3 :data="item" ref="thirdRulesSet" :is-require="isRequired" :from="from"></action-data-rules-set3>
           </div>
           <div v-if="item.havedo === 'yes'" style="margin-left: 40px;">
             <span style="line-height: 40px;">总次数 &nbsp;&nbsp;</span>
             <el-form-item prop="funcType" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-              <el-select v-model="item.funcType" class="subSelect1">
+              <el-select v-model="item.funcType" style="width: 150px;">
                 <el-option lable="1" value="大于等于"></el-option>
                 <el-option lable="2" value="大于"></el-option>
               </el-select>
@@ -197,13 +199,13 @@
           </div>
         </el-form>
         <div v-else>
-          <rules-set
+          <action-rules-set
             :data="item"
             :is-child="true"
-            ref="rulesSet"
+            ref="actionRulesSet"
             :is-require="isRequired"
             :from="from"
-          ></rules-set>
+          ></action-rules-set>
         </div>
       </div>
     </div>
@@ -214,7 +216,7 @@ import actionDataRulesSet3 from './actionData-rules-set3'
 import Treeselect from '@riophae/vue-treeselect'
 import InputTag from '../components/InputTag'
 export default {
-  name: 'rulesSet',
+  name: 'actionRulesSet',
   props: {
     data: {
       type: Object
@@ -240,7 +242,7 @@ export default {
       selectOperateList: [],
       fileList: [
         {
-          value: 'data',
+          value: 'between',
           lable: '绝对时间'
         },
         {
@@ -248,7 +250,7 @@ export default {
           lable: '相对当前时间点'
         },
         {
-          value: 'relative_times',
+          value: 'relative_time_in',
           lable: '相对当前时间区间'
         }
       ],
@@ -301,7 +303,7 @@ export default {
   components: { actionDataRulesSet3, Treeselect, InputTag },
   methods: {
     updateDateDimension (val, ruleItem) {
-      this.parent.updateRulesArr(this.parent.ruleConfig, ruleItem, {
+      this.parent.updateRulesArr(this.parent.actionRuleConfig, ruleItem, {
         dateDimension: val
       })
     },
@@ -322,14 +324,14 @@ export default {
     pramasDateBlur (item, val) {
       // 时间 区间的判断
       let params = item.params
-      if (params[0].value1 && params[0].value2 && params[0].value1 * 1 <= params[0].value2 * 1) {
+      if (params[0].value && params[1].value && params[0].value * 1 <= params[1].value * 1) {
         this.$refs['paramsl' + item.ruleCode][0].clearValidate()
         this.$refs['paramsr' + item.ruleCode][0].clearValidate()
       }
       return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
     selectOperateChange (val, ruleItem) { // 时间区间改变时，数据清空，重新输入
-      this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)
+      this.parent.updateOperateChange(this.parent.actionRuleConfig, ruleItem)
       // this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
       // this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
     },
@@ -345,7 +347,7 @@ export default {
     judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (!value) {
         callback(new Error('请输入'))
-      } else if (params[0].value1 && params[0].value2 && params[0].value1 * 1 >= params[0].value2 * 1) {
+      } else if (params[0].value && params[1].value && params[0].value * 1 >= params[1].value * 1) {
         callback(new Error('起始数值应小于等于终止数值'))
       } else {
         callback()
@@ -353,23 +355,23 @@ export default {
     },
     addChildrenRules (item) {
       // 添加子条件
-      this.parent.addChildreRules(this.parent.ruleConfig, item)
+      this.parent.addChildreRules(this.parent.actionRuleConfig, item)
     },
     deleteRules (item) {
       // 删除条件
-      this.parent.deleteRules(this.parent.ruleConfig, item)
+      this.parent.deleteRules(this.parent.actionRuleConfig, item)
     },
     addThirdChildrenRules (item) {
       //  添加三级子条件
-      this.parent.addThirdChildrenRules(this.parent.ruleConfig, item)
+      this.parent.addThirdChildrenRules(this.parent.actionRuleConfig, item)
     },
     switchSymbol (ruleCode) {
       // 切换且或
-      this.parent.switchSymbol(ruleCode, this.parent.ruleConfig)
+      this.parent.switchSymbol(ruleCode, this.parent.actionRuleConfig)
     },
     selectDateTimeChange (val, ruleItem) {
-      // 处理一下时间数据
-      this.parent.updateDateTimeChange(this.parent.ruleConfig, ruleItem)
+      // 处理一下绝对时间--数据
+      // this.parent.updateDateTimeChange(this.parent.actionRuleConfig, ruleItem)
     }
   }
 }
