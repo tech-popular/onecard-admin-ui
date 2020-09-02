@@ -182,7 +182,7 @@ export default {
         taskDisable: 0,
         requestedUser: '',
         failRepeatTrigger: 3,
-        isRunAgain: 1
+        isRunAgain: 0
       },
       calculateTasks: [],
       tempCalculateTasks: [
