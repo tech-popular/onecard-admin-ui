@@ -368,7 +368,7 @@ export default {
       }
     },
     updateConditionId (arr, position, type) {
-      // 每次增删时，遍历一下actionRuleConfig,更改每个条件的ruleCode   type:增，删，切换且或
+      // 一级 二级嵌套每次增删时，遍历一下actionRuleConfig,更改每个条件的ruleCode   type:增，删，切换且或
       var expArr = []
       var expStr = ''
       var expArrTemp = []
@@ -434,7 +434,7 @@ export default {
       }
     },
     updateRulesArr (arr, citem, obj) {
-      // 更新数组的数据
+      // 更新一级 二级数组的数据
       arr.rules.forEach(item => {
         if (item.ruleCode === citem.ruleCode) {
           Object.keys(obj).forEach(oitem => {
@@ -450,7 +450,7 @@ export default {
       arr.rules.splice(0, 1, rules1) // 强制更新一下数组
       this.actionRuleConfig = arr
     },
-    updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
+    updateOperateChange (data, citem) { // 时间区间改变时，更新数据
       let params = [{ value: '', title: '' }]
       if (citem.func === 'between' || citem.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
@@ -463,16 +463,16 @@ export default {
       if (citem.func === 'relative_time') {
         // subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
         subFunc = 'relative_before'
-        // subTimeSelects = this.subTimeSelects
+        subTimeSelects = this.subTimeSelects
         dateDimension = 'DAYS'
       }
       if (citem.func === 'relative_time_in') {
-        // subTimeSelects = this.subTimeSelects
+        subTimeSelects = this.subTimeSelects
         dateDimension = 'DAYS'
       }
       this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension, childrenRules: childrenRules })
     },
-    updateChildrenOperateChange (data, citem, index) {
+    updateChildrenOperateChange (data, citem, index) { //  三级数据：判断操作符是否为null之类的，若为，则将后面数据清空
       let params = [{ value: '', title: '' }]
       if (citem.func === 'between' || citem.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
@@ -500,7 +500,7 @@ export default {
       data.childrenRules && data.childrenRules.splice(index, 1, citem)
     },
     updateDateTimeChange (data, citem, index) {
-      // 处理一下绝对时间内容，时间插件v-show后与其他输入框不能共用一个参数
+      // 处理一下三级数据：绝对时间内容，时间插件v-show后与其他输入框不能共用一个参数
       let newArr = []
       if (!citem.params[0].datetime) {
         newArr = [
@@ -568,7 +568,7 @@ export default {
       }
       this.updateConditionId(this.actionRuleConfig)
     },
-    deleteChildrenRules (data, childrenRules, citem, cindex) {
+    deleteChildrenRules (data, childrenRules, citem, cindex) {  //  删除三级数据
       let indexPath = findRuleIndex(data.rules, childrenRules) + ''
       let indexPathArr = indexPath.split(',')
       if (indexPathArr.length === 1) {

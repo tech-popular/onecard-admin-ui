@@ -17,7 +17,7 @@
             prop="func"
             :rules="{required: isRequired, message: '请选择', trigger: 'change'}"
           >
-            <el-select v-model="item.func" class="itemIput" @change="data => selectOperateChange(data, item, index)">
+            <el-select v-model="item.func" class="itemIput" @change="data => selectOperateChange(data, item)">
               <el-option
                 style="width:200px"
                 v-for="(fitem, findex) in fileList"
@@ -81,7 +81,7 @@
                     @change="data => updateDateDimension(data, item)"
                   >
                     <el-option
-                      v-for="(fitem, findex) in subTimeSelects"
+                      v-for="(fitem, findex) in item.subTimeSelects"
                       :value="fitem.code"
                       :key="findex"
                       :label="fitem.title"
@@ -118,7 +118,7 @@
                     @change="data => updateDateDimension(data, item)"
                   >
                     <el-option
-                      v-for="(fitem, findex) in subTimeSelects"
+                      v-for="(fitem, findex) in item.subTimeSelects"
                       :value="fitem.code"
                       :key="findex"
                       :label="fitem.title"
@@ -141,7 +141,7 @@
                     @change="data => updateDateDimension(data, item)"
                   >
                     <el-option
-                      v-for="(fitem, findex) in subTimeSelects"
+                      v-for="(fitem, findex) in item.subTimeSelects"
                       :value="fitem.code"
                       :key="findex"
                       :label="fitem.title"
@@ -184,7 +184,7 @@
             <i class="el-icon-close cursor-pointer" @click="deleteRules(item, index)"></i>
           </el-form-item>
           <div>
-					  <action-data-rules-set3 :data="item" ref="thirdRulesSet" :is-require="isRequired" :from="from"></action-data-rules-set3>
+					  <action-children-data-rules-set :data="item" ref="thirdRulesSet" :is-require="isRequired" :from="from"></action-children-data-rules-set>
           </div>
           <div v-if="item.havedo === 'yes'" style="margin-left: 40px;">
             <span style="line-height: 40px;">总次数 &nbsp;&nbsp;</span>
@@ -213,7 +213,7 @@
   </div>
 </template>
 <script>
-import actionDataRulesSet3 from './actionData-rules-set3'
+import actionChildrenDataRulesSet from './actionChildrenData-rules-set'
 import Treeselect from '@riophae/vue-treeselect'
 import InputTag from '../components/InputTag'
 export default {
@@ -265,16 +265,6 @@ export default {
           title: '没做过'
         }
       ],
-      subTimeSelects: [
-        {
-          code: 'DAYS',
-          title: '天'
-        },
-        {
-          code: 'HOURS',
-          title: '小时'
-        }
-      ],
       subSelects: [
         {
           code: 'relative_before',
@@ -301,7 +291,7 @@ export default {
     }
     this.parent = parent
   },
-  components: { actionDataRulesSet3, Treeselect, InputTag },
+  components: { actionChildrenDataRulesSet, Treeselect, InputTag },
   methods: {
     updateDateDimension (val, ruleItem) {
       this.parent.updateRulesArr(this.parent.actionRuleConfig, ruleItem, {
@@ -331,7 +321,7 @@ export default {
       }
       return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
-    selectOperateChange (val, ruleItem, index) { // 时间区间改变时，数据清空，重新输入
+    selectOperateChange (val, ruleItem) { // 时间区间改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.actionRuleConfig, ruleItem)
       this.$nextTick(() => { // 切换时间区间时，手动清除校验信息
         if (ruleItem.func === 'betweent') {
@@ -363,8 +353,8 @@ export default {
     judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (!value) {
         callback(new Error('请输入'))
-      } else if (params[0].value && params[1].value && params[0].value * 1 >= params[1].value * 1) {
-        callback(new Error('起始数值应小于等于终止数值'))
+      } else if (params[0].value && params[1].value && params[0].value * 1 < params[1].value * 1) {
+        callback(new Error('起始数值应大于等于终止数值'))
       } else {
         callback()
       }
