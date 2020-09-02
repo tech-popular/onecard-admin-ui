@@ -111,7 +111,7 @@
               </el-tooltip>
             </el-form-item>
             <el-form-item label="撞库包">
-              <el-select v-model="rejectForm.collisionPackId" filterable @change="collisionPackIdChange" placeholder="请选择撞库包" class="reject-pane-item">
+              <el-select v-model="rejectForm.collisionPackId" filterable clearable @clear="collisionPackIdClear" @change="collisionPackIdChange" placeholder="请选择撞库包" class="reject-pane-item">
                 <el-option
                   v-for="item in collisionList"
                   :key="item.value"
@@ -276,7 +276,6 @@ export default {
       } else {
         this.id = row.id
         this.drawerTitle = tag === 'view' ? '查看' : '编辑'
-        this.getCollisionParams()
         this.getDataInfo(row.id)
       }
     },
@@ -435,11 +434,19 @@ export default {
     getCollisionList () {
       collisionList().then(({data}) => {
         this.collisionList = data.data || []
+        if (this.id) {
+          this.getCollisionParams()
+        }
       })
     },
+    collisionPackIdClear () {
+      this.collisionData = []
+    },
     collisionPackIdChange (val) {
-      this.collisionPackText = this.collisionList.filter(item => item.value === val)[0].text
-      this.getCollisionParams()
+      if (val) {
+        this.collisionPackText = this.collisionList.filter(item => item.value === val)[0].text
+        this.getCollisionParams()
+      }
     },
     getCollisionParams () {
       collisionParams(this.rejectForm.collisionPackId, this.id).then(({data}) => {
