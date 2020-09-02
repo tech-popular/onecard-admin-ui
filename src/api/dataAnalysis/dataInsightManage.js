@@ -17,7 +17,7 @@ export const dataPreviewInfo = params => httpPut(da + 'data/group/preview', para
 export const uploadFileInfo = params => httpGet(da + 'data/group/listOnPage', params)
 export const importExcelFile = params => httpPostFile(da + 'data/group/import', params)
 export const channelsList = () => httpGet(da + 'common/select/channels')
-export const vestPackAvailable = params => httpGet(da + 'vest/pack/select/available', params)
+export const vestPackAvailable = code => httpGetSeries(da + `vest/pack/select/available`, code)
 export const custerAvailable = () => httpGet(da + `data/group/select/available`) // 分群ID
 export const templateDownload = http.adornUrl(da + 'data/group/template/download?token=' + Vue.cookie.get('token'))
 export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManager/value/candidate', params)
@@ -25,3 +25,8 @@ export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManage
 export const overviewData = id => httpGet(da + `data/group/overview/${id}`)
 export const transferLogList = params => httpGet(da + `data/transferLog/listOnPage`, params)
 export const chartInfo = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
+
+export const collisionList = () => httpGet(da + 'data/collision/list')
+export const collisionParams = (collisionPackId, groupId) => httpGet(da + `data/collision/params?collisionPackId=${collisionPackId}&groupId=${groupId}`)
+export const collisionSave = (params, collisionPackId) => httpPost(da + `data/collision/config/group?collisionPackId=${collisionPackId}`, params, false)
+export const collisionUpdate = (params, collisionPackId, groupId) => httpPut(da + `data/collision/config/group?groupId=${groupId}&collisionPackId=${collisionPackId}`, params, false)
