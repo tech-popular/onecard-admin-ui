@@ -109,7 +109,7 @@ export default {
         }
       })
     },
-    channelIdChangeUpdate () {
+    channelIdChangeUpdate () { // 用户所属渠道改变时，清空数据，初始化
       this.getSelectAllCata(indexList => {
         if (indexList.length === 0) {
           this.setInitRulesConfig(this.indexList)
@@ -179,61 +179,60 @@ export default {
     updateInitRulesConfig (arr, indexList) {
       // 获取指标默认展开列表
       arr.rules.forEach(item => {
-        if (!item.rules) {
-          let indexListArr = deepClone(indexList)
-          let indexPath =
-            findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
-          let indexPathArr = indexPath.split(',')
-          let a = indexListArr
-          if (indexPath) {
-            indexPathArr.forEach((fitem, findex) => {
-              if (findex < indexPathArr.length - 1) {
-                a[fitem].isDefaultExpanded = true
-                a = a[fitem].children
-              } else {
-                item.enable = a[fitem].enable
-              }
-            })
-            item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
-            if (
-              item.func === 'relative_within' ||
-              item.func === 'relative_before'
-            ) {
-              // 兼容老数据
-              item.subFunc = item.func
-              item.func = 'relative_time'
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
-              }
-              this.getSelectOperateList(item.fieldType, selectOperateList => {
-                item.selectOperateList = selectOperateList
-                item.subSelects = item.selectOperateList.filter(
-                  sitem => sitem.code === item.func
-                )[0].subSelects
+        if (item.childrenRules) { // 目前只针对第三层数据进行了处理，第二层数据根据具体字段进行处理
+          item.childrenRules.forEach(citem => {
+            let indexListArr = deepClone(indexList)
+            let indexPath = findVueSelectItemIndex(indexListArr, citem.fieldCode) + ''
+            let indexPathArr = indexPath.split(',')
+            let a = indexListArr
+            if (indexPath) {
+              indexPathArr.forEach((fitem, findex) => {
+                if (findex < indexPathArr.length - 1) {
+                  a[fitem].isDefaultExpanded = true
+                  a = a[fitem].children
+                } else {
+                  citem.enable = a[fitem].enable
+                }
               })
-            }
-            if (
-              item.func === 'relative_time_in' ||
-              item.func === 'relative_time'
-            ) {
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
+              citem.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
+              if (
+                citem.func === 'relative_within' ||
+                citem.func === 'relative_before'
+              ) {
+              // 兼容老数据
+                citem.subFunc = citem.func
+                citem.func = 'relative_time'
+                citem.subTimeSelects = this.subTimeSelects
+                if (!citem.dateDimension) {
+                  citem.dateDimension = 'DAYS'
+                }
+                this.getSelectOperateList(citem.fieldType, selectOperateList => {
+                  citem.selectOperateList = selectOperateList
+                  citem.subSelects = citem.selectOperateList.filter(
+                    sitem => sitem.code === citem.func
+                  )[0].subSelects
+                })
               }
-            }
+              if (
+                citem.func === 'relative_time_in' ||
+                citem.func === 'relative_time'
+              ) {
+                citem.subTimeSelects = this.subTimeSelects
+                if (!citem.dateDimension) {
+                  citem.dateDimension = 'DAYS'
+                }
+              }
             // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
-            if (
-              (item.fieldType === 'string' || item.fieldType === 'number') &&
-              (item.func === 'eq' || item.func === 'neq')
-            ) {
-              if (!item.params[0].selectVal) {
-                item.params[0].selectVal = [item.params[0].value]
+              if (
+                (citem.fieldType === 'string' || citem.fieldType === 'number') &&
+                (citem.func === 'eq' || citem.func === 'neq')
+              ) {
+                if (!citem.params[0].selectVal) {
+                  citem.params[0].selectVal = [citem.params[0].value]
+                }
               }
             }
-          }
-        } else {
-          this.updateInitRulesConfig(item, indexList)
+          })
         }
       })
       return arr
@@ -244,6 +243,12 @@ export default {
       this.actionRuleConfig = configJson.actionRuleConfig
       this.actionExpression = configJson.actionExpression
       this.actionExpressionTemplate = configJson.actionExpressionTemplate
+      this.getSelectAllCata((indexList) => {
+        this.actionRuleConfig = this.updateInitRulesConfig(this.actionRuleConfig, indexList)
+        this.$nextTick(() => {
+          this.$emit('renderEnd')
+        })
+      })
       this.$nextTick(() => {
         // 默认将验证错误信息全部清除
         let ruleFormArr = this.getRuleForm()
@@ -297,7 +302,7 @@ export default {
         }
       })
     },
-    updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
+    updateEnumsChange (data, citem, index) { // 多选数据变化时, 重组params
       let newArr = []
       if (citem.params[0].selectVal === null || !citem.params[0].selectVal.length) {
         newArr = [{
@@ -314,7 +319,7 @@ export default {
         })
         newArr.splice(0, 1, { ...newArr[0], selectVal: citem.params[0].selectVal })
       }
-      this.updateRulesArr(data, citem, { params: newArr })
+      this.updateChildrenRulesArr(data, citem, { params: newArr }, index)
     },
     getRuleTemplateItem () {
       //  一级 二级条件模板
@@ -454,6 +459,7 @@ export default {
       let subFunc = ''
       let subTimeSelects = []
       let dateDimension = ''
+      let childrenRules = [] // 待确定 修改时间区间类型时，三级数据是否清空
       if (citem.func === 'relative_time') {
         // subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
         subFunc = 'relative_before'
@@ -464,7 +470,7 @@ export default {
         // subTimeSelects = this.subTimeSelects
         dateDimension = 'DAYS'
       }
-      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension })
+      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension, childrenRules: childrenRules })
     },
     updateChildrenOperateChange (data, citem, index) {
       let params = [{ value: '', title: '' }]
@@ -487,13 +493,13 @@ export default {
       }
       this.updateChildrenRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension }, index)
     },
-    updateChildrenRulesArr (data, citem, obj, index) {
+    updateChildrenRulesArr (data, citem, obj, index) { // 强制更新三级数组
       Object.keys(obj).forEach(oitem => {
         citem[oitem] = obj[oitem]
       })
-      data.childrenRules.splice(index, 1, citem)
+      data.childrenRules && data.childrenRules.splice(index, 1, citem)
     },
-    updateDateTimeChange (data, citem) {
+    updateDateTimeChange (data, citem, index) {
       // 处理一下绝对时间内容，时间插件v-show后与其他输入框不能共用一个参数
       let newArr = []
       if (!citem.params[0].datetime) {
@@ -513,7 +519,7 @@ export default {
           }
         ]
       }
-      this.updateRulesArr(data, citem, { params: newArr })
+      this.updateChildrenRulesArr(data, citem, { params: newArr }, index)
     },
     addChildreRules (data, citem) {
       // 添加子集
@@ -615,19 +621,25 @@ export default {
       let ruleSet = this.$refs.actionRulesSet
       let ruleArr = []
       ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
-      ruleSet.$children.forEach(item => {
-        if (item.$refs.ruleForm) {
-          ruleArr = [...ruleArr, ...item.$refs.ruleForm]
+      function _find (data) { // 为了获取第三层数据
+        if (data.$children) {
+          data.$children.forEach(item => {
+            if (item.$refs.ruleForm) {
+              ruleArr = [...ruleArr, ...item.$refs.ruleForm]
+            }
+            _find(item)
+          })
         }
-      })
+      }
+      _find(ruleSet)
       return ruleArr
     },
     updateRulesConfig (arr) {
       // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
       this.isSelectedUneffectIndex = []
       arr.rules.forEach(item => {
-        if (item.children) {
-          item.children.forEach(citem => {
+        if (item.childrenRules) {
+          item.childrenRules.forEach(citem => {
             citem.selectOperateList = citem.selectOperateList.filter(
             sitem => sitem.code === citem.func
           )
@@ -674,7 +686,7 @@ export default {
     ruleValidate () {
       if (!this.actionRuleConfig.rules.length) {
         return this.$message({
-          message: '请配置用户规则信息',
+          message: '请配置用户行为规则信息',
           type: 'error',
           center: true
         })
@@ -686,7 +698,6 @@ export default {
         actionExpression: this.actionExpression,
         actionExpressionTemplate: this.actionExpressionTemplate
       }
-      console.log(' this.lastSubmitRuleConfig:', this.lastSubmitRuleConfig)
       this.isSelectedUneffectIndex = Array.from(new Set(this.isSelectedUneffectIndex))
       if (this.isSelectedUneffectIndex.length) {
         return this.$message({

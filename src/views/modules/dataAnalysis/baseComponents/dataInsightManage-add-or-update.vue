@@ -356,7 +356,7 @@ export default {
           this.baseForm.channelId = data.data.channelId
             .split(',')
             .filter(item => item != '')
-          if (!data.data.configJson) {
+          if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
             return this.$message({
@@ -368,6 +368,10 @@ export default {
             data.data.configJson,
             this.baseForm.channelId
           )
+          // this.$refs.userActionRule.renderData( // 真实调接口时数据重现
+          //   data.data.actionRuleConfig,
+          //   this.baseForm.channelId
+          // )
         }
       })
     },
@@ -415,6 +419,7 @@ export default {
         })
       }
       this.$refs.userAttrRule.channelIdChangeUpdate()
+      this.$refs.userActionRule.channelIdChangeUpdate()
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -569,10 +574,13 @@ export default {
         })
         return
       }
-      // 用户属性 数据校验
+      // 用户属性 用户行为 数据校验
       this.$refs.userAttrRule.ruleValidate()
+      this.$refs.userActionRule.ruleValidate()
       this.$refs.userAttrRule.isRequired = true
+      this.$refs.userActionRule.isRequired = true
       let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
+      let actionRuleFormArr = this.$refs.userActionRule.getRuleForm()
       this.$nextTick(() => {
         // 待页面中的isRequired = true后再执行校验
         let flag = true
@@ -582,6 +590,13 @@ export default {
           }
         })
         ruleFormArr.forEach(item => {
+          item.validate(valid => {
+            if (!valid) {
+              flag = false
+            }
+          })
+        })
+        actionRuleFormArr.forEach(item => {
           item.validate(valid => {
             if (!valid) {
               flag = false
@@ -602,7 +617,7 @@ export default {
           let params = {
             ...this.baseForm,
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
-            // ...this.$refs.userActionRule.lastSubmitRuleConfig,
+            ...this.$refs.userActionRule.lastSubmitRuleConfig,
             ...this.rejectForm,
             rejectGroupPackCode: code
           }
@@ -629,7 +644,11 @@ export default {
           if (sysUuid && sysArr.includes(sysUuid)) {
             params.username = this.getQueryParams('username') || ''
           }
-          this.loading = true
+          console.log('params: ', params)
+          if (!this.loading) { // 为测试提交信息的数据结构，暂不掉接口
+            return
+          }
+          // this.loading = true
           url(params).then(({ data }) => {
             if (data.status !== '1') {
               this.loading = false

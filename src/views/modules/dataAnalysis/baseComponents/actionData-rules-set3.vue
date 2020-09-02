@@ -61,7 +61,7 @@
               >
                 <input-tag
                   v-model="item.params[0].selectVal"
-                  @change="inputTagChange(item, 'string')"
+                  @change="inputTagChange(item, 'string', index)"
                   :tag-tips="item.strTips"
                   :valueType="'string'"
                   :add-tag-on-blur="true"
@@ -125,7 +125,7 @@
                 >
                   <input-tag
                     v-model="item.params[0].selectVal"
-                    @change="inputTagChange(item, 'number')"
+                    @change="inputTagChange(item, 'number', index)"
                     :valueType="'number'"
                     :tag-tips="[]"
                     :maxlength="10"
@@ -161,7 +161,7 @@
                   v-model="item.params[0].selectVal"
                   multiple
                   class="itemIput"
-                  @change="data => selectEnumsChange(data, item)"
+                  @change="data => selectEnumsChange(data, item, index)"
                   @visible-change="data => selectEnumsVisible(data, item)"
                 >
                   <el-option
@@ -188,7 +188,7 @@
                   placeholder="选择日期时间"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
-                  @change="data => selectDateTimeChange(data, item)"
+                  @change="data => selectDateTimeChange(data, item, index)"
                   class="itemIput"
                 ></el-date-picker>
               </el-form-item>
@@ -207,7 +207,7 @@
                   :default-time="['00:00:00']"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
-                  @change="data => selectEnumsChange(data, item)"
+                  @change="data => selectEnumsChange(data, item, index)"
                   class="itemIput-big"
                 ></el-date-picker>
               </el-form-item>
@@ -546,20 +546,20 @@ export default {
         this.parent.getRulesEnumsList(this.parent.actionRuleConfig, ruleItem)
       }
     },
-    selectEnumsChange (val, ruleItem) {
+    selectEnumsChange (val, ruleItem, index) {
       // 处理一下多选的数据
-      this.parent.updateEnumsChange(this.parent.actionRuleConfig, ruleItem)
+      this.parent.updateEnumsChange(this.data, ruleItem, index)
     },
-    selectDateTimeChange (val, ruleItem) {
+    selectDateTimeChange (val, ruleItem, index) {
       // 处理一下时间数据
-      this.parent.updateDateTimeChange(this.parent.actionRuleConfig, ruleItem)
+      this.parent.updateDateTimeChange(this.data, ruleItem, index)
     },
-    inputTagChange (ruleItem, type) {
+    inputTagChange (ruleItem, type, index) {
       if (ruleItem.params[0].selectVal.length) {
         // 如果已经有输入的值则清空报错提示
         this.$refs[type + 'MultiVal' + ruleItem.ruleCode][0].clearValidate()
       }
-      this.parent.updateEnumsChange(this.parent.actionRuleConfig, ruleItem)
+      this.parent.updateEnumsChange(this.data, ruleItem, index)
     },
     isDateSingleShow (item) {
       // 单时间日期是否显示
