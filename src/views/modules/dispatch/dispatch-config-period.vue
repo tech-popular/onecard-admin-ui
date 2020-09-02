@@ -429,7 +429,9 @@ export default {
       let params = { ...this.dispatchStatus, ...this.formatDispatchTime(this.dispatchTimeForm), taskId: this.taskId }
       taskPeriodSaveOrUpdate(params).then(({data}) => {
         if (data && data.code === 0) {
-          fn()
+          // fn()
+          this.$message.success(data.msg)
+          this.$emit('refreshList')
         } else {
           this.$message.error(data.msg)
         }

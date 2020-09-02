@@ -52,8 +52,8 @@
           </el-table>
         </div>
       </div>
-      <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" @getStatus="getDispatchStatus"></dispatch-config-period>
-      <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id" @refreshList="refreshListhandle"></dispatch-config-alert>
+      <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" @getStatus="getDispatchStatus" @refreshList="refreshListhandle"></dispatch-config-period>
+      <!-- <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id" @refreshList="refreshListhandle"></dispatch-config-alert> -->
       <div class="work-content-1">
         <h3>调度启停</h3>
         <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus">
@@ -87,12 +87,12 @@ import {
 } from '@/api/dispatch/taskManag'
 import dispatchConfigTaskDependent from './dispatch-config-dependent'
 import dispatchConfigPeriod from './dispatch-config-period'
-import dispatchConfigAlert from './dispatch-config-alert'
+// import dispatchConfigAlert from './dispatch-config-alert'
 export default {
   components: {
     dispatchConfigTaskDependent,
-    dispatchConfigPeriod,
-    dispatchConfigAlert
+    dispatchConfigPeriod
+    // dispatchConfigAlert
   },
   data () {
     return {
@@ -140,7 +140,7 @@ export default {
           this.taskType = id.taskType
           this.loading = true
           this.$refs.dispatchConfigPeriod.init()
-          this.$refs.dispatchConfigAlert.init()
+          // this.$refs.dispatchConfigAlert.init()
           this.getTaskBaseInfo()
           this.getTaskSelectDependence()
         }
@@ -230,7 +230,7 @@ export default {
     dataFormSubmit (form) {
       let flag = true
       flag = this.$refs.dispatchConfigPeriod.validateForm()
-      flag = this.$refs.dispatchConfigAlert.validateForm()
+      // flag = this.$refs.dispatchConfigAlert.validateForm()
       this.$refs['dispatchStatus'].validate((valid) => {
         if (!valid) {
           flag = false
@@ -238,9 +238,10 @@ export default {
       })
       if (flag) {
         // 提交周期及状态信息数据
-        this.$refs.dispatchConfigPeriod.submitData(() => {
-          this.$refs.dispatchConfigAlert.submitData()
-        })
+        this.$refs.dispatchConfigPeriod.submitData()
+        // this.$refs.dispatchConfigPeriod.submitData(() => {
+        //   this.$refs.dispatchConfigAlert.submitData()
+        // })
       }
     }
   }
