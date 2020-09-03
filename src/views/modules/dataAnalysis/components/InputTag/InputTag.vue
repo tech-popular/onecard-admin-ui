@@ -1,10 +1,12 @@
 <template>
   <div
     :class="{'read-only': readOnly,'vue-input-tag-wrapper--active': isInputActive}"
-    class="vue-input-tag-wrapper">
+    class="vue-input-tag-wrapper"
+  >
     <div
       @click="focusNewTag()"
     >
+      <span style="position:absolute;top:5px;left:10px;color:#c1c1c1" v-if="!innerTags.length && !isInputActive">{{placeholder}}</span>
       <span v-for="(tag, index) in innerTags" :key="index" class="input-tag">
         <span>{{ tag }}</span>
         <i class="el-icon-error remove" v-if="!readOnly" @click.prevent.stop="remove(index)"></i>
@@ -12,7 +14,6 @@
       <input
         v-if                     = "!readOnly && !isLimit"
         ref                      = "inputtag"
-        :placeholder             = "placeholder"
         type                     = "text"
         v-model                  = "newTag"
         v-on:keydown.delete.stop = "removeLastTag"
@@ -94,6 +95,7 @@ export default {
     }
   },
   mounted () {
+    console.log(this.innerTags)
   },
   computed: {
     isLimit: function () {
@@ -226,7 +228,6 @@ export default {
   flex-wrap: wrap;
   position: relative;
 }
-
 .vue-input-tag-wrapper .input-tag {
   border-radius: 2px;
   border: 1px solid #e9e9eb;

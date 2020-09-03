@@ -2,12 +2,12 @@
 <template>
 <div class="ces-search">
     <el-form :size="size" inline :label-width="labelWidth">
-        <el-form-item v-for='item in searchForm' :label="item.label" :key='item.prop'>
+        <el-form-item v-for='item in searchForm' :label="item.label" :key='item.prop'  :width="width">
             <!-- 输入框 -->
             <el-input v-if="item.type==='Input'" v-model="searchData[item.prop]" size="mini" ></el-input>
             <!-- 下拉框 -->
             <el-select v-if="item.type==='Select'" v-model="searchData[item.prop]" size="mini" @change="item.change(searchData[item.prop])">
-                <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value"></el-option>
+                <el-option v-for="op in item.options" :label="op[item.props.label]" :value="op[item.props.value]" :key="op[item.props.value]"></el-option>
             </el-select>
             <!-- 单选 -->
             <el-radio-group v-if="item.type==='Radio'" v-model="searchData[item.prop]">
@@ -49,6 +49,10 @@ export default {
     labelWidth: {
       type: String,
       default: '100px'
+    },
+    width: {
+      type: String,
+      default: '300px'
     },
     size: {
       type: String,
