@@ -17,7 +17,7 @@
           </el-form-item>
           <el-form-item label="申请系统" prop="system">
             <el-radio-group v-model="dataForm.system" @change="testFunction">
-              <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList">{{item.label}}</el-radio>
+              <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList" style="margin-left:0">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="申请系统模块" prop="systemmodel" v-if="isShow">
