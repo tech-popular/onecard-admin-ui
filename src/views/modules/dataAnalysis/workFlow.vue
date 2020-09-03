@@ -3,8 +3,8 @@
     <div id="sample">
       <div class="left-tool">
         <div class="flow-save">
-          <el-button class="flow-btn-save" type="primary" icon="ios-cube-outline" @click="save" v-if="tag !== 'view'">保存</el-button>
-          <el-button class="flow-btn-goback" type="warning" icon="md-arrow-round-back" @click="goback">返回</el-button>
+          <div><el-button class="flow-btn-goback" type="warning" icon="md-arrow-round-back" @click="goback">返回</el-button></div>
+          <div><el-button class="flow-btn-save" type="primary" icon="ios-cube-outline" @click="save" v-if="tag !== 'view'">保存</el-button></div>
         </div>
         <div id="myPaletteDiv"></div>
       </div>
@@ -27,22 +27,20 @@
         <!-- <submit-botton @submit="handleSubmit" @cancel="handleCancel" slot="footer"></submit-botton> -->
       </el-dialog>
     </div>
-      <switch-node @close="closeSwitchNode" :data='switchNodeData' v-if="switchNodeVisible" ref="switchNodeEl"></switch-node>
-      <div v-if="custerParamsNodeVisible">
-        <custer-allparams-node @close="closeCusterParamsNode" :data='custerParamsNodeData'></custer-allparams-node>
-      </div>
-      <div v-if="custerNodeVisible">
-        <custer-node @close="closeCusterNode" :data='custerNodeData'></custer-node>
-      </div>
+      <in-params-node @close="closeAllNode" v-if="inparamsNodeVisible" ref="inparamsNodeEl"></in-params-node>
+      <group-choice-node @close="closeAllNode" @getSelectCuster="getSelectCuster" v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
+      <data-query-node @close="closeAllNode" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
+      <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
   </div>
 </template>
 <script>
 import go, { Margin } from 'gojs'
 import { palette } from '@/utils/flowPalette' // 侧边栏模板数据
 import { saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
-import switchNode from './workflowNode/switchNode'
-import custerAllparamsNode from './workflowNode/custerAllparamsNode'
-import custerNode from './workflowNode/custerNode'
+import groupChoiceNode from './workflowNode/groupChoiceNode'
+import inParamsNode from './workflowNode/inparamsNode'
+import dataQueryNode from './workflowNode/dataQueryNode'
+import outParamsNode from './workflowNode/outparamsNode'
 var that = null
 var mySelf = null
 export default {
@@ -53,20 +51,25 @@ export default {
         class: 'go.GraphLinksModel',
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
-        nodeDataArray: [],
-        linkDataArray: []
+        nodeDataArray: [
+          {'key': '1', 'category': 'IN_PARAM', 'loc': '0 0', 'nodeName': '入参'},
+          {'key': '2', 'loc': '0 100', 'category': 'GROUP_CHOICE', 'nodeName': '数据转换'}
+        ],
+        linkDataArray: [{
+          from: '1',
+          to: '2'
+        }]
       },
       tag: this.$route.query.tag,
       orderNo: this.$route.query.orderNo,
       flowId: this.$route.query.flowId,
       appId: this.$route.query.appId,
-      switchNodeVisible: false,
-      switchNodeData: {},
-      custerParamsNodeVisible: false,
-      custerParamsNodeData: {},
-      custerNodeVisible: false,
-      custerNodeData: {},
+      inparamsNodeVisible: false,
+      groupChoiceNodeVisible: false,
+      dataQueryNodeVisible: false,
+      outparamsNodeVisible: false,
 
+      selectCuster: [],
       nodeTitle: '',
       successText: '执行成功',
       saveModalVisible: false,
@@ -84,7 +87,7 @@ export default {
       }
     }
   },
-  components: { switchNode, custerAllparamsNode, custerNode },
+  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode },
   created () {
     that = this
     if (that.tag) { // 修改和查看时，加载初始数据
@@ -112,32 +115,17 @@ export default {
         mySelf.myDiagram.model = go.Model.fromJson(res.data.structureJson)
       })
     },
-    closeSwitchNode (item) {
-      this.switchNodeVisible = false
+    closeAllNode (item) {
       if (item && item.tag == 'save') {
         let key = item.data.key
         let _data = mySelf.myDiagram.findNodeForKey(key).data
         _data.data = item.data.config
+        console.log(mySelf.myDiagram.findNodeForKey(key).data)
         that.$message.success(that.successText)
       }
     },
-    closeCusterParamsNode (item) {
-      that.custerParamsNodeVisible = false
-      if (item && item.tag == 'save') {
-        let key = item.data.key
-        let _data = mySelf.myDiagram.findNodeForKey(key).data
-        _data.data = item.data.config
-        that.$message.success(that.successText)
-      }
-    },
-    closeCusterNode (item) {
-      that.custerNodeVisible = false
-      if (item && item.tag == 'save') {
-        let key = item.data.key
-        let _data = mySelf.myDiagram.findNodeForKey(key).data
-        _data.data = item.data.config
-        that.$message.success(that.successText)
-      }
+    getSelectCuster (data) {
+      this.selectCuster = data
     },
     // 加载并刷新画布
     loadJson () {
@@ -162,42 +150,22 @@ export default {
     },
     // 保存
     save () {
+      console.log(mySelf.myDiagram.model.nodeDataArray)
       let linkDataArray = mySelf.myDiagram.model.linkDataArray
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
-      // 判断节点连线名称是否重复，重复不可提交
-      let obj = {}
-      let linkFlag = false
-      linkDataArray.map(item => {
-        if (!obj[item.from] && item.linkText) {
-          obj[item.from] = item.linkText
-          return
-        }
-        if (obj[item.from] && obj[item.from] === item.linkText) {
-          linkFlag = true
-        }
-      })
-      if (linkFlag) return this.$message.error('同一节点的连接内容不能重复！')
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
       nodeDataArray.map(item => {
-        if (item.category !== 'END' && item.category !== 'PARALLEL_BRANCH' && !item.data) {
+        if (!item.data) {
           pNullArr.push(item.nodeName)
-        }
-        //  保存时再判断一下分支节点及合并节点的逻辑
-        var node = mySelf.myDiagram.findNodeForKey(item.key)
-        if (item.category === 'PARALLEL_BRANCH') {
-          that.setBranchLinkKeys(node)
-        }
-        if (item.category === 'BRANCH_COMBINE') {
-          let arr = []
-          let allParentNodes = that.getAllParentNode(node, arr)
-          that.mergeParentsKeys = []
-          allParentNodes.map(function (pNode) { // 找到当前节点的祖宗十八代，不包含当前节点
-            that.mergeParentsKeys.push(pNode.key)
-          })
         }
       })
       if (pNullArr.length) return this.$message.error(`请配置节点【“${pNullArr.join('”、“')}”】的内容`)
+       if(that.tag && that.tag === 'edit') { //修改保存
+          this.saveFlowInfo(mySelf.myDiagram.model.toJson())
+        } else { //新建保存
+          this.saveModalVisible = true
+        }
     },
     handleCancel () {
       this.saveModalVisible = false
@@ -311,41 +279,31 @@ export default {
         }),
         $(go.Placeholder)
       )
-      function textBlock (isEdit, type) { //  可编辑节点名称的textBlock ，type表示是否把名称显示出来
+      function textBlock (isEdit) { //  可编辑节点名称的textBlock ，type表示是否把名称显示出来
         return $(
           go.TextBlock,
           {
             font: '12px sans-serif',
-            stroke: type ? 'transparent' : '#fff', // 分支和合并节点可以不显示名称
+            stroke: '#fff', // 分支和合并节点可以不显示名称
             margin: isEdit ? new Margin(10, 0) : 0,
             maxSize: new go.Size(120, NaN),
-            //  wrap: go.TextBlock.WrapFit,
-            editable: isEdit, // 文字可编辑
-            textEdited: function (textBlock, previousText, currentText) { // 改变了节点名称时触发事件,后面节点的入参名称更新
-              let nodeData = textBlock.part.data.data
-              let node = textBlock.part.data
-              if (previousText !== currentText) {
-                mySelf.myDiagram.model.setDataProperty(node, 'nodeName', currentText)
-              }
-              if (!nodeData) return
-              let outParams = nodeData.outParams
-              if (outParams && outParams.length) {
-                let reg = new RegExp(previousText.split(`(${node.key})`)[0])
-                outParams.map(item => {
-                  item.name = item.name.replace(reg, node.nodeName)
-                })
-              }
-            }
+            editable: isEdit
           },
           new go.Binding('text', '', function (node) {
             let locX = node.loc.split(' ')[0] // 从位置判断是否是左侧菜单中的内容
-            return locX === '0' || !isEdit ? node.nodeName : node.nodeName + '(' + node.key + ')'
+            let newName = node.nodeName
+            if (parseInt(node.key) < 10) {
+              newName = `${newName}(1)`
+            } else {
+              newName = `${newName}(${node.key % ((node.key.length - 1) * 10)})`
+            }
+            return locX === '0' || !isEdit ? node.nodeName : newName
           }).makeTwoWay()
         )
       }
-      // start
+      // IN_PARAM
       mySelf.myDiagram.nodeTemplateMap.add(
-        'START',
+        'IN_PARAM',
         $(
           go.Node,
           'Table',
@@ -364,27 +322,31 @@ export default {
                 strokeWidth: 0
               }
             ),
-            textBlock(false)
+            $(
+              go.TextBlock,
+              {
+                font: '12px sans-serif',
+                stroke: '#fff', // 分支和合并节点可以不显示名称
+                margin: 0,
+                maxSize: new go.Size(120, NaN),
+                editable: false
+              },
+              new go.Binding('text', '', function (node) {
+                return node.nodeName
+              }).makeTwoWay()
+            )
           ),
           {
             doubleClick: function (e, node) { // 点击开始时触发事件
-              if (e.event.path[1].id == 'myPaletteDiv') {
-                return
-              }
-              that.switchNodeVisible = true
-              that.$nextTick(() => {
-                that.switchNodeData = node.part.data
-                console.log(that.$refs)
-                that.$refs.switchNodeEl.init()
-              })
+              that.doubleClickNodeEvent(e, node, 'inparamsNodeVisible', 'inparamsNodeEl')
             }
           },
           makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
         )
       )
-      //category:Conditional时。走默认
+      // category:DATA_QUERY
       mySelf.myDiagram.nodeTemplateMap.add(
-        'CONDITIONAL', // the default category
+        'DATA_QUERY', // the default category
         $(
           go.Node,
           'Table',
@@ -408,12 +370,12 @@ export default {
             textBlock(true)
           ),
           {
-            doubleClick: function(e, node) {
-              that.operateNodeJudgeParams(node, 'edit')
-              if (e.event.path[1].id == 'myPaletteDiv') {
+            doubleClick: function (e, node) {
+              if (!that.selectCuster.length) {
+                that.$message.error('请先在“数据查询”节点选择分群！')
                 return
               }
-              that.doubleClickNodeEvent(node)
+              that.doubleClickNodeEvent(e, node, 'dataQueryNodeVisible', 'dataQueryNodeEl')
             }
           },
           // four named ports, one on each side:
@@ -423,9 +385,9 @@ export default {
           makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
         )
       )
-      // 正常查询
+      // switch
       mySelf.myDiagram.nodeTemplateMap.add(
-        '',
+        'GROUP_CHOICE',
         $(
           go.Node,
           'Table',
@@ -446,25 +408,33 @@ export default {
                 minSize: new go.Size(120, NaN)
               }
             ),
-            textBlock(true)
+            $(
+              go.TextBlock,
+              {
+                font: '12px sans-serif',
+                stroke: '#fff',
+                margin: new Margin(10, 0),
+                maxSize: new go.Size(120, NaN),
+                editable: false
+              },
+              new go.Binding('text', '', function (node) {
+                return node.nodeName
+              }).makeTwoWay()
+            )
           ),
           {
             //  双击展示
             doubleClick: function (e, node) {
-              //  console.log(e)
-              if (e.event.path[1].id == 'myPaletteDiv') {
-                return
-              }
-              that.doubleClickNodeEvent(node)
+              that.doubleClickNodeEvent(e, node, 'groupChoiceNodeVisible', 'groupChoiceNodeEl')
             }
           },
           makePort('T', go.Spot.Top, go.Spot.Top, false, true),
           makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
         )
       )
-      // start
+      // 返参
       mySelf.myDiagram.nodeTemplateMap.add(
-        'END',
+        'OUT_PARAM',
         $(
           go.Node,
           'Table',
@@ -487,60 +457,18 @@ export default {
           ),
           {
             doubleClick: function (e, node) { // 点击开始时触发事件
-              if (e.event.path[1].id == 'myPaletteDiv') {
-                return
-              }
-              that.switchNodeVisible = true
-              that.$nextTick(() => {
-                that.switchNodeData = node.part.data
-                console.log(that.$refs)
-                that.$refs.switchNodeEl.init()
-              })
+              that.doubleClickNodeEvent(e, node, 'outparamsNodeVisible', 'outparamsNodeEl')
             }
           },
           makePort('T', go.Spot.Top, go.Spot.Top, false, true)
         )
       )
-      mySelf.myDiagram.addModelChangedListener(function (evt) { // 监听新拖拽到画布的节点
-        if (!evt.isTransactionFinished) return
-        var txn = evt.object  //  a Transaction
-        if (txn === null) return
-        txn.changes.each(function (e) {
-          if (e.modelChange === 'linkToKey') {
-            let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
-            let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
-            let oldToNode = mySelf.myDiagram.findNodeForKey(e.oldValue)
-            if (e.object.from === '1') return
-            that.lineLinkOperateEvents(fromNode, 'edit') // 修改时，需要用到修改前的key，及修改后的key
-          } else if (e.modelChange === 'nodeDataArray') {
-            if (e.change === go.ChangedEvent.Insert) { // 插入新节点
-              let nodeData = mySelf.myDiagram.findNodeForKey(e.newValue.key).data
-              let keyNum = e.newValue.key * 1
-              let keyLength = e.newValue.key.length
-              let base = 10 // 基数
-              if (keyLength === 2) { // 两位数时，取个位
-                base = e.newValue.key.substr(0, 1) * 10
-              } else if (keyLength === 3) { // 三位数时，取十位加个位
-                base = 100
-                if (nodeData.category === 'ORACLE_QUERY') { // ORACLE_QUERY特殊三位数时，取个位
-                  base = e.newValue.key.substr(0, 2) * 10
-                }
-              } else if (keyLength === 4) { // 四位数时，取十位加个位
-                base = e.newValue.key.substr(0, 2) * 100
-              }
-              let key = keyNum <= 11 ? '' : keyNum % base // 当key为小于等于10时，默认是第一次拖动则不加序号，其他的加序号，序号取key的个位数
-              nodeData.nodeName = e.newValue.nodeName + key// 重置节点的名称，依次往下排列
-              mySelf.myDiagram.model.updateTargetBindings(nodeData)  //  更新节点数据，参数是你当前编辑的节点数据
-            } // else if (e.change === go.ChangedEvent.Remove) { // 删除节点 e.oldValue.key
-          }
-        })
-      })
       mySelf.myDiagram.commandHandler.canDeleteSelection = function () { // 根据对象数据进行判断节点、线是否可以删除的时候
         // 用例获取选中的节点或线
         return mySelf.myDiagram.selection.all(function (node) {
           if (node.data.key) { // 删除的是节点时
-            //   console.log(node.data)
-            this.$confirm('此操作将删除该节点, 是否继续?', '提示', {
+            if (node.data.category === 'IN_PARAM' || node.data.category === 'GROUP_CHOICE') return false
+            that.$confirm('此操作将删除该节点, 是否继续?', '提示', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'warning'
@@ -551,24 +479,38 @@ export default {
             })
           } else {
             let fromNode = mySelf.myDiagram.findNodeForKey(node.data.from)
-            let toNode = mySelf.myDiagram.findNodeForKey(node.data.to)
+            // let toNode = mySelf.myDiagram.findNodeForKey(node.data.to)
             that.lineLinkOperateEvents(fromNode, 'delete') // 删除时，只需要当前连线的to key就可以拿到上面父级所有节点的出参，及下面所有节点的入参
           }
         })
       }
       mySelf.myDiagram.addDiagramListener('LinkDrawn', function (e) { // 监听连线结束的事件
-        let key = e.subject.data.from   // e.subject.data这是这个线条的数据
-        var nodeLink = mySelf.myDiagram.findNodeForKey(key)  // 获取节点对象
-        let category = nodeLink.data.category
-        if (category === 'CONDITIONAL') { // 将状态判断的连线内容保存，保存时判断用
+        console.log(e)
+        let fromKey = e.subject.data.from   // e.subject.data这是这个线条的数据
+        let toKey = e.subject.data.to
+        var fromNodeLink = mySelf.myDiagram.findNodeForKey(fromKey)  // 获取节点对象
+        let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
+        let fromCategory = fromNodeLink.data.category
+        let toCategory = toNodeLink.data.category
+        if (fromCategory === 'GROUP_CHOICE' && toCategory === 'OUT_PARAM') { // 数据转换不可直接连线到返参节点
+          fromNodeLink.findLinksOutOf().each(function (link) {
+            that.$message.error('不可直接返参，请连接分群节点！')
+            return mySelf.myDiagram.model.removeLinkData(link.data)
+          })
+        }
+        if (fromCategory === 'DATA_QUERY') { // 将状态判断的连线内容保存，保存时判断用
           let linkOutData = []
           let linkDataText = []
-          nodeLink.findLinksOutOf().each(function (link) {
+          fromNodeLink.findLinksOutOf().each(function (link) {
             link.data.linkText = link.data.linkText
             ? link.data.linkText
             : 'TRUE'
             if (linkOutData.length == 1) {
               link.data.linkText = linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
+              if (link.data.linkText === 'FALSE' && toCategory === 'DATA_QUERY') { // false线上不可连线分群节点
+                that.$message.error('连线有误，请重新连线')
+                return mySelf.myDiagram.model.removeLinkData(link.data)
+              }
               mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
             }
             if (linkOutData.length == 2) { // 限制最多可连接两条线
@@ -584,8 +526,8 @@ export default {
           })
         } else { // 非状态判断时，只允许有一个子节点
           let linkOutData = []
-          nodeLink.findLinksOutOf().each(function (link) {
-            if (linkOutData.length == 1) { // 限制最多可连接两条线
+          fromNodeLink.findLinksOutOf().each(function (link) {
+            if (linkOutData.length == 1) { // 限制最多可连接一条线
               that.$message.error({
                 content: '最多可连接一个子节点',
                 duration: 1
@@ -687,10 +629,12 @@ export default {
     showLinkLabel (e) { // 显示连线上的文字
       var label = e.subject.findObject('LABEL')
       if (label !== null) {
-        label.visible = e.subject.fromNode.data.category === 'CONDITIONAL' // 除了状态处理显示外。其他的都不显示
+        label.visible = e.subject.fromNode.data.category === 'DATA_QUERY' // 除了状态处理显示外。其他的都不显示
       }
     },
-    doubleClickNodeEvent (node) { // 双击节点时的事件
+    doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件
+      console.log(node.data)
+      if (e.event.path[1].id == 'myPaletteDiv') return
       // 获取节点出来的线
       let nodeLink = mySelf.myDiagram.findNodeForKey(node.key)  // 获取节点对象
       let category = node.part.data.category
@@ -699,95 +643,29 @@ export default {
       nodeLink.findLinksInto().each(function (link) {
         linkIntoData.push(link.data)
       })
-      if (linkIntoData.length == 0) {
+      if (category !== 'IN_PARAM' && linkIntoData.length == 0) {
         that.$message.error('请连接上游节点')
         return
       }
-      let linkOutData = []
-      nodeLink.findLinksOutOf().each(function (link) {
-        linkOutData.push(link.data)
+      // let linkOutData = []
+      // nodeLink.findLinksOutOf().each(function (link) {
+      //   linkOutData.push(link.data)
+      // })
+      // if (linkOutData.length == 0) {
+      //   that.$message.error({
+      //     content: '请连接子节点',
+      //     duration: 1
+      //   })
+      //   return
+      // }
+      that[visibleParams] = true
+      that.$nextTick(() => {
+        that.$refs[nodeEl].init(node.data)
       })
-      if (linkOutData.length == 0) {
-        that.$message.error({
-          content: '请连接子节点',
-          duration: 1
-        })
-        return
-      }
-      let innerParams = [] //  将父级的出参和start出参集合起来，用作该节点的入参
-      let innerParamsObj = {
-        parents: [],
-        start: []
-      }
-      //  判断选择的节点类型
-      that.nodeTitle = node.part.data.nodeName
-      let basicParams = {
-        tag: that.tag === 'view',
-        nodeData: node.part.data,
-        innerParams: node.data.category !== 'BRANCH_COMBINE' ? innerParams : innerParamsObj
-      }
-      console.log(1234, basicParams)
-      if (category == 'SQL_QUERY') { //  sql查询START, END, SQL_QUERY, HBASE_QUERY, API_CALL, DATA_HANDLE, CONDITIONAL
-        that.sqlNodeData = basicParams
-        that.sqlNodeVisible = true
-      } else if (category == 'HBASE_QUERY') { //  hbase查询
-        that.hbaseNodeData = basicParams
-        that.hbaseNodeVisible = true
-      } else if (category == 'REDIS_QUERY') { //  redis查询
-        that.redisNodeData = basicParams
-        that.redisNodeVisible = true
-      } else if (category == 'API_CALL') { //  第三方接口
-        that.thirdNodeData = basicParams
-        that.thirdInterfaceVisible = true
-      } else if (category == 'DATA_HANDLE') { //  数据处理
-        that.dataHandingNodeData = basicParams
-        that.dataHandingNodeVisible = true
-      } else if (category == 'CONDITIONAL') {
-        that.conditionHandingNodeData = basicParams
-        that.conditionHandingNodeVisible = true
-      } else if (category == 'ORACLE_QUERY') {
-        that.oracleNodeData = basicParams
-        that.oracleNodeVisible = true
-        console.log(that.oracleNodeVisible)
-      }
     },
-    lineLinkOperateEvents(fromNode, type) { //连线的修改、删除事件
-    console.log(fromNode)
-      if (fromNode.data.category === 'START')  return // 第一条线不可删除及修改
+    lineLinkOperateEvents (fromNode, type) { // 连线的修改、删除事件
+      if (fromNode.data.category === 'IN_PARAM') return // 第一条线不可删除及修改
       mySelf.myDiagram.commandHandler.deleteSelection()
-    },
-    setBranchLinkKeys (node) { //  修改连线及删除连线时，重新获取分支节点的子节点key
-      that.branchLinkKeys = []
-      node.findLinksOutOf().each(function (link) {
-        let category = link.toNode.data.category
-        if (category !== 'BRANCH_COMBINE') {
-          that.branchLinkKeys.push(link.data.to)
-        }
-      })
-    },
-    getAllParentNode (node, arr) { //  获取当前节点的所有父级及祖宗元素，findTreeParentChain()这个属性如果有多个父级只会取所有父级及祖宗元素，findTreeParentChain()这个属性如果有多个父级只会取第一个，不适用本需求
-      let nodeInto = node.findNodesInto()
-      nodeInto.each(function (inode) {
-        if (inode) {
-          arr.push(inode.data)
-          that.getAllParentNode(inode, arr)
-        }
-      })
-      return Array.from(new Set(arr))
-    },
-    getParentNode (node, arr) { // 获取当前节点的所有父级
-      let nodeInto = node.findNodesInto()
-      nodeInto.each(function (inode) {
-        if (inode) {
-          //  if (inode.data.data && inode.data.data.outParams) {
-          if (inode.category !== 'CONDITIONAL' && inode.category !== 'PARALLEL_BRANCH' && inode.category !== 'BRANCH_COMBINE') { //  父级有出参的情况下
-            arr.push(inode.data)
-          } else {  //  父级没有出参的情况下，取上上个父级的出参内容
-            that.getParentNode(inode, arr)
-          }
-        }
-      })
-      return Array.from(new Set(arr))
     },
     arrIncludes (arr1, arr2) { //  判断arr1是否包含arr2
       return arr2.every(val => arr1.includes(val))
@@ -798,8 +676,6 @@ export default {
 <style lang="scss">
   .work-flow {
     position: absolute;
-    // width: 94%;
-    // height: 94%;
     left: 18px;
     top: 0;
     right: 18px;
@@ -826,15 +702,15 @@ export default {
   }
   .flow-save {
       border-bottom: 1px solid #ccc;
-      padding:10px 0
+      padding:10px 0;
   }
   .flow-save button {
       display: block;
-      margin: 0 auto;
+      margin: 0 auto 10px;
   }
-  .flow-save .flow-btn-save {
-      margin-bottom: 10px;
-  }
+  // .flow-save .flow-btn-save {
+  //     margin-bottom: 10px;
+  // }
   #myPaletteDiv {
       flex: 1
   }
