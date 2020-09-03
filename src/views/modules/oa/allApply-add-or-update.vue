@@ -2,7 +2,7 @@
   <el-dialog
       title="审批记录"
       :visible.sync="dialogVisible"
-      width="50%"
+      width="1000px"
       :before-close="handleClose">
       <el-form label-width="100px" v-if="quanxian === '账号权限'">
         <el-form-item label="标题">
@@ -46,12 +46,12 @@
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
         <el-form-item label="审批流">
-          <el-button 
+          <el-button
            class="el-icon--right"
            size="small"
-           v-for="tag in detalList.defaultApproverList" 
+           v-for="tag in detalList.defaultApproverList"
            :key="tag.name"
-           :type="tag.status === '审批通过' ? 'success' : tag.status === '审批失败' ? 'danger' : 'warning'" 
+           :type="tag.status === '审批通过' ? 'success' : tag.status === '审批失败' ? 'danger' : 'warning'"
            :icon="tag.status === '审批通过' ? 'el-icon-circle-check' : tag.status === '审批失败' ? 'el-icon-circle-close' : 'el-icon-remove-outline'">
             {{tag.name}}
           </el-button>
@@ -101,12 +101,12 @@
           <span>{{detalList.applyReason}}</span>
         </el-form-item>
         <el-form-item label="审批流">
-          <el-button 
+          <el-button
            class="el-icon--right"
            size="small"
-           v-for="tag in detalList.defaultApproverList" 
+           v-for="tag in detalList.defaultApproverList"
            :key="tag.name"
-           :type="tag.status === '审批通过' ? 'success' : tag.status === '审批失败' ? 'danger' : 'warning'" 
+           :type="tag.status === '审批通过' ? 'success' : tag.status === '审批失败' ? 'danger' : 'warning'"
            :icon="tag.status === '审批通过' ? 'el-icon-circle-check' : tag.status === '审批失败' ? 'el-icon-circle-close' : 'el-icon-remove-outline'">
             {{tag.name}}
           </el-button>
