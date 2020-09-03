@@ -88,7 +88,7 @@ export default {
         let obj = this.custerList.filter(citem => citem.value === item)[0]
         arr.push(obj)
       })
-      this.$emit('getSelectCuster', arr)
+      this.$emit('getSelectCuster', arr, this.dataForm.groupId)
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {

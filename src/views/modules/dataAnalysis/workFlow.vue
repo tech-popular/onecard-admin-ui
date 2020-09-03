@@ -10,27 +10,11 @@
       </div>
       <div id="myDiagramDiv"></div>
     </div>
-    <div>
-      <el-dialog
-        :visible.sync="saveModalVisible"
-        title="保存流程"
-        :close-on-click-modal="false"
-      >
-        <el-form ref="saveForm" :model="saveForm" :rules="saveFormValidate" :label-width="100">
-          <el-form-item prop="name" label="流程名称">
-            <el-input v-model="saveForm.name" placeholder="请输入流程名称" />
-          </el-form-item>
-          <el-form-item prop="code" label="流程编号">
-            <el-input v-model="saveForm.code" placeholder="请输入流程编号，只可输入字母、数字、下划线" />
-          </el-form-item>
-        </el-form>
-        <!-- <submit-botton @submit="handleSubmit" @cancel="handleCancel" slot="footer"></submit-botton> -->
-      </el-dialog>
-    </div>
-      <in-params-node @close="closeAllNode" v-if="inparamsNodeVisible" ref="inparamsNodeEl"></in-params-node>
-      <group-choice-node @close="closeAllNode" @getSelectCuster="getSelectCuster" v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
-      <data-query-node @close="closeAllNode" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
-      <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
+    <in-params-node @close="closeAllNode" v-if="inparamsNodeVisible" ref="inparamsNodeEl"></in-params-node>
+    <group-choice-node @close="closeAllNode" @getSelectCuster="getSelectCuster" v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
+    <data-query-node @close="closeAllNode" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
+    <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
+    <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
   </div>
 </template>
 <script>
@@ -41,6 +25,7 @@ import groupChoiceNode from './workflowNode/groupChoiceNode'
 import inParamsNode from './workflowNode/inparamsNode'
 import dataQueryNode from './workflowNode/dataQueryNode'
 import outParamsNode from './workflowNode/outparamsNode'
+import saveData from './workflowNode/saveData'
 var that = null
 var mySelf = null
 export default {
@@ -61,18 +46,19 @@ export default {
         }]
       },
       tag: this.$route.query.tag,
-      orderNo: this.$route.query.orderNo,
       flowId: this.$route.query.flowId,
       appId: this.$route.query.appId,
+      channelCode: '',
+      groupId: [],
       inparamsNodeVisible: false,
       groupChoiceNodeVisible: false,
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
+      saveDataVisible: false,
 
       selectCuster: [],
       nodeTitle: '',
       successText: '执行成功',
-      saveModalVisible: false,
       saveForm: {
         name: '',
         code: ''
@@ -87,7 +73,7 @@ export default {
       }
     }
   },
-  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode },
+  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, saveData },
   created () {
     that = this
     if (that.tag) { // 修改和查看时，加载初始数据
@@ -100,6 +86,7 @@ export default {
   methods: {
     getFlow (flowId) {
       flowView(flowId).then(res => {
+        console.log(res)
         if (res.code !== 200) {
           return this.$message.error(res.message)
         }
@@ -110,8 +97,6 @@ export default {
         this.orderNo = res.data.orderNo
         this.saveForm.name = res.data.name
         this.saveForm.code = res.data.code
-        this.branchLinkKeys = that.flowJson.branchLinkKeys
-        this.mergeParentsKeys = that.flowJson.mergeParentsKeys
         mySelf.myDiagram.model = go.Model.fromJson(res.data.structureJson)
       })
     },
@@ -124,8 +109,9 @@ export default {
         that.$message.success(that.successText)
       }
     },
-    getSelectCuster (data) {
+    getSelectCuster (data, groupId) {
       this.selectCuster = data
+      this.groupId = groupId
     },
     // 加载并刷新画布
     loadJson () {
@@ -135,23 +121,23 @@ export default {
     // 返回
     goback () {
       if (this.tag === 'view') {
-        this.$router.replace({ path: '/configManage/searchFlow', query: {appId: that.appId, orderNo: that.$route.query.orderNo} })
+        this.$router.replace({ path: 'dataAnalysis-dataDecisionManage' })
       } else {
-        that.$Modal.confirm({
-          title: '提示',
-          content: '流程未保存，确认返回？',
-          okText: '确定返回',
-          cancelTtext: '取消',
-          onOk: () => {
-            this.$router.replace({ path: '/configManage/searchFlow', query: {appId: that.appId, orderNo: that.$route.query.orderNo} })
-          }
+        that.$confirm('流程未保存，确认返回？', '提示', {
+          confirmButtonText: '确定返回',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$router.replace({ path: 'dataAnalysis-dataDecisionManage' })
+        }).catch(() => {
+          console.log('cancel')
         })
       }
     },
     // 保存
     save () {
       console.log(mySelf.myDiagram.model.nodeDataArray)
-      let linkDataArray = mySelf.myDiagram.model.linkDataArray
+      // let linkDataArray = mySelf.myDiagram.model.linkDataArray
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
@@ -161,46 +147,43 @@ export default {
         }
       })
       if (pNullArr.length) return this.$message.error(`请配置节点【“${pNullArr.join('”、“')}”】的内容`)
-       if(that.tag && that.tag === 'edit') { //修改保存
-          this.saveFlowInfo(mySelf.myDiagram.model.toJson())
-        } else { //新建保存
-          this.saveModalVisible = true
-        }
+      if (that.tag && that.tag === 'edit') { // 修改保存
+        this.saveFlowInfo(mySelf.myDiagram.model.toJson())
+      } else { // 新建保存
+        this.saveDataVisible = true
+        this.$nextTick(() => {
+          this.$refs.saveDataEl.init()
+        })
+      }
     },
-    handleCancel () {
-      this.saveModalVisible = false
+    closeSave (data) {
+      this.saveFlowInfo(mySelf.myDiagram.model.toJson(), data)
     },
-    handleSubmit () {
-      this.$refs.saveForm.validate((valid) => {
-        if (valid) {
-          this.saveFlowInfo(mySelf.myDiagram.model.toJson())
-        }
-      })
-    },
-    saveFlowInfo (data) {
+    saveFlowInfo (data, saveData) {
+      console.log(123, data)
       let params = JSON.parse(data)
       params.orderNo = this.orderNo
-      params.name = this.saveForm.name
-      params.code = this.saveForm.code
-      params.branchLinkKeys = that.branchLinkKeys  //  分支和合并数据保存一下，用于渲染时用
-      params.mergeParentsKeys = that.mergeParentsKeys //  分支和合并数据保存一下，用于渲染时用
+      params.name = saveData.name
+      params.code = saveData.code
       let url = this.flowId ? editFlowInfo : saveFlowInfo
       if (this.flowId) {
         params.flowId = this.flowId
       }
-      url(JSON.stringify(params)).then(res => {
-        if (res.code !== 200) {
-          return this.$message.error(res.message)
+      console.log(params)
+      url(params).then(({data}) => {
+        if (data.status !== '1') {
+          return this.$message.error(data.message)
         }
-        this.$message.success(res.message)
-        setTimeout(() => {
-          that.$router.replace({ path: '/configManage/searchFlow', query: { orderNo: this.orderNo, appId: this.appId } })
-        }, 300)
+        this.$message.success(data.message)
+        // setTimeout(() => {
+        //   that.$router.replace({ path: '/configManage/searchFlow', query: { orderNo: this.orderNo, appId: this.appId } })
+        // }, 300)
       })
     },
     // 加载
     load () {
       mySelf.myDiagram.model = go.Model.fromJson(this.flowJson)
+      console.log(999)
     },
     diagramInit () {
       mySelf = this
@@ -216,8 +199,8 @@ export default {
             $(go.Shape, 'LineV', { stroke: 'gray', strokeWidth: 0.5, interval: 10 })
           ),
           isReadOnly: mySelf.tag === 'view', // 查看时禁止编辑
-          initialContentAlignment: go.Spot.Center,
-          allowDrop: true, //  must be true to accept drops from the Palette
+          initialContentAlignment: go.Spot.Top,
+          allowDrop: mySelf.tag !== 'view', //  must be true to accept drops from the Palette
           LinkDrawn: that.showLinkLabel, //  this DiagramEvent listener is defined below
           LinkRelinked: that.showLinkLabel,
           scrollsPageOnFocus: false,
