@@ -620,9 +620,11 @@ export default {
       // 获取所有的$refs.ruleForm,用于统一校验数据
       let ruleSet = this.$refs.actionRulesSet
       let ruleArr = []
-      ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
+      if (ruleSet) {
+        ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
+      }
       function _find (data) { // 为了获取第三层数据
-        if (data.$children) {
+        if (data && data.$children) {
           data.$children.forEach(item => {
             if (item.$refs.ruleForm) {
               ruleArr = [...ruleArr, ...item.$refs.ruleForm]
