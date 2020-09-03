@@ -138,7 +138,7 @@
               ></codemirror>
             </div>
           </el-form-item>
-          <div class="work-type-pane">
+          <!-- <div class="work-type-pane">
             <el-form-item label="下发类型：" prop="addDataRule" label-width="120px">
               <el-radio-group v-model="acquisitionTask.addDataRule">
                 <el-radio label="all">全量</el-radio>
@@ -148,7 +148,7 @@
             <el-form-item label="增量规则：" prop="addRuleFields" label-width="200px" v-if="acquisitionTask.addDataRule === 'add'">
               <el-input v-model="acquisitionTask.addRuleFields" placeholder="增量规则" style="width: 300px" />
             </el-form-item>
-          </div>
+          </div> -->
         </el-form>
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px">
