@@ -109,9 +109,10 @@ export default {
         that.$message.success(that.successText)
       }
     },
-    getSelectCuster (data, groupId) {
-      this.selectCuster = data
-      this.groupId = groupId
+    getSelectCuster (custerArr, data) {
+      this.selectCuster = custerArr
+      this.groupId = data.groupId
+      this.channelCode = data.channelCode
     },
     // 加载并刷新画布
     loadJson () {
@@ -161,10 +162,15 @@ export default {
     },
     saveFlowInfo (data, saveData) {
       console.log(123, data)
-      let params = JSON.parse(data)
+      let params = {
+        configJson: data
+      }
+      console.log(params)
       params.orderNo = this.orderNo
       params.name = saveData.name
       params.code = saveData.code
+      params.groupId = this.groupId
+      params.channelCode = this.channelCode
       let url = this.flowId ? editFlowInfo : saveFlowInfo
       if (this.flowId) {
         params.flowId = this.flowId
