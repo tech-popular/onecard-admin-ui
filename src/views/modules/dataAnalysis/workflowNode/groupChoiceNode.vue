@@ -1,18 +1,13 @@
 <template>
-  <el-dialog title="数据查询"
+  <el-dialog title="分群节点"
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
     width="600px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" label-width="120px" ref="dataForm" :rules="dataRules">
-      <el-form-item prop="channelCode" label="用户所属渠道">
-        <el-select v-model="dataForm.channelCode" placeholder="请选择用户所属渠道" style="width: 400px" @change="channelCodeChange">
-          <el-option v-for="(item, index) in channelList" :key="index" :value="item.value" :label="item.text"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item prop="groupId" label="分群名称">
-        <el-select v-model="dataForm.groupId" multiple clearable placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
+        <el-select v-model="dataForm.groupId" placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
           <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text"></el-option>
         </el-select>
       </el-form-item>
@@ -24,11 +19,7 @@
   </el-dialog>
 </template>
 <script>
-import { custerList, channelsList } from '@/api/dataAnalysis/dataDecisionManage'
 export default {
-  props: {
-    data: Object
-  },
   data () {
     return {
       id: '',
@@ -37,13 +28,9 @@ export default {
       channelList: [],
       custerList: [],
       dataForm: {
-        channelCode: '',
-        groupId: []
+        groupId: ''
       },
       dataRules: {
-        channelCode: [
-          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
-        ],
         groupId: [
           { required: true, message: '请选择分群', trigger: 'change' }
         ]
@@ -54,41 +41,15 @@ export default {
     init (data) {
       this.visible = true
       this.key = data.key
-      this.getChannelsList()
+      this.custerList = this.$parent.selectCuster
+      console.log(this.custerList)
       if (data.data) {
-        this.dataForm.channelCode = data.data.configItems.channelCode
-        this.getCusterList(this.dataForm.channelCode)
         this.dataForm.groupId = data.data.configItems.groupId
       }
     },
-    getChannelsList () {
-      channelsList().then(({data}) => {
-        if (data.status * 1 !== 1) {
-          this.channelList = []
-          return
-        }
-        this.channelList = data.data
-      })
-    },
-    channelCodeChange (val) {
-      this.getCusterList(val)
-    },
-    getCusterList (code) {
-      custerList(code).then(({data}) => {
-        if (data.status * 1 !== 1) {
-          this.custerList = []
-          return
-        }
-        this.custerList = data.data
-      })
-    },
-    groupIdChange () {
-      let arr = []
-      this.dataForm.groupId.forEach(item => {
-        let obj = this.custerList.filter(citem => citem.value === item)[0]
-        arr.push(obj)
-      })
-      this.$emit('getSelectCuster', arr, this.dataForm)
+    groupIdChange (val) {
+      let name = this.custerList.filter(item => item.value === val)[0].text
+      this.$emit('setCusterName', name, this.key)
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {

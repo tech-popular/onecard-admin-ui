@@ -11,8 +11,8 @@
       <div id="myDiagramDiv"></div>
     </div>
     <in-params-node @close="closeAllNode" v-if="inparamsNodeVisible" ref="inparamsNodeEl"></in-params-node>
-    <group-choice-node @close="closeAllNode" @getSelectCuster="getSelectCuster" v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
-    <data-query-node @close="closeAllNode" @setCusterName="setCusterName" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
+    <data-query-node @close="closeAllNode" @getSelectCuster="getSelectCuster" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
+    <group-choice-node @close="closeAllNode" @setCusterName="setCusterName"  v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
     <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
     <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
   </div>
@@ -39,7 +39,7 @@ export default {
         linkToPortIdProperty: 'toPort',
         nodeDataArray: [
           {'key': '1', 'category': 'IN_PARAM', 'loc': '0 0', 'nodeName': '入参'},
-          {'key': '2', 'loc': '0 100', 'category': 'GROUP_CHOICE', 'nodeName': '数据转换'}
+          {'key': '2', 'loc': '0 100', 'category': 'DATA_QUERY', 'nodeName': '数据查询'}
         ],
         linkDataArray: [{
           from: '1',
@@ -168,7 +168,7 @@ export default {
         if (!item.data) {
           pNullArr.push(item.nodeName)
         }
-        if (item.category === 'DATA_QUERY') {
+        if (item.category === 'GROUP_CHOICE') {
           let node = mySelf.myDiagram.findNodeForKey(item.key)
           let linkNum = 0
           node.findLinksOutOf().each(function (link) {
@@ -353,9 +353,9 @@ export default {
           makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
         )
       )
-      // category:DATA_QUERY
+      // category:GROUP_CHOICE
       mySelf.myDiagram.nodeTemplateMap.add(
-        'DATA_QUERY', // the default category
+        'GROUP_CHOICE', // the default category
         $(
           go.Node,
           'Table',
@@ -384,7 +384,7 @@ export default {
                 that.$message.error('请先在“数据查询”节点选择分群！')
                 return
               }
-              that.doubleClickNodeEvent(e, node, 'dataQueryNodeVisible', 'dataQueryNodeEl')
+              that.doubleClickNodeEvent(e, node, 'groupChoiceNodeVisible', 'groupChoiceNodeEl')
             }
           },
           // four named ports, one on each side:
@@ -396,7 +396,7 @@ export default {
       )
       // GROUP_CHOICE
       mySelf.myDiagram.nodeTemplateMap.add(
-        'GROUP_CHOICE',
+        'DATA_QUERY',
         $(
           go.Node,
           'Table',
@@ -422,7 +422,7 @@ export default {
           {
             //  双击展示
             doubleClick: function (e, node) {
-              that.doubleClickNodeEvent(e, node, 'groupChoiceNodeVisible', 'groupChoiceNodeEl')
+              that.doubleClickNodeEvent(e, node, 'dataQueryNodeVisible', 'dataQueryNodeEl')
             }
           },
           makePort('T', go.Spot.Top, go.Spot.Top, false, true),
@@ -464,7 +464,7 @@ export default {
         // 用例获取选中的节点或线
         return mySelf.myDiagram.selection.all(function (node) {
           if (node.data.key) { // 删除的是节点时
-            if (node.data.category === 'IN_PARAM' || node.data.category === 'GROUP_CHOICE') return false
+            if (node.data.category === 'IN_PARAM' || node.data.category === 'DATA_QUERY') return false
             that.$confirm('此操作将删除该节点, 是否继续?', '提示', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
@@ -487,13 +487,13 @@ export default {
         let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
         let fromCategory = fromNodeLink.data.category
         let toCategory = toNodeLink.data.category
-        if (fromCategory === 'GROUP_CHOICE' && toCategory === 'OUT_PARAM') { // 数据转换不可直接连线到返参节点
+        if (fromCategory === 'DATA_QUERY' && toCategory === 'OUT_PARAM') { // 数据转换不可直接连线到返参节点
           fromNodeLink.findLinksOutOf().each(function (link) {
             that.$message.error('不可直接返参，请连接分群节点！')
             return mySelf.myDiagram.model.removeLinkData(link.data)
           })
         }
-        if (fromCategory === 'DATA_QUERY') { // 将状态判断的连线内容保存，保存时判断用
+        if (fromCategory === 'GROUP_CHOICE') { // 将状态判断的连线内容保存，保存时判断用
           let linkOutData = []
           let linkDataText = []
           fromNodeLink.findLinksOutOf().each(function (link) {
@@ -624,7 +624,7 @@ export default {
     showLinkLabel (e) { // 显示连线上的文字
       var label = e.subject.findObject('LABEL')
       if (label !== null) {
-        label.visible = e.subject.fromNode.data.category === 'DATA_QUERY' // 除了状态处理显示外。其他的都不显示
+        label.visible = e.subject.fromNode.data.category === 'GROUP_CHOICE' // 除了状态处理显示外。其他的都不显示
       }
     },
     doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件
