@@ -109,7 +109,75 @@
               </span>
             </el-form-item>
           </div>
-          <el-form-item prop="outDataTable" label-width="120px" style="width:700px">
+          <!--redis-->
+          <div v-if="acquisitionTask.outDatasourceType==='REDIS'" style="marginLeft: 120px">
+            <el-form :model="redisData" :rules="dataRule" ref="redisForm" label-width="120px">
+              <el-form-item class="el-redis-item" label="redis数据格式" prop="redisName">
+                <el-select v-model="redisData.redisName" placeholder="redis数据格式" clearable @change="redisNameChange">
+                  <el-option
+                    v-for="item in redisNames"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="redisKey" prop="redisKey">
+                <el-input v-model="redisData.redisKey" placeholder="redisKey" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" :label="redisData.redisLabel + 'Value'" prop="redisValue" v-if="!!redisData.redisName">
+                <el-input v-model="redisData.redisValue" :placeholder="redisData.redisLabel + 'Value'" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="score" v-if="redisData.redisName === 'redisTypeZSet'">
+                <el-input v-model="redisData.zSetScore" placeholder="score" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="key拼接时间" prop="redisJoinType">
+                <el-select v-model="redisData.redisJoinType" placeholder="key拼接时间" clearable>
+                  <el-option v-for="item in redisTypes" :key="item" :label="item" :value="item"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="key失效时间" prop="redisUneffectTime">
+                <el-input
+                  v-model="redisData.redisUneffectTime"
+                  placeholder="key失效时间"
+                  clearable
+                  @input="redisData.redisUneffectTime = redisData.redisUneffectTime.replace(/[^\d]/g,'')"
+                >
+                  <el-select v-model="redisData.redisUnit" slot="append" style="width:100px">
+                    <el-option
+                      v-for="item in redisUnits"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+          <!---->
+          <!--elasticsearch-->
+          <div v-if="acquisitionTask.outDatasourceType==='ELASTICSEARCH'" style="marginLeft: 120px">
+            <el-form :model="elasticData" :rules="dataRule" ref="elasticForm" label-width="60px">
+              <el-form-item class="el-redis-item" label="type">
+                <el-input v-model="elasticData.type" placeholder="type" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="ID列" prop="id">
+                <el-input v-model="elasticData.idColumn" placeholder="ID列" clearable></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+          <!---->
+          <!--mc-->
+          <div v-if="acquisitionTask.outDatasourceType==='MAXCOMPUTE'" style="marginLeft: 120px">
+            <el-form :model="mcData" :rules="dataRule" ref="mcForm" label-width="60px">
+              <el-form-item class="el-redis-item" label="分区列">
+                <el-input v-model="mcData.mcColumn" placeholder="分区列, 若是分区表则必填" clearable></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+          <!---->
+          <el-form-item prop="outDataTable" label="输入数据表/topic名称" label-width="160px" style="width:700px">
             <el-input v-model="acquisitionTask.outDataTable" placeholder="输入数据表/topic名称" />
           </el-form-item>
           <el-form-item prop="outBeforeSql" label="目标库前置处理SQL：" label-width="120px" ref="workBeginSqlForm2">
@@ -238,6 +306,24 @@ export default {
         addDataRule: 'all', // 采集规则（ALL-全量，ADD-增量）
         addRuleFields: ''
       },
+      redisData: {
+        redisName: '',
+        redisKey: '',
+        redisLabel: '',
+        redisValue: '',
+        zSetScore: '',
+        redisJoinType: '',
+        redisUneffectTime: '',
+        redisUnit: '1'
+      },
+      outRedisData: '',
+      elasticData: {
+        type: '',
+        idColumn: ''
+      },
+      mcData: {
+        mcColumn: ''
+      },
       dataRule: {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
@@ -289,6 +375,25 @@ export default {
         ],
         failRepeatTrigger: [
           {required: true, message: '请输入重跑次数', trigger: 'change'}
+        ],
+        //
+        redisName: [
+          { required: true, message: '请选择redis数据格式', trigger: 'change' }
+        ],
+        redisKey: [
+          { required: true, message: '请输入redisKey', trigger: 'change' }
+        ],
+        redisValue: [
+          { required: true, message: '请输入', trigger: 'blur' }
+        ],
+        redisJoinType: [
+          {required: true, message: '请选择key拼接时间', trigger: 'change'}
+        ],
+        redisUneffectTime: [
+          {required: true, message: '请输入key失效时间', trigger: 'blur'}
+        ],
+        idColumn: [
+          {required: true, message: '请输入ID列', trigger: 'blur'}
         ]
       },
       allSystemList: [],
@@ -330,12 +435,95 @@ export default {
           showToken: true
         },
         styleSelectedText: true
-      }
+      },
+      redisNames: [
+        {
+          value: 'redisTypeString',
+          label: 'string'
+        },
+        {
+          value: 'redisTypeList',
+          label: 'list'
+        },
+        {
+          value: 'redisTypeSet',
+          label: 'set'
+        },
+        {
+          value: 'redisTypeZSet',
+          label: 'zSet'
+        },
+        {
+          value: 'redisTypeHash',
+          label: 'hash'
+        }
+      ],
+      redisTypes: [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyyMMdd',
+        'yyyy-MM-dd',
+        'yyyy_MM_dd',
+        'yyyy',
+        'MM',
+        'dd'
+      ],
+      redisUnits: [
+        {
+          value: '1',
+          label: '秒'
+        },
+        {
+          value: '2',
+          label: '分钟'
+        },
+        {
+          value: '3',
+          label: '小时'
+        },
+        {
+          value: '4',
+          label: '天'
+        }
+      ]
     }
   },
   computed: {
     previreCodemirror () {
       return this.$refs.previewSql.codemirror
+    }
+  },
+  watch: {
+    redisData: {
+      handler (newVal, oldVal) {
+        let unitCount = {
+          '1': 1,
+          '2': 60,
+          '3': 60 * 60,
+          '4': 60 * 60 * 24
+        }
+        let time = 0
+        for (let key in unitCount) {
+          if (newVal.redisUnit == key) {
+            time = newVal.redisUneffectTime ? Number(newVal.redisUneffectTime) * unitCount[key] : ''
+          }
+        }
+        let outTableName =
+          newVal.redisName +
+          '#' +
+          (newVal.redisKey ? newVal.redisKey : ' ') +
+          '#' +
+          (newVal.redisJoinType ? newVal.redisJoinType : ' ') +
+          '#' +
+          (time || ' ') +
+          '#' +
+          newVal.redisValue +
+          '#' +
+          (newVal.zSetScore ? newVal.zSetScore : ' ') +
+          '#'
+        this.outRedisData = outTableName
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
@@ -435,6 +623,10 @@ export default {
       }).then(({data}) => {
         this[`all${type}AccountList`] = data.data
       })
+    },
+    redisNameChange (val, index) {
+      let label = this.redisNames.filter(item => item.value === val)[0].label
+      this.redisData.redisLabel = label
     },
     sqlParseClick () {
       if (!this.acquisitionTask.inDatasourceType) {
