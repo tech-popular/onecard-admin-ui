@@ -6,8 +6,8 @@
     width="500px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :rules="dataRules">
-      <el-form-item prop="outParam" label="出参">
-        <el-input v-model="dataForm.outParam" placeholder="请输入出参" style="width: 300px" />
+      <el-form-item prop="outValue" label="出参">
+        <el-input v-model="dataForm.outValue" placeholder="请输入出参" style="width: 300px" />
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -26,10 +26,10 @@ export default {
       visible: false,
       inparamData: [],
       dataForm: {
-        outParam: ''
+        outValue: ''
       },
       dataRules: {
-        outParam: [
+        outValue: [
           { required: true, message: '请选择入参', trigger: 'blur' }
         ]
       }
@@ -41,7 +41,7 @@ export default {
       this.key = data.key
       this.getInparamData()
       if (data.data) {
-        this.dataForm.outParam = data.data.configItems.outParam
+        this.dataForm.outValue = data.data.configItems.outValue
       }
       console.log(data)
     },

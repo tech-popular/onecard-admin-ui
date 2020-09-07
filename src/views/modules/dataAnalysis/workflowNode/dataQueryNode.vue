@@ -7,7 +7,7 @@
     :close-on-click-modal="false">
     <el-form :model="dataForm" label-width="120px" ref="dataForm" :rules="dataRules">
       <el-form-item prop="groupId" label="分群名称">
-        <el-select v-model="dataForm.groupId" placeholder="请选择分群" style="width: 400px">
+        <el-select v-model="dataForm.groupId" placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
           <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text"></el-option>
         </el-select>
       </el-form-item>
@@ -41,11 +41,15 @@ export default {
     init (data) {
       this.visible = true
       this.key = data.key
-      console.log(data)
       this.custerList = this.$parent.selectCuster
+      console.log(this.custerList)
       if (data.data) {
         this.dataForm.groupId = data.data.configItems.groupId
       }
+    },
+    groupIdChange (val) {
+      let name = this.custerList.filter(item => item.value === val)[0].text
+      this.$emit('setCusterName', name, this.key)
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {

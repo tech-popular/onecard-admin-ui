@@ -57,7 +57,7 @@ export default {
       this.getChannelsList()
       if (data.data) {
         this.dataForm.channelCode = data.data.configItems.channelCode
-        this.getCusterList()
+        this.getCusterList(this.dataForm.channelCode)
         this.dataForm.groupId = data.data.configItems.groupId
       }
     },
@@ -70,11 +70,11 @@ export default {
         this.channelList = data.data
       })
     },
-    channelCodeChange () {
-      this.getCusterList()
+    channelCodeChange (val) {
+      this.getCusterList(val)
     },
-    getCusterList () {
-      custerList(this.dataForm.channelCode).then(({data}) => {
+    getCusterList (code) {
+      custerList(code).then(({data}) => {
         if (data.status * 1 !== 1) {
           this.custerList = []
           return

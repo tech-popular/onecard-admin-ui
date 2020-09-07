@@ -1,5 +1,5 @@
 <template>
-  <div class="work-flow">
+  <div class="work-flow" v-loading="loading">
     <div id="sample">
       <div class="left-tool">
         <div class="flow-save">
@@ -12,15 +12,15 @@
     </div>
     <in-params-node @close="closeAllNode" v-if="inparamsNodeVisible" ref="inparamsNodeEl"></in-params-node>
     <group-choice-node @close="closeAllNode" @getSelectCuster="getSelectCuster" v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
-    <data-query-node @close="closeAllNode" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
+    <data-query-node @close="closeAllNode" @setCusterName="setCusterName" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
     <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
     <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
   </div>
 </template>
 <script>
 import go, { Margin } from 'gojs'
-import { palette } from '@/utils/flowPalette' // 侧边栏模板数据
-import { saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
+import { palette } from './dataAnalysisUtils/flowPalette' // 侧边栏模板数据
+import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
 import groupChoiceNode from './workflowNode/groupChoiceNode'
 import inParamsNode from './workflowNode/inparamsNode'
 import dataQueryNode from './workflowNode/dataQueryNode'
@@ -31,6 +31,7 @@ var mySelf = null
 export default {
   data () {
     return {
+      loading: false,
       diagramHeight: '600px',
       flowJson: {
         class: 'go.GraphLinksModel',
@@ -46,8 +47,7 @@ export default {
         }]
       },
       tag: this.$route.query.tag,
-      flowId: this.$route.query.flowId,
-      appId: this.$route.query.appId,
+      id: this.$route.query.id,
       channelCode: '',
       groupId: [],
       inparamsNodeVisible: false,
@@ -55,7 +55,7 @@ export default {
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
       saveDataVisible: false,
-
+      currentName: '',
       selectCuster: [],
       nodeTitle: '',
       successText: '执行成功',
@@ -76,28 +76,53 @@ export default {
   components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, saveData },
   created () {
     that = this
-    if (that.tag) { // 修改和查看时，加载初始数据
-      that.getFlow(this.$route.query.flowId)
-    }
   },
   mounted () {
-    this.diagramInit()
+    if (that.id) {
+      that.getFlow(this.$route.query.id)
+    } else {
+      this.diagramInit()
+    }
   },
   methods: {
-    getFlow (flowId) {
-      flowView(flowId).then(res => {
-        console.log(res)
-        if (res.code !== 200) {
-          return this.$message.error(res.message)
+    getFlow (id) {
+      this.loading = true
+      flowView(id).then(({data}) => {
+        if (data.status !== '1') {
+          this.loading = false
+          return this.$message.error(data.msg)
         }
-        if (!res.data.structureJson) {
+        if (!data.data.configJson) {
+          this.loading = false
           return this.$message.error('JSON信息不存在')
         }
-        that.flowJson = JSON.parse(res.data.structureJson)
-        this.orderNo = res.data.orderNo
-        this.saveForm.name = res.data.name
-        this.saveForm.code = res.data.code
-        mySelf.myDiagram.model = go.Model.fromJson(res.data.structureJson)
+        that.flowJson = data.data.configJson
+        this.$nextTick(() => {
+          this.diagramInit()
+          mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(data.data.configJson))
+          this.loading = false
+        })
+        this.saveForm.name = data.data.name
+        this.saveForm.code = data.data.code
+        this.channelCode = data.data.channelCode
+        // this.groupId = data.groupId
+        this.groupId = data.data.configJson.nodeDataArray.filter(item => item.key === '2')[0].data.configItems.groupId
+        this.getCusterList(data.data.channelCode)
+      })
+    },
+    getCusterList (code) { // 回显时用的
+      custerList(code).then(({data}) => {
+        if (data.status * 1 !== 1) {
+          this.custerList = []
+          return
+        }
+        this.custerList = data.data
+        let arr = []
+        this.groupId.forEach(item => {
+          let obj = this.custerList.filter(citem => citem.value === item)[0]
+          arr.push(obj)
+        })
+        this.selectCuster = arr
       })
     },
     closeAllNode (item) {
@@ -105,19 +130,17 @@ export default {
         let key = item.data.key
         let _data = mySelf.myDiagram.findNodeForKey(key).data
         _data.data = item.data.config
-        console.log(mySelf.myDiagram.findNodeForKey(key).data)
-        that.$message.success(that.successText)
       }
     },
-    getSelectCuster (custerArr, data) {
+    getSelectCuster (custerArr, data) { // 获取数据转换中的参数，用于保存用
       this.selectCuster = custerArr
       this.groupId = data.groupId
       this.channelCode = data.channelCode
     },
-    // 加载并刷新画布
-    loadJson () {
-      var _json = mySelf.myDiagram.model.toJson()
-      mySelf.myDiagram.model = go.Model.fromJson(_json)
+    setCusterName (name, key) { // 分群节点时，节点名称以选择的分群名称来标记
+      this.currentName = name
+      let node = mySelf.myDiagram.findNodeForKey(key).part.data
+      mySelf.myDiagram.model.setDataProperty(node, 'nodeName', name)
     },
     // 返回
     goback () {
@@ -137,19 +160,32 @@ export default {
     },
     // 保存
     save () {
-      console.log(mySelf.myDiagram.model.nodeDataArray)
-      // let linkDataArray = mySelf.myDiagram.model.linkDataArray
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
+      let pChildOneArr = []
       nodeDataArray.map(item => {
         if (!item.data) {
           pNullArr.push(item.nodeName)
         }
+        if (item.category === 'DATA_QUERY') {
+          let node = mySelf.myDiagram.findNodeForKey(item.key)
+          let linkNum = 0
+          node.findLinksOutOf().each(function (link) {
+            linkNum++
+          })
+          if (linkNum < 2) {
+            pChildOneArr.push(item.nodeName)
+          }
+        }
       })
       if (pNullArr.length) return this.$message.error(`请配置节点【“${pNullArr.join('”、“')}”】的内容`)
-      if (that.tag && that.tag === 'edit') { // 修改保存
-        this.saveFlowInfo(mySelf.myDiagram.model.toJson())
+      if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
+      if (that.id) { // 修改保存
+        this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), {
+          name: this.saveForm.name,
+          code: this.saveForm.code
+        })
       } else { // 新建保存
         this.saveDataVisible = true
         this.$nextTick(() => {
@@ -158,32 +194,28 @@ export default {
       }
     },
     closeSave (data) {
-      this.saveFlowInfo(mySelf.myDiagram.model.toJson(), data)
+      this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), data)
     },
-    saveFlowInfo (data, saveData) {
-      console.log(123, data)
+    saveFlowInfo (flowJson, saveData) {
       let params = {
-        configJson: data
+        configJson: flowJson,
+        name: saveData.name,
+        code: saveData.code,
+        groupId: this.groupId,
+        channelCode: this.channelCode
       }
-      console.log(params)
-      params.orderNo = this.orderNo
-      params.name = saveData.name
-      params.code = saveData.code
-      params.groupId = this.groupId
-      params.channelCode = this.channelCode
-      let url = this.flowId ? editFlowInfo : saveFlowInfo
-      if (this.flowId) {
-        params.flowId = this.flowId
+      let url = this.id ? editFlowInfo : saveFlowInfo
+      if (this.id) {
+        params.id = this.id
       }
-      console.log(params)
       url(params).then(({data}) => {
         if (data.status !== '1') {
           return this.$message.error(data.message)
         }
         this.$message.success(data.message)
-        // setTimeout(() => {
-        //   that.$router.replace({ path: '/configManage/searchFlow', query: { orderNo: this.orderNo, appId: this.appId } })
-        // }, 300)
+        setTimeout(() => {
+          that.$router.replace({ path: 'dataAnalysis-dataDecisionManage' })
+        }, 300)
       })
     },
     // 加载
@@ -274,19 +306,19 @@ export default {
           {
             font: '12px sans-serif',
             stroke: '#fff', // 分支和合并节点可以不显示名称
-            margin: isEdit ? new Margin(10, 0) : 0,
+            margin: new Margin(10, 0),
             maxSize: new go.Size(120, NaN),
-            editable: isEdit
+            wrap: go.TextBlock.WrapFit,
+            editable: isEdit,
+            textEdited: function (textBlock, previousText, currentText) { // 改变了节点名称时触发事件,后面节点的入参名称更新
+              let node = textBlock.part.data
+              if (previousText !== currentText) {
+                mySelf.myDiagram.model.setDataProperty(node, 'nodeName', currentText)
+              }
+            }
           },
           new go.Binding('text', '', function (node) {
-            let locX = node.loc.split(' ')[0] // 从位置判断是否是左侧菜单中的内容
-            let newName = node.nodeName
-            if (parseInt(node.key) < 10) {
-              newName = `${newName}(1)`
-            } else {
-              newName = `${newName}(${node.key % ((node.key.length - 1) * 10)})`
-            }
-            return locX === '0' || !isEdit ? node.nodeName : newName
+            return node.nodeName
           }).makeTwoWay()
         )
       }
@@ -311,19 +343,7 @@ export default {
                 strokeWidth: 0
               }
             ),
-            $(
-              go.TextBlock,
-              {
-                font: '12px sans-serif',
-                stroke: '#fff', // 分支和合并节点可以不显示名称
-                margin: 0,
-                maxSize: new go.Size(120, NaN),
-                editable: false
-              },
-              new go.Binding('text', '', function (node) {
-                return node.nodeName
-              }).makeTwoWay()
-            )
+            textBlock(false)
           ),
           {
             doubleClick: function (e, node) { // 点击开始时触发事件
@@ -374,7 +394,7 @@ export default {
           makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
         )
       )
-      // switch
+      // GROUP_CHOICE
       mySelf.myDiagram.nodeTemplateMap.add(
         'GROUP_CHOICE',
         $(
@@ -397,19 +417,7 @@ export default {
                 minSize: new go.Size(120, NaN)
               }
             ),
-            $(
-              go.TextBlock,
-              {
-                font: '12px sans-serif',
-                stroke: '#fff',
-                margin: new Margin(10, 0),
-                maxSize: new go.Size(120, NaN),
-                editable: false
-              },
-              new go.Binding('text', '', function (node) {
-                return node.nodeName
-              }).makeTwoWay()
-            )
+            textBlock(false)
           ),
           {
             //  双击展示
@@ -421,7 +429,7 @@ export default {
           makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
         )
       )
-      // 返参
+      // 返参OUT_PARAM
       mySelf.myDiagram.nodeTemplateMap.add(
         'OUT_PARAM',
         $(
@@ -442,7 +450,7 @@ export default {
                 strokeWidth: 0
               }
             ),
-            textBlock(false)
+            textBlock(true)
           ),
           {
             doubleClick: function (e, node) { // 点击开始时触发事件
@@ -468,13 +476,11 @@ export default {
             })
           } else {
             let fromNode = mySelf.myDiagram.findNodeForKey(node.data.from)
-            // let toNode = mySelf.myDiagram.findNodeForKey(node.data.to)
             that.lineLinkOperateEvents(fromNode, 'delete') // 删除时，只需要当前连线的to key就可以拿到上面父级所有节点的出参，及下面所有节点的入参
           }
         })
       }
       mySelf.myDiagram.addDiagramListener('LinkDrawn', function (e) { // 监听连线结束的事件
-        console.log(e)
         let fromKey = e.subject.data.from   // e.subject.data这是这个线条的数据
         let toKey = e.subject.data.to
         var fromNodeLink = mySelf.myDiagram.findNodeForKey(fromKey)  // 获取节点对象
@@ -496,10 +502,10 @@ export default {
             : 'TRUE'
             if (linkOutData.length == 1) {
               link.data.linkText = linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-              if (link.data.linkText === 'FALSE' && toCategory === 'DATA_QUERY') { // false线上不可连线分群节点
-                that.$message.error('连线有误，请重新连线')
-                return mySelf.myDiagram.model.removeLinkData(link.data)
-              }
+              // if (link.data.linkText === 'FALSE' && toCategory === 'DATA_QUERY') { // false线上不可连线分群节点
+              //   that.$message.error('连线有误，请重新连线')
+              //   return mySelf.myDiagram.model.removeLinkData(link.data)
+              // }
               mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
             }
             if (linkOutData.length == 2) { // 限制最多可连接两条线
@@ -666,7 +672,7 @@ export default {
   .work-flow {
     position: absolute;
     left: 18px;
-    top: 0;
+    top: 18px;
     right: 18px;
     bottom: 18px;
   }

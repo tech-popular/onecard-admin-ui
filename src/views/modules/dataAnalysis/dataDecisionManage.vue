@@ -1,8 +1,20 @@
 <template>
   <div>
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="API名称">
-        <el-input v-model="dataForm.name" placeholder="API名称" clearable />
+      <el-form-item label="决策ID">
+        <el-input v-model="dataForm.decisionId" placeholder="决策ID" clearable />
+      </el-form-item>
+      <el-form-item label="决策编号">
+        <el-input v-model="dataForm.decisionCode" placeholder="决策编号" clearable />
+      </el-form-item>
+      <el-form-item label="决策名称">
+        <el-input v-model="dataForm.decisionName" placeholder="决策名称" clearable />
+      </el-form-item>
+      <el-form-item prop="groupId" label="分群名称">
+        <el-select v-model="dataForm.groupId" filterable clearable placeholder="请选择分群">
+          <el-option value="-1" label="全部"></el-option>
+          <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -11,17 +23,10 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="API名称"></el-table-column>
-      <el-table-column prop="code" header-align="center" align="center" label="接口编码"></el-table-column>
-      <el-table-column prop="desc" header-align="center" align="center" label="API说明">
-        <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.desc)" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
-            <div class="text-to-long-cut">{{scope.row.desc}}</div>
-          </el-tooltip>
-        </template>
-      </el-table-column>
+      <el-table-column prop="id" header-align="center" align="center" label="决策ID"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="决策编号"></el-table-column>
+      <el-table-column prop="code" header-align="center" align="center" label="决策名称"></el-table-column>
+      <el-table-column prop="channelName" header-align="center" align="center" label="渠道"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
@@ -40,19 +45,21 @@
       :page-size="pageSize"
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper" />
-    <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/> -->
   </div>
 </template>
 
 <script>
-  import { apiManageList } from '@/api/dataAnalysis/apiManage'
-  // import AddOrUpdate from './baseComponents/dataDecisionManage-add-or-update'
+  import { decisionList, custerList } from '@/api/dataAnalysis/dataDecisionManage'
   export default {
     data () {
       return {
         dataForm: {
-          name: ''
+          decisionId: '',
+          decisionCode: '',
+          decisionName: '',
+          groupId: '-1'
         },
+        custerList: [],
         dataList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
@@ -61,10 +68,8 @@
         addOrUpdateVisible: false
       }
     },
-    components: {
-      // AddOrUpdate
-    },
     mounted () {
+      this.getCusterList()
       this.getDataList()
     },
     methods: {
@@ -72,11 +77,11 @@
       getDataList () {
         this.dataListLoading = true
         let params = {
-          ...this.dataForm,
+          ...{ ...this.dataForm, groupId: this.dataForm.groupId === '-1' ? '' : this.dataForm.groupId },
           'pageNum': this.pageNum,
           'pageSize': this.pageSize
         }
-        apiManageList(params).then(({data}) => {
+        decisionList(params).then(({data}) => {
           this.dataListLoading = false
           if (data.status !== '1' || !data.data || !data.data.list.length) {
             this.dataList = []
@@ -87,9 +92,22 @@
           this.totalCount = data.data.total
         })
       },
+      getCusterList () {
+        custerList('').then(({data}) => {
+          if (data.status * 1 !== 1) {
+            this.custerList = []
+            return
+          }
+          this.custerList = data.data
+        })
+      },
       // 新增 / 修改
       addOrUpdateHandle (row, tag) {
-        this.$router.push({ path: 'dataAnalysis-workFlow' })
+        if (tag) {
+          this.$router.replace({ path: 'dataAnalysis-workFlow', query: { tag: tag, id: row.id, time: new Date().getTime() } })
+        } else {
+          this.$router.replace({ path: 'dataAnalysis-workFlow', query: { time: new Date().getTime() } })
+        }
       },
       /** 查询 */
       searchHandle () {

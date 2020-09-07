@@ -1,7 +1,7 @@
 import { httpGet, httpPost, httpPut } from '@/api'
 // let da = '/dataAnalysis/'
 let da = '/'
-export const apiManageList = params => httpGet(da + '1', params)
+export const decisionList = params => httpGet(da + 'data/decision/listOnPage', params)
 // 保存查询流程配置信息
 export const saveFlowInfo = params => httpPost(da + 'data/decision/info', params)
 // 修改查询流程配置信息
