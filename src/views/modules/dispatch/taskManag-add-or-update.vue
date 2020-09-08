@@ -157,12 +157,12 @@
           </div>
           <!---->
           <!--elasticsearch-->
-          <div v-if="acquisitionTask.outDatasourceType==='ELASTICSEARCH'" style="marginLeft: 120px">
-            <el-form :model="elasticData" :rules="dataRule" ref="elasticForm" label-width="60px">
+          <div v-if="acquisitionTask.outDatasourceType==='ES'" style="marginLeft: 120px">
+            <el-form :model="elasticData" :rules="dataRule" ref="elasticForm" label-width="160px">
               <el-form-item class="el-redis-item" label="type">
                 <el-input v-model="elasticData.type" placeholder="type" clearable></el-input>
               </el-form-item>
-              <el-form-item class="el-redis-item" label="ID列" prop="id">
+              <el-form-item class="el-redis-item" label="ID列" prop="idColumn">
                 <el-input v-model="elasticData.idColumn" placeholder="ID列" clearable></el-input>
               </el-form-item>
             </el-form>
@@ -170,14 +170,14 @@
           <!---->
           <!--mc-->
           <div v-if="acquisitionTask.outDatasourceType==='MAXCOMPUTE'" style="marginLeft: 120px">
-            <el-form :model="mcData" :rules="dataRule" ref="mcForm" label-width="60px">
+            <el-form :model="mcData" :rules="dataRule" ref="mcForm" label-width="160px">
               <el-form-item class="el-redis-item" label="分区列">
                 <el-input v-model="mcData.mcColumn" placeholder="分区列, 若是分区表则必填" clearable></el-input>
               </el-form-item>
             </el-form>
           </div>
           <!---->
-          <el-form-item prop="outDataTable" label="输入数据表/topic名称" label-width="160px" style="width:700px">
+          <el-form-item prop="outDataTable" label="输入数据表/topic名称" v-if="acquisitionTask.outDatasourceType!='REDIS'" label-width="160px" :style="{marginLeft: acquisitionTask.outDatasourceType==='ES' || acquisitionTask.outDatasourceType==='MAXCOMPUTE' ? '120px' : ''}">
             <el-input v-model="acquisitionTask.outDataTable" placeholder="输入数据表/topic名称" />
           </el-form-item>
           <el-form-item prop="outBeforeSql" label="目标库前置处理SQL：" label-width="120px" ref="workBeginSqlForm2">
@@ -316,7 +316,7 @@ export default {
         redisUneffectTime: '',
         redisUnit: '1'
       },
-      outRedisData: '',
+      outTableName: '',
       elasticData: {
         type: '',
         idColumn: ''
@@ -520,7 +520,29 @@ export default {
           '#' +
           (newVal.zSetScore ? newVal.zSetScore : ' ') +
           '#'
-        this.outRedisData = outTableName
+        this.outTableName = outTableName
+      },
+      immediate: true,
+      deep: true
+    },
+    elasticData: {
+      handler (newVal, oldVal) {
+        let outTableName =
+          (newVal.type ? newVal.type : ' ') +
+          '#' +
+          newVal.idColumn +
+          '#'
+        this.outTableName = outTableName
+      },
+      immediate: true,
+      deep: true
+    },
+    mcData: {
+      handler (newVal, oldVal) {
+        let outTableName =
+          (newVal.mcColumn ? newVal.mcColumn : ' ') +
+          '#'
+        this.outTableName = outTableName
       },
       immediate: true,
       deep: true
@@ -530,6 +552,23 @@ export default {
     init (id) {
       this.id = id ? id.id : ''
       this.dataForm = deepClone(this.tempDataForm)
+      this.redisData = {
+        redisName: '',
+        redisKey: '',
+        redisLabel: '',
+        redisValue: '',
+        zSetScore: '',
+        redisJoinType: '',
+        redisUneffectTime: '',
+        redisUnit: '1'
+      }
+      this.elasticData = {
+        type: '',
+        idColumn: ''
+      }
+      this.mcData = {
+        mcColumn: ''
+      }
       this.getAllSystem()
       this.getAllDatasource('ACQUISITION', 'IN')
       this.getAllDatasource('ACQUISITION', 'OUT')
@@ -565,6 +604,36 @@ export default {
         this.dataForm.taskDescribe = data.data.taskDescribe
         this.dataForm.taskDisable = data.data.taskDisable
         this.dataForm.requestedUser = data.data.requestedUser
+        this.acquisitionTask = data.data.acquisitionTask
+        if (this.acquisitionTask.outDataTable.indexOf('#') > 0) {
+          let arr = this.acquisitionTask.outDataTable.split('#')
+          console.log(arr)
+          if (this.acquisitionTask.outDatasourceType === 'REDIS') {
+            let label = this.redisNames.filter(item => item.value === arr[0])[0].label
+            this.redisData = {
+              redisName: arr[0],
+              redisKey: arr[1],
+              redisJoinType: arr[2] || '',
+              redisUneffectTime: arr[3] || '',
+              redisLabel: label,
+              redisValue: arr[4],
+              zSetScore: arr[5] || '',
+              redisUnit: '1'
+            }
+          } else if (this.acquisitionTask.outDatasourceType === 'ES') {
+            this.elasticData = {
+              type: arr[1],
+              idColumn: arr[2]
+            }
+            this.acquisitionTask.outDataTable = arr[0]
+          } else {
+            console.log(arr, arr[1])
+            this.mcData = {
+              mcColumn: arr[1]
+            }
+            this.acquisitionTask.outDataTable = arr[0]
+          }
+        }
         // 是否重跑判断
         if (data.data.failRepeatTrigger !== 0) {
           this.dataForm.isRunAgain = 0
@@ -573,7 +642,6 @@ export default {
           this.dataForm.isRunAgain = 1
           this.dataForm.failRepeatTrigger = 3
         }
-        this.acquisitionTask = data.data.acquisitionTask
         this.acquisitionTask.sqlField = this.acquisitionTask.sqlField.split(',')
         let filterInArr = this.getAllinDatasourceList.filter(item => item.name === this.acquisitionTask.inDatasourceType)[0]
         let filterOutArr = this.getAlloutDatasourceList.filter(item => item.name === this.acquisitionTask.outDatasourceType)[0]
@@ -715,6 +783,13 @@ export default {
           taskName: `${this.formDs}_to_${this.toDs}_${this.dataForm.taskName}`,
           taskType: 'ACQUISITION',
           acquisitionTask: { ...this.acquisitionTask, sqlField: this.acquisitionTask.sqlField.join(',') }
+        }
+        console.log(this.outTableName, this.outTableName.length)
+        if (this.outTableName.length > 2 && this.acquisitionTask.outDatasourceType !== 'REDIS') {
+          params.acquisitionTask.outDataTable = params.acquisitionTask.outDataTable + '#' + this.outTableName
+        }
+        if (this.outTableName.length > 2 && this.acquisitionTask.outDatasourceType === 'REDIS') {
+          params.acquisitionTask.outDataTable = this.outTableName
         }
         if (params.isRunAgain === 0) {
           params.failRepeatTrigger = params.failRepeatTrigger
