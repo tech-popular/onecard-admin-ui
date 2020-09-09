@@ -123,13 +123,13 @@
                 </el-select>
               </el-form-item>
               <el-form-item class="el-redis-item" label="redisKey" prop="redisKey">
-                <el-input v-model="redisData.redisKey" placeholder="redisKey" clearable></el-input>
+                <el-input v-model="redisData.redisKey" placeholder="前缀{redisKey列索引}后缀" clearable></el-input>
               </el-form-item>
               <el-form-item class="el-redis-item" :label="redisData.redisLabel + 'Value'" prop="redisValue" v-if="!!redisData.redisName">
-                <el-input v-model="redisData.redisValue" :placeholder="redisData.redisLabel + 'Value'" clearable></el-input>
+                <el-input v-model="redisData.redisValue" placeholder="{redisValue列索引}" clearable></el-input>
               </el-form-item>
               <el-form-item class="el-redis-item" label="score" v-if="redisData.redisName === 'redisTypeZSet'">
-                <el-input v-model="redisData.zSetScore" placeholder="score" clearable></el-input>
+                <el-input v-model="redisData.zSetScore" placeholder="{score列索引}" clearable></el-input>
               </el-form-item>
               <el-form-item class="el-redis-item" label="key拼接时间" prop="redisJoinType">
                 <el-select v-model="redisData.redisJoinType" placeholder="key拼接时间" clearable>
