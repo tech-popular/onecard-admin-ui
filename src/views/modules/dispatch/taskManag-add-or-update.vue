@@ -552,6 +552,7 @@ export default {
     init (id) {
       this.id = id ? id.id : ''
       this.dataForm = deepClone(this.tempDataForm)
+      this.acquisitionTask.outDataTable = ''
       this.redisData = {
         redisName: '',
         redisKey: '',
