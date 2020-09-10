@@ -125,7 +125,7 @@
               <el-form-item class="el-redis-item" label="redisKey" prop="redisKey">
                 <el-input v-model="redisData.redisKey" placeholder="参考示例：前缀{redisKey列索引}后缀" clearable></el-input>
               </el-form-item>
-              <el-form-item class="el-redis-item" :label="redisData.redisLabel + 'Value'" prop="redisValue" v-if="!!redisData.redisName">
+              <el-form-item class="el-redis-item" :label="redisData.redisLabel + 'Value'" prop="redisValue" v-if="!!redisData.redisName && redisData.redisName !== 'redisTypeHash'">
                 <el-input v-model="redisData.redisValue" placeholder="{redisValue列索引}" clearable></el-input>
               </el-form-item>
               <el-form-item class="el-redis-item" label="score" v-if="redisData.redisName === 'redisTypeZSet'">
