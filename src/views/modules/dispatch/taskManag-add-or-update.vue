@@ -381,7 +381,7 @@ export default {
           { required: true, message: '请选择redis数据格式', trigger: 'change' }
         ],
         redisKey: [
-          { required: true, message: '请输入redisKey', trigger: 'change' }
+          { required: true, message: '请输入redisKey', trigger: 'blur' }
         ],
         redisValue: [
           { required: true, message: '请输入', trigger: 'blur' }
