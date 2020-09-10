@@ -680,6 +680,7 @@ export default {
         this.formDs = filterArr.alias
       } else {
         this.toDs = filterArr.alias
+        this.acquisitionTask.outDataTable = ''
       }
     },
     dataSourceNameChange (type, val) {
@@ -773,6 +774,20 @@ export default {
           flag = false
         }
       })
+      if (this.$refs['redisForm']) {
+        this.$refs['redisForm'].validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+      }
+      if (this.$refs['elasticForm']) {
+        this.$refs['elasticForm'].validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+      }
       if (flag) {
         console.log(this.dataForm, this.acquisitionTask)
         let url = save
@@ -785,11 +800,11 @@ export default {
           taskType: 'ACQUISITION',
           acquisitionTask: { ...this.acquisitionTask, sqlField: this.acquisitionTask.sqlField.join(',') }
         }
-        console.log(this.outTableName, this.outTableName.length)
-        if (this.outTableName.length > 2 && this.acquisitionTask.outDatasourceType !== 'REDIS') {
+        console.log(222, this.outTableName.trim(), this.outTableName.length)
+        if (this.outTableName.trim().length > 1 && this.acquisitionTask.outDatasourceType !== 'REDIS') {
           params.acquisitionTask.outDataTable = params.acquisitionTask.outDataTable + '#' + this.outTableName
         }
-        if (this.outTableName.length > 2 && this.acquisitionTask.outDatasourceType === 'REDIS') {
+        if (this.outTableName.trim().length > 1 && this.acquisitionTask.outDatasourceType === 'REDIS') {
           params.acquisitionTask.outDataTable = this.outTableName
         }
         if (params.isRunAgain === 0) {
