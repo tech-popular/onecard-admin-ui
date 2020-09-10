@@ -4,9 +4,9 @@
 			<el-form-item label="事件ID">
 				<el-input v-model="dataForm.elementId" placeholder="" clearable=""></el-input>
 			</el-form-item>
-			<!-- <el-form-item label="事件显示中文名">
-				<el-input v-model="dataForm.elementName" placeholder="" clearable=""></el-input>
-			</el-form-item> -->
+			<el-form-item label="事件显示中文名">
+				<el-input v-model="dataForm.eventBuildName" placeholder="" clearable=""></el-input>
+			</el-form-item>
       <el-form-item label="事件类型">
 				<el-select v-model="dataForm.eventType">
 					<el-option v-for="(item,index) in eventTypeList" :label="item.eventName" :value="item.eventType" :key="index">
@@ -35,11 +35,11 @@
 		<el-table  :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column type="index" header-align="center" align="center" width="55" label="序号"></el-table-column>
       <el-table-column prop="elementId" header-align="center" align="center"  label="事件ID"></el-table-column>
-      <el-table-column prop="elementName" header-align="center" align="center"  label="事件显示中文名">
+      <el-table-column prop="eventBuildName" header-align="center" align="center"  label="事件显示中文名">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.elementName)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.elementName}}</div>
+            <div v-html="toBreak(scope.row.eventBuildName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.eventBuildName}}</div>
           </el-tooltip>
         </template>
 			</el-table-column>
@@ -79,7 +79,7 @@ export default {
     return {
       dataForm: {
         elementId: '',
-        elementName: '',
+        eventBuildName: '',
         channelCode: '',
         eventType: '',
         enable: ''
@@ -151,7 +151,7 @@ export default {
       this.pageNum = 1
       this.dataForm = {
         elementId: '',
-        elementName: '',
+        eventBuildName: '',
         channelCode: '',
         eventType: '',
         enable: ''
