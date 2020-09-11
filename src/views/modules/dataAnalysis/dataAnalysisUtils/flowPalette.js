@@ -5,11 +5,11 @@ export const palette = [
   //   nodeName: '入参',
   //   key: '1'
   // },
-  // {
-  //   key: '2',
-  //   category: 'DATA_QUERY',
-  //   nodeName: '数据查询'
-  // },
+  {
+    key: '99999',
+    category: 'NO_USE',
+    nodeName: ''
+  },
   {
     key: '3',
     category: 'GROUP_CHOICE',
