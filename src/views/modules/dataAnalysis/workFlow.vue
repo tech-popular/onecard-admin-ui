@@ -165,7 +165,7 @@ export default {
       let pNullArr = []
       let pChildOneArr = []
       nodeDataArray.map(item => {
-        if (!item.data) {
+        if (!item.data && item.category !== 'NO_USE') {
           pNullArr.push(item.nodeName)
         }
         if (item.category === 'GROUP_CHOICE') {
@@ -221,7 +221,6 @@ export default {
     // 加载
     load () {
       mySelf.myDiagram.model = go.Model.fromJson(this.flowJson)
-      console.log(999)
     },
     diagramInit () {
       mySelf = this
@@ -322,6 +321,30 @@ export default {
           }).makeTwoWay()
         )
       }
+      // 占位NO_USE
+      mySelf.myDiagram.nodeTemplateMap.add(
+        'NO_USE',
+        $(
+          go.Node,
+          'Table',
+          nodeStyle(),
+          { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
+          $(
+            go.Panel,
+            'Auto',
+            $(
+              go.Shape,
+              'Rectangle',
+              {
+                minSize: new go.Size(0, 50),
+                fill: 'transparent',
+                strokeWidth: 0
+              }
+            ),
+            textBlock(false)
+          )
+        )
+      )
       // IN_PARAM
       mySelf.myDiagram.nodeTemplateMap.add(
         'IN_PARAM',
@@ -642,17 +665,6 @@ export default {
         that.$message.error('请连接上游节点')
         return
       }
-      // let linkOutData = []
-      // nodeLink.findLinksOutOf().each(function (link) {
-      //   linkOutData.push(link.data)
-      // })
-      // if (linkOutData.length == 0) {
-      //   that.$message.error({
-      //     content: '请连接子节点',
-      //     duration: 1
-      //   })
-      //   return
-      // }
       that[visibleParams] = true
       that.$nextTick(() => {
         that.$refs[nodeEl].init(node.data)
