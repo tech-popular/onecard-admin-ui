@@ -111,7 +111,7 @@ export default {
       })
     },
     getCusterList (code) { // 回显时用的
-      custerList(code).then(({data}) => {
+      custerList(code, 'dynamic').then(({data}) => {
         if (data.status * 1 !== 1) {
           this.custerList = []
           return
