@@ -24,8 +24,8 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="决策ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="决策编号"></el-table-column>
-      <el-table-column prop="code" header-align="center" align="center" label="决策名称"></el-table-column>
+      <el-table-column prop="code" header-align="center" align="center" label="决策编号"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="决策名称"></el-table-column>
       <el-table-column prop="channelName" header-align="center" align="center" label="渠道"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
