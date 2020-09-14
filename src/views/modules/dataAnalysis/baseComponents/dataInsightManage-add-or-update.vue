@@ -4,7 +4,7 @@
     :visible.sync="visible"
     :show-close="false"
     :wrapperClosable="false"
-    size="1250px"
+    size="1350px"
     class="insight-manage-drawer"
   >
     <div slot="title" class="drawer-title">
@@ -128,10 +128,15 @@
           </el-form-item>
         </el-form>
       </div>
+      <div v-if="baseForm.userType !== 'excel'"> <h3>满足如下条件的用户</h3> </div>
       <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
-        <h3>满足如下条件的用户</h3>
-        <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd"></user-attr-rule-pane>
-        <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd"></user-action-rule-pane>
+          <div class="pane-rules-relation">
+             <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
+          </div>
+           <div style="flex: 1">
+               <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd"></user-attr-rule-pane>
+               <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd"></user-action-rule-pane>
+           </div>
       </div>
       <div class="pane-reject">
         <h3>剔除用户名单</h3>
@@ -241,6 +246,7 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
+      outMostExpressionTemplate: 'and', // 用户属性与用户行为外层关系
       baseForm: {
         name: '',
         userType: 'indicator',
@@ -434,6 +440,10 @@ export default {
         this.vestPackList = res.data.data
       })
     },
+    // 切换用户行为和用户属性外层关系
+    switchSymbol () {
+      this.outMostExpressionTemplate = this.outMostExpressionTemplate === 'and' ? 'or' : 'and'
+    },
     // 获取分群名称
     getCusterList () {
       custerAvailable().then(({ data }) => {
@@ -619,6 +629,7 @@ export default {
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
             ...this.$refs.userActionRule.lastSubmitRuleConfig,
             ...this.rejectForm,
+            outMostExpressionTemplate: this.outMostExpressionTemplate,
             rejectGroupPackCode: code
           }
           params.channelId = params.channelId.join(',')
@@ -644,7 +655,7 @@ export default {
           if (sysUuid && sysArr.includes(sysUuid)) {
             params.username = this.getQueryParams('username') || ''
           }
-          console.log('params: ', params)
+          console.log('params: ', JSON.stringify(params))
           if (!this.loading) { // 为测试提交信息的数据结构，暂不掉接口
             return
           }
@@ -783,7 +794,50 @@ export default {
 .insight-manage-drawer .el-list-leave-active {
   opacity: 0;
 }
-.insight-manage-drawer .pane-rules,
+.insight-manage-drawer .pane-rules {
+  position: relative;
+  display: flex;
+}
+/* .pane-rules-data {
+
+} */
+.pane-rules-relation {
+  left: 0;
+  top: -8px;
+  bottom: 0;
+  position: relative;
+  margin-right: 8px;
+  margin-bottom: 20px;
+}
+.pane-rules-relation:before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  overflow: hidden;
+  background: #d0e2f5;
+}
+.pane-rules-relation span {
+  position: relative;
+  display: block;
+  top: 50%;
+  left: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-50%);
+  border-radius: 3px;
+  background: #d0e2f5;
+  color: #409eff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 25px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
 .insight-manage-drawer .pane-reject {
   border-top: 1px dashed #ccc;
 }

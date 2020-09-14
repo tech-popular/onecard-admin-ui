@@ -26,7 +26,8 @@
 import actionDataRulesSet from './actionData-rule-set.vue'
 import {
   selectOperate,
-  selectAllCata,
+  selectEventAllCata,
+  selectEventIndexAllCata,
   // enumTypeList,
   dataIndexManagerCandidate
 } from '@/api/dataAnalysis/dataInsightManage'
@@ -61,7 +62,8 @@ export default {
         rules: []
       },
       isRequired: true,
-      indexList: [],
+      eventDownList: [],
+      countSelectOperateList: [],
       isSelectedUneffectIndex: [],
       lastSubmitRuleConfig: {},
       subTimeSelects: [
@@ -81,7 +83,8 @@ export default {
   },
   methods: {
     init () {
-      this.getSelectAllCata()
+      this.getEventSelectAllCata()
+      this.getCountSelectOperateList()
       this.actionRuleConfig = {
         // 规则数据
         ruleCode: 'rule_all',
@@ -93,74 +96,54 @@ export default {
       this.actionExpressionTemplate = ''
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
     },
-    getSelectAllCata (fn) {
-      // 获取所有指标
-      selectAllCata({
-        channelCode: this.channelId,
-        flag: this.id ? '-1' : '1'
-      }).then(({ data }) => {
-        if (data.status !== '1') {
-          this.indexList = []
-        } else {
-          this.indexList = this.filterAllCata(data.data)
-        }
-        if (fn) {
-          fn(this.indexList)
+    getEventSelectAllCata () { // 获取事件列表
+      selectEventAllCata({
+        channelCode: this.channelId
+      }).then(({data}) => {
+        if (data.status === '1') {
+          this.eventDownList = data.data
         }
       })
     },
-    channelIdChangeUpdate () { // 用户所属渠道改变时，清空数据，初始化
-      this.getSelectAllCata(indexList => {
-        if (indexList.length === 0) {
-          this.setInitRulesConfig(this.indexList)
-        } else {
-          this.actionRuleConfig = this.updateInitRulesConfig(
-            this.actionRuleConfig,
-            indexList
-          )
-          this.setInitRulesConfig(this.indexList)
-        }
+    // 获取总次数下拉列表
+    getCountSelectOperateList () {
+      this.getSelectOperateList('number', countSelectOperateList => {
+        this.countSelectOperateList = countSelectOperateList
       })
     },
-    filterAllCata (tree) {
-      // 清洗数据，按selectVue的格式重新组织指标数据
-      let arr = []
-      if (!!tree && tree.length !== 0) {
-        tree.forEach((item, index) => {
-          let obj = {}
-          if (item.fieldType) {
-            obj.id = item.englishName + '-' + item.id
-            obj.englishName = item.englishName
-            obj.label = item.chineseName
-            obj.fieldType = item.fieldType
-            obj.enumTypeNum = item.enumTypeNum
-            obj.sourceTable = item.sourceTable
-            obj.dataStandar = item.dataStandar
-            obj.fieldId = item.id
-            obj.channelCode = item.channelCode
-            obj.enable = item.enable
-          } else {
-            obj.id = item.id
-            obj.label = item.name
-          }
-          if (this.filterAllCata(item.dataCata).length) {
-            // 指标层 ，无children
-            obj.children = this.filterAllCata(item.dataCata) // 指标集合
-            arr.push(obj)
-          } else if (this.filterAllCata(item.dataIndex).length) {
-            obj.children = this.filterAllCata(item.dataIndex) // 指标集合
-            arr.push(obj)
-          } else {
-            // 指标父级层
-            if (!item.fieldType) {
-              obj.children = null
-            } else {
-              arr.push(obj) // 每个指标都放在集合中
-            }
-          }
-        })
+    channelIdChangeUpdate () {
+      // 用户所属渠道改变时，清空数据，初始
+      if (this.actionRuleConfig.rules.length) {
+        this.actionRuleConfig.rules = []
+        this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
       }
-      return arr
+      this.updateConditionId(this.actionRuleConfig)
+    },
+    updateEventTypeList (data, val, citem, index) { // 事件改变时，第三层数据需清空数据
+      let indexPath = findRuleIndex(data.rules, citem) + ''
+      let indexPathArr = indexPath.split(',')
+      let eventIndexList = []
+      selectEventIndexAllCata({ elementId: val[1] }).then(({data}) => {
+        if (data.status === '1') {
+          citem.eventIndexList = data.data
+          eventIndexList = data.data
+        }
+      })
+      // 来源参数改变
+      let dataEventDtos = citem.eventDownList.filter(sitem => sitem.eventId === val[0])[0].dataEventDtos
+      citem.sourceTable = dataEventDtos.filter(sitem => sitem.eventId === citem.englishName)[0].sourceTable
+      if (citem.childrenRules.length) {
+        citem.childrenRules = []
+        citem.childrenRules.push(this.getThirdRuleTemplateItem(citem))
+        if (indexPathArr.length === 1) {
+          this.updateChildrenRulesArr(data.rules[indexPathArr[0]], citem.childrenRules[index], {eventIndexList: eventIndexList}, index)
+          this.actionRuleConfig.rules[indexPathArr[0]] = citem
+        } else {
+          this.updateChildrenRulesArr(data.rules[indexPathArr[0]].rules[indexPathArr[1]], citem.childrenRules[index], {eventIndexList: eventIndexList}, index)
+          this.actionRuleConfig.rules[indexPathArr[0]].rules[indexPathArr[1]] = citem
+        }
+      }
+      // this.updateConditionId(this.actionRuleConfig)
     },
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
@@ -243,7 +226,7 @@ export default {
       this.actionRuleConfig = configJson.actionRuleConfig
       this.actionExpression = configJson.actionExpression
       this.actionExpressionTemplate = configJson.actionExpressionTemplate
-      this.getSelectAllCata((indexList) => {
+      this.getEventSelectAllCata((indexList) => {
         this.actionRuleConfig = this.updateInitRulesConfig(this.actionRuleConfig, indexList)
         this.$nextTick(() => {
           this.$emit('renderEnd')
@@ -325,15 +308,30 @@ export default {
       //  一级 二级条件模板
       return {
         type: 'rule',
-        func: '', //  选择的时间类型
+        func: 'between', //  选择的时间类型
         subFunc: '',
         dateDimension: '',
-        havedo: '', //  是否做过
-        eventType: '', // 事件类型
-        funcType: '', //  总次数比较类型
-        sumtimes: '', //  总次数
+        havedo: 'yes', //  是否做过
+        englishName: '', // 事件类型
+        sourceTable: '', // 事件类型 来源
+        eventDownList: this.eventDownList, // 事件列表
+        eventIndexList: [], // 事件属性列表
+        totalCountParams: {
+          func: '',
+          selectOperateList: this.countSelectOperateList,
+          params: [
+            {
+              value: '',
+              title: ''
+            }
+          ]
+        },
         childrenRules: [], // 第三层数组
         params: [
+          {
+            value: '',
+            title: ''
+          },
           {
             value: '',
             title: ''
@@ -341,7 +339,7 @@ export default {
         ]
       }
     },
-    getThirdRuleTemplateItem () {
+    getThirdRuleTemplateItem (data) {
       // 三级条件模板
       return {
         type: 'children_rule',
@@ -352,7 +350,7 @@ export default {
         sourceTable: '',
         fieldId: '',
         englishName: '',
-        indexList: this.indexList, // 指标下拉选
+        eventIndexList: data.eventIndexList, // 事件属性下拉选
         enumTypeNum: '',
         selectOperateList: [], // 操作符下拉选
         selectEnumsList: [], // 内容下拉选
@@ -472,6 +470,23 @@ export default {
       }
       this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension, childrenRules: childrenRules })
     },
+    updateTotalOperateChange (data, citem) { // 总次数区间改变
+      let totalCountParams = {
+        func: citem.totalCountParams.func,
+        selectOperateList: this.countSelectOperateList,
+        params: [
+          {
+            value: '',
+            title: ''
+          }
+        ]
+      }
+      if (citem.totalCountParams.func === 'between') {
+        totalCountParams.func = citem.totalCountParams.func
+        totalCountParams.params.push({ value: '', title: '' })
+      }
+      this.updateRulesArr(data, citem, {totalCountParams: totalCountParams})
+    },
     updateChildrenOperateChange (data, citem, index) { //  三级数据：判断操作符是否为null之类的，若为，则将后面数据清空
       let params = [{ value: '', title: '' }]
       if (citem.func === 'between' || citem.func === 'relative_time_in') {
@@ -544,11 +559,11 @@ export default {
       let indexPathArr = indexPath.split(',')
       if (indexPathArr.length === 1) {
         data.rules[indexPathArr[0]].childrenRules.push(
-          this.getThirdRuleTemplateItem()
+          this.getThirdRuleTemplateItem(data.rules[indexPathArr[0]])
         )
       } else {
         data.rules[indexPathArr[0]].rules[indexPathArr[1]].childrenRules.push(
-          this.getThirdRuleTemplateItem()
+          this.getThirdRuleTemplateItem(data.rules[indexPathArr[0]].rules[indexPathArr[1]])
         )
       }
     },
@@ -568,8 +583,8 @@ export default {
       }
       this.updateConditionId(this.actionRuleConfig)
     },
-    deleteChildrenRules (data, childrenRules, citem, cindex) {  //  删除三级数据
-      let indexPath = findRuleIndex(data.rules, childrenRules) + ''
+    deleteChildrenRules (data, rules, citem, cindex) {  //  删除三级数据
+      let indexPath = findRuleIndex(data.rules, rules) + ''
       let indexPathArr = indexPath.split(',')
       if (indexPathArr.length === 1) {
         data.rules[indexPathArr[0]].childrenRules.splice(cindex, 1)
@@ -637,51 +652,39 @@ export default {
       return ruleArr
     },
     updateRulesConfig (arr) {
-      // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
+      // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList,eventIndexList
       this.isSelectedUneffectIndex = []
       arr.rules.forEach(item => {
-        if (item.childrenRules) {
-          item.childrenRules.forEach(citem => {
-            citem.selectOperateList = citem.selectOperateList.filter(
-            sitem => sitem.code === citem.func
+        if (item.type != 'rules_function') {
+          delete item.eventDownList
+          delete item.eventIndexList
+          item.totalCountParams.selectOperateList = this.countSelectOperateList.filter(
+            sitem => sitem.code === item.totalCountParams.func
           )
-            let selectEnumsArr = []
-            citem.selectEnumsList.forEach(sitem => {
-              citem.params.forEach(pitem => {
-                if (sitem.childrenNum === pitem.value) {
-                  selectEnumsArr.push(sitem)
-                }
+          if (item.childrenRules) {
+            item.childrenRules.forEach(citem => {
+              citem.selectOperateList = citem.selectOperateList.filter(
+              sitem => sitem.code === citem.func
+            )
+              citem.eventIndexList = citem.eventIndexList.filter(sitem => sitem.englishName === citem.englishName)
+              let selectEnumsArr = []
+              citem.selectEnumsList.forEach(sitem => {
+                citem.params.forEach(pitem => {
+                  if (sitem.childrenNum === pitem.value) {
+                    selectEnumsArr.push(sitem)
+                  }
+                })
               })
+              citem.selectEnumsList = selectEnumsArr
+              citem.indexList = []
+              if (citem.label && !citem.enable) {
+                this.isSelectedUneffectIndex.push(citem.label)
+              }
             })
-            citem.selectEnumsList = selectEnumsArr
-            citem.indexList = []
-            if (citem.label && !citem.enable) {
-              this.isSelectedUneffectIndex.push(citem.label)
-            }
-          })
+          }
+        } else {
+          this.updateRulesConfig(item)
         }
-        // if (!item.rules) {
-        //   item.selectOperateList = item.selectOperateList.filter(
-        //     sitem => sitem.code === item.func
-        //   )
-        //   let selectEnumsArr = []
-        //   item.selectEnumsList.forEach(sitem => {
-        //     item.params.forEach(pitem => {
-        //       if (sitem.childrenNum === pitem.value) {
-        //         selectEnumsArr.push(sitem)
-        //       }
-        //     })
-        //   })
-        //   item.selectEnumsList = selectEnumsArr
-        //   item.indexList = []
-        //   if (item.label && !item.enable) {
-        //     this.isSelectedUneffectIndex.push(item.label)
-        //   }
-        // } else {
-        //   if (item.rules) {
-        //     this.updateRulesConfig(item)
-        //   }
-        // }
       })
       return arr
     },
@@ -700,6 +703,7 @@ export default {
         actionExpression: this.actionExpression,
         actionExpressionTemplate: this.actionExpressionTemplate
       }
+      console.log(' this.lastSubmitRuleConfig: ', this.lastSubmitRuleConfig)
       this.isSelectedUneffectIndex = Array.from(new Set(this.isSelectedUneffectIndex))
       if (this.isSelectedUneffectIndex.length) {
         return this.$message({

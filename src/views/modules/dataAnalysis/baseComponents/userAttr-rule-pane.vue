@@ -256,6 +256,7 @@ export default {
             temp = index + ''
           }
           if (!item.rules) {
+            console.log('item:2 ', item)
             if (!type || type !== 'switch') { // 切换且或时，不需要再重新赋值
               let tempArr = temp.split('_')
               let id = getAbc(tempArr[0]) + tempArr.join('').substring(tempArr[0].length)

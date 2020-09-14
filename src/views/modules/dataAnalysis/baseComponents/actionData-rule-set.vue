@@ -41,7 +41,6 @@
                     placeholder="选择日期时间"
                     format="yyyy-MM-dd HH:mm:ss"
                     value-format="yyyy-MM-dd HH:mm:ss"
-                     @change="data => selectDateTimeChange(data, item)"
                     class="itemIput"
                   ></el-date-picker>
                 </el-form-item>&nbsp; ~ &nbsp;
@@ -53,7 +52,6 @@
                     placeholder="选择日期时间"
                     format="yyyy-MM-dd HH:mm:ss"
                     value-format="yyyy-MM-dd HH:mm:ss"
-                    @change="data => selectDateTimeChange(data, item)"
                     class="itemIput"
                   ></el-date-picker>
                 </el-form-item>
@@ -162,14 +160,17 @@
                     />
               </el-select>
             </el-form-item>
-            <el-form-item style="width:120px" prop="eventType"  :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-              <el-select v-model="item.eventType" >
-                <el-option lable="1" value="点击事件"></el-option>
-                <el-option lable="2" value="页面操作"></el-option>
-              </el-select>
+            <el-form-item style="width:120px" prop="eventList"  :rules="{required: isRequired, message: '请选择', trigger: 'change'}">         
+              <el-cascader
+                style="width: 100%"
+                v-model="item.eventList"
+                :options="item.eventDownList"
+                :props="eyentTypeListTreeProps"
+                @change="data => eventTypeChange(data, item, index)"
+              ></el-cascader>        
             </el-form-item>
             <el-form-item>
-              <i class="el-icon-circle-plus cursor-pointer" @click="addThirdChildrenRules(item, index)"></i>
+              <i class="el-icon-plus cursor-pointer" @click="addThirdChildrenRules(item, index)"></i>
               <span>添加属性筛选</span>
             </el-form-item>
           </div>
@@ -188,15 +189,48 @@
           </div>
           <div v-if="item.havedo === 'yes'" style="margin-left: 40px;">
             <span style="line-height: 40px;">总次数 &nbsp;&nbsp;</span>
-            <el-form-item prop="funcType" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-              <el-select v-model="item.funcType" style="width: 150px;">
-                <el-option lable="1" value="大于等于"></el-option>
-                <el-option lable="2" value="大于"></el-option>
+            <el-form-item prop="totalCountParams.func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+              <el-select v-model="item.totalCountParams.func" style="width: 150px;"  @change="data => totalSelectOperateChange(data, item)">
+                <el-option v-for="(fitem,findex) in item.totalCountParams.selectOperateList"                 
+                  :value="fitem.code"
+                  :key="findex"
+                  :label="fitem.title">
+                </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item  prop="sumtimes" style="width:50px" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-              <el-input v-model="item.sumtimes"></el-input>
+            <div v-if="item.totalCountParams.func != 'between'" class="pane-rules-inline">
+            <el-form-item  style="width:50px" prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+              <el-input v-model="item.totalCountParams.params[0].value"></el-input>
             </el-form-item>&nbsp;次
+            </div>
+            <div v-if="item.totalCountParams.func === 'between'" class="pane-rules-inline">
+                <el-form-item  
+                  prop="totalCountParams.params[0].value"
+                  :ref="'totalparamsl' + item.ruleCode"
+                  :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.totalCountParams.params), trigger: 'blur' }">
+                  <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
+                  <el-input
+                    v-model="item.totalCountParams.params[0].value"
+                    :maxlength="10"
+                    class="itemIput-number"
+                    @input="item.totalCountParams.params[0].value = keyupNumberInput(item.totalCountParams.params[0].value)"
+                    @blur="item.totalCountParams.params[0].value = pramasNumBlur(item, item.totalCountParams.params[0].value)"
+                  ></el-input>次&nbsp;&nbsp;于&nbsp;&nbsp;
+                </el-form-item>
+                <el-form-item 
+                  prop="totalCountParams.params[1].value"
+                  :ref="'totalparamsr' + item.ruleCode"
+                  :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.totalCountParams.params), trigger: 'blur' }">
+                  <el-input
+                    v-model="item.totalCountParams.params[1].value"
+                    class="itemIput-number"
+                    :maxlength="10"
+                    @input="item.totalCountParams.params[1].value = keyupNumberInput(item.totalCountParams.params[1].value)"
+                    @blur="item.totalCountParams.params[1].value = pramasNumBlur(item, item.totalCountParams.params[1].value)"
+ 
+                  ></el-input>次&nbsp;&nbsp;之间
+                </el-form-item>
+          </div>
           </div>
         </el-form>
         <div v-else>
@@ -241,6 +275,12 @@ export default {
       multipleList: [],
       parent: null,
       selectOperateList: [],
+      eyentTypeList: [], // 事件类型列表
+      eyentTypeListTreeProps: {
+        label: 'eventName',
+        value: 'eventId',
+        children: 'dataEventDtos'
+      },
       fileList: [
         {
           value: 'between',
@@ -299,6 +339,11 @@ export default {
       })
     },
 
+    // 事件变化
+    eventTypeChange (data, item, index) {
+      item.englishName = data[1]
+      this.parent.updateEventTypeList(this.parent.actionRuleConfig, data, item, index)
+    },
     keyupDateNumberInput (val) {
       // 日期输入框，输入内容 要求 只能输入 正整数
       val = val.replace(/^0(0+)|[^\d]+/g, '')
@@ -341,6 +386,13 @@ export default {
         }
       })
     },
+    totalSelectOperateChange (val, ruleItem) { // 总次数改变时，数据清空，重新输入
+      this.parent.updateTotalOperateChange(this.parent.actionRuleConfig, ruleItem)
+      if (val === 'between') {
+        this.$refs['totalparamsl' + ruleItem.ruleCode][0].clearValidate()
+        this.$refs['totalparamsr' + ruleItem.ruleCode][0].clearValidate()
+      }
+    },
     judgeDataTwoISelect (rule, value, callback, params) { // 日期介于判断
       if (!value) {
         callback(new Error('请输入'))
@@ -375,9 +427,59 @@ export default {
       // 切换且或
       this.parent.switchSymbol(ruleCode, this.parent.actionRuleConfig)
     },
-    selectDateTimeChange (val, ruleItem) {
-      // 处理一下绝对时间--数据
-      // this.parent.updateDateTimeChange(this.parent.actionRuleConfig, ruleItem)
+    keyupNumberInput (val) {
+      // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
+      if (val === '.') {
+        // 开头不能是小数点
+        val = val.replace('.', '')
+      }
+      if (val.split('.').length > 2) {
+        // 不可输入第二个小数点
+        val = val.substring(0, val.length - 1)
+      }
+      if (val.length > 1 && val[val.length - 1] === '-') {
+        // 只能有一个’-‘
+        val = val.substring(0, val.length - 1)
+      }
+      val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
+      return val
+    },
+    judgeNumberTwoInput (rule, value, callback, params) {
+      // 数值介于判断
+      if (value === '') {
+        callback(new Error('请输入'))
+      } else if (params[0].value && params[1].value && params[0].value * 1 >= params[1].value * 1) {
+        callback(new Error('起始数值应小于终止数值'))
+      } else {
+        callback()
+      }
+    },
+    pramasNumBlur (item, val) {
+      // 数值 介于的判断
+      let params = item.totalCountParams.params
+      if (params[0].value && params[1].value && params[0].value * 1 < params[1].value * 1) {
+        this.$refs['totalparamsl' + item.ruleCode][0].clearValidate()
+        this.$refs['totalparamsr' + item.ruleCode][0].clearValidate()
+      }
+      return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
+    },
+    blurNumberInput (val) {
+      // 失去焦点时判断输入内容是否符合要求
+      console.log(323, val)
+      val = val + '' // 数据转为字符串
+      if (val[val.length - 1] === '.') {
+        // 最后一位为小数点时，则删除小数点
+        val = val.substring(0, val.length - 1)
+      }
+      let reg = /^(-)?\d+(\.\d+)?$/g // 只能输入 -. 及数字 不符合要求则置空
+      if (!reg.test(val)) {
+        val = ''
+      }
+      val = val.replace(/^0+\./, '0.') // 000.8999  -> 0.889
+      val = val.replace(/^(-0+)\./, '-0.') // -000.899  -> -0.889
+      val = val.replace(/^0+([0-9])/, '$1') // 009.9 00099999  -> 9.9  999999
+      val = val.replace(/^-0+([0-9])/, '-$1') // -009.9 -00099999 -> -9.9  -999999
+      return val
     }
   }
 }

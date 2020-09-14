@@ -1,8 +1,8 @@
 <template>
-  <div class="pane-rules-content">
+  <div class="childrenPane-rules-content">
     <div v-if="data.childrenRules.length > 0">并且满足</div>
-    <div class="rules-index-line" v-if="data.childrenRules.length > 0"></div>
-    <div class="rules-index-relation" v-if="data.childrenRules.length > 1">
+    <div class="childrenRules-index-line" v-if="data.childrenRules.length > 0"></div>
+    <div class="childrenRules-index-relation" v-if="data.childrenRules.length > 1">
       <span>且</span>
     </div>
     <div style="flex: 1">
@@ -12,20 +12,17 @@
             prop="fieldCode"
             :rules="{required: isRequired, message: '请选择', trigger: 'change'}"
           >
-            <Treeselect
-              :options="item.indexList"
-              :disable-branch-nodes="true"
-              :show-count="true"
+          <el-select   
               v-model="item.fieldCode"
-              :clearable="false"
-              search-nested
-              :load-options="loadOptions"
-              noChildrenText="暂无数据"
-              placeholder="请选择指标"
-              @select="node => fieldCodeChange(node, item, index)"
-              class="tree-select"
-              :disabled="from === 'api'"
-            />
+              @change="data => fieldCodeChange(data, item, index)"
+           >
+            <el-option 
+               v-for="(citem,index) in item.eventIndexList" 
+               :label="citem.chineseName" 
+               :value="citem.englishName" 
+               :key="index"
+               ></el-option>
+          </el-select>
           </el-form-item>
           <el-form-item
             prop="func"
@@ -503,15 +500,14 @@ export default {
       // 切换且或
       this.parent.switchSymbol(ruleCode, this.parent.actionRuleConfig)
     },
-    fieldCodeChange (node, ruleItem, index) {
+    fieldCodeChange (data, ruleItem, index) {
+      let node = ruleItem.eventIndexList.filter(item => item.englishName === ruleItem.fieldCode)[0]
       // 指标改变时，对应的操作符也更新
       this.parent.fieldCodeChange(this.data, ruleItem, {
-        label: node.label,
         englishName: node.englishName,
         fieldType: node.fieldType,
         enumTypeNum: node.enumTypeNum,
-        sourceTable: node.sourceTable,
-        fieldId: node.fieldId,
+        elementId: node.elementId,
         format: node.dataStandar,
         enable: node.enable
       }, index)
@@ -598,15 +594,15 @@ export default {
 .cursor-pointer {
   cursor: pointer;
 }
-.pane-rules-content {
+.childrenPane-rules-content {
   position: relative;
   display: flex;
   margin-left: 80px;
 }
-.pane-rules-content .el-form-item {
+.childrenPane-rules-content .el-form-item {
   margin-bottom: 25px;
 }
-.rules-index-line {
+.childrenRules-index-line {
   left: 0;
   top: -8px;
   bottom: 0;
@@ -615,7 +611,7 @@ export default {
   margin-left: 8px;
   margin-bottom: 20px;
 }
-.rules-index-line:before {
+.childrenRules-index-line:before {
   content: " ";
   position: absolute;
   top: 0;
@@ -625,7 +621,7 @@ export default {
   overflow: hidden;
   background: #5fe952;
 }
-.rules-index-relation {
+.childrenRules-index-relation {
   left: 0;
   top: -8px;
   bottom: 0;
@@ -633,7 +629,7 @@ export default {
   margin-right: 8px;
   margin-bottom: 20px;
 }
-.rules-index-relation:before {
+.childrenRules-index-relation:before {
   content: " ";
   position: absolute;
   top: 0;
@@ -643,7 +639,7 @@ export default {
   overflow: hidden;
   background: #7d8080;
 }
-.rules-index-relation span {
+.childrenRules-index-relation span {
   position: relative;
   display: block;
   top: 50%;
