@@ -118,7 +118,10 @@
       resetHandle () {
         this.pageNum = 1
         this.dataForm = {
-          name: ''
+          decisionId: '',
+          decisionCode: '',
+          decisionName: '',
+          groupId: '-1'
         }
         this.getDataList()
       },
