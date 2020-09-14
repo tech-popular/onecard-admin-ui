@@ -10,5 +10,5 @@ export const editFlowInfo = params => httpPut(da + 'data/decision/info', params)
 export const flowView = id => httpGet(da + `data/decision/info/${id}`)
 
 export const inparamsSelect = () => httpGet(da + 'data/decision/inparams')
-export const custerList = (code, type) => httpGet(da + `/data/group/select/available?channelCode=${code}&type=${type}`)
+export const custerList = (code) => httpGet(da + `/data/group/select/available?channelCode=${code}&type=dynamic`)
 export const channelsList = () => httpGet(da + 'common/select/channels')
