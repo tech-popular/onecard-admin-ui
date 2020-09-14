@@ -18,6 +18,6 @@ export const palette = [
   {
     key: '4',
     category: 'OUT_PARAM',
-    nodeName: '返参'
+    nodeName: '决策\n结果'
   }
 ]

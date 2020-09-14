@@ -38,7 +38,7 @@ export default {
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
         nodeDataArray: [
-          {'key': '1', 'category': 'IN_PARAM', 'loc': '0 0', 'nodeName': '入参'},
+          {'key': '1', 'category': 'IN_PARAM', 'loc': '0 0', 'nodeName': '决策\n入参'},
           {'key': '2', 'loc': '0 100', 'category': 'DATA_QUERY', 'nodeName': '数据查询'}
         ],
         linkDataArray: [{
@@ -111,7 +111,7 @@ export default {
       })
     },
     getCusterList (code) { // 回显时用的
-      custerList(code, 'dynamic').then(({data}) => {
+      custerList(code).then(({data}) => {
         if (data.status * 1 !== 1) {
           this.custerList = []
           return
@@ -303,8 +303,8 @@ export default {
         return $(
           go.TextBlock,
           {
-            font: '12px sans-serif',
-            stroke: '#fff', // 分支和合并节点可以不显示名称
+            font: '12px Arial, sans-serif',
+            stroke: '#fff',
             margin: new Margin(10, 0),
             maxSize: new go.Size(120, NaN),
             wrap: go.TextBlock.WrapFit,
