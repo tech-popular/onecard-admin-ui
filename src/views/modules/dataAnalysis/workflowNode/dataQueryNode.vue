@@ -74,7 +74,7 @@ export default {
       this.getCusterList(val)
     },
     getCusterList (code) {
-      custerList(code).then(({data}) => {
+      custerList(code, 'dynamic').then(({data}) => {
         if (data.status * 1 !== 1) {
           this.custerList = []
           return
