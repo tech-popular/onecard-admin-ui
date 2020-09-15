@@ -128,11 +128,11 @@ export default {
     closeAllNode (item) {
       if (item && item.tag == 'save') {
         let key = item.data.key
-        let _data = mySelf.myDiagram.findNodeForKey(key).data
+        let node = mySelf.myDiagram.findNodeForKey(key)
+        let _data = node.data
         _data.data = item.data.config
         // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
         if (_data.category === 'DATA_QUERY') {
-          let node = mySelf.myDiagram.findNodeForKey(key)
           node.findTreeParts().each(function (cNode) {
             if (cNode.data.category === 'GROUP_CHOICE') {
               let itemGroupId = cNode.data.data.configItems.groupId
@@ -144,6 +144,10 @@ export default {
             }
           })
         }
+        if (_data.category === 'GROUP_CHOICE') { // 根据选中的分群，更新分群节点的名称
+          let node1 = mySelf.myDiagram.findNodeForKey(key).part.data
+          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', this.currentName)
+        }
       }
     },
     getSelectCuster (custerArr, data) { // 获取数据转换中的参数，用于保存用
@@ -153,8 +157,6 @@ export default {
     },
     setCusterName (name, key) { // 分群节点时，节点名称以选择的分群名称来标记
       this.currentName = name
-      let node = mySelf.myDiagram.findNodeForKey(key).part.data
-      mySelf.myDiagram.model.setDataProperty(node, 'nodeName', name)
     },
     // 返回
     goback () {
