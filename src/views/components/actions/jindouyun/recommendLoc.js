@@ -1,10 +1,7 @@
-import { list } from '@/api/lexicon/cacheCleanup'
+import { jdyProductList } from '@/api/jindouyun/recommendLoc'
 export const models = {
   data () {
     return {
-      pageNum: 1, // 当前页
-      pageSize: 10, // 默认每页10条
-      totalPage: 0,
       dataListLoading: false,
       operates: [],
       columns: [
@@ -47,11 +44,7 @@ export const models = {
   },
   methods: {
     init () {
-      const dataBody = {
-        'pageNum': this.pageNum,
-        'pageSize': this.pageSize
-      }
-      this.getList(dataBody)
+      this.getList()
     },
     // 每页数
     sizeChangeHandle (val) {
@@ -64,9 +57,10 @@ export const models = {
       this.init()
     },
     // 列表接口
-    getList (dataBody) {
+    getList () {
       this.dataListLoading = true
-      list(dataBody).then(({data}) => {
+      jdyProductList().then(({data}) => {
+        console.log(data)
         if (data && data.code === 0) {
           this.dataListLoading = false
           this.list = data.data.list
