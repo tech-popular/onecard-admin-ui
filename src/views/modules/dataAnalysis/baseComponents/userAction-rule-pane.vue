@@ -95,15 +95,6 @@ export default {
       this.actionExpressionTemplate = ''
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
     },
-    // getEventSelectAllCata () { // 获取事件列表
-    //   selectEventAllCata({
-    //     channelCode: this.channelId
-    //   }).then(({data}) => {
-    //     if (data.status === '1') {
-    //       this.eventDownList = data.data
-    //     }
-    //   })
-    // },
     getEventSelectAllCata (fn) { // 获取事件列表
       selectEventAllCata({
         channelCode: this.channelId

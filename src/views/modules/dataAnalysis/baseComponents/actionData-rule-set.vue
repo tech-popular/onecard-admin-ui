@@ -65,7 +65,7 @@
                   :rules="{required: isRequired, message: '请输入', trigger: 'blur'}"
                 >
                   <el-input
-                    style="width: 50px;"
+                    style="width: 150px;"
                     v-model="item.params[0].value"
                     :maxlength="10"
                     @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
@@ -102,7 +102,7 @@
                 在&nbsp;过去&nbsp;
                 <el-form-item prop = "params[0].value" :ref="'paramse' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                  <el-input
-                    style="width: 50px;"
+                    style="width: 100px;"
                     v-model="item.params[0].value"
                     :maxlength="10"
                     @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
@@ -125,7 +125,7 @@
                 </el-form-item>到&nbsp;过去&nbsp;
                 <el-form-item prop = "params[1].value" :ref="'paramsn' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input
-                    style="width: 50px;"
+                    style="width: 100px;"
                     v-model="item.params[1].value"
                     :maxlength="10"
                     @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)"
@@ -162,7 +162,6 @@
             </el-form-item>
             <el-form-item style="width:120px" prop="eventList"  :rules="{required: isRequired, message: '请选择', trigger: 'change'}">         
               <el-cascader
-                style="width: 100%"
                 v-model="item.eventList"
                 :options="item.eventDownList"
                 :props="eyentTypeListTreeProps"
@@ -187,7 +186,7 @@
           <div>
 					  <action-children-data-rules-set :data="item" ref="thirdRulesSet" :is-require="isRequired" :from="from"></action-children-data-rules-set>
           </div>
-          <div v-if="item.havedo === 'yes'" style="margin-left: 40px;">
+          <div v-show="item.havedo === 'yes'" style="margin-left: 40px;">
             <span style="line-height: 40px;">总次数 &nbsp;&nbsp;</span>
             <el-form-item prop="totalCountParams.func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
               <el-select v-model="item.totalCountParams.func" style="width: 150px;"  @change="data => totalSelectOperateChange(data, item)">
@@ -227,7 +226,6 @@
                     :maxlength="10"
                     @input="item.totalCountParams.params[1].value = keyupNumberInput(item.totalCountParams.params[1].value)"
                     @blur="item.totalCountParams.params[1].value = pramasNumBlur(item, item.totalCountParams.params[1].value)"
- 
                   ></el-input>次&nbsp;&nbsp;之间
                 </el-form-item>
           </div>
