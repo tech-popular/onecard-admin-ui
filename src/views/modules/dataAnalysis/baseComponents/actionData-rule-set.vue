@@ -151,7 +151,7 @@
           </div>
           <div class="pane-rules-inline">
             <el-form-item prop="havedo" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-              <el-select v-model="item.havedo" class="subSelect1" >
+              <el-select v-model="item.havedo" class="subSelect1"  @change="data => havedoChange(data, item, index)">
                <el-option
                       v-for="(fitem, findex) in havedoSelects"
                       :value="fitem.code"
@@ -199,8 +199,8 @@
               </el-select>
             </el-form-item>
             <div v-if="item.totalCountParams.func != 'between'" class="pane-rules-inline">
-            <el-form-item  style="width:50px" prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-              <el-input v-model="item.totalCountParams.params[0].value"></el-input>
+            <el-form-item  prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+              <el-input v-model="item.totalCountParams.params[0].value" :maxlength="10" class="itemIput-number"></el-input>
             </el-form-item>&nbsp;次
             </div>
             <div v-if="item.totalCountParams.func === 'between'" class="pane-rules-inline">
@@ -341,8 +341,35 @@ export default {
 
     // 事件变化
     eventTypeChange (data, item, index) {
-      item.englishName = data[1]
       this.parent.updateEventTypeList(this.parent.actionRuleConfig, data, item, index)
+    },
+    // 是否做过
+    havedoChange (val, citem, index) {
+      let totalCountParams = []
+      if (val === 'no') {
+        totalCountParams = {
+          func: 'eq',
+          selectOperateList: citem.totalCountParams.selectOperateList,
+          params: [
+            {
+              value: 0,
+              title: ''
+            }
+          ]
+        }
+      } else {
+        totalCountParams = {
+          func: '',
+          selectOperateList: citem.totalCountParams.selectOperateList,
+          params: [
+            {
+              value: '',
+              title: ''
+            }
+          ]
+        }
+      }
+      this.parent.updateChildrenRulesArr(this.data, citem, {totalCountParams: totalCountParams}, index)
     },
     keyupDateNumberInput (val) {
       // 日期输入框，输入内容 要求 只能输入 正整数
@@ -389,8 +416,10 @@ export default {
     totalSelectOperateChange (val, ruleItem) { // 总次数改变时，数据清空，重新输入
       this.parent.updateTotalOperateChange(this.parent.actionRuleConfig, ruleItem)
       if (val === 'between') {
-        this.$refs['totalparamsl' + ruleItem.ruleCode][0].clearValidate()
-        this.$refs['totalparamsr' + ruleItem.ruleCode][0].clearValidate()
+        this.$nextTick(() => {
+          this.$refs['totalparamsl' + ruleItem.ruleCode][0].clearValidate()
+          this.$refs['totalparamsr' + ruleItem.ruleCode][0].clearValidate()
+        })
       }
     },
     judgeDataTwoISelect (rule, value, callback, params) { // 日期介于判断
@@ -465,7 +494,6 @@ export default {
     },
     blurNumberInput (val) {
       // 失去焦点时判断输入内容是否符合要求
-      console.log(323, val)
       val = val + '' // 数据转为字符串
       if (val[val.length - 1] === '.') {
         // 最后一位为小数点时，则删除小数点

@@ -15,6 +15,7 @@
           <el-select   
               v-model="item.fieldCode"
               @change="data => fieldCodeChange(data, item, index)"
+              @visible-change="data => selecteventIndexListVisible(data, item,index)"
            >
             <el-option 
                v-for="(citem,index) in item.eventIndexList" 
@@ -32,7 +33,7 @@
               v-model="item.func"
               class="itemOperateIput"
               @change="data => selectOperateChange(data, item, index)"
-              @visible-change="data => selectOperateVisible(data, item)"
+              @visible-change="data => selectOperateVisible(data, item,index)"
             >
               <el-option
                 v-for="(fitem, findex) in item.selectOperateList"
@@ -502,7 +503,7 @@ export default {
     },
     fieldCodeChange (data, ruleItem, index) {
       let node = ruleItem.eventIndexList.filter(item => item.englishName === ruleItem.fieldCode)[0]
-      // 指标改变时，对应的操作符也更新
+      // 属性改变时，对应的操作符也更新
       this.parent.fieldCodeChange(this.data, ruleItem, {
         englishName: node.englishName,
         fieldType: node.fieldType,
@@ -511,6 +512,20 @@ export default {
         format: node.dataStandar,
         enable: node.enable
       }, index)
+    },
+    selecteventIndexListVisible (val, ruleItem, index) {
+      // 当事件属性下拉框打开时，重新下拉请求数据
+      if (val) {
+        // 打开下拉框时
+        this.parent.getEventIndexList(
+          this.data.eventList[1],
+          eventIndexList => {
+            this.parent.updateChildrenRulesArr(this.data, ruleItem, {
+              eventIndexList: eventIndexList
+            }, index)
+          }
+        )
+      }
     },
     selectOperateChange (val, ruleItem, index) {
       // 操作符改变时，数据清空，重新输入
@@ -521,7 +536,7 @@ export default {
         this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
       }
     },
-    selectOperateVisible (val, ruleItem) {
+    selectOperateVisible (val, ruleItem, index) {
       // 当操作符下拉框打开时，重新下拉请求数据
       if (val) {
         // 打开下拉框时
@@ -530,7 +545,7 @@ export default {
           selectOperateList => {
             this.parent.updateChildrenRulesArr(this.data, ruleItem, {
               selectOperateList: selectOperateList
-            })
+            }, index)
           }
         )
       }

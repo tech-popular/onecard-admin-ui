@@ -338,6 +338,7 @@ export default {
           })
         } else {
           this.flowId = data.data.flowId
+          this.outMostExpressionTemplate = JSON.parse(data.data.configJson).outMostExpressionTemplate
           this.baseForm = {
             name: data.data.name,
             desc: data.data.desc,
@@ -374,10 +375,10 @@ export default {
             data.data.configJson,
             this.baseForm.channelId
           )
-          // this.$refs.userActionRule.renderData( // 真实调接口时数据重现
-          //   data.data.actionRuleConfig,
-          //   this.baseForm.channelId
-          // )
+          this.$refs.userActionRule.renderData( // 真实调接口时数据重现
+            data.data.configJson,
+            this.baseForm.channelId
+          )
         }
       })
     },
@@ -655,11 +656,7 @@ export default {
           if (sysUuid && sysArr.includes(sysUuid)) {
             params.username = this.getQueryParams('username') || ''
           }
-          console.log('params: ', JSON.stringify(params))
-          if (!this.loading) { // 为测试提交信息的数据结构，暂不掉接口
-            return
-          }
-          // this.loading = true
+          this.loading = true
           url(params).then(({ data }) => {
             if (data.status !== '1') {
               this.loading = false

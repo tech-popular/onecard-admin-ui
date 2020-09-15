@@ -34,7 +34,6 @@ import {
 import {
   findRuleIndex,
   getAbc,
-  findVueSelectItemIndex,
   deepClone
 } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -96,12 +95,26 @@ export default {
       this.actionExpressionTemplate = ''
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
     },
-    getEventSelectAllCata () { // 获取事件列表
+    // getEventSelectAllCata () { // 获取事件列表
+    //   selectEventAllCata({
+    //     channelCode: this.channelId
+    //   }).then(({data}) => {
+    //     if (data.status === '1') {
+    //       this.eventDownList = data.data
+    //     }
+    //   })
+    // },
+    getEventSelectAllCata (fn) { // 获取事件列表
       selectEventAllCata({
         channelCode: this.channelId
       }).then(({data}) => {
-        if (data.status === '1') {
+        if (data.status !== '1') {
+          this.eventDownList = []
+        } else {
           this.eventDownList = data.data
+        }
+        if (fn) {
+          fn(this.eventDownList)
         }
       })
     },
@@ -111,6 +124,95 @@ export default {
         this.countSelectOperateList = countSelectOperateList
       })
     },
+    getSelectOperateList (type, fn) {
+      if (!type) {
+        fn([])
+        return
+      }
+      selectOperate(type).then(({ data }) => {
+        let selectOperateList = []
+        if (data.status !== '1') {
+          selectOperateList = []
+        }
+        if (!data.data || (data.data && !data.data.length)) {
+          selectOperateList = []
+        }
+        selectOperateList = data.data
+        fn(selectOperateList)
+      })
+    },
+    // 获取事件属性列表
+    getEventIndexList (elementId, fn) {
+      if (!elementId) {
+        fn([])
+        return
+      }
+      selectEventIndexAllCata({elementId: elementId}).then(({ data }) => {
+        let eventIndexList = []
+        if (data.status !== '1') {
+          eventIndexList = []
+        }
+        if (!data.data || (data.data && !data.data.length)) {
+          eventIndexList = []
+        }
+        eventIndexList = data.data
+        fn(eventIndexList)
+      })
+    },
+    renderData (data, channelId) {
+      let configJson = JSON.parse(data)
+      this.channelId = configJson.channelId
+      this.actionRuleConfig = this.changeRules(configJson.actionRuleConfig)
+      this.actionExpression = configJson.actionExpression
+      this.actionExpressionTemplate = configJson.actionExpressionTemplate
+      this.getEventSelectAllCata((eventDownList) => {
+        this.getSelectOperateList('number', countSelectOperateList => {
+          this.countSelectOperateList = countSelectOperateList
+          this.actionRuleConfig = this.updateInitActionRulesConfig(this.actionRuleConfig, eventDownList, countSelectOperateList)
+          this.$nextTick(() => {
+            this.$emit('renderEnd')
+          })
+        })
+      })
+      this.$nextTick(() => {
+        // 默认将验证错误信息全部清除
+        let ruleFormArr = this.getRuleForm()
+        ruleFormArr.forEach(item => {
+          item.clearValidate()
+        })
+      })
+    },
+    renderApiData (data) {
+      this.actionRuleConfig = this.changeRules(data.actionRuleConfig)
+      this.actionExpression = data.actionExpression
+    },
+    // 回显时修改rules未childrenRules
+    changeRules (data) {
+      data.rules.forEach(item => {
+        if (item.type != 'rules_function') {
+          if (item.rules) {
+            item.childrenRules = deepClone(item.rules)
+            delete item.rules
+          } else {
+            item.childrenRules = []
+          }
+        } else {
+          this.changeRules(item)
+        }
+      })
+      return data
+    },
+    updateInitActionRulesConfig (data, eventDownList, countSelectOperateList) {
+      data.rules.forEach(item => {
+        if (item.type != 'rules_function') {
+          item.eventDownList = eventDownList
+          item.totalCountParams.selectOperateList = countSelectOperateList
+        } else {
+          this.updateInitActionRulesConfig(item, eventDownList, countSelectOperateList)
+        }
+      })
+      return data
+    },
     channelIdChangeUpdate () {
       // 用户所属渠道改变时，清空数据，初始
       if (this.actionRuleConfig.rules.length) {
@@ -119,31 +221,17 @@ export default {
       }
       this.updateConditionId(this.actionRuleConfig)
     },
-    updateEventTypeList (data, val, citem, index) { // 事件改变时，第三层数据需清空数据
-      let indexPath = findRuleIndex(data.rules, citem) + ''
-      let indexPathArr = indexPath.split(',')
-      let eventIndexList = []
-      selectEventIndexAllCata({ elementId: val[1] }).then(({data}) => {
-        if (data.status === '1') {
-          citem.eventIndexList = data.data
-          eventIndexList = data.data
+    updateEventTypeList (arr, val, citem, index) { // 事件改变时，第三层数据需清空数据
+      this.getEventIndexList(val[1], eventIndexList => {
+        citem.eventIndexList = eventIndexList
+        if (citem.childrenRules.length > 0) {
+          citem.childrenRules = []
+          this.addThirdChildrenRules(arr, citem)
         }
       })
       // 来源参数改变
       let dataEventDtos = citem.eventDownList.filter(sitem => sitem.eventId === val[0])[0].dataEventDtos
-      citem.sourceTable = dataEventDtos.filter(sitem => sitem.eventId === citem.englishName)[0].sourceTable
-      if (citem.childrenRules.length) {
-        citem.childrenRules = []
-        citem.childrenRules.push(this.getThirdRuleTemplateItem(citem))
-        if (indexPathArr.length === 1) {
-          this.updateChildrenRulesArr(data.rules[indexPathArr[0]], citem.childrenRules[index], {eventIndexList: eventIndexList}, index)
-          this.actionRuleConfig.rules[indexPathArr[0]] = citem
-        } else {
-          this.updateChildrenRulesArr(data.rules[indexPathArr[0]].rules[indexPathArr[1]], citem.childrenRules[index], {eventIndexList: eventIndexList}, index)
-          this.actionRuleConfig.rules[indexPathArr[0]].rules[indexPathArr[1]] = citem
-        }
-      }
-      // this.updateConditionId(this.actionRuleConfig)
+      citem.sourceTable = dataEventDtos.filter(sitem => sitem.eventId === val[1])[0].sourceTable
     },
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
@@ -158,91 +246,6 @@ export default {
         this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
       }
       this.updateConditionId(this.actionRuleConfig)
-    },
-    updateInitRulesConfig (arr, indexList) {
-      // 获取指标默认展开列表
-      arr.rules.forEach(item => {
-        if (item.childrenRules) { // 目前只针对第三层数据进行了处理，第二层数据根据具体字段进行处理
-          item.childrenRules.forEach(citem => {
-            let indexListArr = deepClone(indexList)
-            let indexPath = findVueSelectItemIndex(indexListArr, citem.fieldCode) + ''
-            let indexPathArr = indexPath.split(',')
-            let a = indexListArr
-            if (indexPath) {
-              indexPathArr.forEach((fitem, findex) => {
-                if (findex < indexPathArr.length - 1) {
-                  a[fitem].isDefaultExpanded = true
-                  a = a[fitem].children
-                } else {
-                  citem.enable = a[fitem].enable
-                }
-              })
-              citem.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
-              if (
-                citem.func === 'relative_within' ||
-                citem.func === 'relative_before'
-              ) {
-              // 兼容老数据
-                citem.subFunc = citem.func
-                citem.func = 'relative_time'
-                citem.subTimeSelects = this.subTimeSelects
-                if (!citem.dateDimension) {
-                  citem.dateDimension = 'DAYS'
-                }
-                this.getSelectOperateList(citem.fieldType, selectOperateList => {
-                  citem.selectOperateList = selectOperateList
-                  citem.subSelects = citem.selectOperateList.filter(
-                    sitem => sitem.code === citem.func
-                  )[0].subSelects
-                })
-              }
-              if (
-                citem.func === 'relative_time_in' ||
-                citem.func === 'relative_time'
-              ) {
-                citem.subTimeSelects = this.subTimeSelects
-                if (!citem.dateDimension) {
-                  citem.dateDimension = 'DAYS'
-                }
-              }
-            // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
-              if (
-                (citem.fieldType === 'string' || citem.fieldType === 'number') &&
-                (citem.func === 'eq' || citem.func === 'neq')
-              ) {
-                if (!citem.params[0].selectVal) {
-                  citem.params[0].selectVal = [citem.params[0].value]
-                }
-              }
-            }
-          })
-        }
-      })
-      return arr
-    },
-    renderData (data, channelId) {
-      this.channelId = channelId
-      let configJson = JSON.parse(data)
-      this.actionRuleConfig = configJson.actionRuleConfig
-      this.actionExpression = configJson.actionExpression
-      this.actionExpressionTemplate = configJson.actionExpressionTemplate
-      this.getEventSelectAllCata((indexList) => {
-        this.actionRuleConfig = this.updateInitRulesConfig(this.actionRuleConfig, indexList)
-        this.$nextTick(() => {
-          this.$emit('renderEnd')
-        })
-      })
-      this.$nextTick(() => {
-        // 默认将验证错误信息全部清除
-        let ruleFormArr = this.getRuleForm()
-        ruleFormArr.forEach(item => {
-          item.clearValidate()
-        })
-      })
-    },
-    renderApiData (data) {
-      this.actionRuleConfig = data.actionRuleConfig
-      this.actionExpression = data.actionExpression
     },
     fieldCodeChange (data, citem, obj, index) { // rxs更新数据
       this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
@@ -307,16 +310,18 @@ export default {
     getRuleTemplateItem () {
       //  一级 二级条件模板
       return {
-        type: 'rule',
-        func: 'between', //  选择的时间类型
-        subFunc: '',
-        dateDimension: '',
-        havedo: 'yes', //  是否做过
-        englishName: '', // 事件类型
-        sourceTable: '', // 事件类型 来源
-        eventDownList: this.eventDownList, // 事件列表
-        eventIndexList: [], // 事件属性列表
-        totalCountParams: {
+        'type': 'rule',
+        'func': 'between', //  选择的时间类型
+        'fieldType': 'date',
+        'fieldCode': 'click_time',
+        'englishName': 'click_time',
+        'subFunc': '',
+        'dateDimension': '',
+        'havedo': 'yes', //  是否做过
+        'sourceTable': '', // 事件类型 来源
+        'eventDownList': this.eventDownList, // 事件列表
+        'eventIndexList': [], // 事件属性列表
+        'totalCountParams': {
           func: '',
           selectOperateList: this.countSelectOperateList,
           params: [
@@ -326,8 +331,8 @@ export default {
             }
           ]
         },
-        childrenRules: [], // 第三层数组
-        params: [
+        'childrenRules': [], // 第三层数组
+        'params': [
           {
             value: '',
             title: ''
@@ -342,22 +347,23 @@ export default {
     getThirdRuleTemplateItem (data) {
       // 三级条件模板
       return {
-        type: 'children_rule',
-        fieldType: '',
-        fieldCode: null,
-        format: '',
-        func: '',
-        sourceTable: '',
-        fieldId: '',
-        englishName: '',
-        eventIndexList: data.eventIndexList, // 事件属性下拉选
-        enumTypeNum: '',
-        selectOperateList: [], // 操作符下拉选
-        selectEnumsList: [], // 内容下拉选
-        subFunc: '',
-        dateDimension: '',
-        strTips: [],
-        params: [
+        'type': 'rule',
+        'relation': 'and',
+        'fieldType': '',
+        'fieldCode': null,
+        'format': '',
+        'func': '',
+        'sourceTable': '',
+        'fieldId': '',
+        'englishName': '',
+        'eventIndexList': data.eventIndexList, // 事件属性下拉选
+        'enumTypeNum': '',
+        'selectOperateList': [], // 操作符下拉选
+        'selectEnumsList': [], // 内容下拉选
+        'subFunc': '',
+        'dateDimension': '',
+        'strTips': [],
+        'params': [
           {
             value: '',
             title: ''
@@ -614,23 +620,6 @@ export default {
       this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
       this.updateConditionId(this.actionRuleConfig)
     },
-    getSelectOperateList (type, fn) {
-      if (!type) {
-        fn([])
-        return
-      }
-      selectOperate(type).then(({ data }) => {
-        let selectOperateList = []
-        if (data.status !== '1') {
-          selectOperateList = []
-        }
-        if (!data.data || (data.data && !data.data.length)) {
-          selectOperateList = []
-        }
-        selectOperateList = data.data
-        fn(selectOperateList)
-      })
-    },
     getRuleForm () {
       // 获取所有的$refs.ruleForm,用于统一校验数据
       let ruleSet = this.$refs.actionRulesSet
@@ -686,7 +675,22 @@ export default {
           this.updateRulesConfig(item)
         }
       })
+      arr = this.changeChildrenRules(arr)
       return arr
+    },
+    // 将第三层数据的childrenRules修改为rules
+    changeChildrenRules (data) {
+      data.rules.forEach(item => {
+        if (item.type != 'rules_function') {
+          if (item.childrenRules != undefined) {
+            item.rules = deepClone(item.childrenRules)
+            delete item.childrenRules
+          }
+        } else {
+          this.changeChildrenRules(item)
+        }
+      })
+      return data
     },
     ruleValidate () {
       if (!this.actionRuleConfig.rules.length) {
@@ -703,7 +707,6 @@ export default {
         actionExpression: this.actionExpression,
         actionExpressionTemplate: this.actionExpressionTemplate
       }
-      console.log(' this.lastSubmitRuleConfig: ', this.lastSubmitRuleConfig)
       this.isSelectedUneffectIndex = Array.from(new Set(this.isSelectedUneffectIndex))
       if (this.isSelectedUneffectIndex.length) {
         return this.$message({
