@@ -130,6 +130,20 @@ export default {
         let key = item.data.key
         let _data = mySelf.myDiagram.findNodeForKey(key).data
         _data.data = item.data.config
+        // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
+        if (_data.category === 'DATA_QUERY') {
+          let node = mySelf.myDiagram.findNodeForKey(key)
+          node.findTreeParts().each(function (cNode) {
+            if (cNode.data.category === 'GROUP_CHOICE') {
+              let itemGroupId = cNode.data.data.configItems.groupId
+              if (itemGroupId && !that.groupId.includes(itemGroupId)) {
+                cNode.data.data.configItems.groupId = ''
+                cNode.data.nodeName = '分群节点'
+                mySelf.myDiagram.model.updateTargetBindings(cNode.data)
+              }
+            }
+          })
+        }
       }
     },
     getSelectCuster (custerArr, data) { // 获取数据转换中的参数，用于保存用
@@ -169,6 +183,10 @@ export default {
           pNullArr.push(item.nodeName)
         }
         if (item.category === 'GROUP_CHOICE') {
+          // 兼容修改数据查询时，把部分分群节点内容置空的情况
+          if (item.data && !item.data.configItems.groupId) {
+            pNullArr.push(item.nodeName)
+          }
           let node = mySelf.myDiagram.findNodeForKey(item.key)
           let linkNum = 0
           node.findLinksOutOf().each(function (link) {
@@ -179,7 +197,7 @@ export default {
           }
         }
       })
-      if (pNullArr.length) return this.$message.error(`请配置节点【“${pNullArr.join('”、“')}”】的内容`)
+      if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容`)
       if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
       if (that.id) { // 修改保存
         this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), {
@@ -445,6 +463,7 @@ export default {
           {
             //  双击展示
             doubleClick: function (e, node) {
+              that.$message.error('修改该节点的出参会影响后面的分群节点的数据！')
               that.doubleClickNodeEvent(e, node, 'dataQueryNodeVisible', 'dataQueryNodeEl')
             }
           },
