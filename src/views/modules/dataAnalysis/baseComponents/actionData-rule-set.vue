@@ -30,7 +30,6 @@
           <!--条件内容区-->
           <div class="pane-rules-inline">
             <!--时间-->
-            <div class="pane-rules-inline pane-rules-datetime" v-if="item.func">
               <!--绝对时间-->
               <div v-if="item.func === 'between'" class="pane-rules-inline">
                 <el-form-item prop="params[0].value" :ref="'paramsr' + item.ruleCode"  :rules="{required: isRequired, validator: (rule, value, callback) => judgeDataTwoISelect(rule, value, callback, item.params), trigger: 'blur'}">
@@ -102,7 +101,7 @@
                 在&nbsp;过去&nbsp;
                 <el-form-item prop = "params[0].value" :ref="'paramse' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                  <el-input
-                    style="width: 100px;"
+                    style="width:90px;"
                     v-model="item.params[0].value"
                     :maxlength="10"
                     @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
@@ -125,7 +124,7 @@
                 </el-form-item>到&nbsp;过去&nbsp;
                 <el-form-item prop = "params[1].value" :ref="'paramsn' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
                   <el-input
-                    style="width: 100px;"
+                    style="width:90px;"
                     v-model="item.params[1].value"
                     :maxlength="10"
                     @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)"
@@ -147,7 +146,6 @@
                   </el-select>
                 </el-form-item>之内
               </div>
-            </div>
           </div>
           <div class="pane-rules-inline">
             <el-form-item prop="havedo" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
@@ -357,7 +355,7 @@ export default {
         }
       } else {
         totalCountParams = {
-          func: '',
+          func: citem.totalCountParams.selectOperateList[0].code,
           selectOperateList: citem.totalCountParams.selectOperateList,
           params: [
             {
@@ -385,16 +383,18 @@ export default {
     pramasDateBlur (item, val) {
       // 时间 区间的判断
       let params = item.params
-      if (params[0].value && params[1].value && params[0].value * 1 <= params[1].value * 1) {
-        this.$refs['paramse' + item.ruleCode][0].clearValidate()
-        this.$refs['paramsn' + item.ruleCode][0].clearValidate()
+      if (params[0].value && params[1].value && params[0].value * 1 >= params[1].value * 1) {
+        this.$nextTick(() => {
+          this.$refs['paramse' + item.ruleCode][0].clearValidate()
+          this.$refs['paramsn' + item.ruleCode][0].clearValidate()
+        })
       }
       return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
     selectOperateChange (val, ruleItem) { // 时间区间改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.actionRuleConfig, ruleItem)
       this.$nextTick(() => { // 切换时间区间时，手动清除校验信息
-        if (ruleItem.func === 'betweent') {
+        if (ruleItem.func === 'between') {
           this.$refs['paramsl' + ruleItem.ruleCode][0].clearValidate()
           this.$refs['paramsr' + ruleItem.ruleCode][0].clearValidate()
         }

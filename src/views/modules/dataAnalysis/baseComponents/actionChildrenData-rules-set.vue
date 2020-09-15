@@ -312,7 +312,7 @@
             </div>
           </div>
           <el-form-item class="btn-group">
-            <el-tooltip placement="top">
+            <el-tooltip v-if="item.func === 'relative_time_in' || item.func === 'relative_time'" placement="top">
               <div slot="content" v-html="tipsHtmlCont(item)" class="tips-content"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
             </el-tooltip>
