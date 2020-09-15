@@ -463,7 +463,11 @@ export default {
           {
             //  双击展示
             doubleClick: function (e, node) {
-              that.$message.error('修改该节点的出参会影响后面的分群节点的数据！')
+              that.$message({
+                type: 'error',
+                message: '修改该节点的出参会影响后面的分群节点的数据！',
+                customClass: 'msg-error'
+              })
               that.doubleClickNodeEvent(e, node, 'dataQueryNodeVisible', 'dataQueryNodeEl')
             }
           },
@@ -819,5 +823,8 @@ export default {
   }
   .status-symbol {
       width: 60px
+  }
+  .msg-error {
+    z-index: 9999 !important
   }
 </style>
