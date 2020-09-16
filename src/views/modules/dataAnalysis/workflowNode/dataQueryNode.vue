@@ -12,8 +12,8 @@
         </el-select>
       </el-form-item>
       <el-form-item prop="groupId" label="分群名称">
-        <el-select v-model="dataForm.groupId" multiple clearable placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
-          <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text"></el-option>
+        <el-select v-model="dataForm.groupId" multiple clearable filterable placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
+          <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text" :disabled="item.disabled"></el-option>
         </el-select>
       </el-form-item>
     </el-form>
@@ -36,6 +36,7 @@ export default {
       visible: false,
       channelList: [],
       custerList: [],
+      curCusterType: '',
       dataForm: {
         channelCode: '',
         groupId: []
@@ -54,6 +55,7 @@ export default {
     init (data) {
       this.visible = true
       this.key = data.key
+      this.curCusterType = ''
       this.getChannelsList()
       if (data.data) {
         this.dataForm.channelCode = data.data.configItems.channelCode
@@ -67,7 +69,7 @@ export default {
           this.channelList = []
           return
         }
-        this.channelList = data.data
+        this.channelList = data.data.filter(item => item.value !== '0000')
       })
     },
     channelCodeChange (val) {
@@ -80,10 +82,32 @@ export default {
           return
         }
         this.custerList = data.data
+        if (this.dataForm.groupId.length) {
+          this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+          this.custerList.map(item => {
+            if (item.type !== this.curCusterType) {
+              item.disabled = true
+            }
+          })
+        }
       })
     },
     groupIdChange () {
       let arr = []
+      if (!this.dataForm.groupId.length) {
+        this.custerList.map(item => {
+          item.disabled = false
+        })
+      } else {
+        if (this.dataForm.groupId.length === 1) {
+          this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+          this.custerList.map(item => {
+            if (item.type !== this.curCusterType) {
+              item.disabled = true
+            }
+          })
+        }
+      }
       this.dataForm.groupId.forEach(item => {
         let obj = this.custerList.filter(citem => citem.value === item)[0]
         arr.push(obj)
@@ -96,7 +120,7 @@ export default {
           let config = {
             configItems: this.dataForm
           }
-          this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
+          this.$emit('close', { tag: 'save', data: { config: config, key: this.key }, type: this.curCusterType })
           this.$parent.dataQueryNodeVisible = false
         }
       })

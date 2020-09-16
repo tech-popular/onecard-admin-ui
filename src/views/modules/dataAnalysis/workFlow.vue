@@ -51,6 +51,7 @@ export default {
       id: this.$route.query.id,
       channelCode: '',
       groupId: [],
+      type: '',
       inparamsNodeVisible: false,
       groupChoiceNodeVisible: false,
       dataQueryNodeVisible: false,
@@ -134,8 +135,9 @@ export default {
         _data.data = item.data.config
         // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
         if (_data.category === 'DATA_QUERY') {
+          this.type = item.type
           node.findTreeParts().each(function (cNode) {
-            if (cNode.data.category === 'GROUP_CHOICE') {
+            if (cNode.data.category === 'GROUP_CHOICE' && cNode.data.data) {
               let itemGroupId = cNode.data.data.configItems.groupId
               if (itemGroupId && !that.groupId.includes(itemGroupId)) {
                 cNode.data.data.configItems.groupId = ''
@@ -237,6 +239,7 @@ export default {
         name: saveData.name,
         code: saveData.code,
         groupId: this.groupId,
+        type: this.type || 'dynamic',
         channelCode: this.channelCode
       }
       let url = this.id ? editFlowInfo : saveFlowInfo
@@ -356,30 +359,6 @@ export default {
           }).makeTwoWay()
         )
       }
-      // 占位NO_USE
-      // mySelf.myDiagram.nodeTemplateMap.add(
-      //   'NO_USE',
-      //   $(
-      //     go.Node,
-      //     'Table',
-      //     nodeStyle(),
-      //     { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
-      //     $(
-      //       go.Panel,
-      //       'Auto',
-      //       $(
-      //         go.Shape,
-      //         'Rectangle',
-      //         {
-      //           minSize: new go.Size(0, 50),
-      //           fill: 'transparent',
-      //           strokeWidth: 0
-      //         }
-      //       ),
-      //       textBlock(false)
-      //     )
-      //   )
-      // )
       // IN_PARAM
       mySelf.myDiagram.nodeTemplateMap.add(
         'IN_PARAM',
@@ -554,6 +533,17 @@ export default {
           fromNodeLink.findLinksOutOf().each(function (link) {
             that.$message.error('不可直接返参，请连接分群节点！')
             return mySelf.myDiagram.model.removeLinkData(link.data)
+          })
+        }
+        if (toCategory === 'OUT_PARAM') {
+          let linkInNum = 0
+          toNodeLink.findLinksInto().each(function (link) {
+            if (linkInNum === 1) {
+              that.$message.error('决策结果只能有一个上级节点！')
+              return mySelf.myDiagram.model.removeLinkData(link.data)
+            } else {
+              linkInNum++
+            }
           })
         }
         if (fromCategory === 'GROUP_CHOICE') { // 将状态判断的连线内容保存，保存时判断用
