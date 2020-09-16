@@ -18,7 +18,6 @@
   </div>
 </template>
 <script>
-import go, { Margin } from 'gojs'
 import { palette } from './dataAnalysisUtils/flowPalette' // 侧边栏模板数据
 import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
 import groupChoiceNode from './workflowNode/groupChoiceNode'
@@ -28,6 +27,8 @@ import outParamsNode from './workflowNode/outparamsNode'
 import saveData from './workflowNode/saveData'
 var that = null
 var mySelf = null
+var go = window.go
+var Margin = go.Margin
 export default {
   data () {
     return {
@@ -180,27 +181,41 @@ export default {
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
       let pChildOneArr = []
+      let pNullLinkArr = []
       nodeDataArray.map(item => {
-        if (!item.data && item.category !== 'NO_USE') {
+        if (!item.data) {
           pNullArr.push(item.nodeName)
         }
-        if (item.category === 'GROUP_CHOICE') {
-          // 兼容修改数据查询时，把部分分群节点内容置空的情况
-          if (item.data && !item.data.configItems.groupId) {
-            pNullArr.push(item.nodeName)
-          }
-          let node = mySelf.myDiagram.findNodeForKey(item.key)
-          let linkNum = 0
-          node.findLinksOutOf().each(function (link) {
-            linkNum++
-          })
-          if (linkNum < 2) {
-            pChildOneArr.push(item.nodeName)
+        let node = mySelf.myDiagram.findNodeForKey(item.key)
+        if (item.category !== 'OUT_PARAM') {
+          if (item.category === 'GROUP_CHOICE') { // 分群节点必须有两个节点，否则报错
+            // 兼容修改数据查询时，把部分分群节点内容置空的情况
+            if (item.data && !item.data.configItems.groupId) {
+              pNullArr.push(item.nodeName)
+            }
+            let linkNum = 0
+            node.findLinksOutOf().each(function (link) {
+              linkNum++
+            })
+            if (linkNum < 2) {
+              pChildOneArr.push(item.nodeName)
+            }
+          } else { // 其他节点若无连线信息则报错
+            let linkNum1 = 0
+            node.findLinksOutOf().each(function (link) {
+              linkNum1++
+            })
+            if (linkNum1 === 0) {
+              pNullLinkArr.push(item.nodeName)
+            }
           }
         }
       })
-      if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容`)
+      if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置连线信息！`)
+      if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
       if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
+      // 删除无用节点
+      // mySelf.myDiagram.model.nodeDataArray = mySelf.myDiagram.model.nodeDataArray.filter(item => item.category !== 'NO_USE')
       if (that.id) { // 修改保存
         this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), {
           name: this.saveForm.name,
@@ -342,29 +357,29 @@ export default {
         )
       }
       // 占位NO_USE
-      mySelf.myDiagram.nodeTemplateMap.add(
-        'NO_USE',
-        $(
-          go.Node,
-          'Table',
-          nodeStyle(),
-          { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
-          $(
-            go.Panel,
-            'Auto',
-            $(
-              go.Shape,
-              'Rectangle',
-              {
-                minSize: new go.Size(0, 50),
-                fill: 'transparent',
-                strokeWidth: 0
-              }
-            ),
-            textBlock(false)
-          )
-        )
-      )
+      // mySelf.myDiagram.nodeTemplateMap.add(
+      //   'NO_USE',
+      //   $(
+      //     go.Node,
+      //     'Table',
+      //     nodeStyle(),
+      //     { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
+      //     $(
+      //       go.Panel,
+      //       'Auto',
+      //       $(
+      //         go.Shape,
+      //         'Rectangle',
+      //         {
+      //           minSize: new go.Size(0, 50),
+      //           fill: 'transparent',
+      //           strokeWidth: 0
+      //         }
+      //       ),
+      //       textBlock(false)
+      //     )
+      //   )
+      // )
       // IN_PARAM
       mySelf.myDiagram.nodeTemplateMap.add(
         'IN_PARAM',

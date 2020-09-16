@@ -6,11 +6,6 @@ export const palette = [
   //   key: '1'
   // },
   {
-    key: '99999',
-    category: 'NO_USE',
-    nodeName: ''
-  },
-  {
     key: '3',
     category: 'GROUP_CHOICE',
     nodeName: '分群节点'

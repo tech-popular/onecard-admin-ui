@@ -31,7 +31,7 @@
   </div>
 </template>
 <script>
-import go from 'gojs'
+var go = window.go
 var mySelf = null
 export default {
   data () {

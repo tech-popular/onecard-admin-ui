@@ -25,10 +25,11 @@
 </template>
 
 <script>
-import go from 'gojs'
+// import go from 'gojs'
 // import '../../../extensions/DataInspector.css'
 // require('../../../extensions/Figures')
 // require('./data')
+var go = window.go
 export default{
 
   data () {
