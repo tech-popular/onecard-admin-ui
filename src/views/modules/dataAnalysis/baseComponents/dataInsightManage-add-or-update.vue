@@ -516,16 +516,16 @@ export default {
       }).catch(() => {
         console.log('cancel')
       })
-        .then(() => {
-          // 确认创建分群时的操作
-          this.drawerTitle = '新建'
-          this.baseForm.name = '复制' + this.baseForm.name
-          this.id = 0
-          this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
-        })
-        .catch(() => {
-          console.log('cancel')
-        })
+        // .then(() => {
+        //   // 确认创建分群时的操作
+        //   this.drawerTitle = '新建'
+        //   this.baseForm.name = '复制' + this.baseForm.name
+        //   this.id = 0
+        //   this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+        // })
+        // .catch(() => {
+        //   console.log('cancel')
+        // })
     },
     saveHandle (type) {
       if (this.baseForm.userType === 'excel') {

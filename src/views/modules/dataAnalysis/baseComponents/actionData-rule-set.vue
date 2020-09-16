@@ -17,145 +17,143 @@
             prop="func"
             :rules="{required: isRequired, message: '请选择', trigger: 'change'}"
           >
-            <el-select v-model="item.func" class="itemIput" @change="data => selectOperateChange(data, item)">
+            <el-select v-model="item.func"  class="itemOperateIput"  @change="data => selectOperateChange(data, item)">
               <el-option
                 style="width:200px"
                 v-for="(fitem, findex) in fileList"
                 :value="fitem.value"
                 :key="findex"
                 :label="fitem.lable"
-              />
-            </el-select>
+              /></el-select>
           </el-form-item>
-          <!--条件内容区-->
+            <!--条件内容区-->
           <div class="pane-rules-inline">
-            <!--时间-->
               <!--绝对时间-->
-              <div v-if="item.func === 'between'" class="pane-rules-inline">
-                <el-form-item prop="params[0].value" :ref="'paramsr' + item.ruleCode"  :rules="{required: isRequired, validator: (rule, value, callback) => judgeDataTwoISelect(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-date-picker
-                    style="width:200px"
-                    v-model="item.params[0].value"
-                    type="datetime"
-                    placeholder="选择日期时间"
-                    format="yyyy-MM-dd HH:mm:ss"
-                    value-format="yyyy-MM-dd HH:mm:ss"
-                    class="itemIput"
-                  ></el-date-picker>
-                </el-form-item>&nbsp; ~ &nbsp;
-                <el-form-item prop="params[1].value" :ref="'paramsl' + item.ruleCode"  :rules="{required: isRequired, validator: (rule, value, callback) => judgeDataTwoISelect(rule, value, callback, item.params), trigger: 'blur'}"> 
-                  <el-date-picker
-                    style="width:200px"
-                    v-model="item.params[1].value"
-                    type="datetime"
-                    placeholder="选择日期时间"
-                    format="yyyy-MM-dd HH:mm:ss"
-                    value-format="yyyy-MM-dd HH:mm:ss"
-                    class="itemIput"
-                  ></el-date-picker>
-                </el-form-item>
-              </div>
-              <!--相对当前时间点-->
-              <div v-if="item.func === 'relative_time'" class="pane-rules-inline">
-                在&nbsp;过去&nbsp;
-                <el-form-item
-                  prop="params[0].value"
-                  :ref="'paramst' + item.ruleCode"
-                  :rules="{required: isRequired, message: '请输入', trigger: 'blur'}"
+            <div v-if="item.func === 'between'" class="pane-rules-inline">
+              <el-form-item prop="params[0].value" :ref="'paramsr' + item.ruleCode"  :rules="{required: isRequired, validator: (rule, value, callback) => judgeDataTwoISelect(rule, value, callback, item.params), trigger: 'blur'}">
+                <el-date-picker
+                  style="width:200px"
+                  v-model="item.params[0].value"
+                  type="datetime"
+                  placeholder="选择日期时间"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  class="itemIput"
+                ></el-date-picker>
+              </el-form-item>&nbsp; ~ &nbsp;
+              <el-form-item prop="params[1].value" :ref="'paramsl' + item.ruleCode"  :rules="{required: isRequired, validator: (rule, value, callback) => judgeDataTwoISelect(rule, value, callback, item.params), trigger: 'blur'}"> 
+                <el-date-picker
+                  style="width:200px"
+                  v-model="item.params[1].value"
+                  type="datetime"
+                  placeholder="选择日期时间"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  class="itemIput"
+                ></el-date-picker>
+              </el-form-item>
+            </div>
+            <!--相对当前时间点-->
+            <div v-if="item.func === 'relative_time'" class="pane-rules-inline">
+              在&nbsp;过去&nbsp;
+              <el-form-item
+                prop="params[0].value"
+                :ref="'paramst' + item.ruleCode"
+                :rules="{required: isRequired, message: '请输入', trigger: 'blur'}"
+              >
+                <el-input
+                  style="width: 150px;"
+                  v-model="item.params[0].value"
+                  :maxlength="10"
+                  @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
+                  @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="dateDimension" :ref="'paramsi' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+                <el-select
+                  v-model="item.dateDimension"
+                  class="subSelect1"
+                  @change="data => updateDateDimension(data, item)"
                 >
-                  <el-input
-                    style="width: 150px;"
-                    v-model="item.params[0].value"
-                    :maxlength="10"
-                    @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
-                    @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item prop="dateDimension" :ref="'paramsi' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <el-select
-                    v-model="item.dateDimension"
-                    class="subSelect1"
-                    @change="data => updateDateDimension(data, item)"
-                  >
-                    <el-option
-                      v-for="(fitem, findex) in item.subTimeSelects"
-                      :value="fitem.code"
-                      :key="findex"
-                      :label="fitem.title"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item prop="subFunc" :ref="'paramsm' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <el-select v-model="item.subFunc" class="subSelect" style="width:90px">
-                    <el-option
-                      v-for="(fitem, findex) in subSelects"
-                      :value="fitem.code"
-                      :key="findex"
-                      :label="fitem.title"
-                    />
-                  </el-select>
-                </el-form-item>
-              </div>
-              <!--相对当前时间点区间-->
-              <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
-                在&nbsp;过去&nbsp;
-                <el-form-item prop = "params[0].value" :ref="'paramse' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                 <el-input
-                    style="width:90px;"
-                    v-model="item.params[0].value"
-                    :maxlength="10"
-                    @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
-                    @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item prop="dateDimension" :ref="'paramso' + item.ruleCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-                  <el-select
-                    v-model="item.dateDimension"
-                    class="subSelect1"
-                    @change="data => updateDateDimension(data, item)"
-                  >
-                    <el-option
-                      v-for="(fitem, findex) in item.subTimeSelects"
-                      :value="fitem.code"
-                      :key="findex"
-                      :label="fitem.title"
-                    />
-                  </el-select>
-                </el-form-item>到&nbsp;过去&nbsp;
-                <el-form-item prop = "params[1].value" :ref="'paramsn' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
-                  <el-input
-                    style="width:90px;"
-                    v-model="item.params[1].value"
-                    :maxlength="10"
-                    @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)"
-                    @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item prop="dateDimension" :ref="'paramsp' + item.ruleCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-                  <el-select
-                    v-model="item.dateDimension"
-                    class="subSelect1"
-                    @change="data => updateDateDimension(data, item)"
-                  >
-                    <el-option
-                      v-for="(fitem, findex) in item.subTimeSelects"
-                      :value="fitem.code"
-                      :key="findex"
-                      :label="fitem.title"
-                    />
-                  </el-select>
-                </el-form-item>之内
-              </div>
+                  <el-option
+                    v-for="(fitem, findex) in item.subTimeSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item prop="subFunc" :ref="'paramsm' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+                <el-select v-model="item.subFunc" class="subSelect" style="width:90px">
+                  <el-option
+                    v-for="(fitem, findex) in subSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>
+            </div>
+            <!--相对当前时间点区间-->
+            <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
+              在&nbsp;过去&nbsp;
+              <el-form-item prop = "params[0].value" :ref="'paramse' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
+                <el-input
+                  style="width:90px;"
+                  v-model="item.params[0].value"
+                  :maxlength="10"
+                  @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
+                  @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="dateDimension" :ref="'paramso' + item.ruleCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+                <el-select
+                  v-model="item.dateDimension"
+                  class="subSelect1"
+                  @change="data => updateDateDimension(data, item)"
+                >
+                  <el-option
+                    v-for="(fitem, findex) in item.subTimeSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>到&nbsp;过去&nbsp;
+              <el-form-item prop = "params[1].value" :ref="'paramsn' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
+                <el-input
+                  style="width:90px;"
+                  v-model="item.params[1].value"
+                  :maxlength="10"
+                  @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)"
+                  @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="dateDimension" :ref="'paramsp' + item.ruleCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+                <el-select
+                  v-model="item.dateDimension"
+                  class="subSelect1"
+                  @change="data => updateDateDimension(data, item)"
+                >
+                  <el-option
+                    v-for="(fitem, findex) in item.subTimeSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>之内
+            </div>
           </div>
           <div class="pane-rules-inline">
             <el-form-item prop="havedo" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
               <el-select v-model="item.havedo" class="subSelect1"  @change="data => havedoChange(data, item, index)">
-               <el-option
-                      v-for="(fitem, findex) in havedoSelects"
-                      :value="fitem.code"
-                      :key="findex"
-                      :label="fitem.title"
-                    />
+                <el-option
+                  v-for="(fitem, findex) in havedoSelects"
+                  :value="fitem.code"
+                  :key="findex"
+                  :label="fitem.title"
+                />
               </el-select>
             </el-form-item>
             <el-form-item style="width:120px" prop="eventList"  :rules="{required: isRequired, message: '请选择', trigger: 'change'}">         
@@ -182,12 +180,12 @@
             <i class="el-icon-close cursor-pointer" @click="deleteRules(item, index)"></i>
           </el-form-item>
           <div>
-					  <action-children-data-rules-set :data="item" ref="thirdRulesSet" :is-require="isRequired" :from="from"></action-children-data-rules-set>
+            <action-children-data-rules-set :data="item" ref="thirdRulesSet" :is-require="isRequired" :from="from"></action-children-data-rules-set>
           </div>
           <div v-show="item.havedo === 'yes'" style="margin-left: 40px;">
             <span style="line-height: 40px;">总次数 &nbsp;&nbsp;</span>
             <el-form-item prop="totalCountParams.func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-              <el-select v-model="item.totalCountParams.func" style="width: 150px;"  @change="data => totalSelectOperateChange(data, item)">
+              <el-select v-model="item.totalCountParams.func"   @change="data => totalSelectOperateChange(data, item)">
                 <el-option v-for="(fitem,findex) in item.totalCountParams.selectOperateList"                 
                   :value="fitem.code"
                   :key="findex"
@@ -195,17 +193,18 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <div v-if="item.totalCountParams.func != 'between'" class="pane-rules-inline">
-            <el-form-item  prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-              <el-input v-model="item.totalCountParams.params[0].value" :maxlength="10" class="itemIput-number"></el-input>
-            </el-form-item>&nbsp;次
-            </div>
-            <div v-if="item.totalCountParams.func === 'between'" class="pane-rules-inline">
-                <el-form-item  
+            <div v-if="isEmpty(item)" class="pane-rules-inline">
+              <div v-if="item.totalCountParams.func != 'between'" class="pane-rules-inline">
+                <el-form-item  prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+                  <el-input v-model="item.totalCountParams.params[0].value" :maxlength="10" class="itemIput-number"></el-input>
+                </el-form-item>&nbsp;次
+              </div>
+              <div v-if="item.totalCountParams.func === 'between'" class="pane-rules-inline">
+                <el-form-item 
                   prop="totalCountParams.params[0].value"
                   :ref="'totalparamsl' + item.ruleCode"
                   :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.totalCountParams.params), trigger: 'blur' }">
-                  <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
+                <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
                   <el-input
                     v-model="item.totalCountParams.params[0].value"
                     :maxlength="10"
@@ -226,7 +225,8 @@
                     @blur="item.totalCountParams.params[1].value = pramasNumBlur(item, item.totalCountParams.params[1].value)"
                   ></el-input>次&nbsp;&nbsp;之间
                 </el-form-item>
-          </div>
+              </div>
+            </div>  
           </div>
         </el-form>
         <div v-else>
@@ -506,6 +506,15 @@ export default {
       val = val.replace(/^0+([0-9])/, '$1') // 009.9 00099999  -> 9.9  999999
       val = val.replace(/^-0+([0-9])/, '-$1') // -009.9 -00099999 -> -9.9  -999999
       return val
+    },
+    isEmpty (item) {
+      // 是否选择了空
+      let emptyArr = ['null', 'not_null', 'not_empty', 'empty']
+      if (!emptyArr.includes(item.totalCountParams.func)) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 }

@@ -2,10 +2,10 @@
   <div class="action-rule-pane">
     <el-form :inline="true" label-position="left">
       <el-form-item label="用户行为满足：">
-        <el-tooltip placement="top">
-          <!-- <div slot="content"  class="tips-content"></div> -->
+        <!-- <el-tooltip placement="top"> -->
+          <!-- <div slot="content" v-html="内容说明"  class="tips-content"></div> -->
           <i class="el-icon-info cursor-pointer" style="color:#409eff; margin-right:60px;"></i>
-        </el-tooltip>
+        <!-- </el-tooltip> -->
         <el-input v-model="actionExpression" disabled style="width: 800px" />
       </el-form-item>
       <el-form-item style="float:right">
@@ -28,7 +28,7 @@ import {
   selectOperate,
   selectEventAllCata,
   selectEventIndexAllCata,
-  // enumTypeList,
+  enumTypeList,
   dataIndexManagerCandidate
 } from '@/api/dataAnalysis/dataInsightManage'
 import {
@@ -229,14 +229,16 @@ export default {
         callback()
       }
     },
-    setInitRulesConfig (indexList) {
-      // 将规则初始化
-      this.indexList = indexList
-      if (this.actionRuleConfig.rules.length) {
-        this.actionRuleConfig.rules = []
-        this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
-      }
-      this.updateConditionId(this.actionRuleConfig)
+    getRulesEnumsList (data, citem, index) { // 展开下拉选时，请求枚举类型的数据
+      let selectEnumsList = []
+      enumTypeList(citem.enumTypeNum).then(res => {
+        if (res.data.status !== '1') {
+          selectEnumsList = []
+        } else {
+          selectEnumsList = res.data.data
+        }
+        this.updateChildrenRulesArr(data, citem, { selectEnumsList: selectEnumsList }, index)
+      })
     },
     fieldCodeChange (data, citem, obj, index) { // rxs更新数据
       this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
@@ -312,6 +314,7 @@ export default {
         'sourceTable': '', // 事件类型 来源
         'eventDownList': this.eventDownList, // 事件列表
         'eventIndexList': [], // 事件属性列表
+        'eventList': [], // 事件
         'totalCountParams': {
           func: '',
           selectOperateList: this.countSelectOperateList,
@@ -347,6 +350,7 @@ export default {
         'sourceTable': data.sourceTable,
         'fieldId': '',
         'englishName': '',
+        'chineseName': '',
         'eventIndexList': data.eventIndexList, // 事件属性下拉选
         'enumTypeNum': '',
         'selectOperateList': [], // 操作符下拉选
@@ -656,9 +660,8 @@ export default {
                 })
               })
               citem.selectEnumsList = selectEnumsArr
-              citem.indexList = []
-              if (citem.label && !citem.enable) {
-                this.isSelectedUneffectIndex.push(citem.label)
+              if (citem.chineseName && !citem.enable) {
+                this.isSelectedUneffectIndex.push(citem.chineseName)
               }
             })
           }

@@ -53,7 +53,7 @@
               <!--string型等于或不等于可以输入多个-->
               <el-form-item
                 prop="params[0].selectVal"
-                :ref="'stringMultiVal' + item.ruleCode"
+                :ref="'stringMultiVal' + index"
                 :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }"
                 v-if="item.func === 'eq' || item.func === 'neq'"
               >
@@ -88,7 +88,7 @@
               <div v-if="item.func === 'between'" class="pane-rules-inline">
                 <el-form-item
                   prop="params[0].value"
-                  :ref="'paramsl' + item.ruleCode"
+                  :ref="'paramsl' + index"
                   :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur' }"
                 >
                   <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
@@ -96,12 +96,12 @@
                     v-model="item.params[0].value"
                     :maxlength="10"
                     @input="item.params[0].value = keyupNumberInput(item.params[0].value)"
-                    @blur="item.params[0].value = pramasNumBlur(item, item.params[0].value)"
+                    @blur="item.params[0].value = pramasNumBlur(item, item.params[0].value,index)"
                   ></el-input>
                 </el-form-item>于
                 <el-form-item
                   prop="params[1].value"
-                  :ref="'paramsr' + item.ruleCode"
+                  :ref="'paramsr' + index"
                   :rules="{required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur'}"
                 >
                   <el-input
@@ -109,7 +109,7 @@
                     :maxlength="10"
                     class="itemIput-number"
                     @input="item.params[1].value = keyupNumberInput(item.params[1].value)"
-                    @blur="item.params[1].value = pramasNumBlur(item, item.params[1].value)"
+                    @blur="item.params[1].value = pramasNumBlur(item, item.params[1].value,index)"
                   ></el-input>之间
                 </el-form-item>
               </div>
@@ -117,7 +117,7 @@
                 <!--数值型等于或不等于可以输入多个-->
                 <el-form-item
                   prop="params[0].selectVal"
-                  :ref="'numberMultiVal' + item.ruleCode"
+                  :ref="'numberMultiVal' + index"
                   :rules="{required: isRequired, message: '请输入', trigger: 'blur'}"
                   v-if="item.func === 'eq' || item.func === 'neq'"
                 >
@@ -160,7 +160,7 @@
                   multiple
                   class="itemIput"
                   @change="data => selectEnumsChange(data, item, index)"
-                  @visible-change="data => selectEnumsVisible(data, item)"
+                  @visible-change="data => selectEnumsVisible(data, item, index)"
                 >
                   <el-option
                     v-for="(fitem, findex) in item.selectEnumsList"
@@ -176,7 +176,7 @@
               <!--绝对时间-->
               <el-form-item
                 v-show="isDateSingleShow(item)"
-                :ref="'datetime' + item.ruleCode"
+                :ref="'datetime' + index"
                 prop="params[0].datetime"
                 :rules="{required: isRequired && isDateSingleShow(item), message: '请选择', trigger: 'change'}"
               >
@@ -193,7 +193,7 @@
               <!--区间-->
               <el-form-item
                 v-show="item.func === 'between'"
-                :ref="'datetimerange' + item.ruleCode"
+                :ref="'datetimerange' + index"
                 prop="params[0].selectVal"
                 :rules="{required: isRequired && item.func === 'between', message: '请选择', trigger: 'change'}"
               >
@@ -254,7 +254,7 @@
                 在&nbsp;过去&nbsp;
                 <el-form-item
                   prop="params[0].value"
-                  :ref="'paramsl' + item.ruleCode"
+                  :ref="'paramsl' + index"
                   :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}"
                 >
                   <el-input
@@ -262,7 +262,7 @@
                     :maxlength="10"
                     class="itemIput-small"
                     @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
-                    @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)"
+                    @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value, index)"
                     :min="1"
                   ></el-input>
                 </el-form-item>
@@ -282,7 +282,7 @@
                 </el-form-item>到&nbsp;过去&nbsp;
                 <el-form-item
                   prop="params[1].value"
-                  :ref="'paramsr' + item.ruleCode"
+                  :ref="'paramsr' + index"
                   :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}"
                 >
                   <el-input
@@ -290,7 +290,7 @@
                     :maxlength="10"
                     class="itemIput-small"
                     @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)"
-                    @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)"
+                    @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value, index)"
                     :min="1"
                   ></el-input>
                 </el-form-item>
@@ -340,9 +340,6 @@ export default {
     isChild: {
       // 是否是当前级别中最后一行，用来显示添加按钮
       type: Boolean
-    },
-    indexList: {
-      type: Array
     },
     isRequire: {
       type: Boolean,
@@ -465,21 +462,22 @@ export default {
       val = val.replace(/^-0+([0-9])/, '-$1') // -009.9 -00099999 -> -9.9  -999999
       return val
     },
-    pramasNumBlur (item, val) {
+    pramasNumBlur (item, val, index) {
       // 数值 介于的判断
       let params = item.params
       if (params[0].value * 1 < params[1].value * 1) {
-        this.$refs['paramsl' + item.ruleCode][0].clearValidate()
-        this.$refs['paramsr' + item.ruleCode][0].clearValidate()
+        console.log('this.$refs: ', this.$refs)
+        this.$refs['paramsl' + index][0].clearValidate()
+        this.$refs['paramsr' + index][0].clearValidate()
       }
       return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
     },
-    pramasDateBlur (item, val) {
+    pramasDateBlur (item, val, index) {
       // 时间 区间的判断
       let params = item.params
       if (params[0].value * 1 >= params[1].value * 1) {
-        this.$refs['paramsl' + item.ruleCode][0].clearValidate()
-        this.$refs['paramsr' + item.ruleCode][0].clearValidate()
+        this.$refs['paramsl' + index][0].clearValidate()
+        this.$refs['paramsr' + index][0].clearValidate()
       }
       return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
@@ -505,6 +503,7 @@ export default {
       let node = ruleItem.eventIndexList.filter(item => item.englishName === ruleItem.fieldCode)[0]
       // 属性改变时，对应的操作符也更新
       this.parent.fieldCodeChange(this.data, ruleItem, {
+        chineseName: node.chineseName,
         englishName: node.englishName,
         fieldType: node.fieldType,
         enumTypeNum: node.enumTypeNum,
@@ -515,7 +514,7 @@ export default {
     },
     selecteventIndexListVisible (val, ruleItem, index) {
       // 当事件属性下拉框打开时，重新下拉请求数据
-      if (val) {
+      if (val && this.data.eventList.length > 0) {
         // 打开下拉框时
         this.parent.getEventIndexList(
           this.data.eventList[1],
@@ -532,8 +531,8 @@ export default {
       this.parent.updateChildrenOperateChange(this.data, ruleItem, index)
       if (ruleItem.fieldType === 'date') {
         // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
-        this.$refs['datetime' + ruleItem.ruleCode][0].clearValidate()
-        this.$refs['datetimerange' + ruleItem.ruleCode][0].clearValidate()
+        this.$refs['datetime' + index][0].clearValidate()
+        this.$refs['datetimerange' + index][0].clearValidate()
       }
     },
     selectOperateVisible (val, ruleItem, index) {
@@ -550,11 +549,11 @@ export default {
         )
       }
     },
-    selectEnumsVisible (val, ruleItem) {
+    selectEnumsVisible (val, ruleItem, index) {
       // 当下拉框打开时，重新请求数据
       if (val) {
         // 打开下拉框时
-        this.parent.getRulesEnumsList(this.data, ruleItem)
+        this.parent.getRulesEnumsList(this.data, ruleItem, index)
       }
     },
     selectEnumsChange (val, ruleItem, index) {
@@ -568,7 +567,7 @@ export default {
     inputTagChange (ruleItem, type, index) {
       if (ruleItem.params[0].selectVal.length) {
         // 如果已经有输入的值则清空报错提示
-        this.$refs[type + 'MultiVal' + ruleItem.ruleCode][0].clearValidate()
+        this.$refs[type + 'MultiVal' + index][0].clearValidate()
       }
       this.parent.updateEnumsChange(this.data, ruleItem, index)
     },
