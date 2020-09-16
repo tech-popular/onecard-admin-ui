@@ -239,7 +239,7 @@ export default {
         name: saveData.name,
         code: saveData.code,
         groupId: this.groupId,
-        type: this.type || 'dynamic',
+        type: this.type.toUpperCase() || 'DYNAMIC',
         channelCode: this.channelCode
       }
       let url = this.id ? editFlowInfo : saveFlowInfo
