@@ -1,4 +1,4 @@
-import { jdyProductList } from '@/api/jindouyun/recommendLoc'
+import { getProInfo } from '@/api/jindouyun/recommendLoc'
 export const models = {
   data () {
     return {
@@ -59,12 +59,12 @@ export const models = {
     // 列表接口
     getList () {
       this.dataListLoading = true
-      jdyProductList().then(({data}) => {
+      getProInfo().then(({data}) => {
         console.log(data)
-        if (data && data.code === 0) {
+        if (data && data.status === '1') {
           this.dataListLoading = false
-          this.list = data.data.list
-          this.totalPage = data.data.totalCount
+          this.list = data.data
+          this.list.map(item => item.product_status === 'on')
         } else {
           this.list = []
           this.totalPage = 0
