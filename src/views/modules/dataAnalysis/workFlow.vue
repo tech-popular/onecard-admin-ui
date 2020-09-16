@@ -51,6 +51,7 @@ export default {
       id: this.$route.query.id,
       channelCode: '',
       groupId: [],
+      type: '',
       inparamsNodeVisible: false,
       groupChoiceNodeVisible: false,
       dataQueryNodeVisible: false,
@@ -134,6 +135,7 @@ export default {
         _data.data = item.data.config
         // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
         if (_data.category === 'DATA_QUERY') {
+          this.type = item.type
           node.findTreeParts().each(function (cNode) {
             if (cNode.data.category === 'GROUP_CHOICE' && cNode.data.data) {
               let itemGroupId = cNode.data.data.configItems.groupId
@@ -237,6 +239,7 @@ export default {
         name: saveData.name,
         code: saveData.code,
         groupId: this.groupId,
+        type: this.type || 'dynamic',
         channelCode: this.channelCode
       }
       let url = this.id ? editFlowInfo : saveFlowInfo

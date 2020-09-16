@@ -36,6 +36,7 @@ export default {
       visible: false,
       channelList: [],
       custerList: [],
+      curCusterType: '',
       dataForm: {
         channelCode: '',
         groupId: []
@@ -54,6 +55,7 @@ export default {
     init (data) {
       this.visible = true
       this.key = data.key
+      this.curCusterType = ''
       this.getChannelsList()
       if (data.data) {
         this.dataForm.channelCode = data.data.configItems.channelCode
@@ -81,9 +83,9 @@ export default {
         }
         this.custerList = data.data
         if (this.dataForm.groupId.length) {
-          let firstType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+          this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
           this.custerList.map(item => {
-            if (item.type !== firstType) {
+            if (item.type !== this.curCusterType) {
               item.disabled = true
             }
           })
@@ -92,19 +94,15 @@ export default {
     },
     groupIdChange () {
       let arr = []
-      let firstType = ''
       if (!this.dataForm.groupId.length) {
         this.custerList.map(item => {
-          if (item.type !== firstType) {
-            item.disabled = false
-          }
+          item.disabled = false
         })
       } else {
-        let firstType = ''
         if (this.dataForm.groupId.length === 1) {
-          firstType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+          this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
           this.custerList.map(item => {
-            if (item.type !== firstType) {
+            if (item.type !== this.curCusterType) {
               item.disabled = true
             }
           })
@@ -122,7 +120,7 @@ export default {
           let config = {
             configItems: this.dataForm
           }
-          this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
+          this.$emit('close', { tag: 'save', data: { config: config, key: this.key }, type: this.curCusterType })
           this.$parent.dataQueryNodeVisible = false
         }
       })
