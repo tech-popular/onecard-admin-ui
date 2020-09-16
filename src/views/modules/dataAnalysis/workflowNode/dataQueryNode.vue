@@ -12,8 +12,8 @@
         </el-select>
       </el-form-item>
       <el-form-item prop="groupId" label="分群名称">
-        <el-select v-model="dataForm.groupId" multiple clearable placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
-          <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text"></el-option>
+        <el-select v-model="dataForm.groupId" multiple clearable filterable placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
+          <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text" :disabled="item.disabled"></el-option>
         </el-select>
       </el-form-item>
     </el-form>
@@ -67,7 +67,7 @@ export default {
           this.channelList = []
           return
         }
-        this.channelList = data.data
+        this.channelList = data.data.filter(item => item.value !== '0000')
       })
     },
     channelCodeChange (val) {
@@ -80,10 +80,36 @@ export default {
           return
         }
         this.custerList = data.data
+        if (this.dataForm.groupId.length) {
+          let firstType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+          this.custerList.map(item => {
+            if (item.type !== firstType) {
+              item.disabled = true
+            }
+          })
+        }
       })
     },
     groupIdChange () {
       let arr = []
+      let firstType = ''
+      if (!this.dataForm.groupId.length) {
+        this.custerList.map(item => {
+          if (item.type !== firstType) {
+            item.disabled = false
+          }
+        })
+      } else {
+        let firstType = ''
+        if (this.dataForm.groupId.length === 1) {
+          firstType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+          this.custerList.map(item => {
+            if (item.type !== firstType) {
+              item.disabled = true
+            }
+          })
+        }
+      }
       this.dataForm.groupId.forEach(item => {
         let obj = this.custerList.filter(citem => citem.value === item)[0]
         arr.push(obj)
