@@ -344,7 +344,7 @@ export default {
         'fieldCode': null,
         'format': '',
         'func': '',
-        'sourceTable': '',
+        'sourceTable': data.sourceTable,
         'fieldId': '',
         'englishName': '',
         'eventIndexList': data.eventIndexList, // 事件属性下拉选
