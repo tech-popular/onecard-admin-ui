@@ -156,11 +156,11 @@ export default {
         eventType: '',
         enable: ''
       }
-      this.getDataList()
+      // this.getDataList()
     },
     // 手动同步
     manualSync () {
-      this.dataListLoading = true
+      // this.dataListLoading = true
     },
     // 每页数
     sizeChangeHandle (page) {

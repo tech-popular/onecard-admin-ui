@@ -5,7 +5,7 @@
 			 <el-input v-model="dataForm.elementId" v-bind:readonly='readonly' placeholder=""></el-input>
 		 </el-form-item>
 		 <el-form-item label="事件显示中文名：">
-			 <el-input v-model="dataForm.elementName" v-bind:readonly='readonly' placeholder=""></el-input>
+			 <el-input v-model="dataForm.eventBuildName" v-bind:readonly='readonly' placeholder=""></el-input>
 		 </el-form-item>
 		<el-form-item label="所属渠道：">
 			 <el-input v-model="dataForm.channelCode" v-bind:readonly='readonly' placeholder=""></el-input>
