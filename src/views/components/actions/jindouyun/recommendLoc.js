@@ -6,32 +6,38 @@ export const models = {
       operates: [],
       columns: [
         {
-          prop: 'id',
+          prop: 'index',
           label: '排序',
           align: 'center'
         },
         {
-          prop: 'productId',
+          prop: 'product_id',
           label: '产品编号',
           align: 'center'
         },
         {
-          prop: 'productName',
+          prop: 'product_channel_name',
           label: '产品名称',
           align: 'center'
         },
         {
-          prop: 'productType',
+          prop: 'product_type',
           label: '产品类型',
-          align: 'center'
+          align: 'center',
+          render(h, params) {
+            return h('span', params.row.product_type === '1' ? '同业' : '异业')
+          }
         },
         {
-          prop: 'lastUpdateTime',
+          prop: 'prodct_access_mode',
           label: '接入模式',
-          align: 'center'
+          align: 'center',
+          render(h, params) {
+            return h('span', params.row.prodct_access_mode === '1' ? 'h5' : '联合登陆')
+          }
         },
         {
-          prop: 'createUser',
+          prop: 'product_settle_mode',
           label: '结算模式',
           align: 'center'
         }
@@ -60,11 +66,12 @@ export const models = {
     getList () {
       this.dataListLoading = true
       getProInfo().then(({data}) => {
-        console.log(data)
         if (data && data.status === '1') {
           this.dataListLoading = false
-          this.list = data.data
-          this.list.map(item => item.product_status === 'on')
+          this.list = data.data.filter(item => item.product_status === 'on')
+          this.list.forEach((item, index) => {
+            item.index = index
+          })
         } else {
           this.list = []
           this.totalPage = 0

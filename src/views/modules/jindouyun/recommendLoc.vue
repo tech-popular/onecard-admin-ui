@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="dataListLoading">
     <tab :list="list" :columns="columns" :operates="operates"/>
   </div>
 </template>
