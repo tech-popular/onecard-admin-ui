@@ -34,7 +34,7 @@
         <el-table-column prop="productName" label="产品名称" header-align="center" align="center"></el-table-column>
         <el-table-column prop="productLocation" label="位置编号" header-align="center" align="center" width="200">
           <template slot-scope="scope">
-            <el-input-number v-model="scope.row.productLocation" :min="0" placeholder="位置编号" style="width:150px"></el-input-number>
+            <el-input-number v-model="scope.row.productLocation" :min="1" placeholder="位置编号" style="width:150px"></el-input-number>
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="center" width="100" label="操作">
