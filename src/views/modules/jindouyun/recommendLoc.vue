@@ -1,5 +1,6 @@
 <template>
   <div v-loading="dataListLoading">
+    <searchForm size='mini' labelWidth = '100px' :searchData = "searchData" :searchHandle="searchHandle"></searchForm>
     <tab :list="list" :columns="columns" :operates="operates"/>
   </div>
 </template>
