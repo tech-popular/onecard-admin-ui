@@ -22,8 +22,9 @@
 </template>
 
 <script>
-import go from 'gojs'
+// import go from 'gojs'
 import { workFlowShow } from '@/api/workerBee/workFlow'
+var go = window.go
 export default {
   data () {
     return {
