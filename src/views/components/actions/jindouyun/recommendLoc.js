@@ -42,6 +42,11 @@ export const models = {
           align: 'center'
         }
       ],
+      searchData: {},
+      searchForm: [],
+      searchHandle: [
+        {label: '刷新', type: 'primary', handle: () => { this.init() }}
+      ],
       list: []
     }
   },
