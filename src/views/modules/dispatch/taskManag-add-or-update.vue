@@ -206,6 +206,12 @@
               ></codemirror>
             </div>
           </el-form-item>
+          <el-form-item prop="estimatedDataVolume" label="并行度" label-width="120px">
+            <el-select v-model="acquisitionTask.estimatedDataVolume">
+              <el-option v-for="item in estimatedDataVolumeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+            （请依据预估数据量选择）
+          </el-form-item>
           <!-- <div class="work-type-pane">
             <el-form-item label="下发类型：" prop="addDataRule" label-width="120px">
               <el-radio-group v-model="acquisitionTask.addDataRule">
@@ -295,6 +301,7 @@ export default {
         inDatasourceType: '',
         inDatasourceId: '',
         inAccountId: '',
+        estimatedDataVolume: 'SMALL',
         inDataSql: '',
         sqlField: [], // 输入sql所对应的字段
         outDatasourceType: '',
@@ -324,6 +331,24 @@ export default {
       mcData: {
         mcColumn: ''
       },
+      estimatedDataVolumeList: [
+        {
+          name: '0-50w',
+          id: 'SMALL'
+        },
+        {
+          name: '50w-500w',
+          id: 'MIDDLE'
+        },
+        {
+          name: '500w-2000w',
+          id: 'LARGE'
+        },
+        {
+          name: '2000w以上',
+          id: 'HUGE'
+        }
+      ],
       dataRule: {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
@@ -339,6 +364,9 @@ export default {
         ],
         inAccountId: [
           { required: true, message: '请选择帐户', trigger: 'change' }
+        ],
+        estimatedDataVolume: [
+          { required: true, message: '请选择预估数据量', trigger: 'change' }
         ],
         inDataSql: [
           { required: true, message: '请输入作业开始前SQL', trigger: 'change' }
@@ -608,7 +636,6 @@ export default {
         this.acquisitionTask = data.data.acquisitionTask
         if (this.acquisitionTask.outDataTable.indexOf('#') > 0) {
           let arr = this.acquisitionTask.outDataTable.split('#')
-          console.log(arr)
           if (this.acquisitionTask.outDatasourceType === 'REDIS') {
             let label = this.redisNames.filter(item => item.value === arr[0])[0].label
             this.redisData = {
