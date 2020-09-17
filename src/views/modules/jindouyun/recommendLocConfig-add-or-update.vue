@@ -61,7 +61,7 @@ export default {
       visible: false,
       dataForm: {
         id: '',
-        name: '近义词'
+        name: ''
       },
       loading: false,
       searchResultList: [],
