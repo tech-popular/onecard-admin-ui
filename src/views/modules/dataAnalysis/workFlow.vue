@@ -535,17 +535,18 @@ export default {
             return mySelf.myDiagram.model.removeLinkData(link.data)
           })
         }
-        if (toCategory === 'OUT_PARAM') {
-          let linkInNum = 0
-          toNodeLink.findLinksInto().each(function (link) {
-            if (linkInNum === 1) {
-              that.$message.error('决策结果只能有一个上级节点！')
-              return mySelf.myDiagram.model.removeLinkData(link.data)
-            } else {
-              linkInNum++
-            }
-          })
-        }
+        // if (toCategory === 'OUT_PARAM') {
+        // 所有节点只能有一个上级节点
+        let linkInNum = 0
+        toNodeLink.findLinksInto().each(function (link) {
+          if (linkInNum === 1) {
+            that.$message.error('节点只能有一个上级节点！')
+            return mySelf.myDiagram.model.removeLinkData(link.data)
+          } else {
+            linkInNum++
+          }
+        })
+        // }
         if (fromCategory === 'GROUP_CHOICE') { // 将状态判断的连线内容保存，保存时判断用
           let linkOutData = []
           let linkDataText = []
