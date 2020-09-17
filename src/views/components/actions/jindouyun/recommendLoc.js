@@ -70,7 +70,7 @@ export const models = {
           this.dataListLoading = false
           this.list = data.data.filter(item => item.product_status === 'on')
           this.list.forEach((item, index) => {
-            item.index = index
+            item.index = index + 1
           })
         } else {
           this.list = []
