@@ -98,6 +98,7 @@ export default {
           this.loading = false
           return this.$message.error('JSON信息不存在')
         }
+        this.type = data.data.type
         that.flowJson = data.data.configJson
         this.$nextTick(() => {
           this.diagramInit()
@@ -239,7 +240,7 @@ export default {
         name: saveData.name,
         code: saveData.code,
         groupId: this.groupId,
-        type: this.type.toUpperCase() || 'DYNAMIC',
+        type: this.type.toUpperCase(),
         channelCode: this.channelCode
       }
       let url = this.id ? editFlowInfo : saveFlowInfo
@@ -695,6 +696,9 @@ export default {
       if (category !== 'IN_PARAM' && linkIntoData.length == 0) {
         that.$message.error('请连接上游节点')
         return
+      }
+      if (category === 'DATA_QUERY' && this.type) {
+        node.data.data.type = this.type
       }
       that[visibleParams] = true
       that.$nextTick(() => {

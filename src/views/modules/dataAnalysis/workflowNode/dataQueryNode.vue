@@ -61,6 +61,7 @@ export default {
         this.dataForm.channelCode = data.data.configItems.channelCode
         this.getCusterList(this.dataForm.channelCode)
         this.dataForm.groupId = data.data.configItems.groupId
+        this.curCusterType = data.data.type
       }
     },
     getChannelsList () {
