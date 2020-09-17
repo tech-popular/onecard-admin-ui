@@ -140,6 +140,16 @@ export const models = {
         this.$refs.addOrUpdate.init(id, tag)
       })
     },
+    handleSearch () {
+      this.init()
+    },
+    resetHandle () {
+      this.searchData = {
+        recommendTaskId: '',
+        recommendTaskName: ''
+      }
+      this.init()
+    },
     // 每页数
     sizeChangeHandle (val) {
       this.pageSize = val
