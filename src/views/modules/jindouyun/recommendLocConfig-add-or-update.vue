@@ -13,7 +13,7 @@
     <div style="display:flex;margin-bottom:20px">
       <el-select
         ref="searchEl"
-        v-model="productId"
+        v-model="productNum"
         filterable
         clearable
         remote
@@ -24,7 +24,7 @@
         @change="searchChange"
         @focus="searchFocus"
       >
-        <el-option :value="item.productId" :label="item.productName" v-for="item in searchResultList" :key="item.productId"></el-option>
+        <el-option :value="item.productNum" :label="item.productName" v-for="item in searchResultList" :key="item.productNum"></el-option>
       </el-select>
       <el-button type="primary" style="margin-left:20px" @click="addToTab">新增</el-button>
     </div>
@@ -66,7 +66,7 @@ export default {
       loading: false,
       searchResultList: [],
       curSelectPro: {},
-      productId: '',
+      productNum: '',
       locIndex: '',
       tableData: [],
       dataRule: {
@@ -80,6 +80,7 @@ export default {
     init (row, tag) {
       this.id = ''
       this.tag = ''
+      this.productNum = ''
       this.dataForm = { // 初始化
         id: '',
         name: ''
@@ -105,8 +106,7 @@ export default {
           id: data.data.id,
           name: data.data.name
         }
-        console.log(data)
-        this.tableData = data.data.locationList
+        this.tableData = data.data.locationList || []
         this.visible = true
         this.$nextTick(() => {
           this.$refs.dataForm.clearValidate()
@@ -114,7 +114,7 @@ export default {
       })
     },
     searchChange (val) {
-      this.curSelectPro = this.searchResultList.filter(item => item.productId === val)[0]
+      this.curSelectPro = this.searchResultList.filter(item => item.productNum === val)[0]
     },
     searchFocus (e) {
       if (!e.srcElement.value) {
@@ -143,16 +143,20 @@ export default {
       })
     },
     addToTab () {
-      if (!this.curSelectPro.productId) return false
-      let isExist = this.tableData.filter(item => this.curSelectPro.productId === item.productId).length
-      if (!isExist) {
+      if (!this.curSelectPro.productNum) return false
+      if (!this.tableData.length || !this.tableData) {
         this.tableData.push(this.curSelectPro)
       } else {
-        this.$message.error('该产品已添加！')
+        let isExist = this.tableData.filter(item => this.curSelectPro.productNum === item.productNum).length
+        if (!isExist) {
+          this.tableData.push(this.curSelectPro)
+        } else {
+          this.$message.error('该产品已添加！')
+        }
       }
     },
     deleteHandle (index, row) {
-      this.$confirm(`确定提删除【${row.productName}】吗？`, '提示', {
+      this.$confirm(`确定删除【${row.productName}】吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
