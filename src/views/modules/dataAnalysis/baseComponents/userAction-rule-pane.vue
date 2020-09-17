@@ -303,7 +303,7 @@ export default {
     getRuleTemplateItem () {
       //  一级 二级条件模板
       return {
-        'type': 'rule',
+        'type': 'event',
         'func': 'between', //  选择的时间类型
         'fieldType': 'date',
         'fieldCode': 'click_time',
@@ -675,11 +675,9 @@ export default {
     // 将第三层数据的childrenRules修改为rules
     changeChildrenRules (data) {
       data.rules.forEach(item => {
-        if (item.type != 'rules_function') {
-          if (item.childrenRules != undefined) {
-            item.rules = deepClone(item.childrenRules)
-            delete item.childrenRules
-          }
+        if (item.type != 'rules_function' && item.type != 'rule') {
+          item.rules = deepClone(item.childrenRules)
+          delete item.childrenRules
         } else {
           this.changeChildrenRules(item)
         }

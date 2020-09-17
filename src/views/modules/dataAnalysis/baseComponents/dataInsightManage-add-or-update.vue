@@ -614,7 +614,7 @@ export default {
             }
           })
         })
-        if (!flag) {
+        if (!flag || actionRuleFormArr.length === 0) {
           this.$refs.userAttrRule.isRequired = false
           this.$refs.userActionRule.isRequired = false
         } else {
