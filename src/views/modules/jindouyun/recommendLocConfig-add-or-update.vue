@@ -179,6 +179,14 @@ export default {
           if (!this.tableData.length) {
             return this.$message.error('没有提交任何产品信息，请填写后再提交！')
           }
+          let ids = []
+          this.tableData.forEach(item => {
+            ids.push(item.productLocation)
+          })
+          let uniqueIds = Array.from(new Set(ids))
+          if (ids.length > uniqueIds.length) {
+             return this.$message.error('位置编号不可重复！')
+          }
           let url = jdyAdd
           let params = {
             name: this.dataForm.name,
