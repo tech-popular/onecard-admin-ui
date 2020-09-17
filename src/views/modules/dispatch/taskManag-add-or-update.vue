@@ -636,7 +636,6 @@ export default {
         this.acquisitionTask = data.data.acquisitionTask
         if (this.acquisitionTask.outDataTable.indexOf('#') > 0) {
           let arr = this.acquisitionTask.outDataTable.split('#')
-          console.log(arr)
           if (this.acquisitionTask.outDatasourceType === 'REDIS') {
             let label = this.redisNames.filter(item => item.value === arr[0])[0].label
             this.redisData = {
