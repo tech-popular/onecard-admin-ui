@@ -51,8 +51,8 @@
     ...
   </div>
 */
-import go from 'gojs'
-
+// import go from 'gojs'
+var go = window.go
 function Inspector (divid, diagram, options) {
   var mainDiv = document.getElementById(divid)
   mainDiv.className = 'inspector'

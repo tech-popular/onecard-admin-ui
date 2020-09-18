@@ -32,10 +32,10 @@
 </template>
 
 <script>
-import go from 'gojs'
+// import go from 'gojs'
 import AddOrUpdate from './workFlowChart-add-or-update'
 import workFlowChartChairle from './workFlowChartChairle'
-
+var go = window.go
 export default{
   props:
   {

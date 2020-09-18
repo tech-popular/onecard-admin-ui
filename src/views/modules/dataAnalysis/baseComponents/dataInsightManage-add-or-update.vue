@@ -128,7 +128,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="baseForm.userType !== 'excel'"> <h3>满足如下条件的用户</h3> </div>
+      <div v-if="baseForm.userType !== 'excel'" class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
       <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
           <div class="pane-rules-relation">
              <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
@@ -141,15 +141,9 @@
       <div class="pane-reject">
         <h3>剔除用户名单</h3>
         <div>
-          <el-form label-width="80px" :model="rejectForm">
-            <el-form-item label="分群包：">
-              <el-select
-                v-model="rejectForm.rejectGroupPackageIds"
-                filterable
-                multiple
-                placeholder="请选择分群包"
-                class="reject-pane-item"
-              >
+          <el-form label-width="80px" :model="rejectForm" :rules="baseRule" ref="rejectForm">
+            <el-form-item label="分群包">
+              <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
                 <el-option
                   v-for="item in custerNameList"
                   :key="item.value"
@@ -158,14 +152,8 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="风控包：">
-              <el-select
-                v-model="rejectForm.vestPackCode"
-                filterable
-                multiple
-                placeholder="请选择风控包"
-                class="reject-pane-item"
-              >
+            <el-form-item label="风控包">
+              <el-select v-model="rejectForm.vestPackCode" filterable multiple placeholder="请选择风控包" class="reject-pane-item">
                 <el-option
                   v-for="item in vestPackList"
                   :key="item.value"
@@ -178,6 +166,32 @@
                 <i class="el-icon-warning cursor-pointer"></i>
               </el-tooltip>
             </el-form-item>
+            <el-form-item label="撞库包">
+              <el-select v-model="rejectForm.collisionPackId" filterable clearable @clear="collisionPackIdClear" @change="collisionPackIdChange" placeholder="请选择撞库包" class="reject-pane-item">
+                <el-option
+                  v-for="item in collisionList"
+                  :key="item.value"
+                  :label="item.text"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <div style="display:flex;width:100%" v-if="collisionData.length">
+              <div style="width:160px;text-align:right;padding-right:10px;">{{collisionPackText}}</div>
+              <el-card class="box-card" shadow="never" style="width:560px">
+                <el-form-item :label="item.paramTitle" :prop="item.paramName" v-for="(item, index) in collisionData" :key="index" :rules="{ required: true, message: item.allowMulti && !item.isEnum ? `请输入${item.paramTitle}，可用回车输入多条` : '请选择' + item.paramTitle, trigger: 'change' }">
+                  <input-tag v-model="rejectForm[item.paramName]" v-if="item.allowMulti && !item.isEnum" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag reject-pane-item1" :placeholder="`请输入${item.paramTitle}，可用回车输入多条`"></input-tag>
+                  <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle"  class="reject-pane-item1">
+                    <el-option
+                      v-for="citem in item.options"
+                      :key="citem.value"
+                      :label="citem.text"
+                      :value="citem.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-card>
+            </div>
           </el-form>
         </div>
       </div>
@@ -217,6 +231,7 @@ import userActionRulePane from './userAction-rule-pane'
 // import userBehaviorRulePane from './userBehavior-rule-pane'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
+import InputTag from '../components/InputTag'
 import {
   savaDataInfo,
   updateDataInfo,
@@ -225,7 +240,11 @@ import {
   templateDownload,
   vestPackAvailable,
   channelsList,
-  custerAvailable
+  custerAvailable,
+  collisionList,
+  collisionParams,
+  collisionSave,
+  collisionUpdate
 } from '@/api/dataAnalysis/dataInsightManage'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -247,6 +266,9 @@ export default {
       vestPackList: [],
       custerNameList: [],
       outMostExpressionTemplate: 'and', // 用户属性与用户行为外层关系
+      collisionData: [],
+      collisionList: [],
+      // allCusterNameList: [],
       baseForm: {
         name: '',
         userType: 'indicator',
@@ -256,11 +278,14 @@ export default {
       },
       rejectForm: {
         rejectGroupPackageIds: [],
-        vestPackCode: []
+        vestPackCode: [],
+        collisionPackId: ''
       },
-      baseRule: {
-        // 基本信息校验规则
-        name: [{ required: true, message: '请输入分群名称', trigger: 'blur' }],
+      collisionPackText: '',
+      baseRule: { // 基本信息校验规则
+        name: [
+          { required: true, message: '请输入分群名称', trigger: 'blur' }
+        ],
         userType: [
           { required: true, message: '请选择分群类型', trigger: 'change' }
         ],
@@ -278,7 +303,8 @@ export default {
     userAttrRulePane,
     userActionRulePane,
     Treeselect,
-    dataPreviewInfo
+    dataPreviewInfo,
+    InputTag
   },
   methods: {
     init (row, tag) {
@@ -291,8 +317,9 @@ export default {
       this.getVestPackAvailable()
       this.getChannelsList()
       this.getCusterList()
-      this.$nextTick(() => {
-        // 默认将基本信息的错误提示消除
+      this.getCollisionList()
+      // this.getCollisionParams()
+      this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
       })
       this.tag = tag
@@ -430,7 +457,9 @@ export default {
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
-      vestPackAvailable().then(res => {
+      vestPackAvailable({
+        channelCode: this.baseForm.channelId
+      }).then(res => {
         if (res.data.status * 1 !== 1) {
           this.vestPackList = []
           return this.$message({
@@ -458,8 +487,41 @@ export default {
         this.custerNameList = data.data
       })
     },
-    radioTypeChange (val) {
-      // 当选择指标筛选时，上传文件置空
+    getCollisionList () {
+      collisionList().then(({data}) => {
+        this.collisionList = data.data || []
+        if (this.id) {
+          this.getCollisionParams()
+        }
+      })
+    },
+    collisionPackIdClear () {
+      this.collisionData = []
+    },
+    collisionPackIdChange (val) {
+      if (val) {
+        this.collisionPackText = this.collisionList.filter(item => item.value === val)[0].text
+        this.getCollisionParams()
+      }
+    },
+    getCollisionParams () {
+      collisionParams(this.rejectForm.collisionPackId, this.id).then(({data}) => {
+        if (data && data.status * 1 === 1) {
+          if (!data.data.length) return
+          this.collisionData = data.data
+          this.rejectForm.collisionPackId = data.data[0].collisionPackId
+          this.collisionPackText = this.collisionList.filter(item => item.value === this.rejectForm.collisionPackId)[0].text
+          data.data.forEach(item => {
+            if (item.allowMulti && !item.isEnum) {
+              this.$set(this.rejectForm, item.paramName, item.value ? item.value.split(',') : '')
+            } else {
+              this.$set(this.rejectForm, item.paramName, item.value || '')
+            }
+          })
+        }
+      })
+    },
+    radioTypeChange (val) { // 当选择指标筛选时，上传文件置空
       if (val === 'indicator') {
         this.fileData.fileList = []
         this.excelFile = ''
@@ -527,6 +589,34 @@ export default {
         //   console.log('cancel')
         // })
     },
+    saveCollision () {
+      let url = collisionSave
+      let params = this.collisionData
+      params.forEach(item => {
+        item.collisionPackId = this.rejectForm.collisionPackId
+        if (item.allowMulti && !item.isEnum) {
+          item.value_bk = this.rejectForm[item.paramName]
+          item.value = this.rejectForm[item.paramName].join(',')
+        } else {
+          item.value = this.rejectForm[item.paramName]
+        }
+      })
+      if (this.id) {
+        url = collisionUpdate
+      }
+      url(params, this.rejectForm.collisionPackId, this.id).then(({data}) => {
+        this.loading = false
+        if ((data && data.status * 1 !== 1) || (data.code && data.code === 500)) {
+          return this.$message.error(data.message || data.msg || '提交失败')
+        }
+        this.$message.success(data.message)
+        this.visible = false
+        this.$parent.addOrUpdateVisible = false
+        this.$nextTick(() => {
+          this.$parent.getDataList()
+        })
+      })
+    },
     saveHandle (type) {
       if (this.baseForm.userType === 'excel') {
         if (!this.excelFile) {
@@ -536,53 +626,51 @@ export default {
           })
           return
         }
-        this.$refs.baseForm.validate(valid => {
-          if (valid) {
-            let data = new FormData() // 上传文件使用new formData()可以实现表单提交
-            data.append(
-              'file',
-              this.fileData.fileList.length ? this.fileData.fileList[0].raw : {}
-            )
-            data.append('name', this.baseForm.name)
-            data.append('type', this.baseForm.type)
-            data.append('userType', this.baseForm.userType)
-            data.append('desc', this.baseForm.desc)
-            data.append('channelId', this.baseForm.channelId)
-            data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
-            this.rejectForm.rejectGroupPackageIds.forEach(item => {
-              data.append('rejectGroupPackageIds', item)
-            })
-            let flag = 0
-            if (this.rejectForm.rejectGroupPackageIds.length) {
-              flag = 1
-            }
-            data.append('rejectGroupPackCode', flag)
-            if (this.id) {
-              data.append('id', this.id)
-            }
-            this.loading = true
-            importExcelFile(data).then(res => {
-              if (res.data.status * 1 !== 1) {
-                this.$message({
-                  type: 'error',
-                  message: res.data.message || '保存失败'
-                })
-                this.loading = false
-              } else {
-                this.$message({
-                  type: 'success',
-                  message: res.data.message || '保存成功'
-                })
-                this.loading = false
-                this.visible = false
-                this.$parent.addOrUpdateVisible = false
-                this.$nextTick(() => {
-                  this.$parent.getDataList()
-                })
-              }
-            })
+        let flag = true
+        this.$refs.baseForm.validate((valid) => {
+          if (!valid) {
+            flag = false
           }
         })
+        this.$refs.rejectForm.validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+        if (flag) {
+          let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
+          data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
+          data.append('name', this.baseForm.name)
+          data.append('type', this.baseForm.type)
+          data.append('userType', this.baseForm.userType)
+          data.append('desc', this.baseForm.desc)
+          data.append('channelId', this.baseForm.channelId)
+          data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
+          this.rejectForm.rejectGroupPackageIds.forEach(item => {
+            data.append('rejectGroupPackageIds', item)
+          })
+          let flag = 0
+          if (this.rejectForm.rejectGroupPackageIds.length) {
+            flag = 1
+          }
+          data.append('rejectGroupPackCode', flag)
+          if (this.id) {
+            data.append('id', this.id)
+          }
+          this.loading = true
+          importExcelFile(data).then(res => {
+            if (res.data.status * 1 !== 1) {
+              this.$message({
+                type: 'error',
+                message: res.data.message || '保存失败'
+              })
+              this.loading = false
+            } else {
+              this.id = res.data.data
+              this.saveCollision()
+            }
+          })
+        }
         return
       }
       // 用户属性 用户行为 数据校验
@@ -596,6 +684,11 @@ export default {
         // 待页面中的isRequired = true后再执行校验
         let flag = true
         this.$refs.baseForm.validate(valid => {
+          if (!valid) {
+            flag = false
+          }
+        })
+        this.$refs.rejectForm.validate((valid) => {
           if (!valid) {
             flag = false
           }
@@ -665,16 +758,8 @@ export default {
                 message: data.message || '数据异常'
               })
             } else {
-              this.$message({
-                type: 'success',
-                message: data.message
-              })
-              this.loading = false
-              this.visible = false
-              this.$parent.addOrUpdateVisible = false
-              this.$nextTick(() => {
-                this.$parent.getDataList()
-              })
+              this.id = data.data
+              this.saveCollision()
             }
           })
         }
@@ -851,4 +936,129 @@ export default {
 .insight-manage-drawer .reject-pane-item {
   width: 50%;
 }
+  .insight-manage-drawer .wrap {
+    padding: 0 20px 20px;
+    margin-top: -12px;
+    width: 100%;
+    overflow-y: auto;
+    position: absolute;
+    top: 75px;
+    bottom: 55px;
+  }
+  .insight-manage-drawer .drawer-title {
+    padding: 15px;
+    background: #333;
+    color: #fff;
+    font-size: 15px;
+    margin: -20px -20px 0 -20px;
+    position: relative;
+  }
+  .insight-manage-drawer .drawer-close {
+    position: absolute;
+    right: 20px;
+  }
+  .insight-manage-drawer .item-inline {
+    display: inline-block;
+  }
+  .insight-manage-drawer .item-code {
+    margin-left: -70px;
+  }
+  .insight-manage-drawer .item-code-name {
+    width: 300px;
+  }
+  .insight-manage-drawer .item-button {
+    margin-left: -60px;
+  }
+  .insight-manage-drawer .copy-code {
+    margin-left: 15px;
+  }
+  .insight-manage-drawer .footer {
+    position: absolute;
+    bottom: 0;
+    background: #fff;
+    padding: 10px 22px 10px 10px;
+    width: 100%;
+    height: 55px;
+    text-align: right;
+    box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
+    z-index: 500;
+  }
+  .insight-manage-drawer .cursor-pointer {
+    cursor: pointer;
+  }
+  .insight-manage-drawer .base-pane-item {
+    width: 80%;
+  }
+  .insight-manage-drawer .vue-treeselect {
+    line-height: 24px;
+  }
+  .insight-manage-drawer .data-description-tips {
+    color: #999;
+    margin-top: 0
+  }
+  .insight-manage-drawer .data-description-tips span {
+    color: red
+  }
+  .insight-manage-drawer .type-radio-group {
+    margin-top: 12px;
+  }
+  .insight-manage-drawer .type-radio-two {
+    margin-top: 10px;
+  }
+  .insight-manage-drawer .upload-excel {
+    display: inline-block;
+    margin-left: 20px;
+  }
+  .insight-manage-drawer .btn-upload {
+    display: inline-block;
+    font-size: 14px;
+    padding-left: 15px;
+  }
+  .insight-manage-drawer .upload-name {
+    font-size: 14px;
+    padding-left: 15px;
+  }
+  .insight-manage-drawer .btn-upload button {
+    margin-left: 10px;
+  }
+  .insight-manage-drawer .btn-download {
+    margin-left: 10px;
+  }
+  .insight-manage-drawer .btn-download a {
+    color: #fff;
+  }
+  .insight-manage-drawer .el-list-enter-active,
+  .insight-manage-drawer .el-list-leave-active {
+    transition: none;
+  }
+  .insight-manage-drawer .el-list-enter,
+  .insight-manage-drawer .el-list-leave-active {
+    opacity: 0;
+  }
+  .insight-manage-drawer .pane-rules-title, .insight-manage-drawer .pane-reject {
+    border-top: 1px dashed #ccc;
+  }
+  .insight-manage-drawer .user-channel {
+    margin-left: 110px;
+  }
+  .insight-manage-drawer .indicator-channel {
+    display: inline-block;
+    margin-left: 20px;
+  }
+  .insight-manage-drawer .pane-reject {
+    margin-top: 20px;
+  }
+  .insight-manage-drawer .reject-pane-item {
+    width:50%
+  }
+  .insight-manage-drawer .reject-pane-item1 {
+    width:80%
+  }
+  .inputTag {
+    display: inline-block;
+    border-radius: 4px;
+    width: 340px;
+    line-height: 22px;
+    border: 1px solid #dcdfe6
+  }
 </style>
