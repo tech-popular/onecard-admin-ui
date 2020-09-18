@@ -115,7 +115,7 @@ export default {
         this.countSelectOperateList = countSelectOperateList
       })
     },
-    getSelectOperateList (type, fn) {
+    getSelectOperateList (type, fn) { // 获取运算符下拉列表
       if (!type) {
         fn([])
         return
@@ -177,8 +177,9 @@ export default {
       this.actionRuleConfig = this.changeRules(data.actionRuleConfig)
       this.actionExpression = data.actionExpression
     },
-    // 回显时修改rules未childrenRules
+    // 回显时修改rules为childrenRules
     changeRules (data) {
+      console.log('data:1 ', data)
       data.rules.forEach(item => {
         if (item.type != 'rules_function') {
           if (item.rules) {
@@ -191,6 +192,7 @@ export default {
           this.changeRules(item)
         }
       })
+      console.log('data: ', data)
       return data
     },
     updateInitActionRulesConfig (data, eventDownList, countSelectOperateList) {
@@ -675,9 +677,11 @@ export default {
     // 将第三层数据的childrenRules修改为rules
     changeChildrenRules (data) {
       data.rules.forEach(item => {
-        if (item.type != 'rules_function' && item.type != 'rule') {
-          item.rules = deepClone(item.childrenRules)
-          delete item.childrenRules
+        if (item.type != 'rules_function') {
+          if(item.childrenRules != undefined) {
+            item.rules = deepClone(item.childrenRules)
+            delete item.childrenRules
+          }
         } else {
           this.changeChildrenRules(item)
         }
