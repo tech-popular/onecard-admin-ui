@@ -1,4 +1,4 @@
-import { getProInfo } from '@/api/jindouyun/recommendLoc'
+import { getProInfo, syncTaskInfo } from '@/api/jindouyun/recommendLoc'
 export const models = {
   data () {
     return {
@@ -45,7 +45,8 @@ export const models = {
       searchData: {},
       searchForm: [],
       searchHandle: [
-        {label: '刷新', type: 'primary', handle: () => { this.init() }}
+        {label: '刷新', type: 'primary', handle: () => { this.init() }},
+        {label: '同步任务', type: 'warning', handle: () => { this.syncTak() }}
       ],
       list: []
     }
@@ -56,6 +57,15 @@ export const models = {
   methods: {
     init () {
       this.getList()
+    },
+    syncTak () {
+      syncTaskInfo().then(({data}) => {
+        if (data && data.status === '1') {
+          this.$message.success(data.message)
+        } else {
+          this.$message.error(data.message || '同步失败')
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (val) {
@@ -80,7 +90,7 @@ export const models = {
         } else {
           this.list = []
           this.totalPage = 0
-          this.$message.error(data.msg)
+          this.$message.error(data.message)
         }
       })
     }
