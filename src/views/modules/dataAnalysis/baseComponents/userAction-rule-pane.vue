@@ -179,7 +179,6 @@ export default {
     },
     // 回显时修改rules为childrenRules
     changeRules (data) {
-      console.log('data:1 ', data)
       data.rules.forEach(item => {
         if (item.type != 'rules_function') {
           if (item.rules) {
@@ -192,7 +191,6 @@ export default {
           this.changeRules(item)
         }
       })
-      console.log('data: ', data)
       return data
     },
     updateInitActionRulesConfig (data, eventDownList, countSelectOperateList) {
