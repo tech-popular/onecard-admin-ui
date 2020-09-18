@@ -128,7 +128,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="baseForm.userType !== 'excel'"> <h3>满足如下条件的用户</h3> </div>
+      <div v-if="baseForm.userType !== 'excel'" class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
       <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
           <div class="pane-rules-relation">
              <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
@@ -265,6 +265,7 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
+      outMostExpressionTemplate: 'and', // 用户属性与用户行为外层关系
       collisionData: [],
       collisionList: [],
       // allCusterNameList: [],
@@ -281,7 +282,6 @@ export default {
         collisionPackId: ''
       },
       collisionPackText: '',
-      outMostExpressionTemplate: '',
       baseRule: { // 基本信息校验规则
         name: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
@@ -299,7 +299,13 @@ export default {
       channelList: []
     }
   },
-  components: {Treeselect, dataPreviewInfo, InputTag, userAttrRulePane, userActionRulePane},
+  components: {
+    userAttrRulePane,
+    userActionRulePane,
+    Treeselect,
+    dataPreviewInfo,
+    InputTag
+  },
   methods: {
     init (row, tag) {
       this.id = 0
@@ -771,7 +777,7 @@ export default {
 }
 </script>
 <style>
- .insight-manage-drawer .wrap {
+.insight-manage-drawer .wrap {
   padding: 0 20px 20px;
   margin-top: -12px;
   width: 100%;
@@ -914,7 +920,7 @@ export default {
   cursor: pointer;
   user-select: none;
 }
-.insight-manage-drawer .pane-reject {
+.insight-manage-drawer .pane-rules-title, .insight-manage-drawer .pane-reject {
   border-top: 1px dashed #ccc;
 }
 .insight-manage-drawer .user-channel {
