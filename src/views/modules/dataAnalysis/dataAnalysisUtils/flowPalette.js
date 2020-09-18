@@ -6,6 +6,12 @@ export const palette = [
   //   key: '1'
   // },
   {
+    key: '5',
+    category: 'TO_FLOW',
+    path: 'flowNode.png',
+    nodeName: '分流'
+  },
+  {
     key: '3',
     category: 'GROUP_CHOICE',
     nodeName: '分群节点'

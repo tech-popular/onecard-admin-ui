@@ -11,9 +11,11 @@
       <div id="myDiagramDiv"></div>
     </div>
     <in-params-node @close="closeAllNode" v-if="inparamsNodeVisible" ref="inparamsNodeEl"></in-params-node>
-    <data-query-node @close="closeAllNode" @getSelectCuster="getSelectCuster" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
-    <group-choice-node @close="closeAllNode" @setCusterName="setCusterName"  v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
+    <data-query-node @close="closeAllNode" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
+    <group-choice-node @close="closeAllNode" v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
     <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
+    <to-flow-node @close="closeAllNode" v-if="toFlowNodeVisible" ref="toFlowNodeEl"></to-flow-node>
+    <to-flow-condition @close="closeFlowCondition" v-if="toFlowConditionVisible" ref="toFlowConditionEl"></to-flow-condition>
     <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
   </div>
 </template>
@@ -24,6 +26,8 @@ import groupChoiceNode from './workflowNode/groupChoiceNode'
 import inParamsNode from './workflowNode/inparamsNode'
 import dataQueryNode from './workflowNode/dataQueryNode'
 import outParamsNode from './workflowNode/outparamsNode'
+import toFlowNode from './workflowNode/toFlowNode'
+import toFlowCondition from './workflowNode/toFlowCondition'
 import saveData from './workflowNode/saveData'
 var that = null
 var mySelf = null
@@ -51,11 +55,14 @@ export default {
       id: this.$route.query.id,
       channelCode: '',
       groupId: [],
-      type: '',
+      type: '', // 分群类型
+      flowType: '', // 分流类型
       inparamsNodeVisible: false,
       groupChoiceNodeVisible: false,
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
+      toFlowNodeVisible: false,
+      toFlowConditionVisible: false,
       saveDataVisible: false,
       currentName: '',
       selectCuster: [],
@@ -75,7 +82,7 @@ export default {
       }
     }
   },
-  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, saveData },
+  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, toFlowNode, toFlowCondition, saveData },
   created () {
     that = this
   },
@@ -136,7 +143,11 @@ export default {
         _data.data = item.data.config
         // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
         if (_data.category === 'DATA_QUERY') {
+          // 获取json外的公共参数
           this.type = item.type
+          this.selectCuster = item.data.config.custerArr
+          this.groupId = item.data.config.configItems.groupId
+          this.channelCode = item.data.config.configItems.channelCode
           node.findTreeParts().each(function (cNode) {
             if (cNode.data.category === 'GROUP_CHOICE' && cNode.data.data) {
               let itemGroupId = cNode.data.data.configItems.groupId
@@ -150,17 +161,34 @@ export default {
         }
         if (_data.category === 'GROUP_CHOICE') { // 根据选中的分群，更新分群节点的名称
           let node1 = mySelf.myDiagram.findNodeForKey(key).part.data
-          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', this.currentName)
+          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
+        }
+        if (_data.category === 'TO_FLOW') { // 获取分流的类型
+          if (this.flowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
+            node.findLinksOutOf().each(function (link) {
+              if (that.flowType !== item.data.config.configItems.flowType) {
+                that.flowType = item.data.config.configItems.flowType
+                if (that.flowType === 'condition') {
+                  link.data.linkText = '请输入分流条件'
+                } else {
+                  link.data.linkText = '0%'
+                }
+                mySelf.myDiagram.model.updateTargetBindings(link.data)
+              }
+            })
+          } else {
+            this.flowType = item.data.config.configItems.flowType
+          }
         }
       }
     },
-    getSelectCuster (custerArr, data) { // 获取数据转换中的参数，用于保存用
-      this.selectCuster = custerArr
-      this.groupId = data.groupId
-      this.channelCode = data.channelCode
-    },
-    setCusterName (name, key) { // 分群节点时，节点名称以选择的分群名称来标记
-      this.currentName = name
+    // 分流条件弹窗关闭事件
+    closeFlowCondition (item) {
+      console.log('con')
+      if (item && item.tag == 'save') {
+        let links = myDiagram.findLinksByExample({'from': item.from, 'to': item.to})
+        console.log(links)
+      }
     },
     // 返回
     goback () {
@@ -338,12 +366,12 @@ export default {
         }),
         $(go.Placeholder)
       )
-      function textBlock (isEdit) { //  可编辑节点名称的textBlock ，type表示是否把名称显示出来
+      function textBlock (isEdit, type) { //  可编辑节点名称的textBlock ，type表示是否把名称显示出来
         return $(
           go.TextBlock,
           {
             font: '12px Arial, sans-serif',
-            stroke: '#fff',
+            stroke: type ? 'transparent' : '#fff',
             margin: new Margin(10, 0),
             maxSize: new go.Size(120, NaN),
             wrap: go.TextBlock.WrapFit,
@@ -503,6 +531,64 @@ export default {
           makePort('T', go.Spot.Top, go.Spot.Top, false, true)
         )
       )
+      mySelf.myDiagram.nodeTemplateMap.add(
+        'TO_FLOW',
+        $(
+          go.Node,
+          'Table',
+          nodeStyle(),
+          {
+            selectionAdornmentTemplate: nodeSelectionAdornmentTemplate
+          },
+          $(
+            go.Panel,
+            'Auto',
+            $(
+              go.Shape,
+              'RoundedRectangle',
+              {
+                fill: '#38bbce',
+                strokeWidth: 0,
+                cursor: 'move',
+                minSize: new go.Size(40, 40)
+              }
+            ),
+            textBlock(false, 'noText'),
+            $(
+              go.Picture,
+              {
+                desiredSize: new go.Size(25, 25),
+                alignment: go.Spot.Center
+              },
+              new go.Binding('source', 'path', this.images)
+            )
+          ),
+          {
+            //  双击展示
+            doubleClick: function (e, node) {
+              that.doubleClickNodeEvent(e, node, 'toFlowNodeVisible', 'toFlowNodeEl')
+            }
+          },
+          makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
+          makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
+        )
+      )
+      mySelf.myDiagram.addModelChangedListener(function (evt) { // 监听新拖拽到画布的节点
+        if (!evt.isTransactionFinished) return
+        var txn = evt.object  // a Transaction
+        if (txn === null) return
+        txn.changes.each(function(e) {
+          if (e.modelChange === 'linkToKey') {
+            // let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
+            // let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
+            // // 修改连线时，若将false连到分流上，则提示
+            // if (newToNode.category === 'TO_FLOW' && e.object.linkText === 'FALSE') {
+            //   mySelf.myDiagram.model.removeLinkData(e.object)
+            //   return that.$message.error('分流节点只能走TRUE分支！')
+            // }
+          }
+        })
+      })
       mySelf.myDiagram.commandHandler.canDeleteSelection = function () { // 根据对象数据进行判断节点、线是否可以删除的时候
         // 用例获取选中的节点或线
         return mySelf.myDiagram.selection.all(function (node) {
@@ -530,13 +616,23 @@ export default {
         let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
         let fromCategory = fromNodeLink.data.category
         let toCategory = toNodeLink.data.category
-        if (fromCategory === 'DATA_QUERY' && toCategory === 'OUT_PARAM') { // 数据转换不可直接连线到返参节点
-          fromNodeLink.findLinksOutOf().each(function (link) {
+
+        fromNodeLink.findLinksOutOf().each(function (link) {
+          // console.log(fromCategory, toCategory)
+          // 入参节点只能连接查询节点
+          if (fromCategory === 'IN_PARAM' && toCategory !== 'DATA_QUERY') return
+          // 数据转换不可直接连线到返参节点
+          if (fromCategory === 'DATA_QUERY' && toCategory === 'OUT_PARAM') {
             that.$message.error('不可直接返参，请连接分群节点！')
             return mySelf.myDiagram.model.removeLinkData(link.data)
-          })
-        }
-        // if (toCategory === 'OUT_PARAM') {
+          }
+          // 分流节点的上级只能是分群节点！或节流节点
+          if (toCategory === 'TO_FLOW' && (fromCategory !== 'GROUP_CHOICE' && fromCategory !== 'TO_FLOW')) {
+            that.$message.error('连线有误，请重新连接！')
+            return mySelf.myDiagram.model.removeLinkData(link.data)
+          }
+        })
+
         // 所有节点只能有一个上级节点
         let linkInNum = 0
         toNodeLink.findLinksInto().each(function (link) {
@@ -547,7 +643,6 @@ export default {
             linkInNum++
           }
         })
-        // }
         if (fromCategory === 'GROUP_CHOICE') { // 将状态判断的连线内容保存，保存时判断用
           let linkOutData = []
           let linkDataText = []
@@ -557,8 +652,8 @@ export default {
             : 'TRUE'
             if (linkOutData.length == 1) {
               link.data.linkText = linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-              // if (link.data.linkText === 'FALSE' && toCategory === 'DATA_QUERY') { // false线上不可连线分群节点
-              //   that.$message.error('连线有误，请重新连线')
+              // if (link.data.linkText === 'FALSE' && toCategory === 'TO_FLOW') { // false线上不可连线分流节点
+              //   that.$message.error('分流节点只能走TRUE分支！')
               //   return mySelf.myDiagram.model.removeLinkData(link.data)
               // }
               mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
@@ -566,6 +661,31 @@ export default {
             if (linkOutData.length == 2) { // 限制最多可连接两条线
               that.$message.error({
                 content: '最多可连接两个子节点',
+                duration: 1
+              })
+              mySelf.myDiagram.model.removeLinkData(link.data)
+              return
+            }
+            linkOutData.push(link.data)
+            linkDataText.push(link.data.linkText)
+          })
+        } else if (fromCategory === 'TO_FLOW') {
+          let linkOutData = []
+          let linkDataText = []
+          fromNodeLink.findLinksOutOf().each(function (link) {
+            if (!that.flowType) {
+              that.$message.error('请先选择分流条件再连线!')
+              return mySelf.myDiagram.model.removeLinkData(link.data)
+            }
+            if (that.flowType === 'condition') {
+              link.data.linkText = '请输入分流条件'
+            } else {
+              link.data.linkText = '0%'
+            }
+            mySelf.myDiagram.model.updateTargetBindings(link.data)
+            if (linkOutData.length == 5) { // 限制最多可连接5条线
+              that.$message.error({
+                content: '最多可连接5个子节点',
                 duration: 1
               })
               mySelf.myDiagram.model.removeLinkData(link.data)
@@ -606,6 +726,16 @@ export default {
           },
           mouseLeave: function (e, link) {
             link.findObject('HIGHLIGHT').stroke = 'transparent'
+          },
+          click: function (e, link) {
+            let fromNode = mySelf.myDiagram.findNodeForKey(link.data.from)
+            if (fromNode.category === 'TO_FLOW') {
+              that.toFlowConditionVisible = true
+              that.$nextTick(() => {
+                console.log(link)
+                that.$refs['toFlowConditionEl'].init(link)
+              })
+            }
           },
           selectionAdorned: false
         },
@@ -676,10 +806,18 @@ export default {
       )
       mySelf.myPalette.layout.sorting = go.GridLayout.Forward
     },
+    // 设置节点图片路径
+    images(src) {
+      if (src != '' && src != null) {
+        return require('@/assets/img/' + src)
+      } else {
+        return ''
+      }
+    },
     showLinkLabel (e) { // 显示连线上的文字
       var label = e.subject.findObject('LABEL')
       if (label !== null) {
-        label.visible = e.subject.fromNode.data.category === 'GROUP_CHOICE' // 除了状态处理显示外。其他的都不显示
+        label.visible = e.subject.fromNode.data.category === 'GROUP_CHOICE' || e.subject.fromNode.data.category === 'TO_FLOW'// 除了状态处理显示外。其他的都不显示
       }
     },
     doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件

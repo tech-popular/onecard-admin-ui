@@ -1,14 +1,14 @@
 <template>
-  <el-dialog title="分群节点"
+  <el-dialog title="分流"
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
-    width="600px"
+    width="500px"
     :close-on-click-modal="false">
-    <el-form :model="dataForm" label-width="120px" ref="dataForm" :rules="dataRules">
-      <el-form-item prop="groupId" label="分群名称">
-        <el-select v-model="dataForm.groupId" placeholder="请选择分群" style="width: 400px" @change="groupIdChange">
-          <el-option v-for="(item, index) in custerList" :key="index" :value="item.value" :label="item.text"></el-option>
+    <el-form :model="dataForm" ref="dataForm" :rules="dataRules">
+      <el-form-item prop="flowType" label="分流方式">
+        <el-select v-model="dataForm.flowType" placeholder="请选择分流方式" style="width: 300px">
+          <el-option v-for="(item, index) in flowData" :key="index" :value="item.value" :label="item.text"></el-option>
         </el-select>
       </el-form-item>
     </el-form>
@@ -25,15 +25,26 @@ export default {
       id: '',
       key: '',
       visible: false,
-      channelList: [],
-      custerList: [],
-      curName: '',
+      flowData: [
+        {
+          value: 'condition',
+          text: '按条件分流'
+        },
+        {
+          value: 'hash',
+          text: '按HASH分流'
+        },
+        {
+          value: 'rate',
+          text: '按比率分流'
+        }
+      ],
       dataForm: {
-        groupId: ''
+        flowType: ''
       },
       dataRules: {
-        groupId: [
-          { required: true, message: '请选择分群', trigger: 'change' }
+        flowType: [
+          { required: true, message: '请选择分流方式', trigger: 'change' }
         ]
       }
     }
@@ -42,29 +53,24 @@ export default {
     init (data) {
       this.visible = true
       this.key = data.key
-      this.custerList = this.$parent.selectCuster
       if (data.data) {
-        this.dataForm.groupId = data.data.configItems.groupId
+        this.dataForm.flowType = data.data.configItems.flowType
       }
-    },
-    groupIdChange (val) {
-      this.curName = this.custerList.filter(item => item.value === val)[0].text
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
           let config = {
-            configItems: this.dataForm,
-            curName: this.curName
+            configItems: this.dataForm
           }
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
-          this.$parent.groupChoiceNodeVisible = false
+          this.$parent.toFlowNodeVisible = false
         }
       })
     },
     cancelHandle () {
       this.visible = false
-      this.$parent.groupChoiceNodeVisible = false
+      this.$parent.toFlowNodeVisible = false
     }
   }
 }
