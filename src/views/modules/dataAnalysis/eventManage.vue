@@ -8,13 +8,13 @@
 				<el-input v-model="dataForm.eventBuildName" placeholder="" clearable=""></el-input>
 			</el-form-item>
       <el-form-item label="事件类型">
-				<el-select v-model="dataForm.eventType">
+				<el-select v-model="dataForm.eventType" clearable >
 					<el-option v-for="(item,index) in eventTypeList" :label="item.eventName" :value="item.eventType" :key="index">
 					</el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item label="渠道">
-				<el-select v-model="dataForm.channelCode">
+				<el-select v-model="dataForm.channelCode" clearable >
 					<el-option v-for="(item,index) in channelCodeList" :label="item.text" :value="item.value" :key="index">
 					</el-option>
 				</el-select>

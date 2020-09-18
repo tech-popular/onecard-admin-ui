@@ -14,7 +14,7 @@
 				</el-select>
 			</el-form-item>
 			<el-form-item label="数据类型">
-        	<el-select v-model="dataForm.fieldType">
+        	<el-select v-model="dataForm.fieldType" clearable >
 					<el-option v-for="(item,index) in fieldTypeList" :label="item.lable" :value="item.value" :key="index">
 					</el-option>
 				</el-select>
