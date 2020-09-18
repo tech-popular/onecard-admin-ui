@@ -83,17 +83,7 @@
             <h3>{{item.name}}</h3>
             <div v-if="item.ruleConfig">
               <h3>满足如下条件的用户</h3>
-              <el-form :inline="true">
-                <el-form-item label="用户属性与用户交易满足：" >
-                  <el-input v-model="item.expression" disabled style="width: 800px" />
-                </el-form-item>
-                <el-form-item style="float:right" v-if="false">
-                  <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
-                </el-form-item>
-              </el-form>
-              <div v-if="item.ruleConfig.rules && item.ruleConfig.rules.length > 0">
-                <rules-set :data="item.ruleConfig" ref="rulesSet" :is-require="isRequired" :from="'api'"></rules-set>
-              </div>
+              <user-attr-rule-pane ref="userAttrRule" :channel-id="baseForm.channelId" :data="item" :from="'api'"></user-attr-rule-pane>
             </div>
             <div v-else>
               <p>{{item.tips}}</p>
@@ -109,11 +99,11 @@
   </el-drawer>
 </template>
 <script>
-import rulesSet from './apiManage-rules-set'
-import { selectOperate, selectAllCata, enumTypeList, savaApiInfo, updateApiInfo, viewApiInfo, getOutParams } from '@/api/dataAnalysis/apiManage'
+import userAttrRulePane from './userAttr-rule-pane'
+import { selectAllCata, enumTypeList, savaApiInfo, updateApiInfo, viewApiInfo, getOutParams } from '@/api/dataAnalysis/apiManage'
 import { viewDataInfo } from '@/api/dataAnalysis/dataInsightManage'
 import { dataTransferManageCuster } from '@/api/dataAnalysis/dataTransferManage'
-import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
+import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
@@ -171,13 +161,8 @@ export default {
       flowId: '',
       tag: '',
       drawerTitle: '',
-      isRequired: false,
       custerNameList: [],
-      indexList: [],
       outParamsIndexList: [],
-      expression: '',
-      expressionTemplate: '',
-      isTreeRoot: true, // 父根节点
       visible: false,
       baseForm: {
         name: '',
@@ -217,12 +202,6 @@ export default {
           { required: true, message: '请选择分群名称', trigger: 'change' }
         ]
       },
-      ruleConfig: { // 规则数据
-        'ruleCode': 'rule_all',
-        'type': 'rules_function',
-        'relation': 'and',
-        'rules': []
-      },
       custerInfoList: [],
       curCusterInfo: {},
       custerLoading: false,
@@ -239,11 +218,9 @@ export default {
         //   code: 'MINUTES', title: '分钟'
         // }
       ]
-      // originCataList: []
-      // isHasOldChannel: false
     }
   },
-  components: { rulesSet, Treeselect },
+  components: { userAttrRulePane, Treeselect },
   computed: {
     code () {
       let department = this.baseForm.department || ''
@@ -260,24 +237,10 @@ export default {
       return false
     },
     newCusterNameList () {
-      // if (!this.id) { // 新增时展示旧分群
       if (!this.filterCursterList.length) {
         return this.custerNameList
       }
       return this.filterCursterList
-      // } else {
-      //   if (this.isHasOldChannel === true) { // 编辑时，如果之前有选中旧分群则展示旧分群
-      //     if (!this.filterCursterList.length) {
-      //       return this.custerNameList
-      //     }
-      //     return this.filterCursterList
-      //   } else { // 编辑时，如果之前没有选中旧分群则不展示旧分群
-      //     if (!this.filterCursterList.length) {
-      //       return this.custerNameList.filter(item => item.channelCode !== '0000')
-      //     }
-      //     return this.filterCursterList.filter(item => item.channelCode !== '0000')
-      //   }
-      // }
     }
   },
   methods: {
@@ -314,7 +277,6 @@ export default {
           })
         }
         this.custerNameList = data.data.filter(item => item.channelCode.split(',').filter(citem => citem !== '').length === 1) // 多渠道的分群不让选择
-        // this.custerNameList = data.data
         if (fn) {
           fn()
         }
@@ -346,7 +308,6 @@ export default {
         this.allSelectedChannelCode.push(this.custerNameList.filter(item => item.value === value[i])[0].channelCode)
       }
       this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
-      // this.custerInfoList = []
       if (this.baseForm.type === 'dynamic') {
         this.getSelectAllCata((indexList) => {
           this.outParamsIndexList = deepClone(indexList)
@@ -354,7 +315,6 @@ export default {
       }
       this.baseForm.outParams = []
       this.outParams = []
-      // this.outParamsIndexList = this.filterAllCata(this.originCataList)
     },
     previewCusterInfo () {
       if (!this.baseForm.templateIds.length) return
@@ -368,6 +328,9 @@ export default {
             this.custerInfoList.splice(0, 1, this.custerInfoList[0]) // 利用这个更新视图
             this.$nextTick(() => {
               this.custerLoading = false
+              this.custerInfoList.forEach((citem, cindex) => {
+                this.$refs.userAttrRule[cindex].renderApiData(citem)
+              })
             })
           }
         })
@@ -379,11 +342,8 @@ export default {
       this.flowId = ''
       this.outParams = []
       this.outParamsIndexList = []
-      this.expression = ''
-      this.expressionTemplate = ''
       this.loading = true
       this.visible = true
-      this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getDepartmentList()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
@@ -414,14 +374,9 @@ export default {
         apiName: '',
         templateIds: []
       }
-      this.ruleConfig = { // 规则数据
-        'ruleCode': 'rule_all',
-        'type': 'rules_function',
-        'relation': 'and',
-        'rules': []
-      }
-      this.expression = ''
-      this.expressionTemplate = ''
+      this.$nextTick(() => {
+        this.$refs.userAttrRule.init()
+      })
     },
     getCusterInfo (id, fn) { // 获取分群数据
       viewDataInfo(id).then(({data}) => {
@@ -477,7 +432,6 @@ export default {
           this.baseForm = {
             name: data.data.name,
             inParam: data.data.inParam,
-            // inParam: data.data.inParam.split(','),
             desc: data.data.desc,
             department: data.data.code.split('_')[0],
             apiName: data.data.code.split('_')[1],
@@ -499,13 +453,9 @@ export default {
           let templateIds = data.data.templateIds
           for (let i = 0; i < templateIds.length; i++) {
             let channelCode = this.custerNameList.filter(item => item.value === templateIds[i])[0].channelCode
-            // if (channelCode === '0000') {
-            //   this.isHasOldChannel = true
-            // }
             this.allSelectedChannelCode.push(channelCode)
           }
           this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
-          console.log(this.allSelectedChannelCode)
           // 分群包
           if (!this.baseForm.templateIds) {
             this.filterCursterList = this.custerNameList
@@ -527,7 +477,6 @@ export default {
             }
           }
           this.getSelectAllCata((indexList) => {
-            // this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
             this.outParamsIndexList = this.updateOutParamsList(indexList)
             this.$nextTick(() => {
               this.loading = false
@@ -615,7 +564,6 @@ export default {
         if (data.status !== '1') {
           this.indexList = []
         } else {
-          // this.originCataList = data.data
           this.indexList = this.filterAllCata(data.data)
         }
         if (fn) {
@@ -642,9 +590,6 @@ export default {
             obj.id = item.id
             obj.label = item.name
           }
-          // if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-          //   obj.children = this.filterAllCata(item.dataCataLogList)
-          //   arr.push(obj)
           if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
             obj.children = this.filterAllCata(item.dataCata) // 指标集合
             arr.push(obj)
@@ -667,237 +612,6 @@ export default {
         callback()
       }
     },
-    getRuleTemplateItem (index) { // 条件模板
-      return {
-        'type': 'rule',
-        'fieldType': '',
-        'fieldCode': null,
-        'format': '',
-        'func': '',
-        'sourceTable': '',
-        'fieldId': '',
-        'englishName': '',
-        'indexList': this.indexList, // 指标下拉选
-        'enumTypeNum': '',
-        'selectOperateList': [], // 操作符下拉选
-        'selectEnumsList': [], // 内容下拉选
-        'subFunc': '',
-        'params': [{
-          value: '',
-          title: ''
-        }]
-      }
-    },
-    updateConditionId (arr, position, type) { // 每次增删时，遍历一下ruleConfig,更改每个条件的ruleCode   type:增，删，切换且或
-      var expArr = []
-      var expStr = ''
-      var expArrTemp = []
-      var expStrTemp = ''
-      let relation = arr.relation
-      function _find (arr, position) {
-        var temp = ''
-        var exp = []
-        var expTemp = []
-        arr.rules.forEach((item, index) => {
-          if (position != undefined) {
-            temp = position + '_' + index
-          } else {
-            temp = index + ''
-          }
-          if (!item.rules) {
-            if (!type || type !== 'switch') { // 切换且或时，不需要再重新赋值
-              let tempArr = temp.split('_')
-              let id = getAbc(tempArr[0]) + tempArr.join('').substring(tempArr[0].length)
-              item.ruleCode = id
-            }
-            // 获取表达式
-            if (position != undefined) {
-              exp.push(item.ruleCode)
-              expTemp.push(`{${item.ruleCode}}`)
-              if (index === arr.rules.length - 1) {
-                let str = `(${[...new Set(exp)].join(' ' + arr.relation + ' ')})` // 二级拼接
-                let tempStr = `(${[...new Set(expTemp)].join(' ' + arr.relation + ' ')})` // 二级拼接
-                expArr.push(str)
-                expStr = expArr.join(' ' + relation + ' ') // 所有一级拼接
-                expArrTemp.push(tempStr)
-                expStrTemp = expArrTemp.join(' ' + relation + ' ')
-              }
-            } else {
-              expArr.push(item.ruleCode)
-              expStr = expArr.join(' ' + arr.relation + ' ')
-              expArrTemp.push(`{${item.ruleCode}}`)
-              expStrTemp = expArrTemp.join(' ' + arr.relation + ' ')
-            }
-            // 获取表达式end
-          } else {
-            let tempArr = temp.split('_')
-            let id = getAbc(tempArr[0]) + tempArr.join('').substring(tempArr[0].length)
-            item.ruleCode = id
-            temp = _find(item, temp)
-          }
-        })
-      }
-      _find(arr, position)
-      this.expression = expStr
-      this.expressionTemplate = expStrTemp
-      if (type !== 'switch') {
-        this.ruleConfig = arr
-      }
-    },
-    updateRulesArr (arr, citem, obj) { // 更新数组的数据
-      arr.rules.forEach(item => {
-        if (item.ruleCode === citem.ruleCode) {
-          Object.keys(obj).forEach(oitem => {
-            item[oitem] = obj[oitem]
-          })
-        } else {
-          if (item.rules) {
-            this.updateRulesArr(item, citem, obj)
-          }
-        }
-      })
-      this.ruleConfig = arr
-    },
-    getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
-      let selectEnumsList = []
-      enumTypeList(citem.enumTypeNum).then(res => {
-        if (res.data.status !== '1') {
-          selectEnumsList = []
-        } else {
-          selectEnumsList = res.data.data
-        }
-        this.updateRulesArr(data, citem, { selectEnumsList: selectEnumsList })
-      })
-    },
-    updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
-      let params = [{ value: '', title: '' }]
-      if (citem.func === 'between' || citem.func === 'relative_time' || citem.func === 'relative_time_in') {
-        params.push({ value: '', title: '' })
-      }
-      this.updateRulesArr(data, citem, { params: params })
-    },
-    updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
-      let newArr = []
-      if (citem.params[0].selectVal === null || !citem.params[0].selectVal.length) {
-        newArr = [{
-          value: '',
-          title: '',
-          selectVal: []
-        }]
-      } else {
-        citem.params[0].selectVal.forEach(item => {
-          newArr.push({
-            value: item,
-            title: ''
-          })
-        })
-        newArr.splice(0, 1, { ...newArr[0], selectVal: citem.params[0].selectVal })
-      }
-      this.updateRulesArr(data, citem, { params: newArr })
-    },
-    updateDateTimeChange (data, citem) { // 处理一下时间内容，时间插件v-show后与其他输入框不能共用一个参数
-      let newArr = []
-      if (!citem.params[0].datetime) {
-        newArr = [{
-          value: '',
-          title: '',
-          datetime: ''
-        }]
-      } else {
-        newArr = [{
-          value: citem.params[0].datetime,
-          title: '',
-          datetime: citem.params[0].datetime
-        }]
-      }
-      this.updateRulesArr(data, citem, { params: newArr })
-    },
-    fieldCodeChange (data, citem, obj) { // rxs更新数据
-      this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
-        let params = {
-          selectOperateList: selectOperateList,
-          func: selectOperateList[0].code,
-          params: [{ value: '', title: '' }]
-        }
-        Object.keys(obj).forEach(oitem => {
-          params[oitem] = obj[oitem]
-        })
-        this.updateRulesArr(data, citem, params)
-      })
-    },
-    addChildreRules (data, citem) {
-      let indexPath = findRuleIndex(data.rules, citem) + ''
-      let indexPathArr = indexPath.split(',')
-      if (indexPathArr.length === 1) {
-        let newObj = {
-          'relation': 'and',
-          'type': 'rules_function',
-          'ruleCode': citem.ruleCode,
-          'rules': [
-            data.rules[indexPathArr[0]],
-            this.getRuleTemplateItem()
-          ]
-        }
-        data.rules.splice(indexPathArr[0], 1, newObj)
-      } else {
-        data.rules[indexPathArr[0]].rules.push(this.getRuleTemplateItem())
-      }
-      this.updateConditionId(this.ruleConfig)
-    },
-    deleteRules (data, citem) { // 删除规则
-      let indexPath = findRuleIndex(data.rules, citem) + ''
-      let indexPathArr = indexPath.split(',')
-      if (indexPathArr.length === 1) {
-        data.rules.splice(indexPathArr[0], 1)
-      } else {
-        data.rules[indexPathArr[0]].rules.splice(indexPathArr[1], 1)
-        if (data.rules[indexPathArr[0]].rules.length === 1) { // 若二级内容只有一个时，提至一级位置
-          let oldObj = data.rules[indexPathArr[0]].rules[0]
-          data.rules.splice(indexPathArr[0], 1, oldObj)
-        }
-      }
-      this.updateConditionId(this.ruleConfig)
-    },
-    switchSymbol (ruleCode, data) { // 切换且或
-      if (data.ruleCode === ruleCode) {
-        data.relation = this.ruleConfig.relation === 'and' ? 'or' : 'and'
-      } else {
-        data.rules.forEach((item, index) => {
-          if (item.relation && item.ruleCode === ruleCode) {
-            data.rules[index].relation = data.rules[index].relation === 'and' ? 'or' : 'and'
-          }
-        })
-      }
-      this.updateConditionId(this.ruleConfig, undefined, 'switch')
-    },
-    addRules () { // 添加一级条件
-      this.ruleConfig.rules.push(this.getRuleTemplateItem())
-      this.updateConditionId(this.ruleConfig)
-    },
-    getSelectOperateList (type, fn) {
-      selectOperate(type).then(({data}) => {
-        let selectOperateList = []
-        if (data.status !== '1') {
-          selectOperateList = []
-        }
-        if (!data.data || (data.data && !data.data.length)) {
-          selectOperateList = []
-        }
-        selectOperateList = data.data
-        fn(selectOperateList)
-      })
-    },
-    getRuleForm () { // 获取所有的$refs.ruleForm,用于统一校验数据
-      let ruleSet = this.$refs.rulesSet
-      let ruleArr = []
-      ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
-      ruleSet.$children.forEach(item => {
-        if (item.$refs.ruleForm) {
-          ruleArr = [...ruleArr, ...item.$refs.ruleForm]
-        }
-      })
-      return ruleArr
-    },
     outParamsSelect (node) { // 选中出参
       this.outParams.push({
         title: node.label,
@@ -916,28 +630,6 @@ export default {
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
       this.$parent.addOrUpdateVisible = false
-    },
-    updateRulesConfig (arr) { // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
-      arr.rules.forEach(item => {
-        if (!item.rules) {
-          item.selectOperateList = item.selectOperateList.filter(sitem => sitem.code === item.func)
-          let selectEnumsArr = []
-          item.selectEnumsList.forEach(sitem => {
-            item.params.forEach(pitem => {
-              if (sitem.childrenNum === pitem.value) {
-                selectEnumsArr.push(sitem)
-              }
-            })
-          })
-          item.selectEnumsList = selectEnumsArr
-          item.indexList = []
-        } else {
-          if (item.rules) {
-            this.updateRulesConfig(item)
-          }
-        }
-      })
-      return arr
     },
     saveHandle () {
       let flag = true

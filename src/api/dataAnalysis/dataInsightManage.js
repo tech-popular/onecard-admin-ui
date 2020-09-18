@@ -30,3 +30,5 @@ export const collisionList = () => httpGet(da + 'data/collision/list')
 export const collisionParams = (collisionPackId, groupId) => httpGet(da + `data/collision/params?collisionPackId=${collisionPackId}&groupId=${groupId}`)
 export const collisionSave = (params, collisionPackId) => httpPost(da + `data/collision/config/group?collisionPackId=${collisionPackId}`, params, false)
 export const collisionUpdate = (params, collisionPackId, groupId) => httpPut(da + `data/collision/config/group?groupId=${groupId}&collisionPackId=${collisionPackId}`, params, false)
+export const selectEventAllCata = params => httpGet(da + 'data/event/getEventDropDownList', params) // 加载事件类型接口
+export const selectEventIndexAllCata = params => httpGet(da + 'data/event/index/getEventIndexByElementId', params) // 加载事件属性类型接口

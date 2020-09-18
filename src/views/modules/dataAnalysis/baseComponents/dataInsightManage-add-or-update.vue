@@ -4,86 +4,142 @@
     :visible.sync="visible"
     :show-close="false"
     :wrapperClosable="false"
-    size="1250px"
+    size="1350px"
     class="insight-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">
+      {{drawerTitle}}
+      <i class="el-icon-close drawer-close" @click="drawerClose"></i>
+    </div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3 ref="baseTitle">基本信息</h3>
-        <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
+        <el-form
+          label-width="120px"
+          :model="baseForm"
+          ref="baseForm"
+          :rules="baseRule"
+          class="base-form"
+        >
           <el-form-item label="分群名称" prop="name">
-            <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
+            <el-input
+              v-model.trim="baseForm.name"
+              placeholder="分群名称"
+              clearable
+              class="base-pane-item"
+            />
           </el-form-item>
           <el-form-item label="分群类型" prop="userType">
             <div class="type-radio-item type-radio-one">
-              <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
+              <el-radio
+                label="indicator"
+                v-model="baseForm.userType"
+                @change="radioTypeChange"
+                :disabled="!!id"
+              >指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 用户所属渠道
-                <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable multiple :disabled="!!id" style="width: 400px">
+                <el-select
+                  v-model="baseForm.channelId"
+                  @change="channelIdChange"
+                  filterable
+                  multiple
+                  :disabled="!!id"
+                  style="width: 400px"
+                >
                   <template v-for="(item, index) in channelList">
-                    <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
+                    <el-option
+                      :key="index"
+                      :label="item.text"
+                      :value="item.value"
+                      :disabled="item.disabled"
+                    ></el-option>
                   </template>
                 </el-select>
               </div>
             </div>
             <div class="type-radio-item type-radio-two">
-              <el-radio label="excel" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">excel文件导入</el-radio>
+              <el-radio
+                label="excel"
+                v-model="baseForm.userType"
+                @change="radioTypeChange"
+                :disabled="!!id"
+              >excel文件导入</el-radio>
             </div>
           </el-form-item>
-          <el-form-item label="用户所属渠道" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
+          <el-form-item
+            label="用户所属渠道"
+            prop="channelId"
+            v-if="baseForm.userType === 'excel'"
+            class="user-channel"
+          >
             <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px">
               <template v-for="(item, index) in channelList">
                 <el-option :key="index" :label="item.text" :value="item.value"></el-option>
               </template>
             </el-select>
             <span v-if="excelFile" class="upload-name">{{excelFile}}</span>
-                <el-upload
-                  v-if="baseForm.userType === 'excel'"
-                  class="upload-excel"
-                  ref="upload"
-                  action="aaa"
-                  accept=".xlsx, .xls"
-                  :file-list="fileData.fileList"
-                  :on-change="handleChange"
-                  :before-upload="beforeUpload"
-                  :show-file-list="false"
-                  :auto-upload="false"
-                >
-                  <el-button slot="trigger" size="small" type="default" icon ="el-icon-document">选择文件</el-button>
-                </el-upload>
-                <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
+            <el-upload
+              v-if="baseForm.userType === 'excel'"
+              class="upload-excel"
+              ref="upload"
+              action="aaa"
+              accept=".xlsx, .xls"
+              :file-list="fileData.fileList"
+              :on-change="handleChange"
+              :before-upload="beforeUpload"
+              :show-file-list="false"
+              :auto-upload="false"
+            >
+              <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
+            </el-upload>
+            <el-button
+              v-if="baseForm.userType === 'excel'"
+              class="btn-download"
+              size="small"
+              type="primary"
+              icon="el-icon-download"
+            >
+              <a :href="templateUrl">下载模板</a>
+            </el-button>
           </el-form-item>
           <el-form-item label="计算类型" prop="type">
-            <el-radio-group v-model="baseForm.type" :disabled="!!id || baseForm.userType === 'excel'">
+            <el-radio-group
+              v-model="baseForm.type"
+              :disabled="!!id || baseForm.userType === 'excel'"
+            >
               <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="分群描述">
-            <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
-            <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
+            <el-input
+              type="textarea"
+              class="base-pane-item"
+              v-model="baseForm.desc"
+              placeholder="最多输入100个字符"
+              maxlength="100"
+              :autosize="{ minRows: 3, maxRows: 5}"
+            />
+            <p class="data-description-tips">
+              最多输入100个字符，您还可以输入
+              <span v-text="100 - baseForm.desc.length"></span>个字符
+            </p>
           </el-form-item>
         </el-form>
       </div>
+      <div v-if="baseForm.userType !== 'excel'"> <h3>满足如下条件的用户</h3> </div>
       <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
-        <h3>满足如下条件的用户</h3>
-        <el-form :inline="true">
-          <el-form-item label="用户属性与用户交易满足：" >
-            <el-input v-model="expression" disabled style="width: 800px" />
-          </el-form-item>
-          <el-form-item style="float:right">
-            <i class="el-icon-circle-plus cursor-pointer" @click="addRules">添加</i>
-          </el-form-item>
-        </el-form>
-        <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
-          <rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired"></rules-set>
-        </div>
+          <div class="pane-rules-relation">
+             <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
+          </div>
+           <div style="flex: 1">
+               <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd"></user-attr-rule-pane>
+               <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd"></user-action-rule-pane>
+           </div>
       </div>
       <div class="pane-reject">
-        <h3>
-          剔除用户名单
-        </h3>
+        <h3>剔除用户名单</h3>
         <div>
           <el-form label-width="80px" :model="rejectForm" :rules="baseRule" ref="rejectForm">
             <el-form-item label="分群包">
@@ -92,8 +148,8 @@
                   v-for="item in custerNameList"
                   :key="item.value"
                   :label="item.text"
-                  :value="item.value">
-                </el-option>
+                  :value="item.value"
+                ></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="风控包">
@@ -102,8 +158,8 @@
                   v-for="item in vestPackList"
                   :key="item.value"
                   :label="item.text"
-                  :value="item.value">
-                </el-option>
+                  :value="item.value"
+                ></el-option>
               </el-select>
               <el-tooltip placement="top">
                 <div slot="content">因风控包需调用第三方接口，当判断指定用户是否在此分群时，不进行风控包过滤</div>
@@ -141,23 +197,42 @@
       </div>
     </div>
     <div class="footer">
-      <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel'">数据预览</el-button>
-      <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel'">复制创建新分群</el-button>
-      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="tag !== 'view'" :disabled="loading">保存</el-button>
+      <el-button
+        type="success"
+        @click="saveHandle('preview')"
+        size="small"
+        v-if="baseForm.userType !== 'excel'"
+      >数据预览</el-button>
+      <el-button
+        type="primary"
+        @click="copyHandle('save')"
+        size="small"
+        v-if="!!id && baseForm.userType !== 'excel'"
+      >复制创建新分群</el-button>
+      <el-button
+        type="primary"
+        @click="saveHandle('save')"
+        size="small"
+        v-if="tag !== 'view'"
+        :disabled="loading"
+      >保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
-    <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
+    <data-preview-info
+      v-if="isPreviewShow"
+      ref="dataPreviewInfo"
+      :vestPackCode="rejectForm.vestPackCode"
+    ></data-preview-info>
   </el-drawer>
 </template>
 <script>
-import rulesSet from './apiManage-rules-set'
+import userAttrRulePane from './userAttr-rule-pane'
+import userActionRulePane from './userAction-rule-pane'
+// import userBehaviorRulePane from './userBehavior-rule-pane'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
 import InputTag from '../components/InputTag'
 import {
-  selectOperate,
-  selectAllCata,
-  enumTypeList,
   savaDataInfo,
   updateDataInfo,
   viewDataInfo,
@@ -166,13 +241,11 @@ import {
   vestPackAvailable,
   channelsList,
   custerAvailable,
-  dataIndexManagerCandidate,
   collisionList,
   collisionParams,
   collisionSave,
   collisionUpdate
 } from '@/api/dataAnalysis/dataInsightManage'
-import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
@@ -180,15 +253,10 @@ export default {
     return {
       isPreviewShow: true,
       loading: false,
-      id: '',
+      id: 0,
       flowId: '',
       tag: '',
       drawerTitle: '',
-      isRequired: false,
-      indexList: [],
-      expression: '',
-      expressionTemplate: '',
-      isTreeRoot: true, // 父根节点
       visible: false,
       fileData: {
         fileList: []
@@ -213,6 +281,7 @@ export default {
         collisionPackId: ''
       },
       collisionPackText: '',
+      outMostExpressionTemplate: '',
       baseRule: { // 基本信息校验规则
         name: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
@@ -227,38 +296,18 @@ export default {
           { required: true, message: '请选择用户所属渠道', trigger: 'change' }
         ]
       },
-      ruleConfig: { // 规则数据
-        'ruleCode': 'rule_all',
-        'type': 'rules_function',
-        'relation': 'and',
-        'rules': []
-      },
-      channelList: [],
-      isSelectedUneffectIndex: [], // 选中的指标是否有无效指标
-      subTimeSelects: [
-        {
-          code: 'DAYS', title: '天'
-        },
-        {
-          code: 'HOURS', title: '小时'
-        }
-        // {
-        //   code: 'MINUTES', title: '分钟'
-        // }
-      ]
+      channelList: []
     }
   },
-  components: { rulesSet, Treeselect, dataPreviewInfo, InputTag },
+  components: {Treeselect, dataPreviewInfo, InputTag, userAttrRulePane, userActionRulePane},
   methods: {
     init (row, tag) {
-      this.id = ''
+      this.id = 0
       this.tag = ''
       this.flowId = ''
-      this.expression = ''
-      this.expressionTemplate = ''
       this.loading = true
       this.visible = true
-      this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
+      // this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getVestPackAvailable()
       this.getChannelsList()
       this.getCusterList()
@@ -271,7 +320,6 @@ export default {
       if (!tag) {
         this.loading = false
         this.drawerTitle = '新增'
-        this.getSelectAllCata()
         this.initEmptyData()
       } else {
         this.id = row.id
@@ -279,7 +327,13 @@ export default {
         this.getDataInfo(row.id)
       }
     },
-    initEmptyData () { // 当数据异常时，初始化数据
+    async loadOptions ({ action, parentNode, callback }) {
+      if (action === LOAD_CHILDREN_OPTIONS) {
+        callback()
+      }
+    },
+    initEmptyData () {
+      // 当数据异常时，初始化数据
       this.baseForm = {
         name: '',
         userType: 'indicator',
@@ -287,17 +341,15 @@ export default {
         channelId: ['2001'],
         desc: ''
       }
-      this.ruleConfig = { // 规则数据
-        'ruleCode': 'rule_all',
-        'type': 'rules_function',
-        'relation': 'and',
-        'rules': []
-      }
-      this.expression = ''
-      this.expressionTemplate = ''
+      this.$nextTick(() => {
+        console.log(this.$refs)
+        this.$refs.userAttrRule.init()
+        this.$refs.userActionRule.init()
+      })
     },
-    getDataInfo (id) { // 查看及编辑时请求数据
-      viewDataInfo(id).then(({data}) => {
+    getDataInfo (id) {
+      // 查看及编辑时请求数据
+      viewDataInfo(id).then(({ data }) => {
         if (data.status !== '1') {
           this.initEmptyData()
           this.loading = false
@@ -307,17 +359,21 @@ export default {
           })
         } else {
           this.flowId = data.data.flowId
+          this.outMostExpressionTemplate = JSON.parse(data.data.configJson).outMostExpressionTemplate
           this.baseForm = {
             name: data.data.name,
             desc: data.data.desc,
             userType: data.data.userType,
             type: data.data.type
           }
-          this.rejectForm.rejectGroupPackageIds = data.data.rejectGroupPackageIds || []
+          this.rejectForm.rejectGroupPackageIds =
+            data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
             this.rejectForm.vestPackCode = []
           } else {
-            this.rejectForm.vestPackCode = data.data.vestPackCode.split(',').filter(item => item != '')
+            this.rejectForm.vestPackCode = data.data.vestPackCode
+              .split(',')
+              .filter(item => item != '')
           }
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
@@ -325,8 +381,10 @@ export default {
             this.loading = false
             return
           }
-          this.baseForm.channelId = data.data.channelId.split(',').filter(item => item != '')
-          if (!data.data.configJson) {
+          this.baseForm.channelId = data.data.channelId
+            .split(',')
+            .filter(item => item != '')
+          if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
             return this.$message({
@@ -334,24 +392,19 @@ export default {
               type: 'error'
             })
           }
-          let configJson = JSON.parse(data.data.configJson)
-          this.ruleConfig = configJson.ruleConfig
-          this.expression = configJson.expression
-          this.expressionTemplate = configJson.expressionTemplate
-          this.getSelectAllCata((indexList) => {
-            this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
-            this.$nextTick(() => {
-              this.loading = false
-            })
-          })
-          this.$nextTick(() => { // 默认将验证错误信息全部清除
-            let ruleFormArr = this.getRuleForm()
-            ruleFormArr.forEach(item => {
-              item.clearValidate()
-            })
-          })
+          this.$refs.userAttrRule.renderData(
+            data.data.configJson,
+            this.baseForm.channelId
+          )
+          this.$refs.userActionRule.renderData( // 真实调接口时数据重现
+            data.data.configJson,
+            this.baseForm.channelId
+          )
         }
       })
+    },
+    renderEnd () {
+      this.loading = false
     },
     getChannelsList () {
       channelsList().then(res => {
@@ -369,7 +422,8 @@ export default {
         })
       })
     },
-    channelIdChange () { // 用户渠道改变时，重新过滤指标数据
+    channelIdChange () {
+      // 用户渠道改变时，重新过滤指标数据
       if (this.baseForm.channelId.length === 0) {
         this.channelList.forEach(item => {
           item.disabled = false
@@ -392,14 +446,8 @@ export default {
           }
         })
       }
-      this.getSelectAllCata((indexList) => {
-        if (indexList.length === 0) {
-          this.setInitRulesConfig(this.indexList)
-        } else {
-          this.ruleConfig = this.updateInitRulesConfig(this.ruleConfig, indexList)
-          this.setInitRulesConfig(this.indexList)
-        }
-      })
+      this.$refs.userAttrRule.channelIdChangeUpdate()
+      this.$refs.userActionRule.channelIdChangeUpdate()
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -416,9 +464,13 @@ export default {
         this.vestPackList = res.data.data
       })
     },
+    // 切换用户行为和用户属性外层关系
+    switchSymbol () {
+      this.outMostExpressionTemplate = this.outMostExpressionTemplate === 'and' ? 'or' : 'and'
+    },
     // 获取分群名称
     getCusterList () {
-      custerAvailable().then(({data}) => {
+      custerAvailable().then(({ data }) => {
         if (data.status !== '1') {
           this.custerNameList = []
           return this.$message({
@@ -427,8 +479,6 @@ export default {
           })
         }
         this.custerNameList = data.data
-        // this.allCusterNameList = data.data
-        // this.custerNameList = this.allCusterNameList.filter(item => item.channelCode === this.baseForm.channelId)
       })
     },
     getCollisionList () {
@@ -474,13 +524,15 @@ export default {
         this.baseForm.type = 'static'
       }
     },
-    handleChange (file, fileList) { // 上传文件变化时
+    handleChange (file, fileList) {
+      // 上传文件变化时
       if (fileList.length > 0) {
         this.fileData.fileList = [fileList[fileList.length - 1]] // 这一步，是展示最后一次选择的文件
         this.excelFile = this.fileData.fileList[0].name
       }
     },
-    beforeUpload (file) { // 上传文件之前的事件
+    beforeUpload (file) {
+      // 上传文件之前的事件
       let that = this
       let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
       if (fileName != 'xls' && fileName != 'xlsx') {
@@ -491,430 +543,6 @@ export default {
         return false
       }
     },
-    updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
-      arr.rules.forEach(item => {
-        if (!item.rules) {
-          let indexListArr = deepClone(indexList)
-          let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
-          let indexPathArr = indexPath.split(',')
-          let a = indexListArr
-          if (indexPath) {
-            indexPathArr.forEach((fitem, findex) => {
-              if (findex < indexPathArr.length - 1) {
-                a[fitem].isDefaultExpanded = true
-                a = a[fitem].children
-              } else {
-                item.enable = a[fitem].enable
-              }
-            })
-            item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
-            if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
-              item.subFunc = item.func
-              item.func = 'relative_time'
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
-              }
-              this.getSelectOperateList(item.fieldType, (selectOperateList) => {
-                item.selectOperateList = selectOperateList
-                item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
-              })
-            }
-            if (item.func === 'relative_time_in' || item.func === 'relative_time') {
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
-              }
-            }
-            // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
-            if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
-              if (!item.params[0].selectVal) {
-                item.params[0].selectVal = [ item.params[0].value ]
-              }
-            }
-          }
-        } else {
-          this.updateInitRulesConfig(item, indexList)
-        }
-      })
-      return arr
-    },
-    setInitRulesConfig (indexList) {  // 将规则初始化
-      this.indexList = indexList
-      if (this.ruleConfig.rules.length) {
-        this.ruleConfig.rules = []
-        this.ruleConfig.rules.push(this.getRuleTemplateItem())
-      }
-      this.updateConditionId(this.ruleConfig)
-    },
-    getSelectAllCata (fn) { // 获取所有指标
-      selectAllCata({
-        channelCode: this.baseForm.channelId,
-        flag: this.id ? '-1' : '1'
-      }).then(({data}) => {
-        if (data.status !== '1') {
-          this.indexList = []
-        } else {
-          this.indexList = this.filterAllCata(data.data)
-        }
-        if (fn) {
-          fn(this.indexList)
-        }
-      })
-    },
-    filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
-      let arr = []
-      if (!!tree && tree.length !== 0) {
-        tree.forEach((item, index) => {
-          let obj = {}
-          if (item.fieldType) {
-            obj.id = item.englishName + '-' + item.id
-            obj.englishName = item.englishName
-            obj.label = item.chineseName
-            obj.fieldType = item.fieldType
-            obj.enumTypeNum = item.enumTypeNum
-            obj.sourceTable = item.sourceTable
-            obj.dataStandar = item.dataStandar
-            obj.fieldId = item.id
-            obj.channelCode = item.channelCode
-            obj.enable = item.enable
-          } else {
-            obj.id = item.id
-            obj.label = item.name
-          }
-          if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
-            obj.children = this.filterAllCata(item.dataCata) // 指标集合
-            arr.push(obj)
-          } else if (this.filterAllCata(item.dataIndex).length) {
-            obj.children = this.filterAllCata(item.dataIndex) // 指标集合
-            arr.push(obj)
-          } else { // 指标父级层
-            if (!item.fieldType) {
-              obj.children = null
-            } else {
-              arr.push(obj) // 每个指标都放在集合中
-            }
-          }
-        })
-      }
-      return arr
-    },
-    async loadOptions ({ action, parentNode, callback }) {
-      if (action === LOAD_CHILDREN_OPTIONS) {
-        callback()
-      }
-    },
-    getRuleTemplateItem () { // 条件模板
-      return {
-        'type': 'rule',
-        'fieldType': '',
-        'fieldCode': null,
-        'format': '',
-        'func': '',
-        'sourceTable': '',
-        'fieldId': '',
-        'englishName': '',
-        'indexList': this.indexList, // 指标下拉选
-        'enumTypeNum': '',
-        'selectOperateList': [], // 操作符下拉选
-        'selectEnumsList': [], // 内容下拉选
-        'subFunc': '',
-        'dateDimension': '',
-        'strTips': [],
-        'params': [{
-          value: '',
-          title: ''
-        }]
-      }
-    },
-    updateConditionId (arr, position, type) { // 每次增删时，遍历一下ruleConfig,更改每个条件的ruleCode   type:增，删，切换且或
-      var expArr = []
-      var expStr = ''
-      var expArrTemp = []
-      var expStrTemp = ''
-      let relation = arr.relation
-      function _find (arr, position) {
-        var temp = ''
-        var exp = []
-        var expTemp = []
-        arr.rules.forEach((item, index) => {
-          if (position != undefined) {
-            temp = position + '_' + index
-          } else {
-            temp = index + ''
-          }
-          if (!item.rules) {
-            if (!type || type !== 'switch') { // 切换且或时，不需要再重新赋值
-              let tempArr = temp.split('_')
-              let id = getAbc(tempArr[0]) + tempArr.join('').substring(tempArr[0].length)
-              item.ruleCode = id
-            }
-            // 获取表达式
-            if (position != undefined) {
-              exp.push(item.ruleCode)
-              expTemp.push(`{${item.ruleCode}}`)
-              if (index === arr.rules.length - 1) {
-                let str = `(${[...new Set(exp)].join(' ' + arr.relation + ' ')})` // 二级拼接
-                let tempStr = `(${[...new Set(expTemp)].join(' ' + arr.relation + ' ')})` // 二级拼接
-                expArr.push(str)
-                expStr = expArr.join(' ' + relation + ' ') // 所有一级拼接
-                expArrTemp.push(tempStr)
-                expStrTemp = expArrTemp.join(' ' + relation + ' ')
-              }
-            } else {
-              expArr.push(item.ruleCode)
-              expStr = expArr.join(' ' + arr.relation + ' ')
-              expArrTemp.push(`{${item.ruleCode}}`)
-              expStrTemp = expArrTemp.join(' ' + arr.relation + ' ')
-            }
-            // 获取表达式end
-          } else {
-            let tempArr = temp.split('_')
-            let id = getAbc(tempArr[0]) + tempArr.join('').substring(tempArr[0].length)
-            item.ruleCode = id
-            temp = _find(item, temp)
-          }
-        })
-      }
-      _find(arr, position)
-      this.expression = expStr
-      this.expressionTemplate = expStrTemp
-      if (type !== 'switch') {
-        this.ruleConfig = arr
-      }
-    },
-    updateRulesArr (arr, citem, obj) { // 更新数组的数据
-      arr.rules.forEach(item => {
-        if (item.ruleCode === citem.ruleCode) {
-          Object.keys(obj).forEach(oitem => {
-            item[oitem] = obj[oitem]
-          })
-        } else {
-          if (item.rules) {
-            this.updateRulesArr(item, citem, obj)
-          }
-        }
-      })
-      let rules1 = arr.rules[0]
-      arr.rules.splice(0, 1, rules1) // 强制更新一下数组
-      this.ruleConfig = arr
-    },
-    getRulesEnumsList (data, citem) { // 展开下拉选时，请求枚举类型的数据
-      let selectEnumsList = []
-      enumTypeList(citem.enumTypeNum).then(res => {
-        if (res.data.status !== '1') {
-          selectEnumsList = []
-        } else {
-          selectEnumsList = res.data.data
-        }
-        this.updateRulesArr(data, citem, { selectEnumsList: selectEnumsList })
-      })
-    },
-    updateOperateChange (data, citem) { // 判断操作符是否为null之类的，若为，则将后面数据清空
-      let params = [{ value: '', title: '' }]
-      if (citem.func === 'between' || citem.func === 'relative_time_in') {
-        params.push({ value: '', title: '' })
-      }
-      let subSelects = []
-      let subFunc = ''
-      let subTimeSelects = []
-      let dateDimension = ''
-      if (citem.func === 'relative_time') {
-        subSelects = citem.selectOperateList.filter(item => item.code === citem.func)[0].subSelects
-        subFunc = 'relative_before'
-        subTimeSelects = this.subTimeSelects
-        dateDimension = 'DAYS'
-      }
-      if (citem.func === 'relative_time_in') {
-        subTimeSelects = this.subTimeSelects
-        dateDimension = 'DAYS'
-      }
-      this.updateRulesArr(data, citem, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension })
-    },
-    updateEnumsChange (data, citem) { // 多选数据变化时, 重组params
-      let newArr = []
-      if (citem.params[0].selectVal === null || !citem.params[0].selectVal.length) {
-        newArr = [{
-          value: '',
-          title: '',
-          selectVal: []
-        }]
-      } else {
-        citem.params[0].selectVal.forEach(item => {
-          newArr.push({
-            value: item,
-            title: ''
-          })
-        })
-        newArr.splice(0, 1, { ...newArr[0], selectVal: citem.params[0].selectVal })
-      }
-      this.updateRulesArr(data, citem, { params: newArr })
-    },
-    updateDateTimeChange (data, citem) { // 处理一下时间内容，时间插件v-show后与其他输入框不能共用一个参数
-      let newArr = []
-      if (!citem.params[0].datetime) {
-        newArr = [{
-          value: '',
-          title: '',
-          datetime: ''
-        }]
-      } else {
-        newArr = [{
-          value: citem.params[0].datetime,
-          title: '',
-          datetime: citem.params[0].datetime
-        }]
-      }
-      this.updateRulesArr(data, citem, { params: newArr })
-    },
-    fieldCodeChange (data, citem, obj) { // rxs更新数据
-      this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
-        let params = {
-          selectOperateList: selectOperateList,
-          func: selectOperateList[0].code,
-          subFunc: '',
-          dateDimension: '',
-          strTips: [],
-          params: [{ value: '', title: '' }]
-        }
-        if (params.func === 'relative_time') {
-          params.subFunc = 'relative_before'
-          params.dateDimension = 'DAYS'
-        }
-        if (params.func === 'relative_time_in') {
-          params.dateDimension = 'DAYS'
-        }
-        Object.keys(obj).forEach(oitem => {
-          params[oitem] = obj[oitem]
-        })
-        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-        }
-        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-          let res = data
-          dataIndexManagerCandidate({ // 字符串提示输入示例
-            sourceTable: obj.sourceTable,
-            fieldName: obj.englishName,
-            count: 10
-          }).then(({data}) => {
-            if (data.status * 1 === 1 && data.data.length) {
-              params.strTips = data.data
-            }
-            this.updateRulesArr(res, citem, params)
-          })
-        } else {
-          this.updateRulesArr(data, citem, params)
-        }
-      })
-    },
-    addChildreRules (data, citem) { // 添加子集
-      let indexPath = findRuleIndex(data.rules, citem) + ''
-      let indexPathArr = indexPath.split(',')
-      if (indexPathArr.length === 1) {
-        let newObj = {
-          'relation': 'and',
-          'type': 'rules_function',
-          'ruleCode': citem.ruleCode,
-          'rules': [
-            data.rules[indexPathArr[0]],
-            this.getRuleTemplateItem()
-          ]
-        }
-        data.rules.splice(indexPathArr[0], 1, newObj)
-      } else {
-        data.rules[indexPathArr[0]].rules.push(this.getRuleTemplateItem())
-      }
-      this.updateConditionId(this.ruleConfig)
-    },
-    deleteRules (data, citem) { // 删除规则
-      let indexPath = findRuleIndex(data.rules, citem) + ''
-      let indexPathArr = indexPath.split(',')
-      if (indexPathArr.length === 1) {
-        data.rules.splice(indexPathArr[0], 1)
-      } else {
-        data.rules[indexPathArr[0]].rules.splice(indexPathArr[1], 1)
-        if (data.rules[indexPathArr[0]].rules.length === 1) { // 若二级内容只有一个时，提至一级位置
-          let oldObj = data.rules[indexPathArr[0]].rules[0]
-          data.rules.splice(indexPathArr[0], 1, oldObj)
-        }
-      }
-      this.updateConditionId(this.ruleConfig)
-    },
-    switchSymbol (ruleCode, data) { // 切换且或
-      if (data.ruleCode === ruleCode) {
-        data.relation = this.ruleConfig.relation === 'and' ? 'or' : 'and'
-      } else {
-        data.rules.forEach((item, index) => {
-          if (item.relation && item.ruleCode === ruleCode) {
-            data.rules[index].relation = data.rules[index].relation === 'and' ? 'or' : 'and'
-          }
-        })
-      }
-      this.updateConditionId(this.ruleConfig, undefined, 'switch')
-    },
-    addRules () { // 添加一级条件
-      this.ruleConfig.rules.push(this.getRuleTemplateItem())
-      this.updateConditionId(this.ruleConfig)
-    },
-    getSelectOperateList (type, fn) {
-      if (!type) {
-        fn([])
-        return
-      }
-      selectOperate(type).then(({data}) => {
-        let selectOperateList = []
-        if (data.status !== '1') {
-          selectOperateList = []
-        }
-        if (!data.data || (data.data && !data.data.length)) {
-          selectOperateList = []
-        }
-        selectOperateList = data.data
-        fn(selectOperateList)
-      })
-    },
-    getRuleForm () { // 获取所有的$refs.ruleForm,用于统一校验数据
-      let ruleSet = this.$refs.rulesSet
-      let ruleArr = []
-      ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
-      ruleSet.$children.forEach(item => {
-        if (item.$refs.ruleForm) {
-          ruleArr = [...ruleArr, ...item.$refs.ruleForm]
-        }
-      })
-      return ruleArr
-    },
-    drawerClose () { // 关闭抽屉弹窗
-      this.visible = false
-      this.$parent.addOrUpdateVisible = false
-    },
-    updateRulesConfig (arr) { // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
-      this.isSelectedUneffectIndex = []
-      arr.rules.forEach(item => {
-        if (!item.rules) {
-          item.selectOperateList = item.selectOperateList.filter(sitem => sitem.code === item.func)
-          let selectEnumsArr = []
-          item.selectEnumsList.forEach(sitem => {
-            item.params.forEach(pitem => {
-              if (sitem.childrenNum === pitem.value) {
-                selectEnumsArr.push(sitem)
-              }
-            })
-          })
-          item.selectEnumsList = selectEnumsArr
-          item.indexList = []
-          if (item.label && !item.enable) {
-            this.isSelectedUneffectIndex.push(item.label)
-          }
-        } else {
-          if (item.rules) {
-            this.updateRulesConfig(item)
-          }
-        }
-      })
-      return arr
-    },
     previewHandle () {
       this.isPreviewShow = true
       this.$nextTick(() => {
@@ -923,7 +551,8 @@ export default {
     },
     getQueryParams (name) {
       let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
-      let params = window.location.search.substr(1) || window.location.href.split('?')[1]
+      let params =
+        window.location.search.substr(1) || window.location.href.split('?')[1]
       let r = params && params.match(reg)
       if (r != null) {
         return decodeURI(r[2])
@@ -938,11 +567,21 @@ export default {
       }).then(() => { // 确认创建分群时的操作
         this.drawerTitle = '新建'
         this.baseForm.name = '复制' + this.baseForm.name
-        this.id = ''
+        this.id = 0
         this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
       }).catch(() => {
         console.log('cancel')
       })
+        // .then(() => {
+        //   // 确认创建分群时的操作
+        //   this.drawerTitle = '新建'
+        //   this.baseForm.name = '复制' + this.baseForm.name
+        //   this.id = 0
+        //   this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+        // })
+        // .catch(() => {
+        //   console.log('cancel')
+        // })
     },
     saveCollision () {
       let url = collisionSave
@@ -1028,19 +667,17 @@ export default {
         }
         return
       }
-      if (!this.ruleConfig.rules.length) {
-        this.$message({
-          message: '请配置用户规则信息',
-          type: 'error',
-          center: true
-        })
-        return
-      }
-      this.isRequired = true
-      let ruleFormArr = this.getRuleForm()
-      this.$nextTick(() => { // 待页面中的isRequired = true后再执行校验
+      // 用户属性 用户行为 数据校验
+      this.$refs.userAttrRule.ruleValidate()
+      this.$refs.userActionRule.ruleValidate()
+      this.$refs.userAttrRule.isRequired = true
+      this.$refs.userActionRule.isRequired = true
+      let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
+      let actionRuleFormArr = this.$refs.userActionRule.getRuleForm()
+      this.$nextTick(() => {
+        // 待页面中的isRequired = true后再执行校验
         let flag = true
-        this.$refs.baseForm.validate((valid) => {
+        this.$refs.baseForm.validate(valid => {
           if (!valid) {
             flag = false
           }
@@ -1051,29 +688,38 @@ export default {
           }
         })
         ruleFormArr.forEach(item => {
-          item.validate((valid) => {
+          item.validate(valid => {
             if (!valid) {
               flag = false
             }
           })
         })
-        if (!flag) {
-          this.isRequired = false
-        } else { // 全部校验通过后，可保存数据
-          let ruleConfig = this.updateRulesConfig(deepClone(this.ruleConfig)) // 过滤数据
-          this.isSelectedUneffectIndex = Array.from(new Set(this.isSelectedUneffectIndex))
-          if (this.isSelectedUneffectIndex.length) {
-            return this.$message({
-              message: `【${this.isSelectedUneffectIndex.join('，')}】为无效指标，请重新选择`,
-              type: 'error',
-              center: true
-            })
-          }
+        actionRuleFormArr.forEach(item => {
+          item.validate(valid => {
+            if (!valid) {
+              flag = false
+            }
+          })
+        })
+        if (!flag || actionRuleFormArr.length === 0) {
+          this.$refs.userAttrRule.isRequired = false
+          this.$refs.userActionRule.isRequired = false
+        } else {
+          // 全部校验通过后，可保存数据
+          this.$refs.userAttrRule.uneffectIndexValidate()
+          this.$refs.userActionRule.uneffectIndexValidate()
           let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
             code = 1
           }
-          let params = { ...this.baseForm, expression: this.expression, expressionTemplate: this.expressionTemplate, ruleConfig: ruleConfig, ...this.rejectForm, rejectGroupPackCode: code }
+          let params = {
+            ...this.baseForm,
+            ...this.$refs.userAttrRule.lastSubmitRuleConfig,
+            ...this.$refs.userActionRule.lastSubmitRuleConfig,
+            ...this.rejectForm,
+            outMostExpressionTemplate: this.outMostExpressionTemplate,
+            rejectGroupPackCode: code
+          }
           params.channelId = params.channelId.join(',')
           if (type === 'preview') {
             this.isPreviewShow = true
@@ -1098,7 +744,7 @@ export default {
             params.username = this.getQueryParams('username') || ''
           }
           this.loading = true
-          url(params).then(({data}) => {
+          url(params).then(({ data }) => {
             if (data.status !== '1') {
               this.loading = false
               return this.$message({
@@ -1113,6 +759,10 @@ export default {
         }
       })
     },
+    drawerClose () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
+    },
     cancelHandle () {
       this.visible = false
       this.$parent.addOrUpdateVisible = false
@@ -1121,121 +771,165 @@ export default {
 }
 </script>
 <style>
-  .insight-manage-drawer .wrap {
-    padding: 0 20px 20px;
-    margin-top: -12px;
-    width: 100%;
-    overflow-y: auto;
-    position: absolute;
-    top: 75px;
-    bottom: 55px;
-  }
-  .insight-manage-drawer .drawer-title {
-    padding: 15px;
-    background: #333;
-    color: #fff;
-    font-size: 15px;
-    margin: -20px -20px 0 -20px;
-    position: relative;
-  }
-  .insight-manage-drawer .drawer-close {
-    position: absolute;
-    right: 20px;
-  }
-  .insight-manage-drawer .item-inline {
-    display: inline-block;
-  }
-  .insight-manage-drawer .item-code {
-    margin-left: -70px;
-  }
-  .insight-manage-drawer .item-code-name {
-    width: 300px;
-  }
-  .insight-manage-drawer .item-button {
-    margin-left: -60px;
-  }
-  .insight-manage-drawer .copy-code {
-    margin-left: 15px;
-  }
-  .insight-manage-drawer .footer {
-    position: absolute;
-    bottom: 0;
-    background: #fff;
-    padding: 10px 22px 10px 10px;
-    width: 100%;
-    height: 55px;
-    text-align: right;
-    box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
-    z-index: 500;
-  }
-  .insight-manage-drawer .cursor-pointer {
-    cursor: pointer;
-  }
-  .insight-manage-drawer .base-pane-item {
-    width: 80%;
-  }
-  .insight-manage-drawer .vue-treeselect {
-    line-height: 24px;
-  }
-  .insight-manage-drawer .data-description-tips {
-    color: #999;
-    margin-top: 0
-  }
-  .insight-manage-drawer .data-description-tips span {
-    color: red
-  }
-  .insight-manage-drawer .type-radio-group {
-    margin-top: 12px;
-  }
-  .insight-manage-drawer .type-radio-two {
-    margin-top: 10px;
-  }
-  .insight-manage-drawer .upload-excel {
-    display: inline-block;
-    margin-left: 20px;
-  }
-  .insight-manage-drawer .btn-upload {
-    display: inline-block;
-    font-size: 14px;
-    padding-left: 15px;
-  }
-  .insight-manage-drawer .upload-name {
-    font-size: 14px;
-    padding-left: 15px;
-  }
-  .insight-manage-drawer .btn-upload button {
-    margin-left: 10px;
-  }
-  .insight-manage-drawer .btn-download {
-    margin-left: 10px;
-  }
-  .insight-manage-drawer .btn-download a {
-    color: #fff;
-  }
-  .insight-manage-drawer .el-list-enter-active,
-  .insight-manage-drawer .el-list-leave-active {
-    transition: none;
-  }
-  .insight-manage-drawer .el-list-enter,
-  .insight-manage-drawer .el-list-leave-active {
-    opacity: 0;
-  }
-  .insight-manage-drawer .pane-rules, .insight-manage-drawer .pane-reject {
-    border-top: 1px dashed #ccc;
-  }
-  .insight-manage-drawer .user-channel {
-    margin-left: 110px;
-  }
-  .insight-manage-drawer .indicator-channel {
-    display: inline-block;
-    margin-left: 20px;
-  }
-  .insight-manage-drawer .pane-reject {
-    margin-top: 20px;
-  }
-  .insight-manage-drawer .reject-pane-item {
-    width:50%
-  }
+ .insight-manage-drawer .wrap {
+  padding: 0 20px 20px;
+  margin-top: -12px;
+  width: 100%;
+  overflow-y: auto;
+  position: absolute;
+  top: 75px;
+  bottom: 55px;
+}
+.insight-manage-drawer .drawer-title {
+  padding: 15px;
+  background: #333;
+  color: #fff;
+  font-size: 15px;
+  margin: -20px -20px 0 -20px;
+  position: relative;
+}
+.insight-manage-drawer .drawer-close {
+  position: absolute;
+  right: 20px;
+}
+.insight-manage-drawer .item-inline {
+  display: inline-block;
+}
+.insight-manage-drawer .item-code {
+  margin-left: -70px;
+}
+.insight-manage-drawer .item-code-name {
+  width: 300px;
+}
+.insight-manage-drawer .item-button {
+  margin-left: -60px;
+}
+.insight-manage-drawer .copy-code {
+  margin-left: 15px;
+}
+.insight-manage-drawer .footer {
+  position: absolute;
+  bottom: 0;
+  background: #fff;
+  padding: 10px 22px 10px 10px;
+  width: 100%;
+  height: 55px;
+  text-align: right;
+  box-shadow: 0 -2px 9px 0 rgba(153, 169, 191, 0.17);
+  z-index: 500;
+}
+.insight-manage-drawer .cursor-pointer {
+  cursor: pointer;
+}
+.insight-manage-drawer .base-pane-item {
+  width: 80%;
+}
+.insight-manage-drawer .vue-treeselect {
+  line-height: 24px;
+}
+.insight-manage-drawer .data-description-tips {
+  color: #999;
+  margin-top: 0;
+}
+.insight-manage-drawer .data-description-tips span {
+  color: red;
+}
+.insight-manage-drawer .type-radio-group {
+  margin-top: 12px;
+}
+.insight-manage-drawer .type-radio-two {
+  margin-top: 10px;
+}
+.insight-manage-drawer .upload-excel {
+  display: inline-block;
+  margin-left: 20px;
+}
+.insight-manage-drawer .btn-upload {
+  display: inline-block;
+  font-size: 14px;
+  padding-left: 15px;
+}
+.insight-manage-drawer .upload-name {
+  font-size: 14px;
+  padding-left: 15px;
+}
+.insight-manage-drawer .btn-upload button {
+  margin-left: 10px;
+}
+.insight-manage-drawer .btn-download {
+  margin-left: 10px;
+}
+.insight-manage-drawer .btn-download a {
+  color: #fff;
+}
+.insight-manage-drawer .el-list-enter-active,
+.insight-manage-drawer .el-list-leave-active {
+  transition: none;
+}
+.insight-manage-drawer .el-list-enter,
+.insight-manage-drawer .el-list-leave-active {
+  opacity: 0;
+}
+.insight-manage-drawer .pane-rules {
+  position: relative;
+  display: flex;
+}
+/* .pane-rules-data {
+
+} */
+.pane-rules-relation {
+  left: 0;
+  top: -8px;
+  bottom: 0;
+  position: relative;
+  margin-right: 8px;
+  margin-bottom: 20px;
+}
+.pane-rules-relation:before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  overflow: hidden;
+  background: #d0e2f5;
+}
+.pane-rules-relation span {
+  position: relative;
+  display: block;
+  top: 50%;
+  left: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-50%);
+  border-radius: 3px;
+  background: #d0e2f5;
+  color: #409eff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 25px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+.insight-manage-drawer .pane-reject {
+  border-top: 1px dashed #ccc;
+}
+.insight-manage-drawer .user-channel {
+  margin-left: 110px;
+}
+.insight-manage-drawer .indicator-channel {
+  display: inline-block;
+  margin-left: 20px;
+}
+.insight-manage-drawer .pane-reject {
+  margin-top: 20px;
+}
+.insight-manage-drawer .reject-pane-item {
+  width: 50%;
+}
   .insight-manage-drawer .reject-pane-item1 {
     width:80%
   }
