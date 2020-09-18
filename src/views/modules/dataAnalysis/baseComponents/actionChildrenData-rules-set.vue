@@ -507,6 +507,7 @@ export default {
         englishName: node.englishName,
         fieldType: node.fieldType,
         enumTypeNum: node.enumTypeNum,
+        sourceTable: ruleItem.sourceTable,
         elementId: node.elementId,
         format: node.dataStandar,
         enable: node.enable

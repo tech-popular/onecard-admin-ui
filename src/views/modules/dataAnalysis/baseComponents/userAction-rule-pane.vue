@@ -28,8 +28,8 @@ import {
   selectOperate,
   selectEventAllCata,
   selectEventIndexAllCata,
-  enumTypeList,
-  dataIndexManagerCandidate
+  enumTypeList
+  // dataIndexManagerCandidate
 } from '@/api/dataAnalysis/dataInsightManage'
 import {
   findRuleIndex,
@@ -215,14 +215,14 @@ export default {
     updateEventTypeList (arr, val, citem, index) { // 事件改变时，第三层数据需清空数据
       this.getEventIndexList(val[1], eventIndexList => {
         citem.eventIndexList = eventIndexList
+         // 来源参数改变
+        let dataEventDtos = citem.eventDownList.filter(sitem => sitem.eventId === val[0])[0].dataEventDtos
+        citem.sourceTable = dataEventDtos.filter(sitem => sitem.eventId === val[1])[0].sourceTable
         if (citem.childrenRules.length > 0) {
           citem.childrenRules = []
           this.addThirdChildrenRules(arr, citem)
         }
       })
-      // 来源参数改变
-      let dataEventDtos = citem.eventDownList.filter(sitem => sitem.eventId === val[0])[0].dataEventDtos
-      citem.sourceTable = dataEventDtos.filter(sitem => sitem.eventId === val[1])[0].sourceTable
     },
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
@@ -265,17 +265,18 @@ export default {
         }
         if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
           params.params = [{ value: [], title: '' }]
-          let res = data
-          dataIndexManagerCandidate({ // 字符串提示输入示例
-            sourceTable: obj.sourceTable,
-            fieldName: obj.englishName,
-            count: 10
-          }).then(({data}) => {
-            if (data.status * 1 === 1 && data.data.length) {
-              params.strTips = data.data
-            }
-            this.updateChildrenRulesArr(res, citem, params, index)
-          })
+          this.updateChildrenRulesArr(data, citem, params, index)
+          // let res = data
+          // dataIndexManagerCandidate({ // 字符串提示输入示例
+          //   sourceTable: obj.sourceTable,
+          //   fieldName: obj.englishName,
+          //   count: 10
+          // }).then(({data}) => {
+          //   if (data.status * 1 === 1 && data.data.length) {
+          //     params.strTips = data.data
+          //   }
+            // this.updateChildrenRulesArr(res, citem, params, index)
+          // })
         } else {
           this.updateChildrenRulesArr(data, citem, params, index)
         }
@@ -449,7 +450,7 @@ export default {
       arr.rules.splice(0, 1, rules1) // 强制更新一下数组
       this.actionRuleConfig = arr
     },
-    updateOperateChange (data, citem) { // 时间区间改变时，更新数据
+    updateOperateChange (data, citem) { // 一级 二级 时间区间改变时，更新数据
       let params = [{ value: '', title: '' }]
       if (citem.func === 'between' || citem.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
@@ -676,7 +677,7 @@ export default {
     changeChildrenRules (data) {
       data.rules.forEach(item => {
         if (item.type != 'rules_function') {
-          if(item.childrenRules != undefined) {
+          if (item.childrenRules != undefined) {
             item.rules = deepClone(item.childrenRules)
             delete item.childrenRules
           }
