@@ -173,10 +173,10 @@ export default {
         if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
           let filterArr = that.flowTypeArr.filter(item => item.key === key)
           let curFlowType = filterArr.length ? filterArr[0].flowType : ''
-          console.log(item, curFlowType)
           if (curFlowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
             node.findLinksOutOf().each(function (link) {
               if (curFlowType !== item.data.config.configItems.flowType) {
+                link.data.data = null
                 if (item.data.config.configItems.flowType === 'condition') {
                   link.data.linkText = '请输入分流条件'
                   link.data.type = 'condition'
@@ -198,7 +198,6 @@ export default {
               key: key
             })
           }
-          console.log(that.flowTypeArr)
           mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.flowName)
         }
       }
@@ -206,23 +205,18 @@ export default {
     // 分流条件弹窗关闭事件
     closeMultiBranchCondition (item) {
       if (item && item.tag == 'save') {
-        console.log(item, this.flowJson.linkDataArray)
         this.flowJson.linkDataArray.forEach(citem => {
           if (citem.from === item.data.from && citem.to === item.data.to) {
             citem.data = item.data.config
             citem.type = 'condition'
             citem.linkText = item.data.config.configItems.name // 对连线的文字赋值
-            console.log(123, citem, mySelf.myDiagram.model)
             mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
-            // mySelf.myDiagram.model.setDataProperty(citem, 'linkText', item.data.config.configItems.name)
           }
         })
-        console.log(mySelf.myDiagram.model, this.flowJson)
       }
     },
     closeMultiBranchRate (item) {
       if (item && item.tag == 'save') {
-        console.log(item)
         this.flowJson.linkDataArray.forEach(citem => {
           if (citem.from === item.data.from && citem.to === item.data.to) {
             citem.data = item.data.config
@@ -316,7 +310,6 @@ export default {
       if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // 判断连线的内容
-      console.log(linkDataArray, mySelf.myDiagram.model.toJson())
       if (that.id) { // 修改保存
         this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), {
           name: this.saveForm.name,
@@ -737,7 +730,6 @@ export default {
         let toCategory = toNodeLink.data.category
 
         fromNodeLink.findLinksOutOf().each(function (link) {
-          // console.log(fromCategory, toCategory)
           // 入参节点只能连接查询节点
           if (fromCategory === 'IN_PARAM' && toCategory !== 'DATA_QUERY') return
           // 数据转换不可直接连线到返参节点
@@ -786,7 +778,6 @@ export default {
             linkDataText.push(link.data.linkText)
           })
         } else if (fromCategory === 'MULTI_BRANCH') {
-          console.log(9999, e)
           // 从分流拉连线时，默认显示为默认值
           let filterArr = that.flowTypeArr.filter(item => item.key === fromKey)
           let curFlowType = filterArr.length ? filterArr[0].flowType : ''
@@ -944,7 +935,6 @@ export default {
       }
     },
     doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件
-      console.log(node.data)
       if (e.event.path[1].id == 'myPaletteDiv') return
       // 获取节点出来的线
       let nodeLink = mySelf.myDiagram.findNodeForKey(node.key)  // 获取节点对象

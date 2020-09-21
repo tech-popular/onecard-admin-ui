@@ -27,8 +27,8 @@
       />
       </el-form-item>
       <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
-        <el-select v-model="dataForm.func" class="itemOperateIput" @change="selectOperateChange" @visible-change="selectOperateVisible">
-          <el-option v-for="(fitem, findex) in selectOperateList" :value="fitem.code" :key="findex" :label="fitem.title"/>
+        <el-select v-model="dataForm.func" class="itemOperateIput" @change="selectOperateChange">
+          <el-option v-for="(fitem, findex) in selectOperateList" :value="fitem.code" :key="findex" :label="fitem.title" />
         </el-select>
       </el-form-item>
       <!--条件内容区-->
@@ -192,7 +192,8 @@ export default {
         }
       ],
       selectEnumsList: [], // 内容下拉选
-      dataForm: {
+      dataForm: {},
+      dataFormTemp: {
         name: '',
         'fieldType': '',
         'fieldCode': null,
@@ -243,6 +244,7 @@ export default {
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
+      this.dataForm = this.dataFormTemp
       if (link.data.data) {
         this.loading = true
         this.dataForm = link.data.data.configItems
@@ -335,7 +337,6 @@ export default {
         val = val.substring(0, val.length - 1)
       }
       val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
-      console.log(999444, val)
       return val
     },
     keyupDateNumberInput (val) { // 日期输入框，输入内容 要求 只能输入 正整数
@@ -343,7 +344,6 @@ export default {
       return val
     },
     blurDateNumberInput (val) { // 日期输入框，失去焦点时判断输入内容是否符合要求
-      console.log(this.dataForm.params[0].value, val)
       let reg = /^([0]|[1-9][0-9]*)$/
       if (!reg.test(val)) {
         val = ''
@@ -428,7 +428,6 @@ export default {
       })
     },
     selectOperateChange (val) { // 操作符改变时，数据清空，重新输入
-      console.log(123, val)
       let params = [{ value: '', title: '' }]
       if (this.dataForm.func === 'between' || this.dataForm.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
@@ -448,15 +447,9 @@ export default {
         dateDimension = 'DAYS'
       }
       this.updateRulesArr(this.dataForm, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension })
-      console.log(this.dataForm)
       if (this.dataForm.fieldType === 'date') { // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
         this.$refs['datetime'].clearValidate()
         this.$refs['datetimerange'].clearValidate()
-      }
-    },
-    selectOperateVisible (val) { // 当操作符下拉框打开时，重新下拉请求数据
-      if (val) { // 打开下拉框时
-        this.getSelectOperateList(this.dataForm.fieldType)
       }
     },
     inputTagChange (type) {
@@ -528,9 +521,8 @@ export default {
       this.updateRulesArr(this.dataForm, { params: newArr })
     },
     updateRulesArr (dataForm, obj) { // 更新数组的数据
-      Object.keys(obj).forEach(oitem => {
-        dataForm[oitem] = obj[oitem]
-      })
+      this.dataForm = { ...this.dataForm, ...obj }
+      console.log(this.dataForm, this.selectOperateList)
     },
     getSelectOperateList (type, fn) {
       selectOperate(type).then(({data}) => {
