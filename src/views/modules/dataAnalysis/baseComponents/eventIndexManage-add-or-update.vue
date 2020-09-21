@@ -1,7 +1,7 @@
 <template>
   <el-dialog title='查看' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form label-width="120px" label-position="right" v-model="dataForm" ref="dataForm">
-		 <el-form-item label="属性ID：">
+		 <el-form-item label="事件ID：">
 			 <el-input v-model="dataForm.elementId" v-bind:readonly='readonly' placeholder=""></el-input>
 		 </el-form-item>
 		 <el-form-item label="属性名称：">
