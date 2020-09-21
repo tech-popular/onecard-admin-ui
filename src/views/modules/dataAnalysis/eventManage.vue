@@ -33,7 +33,7 @@
       </el-form-item>
 		</el-form>
 		<el-table  :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column type="index" header-align="center" align="center" width="55" label="序号"></el-table-column>
+      <el-table-column prop="id" header-align="center" align="center" width="55" label="序号"></el-table-column>
       <el-table-column prop="elementId" header-align="center" align="center"  label="事件ID"></el-table-column>
       <el-table-column prop="eventBuildName" header-align="center" align="center"  label="事件显示中文名">
         <template slot-scope="scope">
