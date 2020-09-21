@@ -1,14 +1,14 @@
 <template>
   <div class="event-wrap">
 		<el-form :inline="true" :model="dataForm" ref="dataForm">
-			<el-form-item label="属性ID">
+			<el-form-item label="事件ID">
 				<el-input v-model="dataForm.id" placeholder="" clearable=""></el-input>
 			</el-form-item>
 			<el-form-item label="属性名称">
 				<el-input v-model="dataForm.englishName" placeholder="" clearable=""></el-input>
 			</el-form-item>
       <el-form-item label="属性类型">
-					<el-select v-model="dataForm.dataStandar">
+					<el-select v-model="dataForm.dataStandar" clearable>
 					<el-option v-for="(item,index) in dataStandarList" :label="item.lable" :value="item.value" :key="index">
 					</el-option>
 				</el-select>
@@ -33,7 +33,7 @@
       </el-form-item>
 		</el-form>
 		<el-table  :data="dataList" border v-loading="dataListLoading"  style="width: 100%;">
-      <el-table-column prop="elementId" header-align="center" align="center"  label="属性ID" sortable></el-table-column>
+      <el-table-column prop="elementId" header-align="center" align="center"  label="事件ID" sortable></el-table-column>
       <el-table-column prop="englishName" header-align="center" align="center"  label="属性名称">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">

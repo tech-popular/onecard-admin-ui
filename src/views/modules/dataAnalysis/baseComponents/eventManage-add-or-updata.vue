@@ -11,7 +11,7 @@
 			 <el-input v-model="dataForm.channelCode" v-bind:readonly='readonly' placeholder=""></el-input>
 		 </el-form-item>
 		 	<el-form-item label="事件类型">
-			 <el-input v-model="dataForm.eventType" v-bind:readonly='readonly' placeholder=""></el-input>
+			 <el-input v-model="dataForm.eventName" v-bind:readonly='readonly' placeholder=""></el-input>
 		 </el-form-item>
 		 	<el-form-item label="创建时间">
 	      <el-input v-model="dataForm.createTime" v-bind:readonly='readonly' placeholder=""></el-input>
