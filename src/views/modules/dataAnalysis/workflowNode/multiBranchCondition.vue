@@ -5,7 +5,7 @@
     :visible.sync="visible"
     width="950px"
     :close-on-click-modal="false">
-    <el-form :model="dataForm" ref="dataForm" :inline="true">
+    <el-form :model="dataForm" ref="dataForm" :inline="true" v-loading="loading">
       <div>
         <el-form-item label="条件名称：" prop="name" :rules="{required: true, message: '请选择', trigger: 'blur'}">
           <el-input v-model="dataForm.name" placeholder="请输入条件名称" style="width:400px"></el-input>
@@ -69,7 +69,7 @@
         <div v-if="dataForm.fieldType === 'enums'"  class="pane-rules-inline">
           <el-form-item prop="params[0].selectVal" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
             <el-select v-model="dataForm.params[0].selectVal" multiple class="itemIput" @change="selectEnumsChange" @visible-change="selectEnumsVisible">
-              <el-option v-for="(fitem, findex) in dataForm.selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
+              <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
           </el-form-item>
         </div>
@@ -124,7 +124,7 @@
           <div v-if="dataForm.func === 'relative_time_in'" class="pane-rules-inline">
             在&nbsp;过去&nbsp;
             <el-form-item prop="params[0].value" ref="paramsl" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, dataForm.params), trigger: 'blur'}">
-              <el-input v-model="dataForm.params[0].value" :maxlength="10" class="itemIput-small" @input="dataForm.params[0].value = keyupDateNumberInput(dataForm.params[0].value)" @blur="dataForm.params[0].value = pramasDateBlur(item, dataForm.params[0].value)" :min="1"></el-input>
+              <el-input v-model="dataForm.params[0].value" :maxlength="10" class="itemIput-small" @input="dataForm.params[0].value = keyupDateNumberInput(dataForm.params[0].value)" @blur="dataForm.params[0].value = pramasDateBlur(dataForm.params[0].value)" :min="1"></el-input>
             </el-form-item>
             <el-form-item prop="dateDimension">
               <el-select v-model="dataForm.dateDimension" class="subSelect1" @change="updateDateDimension">
@@ -133,7 +133,7 @@
             </el-form-item>
             到&nbsp;过去&nbsp;
             <el-form-item prop="params[1].value" ref="paramsr" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, dataForm.params), trigger: 'blur'}">
-              <el-input v-model="dataForm.params[1].value" :maxlength="10" class="itemIput-small" @input="dataForm.params[1].value = keyupDateNumberInput(dataForm.params[1].value)" @blur="dataForm.params[1].value = pramasDateBlur(item, dataForm.params[1].value)" :min="1"></el-input>
+              <el-input v-model="dataForm.params[1].value" :maxlength="10" class="itemIput-small" @input="dataForm.params[1].value = keyupDateNumberInput(dataForm.params[1].value)" @blur="dataForm.params[1].value = pramasDateBlur(dataForm.params[1].value)" :min="1"></el-input>
             </el-form-item>
             <el-form-item prop="dateDimension">
               <el-select v-model="dataForm.dateDimension" class="subSelect1" @change="updateDateDimension">
@@ -174,6 +174,7 @@ export default {
       to: '',
       visible: false,
       isRequired: true,
+      loading: false,
       indexList: [],
       selectOperateList: [],
       flowData: [
@@ -190,6 +191,7 @@ export default {
           text: '按比率分流'
         }
       ],
+      selectEnumsList: [], // 内容下拉选
       dataForm: {
         name: '',
         'fieldType': '',
@@ -201,7 +203,6 @@ export default {
         'englishName': '',
         'indexList': this.indexList, // 指标下拉选
         'enumTypeNum': '',
-        'selectEnumsList': [], // 内容下拉选
         'subFunc': '',
         'dateDimension': '',
         'strTips': [],
@@ -242,9 +243,15 @@ export default {
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
-      this.getSelectAllCata()
-      if (link.data) {
-        // this.dataForm.flowType = data.data.configItems.flowType
+      if (link.data.data) {
+        this.loading = true
+        this.dataForm = link.data.data.configItems
+        this.getSelectAllCata(() => {
+          this.getSelectOperateList(this.dataForm.fieldType)
+          this.loading = false
+        })
+      } else {
+        this.getSelectAllCata()
       }
     },
     getSelectAllCata (fn) { // 获取所有指标
@@ -299,7 +306,7 @@ export default {
       }
       return arr
     },
-    judgeDateTwoInput (value, callback, params) { // 数值时间区间判断
+    judgeDateTwoInput (rule, value, callback, params) { // 数值时间区间判断
       if (value === '') {
         callback(new Error('请输入'))
       } else if (params[0].value * 1 < params[1].value * 1) {
@@ -336,6 +343,7 @@ export default {
       return val
     },
     blurDateNumberInput (val) { // 日期输入框，失去焦点时判断输入内容是否符合要求
+      console.log(this.dataForm.params[0].value, val)
       let reg = /^([0]|[1-9][0-9]*)$/
       if (!reg.test(val)) {
         val = ''
@@ -379,7 +387,6 @@ export default {
       }
     },
     fieldCodeChange (node) { // rxs更新数据
-      console.log(node)
       let obj = node
       this.getSelectOperateList(obj.fieldType, () => {
         let params = {
@@ -421,6 +428,7 @@ export default {
       })
     },
     selectOperateChange (val) { // 操作符改变时，数据清空，重新输入
+      console.log(123, val)
       let params = [{ value: '', title: '' }]
       if (this.dataForm.func === 'between' || this.dataForm.func === 'relative_time_in') {
         params.push({ value: '', title: '' })
@@ -430,7 +438,7 @@ export default {
       let subTimeSelects = []
       let dateDimension = ''
       if (this.dataForm.func === 'relative_time') {
-        subSelects = this.dataForm.selectOperateList.filter(item => item.code === this.dataForm.func)[0].subSelects
+        subSelects = this.selectOperateList.filter(item => item.code === this.dataForm.func)[0].subSelects
         subFunc = 'relative_before'
         subTimeSelects = this.subTimeSelects
         dateDimension = 'DAYS'
@@ -440,6 +448,7 @@ export default {
         dateDimension = 'DAYS'
       }
       this.updateRulesArr(this.dataForm, { params: params, subSelects: subSelects, subFunc: subFunc, subTimeSelects: subTimeSelects, dateDimension: dateDimension })
+      console.log(this.dataForm)
       if (this.dataForm.fieldType === 'date') { // v-show 状态下， 有验证无法去除，所以手动清除一下错误提示
         this.$refs['datetime'].clearValidate()
         this.$refs['datetimerange'].clearValidate()
@@ -458,14 +467,13 @@ export default {
     },
     selectEnumsVisible (val) { // 当下拉框打开时，重新请求数据
       if (val) { // 打开下拉框时
-        let selectEnumsList = []
         enumTypeList(this.dataForm.enumTypeNum).then(res => {
           if (res.data.status !== '1') {
-            selectEnumsList = []
+            this.selectEnumsList = []
           } else {
-            selectEnumsList = res.data.data
+            this.selectEnumsList = res.data.data
           }
-          this.updateRulesArr(this.dataForm, { selectEnumsList: selectEnumsList })
+          // this.updateRulesArr(this.dataForm, { selectEnumsList: selectEnumsList })
         })
       }
     },
@@ -560,13 +568,13 @@ export default {
             configItems: this.dataForm
           }
           this.$emit('close', { tag: 'save', data: { config: config, from: this.from, to: this.to } })
-          this.$parent.toFlowNodeVisible = false
+          this.$parent.multiBranchConditionVisible = false
         }
       })
     },
     cancelHandle () {
       this.visible = false
-      this.$parent.toFlowNodeVisible = false
+      this.$parent.multiBranchConditionVisible = false
     }
   }
 }

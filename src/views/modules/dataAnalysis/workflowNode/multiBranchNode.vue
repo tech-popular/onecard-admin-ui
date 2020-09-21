@@ -28,15 +28,15 @@ export default {
       flowData: [
         {
           value: 'condition',
-          text: '按条件分流'
+          text: '条件分流'
         },
         {
           value: 'hash',
-          text: '按HASH分流'
+          text: 'HASH分流'
         },
         {
           value: 'rate',
-          text: '按比率分流'
+          text: '概率分流'
         }
       ],
       dataForm: {
@@ -60,17 +60,19 @@ export default {
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
+          let flowName = this.flowData.filter(item => item.value === this.dataForm.flowType)[0].text
           let config = {
-            configItems: this.dataForm
+            configItems: this.dataForm,
+            flowName: flowName
           }
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
-          this.$parent.toFlowNodeVisible = false
+          this.$parent.multiBranchNodeVisible = false
         }
       })
     },
     cancelHandle () {
       this.visible = false
-      this.$parent.toFlowNodeVisible = false
+      this.$parent.multiBranchNodeVisible = false
     }
   }
 }

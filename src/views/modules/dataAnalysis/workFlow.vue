@@ -14,20 +14,23 @@
     <data-query-node @close="closeAllNode" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
     <group-choice-node @close="closeAllNode" v-if="groupChoiceNodeVisible" ref="groupChoiceNodeEl"></group-choice-node>
     <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
-    <to-flow-node @close="closeAllNode" v-if="toFlowNodeVisible" ref="toFlowNodeEl"></to-flow-node>
-    <to-flow-condition @close="closeFlowCondition" v-if="toFlowConditionVisible" ref="toFlowConditionEl"></to-flow-condition>
+    <multi-branch-node @close="closeAllNode" v-if="multiBranchNodeVisible" ref="multiBranchNodeEl"></multi-branch-node>
+    <multi-branch-condition @close="closeMultiBranchCondition" v-if="multiBranchConditionVisible" ref="multiBranchConditionEl"></multi-branch-condition>
+    <multi-branch-rate @close="closeMultiBranchRate" v-if="multiBranchRateVisible" ref="multiBranchRateEl"></multi-branch-rate>
     <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
   </div>
 </template>
 <script>
-import { palette } from './dataAnalysisUtils/flowPalette' // 侧边栏模板数据
+// import { deepClone } from '@/utils'
+import { palette } from './dataAnalysisUtils/flowPalette' // 侧边栏模板数据 MULTI_BRANCH
 import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
 import groupChoiceNode from './workflowNode/groupChoiceNode'
 import inParamsNode from './workflowNode/inparamsNode'
 import dataQueryNode from './workflowNode/dataQueryNode'
 import outParamsNode from './workflowNode/outparamsNode'
-import toFlowNode from './workflowNode/toFlowNode'
-import toFlowCondition from './workflowNode/toFlowCondition'
+import multiBranchNode from './workflowNode/multiBranchNode'
+import multiBranchCondition from './workflowNode/multiBranchCondition'
+import multiBranchRate from './workflowNode/multiBranchRate'
 import saveData from './workflowNode/saveData'
 var that = null
 var mySelf = null
@@ -56,13 +59,14 @@ export default {
       channelCode: '',
       groupId: [],
       type: '', // 分群类型
-      flowType: '', // 分流类型
+      flowTypeArr: [], // 分流类型
       inparamsNodeVisible: false,
       groupChoiceNodeVisible: false,
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
-      toFlowNodeVisible: false,
-      toFlowConditionVisible: false,
+      multiBranchNodeVisible: false,
+      multiBranchConditionVisible: false,
+      multiBranchRateVisible: false,
       saveDataVisible: false,
       currentName: '',
       selectCuster: [],
@@ -82,7 +86,7 @@ export default {
       }
     }
   },
-  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, toFlowNode, toFlowCondition, saveData },
+  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, saveData },
   created () {
     that = this
   },
@@ -106,10 +110,12 @@ export default {
           return this.$message.error('JSON信息不存在')
         }
         this.type = data.data.type
+        that.flowTypeArr = data.data.configJson.flowTypeArr
         that.flowJson = data.data.configJson
         this.$nextTick(() => {
           this.diagramInit()
-          mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(data.data.configJson))
+          mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(that.flowJson))
+          this.load()
           this.loading = false
         })
         this.saveForm.name = data.data.name
@@ -139,6 +145,7 @@ export default {
       if (item && item.tag == 'save') {
         let key = item.data.key
         let node = mySelf.myDiagram.findNodeForKey(key)
+        let node1 = mySelf.myDiagram.findNodeForKey(key).part.data
         let _data = node.data
         _data.data = item.data.config
         // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
@@ -160,34 +167,70 @@ export default {
           })
         }
         if (_data.category === 'GROUP_CHOICE') { // 根据选中的分群，更新分群节点的名称
-          let node1 = mySelf.myDiagram.findNodeForKey(key).part.data
+          // let node1 = mySelf.myDiagram.findNodeForKey(key).part.data
           mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
         }
-        if (_data.category === 'TO_FLOW') { // 获取分流的类型
-          if (this.flowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
+        if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
+          let filterArr = that.flowTypeArr.filter(item => item.key === key)
+          let curFlowType = filterArr.length ? filterArr[0].flowType : ''
+          console.log(item, curFlowType)
+          if (curFlowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
             node.findLinksOutOf().each(function (link) {
-              if (that.flowType !== item.data.config.configItems.flowType) {
-                that.flowType = item.data.config.configItems.flowType
-                if (that.flowType === 'condition') {
+              if (curFlowType !== item.data.config.configItems.flowType) {
+                if (item.data.config.configItems.flowType === 'condition') {
                   link.data.linkText = '请输入分流条件'
+                  link.data.type = 'condition'
                 } else {
                   link.data.linkText = '0%'
+                  link.data.type = 'rate'
                 }
                 mySelf.myDiagram.model.updateTargetBindings(link.data)
               }
             })
+            let index = that.flowTypeArr.findIndex(item => item.key === key)
+            that.flowTypeArr.splice(index, 1, {
+              flowType: item.data.config.configItems.flowType,
+              key: key
+            })
           } else {
-            this.flowType = item.data.config.configItems.flowType
+            that.flowTypeArr.push({
+              flowType: item.data.config.configItems.flowType,
+              key: key
+            })
           }
+          console.log(that.flowTypeArr)
+          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.flowName)
         }
       }
     },
     // 分流条件弹窗关闭事件
-    closeFlowCondition (item) {
-      console.log('con')
+    closeMultiBranchCondition (item) {
       if (item && item.tag == 'save') {
-        let links = myDiagram.findLinksByExample({'from': item.from, 'to': item.to})
-        console.log(links)
+        console.log(item, this.flowJson.linkDataArray)
+        this.flowJson.linkDataArray.forEach(citem => {
+          if (citem.from === item.data.from && citem.to === item.data.to) {
+            citem.data = item.data.config
+            citem.type = 'condition'
+            citem.linkText = item.data.config.configItems.name // 对连线的文字赋值
+            console.log(123, citem, mySelf.myDiagram.model)
+            mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
+            // mySelf.myDiagram.model.setDataProperty(citem, 'linkText', item.data.config.configItems.name)
+          }
+        })
+        console.log(mySelf.myDiagram.model, this.flowJson)
+      }
+    },
+    closeMultiBranchRate (item) {
+      if (item && item.tag == 'save') {
+        console.log(item)
+        this.flowJson.linkDataArray.forEach(citem => {
+          if (citem.from === item.data.from && citem.to === item.data.to) {
+            citem.data = item.data.config
+            citem.type = 'rate'
+            citem.linkText = item.data.config.configItems.rate + '%' // 对连线的文字赋值
+            mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
+          }
+        })
       }
     },
     // 返回
@@ -209,10 +252,14 @@ export default {
     // 保存
     save () {
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
+      let linkDataArray = mySelf.myDiagram.model.linkDataArray
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
       let pChildOneArr = []
       let pNullLinkArr = []
+      let pFlowLinkArr = []
+      let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
+      let pFlowLinkRateIs100 = []
       nodeDataArray.map(item => {
         if (!item.data) {
           pNullArr.push(item.nodeName)
@@ -231,6 +278,26 @@ export default {
             if (linkNum < 2) {
               pChildOneArr.push(item.nodeName)
             }
+          } else if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
+            let linkNum = 0
+            let linkIs100 = 0
+            node.findLinksOutOf().each(function (link) {
+              linkNum++
+              if (link.data.type === 'condition' && !link.data.data) { // 按条件分流时，判断条件是否填写完成
+                pFlowlinkConditionIsFinished.push(item.nodeName)
+              }
+              if (link.data.type === 'rate') { // 判断比率是否总和为100
+                let rate = link.data.data ? link.data.data.configItems.rate : 0
+                linkIs100 += rate
+              }
+            })
+            if (linkNum < 2) { // 分流至少2个子节点
+              pFlowLinkArr.push(item.nodeName)
+            }
+            let type = item.data.configItems.flowType
+            if (type !== 'condition' && linkIs100 !== 100) {
+              pFlowLinkRateIs100.push(item.nodeName)
+            }
           } else { // 其他节点若无连线信息则报错
             let linkNum1 = 0
             node.findLinksOutOf().each(function (link) {
@@ -245,8 +312,11 @@ export default {
       if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置连线信息！`)
       if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
       if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
-      // 删除无用节点
-      // mySelf.myDiagram.model.nodeDataArray = mySelf.myDiagram.model.nodeDataArray.filter(item => item.category !== 'NO_USE')
+      if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
+      if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
+      if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
+      // 判断连线的内容
+      console.log(linkDataArray, mySelf.myDiagram.model.toJson())
       if (that.id) { // 修改保存
         this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), {
           name: this.saveForm.name,
@@ -264,7 +334,7 @@ export default {
     },
     saveFlowInfo (flowJson, saveData) {
       let params = {
-        configJson: flowJson,
+        configJson: { ...flowJson, flowTypeArr: this.flowTypeArr },
         name: saveData.name,
         code: saveData.code,
         groupId: this.groupId,
@@ -371,8 +441,9 @@ export default {
           go.TextBlock,
           {
             font: '12px Arial, sans-serif',
-            stroke: type ? 'transparent' : '#fff',
-            margin: new Margin(10, 0),
+            // stroke: type ? 'transparent' : '#fff',
+            stroke: '#fff',
+            margin: type ? new Margin(20, 0, 3, 0) : new Margin(10, 0),
             maxSize: new go.Size(120, NaN),
             wrap: go.TextBlock.WrapFit,
             editable: isEdit,
@@ -531,8 +602,9 @@ export default {
           makePort('T', go.Spot.Top, go.Spot.Top, false, true)
         )
       )
+      // MULTI_BRANCH
       mySelf.myDiagram.nodeTemplateMap.add(
-        'TO_FLOW',
+        'MULTI_BRANCH',
         $(
           go.Node,
           'Table',
@@ -553,12 +625,12 @@ export default {
                 minSize: new go.Size(40, 40)
               }
             ),
-            textBlock(false, 'noText'),
+            textBlock(false, 'flow'),
             $(
               go.Picture,
               {
-                desiredSize: new go.Size(25, 25),
-                alignment: go.Spot.Center
+                desiredSize: new go.Size(40, 16),
+                alignment: go.Spot.Top
               },
               new go.Binding('source', 'path', this.images)
             )
@@ -566,7 +638,7 @@ export default {
           {
             //  双击展示
             doubleClick: function (e, node) {
-              that.doubleClickNodeEvent(e, node, 'toFlowNodeVisible', 'toFlowNodeEl')
+              that.doubleClickNodeEvent(e, node, 'multiBranchNodeVisible', 'multiBranchNodeEl')
             }
           },
           makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
@@ -578,11 +650,58 @@ export default {
         var txn = evt.object  // a Transaction
         if (txn === null) return
         txn.changes.each(function(e) {
+          if (e.modelChange === 'linkFromKey') {
+            let newFromNode = mySelf.myDiagram.findNodeForKey(e.newValue)
+            let groupLinkDataText = []
+            let flowLinkDataText = []
+            that.flowJson.linkDataArray.forEach(citem => {
+              if (newFromNode.category === 'MULTI_BRANCH' && citem.from === e.newValue) {
+                let linkText = ''
+                let filterArr = that.flowTypeArr.filter(item => item.key === citem.from)
+                let curFlowType = filterArr.length ? filterArr[0].flowType : ''
+                if (flowLinkDataText.length < 5 && citem.to === e.object.to) {
+                  if (curFlowType === 'condition') {
+                    linkText = '请输入分流条件'
+                    citem.type = 'condition'
+                  } else {
+                    linkText = '0%'
+                    citem.type = 'rate'
+                  }
+                  citem.linkText = linkText // 对连线的文字赋值
+                  mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
+                } else {
+                  if (citem.to === e.object.to) {
+                    that.$message.error('最多可连接5个子节点')
+                    return mySelf.myDiagram.model.removeLinkData(citem)
+                  }
+                }
+                flowLinkDataText.push(citem.linkText)
+              }
+              if (newFromNode.category === 'GROUP_CHOICE' && citem.from === e.newValue) {
+                if (groupLinkDataText.length === 0) {
+                  citem.linkText = 'TRUE'
+                  mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+                } else if (groupLinkDataText.length === 1) {
+                  if (citem.to === e.object.to) { // 只更新本条线内容
+                    citem.linkText = groupLinkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
+                    mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+                  }
+                } else if (groupLinkDataText.length == 2) { // 限制最多可连接两条线
+                  if (citem.to === e.object.to) {
+                    that.$message.error('最多可连接两个子节点')
+                    return mySelf.myDiagram.model.removeLinkData(citem)
+                  }
+                }
+                groupLinkDataText.push(citem.linkText)
+              }
+            })
+          }
           if (e.modelChange === 'linkToKey') {
+            // console.log(122, e.object)
             // let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
             // let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
             // // 修改连线时，若将false连到分流上，则提示
-            // if (newToNode.category === 'TO_FLOW' && e.object.linkText === 'FALSE') {
+            // if (newToNode.category === 'MULTI_BRANCH' && e.object.linkText === 'FALSE') {
             //   mySelf.myDiagram.model.removeLinkData(e.object)
             //   return that.$message.error('分流节点只能走TRUE分支！')
             // }
@@ -627,7 +746,7 @@ export default {
             return mySelf.myDiagram.model.removeLinkData(link.data)
           }
           // 分流节点的上级只能是分群节点！或节流节点
-          if (toCategory === 'TO_FLOW' && (fromCategory !== 'GROUP_CHOICE' && fromCategory !== 'TO_FLOW')) {
+          if (toCategory === 'MULTI_BRANCH' && (fromCategory !== 'GROUP_CHOICE' && fromCategory !== 'MULTI_BRANCH')) {
             that.$message.error('连线有误，请重新连接！')
             return mySelf.myDiagram.model.removeLinkData(link.data)
           }
@@ -652,56 +771,52 @@ export default {
             : 'TRUE'
             if (linkOutData.length == 1) {
               link.data.linkText = linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-              // if (link.data.linkText === 'FALSE' && toCategory === 'TO_FLOW') { // false线上不可连线分流节点
+              // if (link.data.linkText === 'FALSE' && toCategory === 'MULTI_BRANCH') { // false线上不可连线分流节点
               //   that.$message.error('分流节点只能走TRUE分支！')
               //   return mySelf.myDiagram.model.removeLinkData(link.data)
               // }
               mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
             }
             if (linkOutData.length == 2) { // 限制最多可连接两条线
-              that.$message.error({
-                content: '最多可连接两个子节点',
-                duration: 1
-              })
+              that.$message.error('最多可连接两个子节点')
               mySelf.myDiagram.model.removeLinkData(link.data)
               return
             }
             linkOutData.push(link.data)
             linkDataText.push(link.data.linkText)
           })
-        } else if (fromCategory === 'TO_FLOW') {
+        } else if (fromCategory === 'MULTI_BRANCH') {
+          console.log(9999, e)
+          // 从分流拉连线时，默认显示为默认值
+          let filterArr = that.flowTypeArr.filter(item => item.key === fromKey)
+          let curFlowType = filterArr.length ? filterArr[0].flowType : ''
+          if (!curFlowType) {
+            that.$message.error('请先选择分流条件再连线!')
+            return mySelf.myDiagram.model.removeLinkData(e.subject.data)
+          }
+          if (curFlowType === 'condition') {
+            e.subject.data.linkText = '请输入分流条件'
+            e.subject.data.type = 'condition'
+          } else {
+            e.subject.data.linkText = '0%'
+            e.subject.data.type = 'rate'
+          }
+          mySelf.myDiagram.model.updateTargetBindings(e.subject.data)
+          // 判断拉的条数
           let linkOutData = []
-          let linkDataText = []
           fromNodeLink.findLinksOutOf().each(function (link) {
-            if (!that.flowType) {
-              that.$message.error('请先选择分流条件再连线!')
-              return mySelf.myDiagram.model.removeLinkData(link.data)
-            }
-            if (that.flowType === 'condition') {
-              link.data.linkText = '请输入分流条件'
-            } else {
-              link.data.linkText = '0%'
-            }
-            mySelf.myDiagram.model.updateTargetBindings(link.data)
             if (linkOutData.length == 5) { // 限制最多可连接5条线
-              that.$message.error({
-                content: '最多可连接5个子节点',
-                duration: 1
-              })
+              that.$message.error('最多可连接5个子节点')
               mySelf.myDiagram.model.removeLinkData(link.data)
               return
             }
             linkOutData.push(link.data)
-            linkDataText.push(link.data.linkText)
           })
         } else { // 非状态判断时，只允许有一个子节点
           let linkOutData = []
           fromNodeLink.findLinksOutOf().each(function (link) {
             if (linkOutData.length == 1) { // 限制最多可连接一条线
-              that.$message.error({
-                content: '最多可连接一个子节点',
-                duration: 1
-              })
+              that.$message.error('最多可连接一个子节点')
               mySelf.myDiagram.model.removeLinkData(link.data)
               return
             }
@@ -727,14 +842,22 @@ export default {
           mouseLeave: function (e, link) {
             link.findObject('HIGHLIGHT').stroke = 'transparent'
           },
-          click: function (e, link) {
+          doubleClick: function (e, link) {
             let fromNode = mySelf.myDiagram.findNodeForKey(link.data.from)
-            if (fromNode.category === 'TO_FLOW') {
-              that.toFlowConditionVisible = true
-              that.$nextTick(() => {
-                console.log(link)
-                that.$refs['toFlowConditionEl'].init(link)
-              })
+            if (fromNode.category === 'MULTI_BRANCH') {
+              let filterArr = that.flowTypeArr.filter(item => item.key === link.data.from)
+              let curFlowType = filterArr.length ? filterArr[0].flowType : ''
+              if (curFlowType === 'condition') {
+                that.multiBranchConditionVisible = true
+                that.$nextTick(() => {
+                  that.$refs['multiBranchConditionEl'].init(link)
+                })
+              } else {
+                that.multiBranchRateVisible = true
+                that.$nextTick(() => {
+                  that.$refs['multiBranchRateEl'].init(link, curFlowType)
+                })
+              }
             }
           },
           selectionAdorned: false
@@ -817,7 +940,7 @@ export default {
     showLinkLabel (e) { // 显示连线上的文字
       var label = e.subject.findObject('LABEL')
       if (label !== null) {
-        label.visible = e.subject.fromNode.data.category === 'GROUP_CHOICE' || e.subject.fromNode.data.category === 'TO_FLOW'// 除了状态处理显示外。其他的都不显示
+        label.visible = e.subject.fromNode.data.category === 'GROUP_CHOICE' || e.subject.fromNode.data.category === 'MULTI_BRANCH'// 除了状态处理显示外。其他的都不显示
       }
     },
     doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件

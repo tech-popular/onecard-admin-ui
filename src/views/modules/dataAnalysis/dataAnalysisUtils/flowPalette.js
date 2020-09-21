@@ -7,7 +7,7 @@ export const palette = [
   // },
   {
     key: '5',
-    category: 'TO_FLOW',
+    category: 'MULTI_BRANCH',
     path: 'flowNode.png',
     nodeName: '分流'
   },
