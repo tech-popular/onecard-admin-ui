@@ -109,7 +109,75 @@
               </span>
             </el-form-item>
           </div>
-          <el-form-item prop="outDataTable" label-width="120px" style="width:700px">
+          <!--redis-->
+          <div v-if="acquisitionTask.outDatasourceType==='REDIS'" style="marginLeft: 120px">
+            <el-form :model="redisData" :rules="dataRule" ref="redisForm" label-width="120px">
+              <el-form-item class="el-redis-item" label="redis数据格式" prop="redisName">
+                <el-select v-model="redisData.redisName" placeholder="redis数据格式" clearable @change="redisNameChange">
+                  <el-option
+                    v-for="item in redisNames"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="redisKey" prop="redisKey">
+                <el-input v-model="redisData.redisKey" placeholder="参考示例：前缀{redisKey列索引}后缀" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" :label="redisData.redisLabel + 'Value'" prop="redisValue" v-if="!!redisData.redisName && redisData.redisName !== 'redisTypeHash'">
+                <el-input v-model="redisData.redisValue" placeholder="{redisValue列索引}" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="score" v-if="redisData.redisName === 'redisTypeZSet'">
+                <el-input v-model="redisData.zSetScore" placeholder="{score列索引}" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="key拼接时间" prop="redisJoinType">
+                <el-select v-model="redisData.redisJoinType" placeholder="key拼接时间" clearable>
+                  <el-option v-for="item in redisTypes" :key="item" :label="item" :value="item"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="key失效时间" prop="redisUneffectTime">
+                <el-input
+                  v-model="redisData.redisUneffectTime"
+                  placeholder="key失效时间"
+                  clearable
+                  @input="redisData.redisUneffectTime = redisData.redisUneffectTime.replace(/[^\d]/g,'')"
+                >
+                  <el-select v-model="redisData.redisUnit" slot="append" style="width:100px">
+                    <el-option
+                      v-for="item in redisUnits"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+          <!---->
+          <!--elasticsearch-->
+          <div v-if="acquisitionTask.outDatasourceType==='ES'" style="marginLeft: 120px">
+            <el-form :model="elasticData" :rules="dataRule" ref="elasticForm" label-width="160px">
+              <el-form-item class="el-redis-item" label="type">
+                <el-input v-model="elasticData.type" placeholder="type" clearable></el-input>
+              </el-form-item>
+              <el-form-item class="el-redis-item" label="ID列" prop="idColumn">
+                <el-input v-model="elasticData.idColumn" placeholder="ID列索引下标" clearable></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+          <!---->
+          <!--mc-->
+          <div v-if="acquisitionTask.outDatasourceType==='MAXCOMPUTE'" style="marginLeft: 120px">
+            <el-form :model="mcData" :rules="dataRule" ref="mcForm" label-width="160px">
+              <el-form-item class="el-redis-item" label="分区列">
+                <el-input v-model="mcData.mcColumn" placeholder="分区列, 若是分区表则必填" clearable></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+          <!---->
+          <el-form-item prop="outDataTable" label="输入数据表/topic名称" v-if="acquisitionTask.outDatasourceType!='REDIS'" label-width="160px" :style="{marginLeft: acquisitionTask.outDatasourceType==='ES' || acquisitionTask.outDatasourceType==='MAXCOMPUTE' ? '120px' : ''}">
             <el-input v-model="acquisitionTask.outDataTable" placeholder="输入数据表/topic名称" />
           </el-form-item>
           <el-form-item prop="outBeforeSql" label="目标库前置处理SQL：" label-width="120px" ref="workBeginSqlForm2">
@@ -137,6 +205,12 @@
                 style="padding-bottom: 0px"
               ></codemirror>
             </div>
+          </el-form-item>
+          <el-form-item prop="estimatedDataVolume" label="并行度" label-width="120px">
+            <el-select v-model="acquisitionTask.estimatedDataVolume">
+              <el-option v-for="item in estimatedDataVolumeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+            （请依据预估数据量选择）
           </el-form-item>
           <!-- <div class="work-type-pane">
             <el-form-item label="下发类型：" prop="addDataRule" label-width="120px">
@@ -227,6 +301,7 @@ export default {
         inDatasourceType: '',
         inDatasourceId: '',
         inAccountId: '',
+        estimatedDataVolume: 'SMALL',
         inDataSql: '',
         sqlField: [], // 输入sql所对应的字段
         outDatasourceType: '',
@@ -238,6 +313,42 @@ export default {
         addDataRule: 'all', // 采集规则（ALL-全量，ADD-增量）
         addRuleFields: ''
       },
+      redisData: {
+        redisName: '',
+        redisKey: '',
+        redisLabel: '',
+        redisValue: '',
+        zSetScore: '',
+        redisJoinType: '',
+        redisUneffectTime: '',
+        redisUnit: '1'
+      },
+      outTableName: '',
+      elasticData: {
+        type: '',
+        idColumn: ''
+      },
+      mcData: {
+        mcColumn: ''
+      },
+      estimatedDataVolumeList: [
+        {
+          name: '0-50w',
+          id: 'SMALL'
+        },
+        {
+          name: '50w-500w',
+          id: 'MIDDLE'
+        },
+        {
+          name: '500w-2000w',
+          id: 'LARGE'
+        },
+        {
+          name: '2000w以上',
+          id: 'HUGE'
+        }
+      ],
       dataRule: {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
@@ -253,6 +364,9 @@ export default {
         ],
         inAccountId: [
           { required: true, message: '请选择帐户', trigger: 'change' }
+        ],
+        estimatedDataVolume: [
+          { required: true, message: '请选择预估数据量', trigger: 'change' }
         ],
         inDataSql: [
           { required: true, message: '请输入作业开始前SQL', trigger: 'change' }
@@ -289,6 +403,25 @@ export default {
         ],
         failRepeatTrigger: [
           {required: true, message: '请输入重跑次数', trigger: 'change'}
+        ],
+        //
+        redisName: [
+          { required: true, message: '请选择redis数据格式', trigger: 'change' }
+        ],
+        redisKey: [
+          { required: true, message: '请输入redisKey', trigger: 'blur' }
+        ],
+        redisValue: [
+          { required: true, message: '请输入', trigger: 'blur' }
+        ],
+        redisJoinType: [
+          {required: true, message: '请选择key拼接时间', trigger: 'change'}
+        ],
+        redisUneffectTime: [
+          {required: true, message: '请输入key失效时间', trigger: 'blur'}
+        ],
+        idColumn: [
+          {required: true, message: '请输入ID列', trigger: 'blur'}
         ]
       },
       allSystemList: [],
@@ -330,7 +463,56 @@ export default {
           showToken: true
         },
         styleSelectedText: true
-      }
+      },
+      redisNames: [
+        {
+          value: 'redisTypeString',
+          label: 'string'
+        },
+        {
+          value: 'redisTypeList',
+          label: 'list'
+        },
+        {
+          value: 'redisTypeSet',
+          label: 'set'
+        },
+        {
+          value: 'redisTypeZSet',
+          label: 'zSet'
+        },
+        {
+          value: 'redisTypeHash',
+          label: 'hash'
+        }
+      ],
+      redisTypes: [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyyMMdd',
+        'yyyy-MM-dd',
+        'yyyy_MM_dd',
+        'yyyy',
+        'MM',
+        'dd'
+      ],
+      redisUnits: [
+        {
+          value: '1',
+          label: '秒'
+        },
+        {
+          value: '2',
+          label: '分钟'
+        },
+        {
+          value: '3',
+          label: '小时'
+        },
+        {
+          value: '4',
+          label: '天'
+        }
+      ]
     }
   },
   computed: {
@@ -338,10 +520,84 @@ export default {
       return this.$refs.previewSql.codemirror
     }
   },
+  watch: {
+    redisData: {
+      handler (newVal, oldVal) {
+        let unitCount = {
+          '1': 1,
+          '2': 60,
+          '3': 60 * 60,
+          '4': 60 * 60 * 24
+        }
+        let time = 0
+        for (let key in unitCount) {
+          if (newVal.redisUnit == key) {
+            time = newVal.redisUneffectTime ? Number(newVal.redisUneffectTime) * unitCount[key] : ''
+          }
+        }
+        let outTableName =
+          newVal.redisName +
+          '#' +
+          (newVal.redisKey ? newVal.redisKey : ' ') +
+          '#' +
+          (newVal.redisJoinType ? newVal.redisJoinType : ' ') +
+          '#' +
+          (time || ' ') +
+          '#' +
+          newVal.redisValue +
+          '#' +
+          (newVal.zSetScore ? newVal.zSetScore : ' ') +
+          '#'
+        this.outTableName = outTableName
+      },
+      immediate: true,
+      deep: true
+    },
+    elasticData: {
+      handler (newVal, oldVal) {
+        let outTableName =
+          (newVal.type ? newVal.type : ' ') +
+          '#' +
+          newVal.idColumn +
+          '#'
+        this.outTableName = outTableName
+      },
+      immediate: true,
+      deep: true
+    },
+    mcData: {
+      handler (newVal, oldVal) {
+        let outTableName =
+          (newVal.mcColumn ? newVal.mcColumn : ' ') +
+          '#'
+        this.outTableName = outTableName
+      },
+      immediate: true,
+      deep: true
+    }
+  },
   methods: {
     init (id) {
       this.id = id ? id.id : ''
       this.dataForm = deepClone(this.tempDataForm)
+      this.acquisitionTask.outDataTable = ''
+      this.redisData = {
+        redisName: '',
+        redisKey: '',
+        redisLabel: '',
+        redisValue: '',
+        zSetScore: '',
+        redisJoinType: '',
+        redisUneffectTime: '',
+        redisUnit: '1'
+      }
+      this.elasticData = {
+        type: '',
+        idColumn: ''
+      }
+      this.mcData = {
+        mcColumn: ''
+      }
       this.getAllSystem()
       this.getAllDatasource('ACQUISITION', 'IN')
       this.getAllDatasource('ACQUISITION', 'OUT')
@@ -377,6 +633,35 @@ export default {
         this.dataForm.taskDescribe = data.data.taskDescribe
         this.dataForm.taskDisable = data.data.taskDisable
         this.dataForm.requestedUser = data.data.requestedUser
+        this.acquisitionTask = data.data.acquisitionTask
+        if (this.acquisitionTask.outDataTable.indexOf('#') > 0) {
+          let arr = this.acquisitionTask.outDataTable.split('#')
+          if (this.acquisitionTask.outDatasourceType === 'REDIS') {
+            let label = this.redisNames.filter(item => item.value === arr[0])[0].label
+            this.redisData = {
+              redisName: arr[0],
+              redisKey: arr[1],
+              redisJoinType: arr[2] || '',
+              redisUneffectTime: arr[3] || '',
+              redisLabel: label,
+              redisValue: arr[4],
+              zSetScore: arr[5] || '',
+              redisUnit: '1'
+            }
+          } else if (this.acquisitionTask.outDatasourceType === 'ES') {
+            this.elasticData = {
+              type: arr[1],
+              idColumn: arr[2]
+            }
+            this.acquisitionTask.outDataTable = arr[0]
+          } else {
+            console.log(arr, arr[1])
+            this.mcData = {
+              mcColumn: arr[1]
+            }
+            this.acquisitionTask.outDataTable = arr[0]
+          }
+        }
         // 是否重跑判断
         if (data.data.failRepeatTrigger !== 0) {
           this.dataForm.isRunAgain = 0
@@ -385,7 +670,6 @@ export default {
           this.dataForm.isRunAgain = 1
           this.dataForm.failRepeatTrigger = 3
         }
-        this.acquisitionTask = data.data.acquisitionTask
         this.acquisitionTask.sqlField = this.acquisitionTask.sqlField.split(',')
         let filterInArr = this.getAllinDatasourceList.filter(item => item.name === this.acquisitionTask.inDatasourceType)[0]
         let filterOutArr = this.getAlloutDatasourceList.filter(item => item.name === this.acquisitionTask.outDatasourceType)[0]
@@ -423,6 +707,7 @@ export default {
         this.formDs = filterArr.alias
       } else {
         this.toDs = filterArr.alias
+        this.acquisitionTask.outDataTable = ''
       }
     },
     dataSourceNameChange (type, val) {
@@ -435,6 +720,10 @@ export default {
       }).then(({data}) => {
         this[`all${type}AccountList`] = data.data
       })
+    },
+    redisNameChange (val, index) {
+      let label = this.redisNames.filter(item => item.value === val)[0].label
+      this.redisData.redisLabel = label
     },
     sqlParseClick () {
       if (!this.acquisitionTask.inDatasourceType) {
@@ -512,6 +801,20 @@ export default {
           flag = false
         }
       })
+      if (this.$refs['redisForm']) {
+        this.$refs['redisForm'].validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+      }
+      if (this.$refs['elasticForm']) {
+        this.$refs['elasticForm'].validate((valid) => {
+          if (!valid) {
+            flag = false
+          }
+        })
+      }
       if (flag) {
         console.log(this.dataForm, this.acquisitionTask)
         let url = save
@@ -523,6 +826,13 @@ export default {
           taskName: `${this.formDs}_to_${this.toDs}_${this.dataForm.taskName}`,
           taskType: 'ACQUISITION',
           acquisitionTask: { ...this.acquisitionTask, sqlField: this.acquisitionTask.sqlField.join(',') }
+        }
+        console.log(222, this.outTableName.trim(), this.outTableName.length)
+        if (this.outTableName.trim().length > 1 && this.acquisitionTask.outDatasourceType !== 'REDIS') {
+          params.acquisitionTask.outDataTable = params.acquisitionTask.outDataTable + '#' + this.outTableName
+        }
+        if (this.outTableName.trim().length > 1 && this.acquisitionTask.outDatasourceType === 'REDIS') {
+          params.acquisitionTask.outDataTable = this.outTableName
         }
         if (params.isRunAgain === 0) {
           params.failRepeatTrigger = params.failRepeatTrigger

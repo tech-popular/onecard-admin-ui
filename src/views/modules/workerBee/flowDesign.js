@@ -1,5 +1,6 @@
-import go from 'gojs'
+// import go from 'gojs'
 import { Message, MessageBox } from 'element-ui'
+var go = window.go
 function FlowDesigner (
   diagramDiv,
   params,
