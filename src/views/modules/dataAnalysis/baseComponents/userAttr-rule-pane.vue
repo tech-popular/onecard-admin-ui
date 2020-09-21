@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-left:15px">
+  <div style="margin-left:15px; border: 1px dashed #ccc; padding: 10px;">
     <el-form :inline="true" label-position="left">
       <el-form-item label="用户属性与用户交易满足："  label-width="180px">
         <el-input v-model="expression" disabled style="width: 800px" />
@@ -490,7 +490,9 @@ export default {
     getRuleForm () { // 获取所有的$refs.ruleForm,用于统一校验数据
       let ruleSet = this.$refs.rulesSet
       let ruleArr = []
-      ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
+      if (ruleSet) {
+        ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
+      }
       ruleSet.$children.forEach(item => {
         if (item.$refs.ruleForm) {
           ruleArr = [...ruleArr, ...item.$refs.ruleForm]

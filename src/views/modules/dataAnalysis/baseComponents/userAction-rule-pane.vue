@@ -80,6 +80,17 @@ export default {
       ]
     }
   },
+  watch: {
+    'actionRuleConfig.rules': {
+      handler (newVal, oldVal) {
+        if (newVal.length > 0) {
+          this.$emit('isShowRelation', true)
+        } else {
+          this.$emit('isShowRelation', false)
+        }
+      }
+    }
+  },
   methods: {
     init () {
       this.getEventSelectAllCata(this.channelId)
@@ -691,18 +702,9 @@ export default {
       })
       return data
     },
-    ruleValidate () {
-      if (!this.actionRuleConfig.rules.length) {
-        return this.$message({
-          message: '请配置用户行为规则信息',
-          type: 'error',
-          center: true
-        })
-      }
-    },
     uneffectIndexValidate () { // 无效指标提示
       this.lastSubmitRuleConfig = { // 过滤数据
-        actionRuleConfig: this.updateRulesConfig(deepClone(this.actionRuleConfig)),
+        actionRuleConfig: this.actionRuleConfig.rules.length > 0 ? this.updateRulesConfig(deepClone(this.actionRuleConfig)) : {},
         actionExpression: this.actionExpression,
         actionExpressionTemplate: this.actionExpressionTemplate
       }
@@ -720,7 +722,10 @@ export default {
 </script>
 <style>
 .action-rule-pane {
-  margin-left: 15px
+  margin-left: 15px;
+  margin-top: 20px;
+  border: 1px dashed #ccc;
+  padding: 10px;
 }
 .action-rule-pane .el-form-item__label {
   padding-right: 0;
