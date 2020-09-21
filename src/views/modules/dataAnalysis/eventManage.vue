@@ -29,7 +29,7 @@
 			<el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button type="success" @click="manualSync()">手动同步</el-button>
+        <!-- <el-button type="success" @click="manualSync()">手动同步</el-button> -->
       </el-form-item>
 		</el-form>
 		<el-table  :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
