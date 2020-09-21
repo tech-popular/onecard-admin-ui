@@ -85,7 +85,8 @@ export default {
         }
       })
     },
-    channelIdChangeUpdate () {
+    channelIdChangeUpdate (channelId) {
+      this.channelId = channelId
       this.getSelectAllCata((indexList) => {
         if (indexList.length === 0) {
           this.setInitRulesConfig(this.indexList)

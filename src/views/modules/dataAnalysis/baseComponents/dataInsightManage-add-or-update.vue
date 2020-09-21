@@ -452,8 +452,8 @@ export default {
           }
         })
       }
-      this.$refs.userAttrRule.channelIdChangeUpdate()
-      this.$refs.userActionRule.channelIdChangeUpdate()
+      this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
+      this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId)
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
