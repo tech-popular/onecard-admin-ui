@@ -38,7 +38,7 @@
                 :disabled="!!id"
               >指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
-                用户所属渠道
+                <el-form-item label="用户所属渠道" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
                 <el-select
                   v-model="baseForm.channelId"
                   @change="channelIdChange"
@@ -55,6 +55,7 @@
                     ></el-option>
                   </template>
                 </el-select>
+                </el-form-item>
               </div>
             </div>
             <div class="type-radio-item type-radio-two">
@@ -273,7 +274,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: ['2001'],
+        channelId: '',
         desc: ''
       },
       rejectForm: {
@@ -344,7 +345,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: '2001',
+        channelId: '',
         desc: ''
       }
       this.$nextTick(() => {
@@ -388,8 +389,6 @@ export default {
             return
           }
           this.baseForm.channelId = data.data.channelId
-            .split(',')
-            .filter(item => item != '')
           if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
@@ -733,7 +732,6 @@ export default {
             outMostExpressionTemplate: this.outMostExpressionTemplate,
             rejectGroupPackCode: code
           }
-          params.channelId = params.channelId.join(',')
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {

@@ -304,11 +304,11 @@ export default {
       subSelects: [
         {
           code: 'relative_before',
-          title: '之内'
+          title: '之前'
         },
         {
-          code: 'relative_after',
-          title: '之外'
+          code: 'relative_within',
+          title: '之内'
         }
       ]
     }
