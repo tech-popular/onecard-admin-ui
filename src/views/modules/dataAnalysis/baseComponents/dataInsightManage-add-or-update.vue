@@ -43,7 +43,6 @@
                   v-model="baseForm.channelId"
                   @change="channelIdChange"
                   filterable
-                  multiple
                   :disabled="!!id"
                   style="width: 400px"
                 >
@@ -345,7 +344,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: ['2001'],
+        channelId: '2001',
         desc: ''
       }
       this.$nextTick(() => {
