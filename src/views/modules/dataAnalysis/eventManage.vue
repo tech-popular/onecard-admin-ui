@@ -44,7 +44,7 @@
         </template>
 			</el-table-column>
       <el-table-column prop="channelCode" header-align="center" align="center" label="所属渠道"></el-table-column>
-      <el-table-column prop="eventType" header-align="center" align="center" label="事件类型"></el-table-column>
+      <el-table-column prop="eventName" header-align="center" align="center" label="事件类型"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" width="154"  label="创建时间"></el-table-column>
       <el-table-column prop="enable" header-align="center" align="center" label="事件状态">
         <template slot-scope="scope">
