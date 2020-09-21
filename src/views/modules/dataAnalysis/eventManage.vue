@@ -29,7 +29,7 @@
 			<el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button type="success" @click="manualSync()">手动同步</el-button>
+        <!-- <el-button type="success" @click="manualSync()">手动同步</el-button> -->
       </el-form-item>
 		</el-form>
 		<el-table  :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -44,7 +44,7 @@
         </template>
 			</el-table-column>
       <el-table-column prop="channelCode" header-align="center" align="center" label="所属渠道"></el-table-column>
-      <el-table-column prop="eventType" header-align="center" align="center" label="事件类型"></el-table-column>
+      <el-table-column prop="eventName" header-align="center" align="center" label="事件类型"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" width="154"  label="创建时间"></el-table-column>
       <el-table-column prop="enable" header-align="center" align="center" label="事件状态">
         <template slot-scope="scope">
