@@ -37,6 +37,7 @@ export default {
       channelList: [],
       custerList: [],
       curCusterType: '',
+      custerArr: [],
       dataForm: {
         channelCode: '',
         groupId: []
@@ -113,13 +114,14 @@ export default {
         let obj = this.custerList.filter(citem => citem.value === item)[0]
         arr.push(obj)
       })
-      this.$emit('getSelectCuster', arr, this.dataForm)
+      this.custerArr = arr
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
           let config = {
-            configItems: this.dataForm
+            configItems: this.dataForm,
+            custerArr: this.custerArr
           }
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key }, type: this.curCusterType })
           this.$parent.dataQueryNodeVisible = false

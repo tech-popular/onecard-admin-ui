@@ -27,6 +27,7 @@ export default {
       visible: false,
       channelList: [],
       custerList: [],
+      curName: '',
       dataForm: {
         groupId: ''
       },
@@ -42,20 +43,19 @@ export default {
       this.visible = true
       this.key = data.key
       this.custerList = this.$parent.selectCuster
-      console.log(this.custerList)
       if (data.data) {
         this.dataForm.groupId = data.data.configItems.groupId
       }
     },
     groupIdChange (val) {
-      let name = this.custerList.filter(item => item.value === val)[0].text
-      this.$emit('setCusterName', name, this.key)
+      this.curName = this.custerList.filter(item => item.value === val)[0].text
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
           let config = {
-            configItems: this.dataForm
+            configItems: this.dataForm,
+            curName: this.curName
           }
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
           this.$parent.groupChoiceNodeVisible = false
