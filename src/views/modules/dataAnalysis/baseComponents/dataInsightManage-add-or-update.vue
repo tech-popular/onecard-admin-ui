@@ -43,7 +43,6 @@
                   v-model="baseForm.channelId"
                   @change="channelIdChange"
                   filterable
-                  multiple
                   :disabled="!!id"
                   style="width: 400px"
                 >
@@ -130,12 +129,12 @@
       </div>
       <div v-if="baseForm.userType !== 'excel'" class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
       <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
-          <div class="pane-rules-relation">
+          <div class="pane-rules-relation" v-if="showRelation">
              <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
           </div>
            <div style="flex: 1">
                <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd"></user-attr-rule-pane>
-               <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd"></user-action-rule-pane>
+               <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowRelation="isShowRelation"></user-action-rule-pane>
            </div>
       </div>
       <div class="pane-reject">
@@ -253,6 +252,7 @@ export default {
     return {
       isPreviewShow: true,
       loading: false,
+      showRelation: false,
       id: 0,
       flowId: '',
       tag: '',
@@ -265,7 +265,7 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
-      outMostExpressionTemplate: 'and', // 用户属性与用户行为外层关系
+      outMostExpressionTemplate: '', // 用户属性与用户行为外层关系
       collisionData: [],
       collisionList: [],
       // allCusterNameList: [],
@@ -344,7 +344,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: ['2001'],
+        channelId: '2001',
         desc: ''
       }
       this.$nextTick(() => {
@@ -412,6 +412,14 @@ export default {
     renderEnd () {
       this.loading = false
     },
+    isShowRelation (val) {
+      if (val) {
+        this.outMostExpressionTemplate = 'and'
+      } else {
+        this.outMostExpressionTemplate = ''
+      }
+      this.showRelation = val
+    },
     getChannelsList () {
       channelsList().then(res => {
         if (res.data.status * 1 !== 1) {
@@ -452,8 +460,8 @@ export default {
           }
         })
       }
-      this.$refs.userAttrRule.channelIdChangeUpdate()
-      this.$refs.userActionRule.channelIdChangeUpdate()
+      this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
+      this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId)
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -675,7 +683,6 @@ export default {
       }
       // 用户属性 用户行为 数据校验
       this.$refs.userAttrRule.ruleValidate()
-      this.$refs.userActionRule.ruleValidate()
       this.$refs.userAttrRule.isRequired = true
       this.$refs.userActionRule.isRequired = true
       let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
@@ -707,7 +714,7 @@ export default {
             }
           })
         })
-        if (!flag || actionRuleFormArr.length === 0) {
+        if (!flag || ruleFormArr.length === 0) {
           this.$refs.userAttrRule.isRequired = false
           this.$refs.userActionRule.isRequired = false
         } else {

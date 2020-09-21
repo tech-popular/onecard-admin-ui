@@ -2,10 +2,10 @@
   <div class="action-rule-pane">
     <el-form :inline="true" label-position="left">
       <el-form-item label="用户行为满足：">
-        <!-- <el-tooltip placement="top"> -->
-          <!-- <div slot="content" v-html="内容说明"  class="tips-content"></div> -->
+        <el-tooltip placement="top"> 
+          <div slot="content" class="tips-content">用户行为筛选范围为注册用户</div>
           <i class="el-icon-info cursor-pointer" style="color:#409eff; margin-right:60px;"></i>
-        <!-- </el-tooltip> -->
+        </el-tooltip> 
         <el-input v-model="actionExpression" disabled style="width: 800px" />
       </el-form-item>
       <el-form-item style="float:right">
@@ -80,9 +80,20 @@ export default {
       ]
     }
   },
+  watch: {
+    'actionRuleConfig.rules': {
+      handler (newVal, oldVal) {
+        if (newVal.length > 0) {
+          this.$emit('isShowRelation', true)
+        } else {
+          this.$emit('isShowRelation', false)
+        }
+      }
+    }
+  },
   methods: {
     init () {
-      this.getEventSelectAllCata()
+      this.getEventSelectAllCata(this.channelId)
       this.getCountSelectOperateList()
       this.actionRuleConfig = {
         // 规则数据
@@ -95,9 +106,9 @@ export default {
       this.actionExpressionTemplate = ''
       this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
     },
-    getEventSelectAllCata (fn) { // 获取事件列表
+    getEventSelectAllCata (channelId, fn) { // 获取事件列表
       selectEventAllCata({
-        channelCode: this.channelId
+        channelCode: channelId = channelId.length > 0 ? channelId : ''
       }).then(({data}) => {
         if (data.status !== '1') {
           this.eventDownList = []
@@ -152,11 +163,11 @@ export default {
     },
     renderData (data, channelId) {
       let configJson = JSON.parse(data)
-      this.channelId = configJson.channelId
+      this.channelId = channelId
       this.actionRuleConfig = this.changeRules(configJson.actionRuleConfig)
       this.actionExpression = configJson.actionExpression
       this.actionExpressionTemplate = configJson.actionExpressionTemplate
-      this.getEventSelectAllCata((eventDownList) => {
+      this.getEventSelectAllCata(channelId, (eventDownList) => {
         this.getSelectOperateList('number', countSelectOperateList => {
           this.countSelectOperateList = countSelectOperateList
           this.actionRuleConfig = this.updateInitActionRulesConfig(this.actionRuleConfig, eventDownList, countSelectOperateList)
@@ -204,9 +215,10 @@ export default {
       })
       return data
     },
-    channelIdChangeUpdate () {
+    channelIdChangeUpdate (channelId) {
+      this.channelId = channelId
       // 用户所属渠道改变时，清空数据，初始
-      this.getEventSelectAllCata(eventDownList => {
+      this.getEventSelectAllCata(channelId, (eventDownList) => {
         this.eventDownList = eventDownList
         if (this.actionRuleConfig.rules.length) {
           this.actionRuleConfig.rules = []
@@ -690,18 +702,9 @@ export default {
       })
       return data
     },
-    ruleValidate () {
-      if (!this.actionRuleConfig.rules.length) {
-        return this.$message({
-          message: '请配置用户行为规则信息',
-          type: 'error',
-          center: true
-        })
-      }
-    },
     uneffectIndexValidate () { // 无效指标提示
       this.lastSubmitRuleConfig = { // 过滤数据
-        actionRuleConfig: this.updateRulesConfig(deepClone(this.actionRuleConfig)),
+        actionRuleConfig: this.actionRuleConfig.rules.length > 0 ? this.updateRulesConfig(deepClone(this.actionRuleConfig)) : {},
         actionExpression: this.actionExpression,
         actionExpressionTemplate: this.actionExpressionTemplate
       }
@@ -719,7 +722,10 @@ export default {
 </script>
 <style>
 .action-rule-pane {
-  margin-left: 15px
+  margin-left: 15px;
+  margin-top: 20px;
+  border: 1px dashed #ccc;
+  padding: 10px;
 }
 .action-rule-pane .el-form-item__label {
   padding-right: 0;
