@@ -1,5 +1,4 @@
-import { httpPost } from '@/api'
-import {httpGet} from "../index";
+import { httpPost, httpGet } from '@/api'
 let base = '/'
 // 策略模块
 export const beeTaskList = (params, flag) => httpPost(base + 'dimension/selectDimensionList', params, flag) // 初始化列表
