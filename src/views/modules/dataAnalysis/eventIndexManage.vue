@@ -2,7 +2,7 @@
   <div class="event-wrap">
 		<el-form :inline="true" :model="dataForm" ref="dataForm">
 			<el-form-item label="事件ID">
-				<el-input v-model="dataForm.id" placeholder="" clearable=""></el-input>
+				<el-input v-model="dataForm.elementId" placeholder="" clearable=""></el-input>
 			</el-form-item>
 			<el-form-item label="属性名称">
 				<el-input v-model="dataForm.englishName" placeholder="" clearable=""></el-input>
@@ -76,7 +76,7 @@ export default {
   data () {
     return {
       dataForm: {
-        id: '',
+        elementId: '',
         englishName: '',
         dataStandar: '',
         fieldType: '',
