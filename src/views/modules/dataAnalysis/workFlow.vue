@@ -246,7 +246,6 @@ export default {
     // 保存
     save () {
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
-      let linkDataArray = mySelf.myDiagram.model.linkDataArray
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
       let pChildOneArr = []
