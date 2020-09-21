@@ -332,11 +332,11 @@ export default {
         'eventIndexList': [], // 事件属性列表
         'eventList': [], // 事件
         'totalCountParams': {
-          func: '',
+          func: 'ge',
           selectOperateList: this.countSelectOperateList,
           params: [
             {
-              value: '',
+              value: '1',
               title: ''
             }
           ]
