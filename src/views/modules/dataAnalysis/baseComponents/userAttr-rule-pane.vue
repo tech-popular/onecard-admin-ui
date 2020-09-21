@@ -493,7 +493,7 @@ export default {
       if (ruleSet) {
         ruleArr = ruleSet.$refs.ruleForm || [] // 如果只有一个两极的内容，则默认会为空
       }
-      ruleSet.$children.forEach(item => {
+      ruleSet && ruleSet.$children.forEach(item => {
         if (item.$refs.ruleForm) {
           ruleArr = [...ruleArr, ...item.$refs.ruleForm]
         }
