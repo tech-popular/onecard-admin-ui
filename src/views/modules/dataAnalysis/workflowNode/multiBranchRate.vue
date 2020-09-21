@@ -7,10 +7,7 @@
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :rules="dataRules">
       <el-form-item prop="rate" label="所占比率">
-        <!-- <el-select v-model="dataForm.rate" placeholder="请选择所占比率" style="width: 300px">
-          <el-option v-for="item in flowData" :key="item" :value="item" :label="item + '%'"></el-option>
-        </el-select> -->
-        <el-input-number placeholder="请选择所占比率" :min="0" :max="100" v-model="dataForm.rate" style="width: 200px">
+        <el-input-number placeholder="请选择所占比率" :min="0" :max="100" :step="1" v-model="dataForm.rate" style="width: 200px" @blur="rateBlur">
         </el-input-number>&nbsp;%
       </el-form-item>
     </el-form>
@@ -46,6 +43,12 @@ export default {
       this.title = type === 'hash' ? '按HASH分流' : '按百分比分流'
       if (link.data.data) {
         this.dataForm = link.data.data.configItems
+      }
+    },
+    rateBlur () { // 不要小数点，取整数显示
+      let rate = this.dataForm.rate + ''
+      if (rate.indexOf('.') > -1) {
+        this.dataForm.rate = rate.split('.')[0]
       }
     },
     saveHandle () {
