@@ -206,11 +206,14 @@ export default {
     },
     channelIdChangeUpdate () {
       // 用户所属渠道改变时，清空数据，初始
-      if (this.actionRuleConfig.rules.length) {
-        this.actionRuleConfig.rules = []
-        this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
-      }
-      this.updateConditionId(this.actionRuleConfig)
+      this.getEventSelectAllCata(eventDownList => {
+        this.eventDownList = eventDownList
+        if (this.actionRuleConfig.rules.length) {
+          this.actionRuleConfig.rules = []
+          this.actionRuleConfig.rules.push(this.getRuleTemplateItem())
+        }
+        this.updateConditionId(this.actionRuleConfig)
+      })
     },
     updateEventTypeList (arr, val, citem, index) { // 事件改变时，第三层数据需清空数据
       this.getEventIndexList(val[1], eventIndexList => {
