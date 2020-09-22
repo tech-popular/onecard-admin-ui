@@ -84,9 +84,9 @@ export default {
     'actionRuleConfig.rules': {
       handler (newVal, oldVal) {
         if (newVal.length > 0) {
-          this.$emit('isShowRelation', true)
+          this.$emit('isShowActionRule', true)
         } else {
-          this.$emit('isShowRelation', false)
+          this.$emit('isShowActionRule', false)
         }
       }
     }

@@ -130,12 +130,12 @@
       </div>
       <div v-if="baseForm.userType !== 'excel'" class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
       <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
-          <div class="pane-rules-relation" v-if="showRelation">
+          <div class="pane-rules-relation" v-if="showActionRule && showAtterRule">
              <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
           </div>
            <div style="flex: 1">
-               <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd"></user-attr-rule-pane>
-               <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowRelation="isShowRelation"></user-action-rule-pane>
+               <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd" @isShowAttrRule="isShowAttrRule"></user-attr-rule-pane>
+               <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowActionRule="isShowActionRule"></user-action-rule-pane>
            </div>
       </div>
       <div class="pane-reject">
@@ -253,7 +253,8 @@ export default {
     return {
       isPreviewShow: true,
       loading: false,
-      showRelation: false,
+      showActionRule: false,
+      showAtterRule: false,
       id: 0,
       flowId: '',
       tag: '',
@@ -266,7 +267,7 @@ export default {
       templateUrl: templateDownload,
       vestPackList: [],
       custerNameList: [],
-      outMostExpressionTemplate: '', // 用户属性与用户行为外层关系
+      outMostExpressionTemplate: 'and', // 用户属性与用户行为外层关系
       collisionData: [],
       collisionList: [],
       // allCusterNameList: [],
@@ -366,7 +367,7 @@ export default {
           })
         } else {
           this.flowId = data.data.flowId
-          this.outMostExpressionTemplate = JSON.parse(data.data.configJson).outMostExpressionTemplate
+          this.outMostExpressionTemplate = JSON.parse(data.data.configJson).outMostExpressionTemplate ? JSON.parse(data.data.configJson).outMostExpressionTemplate : 'and'
           this.baseForm = {
             name: data.data.name,
             desc: data.data.desc,
@@ -411,13 +412,21 @@ export default {
     renderEnd () {
       this.loading = false
     },
-    isShowRelation (val) {
+    isShowActionRule (val) {
       if (val) {
-        this.outMostExpressionTemplate = 'and'
+        this.outMostExpressionTemplate = this.outMostExpressionTemplate
       } else {
-        this.outMostExpressionTemplate = ''
+        this.outMostExpressionTemplate = this.outMostExpressionTemplate
       }
-      this.showRelation = val
+      this.showActionRule = val
+    },
+    isShowAttrRule (val) {
+      if (val) {
+        this.outMostExpressionTemplate = this.outMostExpressionTemplate
+      } else {
+        this.outMostExpressionTemplate = this.outMostExpressionTemplate
+      }
+      this.showAtterRule = val
     },
     getChannelsList () {
       channelsList().then(res => {
@@ -681,7 +690,7 @@ export default {
         return
       }
       // 用户属性 用户行为 数据校验
-      this.$refs.userAttrRule.ruleValidate()
+      // this.$refs.userAttrRule.ruleValidate()
       this.$refs.userAttrRule.isRequired = true
       this.$refs.userActionRule.isRequired = true
       let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
@@ -713,7 +722,14 @@ export default {
             }
           })
         })
-        if (!flag || ruleFormArr.length === 0) {
+        if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) {
+          return this.$message({
+            message: '请配置满足条件的用户',
+            type: 'error',
+            center: true
+          })
+        }
+        if (!flag) {
           this.$refs.userAttrRule.isRequired = false
           this.$refs.userActionRule.isRequired = false
         } else {
@@ -729,7 +745,7 @@ export default {
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
             ...this.$refs.userActionRule.lastSubmitRuleConfig,
             ...this.rejectForm,
-            outMostExpressionTemplate: this.outMostExpressionTemplate,
+            outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : '',
             rejectGroupPackCode: code
           }
           if (type === 'preview') {
