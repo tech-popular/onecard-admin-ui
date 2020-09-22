@@ -416,7 +416,7 @@ export default {
       if (val) {
         this.outMostExpressionTemplate = this.outMostExpressionTemplate
       } else {
-        this.outMostExpressionTemplate = this.outMostExpressionTemplate
+        this.outMostExpressionTemplate = 'and'
       }
       this.showActionRule = val
     },
@@ -424,7 +424,7 @@ export default {
       if (val) {
         this.outMostExpressionTemplate = this.outMostExpressionTemplate
       } else {
-        this.outMostExpressionTemplate = this.outMostExpressionTemplate
+        this.outMostExpressionTemplate = 'and'
       }
       this.showAtterRule = val
     },
