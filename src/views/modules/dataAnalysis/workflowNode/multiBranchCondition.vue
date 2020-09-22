@@ -175,6 +175,7 @@ export default {
       visible: false,
       isRequired: true,
       loading: false,
+      channelCode: '',
       indexList: [],
       selectOperateList: [],
       flowData: [
@@ -240,11 +241,12 @@ export default {
   },
   components: { Treeselect, InputTag },
   methods: {
-    init (link) {
+    init (link, channelCode) {
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
       this.dataForm = this.dataFormTemp
+      this.channelCode = channelCode
       if (link.data.data) {
         this.loading = true
         this.dataForm = link.data.data.configItems
@@ -258,7 +260,7 @@ export default {
     },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata({
-        channelCode: '1001', // this.baseForm.channelId,
+        channelCode: this.channelCode,
         flag: this.id ? '-1' : '1'
       }).then(({data}) => {
         if (data.status !== '1') {

@@ -435,7 +435,7 @@ export default {
             font: '12px Arial, sans-serif',
             // stroke: type ? 'transparent' : '#fff',
             stroke: '#fff',
-            margin: type ? new Margin(20, 0, 3, 0) : new Margin(10, 0),
+            margin: type ? new Margin(26, 5, 5, 5) : new Margin(10, 0),
             maxSize: new go.Size(120, NaN),
             wrap: go.TextBlock.WrapFit,
             editable: isEdit,
@@ -621,7 +621,7 @@ export default {
             $(
               go.Picture,
               {
-                desiredSize: new go.Size(40, 16),
+                desiredSize: new go.Size(40, 20),
                 alignment: go.Spot.Top
               },
               new go.Binding('source', 'path', this.images)
@@ -643,7 +643,9 @@ export default {
         if (txn === null) return
         txn.changes.each(function(e) {
           if (e.modelChange === 'linkFromKey') {
+            // that.linkDrawnChange(e.object.from, e.newValue, e)
             let newFromNode = mySelf.myDiagram.findNodeForKey(e.newValue)
+            let fromCategory = newFromNode.data.category
             let groupLinkDataText = []
             let flowLinkDataText = []
             that.flowJson.linkDataArray.forEach(citem => {
@@ -679,19 +681,30 @@ export default {
                     mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
                   }
                 } else if (groupLinkDataText.length == 2) { // 限制最多可连接两条线
-                  if (citem.to === e.object.to) {
-                    that.$message.error('最多可连接两个子节点')
-                    return mySelf.myDiagram.model.removeLinkData(citem)
-                  }
+                  let curLink = that.flowJson.linkDataArray.filter(item => item.to === e.object.to)[0]
+                  that.$message.error('最多可连接两个子节点')
+                  return mySelf.myDiagram.model.removeLinkData(curLink)
                 }
                 groupLinkDataText.push(citem.linkText)
               }
             })
+            if (fromCategory !== 'MULTI_BRANCH' && fromCategory !== 'GROUP_CHOICE') {
+              let linkOutData = []
+              newFromNode.findLinksOutOf().each(function (link) {
+                if (linkOutData.length == 1) { // 限制最多可连接一条线
+                  that.$message.error('最多可连接一个子节点')
+                  mySelf.myDiagram.model.removeLinkData(link.data)
+                  return
+                }
+                linkOutData.push(link.data)
+              })
+            }
           }
           if (e.modelChange === 'linkToKey') {
-            // console.log(122, e.object)
             // let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
-            // let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
+            let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
+            that.linkDrawnChange(e.object.from, e.newValue, e)
+            that.isOnlyOneInLink(newToNode)
             // // 修改连线时，若将false连到分流上，则提示
             // if (newToNode.category === 'MULTI_BRANCH' && e.object.linkText === 'FALSE') {
             //   mySelf.myDiagram.model.removeLinkData(e.object)
@@ -726,33 +739,8 @@ export default {
         var fromNodeLink = mySelf.myDiagram.findNodeForKey(fromKey)  // 获取节点对象
         let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
         let fromCategory = fromNodeLink.data.category
-        let toCategory = toNodeLink.data.category
-
-        fromNodeLink.findLinksOutOf().each(function (link) {
-          // 入参节点只能连接查询节点
-          if (fromCategory === 'IN_PARAM' && toCategory !== 'DATA_QUERY') return
-          // 数据转换不可直接连线到返参节点
-          if (fromCategory === 'DATA_QUERY' && toCategory === 'OUT_PARAM') {
-            that.$message.error('不可直接返参，请连接分群节点！')
-            return mySelf.myDiagram.model.removeLinkData(link.data)
-          }
-          // 分流节点的上级只能是分群节点！或节流节点
-          if (toCategory === 'MULTI_BRANCH' && (fromCategory !== 'GROUP_CHOICE' && fromCategory !== 'MULTI_BRANCH')) {
-            that.$message.error('连线有误，请重新连接！')
-            return mySelf.myDiagram.model.removeLinkData(link.data)
-          }
-        })
-
         // 所有节点只能有一个上级节点
-        let linkInNum = 0
-        toNodeLink.findLinksInto().each(function (link) {
-          if (linkInNum === 1) {
-            that.$message.error('节点只能有一个上级节点！')
-            return mySelf.myDiagram.model.removeLinkData(link.data)
-          } else {
-            linkInNum++
-          }
-        })
+        that.isOnlyOneInLink(toNodeLink)
         if (fromCategory === 'GROUP_CHOICE') { // 将状态判断的连线内容保存，保存时判断用
           let linkOutData = []
           let linkDataText = []
@@ -762,10 +750,6 @@ export default {
             : 'TRUE'
             if (linkOutData.length == 1) {
               link.data.linkText = linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-              // if (link.data.linkText === 'FALSE' && toCategory === 'MULTI_BRANCH') { // false线上不可连线分流节点
-              //   that.$message.error('分流节点只能走TRUE分支！')
-              //   return mySelf.myDiagram.model.removeLinkData(link.data)
-              // }
               mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
             }
             if (linkOutData.length == 2) { // 限制最多可连接两条线
@@ -803,15 +787,7 @@ export default {
             linkOutData.push(link.data)
           })
         } else { // 非状态判断时，只允许有一个子节点
-          let linkOutData = []
-          fromNodeLink.findLinksOutOf().each(function (link) {
-            if (linkOutData.length == 1) { // 限制最多可连接一条线
-              that.$message.error('最多可连接一个子节点')
-              mySelf.myDiagram.model.removeLinkData(link.data)
-              return
-            }
-            linkOutData.push(link.data)
-          })
+          that.linkDrawnChange(fromKey, toKey, e)
         }
       })
       mySelf.myDiagram.linkTemplate = $(
@@ -838,9 +814,12 @@ export default {
               let filterArr = that.flowTypeArr.filter(item => item.key === link.data.from)
               let curFlowType = filterArr.length ? filterArr[0].flowType : ''
               if (curFlowType === 'condition') {
+                if (!that.channelCode) {
+                  return that.$message.error('请先配置数据查询节点！')
+                }
                 that.multiBranchConditionVisible = true
                 that.$nextTick(() => {
-                  that.$refs['multiBranchConditionEl'].init(link)
+                  that.$refs['multiBranchConditionEl'].init(link, that.channelCode)
                 })
               } else {
                 that.multiBranchRateVisible = true
@@ -918,6 +897,41 @@ export default {
         }
       )
       mySelf.myPalette.layout.sorting = go.GridLayout.Forward
+    },
+    linkDrawnChange (fromKey, toKey, e) {
+      let fromNodeLink = mySelf.myDiagram.findNodeForKey(fromKey)  // 获取节点对象
+      let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
+      let fromCategory = fromNodeLink.data.category
+      let toCategory = toNodeLink.data.category
+      let linkOutData = []
+      fromNodeLink.findLinksOutOf().each(function (link) {
+        // 入参节点只能连接查询节点
+        if (fromCategory === 'IN_PARAM' && toCategory !== 'DATA_QUERY' && fromKey === link.data.from && toKey === link.data.to) {
+          return mySelf.myDiagram.model.removeLinkData(link.data)
+        }
+        // // 数据转换不可直接连线到返参节点
+        if (fromCategory === 'DATA_QUERY' && toCategory === 'OUT_PARAM' && fromKey === link.data.from && toKey === link.data.to) {
+          that.$message.error('不可直接返参，请重新连接！')
+          return mySelf.myDiagram.model.removeLinkData(link.data)
+        }
+        if (linkOutData.length == 1) { // 限制最多可连接一条线
+          that.$message.error('最多可连接一个子节点')
+          mySelf.myDiagram.model.removeLinkData(link.data)
+          return
+        }
+        linkOutData.push(link.data)
+      })
+    },
+    isOnlyOneInLink (toNodeLink) { // 判断每个节点只有一个上级节点
+      let linkInNum = 0
+      toNodeLink.findLinksInto().each(function (link) {
+        if (linkInNum === 1) {
+          that.$message.error('节点只能有一个上级节点！')
+          return mySelf.myDiagram.model.removeLinkData(link.data)
+        } else {
+          linkInNum++
+        }
+      })
     },
     // 设置节点图片路径
     images(src) {
