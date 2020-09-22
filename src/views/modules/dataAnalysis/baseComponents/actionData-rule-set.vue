@@ -66,7 +66,7 @@
                   v-model="item.params[0].value"
                   :maxlength="10"
                   @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
-                  @blur="item.params[0].value = blurDateNumberInput(item.params[0].value)"
+                  @blur="item.params[0].value = blurNumberInput(item.params[0].value)"
                 ></el-input>
               </el-form-item>
               <el-form-item prop="dateDimension" :ref="'paramsi' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
@@ -196,7 +196,12 @@
             <div v-if="isEmpty(item)" class="pane-rules-inline">
               <div v-if="item.totalCountParams.func != 'between'" class="pane-rules-inline">
                 <el-form-item  prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <el-input v-model="item.totalCountParams.params[0].value" :maxlength="10" class="itemIput-number"></el-input>
+                  <el-input 
+                    v-model="item.totalCountParams.params[0].value" 
+                    :maxlength="10" class="itemIput-number" 
+                    @input="item.totalCountParams.params[0].value = keyupNumberInput(item.totalCountParams.params[0].value)"
+                    @blur="item.totalCountParams.params[0].value = blurNumberInput(item.totalCountParams.params[0].value)"
+                    ></el-input>
                 </el-form-item>&nbsp;次
               </div>
               <div v-if="item.totalCountParams.func === 'between'" class="pane-rules-inline">
@@ -355,11 +360,11 @@ export default {
         }
       } else {
         totalCountParams = {
-          func: citem.totalCountParams.selectOperateList[0].code,
+          func: citem.totalCountParams.selectOperateList[4].code,
           selectOperateList: citem.totalCountParams.selectOperateList,
           params: [
             {
-              value: '',
+              value: '1',
               title: ''
             }
           ]
@@ -368,12 +373,12 @@ export default {
       this.parent.updateChildrenRulesArr(this.data, citem, {totalCountParams: totalCountParams}, index)
     },
     keyupDateNumberInput (val) {
-      // 日期输入框，输入内容 要求 只能输入 正整数
+      // 输入框，输入内容 要求 只能输入 正整数
       val = val.replace(/^0(0+)|[^\d]+/g, '')
       return val
     },
-    blurDateNumberInput (val) {
-      // 日期输入框，失去焦点时判断输入内容是否符合要求
+    blurNumberInput (val) {
+      // 输入框，失去焦点时判断输入内容是否符合要求
       let reg = /^([0]|[1-9][0-9]*)$/
       if (!reg.test(val)) {
         val = ''
@@ -389,7 +394,7 @@ export default {
           this.$refs['paramsn' + item.ruleCode][0].clearValidate()
         })
       }
-      return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
+      return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
     },
     selectOperateChange (val, ruleItem) { // 时间区间改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.actionRuleConfig, ruleItem)
@@ -455,20 +460,8 @@ export default {
       this.parent.switchSymbol(ruleCode, this.parent.actionRuleConfig)
     },
     keyupNumberInput (val) {
-      // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
-      if (val === '.') {
-        // 开头不能是小数点
-        val = val.replace('.', '')
-      }
-      if (val.split('.').length > 2) {
-        // 不可输入第二个小数点
-        val = val.substring(0, val.length - 1)
-      }
-      if (val.length > 1 && val[val.length - 1] === '-') {
-        // 只能有一个’-‘
-        val = val.substring(0, val.length - 1)
-      }
-      val = val.replace(/[^-.\d]/g, '') // 清除“数字”和“.”以外的字符  [^.\d]
+      // 输入框，输入内容 要求 只能输入 非负整数
+      val = val.replace(/^0(0+)|[^\d]+/g, '')
       return val
     },
     judgeNumberTwoInput (rule, value, callback, params) {
@@ -489,23 +482,6 @@ export default {
         this.$refs['totalparamsr' + item.ruleCode][0].clearValidate()
       }
       return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
-    },
-    blurNumberInput (val) {
-      // 失去焦点时判断输入内容是否符合要求
-      val = val + '' // 数据转为字符串
-      if (val[val.length - 1] === '.') {
-        // 最后一位为小数点时，则删除小数点
-        val = val.substring(0, val.length - 1)
-      }
-      let reg = /^(-)?\d+(\.\d+)?$/g // 只能输入 -. 及数字 不符合要求则置空
-      if (!reg.test(val)) {
-        val = ''
-      }
-      val = val.replace(/^0+\./, '0.') // 000.8999  -> 0.889
-      val = val.replace(/^(-0+)\./, '-0.') // -000.899  -> -0.889
-      val = val.replace(/^0+([0-9])/, '$1') // 009.9 00099999  -> 9.9  999999
-      val = val.replace(/^-0+([0-9])/, '-$1') // -009.9 -00099999 -> -9.9  -999999
-      return val
     },
     isEmpty (item) {
       // 是否选择了空

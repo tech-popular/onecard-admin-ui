@@ -164,7 +164,7 @@ export default {
     renderData (data, channelId) {
       let configJson = JSON.parse(data)
       this.channelId = channelId
-      this.actionRuleConfig = this.changeRules(configJson.actionRuleConfig)
+      this.actionRuleConfig = configJson.actionRuleConfig ? this.changeRules(configJson.actionRuleConfig) : this.actionRuleConfig
       this.actionExpression = configJson.actionExpression
       this.actionExpressionTemplate = configJson.actionExpressionTemplate
       this.getEventSelectAllCata(channelId, (eventDownList) => {
@@ -332,11 +332,11 @@ export default {
         'eventIndexList': [], // 事件属性列表
         'eventList': [], // 事件
         'totalCountParams': {
-          func: '',
+          func: 'ge',
           selectOperateList: this.countSelectOperateList,
           params: [
             {
-              value: '',
+              value: '1',
               title: ''
             }
           ]
@@ -704,7 +704,7 @@ export default {
     },
     uneffectIndexValidate () { // 无效指标提示
       this.lastSubmitRuleConfig = { // 过滤数据
-        actionRuleConfig: this.actionRuleConfig.rules.length > 0 ? this.updateRulesConfig(deepClone(this.actionRuleConfig)) : {},
+        actionRuleConfig: this.actionRuleConfig.rules.length > 0 ? this.updateRulesConfig(deepClone(this.actionRuleConfig)) : null,
         actionExpression: this.actionExpression,
         actionExpressionTemplate: this.actionExpressionTemplate
       }
