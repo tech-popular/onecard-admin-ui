@@ -57,6 +57,17 @@ export default {
       ]
     }
   },
+  watch: {
+    'ruleConfig.rules': {
+      handler (newVal, oldVal) {
+        if (newVal.length > 0) {
+          this.$emit('isShowAttrRule', true)
+        } else {
+          this.$emit('isShowAttrRule', false)
+        }
+      }
+    }
+  },
   methods: {
     init () {
       this.getSelectAllCata()
@@ -99,7 +110,7 @@ export default {
     renderData (data, channelId) {
       this.channelId = channelId
       let configJson = JSON.parse(data)
-      this.ruleConfig = configJson.ruleConfig
+      this.ruleConfig = configJson.ruleConfig ? configJson.ruleConfig : this.ruleConfig
       this.expression = configJson.expression
       this.expressionTemplate = configJson.expressionTemplate
       this.getSelectAllCata((indexList) => {
@@ -526,18 +537,18 @@ export default {
       })
       return arr
     },
-    ruleValidate () {
-      if (!this.ruleConfig.rules.length) {
-        return this.$message({
-          message: '请配置用户规则信息',
-          type: 'error',
-          center: true
-        })
-      }
-    },
+    // ruleValidate () {
+    //   if (!this.ruleConfig.rules.length) {
+    //     return this.$message({
+    //       message: '请配置用户规则信息',
+    //       type: 'error',
+    //       center: true
+    //     })
+    //   }
+    // },
     uneffectIndexValidate () { // 无效指标提示
       this.lastSubmitRuleConfig = { // 过滤数据
-        ruleConfig: this.updateRulesConfig(deepClone(this.ruleConfig)),
+        ruleConfig: this.ruleConfig.rules.length > 0 ? this.updateRulesConfig(deepClone(this.ruleConfig)) : null,
         expression: this.expression,
         expressionTemplate: this.expressionTemplate
       }
