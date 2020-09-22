@@ -109,6 +109,17 @@
               </span>
             </el-form-item>
           </div>
+          <!--kafka-->
+          <div v-if="acquisitionTask.outDatasourceType==='KAFKA'">
+            <el-form :model="kafkaData" :rules="dataRule" ref="redisForm" label-width="120px">
+              <el-form-item class="el-redis-item" label="是否使用schma" prop="schma">
+                <el-radio-group v-model="kafkaData.schma">
+                  <el-radio label="1">是</el-radio>
+                  <el-radio label="0">否</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-form>
+          </div>
           <!--redis-->
           <div v-if="acquisitionTask.outDatasourceType==='REDIS'" style="marginLeft: 120px">
             <el-form :model="redisData" :rules="dataRule" ref="redisForm" label-width="120px">
@@ -330,6 +341,9 @@ export default {
       },
       mcData: {
         mcColumn: ''
+      },
+      kafkaData: {
+        schma: '1'
       },
       estimatedDataVolumeList: [
         {
@@ -574,6 +588,16 @@ export default {
       },
       immediate: true,
       deep: true
+    },
+    kafkaData: {
+      handler (newVal, oldVal) {
+        let outTableName =
+          newVal.schma +
+          '#'
+        this.outTableName = outTableName
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
@@ -597,6 +621,9 @@ export default {
       }
       this.mcData = {
         mcColumn: ''
+      }
+      this.kafkaData = {
+        schma: '1'
       }
       this.getAllSystem()
       this.getAllDatasource('ACQUISITION', 'IN')
@@ -652,6 +679,11 @@ export default {
             this.elasticData = {
               type: arr[1],
               idColumn: arr[2]
+            }
+            this.acquisitionTask.outDataTable = arr[0]
+          } else if (this.acquisitionTask.outDatasourceType === 'KAFKA') {
+            this.kafkaData = {
+              schma: arr[1]
             }
             this.acquisitionTask.outDataTable = arr[0]
           } else {
