@@ -440,7 +440,7 @@ export default {
       } else if (params[0].value && params[1].value && params[0].value * 1 < params[1].value * 1) {
         callback(new Error('起始数值应大于等于终止数值'))
       } else if (params[0].value && params[1].value && (params[0].value * 1 - params[1].value * 1 >= 180)) {
-        callback(new Error('选择范围为180天内'))
+        callback(new Error('时间选择范围为180天内'))
       } else {
         callback()
       }
