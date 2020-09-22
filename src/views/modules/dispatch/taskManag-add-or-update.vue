@@ -343,7 +343,7 @@ export default {
         mcColumn: ''
       },
       kafkaData: {
-        schma: '1'
+        schma: '0'
       },
       estimatedDataVolumeList: [
         {
@@ -623,7 +623,7 @@ export default {
         mcColumn: ''
       }
       this.kafkaData = {
-        schma: '1'
+        schma: '0'
       }
       this.getAllSystem()
       this.getAllDatasource('ACQUISITION', 'IN')
