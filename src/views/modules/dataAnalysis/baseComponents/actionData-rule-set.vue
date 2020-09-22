@@ -196,7 +196,12 @@
             <div v-if="isEmpty(item)" class="pane-rules-inline">
               <div v-if="item.totalCountParams.func != 'between'" class="pane-rules-inline">
                 <el-form-item  prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
-                  <el-input v-model="item.totalCountParams.params[0].value" :maxlength="10" class="itemIput-number" @input="item.totalCountParams.params[0].value = keyupNumberInput(item.totalCountParams.params[0].value)"></el-input>
+                  <el-input 
+                    v-model="item.totalCountParams.params[0].value" 
+                    :maxlength="10" class="itemIput-number" 
+                    @input="item.totalCountParams.params[0].value = keyupNumberInput(item.totalCountParams.params[0].value)"
+                    @blur="item.totalCountParams.params[0].value = blurNumberInput(item.totalCountParams.params[0].value)"
+                    ></el-input>
                 </el-form-item>&nbsp;次
               </div>
               <div v-if="item.totalCountParams.func === 'between'" class="pane-rules-inline">
