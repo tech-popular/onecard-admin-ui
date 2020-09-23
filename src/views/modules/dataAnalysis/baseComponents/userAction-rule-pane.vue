@@ -209,6 +209,9 @@ export default {
         if (item.type != 'rules_function') {
           item.eventDownList = eventDownList
           item.totalCountParams.selectOperateList = countSelectOperateList
+          if (item.havedo === 'no') {
+            item.totalCountParams.func = 'eq'
+          }
         } else {
           this.updateInitActionRulesConfig(item, eventDownList, countSelectOperateList)
         }
@@ -658,9 +661,14 @@ export default {
         if (item.type != 'rules_function') {
           delete item.eventDownList
           delete item.eventIndexList
-          item.totalCountParams.selectOperateList = this.countSelectOperateList.filter(
-            sitem => sitem.code === item.totalCountParams.func
-          )
+          if (item.havedo === 'yes') {
+            item.totalCountParams.selectOperateList = this.countSelectOperateList.filter(
+              sitem => sitem.code === item.totalCountParams.func
+            )
+          } else {
+            item.totalCountParams.func = ''
+            item.totalCountParams.selectOperateList = []
+          }
           if (item.childrenRules) {
             item.childrenRules.forEach(citem => {
               citem.selectOperateList = citem.selectOperateList.filter(
