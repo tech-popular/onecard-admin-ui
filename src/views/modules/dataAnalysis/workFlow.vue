@@ -72,6 +72,8 @@ export default {
       selectCuster: [],
       nodeTitle: '',
       successText: '执行成功',
+      defaultRate: '0%',
+      defaultCondition: '请输入分流条件',
       saveForm: {
         name: '',
         code: ''
@@ -95,6 +97,46 @@ export default {
       that.getFlow(this.$route.query.id)
     } else {
       this.diagramInit()
+    }
+  },
+  watch: {
+    'flowJson.linkDataArray': {
+      handler (newVal) {
+        let branchNodeArr = []
+        newVal.map(item => {
+          let firstNum = item.from.substring(0, 1)
+          if (firstNum === '5') {
+            if (!branchNodeArr[item.from]) {
+              var arr = []
+              arr.push({...item})
+              item.num = 1
+              if (item.type === 'rate') {
+                let name = item.data ? item.data.configItems.rate : that.defaultRate
+                item.linkText = '<' + item.num + '> ' + name
+              } else {
+                let name = item.data ? item.data.configItems.name : that.defaultCondition
+                item.linkText = '<' + item.num + '> ' + name
+              }
+              branchNodeArr[item.from] = arr
+            } else {
+              item.num = branchNodeArr[item.from].length + 1
+             if (item.type === 'rate') {
+                let name = item.data ? item.data.configItems.rate : that.defaultRate
+                item.linkText = '<' + item.num + '> ' + name
+              } else {
+                let name = item.data ? item.data.configItems.name : that.defaultCondition
+                item.linkText = '<' + item.num + '> ' + name
+              }
+              branchNodeArr[item.from].push({...item})
+            }
+            this.$nextTick(() => {
+              mySelf.myDiagram.model.updateTargetBindings(item)
+            })
+          }
+        })
+        // branchNodeArr = branchNodeArr.filter(item => item != '')
+      },
+      deep: true
     }
   },
   methods: {
@@ -154,6 +196,15 @@ export default {
           this.type = item.type
           this.selectCuster = item.data.config.custerArr
           this.groupId = item.data.config.configItems.groupId
+          if (that.channelCode && that.channelCode !== item.data.config.configItems.channelCode) {
+            that.flowJson.linkDataArray.forEach(item => {
+              if (item.type === 'condition') {
+                item.data = null
+                item.linkText = '<' + item.num + '> ' + that.defaultCondition
+                mySelf.myDiagram.model.updateTargetBindings(item)
+              }
+            })
+          }
           this.channelCode = item.data.config.configItems.channelCode
           node.findTreeParts().each(function (cNode) {
             if (cNode.data.category === 'GROUP_CHOICE' && cNode.data.data) {
@@ -167,7 +218,6 @@ export default {
           })
         }
         if (_data.category === 'GROUP_CHOICE') { // 根据选中的分群，更新分群节点的名称
-          // let node1 = mySelf.myDiagram.findNodeForKey(key).part.data
           mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
         }
         if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
@@ -178,10 +228,10 @@ export default {
               if (curFlowType !== item.data.config.configItems.flowType) {
                 link.data.data = null
                 if (item.data.config.configItems.flowType === 'condition') {
-                  link.data.linkText = '请输入分流条件'
+                  link.data.linkText = that.defaultCondition
                   link.data.type = 'condition'
                 } else {
-                  link.data.linkText = '0%'
+                  link.data.linkText = that.defaultRate
                   link.data.type = 'rate'
                 }
                 mySelf.myDiagram.model.updateTargetBindings(link.data)
@@ -209,7 +259,7 @@ export default {
           if (citem.from === item.data.from && citem.to === item.data.to) {
             citem.data = item.data.config
             citem.type = 'condition'
-            citem.linkText = item.data.config.configItems.name // 对连线的文字赋值
+            citem.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.name // 对连线的文字赋值
             mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
           }
         })
@@ -221,7 +271,7 @@ export default {
           if (citem.from === item.data.from && citem.to === item.data.to) {
             citem.data = item.data.config
             citem.type = 'rate'
-            citem.linkText = item.data.config.configItems.rate + '%' // 对连线的文字赋值
+            citem.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.rate + '%' // 对连线的文字赋值
             mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
           }
         })
@@ -339,7 +389,7 @@ export default {
       }
       url(params).then(({data}) => {
         if (data.status !== '1') {
-          return this.$message.error(data.message)
+          return this.$message.error(data.message || '保存失败')
         }
         this.$message.success(data.message)
         setTimeout(() => {
@@ -553,7 +603,7 @@ export default {
             doubleClick: function (e, node) {
               that.$message({
                 type: 'error',
-                message: '修改该节点的出参会影响后面的分群节点的数据！',
+                message: '修改该节点的出参会影响后面的分群节点及条件分流的数据！',
                 customClass: 'msg-error'
               })
               that.doubleClickNodeEvent(e, node, 'dataQueryNodeVisible', 'dataQueryNodeEl')
@@ -655,11 +705,13 @@ export default {
                 let curFlowType = filterArr.length ? filterArr[0].flowType : ''
                 if (flowLinkDataText.length < 5 && citem.to === e.object.to) {
                   if (curFlowType === 'condition') {
-                    linkText = '请输入分流条件'
+                    linkText = that.defaultCondition
                     citem.type = 'condition'
+                    citem.data = null
                   } else {
-                    linkText = '0%'
+                    linkText = that.defaultRate
                     citem.type = 'rate'
+                    citem.data = null
                   }
                   citem.linkText = linkText // 对连线的文字赋值
                   mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
@@ -701,9 +753,12 @@ export default {
             }
           }
           if (e.modelChange === 'linkToKey') {
-            // let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
+            let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
             let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
-            that.linkDrawnChange(e.object.from, e.newValue, e)
+            let fromCategory = fromNode.data.category
+            if (fromCategory !== 'MULTI_BRANCH' && fromCategory !== 'GROUP_CHOICE') {
+              that.linkDrawnChange(e.object.from, e.newValue, e)
+            }
             that.isOnlyOneInLink(newToNode)
             // // 修改连线时，若将false连到分流上，则提示
             // if (newToNode.category === 'MULTI_BRANCH' && e.object.linkText === 'FALSE') {
@@ -769,10 +824,10 @@ export default {
             return mySelf.myDiagram.model.removeLinkData(e.subject.data)
           }
           if (curFlowType === 'condition') {
-            e.subject.data.linkText = '请输入分流条件'
+            e.subject.data.linkText = that.defaultCondition
             e.subject.data.type = 'condition'
           } else {
-            e.subject.data.linkText = '0%'
+            e.subject.data.linkText = that.defaultRate
             e.subject.data.type = 'rate'
           }
           mySelf.myDiagram.model.updateTargetBindings(e.subject.data)

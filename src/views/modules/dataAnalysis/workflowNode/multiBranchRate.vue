@@ -24,6 +24,7 @@ export default {
       id: '',
       key: '',
       title: '',
+      num: '',
       visible: false,
       dataForm: {
         rate: 0
@@ -40,6 +41,7 @@ export default {
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
+      this.num = link.data.num
       this.title = type === 'hash' ? '按HASH分流' : '按百分比分流'
       if (link.data.data) {
         this.dataForm = link.data.data.configItems
@@ -57,7 +59,7 @@ export default {
           let config = {
             configItems: this.dataForm
           }
-          this.$emit('close', { tag: 'save', data: { config: config, from: this.from, to: this.to } })
+          this.$emit('close', { tag: 'save', data: { config: config, from: this.from, to: this.to, num: this.num } })
           this.$parent.multiBranchRateVisible = false
         }
       })
