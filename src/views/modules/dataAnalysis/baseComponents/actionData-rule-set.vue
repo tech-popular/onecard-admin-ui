@@ -165,8 +165,7 @@
               ></el-cascader>        
             </el-form-item>
             <el-form-item>
-              <i class="el-icon-plus cursor-pointer" @click="addThirdChildrenRules(item, index)"></i>
-              <span>添加属性筛选</span>
+              <i class="el-icon-plus cursor-pointer" @click="addThirdChildrenRules(item, index)"> 添加属性筛选 </i>
             </el-form-item>
           </div>
           <el-form-item style="float: right" v-if="from !== 'api'">

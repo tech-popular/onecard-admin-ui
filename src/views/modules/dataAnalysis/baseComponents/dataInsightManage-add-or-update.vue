@@ -745,7 +745,7 @@ export default {
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
             ...this.$refs.userActionRule.lastSubmitRuleConfig,
             ...this.rejectForm,
-            outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : '',
+            outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
             rejectGroupPackCode: code
           }
           if (type === 'preview') {
