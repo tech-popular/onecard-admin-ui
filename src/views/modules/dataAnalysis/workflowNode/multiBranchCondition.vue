@@ -3,7 +3,7 @@
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
-    width="950px"
+    width="1200px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :inline="true" v-loading="loading">
       <div>
@@ -46,13 +46,13 @@
         <!--number-->
         <div v-if="dataForm.fieldType === 'number'"  class="pane-rules-inline">
           <div v-if="dataForm.func === 'between'"  class="pane-rules-inline">
-            <el-form-item prop="params[0].value" ref="paramsl'" :rules="{ required: isRequired, validator: (value, callback) => judgeNumberTwoInput(value, callback, dataForm.params), trigger: 'blur' }">
+            <el-form-item prop="params[0].value" ref="paramsl" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, dataForm.params), trigger: 'blur' }">
               <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
-              <el-input v-model="dataForm.params[0].value" :maxlength="10" @input="dataForm.params[0].value = keyupNumberInput(dataForm.params[0].value)" @blur="dataForm.params[0].value = pramasNumBlur(dataForm, dataForm.params[0].value)"></el-input>
+              <el-input v-model="dataForm.params[0].value" :maxlength="10" @input="dataForm.params[0].value = keyupNumberInput(dataForm.params[0].value)" @blur="dataForm.params[0].value = pramasNumBlur(dataForm.params[0].value)" style="width:100px"></el-input>
             </el-form-item>
             于
-            <el-form-item prop="params[1].value" ref="paramsr" :rules="{required: isRequired, validator: (value, callback) => judgeNumberTwoInput(value, callback, dataForm.params), trigger: 'blur'}">
-              <el-input v-model="dataForm.params[1].value" :maxlength="10" class="itemIput-number" @input="item.params[1].value = keyupNumberInput(dataForm.params[1].value)" @blur="dataForm.params[1].value = pramasNumBlur(dataForm.params[1].value)"></el-input> 之间
+            <el-form-item prop="params[1].value" ref="paramsr" :rules="{required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, dataForm.params), trigger: 'blur'}">
+              <el-input v-model="dataForm.params[1].value" :maxlength="10" class="itemIput-number" @input="dataForm.params[1].value = keyupNumberInput(dataForm.params[1].value)" @blur="dataForm.params[1].value = pramasNumBlur(dataForm.params[1].value)" style="width:100px"></el-input> 之间
             </el-form-item>
           </div>
           <div v-else>
@@ -110,12 +110,12 @@
               <el-input v-model="dataForm.params[0].value" :maxlength="10" @input="dataForm.params[0].value = keyupDateNumberInput(dataForm.params[0].value)" @blur="dataForm.params[0].value = blurDateNumberInput(dataForm.params[0].value)" class="itemIput-small"></el-input>
             </el-form-item>
             <el-form-item prop="dateDimension">
-              <el-select v-model="dataForm.dateDimension" class="subSelect1" @change="updateDateDimension">
+              <el-select v-model="dataForm.dateDimension" class="subSelect1" @change="updateDateDimension" style="width:80px">
                 <el-option v-for="(fitem, findex) in dataForm.subTimeSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
               </el-select>
             </el-form-item>
             <el-form-item prop="subFunc">
-              <el-select v-model="dataForm.subFunc" class="subSelect">
+              <el-select v-model="dataForm.subFunc" class="subSelect" style="width:80px">
                 <el-option v-for="(fitem, findex) in dataForm.subSelects" :value="fitem.code" :key="findex" :label="fitem.title" />
               </el-select>
             </el-form-item>
@@ -123,7 +123,7 @@
           <!--相对时间点-->
           <div v-if="dataForm.func === 'relative_time_in'" class="pane-rules-inline">
             在&nbsp;过去&nbsp;
-            <el-form-item prop="params[0].value" ref="paramsl" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, dataForm.params), trigger: 'blur'}">
+            <el-form-item prop="params[0].value" ref="paramsdl" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, dataForm.params), trigger: 'blur'}">
               <el-input v-model="dataForm.params[0].value" :maxlength="10" class="itemIput-small" @input="dataForm.params[0].value = keyupDateNumberInput(dataForm.params[0].value)" @blur="dataForm.params[0].value = pramasDateBlur(dataForm.params[0].value)" :min="1"></el-input>
             </el-form-item>
             <el-form-item prop="dateDimension">
@@ -132,7 +132,7 @@
               </el-select>
             </el-form-item>
             到&nbsp;过去&nbsp;
-            <el-form-item prop="params[1].value" ref="paramsr" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, dataForm.params), trigger: 'blur'}">
+            <el-form-item prop="params[1].value" ref="paramsdr" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, dataForm.params), trigger: 'blur'}">
               <el-input v-model="dataForm.params[1].value" :maxlength="10" class="itemIput-small" @input="dataForm.params[1].value = keyupDateNumberInput(dataForm.params[1].value)" @blur="dataForm.params[1].value = pramasDateBlur(dataForm.params[1].value)" :min="1"></el-input>
             </el-form-item>
             <el-form-item prop="dateDimension">
@@ -172,6 +172,7 @@ export default {
       id: '',
       from: '',
       to: '',
+      num: '',
       visible: false,
       isRequired: true,
       loading: false,
@@ -242,9 +243,11 @@ export default {
   components: { Treeselect, InputTag },
   methods: {
     init (link, channelCode) {
+      console.log(link)
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
+      this.num = link.data.num
       this.dataForm = this.dataFormTemp
       this.channelCode = channelCode
       if (link.data.data) {
@@ -319,7 +322,7 @@ export default {
         callback()
       }
     },
-    judgeNumberTwoInput (value, callback, params) { // 数值介于判断
+    judgeNumberTwoInput (rule, value, callback, params) { // 数值介于判断
       if (value === '') {
         callback(new Error('请输入'))
       } else if (params[0].value * 1 >= params[1].value * 1) {
@@ -370,6 +373,7 @@ export default {
     pramasNumBlur (val) { // 数值 介于的判断
       let params = this.dataForm.params
       if (params[0].value * 1 < params[1].value * 1) {
+        console.log(this.$refs)
         this.$refs['paramsl'].clearValidate()
         this.$refs['paramsr'].clearValidate()
       }
@@ -378,8 +382,8 @@ export default {
     pramasDateBlur (val) { // 时间 区间的判断
       let params = this.dataForm.params
       if (params[0].value * 1 >= params[1].value * 1) {
-        this.$refs['paramsl'].clearValidate()
-        this.$refs['paramsr'].clearValidate()
+        this.$refs['paramsdl'].clearValidate()
+        this.$refs['paramsdr'].clearValidate()
       }
       return this.blurDateNumberInput(val) // 返回一下处理过的值 用于赋值
     },
@@ -501,7 +505,7 @@ export default {
       this.updateEnumsChange()
     },
     updateDateDimension (val) {
-      this.parent.updateRulesArr(this.dataForm, { dateDimension: val })
+      this.updateRulesArr(this.dataForm, { dateDimension: val })
     },
     updateEnumsChange () {
       let newArr = []
@@ -561,7 +565,7 @@ export default {
           let config = {
             configItems: this.dataForm
           }
-          this.$emit('close', { tag: 'save', data: { config: config, from: this.from, to: this.to } })
+          this.$emit('close', { tag: 'save', data: { config: config, from: this.from, to: this.to, num: this.num } })
           this.$parent.multiBranchConditionVisible = false
         }
       })
@@ -639,7 +643,7 @@ export default {
     margin-right: 5px;
   }
   .itemIput {
-    width: 300px;
+    width: 260px;
   }
   .subSelect {
     width: 140px;
@@ -651,7 +655,7 @@ export default {
     width: 372px;
   }
   .itemIput-small {
-    width: 110px;
+    width: 80px;
   }
   .itemIput-number {
     width: 200px;
