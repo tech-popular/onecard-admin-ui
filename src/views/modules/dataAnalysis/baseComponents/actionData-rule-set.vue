@@ -349,7 +349,7 @@ export default {
       if (val === 'no') {
         totalCountParams = {
           func: 'eq',
-          selectOperateList: [],
+          selectOperateList: citem.totalCountParams.selectOperateList,
           params: [
             {
               value: 0,
@@ -359,7 +359,7 @@ export default {
         }
       } else {
         totalCountParams = {
-          func: citem.totalCountParams.selectOperateList[4].code,
+          func: 'ge',
           selectOperateList: citem.totalCountParams.selectOperateList,
           params: [
             {
