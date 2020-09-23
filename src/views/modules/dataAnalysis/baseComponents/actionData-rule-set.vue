@@ -164,7 +164,7 @@
                 @change="data => eventTypeChange(data, item, index)"
               ></el-cascader>        
             </el-form-item>
-            <el-form-item>
+            <el-form-item v-if="item.havedo === 'yes'">
               <i class="el-icon-plus cursor-pointer" @click="addThirdChildrenRules(item, index)"> 添加属性筛选 </i>
             </el-form-item>
           </div>
@@ -349,7 +349,7 @@ export default {
       if (val === 'no') {
         totalCountParams = {
           func: 'eq',
-          selectOperateList: citem.totalCountParams.selectOperateList,
+          selectOperateList: [],
           params: [
             {
               value: 0,
