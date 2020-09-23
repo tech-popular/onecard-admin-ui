@@ -388,7 +388,7 @@ export default {
     pramasDateBlur (item, val) {
       // 时间 区间的判断
       let params = item.params
-      if (params[0].value && params[1].value && params[0].value * 1 >= params[1].value * 1) {
+      if (params[0].value && params[1].value && params[0].value * 1 >= params[1].value * 1 && (params[0].value * 1 - params[1].value * 1 < 180)) {
         this.$nextTick(() => {
           this.$refs['paramse' + item.ruleCode][0].clearValidate()
           this.$refs['paramsn' + item.ruleCode][0].clearValidate()
@@ -439,6 +439,8 @@ export default {
         callback(new Error('请输入'))
       } else if (params[0].value && params[1].value && params[0].value * 1 < params[1].value * 1) {
         callback(new Error('起始数值应大于等于终止数值'))
+      } else if (params[0].value && params[1].value && (params[0].value * 1 - params[1].value * 1 >= 180)) {
+        callback(new Error('时间选择范围为180天内'))
       } else {
         callback()
       }
