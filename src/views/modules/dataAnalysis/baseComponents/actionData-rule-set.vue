@@ -192,7 +192,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <div v-if="isEmpty(item)" class="pane-rules-inline">
+            <div v-if="item.havedo === 'yes' && isEmpty(item)" class="pane-rules-inline">
               <div v-if="item.totalCountParams.func != 'between'" class="pane-rules-inline">
                 <el-form-item  prop="totalCountParams.params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
                   <el-input 
@@ -352,7 +352,7 @@ export default {
           selectOperateList: citem.totalCountParams.selectOperateList,
           params: [
             {
-              value: 0,
+              value: '',
               title: ''
             }
           ]
