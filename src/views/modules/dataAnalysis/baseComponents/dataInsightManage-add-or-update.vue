@@ -957,14 +957,14 @@ export default {
 .insight-manage-drawer .reject-pane-item {
   width: 50%;
 }
-  .insight-manage-drawer .reject-pane-item1 {
-    width:80%
-  }
-  .inputTag {
-    display: inline-block;
-    border-radius: 4px;
-    width: 340px;
-    line-height: 22px;
-    border: 1px solid #dcdfe6
-  }
+.insight-manage-drawer .reject-pane-item1 {
+  width:80%
+}
+.inputTag {
+  display: inline-block;
+  border-radius: 4px;
+  width: 340px;
+  line-height: 22px;
+  border: 1px solid #dcdfe6
+}
 </style>

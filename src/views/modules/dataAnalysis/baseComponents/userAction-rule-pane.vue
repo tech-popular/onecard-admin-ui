@@ -3,7 +3,7 @@
     <el-form :inline="true" label-position="left">
       <el-form-item label="用户行为满足：">
         <el-tooltip placement="top"> 
-          <div slot="content" class="tips-content">用户行为筛选范围为注册用户</div>
+          <div slot="content" class="tips-content">用户行为筛选范围为注册用户，同时暂不支持API调用</div>
           <i class="el-icon-info cursor-pointer" style="color:#409eff; margin-right:60px;"></i>
         </el-tooltip> 
         <el-input v-model="actionExpression" disabled style="width: 800px" />
