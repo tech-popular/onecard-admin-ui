@@ -941,7 +941,7 @@ export default {
   cursor: pointer;
   user-select: none;
 }
-.insight-manage-drawer .pane-reject {
+.insight-manage-drawer .pane-rules-title, .insight-manage-drawer .pane-reject {
   border-top: 1px dashed #ccc;
 }
 .insight-manage-drawer .user-channel {
@@ -957,129 +957,14 @@ export default {
 .insight-manage-drawer .reject-pane-item {
   width: 50%;
 }
-  .insight-manage-drawer .wrap {
-    padding: 0 20px 20px;
-    margin-top: -12px;
-    width: 100%;
-    overflow-y: auto;
-    position: absolute;
-    top: 75px;
-    bottom: 55px;
-  }
-  .insight-manage-drawer .drawer-title {
-    padding: 15px;
-    background: #333;
-    color: #fff;
-    font-size: 15px;
-    margin: -20px -20px 0 -20px;
-    position: relative;
-  }
-  .insight-manage-drawer .drawer-close {
-    position: absolute;
-    right: 20px;
-  }
-  .insight-manage-drawer .item-inline {
-    display: inline-block;
-  }
-  .insight-manage-drawer .item-code {
-    margin-left: -70px;
-  }
-  .insight-manage-drawer .item-code-name {
-    width: 300px;
-  }
-  .insight-manage-drawer .item-button {
-    margin-left: -60px;
-  }
-  .insight-manage-drawer .copy-code {
-    margin-left: 15px;
-  }
-  .insight-manage-drawer .footer {
-    position: absolute;
-    bottom: 0;
-    background: #fff;
-    padding: 10px 22px 10px 10px;
-    width: 100%;
-    height: 55px;
-    text-align: right;
-    box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
-    z-index: 500;
-  }
-  .insight-manage-drawer .cursor-pointer {
-    cursor: pointer;
-  }
-  .insight-manage-drawer .base-pane-item {
-    width: 80%;
-  }
-  .insight-manage-drawer .vue-treeselect {
-    line-height: 24px;
-  }
-  .insight-manage-drawer .data-description-tips {
-    color: #999;
-    margin-top: 0
-  }
-  .insight-manage-drawer .data-description-tips span {
-    color: red
-  }
-  .insight-manage-drawer .type-radio-group {
-    margin-top: 12px;
-  }
-  .insight-manage-drawer .type-radio-two {
-    margin-top: 10px;
-  }
-  .insight-manage-drawer .upload-excel {
-    display: inline-block;
-    margin-left: 20px;
-  }
-  .insight-manage-drawer .btn-upload {
-    display: inline-block;
-    font-size: 14px;
-    padding-left: 15px;
-  }
-  .insight-manage-drawer .upload-name {
-    font-size: 14px;
-    padding-left: 15px;
-  }
-  .insight-manage-drawer .btn-upload button {
-    margin-left: 10px;
-  }
-  .insight-manage-drawer .btn-download {
-    margin-left: 10px;
-  }
-  .insight-manage-drawer .btn-download a {
-    color: #fff;
-  }
-  .insight-manage-drawer .el-list-enter-active,
-  .insight-manage-drawer .el-list-leave-active {
-    transition: none;
-  }
-  .insight-manage-drawer .el-list-enter,
-  .insight-manage-drawer .el-list-leave-active {
-    opacity: 0;
-  }
-  .insight-manage-drawer .pane-rules-title, .insight-manage-drawer .pane-reject {
-    border-top: 1px dashed #ccc;
-  }
-  .insight-manage-drawer .user-channel {
-    margin-left: 110px;
-  }
-  .insight-manage-drawer .indicator-channel {
-    display: inline-block;
-    margin-left: 20px;
-  }
-  .insight-manage-drawer .pane-reject {
-    margin-top: 20px;
-  }
-  .insight-manage-drawer .reject-pane-item {
-    width:50%
-  }
-  .insight-manage-drawer .reject-pane-item1 {
-    width:80%
-  }
-  .inputTag {
-    display: inline-block;
-    border-radius: 4px;
-    width: 340px;
-    line-height: 22px;
-    border: 1px solid #dcdfe6
-  }
+.insight-manage-drawer .reject-pane-item1 {
+  width:80%
+}
+.inputTag {
+  display: inline-block;
+  border-radius: 4px;
+  width: 340px;
+  line-height: 22px;
+  border: 1px solid #dcdfe6
+}
 </style>

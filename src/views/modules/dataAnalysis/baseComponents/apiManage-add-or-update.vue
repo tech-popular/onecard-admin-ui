@@ -34,7 +34,7 @@
                 v-for="item in newCusterNameList"
                 :key="item.value"
                 :label="item.text"
-                :disabled="item.disabled"
+                :disabled="item.disabled || !!item.isUserAction"
                 :value="item.value">
               </el-option>
             </el-select>
