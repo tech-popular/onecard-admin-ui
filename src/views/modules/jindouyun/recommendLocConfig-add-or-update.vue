@@ -1,5 +1,5 @@
 <template>
-   <el-dialog :title="id ? tag === 'view' ? '查看' : '编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="600px">
+   <el-dialog :title="id ? tag === 'view' ? '查看' : '编辑': '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="800px">
     <h3 id="title">基本信息</h3>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
       <el-form-item label="任务ID:" prop="id" v-if="!!id" >
@@ -24,23 +24,37 @@
         @change="searchChange"
         @focus="searchFocus"
       >
-        <el-option :value="item.productNum" :label="item.productName" v-for="item in searchResultList" :key="item.productNum"></el-option>
+      <el-option :value="item.productNum" :label="item.productName" v-for="item in searchResultList" :key="item.productNum"></el-option>
       </el-select>
-      <el-button type="primary" style="margin-left:20px" @click="addToTab">新增</el-button>
+      <el-button type="primary" style="margin-left:20px;margin-right:10px;" size="small" @click="addToTab">新增</el-button>
+      <el-upload
+        class="upload-file"
+        ref="upload"
+        :action="uploadWords"
+        accept=".xlsx, .xls"
+        :show-file-list="false"
+        :on-success="uploadSuccess"
+      >
+        <el-button size="small" style="margin-right:10px;">文件导入</el-button>
+      </el-upload>
+      <el-button type="success" size="small"><a :href="templateUrl" style="color:#fff;text-decoration: none;">下载模板</a></el-button>
+      <el-button type="danger" size="small" @click="multiRemoveClick">批量删除</el-button>
     </div>
     <div>
-      <el-table :data="tableData" border style="width: 100%">
+      <el-table :data="tableData"  @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border style="width: 100%">
+      <el-table-column type="selection" header-align="center" align="center" width="100"></el-table-column>
+      <el-table-column prop="productLocation" label="序号" header-align="center" align="center" width="100">
+        <template slot-scope="scope">
+          {{scope.$index + 1}}
+        </template>
+      </el-table-column>
         <el-table-column prop="productNum" label="产品编号" header-align="center" align="center" width="100"></el-table-column>
         <el-table-column prop="productName" label="产品名称" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="productLocation" label="位置编号" header-align="center" align="center" width="200">
-          <template slot-scope="scope">
-            <el-input-number v-model="scope.row.productLocation" :min="1" placeholder="位置编号" style="width:150px"></el-input-number>
-          </template>
-        </el-table-column>
         <el-table-column header-align="center" align="center" width="100" label="操作">
           <template slot-scope="scope">
-            <el-button type="danger" icon="el-icon-close" circle  size="mini" @click="deleteHandle(scope.$index, scope.row)" style="padding:5px"></el-button>
-          </template>
+            <span @click="moveUp(scope.$index)" v-if="scope.$index !== 0"><icon-svg name="top" style="color: #2093f7"></icon-svg></span>
+            <span @click="moveDown(scope.$index)" v-if="scope.$index !== tableData.length-1"><icon-svg name="down" style="color: green"></icon-svg></span>
+        </template>
         </el-table-column>
       </el-table>
     </div>
@@ -52,6 +66,7 @@
 </template>
 <script>
 import { jdyAdd, jdyEdit, jdyDetail, jdyGetPro } from '@/api/jindouyun/recommendLocConfig'
+import { deepClone } from './js/utils'
 export default {
   data () {
     return {
@@ -69,11 +84,14 @@ export default {
       productNum: '',
       locIndex: '',
       tableData: [],
+      tableDataChecked: [],
       dataRule: {
         name: [
           { required: true, message: '请输入名称', trigger: 'blur' }
         ]
-      }
+      },
+      templateUrl: '',
+      uploadWords: ''
     }
   },
   methods: {
@@ -155,13 +173,62 @@ export default {
         }
       }
     },
-    deleteHandle (index, row) {
-      this.$confirm(`确定删除【${row.productName}】吗？`, '提示', {
+    handleSelectionChange (val) {
+      this.tableDataChecked = val
+    },
+    handleAllCheckedChange (val) {
+      this.tableDataChecked = val
+    },
+    uploadSuccess (response, file) { // 上传成功时
+      if (response.code !== 0) {
+        return this.$message({
+          type: 'error',
+          message: response.msg
+        })
+      }
+      this.excelFile = file.name
+      // response.data.forEach(item => {
+      //   if (!this.dynamicQuery.includes(item)) {
+      //     this.dynamicQuery.push(item)
+      //   }
+      // })
+    },
+    // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
+    moveUp (index) {
+      let data = deepClone(this.tableData)
+      if (index === 0) return
+      data.splice(index - 1, 0, (data[index])) // 在上一项插入该项
+      data.splice(index + 1, 1) // 删除后一项
+      this.tableData = data
+    },
+    // 下移 将当前数组index索引与前面一个元素互换位置，向数组前面移动一位
+    moveDown (index) {
+      let data = deepClone(this.tableData)
+      if (index === (data.length - 1)) return
+      data.splice(index + 2, 0, (data[index])) // 在下一项插入该项
+      data.splice(index, 1) // 删除前一项
+      this.tableData = data
+    },
+    multiRemoveClick () { // 批量删除
+      if (!this.tableDataChecked.length) return
+      this.$confirm('确定批量删除选中产品？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => { // 确认创建分群时的操作
-        this.tableData.splice(index, 1)
+        let data = deepClone(this.tableData)
+        if (data.length === this.tableDataChecked.length) {
+          data = []
+        } else {
+          this.tableDataChecked.forEach(item => {
+            data.forEach((ditem, dindex) => {
+              if (item.productNum === ditem.productNum) {
+                data.splice(dindex, 1)
+              }
+            })
+          })
+        }
+        this.tableData = deepClone(data)
       }).catch(() => {
         console.log('取消')
       })
