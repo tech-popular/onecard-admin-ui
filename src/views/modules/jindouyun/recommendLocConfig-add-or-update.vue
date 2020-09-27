@@ -38,7 +38,7 @@
         <el-button size="small" style="margin-right:10px;">文件导入</el-button>
       </el-upload>
       <el-button type="success" size="small"><a :href="templateUrl" style="color:#fff;text-decoration: none;">下载模板</a></el-button>
-      <el-button type="danger" size="small" @click="multiRemoveClick">批量删除</el-button>
+      <el-button type="danger" size="small" @click="multiRemoveClick" >批量删除</el-button>
     </div>
     <div>
       <el-table :data="tableData"  @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border style="width: 100%">
@@ -186,10 +186,9 @@ export default {
           message: response.msg
         })
       }
-      this.excelFile = file.name
       // response.data.forEach(item => {
-      //   if (!this.dynamicQuery.includes(item)) {
-      //     this.dynamicQuery.push(item)
+      //   if (!this.tableData.includes(item)) {
+      //     this.tableData.push(item)
       //   }
       // })
     },
@@ -211,7 +210,7 @@ export default {
     },
     multiRemoveClick () { // 批量删除
       if (!this.tableDataChecked.length) return
-      this.$confirm('确定批量删除选中产品？', '提示', {
+      this.$confirm('确定删除选中产品？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
