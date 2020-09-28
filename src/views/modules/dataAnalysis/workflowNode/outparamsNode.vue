@@ -43,7 +43,6 @@ export default {
       if (data.data) {
         this.dataForm.outValue = data.data.configItems.outValue
       }
-      console.log(data)
     },
     getInparamData () {
       inparamsSelect().then(({data}) => {
@@ -53,7 +52,6 @@ export default {
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
-          console.log(this.data)
           let config = {
             configItems: this.dataForm
           }
