@@ -1058,6 +1058,7 @@ export default {
     lineLinkOperateEvents (fromNode, type) { // 连线的修改、删除事件
       if (fromNode.data.category === 'IN_PARAM') return // 第一条线不可删除及修改
       mySelf.myDiagram.commandHandler.deleteSelection()
+      that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
     },
     arrIncludes (arr1, arr2) { //  判断arr1是否包含arr2
       return arr2.every(val => arr1.includes(val))
