@@ -134,7 +134,6 @@ export default {
             })
           }
         })
-        // branchNodeArr = branchNodeArr.filter(item => item != '')
       },
       deep: true
     }
@@ -157,7 +156,7 @@ export default {
         this.$nextTick(() => {
           this.diagramInit()
           mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(that.flowJson))
-          this.load()
+          // this.load()
           this.loading = false
         })
         this.saveForm.name = data.data.name
@@ -214,6 +213,23 @@ export default {
                 cNode.data.nodeName = '分群节点'
                 mySelf.myDiagram.model.updateTargetBindings(cNode.data)
               }
+            }
+            // 若分群更改为静态时，其所有子孙节点 分流节点 全部置空，且删除连线
+            if (cNode.data.category === 'MULTI_BRANCH' && cNode.data.data && cNode.data.data.configItems.flowType === 'condition') {
+              let fnode = mySelf.myDiagram.findNodeForKey(cNode.data.key)
+              let removeLinks = []
+              fnode.findLinksOutOf().each(function(link) {
+                removeLinks.push(link.data)
+              })
+              mySelf.myDiagram.model.removeLinkDataCollection(removeLinks)
+              let index = that.flowTypeArr.findIndex(item => item.key === cNode.data.key)
+              that.flowTypeArr.splice(index, 1, {
+                flowType: item.data.config.configItems.flowType,
+                key: key
+              })
+              cNode.data.data = null
+              cNode.data.nodeName = '分流节点'
+              mySelf.myDiagram.model.updateTargetBindings(cNode.data)
             }
           })
         }
@@ -322,6 +338,9 @@ export default {
               pChildOneArr.push(item.nodeName)
             }
           } else if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
+            if (!item.data) {
+              pNullArr.push(item.nodeName)
+            }
             let linkNum = 0
             let linkIs100 = 0
             node.findLinksOutOf().each(function (link) {
@@ -337,7 +356,7 @@ export default {
             if (linkNum < 2) { // 分流至少2个子节点
               pFlowLinkArr.push(item.nodeName)
             }
-            let type = item.data.configItems.flowType
+            let type = item.data && item.data.configItems.flowType
             if (type !== 'condition' && linkIs100 !== 100) {
               pFlowLinkRateIs100.push(item.nodeName)
             }
@@ -680,6 +699,9 @@ export default {
           {
             //  双击展示
             doubleClick: function (e, node) {
+              if (!that.type) {
+                return that.$message.error('请先配置【数据查询】节点！')
+              }
               that.doubleClickNodeEvent(e, node, 'multiBranchNodeVisible', 'multiBranchNodeEl')
             }
           },
@@ -1021,7 +1043,11 @@ export default {
       }
       that[visibleParams] = true
       that.$nextTick(() => {
-        that.$refs[nodeEl].init(node.data)
+        if (category === 'MULTI_BRANCH') {
+          that.$refs[nodeEl].init(node.data, this.type)
+        } else {
+          that.$refs[nodeEl].init(node.data)
+        }
       })
     },
     lineLinkOperateEvents (fromNode, type) { // 连线的修改、删除事件
