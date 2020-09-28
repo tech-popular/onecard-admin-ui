@@ -215,22 +215,22 @@ export default {
               }
             }
             // 若分群更改为静态时，其所有子孙节点 分流节点 全部置空，且删除连线
-            if (cNode.data.category === 'MULTI_BRANCH' && cNode.data.data && cNode.data.data.configItems.flowType === 'condition') {
-              let fnode = mySelf.myDiagram.findNodeForKey(cNode.data.key)
-              let removeLinks = []
-              fnode.findLinksOutOf().each(function(link) {
-                removeLinks.push(link.data)
-              })
-              mySelf.myDiagram.model.removeLinkDataCollection(removeLinks)
-              let index = that.flowTypeArr.findIndex(item => item.key === cNode.data.key)
-              that.flowTypeArr.splice(index, 1, {
-                flowType: item.data.config.configItems.flowType,
-                key: key
-              })
-              cNode.data.data = null
-              cNode.data.nodeName = '分流节点'
-              mySelf.myDiagram.model.updateTargetBindings(cNode.data)
-            }
+            // if (cNode.data.category === 'MULTI_BRANCH' && cNode.data.data && cNode.data.data.configItems.flowType === 'condition') {
+            //   let fnode = mySelf.myDiagram.findNodeForKey(cNode.data.key)
+            //   let removeLinks = []
+            //   fnode.findLinksOutOf().each(function(link) {
+            //     removeLinks.push(link.data)
+            //   })
+            //   mySelf.myDiagram.model.removeLinkDataCollection(removeLinks)
+            //   let index = that.flowTypeArr.findIndex(item => item.key === cNode.data.key)
+            //   that.flowTypeArr.splice(index, 1, {
+            //     flowType: item.data.config.configItems.flowType,
+            //     key: key
+            //   })
+            //   cNode.data.data = null
+            //   cNode.data.nodeName = '分流节点'
+            //   mySelf.myDiagram.model.updateTargetBindings(cNode.data)
+            // }
           })
         }
         if (_data.category === 'GROUP_CHOICE') { // 根据选中的分群，更新分群节点的名称
@@ -271,7 +271,7 @@ export default {
     // 分流条件弹窗关闭事件
     closeMultiBranchCondition (item) {
       if (item && item.tag == 'save') {
-        this.flowJson.linkDataArray.forEach(citem => {
+        mySelf.myDiagram.model.linkDataArray.forEach(citem => {
           if (citem.from === item.data.from && citem.to === item.data.to) {
             citem.data = item.data.config
             citem.type = 'condition'
@@ -283,7 +283,7 @@ export default {
     },
     closeMultiBranchRate (item) {
       if (item && item.tag == 'save') {
-        this.flowJson.linkDataArray.forEach(citem => {
+        mySelf.myDiagram.model.linkDataArray.forEach(citem => {
           if (citem.from === item.data.from && citem.to === item.data.to) {
             citem.data = item.data.config
             citem.type = 'rate'
@@ -622,7 +622,7 @@ export default {
             doubleClick: function (e, node) {
               that.$message({
                 type: 'error',
-                message: '修改该节点的出参会影响后面的分群节点及条件分流的数据！',
+                message: '修改该节点的出参会影响后面的分群节点的数据！',
                 customClass: 'msg-error'
               })
               that.doubleClickNodeEvent(e, node, 'dataQueryNodeVisible', 'dataQueryNodeEl')
@@ -699,9 +699,9 @@ export default {
           {
             //  双击展示
             doubleClick: function (e, node) {
-              if (!that.type) {
-                return that.$message.error('请先配置【数据查询】节点！')
-              }
+              // if (!that.type) {
+              //   return that.$message.error('请先配置【数据查询】节点！')
+              // }
               that.doubleClickNodeEvent(e, node, 'multiBranchNodeVisible', 'multiBranchNodeEl')
             }
           },
@@ -801,6 +801,10 @@ export default {
               type: 'warning'
             }).then(() => {
               mySelf.myDiagram.commandHandler.deleteSelection()
+              that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
+              that.flowJson.nodeDataArray = mySelf.myDiagram.model.nodeDataArray
+              let index = that.flowTypeArr.findIndex(item => item.key === node.data.key)
+              that.flowTypeArr.splice(index, 1)
             }).catch(() => {
               console.log('cancel')
             })
@@ -1043,11 +1047,12 @@ export default {
       }
       that[visibleParams] = true
       that.$nextTick(() => {
-        if (category === 'MULTI_BRANCH') {
-          that.$refs[nodeEl].init(node.data, this.type)
-        } else {
-          that.$refs[nodeEl].init(node.data)
-        }
+        that.$refs[nodeEl].init(node.data)
+        // if (category === 'MULTI_BRANCH') {
+        //   that.$refs[nodeEl].init(node.data, this.type)
+        // } else {
+        //   that.$refs[nodeEl].init(node.data)
+        // }
       })
     },
     lineLinkOperateEvents (fromNode, type) { // 连线的修改、删除事件

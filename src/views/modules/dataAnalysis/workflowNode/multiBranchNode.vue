@@ -25,7 +25,20 @@ export default {
       id: '',
       key: '',
       visible: false,
-      flowData: [],
+      flowData: [
+        {
+          value: 'condition',
+          text: '条件分流'
+        },
+        {
+          value: 'hash',
+          text: 'HASH分流'
+        },
+        {
+          value: 'rate',
+          text: '概率分流'
+        }
+      ],
       dataForm: {
         flowType: ''
       },
@@ -37,36 +50,9 @@ export default {
     }
   },
   methods: {
-    init (data, type) {
+    init (data) {
       this.visible = true
       this.key = data.key
-      if (type.toUpperCase() === 'DYNAMIC') {
-        this.flowData = [
-          {
-            value: 'condition',
-            text: '条件分流'
-          },
-          {
-            value: 'hash',
-            text: 'HASH分流'
-          },
-          {
-            value: 'rate',
-            text: '概率分流'
-          }
-        ]
-      } else {
-        this.flowData = [
-          {
-            value: 'hash',
-            text: 'HASH分流'
-          },
-          {
-            value: 'rate',
-            text: '概率分流'
-          }
-        ]
-      }
       if (data.data) {
         this.dataForm.flowType = data.data.configItems.flowType
       }
