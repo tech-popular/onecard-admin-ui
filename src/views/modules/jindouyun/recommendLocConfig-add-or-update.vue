@@ -43,7 +43,7 @@
     <div>
       <el-table :data="tableData"  @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border style="width: 100%">
       <el-table-column type="selection" header-align="center" align="center" width="100"></el-table-column>
-      <el-table-column prop="productLocation" label="序号" header-align="center" align="center" width="100">
+      <el-table-column label="序号" header-align="center" align="center" width="100">
         <template slot-scope="scope">
           {{scope.$index + 1}}
         </template>
@@ -65,7 +65,7 @@
   </el-dialog>
 </template>
 <script>
-import { jdyAdd, jdyEdit, jdyDetail, jdyGetPro } from '@/api/jindouyun/recommendLocConfig'
+import { jdyAdd, jdyEdit, jdyDetail, jdyGetPro, jdyuploadWords, jdydownloadTemplate } from '@/api/jindouyun/recommendLocConfig'
 import { deepClone } from './js/utils'
 export default {
   data () {
@@ -90,8 +90,8 @@ export default {
           { required: true, message: '请输入名称', trigger: 'blur' }
         ]
       },
-      templateUrl: '',
-      uploadWords: ''
+      templateUrl: jdydownloadTemplate,
+      uploadWords: jdyuploadWords
     }
   },
   methods: {
@@ -180,17 +180,23 @@ export default {
       this.tableDataChecked = val
     },
     uploadSuccess (response, file) { // 上传成功时
-      if (response.code !== 0) {
+      if (response.status === 0) {
         return this.$message({
           type: 'error',
-          message: response.msg
+          message: response.message
         })
       }
-      // response.data.forEach(item => {
-      //   if (!this.tableData.includes(item)) {
-      //     this.tableData.push(item)
-      //   }
-      // })
+      // 上传文件返回的productNum是number类型，而this.tableData的productNum是string类型
+      response.data.forEach(item => {
+        item.productNum = item.productNum.toString()
+      })
+      // 去重
+      this.tableData = this.unique(this.tableData.concat(response.data))
+    },
+    // 取两个对象数组的并集且去重
+    unique (arr) {
+      const res = new Map()
+      return arr.filter((arr) => !res.has(arr.productNum) && res.set(arr.productNum, 1))
     },
     // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
     moveUp (index) {
@@ -238,21 +244,22 @@ export default {
     dataSubmit () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
-          let len = this.tableData.filter(item => !item.productLocation).length
-          if (len > 0) {
-            return this.$message.error('位置编号不可为空！')
-          }
+          // let len = this.tableData.filter(item => !item.productLocation).length
+          // console.log(' this.tableData: ', this.tableData)
+          // if (len > 0) {
+          //   return this.$message.error('位置编号不可为空！')
+          // }
           if (!this.tableData.length) {
             return this.$message.error('没有提交任何产品信息，请填写后再提交！')
           }
-          let ids = []
-          this.tableData.forEach(item => {
-            ids.push(item.productLocation)
+          // let ids = []
+          this.tableData.forEach((item, index) => {
+            item.productLocation = index + 1
           })
-          let uniqueIds = Array.from(new Set(ids))
-          if (ids.length > uniqueIds.length) {
-             return this.$message.error('位置编号不可重复！')
-          }
+          // let uniqueIds = Array.from(new Set(ids))
+          // if (ids.length > uniqueIds.length) {
+          //    return this.$message.error('位置编号不可重复！')
+          // }
           let url = jdyAdd
           let params = {
             name: this.dataForm.name,
