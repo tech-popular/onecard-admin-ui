@@ -804,7 +804,9 @@ export default {
               that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
               that.flowJson.nodeDataArray = mySelf.myDiagram.model.nodeDataArray
               let index = that.flowTypeArr.findIndex(item => item.key === node.data.key)
-              that.flowTypeArr.splice(index, 1)
+              if (index >= 0) {
+                that.flowTypeArr.splice(index, 1)
+              }
             }).catch(() => {
               console.log('cancel')
             })
