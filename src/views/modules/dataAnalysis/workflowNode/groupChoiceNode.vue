@@ -45,6 +45,7 @@ export default {
       this.custerList = this.$parent.selectCuster
       if (data.data) {
         this.dataForm.groupId = data.data.configItems.groupId
+        this.curName = this.custerList.filter(item => item.value === this.dataForm.groupId)[0].text
       }
     },
     groupIdChange (val) {

@@ -379,9 +379,12 @@ export default {
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // 判断连线的内容
       if (that.id) { // 修改保存
-        this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), {
+        let data = {
           name: this.saveForm.name,
           code: this.saveForm.code
+        }
+        this.$nextTick(() => {
+          this.saveFlowInfoData(data)
         })
       } else { // 新建保存
         this.saveDataVisible = true
@@ -391,11 +394,18 @@ export default {
       }
     },
     closeSave (data) {
-      this.saveFlowInfo(JSON.parse(mySelf.myDiagram.model.toJson()), data)
+      this.saveFlowInfoData(data)
     },
-    saveFlowInfo (flowJson, saveData) {
+    saveFlowInfoData (saveData) {
+      let flowData = {
+        class: 'GraphLinksModel',
+        linkFromPortIdProperty: 'fromPort',
+        linkToPortIdProperty: 'toPort',
+        linkDataArray: mySelf.myDiagram.model.linkDataArray,
+        nodeDataArray: mySelf.myDiagram.model.nodeDataArray
+      }
       let params = {
-        configJson: { ...flowJson, flowTypeArr: this.flowTypeArr },
+        configJson: { ...flowData, flowTypeArr: this.flowTypeArr },
         name: saveData.name,
         code: saveData.code,
         groupId: this.groupId,
@@ -869,6 +879,7 @@ export default {
             }
             linkOutData.push(link.data)
           })
+          that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
         } else { // 非状态判断时，只允许有一个子节点
           that.linkDrawnChange(fromKey, toKey, e)
         }
