@@ -28,6 +28,7 @@ export default {
       channelList: [],
       custerList: [],
       curName: '',
+      curType: '',
       dataForm: {
         groupId: ''
       },
@@ -46,16 +47,18 @@ export default {
       if (data.data) {
         this.dataForm.groupId = data.data.configItems.groupId
         this.curName = this.custerList.filter(item => item.value === this.dataForm.groupId)[0].text
+        this.curType = this.custerList.filter(item => item.value === this.dataForm.groupId)[0].type
       }
     },
     groupIdChange (val) {
       this.curName = this.custerList.filter(item => item.value === val)[0].text
+      this.curType = this.custerList.filter(item => item.value === val)[0].type
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
           let config = {
-            configItems: this.dataForm,
+            configItems: { ...this.dataForm, type: this.curType },
             curName: this.curName
           }
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
