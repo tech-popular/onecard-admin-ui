@@ -379,12 +379,9 @@ export default {
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // 判断连线的内容
       if (that.id) { // 修改保存
-        let data = {
+        this.saveFlowInfoData({
           name: this.saveForm.name,
           code: this.saveForm.code
-        }
-        this.$nextTick(() => {
-          this.saveFlowInfoData(data)
         })
       } else { // 新建保存
         this.saveDataVisible = true
@@ -404,6 +401,7 @@ export default {
         linkDataArray: mySelf.myDiagram.model.linkDataArray,
         nodeDataArray: mySelf.myDiagram.model.nodeDataArray
       }
+      console.log(flowData)
       let params = {
         configJson: { ...flowData, flowTypeArr: this.flowTypeArr },
         name: saveData.name,
@@ -416,6 +414,7 @@ export default {
       if (this.id) {
         params.id = this.id
       }
+      console.log(params, url)
       url(params).then(({data}) => {
         if (data.status !== '1') {
           return this.$message.error(data.message || '保存失败')
