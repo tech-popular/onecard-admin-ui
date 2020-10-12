@@ -48,14 +48,14 @@
           {{scope.$index + 1}}
         </template>
       </el-table-column>
-        <el-table-column prop="productNum" label="产品编号" header-align="center" align="center" width="100"></el-table-column>
-        <el-table-column prop="productName" label="产品名称" header-align="center" align="center"></el-table-column>
-        <el-table-column header-align="center" align="center" width="100" label="操作">
-          <template slot-scope="scope">
-            <span @click="moveUp(scope.$index)" v-if="scope.$index !== 0"><icon-svg name="top" style="color: #2093f7"></icon-svg></span>
-            <span @click="moveDown(scope.$index)" v-if="scope.$index !== tableData.length-1"><icon-svg name="down" style="color: green"></icon-svg></span>
+      <el-table-column prop="productNum" label="产品编号" header-align="center" align="center" width="100"></el-table-column>
+      <el-table-column prop="productName" label="产品名称" header-align="center" align="center"></el-table-column>
+      <el-table-column header-align="center" align="center" width="100" label="操作">
+        <template slot-scope="scope">
+          <span @click="moveUp(scope.$index)" v-if="scope.$index !== 0"><icon-svg name="top" style="color: #2093f7"></icon-svg></span>
+          <span @click="moveDown(scope.$index)" v-if="scope.$index !== tableData.length-1"><icon-svg name="down" style="color: green"></icon-svg></span>
         </template>
-        </el-table-column>
+      </el-table-column>
       </el-table>
     </div>
     <div slot="footer">
@@ -187,6 +187,7 @@ export default {
         })
       }
       // 上传文件返回的productNum是number类型，而this.tableData的productNum是string类型
+      // 统一数据类型 进行去重
       response.data.forEach(item => {
         item.productNum = item.productNum.toString()
       })
@@ -220,7 +221,7 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => { // 确认创建分群时的操作
+      }).then(() => {
         let data = deepClone(this.tableData)
         if (data.length === this.tableDataChecked.length) {
           data = []
@@ -244,22 +245,12 @@ export default {
     dataSubmit () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
-          // let len = this.tableData.filter(item => !item.productLocation).length
-          // console.log(' this.tableData: ', this.tableData)
-          // if (len > 0) {
-          //   return this.$message.error('位置编号不可为空！')
-          // }
           if (!this.tableData.length) {
             return this.$message.error('没有提交任何产品信息，请填写后再提交！')
           }
-          // let ids = []
           this.tableData.forEach((item, index) => {
             item.productLocation = index + 1
           })
-          // let uniqueIds = Array.from(new Set(ids))
-          // if (ids.length > uniqueIds.length) {
-          //    return this.$message.error('位置编号不可重复！')
-          // }
           let url = jdyAdd
           let params = {
             name: this.dataForm.name,
