@@ -163,11 +163,11 @@ export default {
     addToTab () {
       if (!this.curSelectPro.productNum) return false
       if (!this.tableData.length || !this.tableData) {
-        this.tableData.push(this.curSelectPro)
+        this.tableData.unshift(this.curSelectPro)
       } else {
-        let isExist = this.tableData.filter(item => this.curSelectPro.productNum === item.productNum).length
+        let isExist = this.tableData.filter(item => this.curSelectPro.productNum == item.productNum).length
         if (!isExist) {
-          this.tableData.push(this.curSelectPro)
+          this.tableData.unshift(this.curSelectPro)
         } else {
           this.$message.error('该产品已添加！')
         }
