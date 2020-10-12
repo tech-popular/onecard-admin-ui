@@ -167,7 +167,7 @@ export const models = {
         if (data && data.status * 1 === 1) {
           this.dataListLoading = false
           this.list = data.data.rows
-          this.totalPage = data.data.totalCount
+          this.totalPage = data.data.total
         } else {
           this.list = []
           this.totalPage = 0
