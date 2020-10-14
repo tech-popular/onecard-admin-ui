@@ -74,9 +74,6 @@ export default {
           code: 'HOURS',
           title: '小时'
         }
-        // {
-        //   code: 'MINUTES', title: '分钟'
-        // }
       ]
     }
   },

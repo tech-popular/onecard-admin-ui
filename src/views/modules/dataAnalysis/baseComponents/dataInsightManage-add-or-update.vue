@@ -135,7 +135,7 @@
           </div>
            <div style="flex: 1">
                <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd" @isShowAttrRule="isShowAttrRule"></user-attr-rule-pane>
-               <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowActionRule="isShowActionRule"></user-action-rule-pane>
+               <!-- <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowActionRule="isShowActionRule"></user-action-rule-pane> -->
            </div>
       </div>
       <div class="pane-reject">
@@ -352,7 +352,7 @@ export default {
       this.$nextTick(() => {
         console.log(this.$refs)
         this.$refs.userAttrRule.init()
-        this.$refs.userActionRule.init()
+        // this.$refs.userActionRule.init()
       })
     },
     getDataInfo (id) {
@@ -402,10 +402,10 @@ export default {
             data.data.configJson,
             this.baseForm.channelId
           )
-          this.$refs.userActionRule.renderData( // 真实调接口时数据重现
-            data.data.configJson,
-            this.baseForm.channelId
-          )
+          // this.$refs.userActionRule.renderData( // 真实调接口时数据重现
+          //   data.data.configJson,
+          //   this.baseForm.channelId
+          // )
         }
       })
     },
@@ -469,7 +469,7 @@ export default {
         })
       }
       this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
-      this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId)
+      // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId)
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -692,9 +692,9 @@ export default {
       // 用户属性 用户行为 数据校验
       // this.$refs.userAttrRule.ruleValidate()
       this.$refs.userAttrRule.isRequired = true
-      this.$refs.userActionRule.isRequired = true
+      // this.$refs.userActionRule.isRequired = true
       let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
-      let actionRuleFormArr = this.$refs.userActionRule.getRuleForm()
+      // let actionRuleFormArr = this.$refs.userActionRule.getRuleForm()
       this.$nextTick(() => {
         // 待页面中的isRequired = true后再执行校验
         let flag = true
@@ -715,27 +715,31 @@ export default {
             }
           })
         })
-        actionRuleFormArr.forEach(item => {
-          item.validate(valid => {
-            if (!valid) {
-              flag = false
-            }
-          })
-        })
-        if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) {
+        // actionRuleFormArr.forEach(item => {
+        //   item.validate(valid => {
+        //     if (!valid) {
+        //       flag = false
+        //     }
+        //   })
+        // })
+        if (ruleFormArr.length === 0) {
+        // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) {
           return this.$message({
-            message: '请配置满足条件的用户',
+            message: '请配置用户规则信息',
             type: 'error',
             center: true
           })
         }
         if (!flag) {
           this.$refs.userAttrRule.isRequired = false
-          this.$refs.userActionRule.isRequired = false
+          // this.$refs.userActionRule.isRequired = false
         } else {
           // 全部校验通过后，可保存数据
           this.$refs.userAttrRule.uneffectIndexValidate()
-          this.$refs.userActionRule.uneffectIndexValidate()
+          // this.$refs.userActionRule.uneffectIndexValidate()
+          if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) {
+            return false
+          }
           let code = 0
           if (this.rejectForm.rejectGroupPackageIds.length) {
             code = 1
@@ -743,7 +747,7 @@ export default {
           let params = {
             ...this.baseForm,
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
-            ...this.$refs.userActionRule.lastSubmitRuleConfig,
+            // ...this.$refs.userActionRule.lastSubmitRuleConfig,
             ...this.rejectForm,
             outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
             rejectGroupPackCode: code

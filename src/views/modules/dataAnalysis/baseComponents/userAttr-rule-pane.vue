@@ -1,5 +1,6 @@
 <template>
-  <div style="margin-left:15px; border: 1px dashed #ccc; padding: 10px;">
+  <div style="margin-left:15px;">
+  <!-- < style="margin-left:15px; border: 1px dashed #ccc; padding: 10px;"> -->
     <el-form :inline="true" label-position="left">
       <el-form-item label="用户属性与用户交易满足："  label-width="180px">
         <el-input v-model="expression" disabled style="width: 800px" />
