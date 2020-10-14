@@ -17,7 +17,6 @@
   </el-dialog>
 </template>
 <script>
-import { inparamsSelect } from '@/api/dataAnalysis/dataDecisionManage'
 export default {
   data () {
     return {
@@ -39,15 +38,9 @@ export default {
     init (data) {
       this.visible = true
       this.key = data.key
-      this.getInparamData()
       if (data.data) {
         this.dataForm.outValue = data.data.configItems.outValue
       }
-    },
-    getInparamData () {
-      inparamsSelect().then(({data}) => {
-        this.inparamData = data.data
-      })
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
