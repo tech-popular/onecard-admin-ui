@@ -77,10 +77,10 @@ export default {
           this.totalNum = 0
           this.tableData = []
           this.loading = false
-          return this.$message({
-            type: 'error',
-            message: data.message || '数据异常'
-          })
+          // return this.$message({
+          //   type: 'error',
+          //   message: data.message || '数据异常'
+          // })
         } else {
           this.totalNum = data.data.total
           this.tableData = data.data.tableData

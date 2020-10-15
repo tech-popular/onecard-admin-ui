@@ -26,6 +26,8 @@ export const overviewData = id => httpGet(da + `data/group/overview/${id}`)
 export const transferLogList = params => httpGet(da + `data/transferLog/listOnPage`, params)
 export const chartInfo = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
 
+export const selectEventAllCata = params => httpGetSeries(da + 'data/event/getEventDropDownList', params) // 加载事件类型接口
+export const selectEventIndexAllCata = params => httpGet(da + 'data/event/index/getEventIndexByElementId', params) // 加载事件属性类型接口
 export const collisionList = () => httpGet(da + 'data/collision/list')
 export const collisionParams = (collisionPackId, groupId) => httpGet(da + `data/collision/params?collisionPackId=${collisionPackId}&groupId=${groupId}`)
 export const collisionSave = (params, collisionPackId) => httpPost(da + `data/collision/config/group?collisionPackId=${collisionPackId}`, params, false)
