@@ -17,23 +17,23 @@ export const models = {
       // 操作按钮
       operatesWidth: '300px',
       operates: [
-        {
-          id: 1,
-          label: '查看',
-          type: 'default',
-          isShow: (id) => {
-            return id.status === true
-          },
-          method: (id) => {
-            this.addOrUpdateHandle(id, 'view')
-          }
-        },
+        // {
+        //   id: 1,
+        //   label: '查看',
+        //   type: 'default',
+        //   isShow: (id) => {
+        //     return id.status === true
+        //   },
+        //   method: (id) => {
+        //     this.addOrUpdateHandle(id, 'view')
+        //   }
+        // },
         {
           id: 2,
           label: '编辑',
           type: 'primary',
           isShow: (id) => {
-            return id.status === false
+            return true
           },
           method: (id) => {
             this.addOrUpdateHandle(id, 'edit')
@@ -167,7 +167,7 @@ export const models = {
         if (data && data.status * 1 === 1) {
           this.dataListLoading = false
           this.list = data.data.rows
-          this.totalPage = data.data.totalCount
+          this.totalPage = data.data.total
         } else {
           this.list = []
           this.totalPage = 0
