@@ -1,5 +1,6 @@
 <template>
   <div style="margin-left:15px;">
+  <!-- 用户行为上线时需添加边框 -->
   <!-- < style="margin-left:15px; border: 1px dashed #ccc; padding: 10px;"> -->
     <el-form :inline="true" label-position="left">
       <el-form-item label="用户属性与用户交易满足："  label-width="180px">

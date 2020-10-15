@@ -135,6 +135,7 @@
           </div>
            <div style="flex: 1">
                <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd" @isShowAttrRule="isShowAttrRule"></user-attr-rule-pane>
+               <!-- 暂时隐藏用户行为 -->
                <!-- <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowActionRule="isShowActionRule"></user-action-rule-pane> -->
            </div>
       </div>
@@ -352,7 +353,7 @@ export default {
       this.$nextTick(() => {
         console.log(this.$refs)
         this.$refs.userAttrRule.init()
-        // this.$refs.userActionRule.init()
+        // this.$refs.userActionRule.init() // 用户行为暂时隐藏
       })
     },
     getDataInfo (id) {
@@ -402,6 +403,7 @@ export default {
             data.data.configJson,
             this.baseForm.channelId
           )
+          // 用户行为暂时隐藏
           // this.$refs.userActionRule.renderData( // 真实调接口时数据重现
           //   data.data.configJson,
           //   this.baseForm.channelId
@@ -469,7 +471,7 @@ export default {
         })
       }
       this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
-      // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId)
+      // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId) // 用户行为暂时隐藏
       this.rejectForm.rejectGroupPackageIds = []
     },
     getVestPackAvailable () {
@@ -690,11 +692,10 @@ export default {
         return
       }
       // 用户属性 用户行为 数据校验
-      // this.$refs.userAttrRule.ruleValidate()
       this.$refs.userAttrRule.isRequired = true
-      // this.$refs.userActionRule.isRequired = true
+      // this.$refs.userActionRule.isRequired = true // 用户行为暂时隐藏
       let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
-      // let actionRuleFormArr = this.$refs.userActionRule.getRuleForm()
+      // let actionRuleFormArr = this.$refs.userActionRule.getRuleForm() // 用户行为暂时隐藏
       this.$nextTick(() => {
         // 待页面中的isRequired = true后再执行校验
         let flag = true
@@ -715,7 +716,7 @@ export default {
             }
           })
         })
-        // actionRuleFormArr.forEach(item => {
+        // actionRuleFormArr.forEach(item => { // 用户行为暂时隐藏
         //   item.validate(valid => {
         //     if (!valid) {
         //       flag = false
@@ -723,7 +724,7 @@ export default {
         //   })
         // })
         if (ruleFormArr.length === 0) {
-        // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) {
+        // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
           return this.$message({
             message: '请配置用户规则信息',
             type: 'error',
@@ -732,12 +733,12 @@ export default {
         }
         if (!flag) {
           this.$refs.userAttrRule.isRequired = false
-          // this.$refs.userActionRule.isRequired = false
+          // this.$refs.userActionRule.isRequired = false // 用户行为暂时隐藏
         } else {
           // 全部校验通过后，可保存数据
           this.$refs.userAttrRule.uneffectIndexValidate()
-          // this.$refs.userActionRule.uneffectIndexValidate()
-          if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) {
+          // this.$refs.userActionRule.uneffectIndexValidate() // 用户行为暂时隐藏
+          if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
             return false
           }
           let code = 0
@@ -747,7 +748,7 @@ export default {
           let params = {
             ...this.baseForm,
             ...this.$refs.userAttrRule.lastSubmitRuleConfig,
-            // ...this.$refs.userActionRule.lastSubmitRuleConfig,
+            // ...this.$refs.userActionRule.lastSubmitRuleConfig, //用户行为
             ...this.rejectForm,
             outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
             rejectGroupPackCode: code
