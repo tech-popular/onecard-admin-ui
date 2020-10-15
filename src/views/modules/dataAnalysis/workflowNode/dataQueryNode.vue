@@ -37,6 +37,7 @@ export default {
       channelList: [],
       custerList: [],
       curCusterType: '',
+      custerArr: [],
       dataForm: {
         channelCode: '',
         groupId: []
@@ -83,43 +84,61 @@ export default {
           return
         }
         this.custerList = data.data
-        if (this.dataForm.groupId.length) {
-          this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
-          this.custerList.map(item => {
-            if (item.type !== this.curCusterType) {
-              item.disabled = true
-            }
-          })
-        }
+        // if (this.dataForm.groupId.length) {
+        //   this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+        //   this.custerList.map(item => {
+        //     if (item.type !== this.curCusterType) {
+        //       item.disabled = true
+        //     }
+        //   })
+        // }
       })
     },
     groupIdChange () {
+      // let arr = []
+      // if (!this.dataForm.groupId.length) {
+      //   this.custerList.map(item => {
+      //     item.disabled = false
+      //   })
+      // } else {
+      //   if (this.dataForm.groupId.length === 1) {
+      //     this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
+      //     this.custerList.map(item => {
+      //       if (item.type !== this.curCusterType) {
+      //         item.disabled = true
+      //       }
+      //     })
+      //   }
+      // }
+      // this.dataForm.groupId.forEach(item => {
+      //   let obj = this.custerList.filter(citem => citem.value === item)[0]
+      //   arr.push(obj)
+      // })
+      // this.custerArr = arr
       let arr = []
-      if (!this.dataForm.groupId.length) {
-        this.custerList.map(item => {
-          item.disabled = false
-        })
-      } else {
-        if (this.dataForm.groupId.length === 1) {
-          this.curCusterType = this.custerList.filter(citem => citem.value === this.dataForm.groupId[0])[0].type
-          this.custerList.map(item => {
-            if (item.type !== this.curCusterType) {
-              item.disabled = true
-            }
-          })
-        }
-      }
       this.dataForm.groupId.forEach(item => {
         let obj = this.custerList.filter(citem => citem.value === item)[0]
         arr.push(obj)
       })
-      this.$emit('getSelectCuster', arr, this.dataForm)
+      this.custerArr = arr
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
+          let isStatic = this.custerArr.filter(item => item.type === 'static')
+          let isDynamic = this.custerArr.filter(item => item.type === 'dynamic')
+          if (isStatic.length && isDynamic.length) {
+            this.curCusterType = 'MIXED'
+          }
+          if (isStatic.length && !isDynamic.length) {
+            this.curCusterType = 'STATIC'
+          }
+          if (!isStatic.length && isDynamic.length) {
+            this.curCusterType = 'DYNAMIC'
+          }
           let config = {
-            configItems: this.dataForm
+            configItems: this.dataForm,
+            custerArr: this.custerArr
           }
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key }, type: this.curCusterType })
           this.$parent.dataQueryNodeVisible = false
