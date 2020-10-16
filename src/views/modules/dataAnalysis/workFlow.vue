@@ -398,8 +398,8 @@ export default {
         class: 'GraphLinksModel',
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
-        linkDataArray: mySelf.myDiagram.model.linkDataArray,
-        nodeDataArray: mySelf.myDiagram.model.nodeDataArray
+        linkDataArray: JSON.parse(JSON.stringify(mySelf.myDiagram.model.linkDataArray)),
+        nodeDataArray: JSON.parse(JSON.stringify(mySelf.myDiagram.model.nodeDataArray))
       }
       console.log(flowData)
       let params = {
@@ -414,7 +414,7 @@ export default {
       if (this.id) {
         params.id = this.id
       }
-      console.log(params, url)
+      console.log(params)
       url(params).then(({data}) => {
         if (data.status !== '1') {
           return this.$message.error(data.message || '保存失败')
