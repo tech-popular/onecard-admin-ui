@@ -201,7 +201,9 @@ export default {
               if (item.type === 'condition') {
                 item.data = null
                 item.linkText = '<' + item.num + '> ' + that.defaultCondition
-                mySelf.myDiagram.model.updateTargetBindings(item)
+                // mySelf.myDiagram.model.updateTargetBindings(item)
+                mySelf.myDiagram.model.setDataProperty(item, 'data', null)
+                mySelf.myDiagram.model.setDataProperty(item, 'linkText', '<' + item.num + '> ' + that.defaultCondition)
               }
             })
           }
@@ -212,7 +214,9 @@ export default {
               if (itemGroupId && !that.groupId.includes(itemGroupId)) {
                 cNode.data.data.configItems.groupId = ''
                 cNode.data.nodeName = '分群节点'
-                mySelf.myDiagram.model.updateTargetBindings(cNode.data)
+                // mySelf.myDiagram.model.updateTargetBindings(cNode.data)
+                mySelf.myDiagram.model.setDataProperty(cNode.data.data.configItems, 'groupId', '')
+                mySelf.myDiagram.model.setDataProperty(cNode.data, 'nodeName', '分群节点')
               }
             }
             // 若分群更改为静态时，其所有子孙节点 分流节点 全部置空，且删除连线
@@ -247,11 +251,15 @@ export default {
                 if (item.data.config.configItems.flowType === 'condition') {
                   link.data.linkText = that.defaultCondition
                   link.data.type = 'condition'
+                  mySelf.myDiagram.model.setDataProperty(link.data, 'linkText', that.defaultCondition)
+                  mySelf.myDiagram.model.setDataProperty(link.data, 'type', 'condition')
                 } else {
                   link.data.linkText = that.defaultRate
                   link.data.type = 'rate'
+                  mySelf.myDiagram.model.setDataProperty(link.data, 'linkText', that.defaultRate)
+                  mySelf.myDiagram.model.setDataProperty(link.data, 'type', 'rate')
                 }
-                mySelf.myDiagram.model.updateTargetBindings(link.data)
+                // mySelf.myDiagram.model.updateTargetBindings(link.data)
               }
             })
             let index = that.flowTypeArr.findIndex(item => item.key === key)
@@ -729,6 +737,7 @@ export default {
         if (txn === null) return
         txn.changes.each(function(e) {
           if (e.modelChange === 'linkFromKey') {
+            console.log(9999)
             // that.linkDrawnChange(e.object.from, e.newValue, e)
             let newFromNode = mySelf.myDiagram.findNodeForKey(e.newValue)
             let fromCategory = newFromNode.data.category
@@ -768,11 +777,13 @@ export default {
               if (newFromNode.category === 'GROUP_CHOICE' && citem.from === e.newValue) {
                 if (groupLinkDataText.length === 0) {
                   citem.linkText = 'TRUE'
-                  mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+                  // mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+                  mySelf.myDiagram.model.setDataProperty(citem, 'linkText', 'TRUE')
                 } else if (groupLinkDataText.length === 1) {
                   if (citem.to === e.object.to) { // 只更新本条线内容
                     citem.linkText = groupLinkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-                    mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+                    // mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+                    mySelf.myDiagram.model.setDataProperty(citem, 'linkText', groupLinkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE')
                   }
                 } else if (groupLinkDataText.length == 2) { // 限制最多可连接两条线
                   let curLink = that.flowJson.linkDataArray.filter(item => item.to === e.object.to)[0]
@@ -853,7 +864,8 @@ export default {
             : 'TRUE'
             if (linkOutData.length == 1) {
               link.data.linkText = linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-              mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
+              // mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
+              mySelf.myDiagram.model.setDataProperty(link.data, 'linkText', linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE')
             }
             if (linkOutData.length == 2) { // 限制最多可连接两条线
               that.$message.error('最多可连接两个子节点')
@@ -872,13 +884,17 @@ export default {
             return mySelf.myDiagram.model.removeLinkData(e.subject.data)
           }
           if (curFlowType === 'condition') {
-            e.subject.data.linkText = that.defaultCondition
-            e.subject.data.type = 'condition'
+            mySelf.myDiagram.model.setDataProperty(e.subject.data, 'linkText', that.defaultCondition)
+            mySelf.myDiagram.model.setDataProperty(e.subject.data, 'type', 'condition')
+            // e.subject.data.linkText = that.defaultCondition
+            // e.subject.data.type = 'condition'
           } else {
-            e.subject.data.linkText = that.defaultRate
-            e.subject.data.type = 'rate'
+            mySelf.myDiagram.model.setDataProperty(e.subject.data, 'linkText', that.defaultRate)
+            mySelf.myDiagram.model.setDataProperty(e.subject.data, 'type', 'rate')
+            // e.subject.data.linkText = that.defaultRate
+            // e.subject.data.type = 'rate'
           }
-          mySelf.myDiagram.model.updateTargetBindings(e.subject.data)
+          // mySelf.myDiagram.model.updateTargetBindings(e.subject.data)
           // 判断拉的条数
           let linkOutData = []
           fromNodeLink.findLinksOutOf().each(function (link) {
