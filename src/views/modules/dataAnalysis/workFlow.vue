@@ -398,10 +398,10 @@ export default {
         class: 'GraphLinksModel',
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
-        linkDataArray: JSON.parse(JSON.stringify(mySelf.myDiagram.model.linkDataArray)),
-        nodeDataArray: JSON.parse(JSON.stringify(mySelf.myDiagram.model.nodeDataArray))
+        linkDataArray: that.jsonParseData(mySelf.myDiagram.model.linkDataArray),
+        nodeDataArray: that.jsonParseData(mySelf.myDiagram.model.nodeDataArray)
       }
-      console.log(flowData)
+      console.log(mySelf.myDiagram.model.linkDataArray)
       let params = {
         configJson: { ...flowData, flowTypeArr: this.flowTypeArr },
         name: saveData.name,
@@ -810,8 +810,8 @@ export default {
               type: 'warning'
             }).then(() => {
               mySelf.myDiagram.commandHandler.deleteSelection()
-              that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
-              that.flowJson.nodeDataArray = mySelf.myDiagram.model.nodeDataArray
+              that.flowJson.linkDataArray = that.jsonParseData(mySelf.myDiagram.model.linkDataArray)
+              that.flowJson.nodeDataArray = that.jsonParseData(mySelf.myDiagram.model.nodeDataArray)
               let index = that.flowTypeArr.findIndex(item => item.key === node.data.key)
               if (index >= 0) {
                 that.flowTypeArr.splice(index, 1)
@@ -878,7 +878,7 @@ export default {
             }
             linkOutData.push(link.data)
           })
-          that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
+          that.flowJson.linkDataArray = that.jsonParseData(mySelf.myDiagram.model.linkDataArray)
         } else { // 非状态判断时，只允许有一个子节点
           that.linkDrawnChange(fromKey, toKey, e)
         }
@@ -991,6 +991,9 @@ export default {
       )
       mySelf.myPalette.layout.sorting = go.GridLayout.Forward
     },
+    jsonParseData (data) {
+      return JSON.parse(JSON.stringify(data))
+    },
     linkDrawnChange (fromKey, toKey, e) {
       let fromNodeLink = mySelf.myDiagram.findNodeForKey(fromKey)  // 获取节点对象
       let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
@@ -1070,7 +1073,7 @@ export default {
     lineLinkOperateEvents (fromNode, type) { // 连线的修改、删除事件
       if (fromNode.data.category === 'IN_PARAM') return // 第一条线不可删除及修改
       mySelf.myDiagram.commandHandler.deleteSelection()
-      that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
+      that.flowJson.linkDataArray = that.jsonParseData(mySelf.myDiagram.model.linkDataArray)
     },
     arrIncludes (arr1, arr2) { //  判断arr1是否包含arr2
       return arr2.every(val => arr1.includes(val))
