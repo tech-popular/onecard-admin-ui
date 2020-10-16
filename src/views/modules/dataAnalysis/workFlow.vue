@@ -279,6 +279,7 @@ export default {
           link.data.data = item.data.config
           link.data.type = 'condition'
           link.data.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.name // 对连线的文字赋值
+          console.log(89099999, link)
           mySelf.myDiagram.model.updateTargetBindings(link.data)
         })
       }
