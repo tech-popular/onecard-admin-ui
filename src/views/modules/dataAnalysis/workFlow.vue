@@ -74,7 +74,7 @@ export default {
       successText: '执行成功',
       defaultRate: '0%',
       defaultCondition: '请输入分流条件',
-      saveForm: {
+      saveFormData: {
         name: '',
         code: ''
       },
@@ -130,10 +130,10 @@ export default {
               }
               branchNodeArr[item.from].push({...item})
             }
-            this.$nextTick(() => {
-              mySelf.myDiagram.model.updateTargetBindings(item)
-              console.log(mySelf.myDiagram.model)
-            })
+            // this.$nextTick(() => {
+            //   mySelf.myDiagram.model.updateTargetBindings(item)
+            //   console.log(mySelf.myDiagram.model)
+            // })
           }
         })
       },
@@ -161,8 +161,8 @@ export default {
           // this.load()
           this.loading = false
         })
-        this.saveForm.name = data.data.name
-        this.saveForm.code = data.data.code
+        this.saveFormData.name = data.data.name
+        this.saveFormData.code = data.data.code
         this.channelCode = data.data.channelCode
         // this.groupId = data.groupId
         this.groupId = data.data.configJson.nodeDataArray.filter(item => item.key === '2')[0].data.configItems.groupId
@@ -273,27 +273,25 @@ export default {
     // 分流条件弹窗关闭事件
     closeMultiBranchCondition (item) {
       if (item && item.tag == 'save') {
-        mySelf.myDiagram.model.linkDataArray.forEach(citem => {
-          if (citem.from === item.data.from && citem.to === item.data.to) {
-            citem.data = item.data.config
-            citem.type = 'condition'
-            citem.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.name // 对连线的文字赋值
-            console.log(citem, item)
-            mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
-            console.log(mySelf.myDiagram.model)
-          }
+        let nodeA = mySelf.myDiagram.findNodeForKey(item.data.from)
+        let nodeB = mySelf.myDiagram.findNodeForKey(item.data.to)
+        nodeA.findLinksTo(nodeB).each(function (link) {
+          link.data.data = item.data.config
+          link.data.type = 'condition'
+          link.data.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.name // 对连线的文字赋值
+          mySelf.myDiagram.model.updateTargetBindings(link.data)
         })
       }
     },
     closeMultiBranchRate (item) {
       if (item && item.tag == 'save') {
-        mySelf.myDiagram.model.linkDataArray.forEach(citem => {
-          if (citem.from === item.data.from && citem.to === item.data.to) {
-            citem.data = item.data.config
-            citem.type = 'rate'
-            citem.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.rate + '%' // 对连线的文字赋值
-            mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
-          }
+        let nodeA = mySelf.myDiagram.findNodeForKey(item.data.from)
+        let nodeB = mySelf.myDiagram.findNodeForKey(item.data.to)
+        nodeA.findLinksTo(nodeB).each(function (link) {
+          link.data.data = item.data.config
+          link.data.type = 'rate'
+          link.data.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.rate + '%' // 对连线的文字赋值
+          mySelf.myDiagram.model.updateTargetBindings(link.data)
         })
       }
     },
@@ -316,6 +314,7 @@ export default {
     // 保存
     save () {
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
+      console.log(nodeDataArray)
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
       let pChildOneArr = []
@@ -383,33 +382,32 @@ export default {
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // 判断连线的内容
       if (that.id) { // 修改保存
-        this.saveFlowInfoData({
-          name: this.saveForm.name,
-          code: this.saveForm.code
-        })
+        console.log(890)
+        that.saveFlowInfoData()
       } else { // 新建保存
-        this.saveDataVisible = true
-        this.$nextTick(() => {
-          this.$refs.saveDataEl.init()
+        that.saveDataVisible = true
+        that.$nextTick(() => {
+          that.$refs.saveDataEl.init()
         })
       }
     },
     closeSave (data) {
-      this.saveFlowInfoData(data)
+      that.saveFormData.name = data.name
+      that.saveFormData.code = data.code
+      that.saveFlowInfoData()
     },
-    saveFlowInfoData (saveData) {
-      let flowData = {
-        class: 'GraphLinksModel',
-        linkFromPortIdProperty: 'fromPort',
-        linkToPortIdProperty: 'toPort',
-        linkDataArray: that.jsonParseData(mySelf.myDiagram.model.linkDataArray),
-        nodeDataArray: that.jsonParseData(mySelf.myDiagram.model.nodeDataArray)
-      }
-      console.log(mySelf.myDiagram.model.linkDataArray)
+    saveFlowInfoData () {
       let params = {
-        configJson: { ...flowData, flowTypeArr: this.flowTypeArr },
-        name: saveData.name,
-        code: saveData.code,
+        configJson: {
+          class: 'GraphLinksModel',
+          linkFromPortIdProperty: 'fromPort',
+          linkToPortIdProperty: 'toPort',
+          linkDataArray: JSON.parse(JSON.stringify(mySelf.myDiagram.model.linkDataArray)),
+          nodeDataArray: JSON.parse(JSON.stringify(mySelf.myDiagram.model.nodeDataArray)),
+          flowTypeArr: this.flowTypeArr
+        },
+        name: that.saveFormData.name,
+        code: that.saveFormData.code,
         groupId: this.groupId,
         type: this.type.toUpperCase(),
         channelCode: this.channelCode
@@ -995,9 +993,10 @@ export default {
       )
       mySelf.myPalette.layout.sorting = go.GridLayout.Forward
     },
-    jsonParseData (data) {
-      return JSON.parse(JSON.stringify(data))
-    },
+    // jsonParseData (data) {
+    //   console.log(JSON.parse(JSON.stringify(data)))
+    //   return JSON.parse(JSON.stringify(data))
+    // },
     linkDrawnChange (fromKey, toKey, e) {
       let fromNodeLink = mySelf.myDiagram.findNodeForKey(fromKey)  // 获取节点对象
       let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
