@@ -103,6 +103,7 @@ export default {
     'flowJson.linkDataArray': {
       handler (newVal) {
         let branchNodeArr = []
+        console.log(newVal)
         newVal.map(item => {
           let firstNum = item.from.substring(0, 1)
           if (firstNum === '5') {
@@ -131,6 +132,7 @@ export default {
             }
             this.$nextTick(() => {
               mySelf.myDiagram.model.updateTargetBindings(item)
+              console.log(mySelf.myDiagram.model)
             })
           }
         })
@@ -276,7 +278,9 @@ export default {
             citem.data = item.data.config
             citem.type = 'condition'
             citem.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.name // 对连线的文字赋值
+            console.log(citem, item)
             mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
+            console.log(mySelf.myDiagram.model)
           }
         })
       }
@@ -810,8 +814,8 @@ export default {
               type: 'warning'
             }).then(() => {
               mySelf.myDiagram.commandHandler.deleteSelection()
-              that.flowJson.linkDataArray = that.jsonParseData(mySelf.myDiagram.model.linkDataArray)
-              that.flowJson.nodeDataArray = that.jsonParseData(mySelf.myDiagram.model.nodeDataArray)
+              that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
+              that.flowJson.nodeDataArray = mySelf.myDiagram.model.nodeDataArray
               let index = that.flowTypeArr.findIndex(item => item.key === node.data.key)
               if (index >= 0) {
                 that.flowTypeArr.splice(index, 1)
@@ -878,7 +882,7 @@ export default {
             }
             linkOutData.push(link.data)
           })
-          that.flowJson.linkDataArray = that.jsonParseData(mySelf.myDiagram.model.linkDataArray)
+          that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
         } else { // 非状态判断时，只允许有一个子节点
           that.linkDrawnChange(fromKey, toKey, e)
         }
@@ -1073,7 +1077,7 @@ export default {
     lineLinkOperateEvents (fromNode, type) { // 连线的修改、删除事件
       if (fromNode.data.category === 'IN_PARAM') return // 第一条线不可删除及修改
       mySelf.myDiagram.commandHandler.deleteSelection()
-      that.flowJson.linkDataArray = that.jsonParseData(mySelf.myDiagram.model.linkDataArray)
+      that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
     },
     arrIncludes (arr1, arr2) { //  判断arr1是否包含arr2
       return arr2.every(val => arr1.includes(val))
