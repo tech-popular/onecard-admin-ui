@@ -103,7 +103,6 @@ export default {
     'flowJson.linkDataArray': {
       handler (newVal) {
         let branchNodeArr = []
-        console.log(newVal)
         newVal.map(item => {
           let firstNum = item.from.substring(0, 1)
           if (firstNum === '5') {
@@ -276,11 +275,13 @@ export default {
         let nodeA = mySelf.myDiagram.findNodeForKey(item.data.from)
         let nodeB = mySelf.myDiagram.findNodeForKey(item.data.to)
         nodeA.findLinksTo(nodeB).each(function (link) {
-          link.data.data = item.data.config
-          link.data.type = 'condition'
-          link.data.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.name // 对连线的文字赋值
-          console.log(89099999, link)
-          mySelf.myDiagram.model.updateTargetBindings(link.data)
+          // link.data.data = item.data.config
+          // link.data.type = 'condition'
+          // link.data.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.name // 对连线的文字赋值
+          // mySelf.myDiagram.model.updateTargetBindings(link.data)
+          mySelf.myDiagram.model.setDataProperty(link.data, 'data', item.data.config)
+          mySelf.myDiagram.model.setDataProperty(link.data, 'type', 'condition')
+          mySelf.myDiagram.model.setDataProperty(link.data, 'linkText', '<' + item.data.num + '> ' + item.data.config.configItems.name)
         })
       }
     },
@@ -289,10 +290,13 @@ export default {
         let nodeA = mySelf.myDiagram.findNodeForKey(item.data.from)
         let nodeB = mySelf.myDiagram.findNodeForKey(item.data.to)
         nodeA.findLinksTo(nodeB).each(function (link) {
-          link.data.data = item.data.config
-          link.data.type = 'rate'
-          link.data.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.rate + '%' // 对连线的文字赋值
-          mySelf.myDiagram.model.updateTargetBindings(link.data)
+          // link.data.data = item.data.config
+          // link.data.type = 'rate'
+          // link.data.linkText = '<' + item.data.num + '> ' + item.data.config.configItems.rate + '%' // 对连线的文字赋值
+          // mySelf.myDiagram.model.updateTargetBindings(link.data)
+          mySelf.myDiagram.model.setDataProperty(link.data, 'data', item.data.config)
+          mySelf.myDiagram.model.setDataProperty(link.data, 'type', 'rate')
+          mySelf.myDiagram.model.setDataProperty(link.data, 'linkText', '<' + item.data.num + '> ' + item.data.config.configItems.rate + '%')
         })
       }
     },
@@ -315,7 +319,6 @@ export default {
     // 保存
     save () {
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
-      console.log(nodeDataArray)
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
       let pChildOneArr = []
@@ -383,7 +386,6 @@ export default {
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // 判断连线的内容
       if (that.id) { // 修改保存
-        console.log(890)
         that.saveFlowInfoData()
       } else { // 新建保存
         that.saveDataVisible = true
@@ -735,20 +737,26 @@ export default {
             that.flowJson.linkDataArray.forEach(citem => {
               if (newFromNode.category === 'MULTI_BRANCH' && citem.from === e.newValue) {
                 let linkText = ''
+                let type = ''
                 let filterArr = that.flowTypeArr.filter(item => item.key === citem.from)
                 let curFlowType = filterArr.length ? filterArr[0].flowType : ''
                 if (flowLinkDataText.length < 5 && citem.to === e.object.to) {
                   if (curFlowType === 'condition') {
                     linkText = that.defaultCondition
                     citem.type = 'condition'
+                    type = 'condition'
                     citem.data = null
                   } else {
                     linkText = that.defaultRate
                     citem.type = 'rate'
+                    type = 'rate'
                     citem.data = null
                   }
                   citem.linkText = linkText // 对连线的文字赋值
-                  mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
+                  // mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
+                  mySelf.myDiagram.model.setDataProperty(citem, 'data', null)
+                  mySelf.myDiagram.model.setDataProperty(citem, 'type', type)
+                  mySelf.myDiagram.model.setDataProperty(citem, 'linkText', linkText)
                 } else {
                   if (citem.to === e.object.to) {
                     that.$message.error('最多可连接5个子节点')
@@ -994,10 +1002,6 @@ export default {
       )
       mySelf.myPalette.layout.sorting = go.GridLayout.Forward
     },
-    // jsonParseData (data) {
-    //   console.log(JSON.parse(JSON.stringify(data)))
-    //   return JSON.parse(JSON.stringify(data))
-    // },
     linkDrawnChange (fromKey, toKey, e) {
       let fromNodeLink = mySelf.myDiagram.findNodeForKey(fromKey)  // 获取节点对象
       let toNodeLink = mySelf.myDiagram.findNodeForKey(toKey)
