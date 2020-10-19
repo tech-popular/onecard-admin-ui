@@ -37,7 +37,7 @@
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'update')">编辑</el-button>
           <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button>
-          <el-button type="text" size="small" @click="tableShowHandle(scope.row)">分群概览</el-button>
+          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">分群概览</el-button>
         </template>
       </el-table-column>
     </el-table>
