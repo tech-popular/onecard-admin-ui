@@ -1,13 +1,15 @@
 <template>
-  <el-dialog title="返参"
+  <el-dialog title="分流"
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
     width="500px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :rules="dataRules">
-      <el-form-item prop="outValue" label="出参">
-        <el-input v-model="dataForm.outValue" placeholder="请输入出参" style="width: 300px" />
+      <el-form-item prop="flowType" label="分流方式">
+        <el-select v-model="dataForm.flowType" placeholder="请选择分流方式" style="width: 300px">
+          <el-option v-for="(item, index) in flowData" :key="index" :value="item.value" :label="item.text"></el-option>
+        </el-select>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -23,13 +25,26 @@ export default {
       id: '',
       key: '',
       visible: false,
-      inparamData: [],
+      flowData: [
+        {
+          value: 'condition',
+          text: '条件分流'
+        },
+        {
+          value: 'hash',
+          text: 'HASH分流'
+        },
+        {
+          value: 'rate',
+          text: '概率分流'
+        }
+      ],
       dataForm: {
-        outValue: ''
+        flowType: ''
       },
       dataRules: {
-        outValue: [
-          { required: true, message: '请选择入参', trigger: 'blur' }
+        flowType: [
+          { required: true, message: '请选择分流方式', trigger: 'change' }
         ]
       }
     }
@@ -39,23 +54,25 @@ export default {
       this.visible = true
       this.key = data.key
       if (data.data) {
-        this.dataForm.outValue = data.data.configItems.outValue
+        this.dataForm.flowType = data.data.configItems.flowType
       }
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
+          let flowName = this.flowData.filter(item => item.value === this.dataForm.flowType)[0].text
           let config = {
-            configItems: this.dataForm
+            configItems: this.dataForm,
+            flowName: flowName
           }
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
-          this.$parent.outparamsNodeVisible = false
+          this.$parent.multiBranchNodeVisible = false
         }
       })
     },
     cancelHandle () {
       this.visible = false
-      this.$parent.outparamsNodeVisible = false
+      this.$parent.multiBranchNodeVisible = false
     }
   }
 }
