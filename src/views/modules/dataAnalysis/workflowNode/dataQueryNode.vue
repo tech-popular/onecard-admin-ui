@@ -75,6 +75,7 @@ export default {
       })
     },
     channelCodeChange (val) {
+      this.dataForm.groupId = []
       this.getCusterList(val)
     },
     getCusterList (code) {
