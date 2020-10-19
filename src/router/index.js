@@ -20,7 +20,7 @@ const globalRoutes = [
   { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } },
   { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
   { path: '/resetPassword', component: _import('common/resetPass'), name: 'resetPass', meta: { title: '重置密码' } },
-  { path: '/canary', redirect: '/login' }
+  { path: '', redirect: '/login' }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -51,6 +51,7 @@ const mainRoutes = {
     { path: '/dataAnalysis-workFlow', component: _import('modules/dataAnalysis/workFlow'), name: 'dataAnalysis-workFlow', meta: { title: '决策配置', isTab: false } }
   ],
   beforeEnter (to, from, next) {
+    console.log(to)
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       clearLoginInfo()
@@ -68,6 +69,7 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  console.log(to)
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
