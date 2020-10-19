@@ -25,7 +25,7 @@ const globalRoutes = [
 
 // 主入口路由(需嵌套上左右整体布局)
 const mainRoutes = {
-  path: '',
+  path: '/',
   component: _import('main'),
   name: 'main',
   // redirect: { name: 'home' },
@@ -193,7 +193,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
     mainRoutes.children = routes
     router.addRoutes([
       mainRoutes,
-      { path: '*', redirect: { name: 'login' } }
+      { path: '*', redirect: { name: '404' } }
     ])
     sessionStorage.setItem('dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'))
   }
