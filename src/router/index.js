@@ -193,7 +193,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
     mainRoutes.children = routes
     router.addRoutes([
       mainRoutes,
-      { path: '*', redirect: { name: '404' } }
+      { path: '*', redirect: { name: 'login' } }
     ])
     sessionStorage.setItem('dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'))
   }
