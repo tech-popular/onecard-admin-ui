@@ -20,7 +20,7 @@ const globalRoutes = [
   { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } },
   { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
   { path: '/resetPassword', component: _import('common/resetPass'), name: 'resetPass', meta: { title: '重置密码' } },
-  { path: '', redirect: '/login' }
+  { path: '/canary', redirect: '/login' }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
