@@ -167,6 +167,7 @@ export default {
       if (!this.curSelectPro.productNum) return false
       if (!this.tableData.length || !this.tableData) {
         this.tableData.unshift(this.curSelectPro)
+        this.tableAddData.unshift(this.curSelectPro)
       } else {
         let isExist = this.tableData.filter(item => this.curSelectPro.productNum == item.productNum).length
         if (!isExist) {
@@ -240,6 +241,7 @@ export default {
         let data = deepClone(this.tableData)
         if (data.length === this.tableDataChecked.length) {
           data = []
+          this.tableAddData = []
         } else {
           this.tableDataChecked.forEach(item => {
             data.forEach((ditem, dindex) => {
