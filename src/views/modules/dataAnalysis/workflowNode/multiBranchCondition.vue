@@ -254,6 +254,7 @@ export default {
       if (link.data.data) {
         this.loading = true
         this.dataForm = link.data.data.configItems
+        this.selectEnumsList = link.data.data.configItems.selectEnumsList
         this.getSelectAllCata(() => {
           this.getSelectOperateList(this.dataForm.fieldType)
           this.loading = false
@@ -473,7 +474,7 @@ export default {
           } else {
             this.selectEnumsList = res.data.data
           }
-          // this.updateRulesArr(this.dataForm, { selectEnumsList: selectEnumsList })
+          this.updateRulesArr(this.dataForm, { selectEnumsList: this.selectEnumsList })
         })
       }
     },
@@ -562,6 +563,9 @@ export default {
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
+          let selectVal = this.dataForm.params[0].selectVal
+          let newArr = this.dataForm.selectEnumsList.filter(item => selectVal.includes(item.childrenNum))
+          this.dataForm.selectEnumsList = newArr
           console.log(this.dataForm)
           let config = {
             configItems: this.dataForm
