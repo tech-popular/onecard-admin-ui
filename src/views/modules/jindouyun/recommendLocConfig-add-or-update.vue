@@ -85,7 +85,7 @@ export default {
       locIndex: '',
       tableData: [],
       tableDataChecked: [],
-      tableDataLength: 0,
+      tableAddData: [],
       dataRule: {
         name: [
           { required: true, message: '请输入名称', trigger: 'blur' }
@@ -105,7 +105,7 @@ export default {
         name: ''
       }
       this.tableData = []
-      this.tableDataLength = 0
+      this.tableAddData = []
       if (row && row.id) {
         this.id = row.id
         this.tag = tag
@@ -171,6 +171,7 @@ export default {
         let isExist = this.tableData.filter(item => this.curSelectPro.productNum == item.productNum).length
         if (!isExist) {
           this.tableData.unshift(this.curSelectPro)
+          this.tableAddData.unshift(this.curSelectPro)
         } else {
           this.$message.error('该产品已添加！')
         }
@@ -179,7 +180,7 @@ export default {
     // 设置背景色
     cellStyle ({ row, column, rowIndex, columnIndex }) {
       const style = {}
-      const addlength = this.tableData.length - this.tableDataLength
+      const addlength = this.tableAddData.length
       if (this.id) {
         if (rowIndex < addlength) {
           style.background = '#97CBFF'
@@ -244,6 +245,11 @@ export default {
             data.forEach((ditem, dindex) => {
               if (item.productNum === ditem.productNum) {
                 data.splice(dindex, 1)
+              }
+            })
+            this.tableAddData.forEach((aitem, aindex) => {
+              if (item.productNum === aitem.productNum) {
+                this.tableAddData.splice(aindex, 1)
               }
             })
           })
