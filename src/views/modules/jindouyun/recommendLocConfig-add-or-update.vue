@@ -105,7 +105,6 @@ export default {
         name: ''
       }
       this.tableData = []
-      this.tableAddData = []
       if (row && row.id) {
         this.id = row.id
         this.tag = tag
@@ -166,13 +165,13 @@ export default {
     addToTab () {
       if (!this.curSelectPro.productNum) return false
       if (!this.tableData.length || !this.tableData) {
+        this.curSelectPro.styleState = true
         this.tableData.unshift(this.curSelectPro)
-        this.tableAddData.unshift(this.curSelectPro)
       } else {
         let isExist = this.tableData.filter(item => this.curSelectPro.productNum == item.productNum).length
         if (!isExist) {
+          this.curSelectPro.styleState = true
           this.tableData.unshift(this.curSelectPro)
-          this.tableAddData.unshift(this.curSelectPro)
         } else {
           this.$message.error('该产品已添加！')
         }
@@ -181,9 +180,8 @@ export default {
     // 设置背景色
     cellStyle ({ row, column, rowIndex, columnIndex }) {
       const style = {}
-      const addlength = this.tableAddData.length
       if (this.id) {
-        if (rowIndex < addlength) {
+        if (row.styleState) {
           style.background = '#97CBFF'
         }
         return style
@@ -241,17 +239,11 @@ export default {
         let data = deepClone(this.tableData)
         if (data.length === this.tableDataChecked.length) {
           data = []
-          this.tableAddData = []
         } else {
           this.tableDataChecked.forEach(item => {
             data.forEach((ditem, dindex) => {
               if (item.productNum === ditem.productNum) {
                 data.splice(dindex, 1)
-              }
-            })
-            this.tableAddData.forEach((aitem, aindex) => {
-              if (item.productNum === aitem.productNum) {
-                this.tableAddData.splice(aindex, 1)
               }
             })
           })
@@ -272,6 +264,9 @@ export default {
           }
           this.tableData.forEach((item, index) => {
             item.productLocation = index + 1
+            if (item.styleState) {
+              delete item.styleState
+            }
           })
           let url = jdyAdd
           let params = {
@@ -297,8 +292,3 @@ export default {
   }
 }
 </script>
-<style>
-.add-row {
-  background-color: darkcyan;
-}
-</style>
