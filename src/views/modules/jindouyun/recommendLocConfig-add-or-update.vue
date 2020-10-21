@@ -85,7 +85,6 @@ export default {
       locIndex: '',
       tableData: [],
       tableDataChecked: [],
-      tableAddData: [],
       dataRule: {
         name: [
           { required: true, message: '请输入名称', trigger: 'blur' }
