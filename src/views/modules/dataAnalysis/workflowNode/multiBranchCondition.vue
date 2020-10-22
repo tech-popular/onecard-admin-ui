@@ -563,10 +563,10 @@ export default {
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
-          let selectVal = this.dataForm.params[0].selectVal
-          let newArr = this.dataForm.selectEnumsList.filter(item => selectVal.includes(item.childrenNum))
-          this.dataForm.selectEnumsList = newArr
           console.log(this.dataForm)
+          let selectVal = this.dataForm.params[0].selectVal
+          let newArr = this.dataForm.selectEnumsList && this.dataForm.selectEnumsList.filter(item => selectVal.includes(item.childrenNum))
+          this.dataForm.selectEnumsList = newArr
           let config = {
             configItems: this.dataForm
           }
