@@ -41,7 +41,7 @@
       <el-button type="danger" size="small" @click="multiRemoveClick" >批量删除</el-button>
     </div>
     <div>
-      <el-table :data="tableData"  @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border style="width: 100%">
+      <el-table :data="tableData"  @selection-change="handleSelectionChange" @select-all="handleAllCheckedChange" border :cell-style="cellStyle" style="width: 100%">
       <el-table-column type="selection" header-align="center" align="center" width="100"></el-table-column>
       <el-table-column label="序号" header-align="center" align="center" width="100">
         <template slot-scope="scope">
@@ -125,6 +125,7 @@ export default {
           name: data.data.name
         }
         this.tableData = data.data.locationList || []
+        this.tableDataLength = data.data.locationList.length
         this.visible = true
         this.$nextTick(() => {
           this.$refs.dataForm.clearValidate()
@@ -163,14 +164,26 @@ export default {
     addToTab () {
       if (!this.curSelectPro.productNum) return false
       if (!this.tableData.length || !this.tableData) {
+        this.curSelectPro.styleState = true
         this.tableData.unshift(this.curSelectPro)
       } else {
         let isExist = this.tableData.filter(item => this.curSelectPro.productNum == item.productNum).length
         if (!isExist) {
+          this.curSelectPro.styleState = true
           this.tableData.unshift(this.curSelectPro)
         } else {
           this.$message.error('该产品已添加！')
         }
+      }
+    },
+    // 设置背景色
+    cellStyle ({ row, column, rowIndex, columnIndex }) {
+      const style = {}
+      if (this.id) {
+        if (row.styleState) {
+          style.background = '#97CBFF'
+        }
+        return style
       }
     },
     handleSelectionChange (val) {
@@ -250,6 +263,9 @@ export default {
           }
           this.tableData.forEach((item, index) => {
             item.productLocation = index + 1
+            if (item.styleState) {
+              delete item.styleState
+            }
           })
           let url = jdyAdd
           let params = {

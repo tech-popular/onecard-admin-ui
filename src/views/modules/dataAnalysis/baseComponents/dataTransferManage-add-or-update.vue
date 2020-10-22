@@ -340,6 +340,7 @@
         baseForm: {
           id: '',
           taskUniqueFlag: null, // 蜂巢任务ID
+          dolphinProcessId: null,
           transferName: '', // 任务名称
           templateId: '', // 分群名称
           outParams: [],
@@ -726,6 +727,7 @@
         postData.id = data.id ? data.id : ''
         postData.triggerMode = data.triggerMode
         postData.taskUniqueFlag = data.taskUniqueFlag
+        postData.dolphinProcessId = data.dolphinProcessId
         postData.transferName = data.transferName
         postData.templateId = data.templateId
         postData.transferType = data.transferType.join(',')
@@ -819,6 +821,7 @@
             let disData = data.data
             this.baseForm.id = disData.id
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
+            this.baseForm.dolphinProcessId = disData.dolphinProcessId
             this.baseForm.templateId = disData.templateId
             this.baseForm.transferName = disData.transferName
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
@@ -906,6 +909,7 @@
       // 打开抽屉弹窗
       init (row, tag) {
         this.baseForm.taskUniqueFlag = null
+        this.baseForm.dolphinProcessId = null
         this.baseForm.id = ''
         this.baseForm.transferName = ''
         this.baseForm.taskDescribtion = ''
