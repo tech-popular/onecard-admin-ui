@@ -112,7 +112,7 @@ export default {
           return this.$message.error('JSON信息不存在')
         }
         this.type = data.data.type
-        that.flowTypeArr = data.data.configJson.flowTypeArr
+        that.flowTypeArr = data.data.configJson.flowTypeArr || []
         that.flowJson = data.data.configJson
         this.$nextTick(() => {
           this.diagramInit()
