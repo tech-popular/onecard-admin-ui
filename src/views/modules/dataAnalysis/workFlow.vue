@@ -17,6 +17,7 @@
     <multi-branch-node @close="closeAllNode" v-if="multiBranchNodeVisible" ref="multiBranchNodeEl"></multi-branch-node>
     <multi-branch-condition @close="closeMultiBranchCondition" v-if="multiBranchConditionVisible" ref="multiBranchConditionEl"></multi-branch-condition>
     <multi-branch-rate @close="closeMultiBranchRate" v-if="multiBranchRateVisible" ref="multiBranchRateEl"></multi-branch-rate>
+    <data-query-line @close="closeDataQueryLine" v-if="dataQueryLineVisible" ref="dataQueryLineEl"></data-query-line>
     <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
   </div>
 </template>
@@ -31,6 +32,7 @@ import outParamsNode from './workflowNode/outparamsNode'
 import multiBranchNode from './workflowNode/multiBranchNode'
 import multiBranchCondition from './workflowNode/multiBranchCondition'
 import multiBranchRate from './workflowNode/multiBranchRate'
+import dataQueryLine from './workflowNode/dataQueryLine'
 import saveData from './workflowNode/saveData'
 var that = null
 var mySelf = null
@@ -67,6 +69,7 @@ export default {
       multiBranchNodeVisible: false,
       multiBranchConditionVisible: false,
       multiBranchRateVisible: false,
+      dataQueryLineVisible: false,
       saveDataVisible: false,
       currentName: '',
       selectCuster: [],
@@ -88,7 +91,7 @@ export default {
       }
     }
   },
-  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, saveData },
+  components: { groupChoiceNode, inParamsNode, dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, dataQueryLine, saveData },
   created () {
     that = this
   },
@@ -254,6 +257,17 @@ export default {
         })
       }
     },
+    closeDataQueryLine (item) {
+      if (item && item.tag == 'save') {
+        let nodeA = mySelf.myDiagram.findNodeForKey(item.data.from)
+        let nodeB = mySelf.myDiagram.findNodeForKey(item.data.to)
+        nodeA.findLinksTo(nodeB).each(function (link) {
+          link.data.data = item.data.config
+          link.data.linkText = item.data.config.configItems.name // 对连线的文字赋值
+          mySelf.myDiagram.model.updateTargetBindings(link.data)
+        })
+      }
+    },
     // 返回
     goback () {
       if (this.tag === 'view') {
@@ -364,7 +378,12 @@ export default {
         channelCode: this.channelCode
       }
       params.configJson = jsonData
-      console.log(123, params)
+      let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
+      let linkTextData = []
+      dataQueryNode.findLinksOutOf().each(function (link) {
+        linkTextData.push(link.data.linkText)
+      })
+      params.outParams = linkTextData
       let url = this.id ? editFlowInfo : saveFlowInfo
       if (this.id) {
         params.id = this.id
@@ -725,7 +744,7 @@ export default {
                 groupLinkDataText.push(citem.linkText)
               }
             })
-            if (fromCategory !== 'MULTI_BRANCH' && fromCategory !== 'GROUP_CHOICE') {
+            if (fromCategory === 'IN_PARAM') {
               let linkOutData = []
               newFromNode.findLinksOutOf().each(function (link) {
                 if (linkOutData.length == 1) { // 限制最多可连接一条线
@@ -741,7 +760,7 @@ export default {
             let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
             let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
             let fromCategory = fromNode.data.category
-            if (fromCategory !== 'MULTI_BRANCH' && fromCategory !== 'GROUP_CHOICE') {
+            if (fromCategory === 'IN_PARAM') {
               that.linkDrawnChange(e.object.from, e.newValue, e)
             }
             that.isOnlyOneInLink(newToNode)
@@ -816,8 +835,15 @@ export default {
           }
           // ------
           let lineNum = 0
+          let linkOutData = []
           fromNodeLink.findLinksOutOf().each(function (link) {
             lineNum++
+            if (linkOutData.length == 5) { // 限制最多可连接5条线
+              that.$message.error('最多可连接5个子节点')
+              mySelf.myDiagram.model.removeLinkData(link.data)
+              return
+            }
+            linkOutData.push(link.data)
           })
           if (curFlowType === 'condition') {
             e.subject.data.linkText = that.defaultCondition
@@ -829,16 +855,26 @@ export default {
           e.subject.data.num = lineNum
           mySelf.myDiagram.model.updateTargetBindings(e.subject.data)
           // 判断拉的条数
-          let linkOutData = []
-          fromNodeLink.findLinksOutOf().each(function (link) {
-            if (linkOutData.length == 5) { // 限制最多可连接5条线
-              that.$message.error('最多可连接5个子节点')
-              mySelf.myDiagram.model.removeLinkData(link.data)
-              return
-            }
-            linkOutData.push(link.data)
-          })
+          // let linkOutData = []
+          // fromNodeLink.findLinksOutOf().each(function (link) {
+          //   if (linkOutData.length == 5) { // 限制最多可连接5条线
+          //     that.$message.error('最多可连接5个子节点')
+          //     mySelf.myDiagram.model.removeLinkData(link.data)
+          //     return
+          //   }
+          //   linkOutData.push(link.data)
+          // })
           that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
+        } else if (fromCategory === 'DATA_QUERY') {
+          let lineNum = 0
+          fromNodeLink.findLinksOutOf().each(function (link) {
+            lineNum++
+            link.data.linkText = link.data.linkText
+            ? link.data.linkText
+            : 'result' + lineNum
+            mySelf.myDiagram.model.updateTargetBindings(link.data)
+          })
+          // e.subject.data.linkText = 'result' + lineNum
         } else { // 非状态判断时，只允许有一个子节点
           that.linkDrawnChange(fromKey, toKey, e)
         }
@@ -880,6 +916,18 @@ export default {
                   that.$refs['multiBranchRateEl'].init(link, curFlowType)
                 })
               }
+            } else if (fromNode.category === 'DATA_QUERY') {
+              let linkTextData = []
+              fromNode.findLinksOutOf().each(function (link) {
+                linkTextData.push({
+                  to: link.data.to,
+                  text: link.data.linkText
+                })
+              })
+              that.dataQueryLineVisible = true
+                that.$nextTick(() => {
+                  that.$refs['dataQueryLineEl'].init(link, linkTextData)
+                })
             }
           },
           selectionAdorned: false
@@ -997,7 +1045,7 @@ export default {
     showLinkLabel (e) { // 显示连线上的文字
       var label = e.subject.findObject('LABEL')
       if (label !== null) {
-        label.visible = e.subject.fromNode.data.category === 'GROUP_CHOICE' || e.subject.fromNode.data.category === 'MULTI_BRANCH'// 除了状态处理显示外。其他的都不显示
+        label.visible = e.subject.fromNode.data.category === 'GROUP_CHOICE' || e.subject.fromNode.data.category === 'MULTI_BRANCH' || e.subject.fromNode.data.category === 'DATA_QUERY'// 除了状态处理显示外。其他的都不显示
       }
     },
     doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件
