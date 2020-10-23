@@ -871,7 +871,7 @@ export default {
             lineNum++
             link.data.linkText = link.data.linkText
             ? link.data.linkText
-            : 'result' + (lineNum === 1 ? '' : lineNum)
+            : 'RESULT' + (lineNum === 1 ? '' : lineNum)
             mySelf.myDiagram.model.updateTargetBindings(link.data)
           })
           // e.subject.data.linkText = 'result' + lineNum
