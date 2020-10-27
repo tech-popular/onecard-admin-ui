@@ -74,6 +74,7 @@ export default {
   data () {
     return {
       visible: false,
+      newTask: true,
       taskId: '',
       pageNo: 1, // 当前页
       pageSize: 10, // 默认每页10条
@@ -86,11 +87,20 @@ export default {
     }
   },
   methods: {
-    init (id) {
+    init (id, newTask) {
       this.taskId = id
+      this.newTask = newTask
       this.visible = true
+      this.pageNo = 1
+      this.pageSize = 10
+      this.totalCount = 0
+      this.leftTableData = []
       this.rightTableData = []
-      this.getTaskBaseList()
+      if (newTask) {
+        this.getTaskBaseList()
+      } else {
+        this.getOldTaskBaseList()
+      }
     },
     getTaskBaseList () {
       taskBaseList({
@@ -108,10 +118,30 @@ export default {
         }
       })
     },
+    getOldTaskBaseList () {
+      // taskBaseList({
+      //   taskId: this.taskId,
+      //   taskName: this.leftSearchText,
+      //   pageNum: this.pageNo,
+      //   pageSize: this.pageSize
+      // }).then(({data}) => {
+      //   if (data && data.code === 0) {
+      //     this.leftTableData = data.data.records
+      //     this.totalCount = data.data.total
+      //   } else {
+      //     this.leftTableData = []
+      //     this.totalCount = []
+      //   }
+      // })
+    },
     // 左侧搜索功能
     searchTableHandle () {
       this.pageNo = 1
-      this.getTaskBaseList()
+      if (this.newTask) {
+        this.getTaskBaseList()
+      } else {
+        this.getOldTaskBaseList()
+      }
     },
     handleLeftSelectChange (val) {
       this.leftSelectedData = val
@@ -165,7 +195,11 @@ export default {
       }).then(({data}) => {
         if (data && data.code === 0) {
           this.$message.success(data.msg || '提交成功')
+          if (this.newTask) {
           this.$emit('refreshTaskDependence')
+          } else {
+          this.$emit('refreshOldTaskDependence')
+         }
           this.visible = false
         } else {
           this.$message.error(data.msg || '提交异常')
@@ -176,12 +210,20 @@ export default {
     sizeChangeHandle (page) {
       this.pageSize = page
       this.pageNo = 1
-      this.getTaskBaseList()
+      if (this.newTask) {
+        this.getTaskBaseList()
+      } else {
+        this.getOldTaskBaseList()
+      }
     },
     // 当前页
     currentChangeHandle (page) {
       this.pageNo = page
-      this.getTaskBaseList()
+      if (this.newTask) {
+        this.getTaskBaseList()
+      } else {
+        this.getOldTaskBaseList()
+      }
     }
   }
 }

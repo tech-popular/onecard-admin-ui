@@ -29,7 +29,7 @@
         </el-form-item>
       </el-form>
       <div class="work-content-1">
-        <h3 style="overflow:hidden">任务依赖
+        <h3 style="overflow:hidden">新调度任务依赖
           <el-button style="float:right" type="danger" @click="deleteDependenceHandle">批量删除</el-button>
           <el-button style="float:right;margin-right:20px" type="primary" @click="addDependenceHandle">新增依赖</el-button>
         </h3>
@@ -47,6 +47,30 @@
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
                 <a style="cursor: pointer" @click="deleteDependenceHandle(scope.row)">删除</a>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+            <div class="work-content-1">
+        <h3 style="overflow:hidden">老调度任务依赖
+          <el-button style="float:right" type="danger" @click="deleteOldDependenceHandle">批量删除</el-button>
+          <el-button style="float:right;margin-right:20px" type="primary" @click="addOldDependenceHandle">新增依赖</el-button>
+        </h3>
+        <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
+          <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>
+          <el-table
+            style="flex:1;"
+            ref="multipleTable"
+            :data="dataForm.selectedOldDpendeceList"
+            border
+            @selection-change="handleSelectOldDependenceChange">
+            <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+            <el-table-column label="操作" header-align="center" align="center">
+              <template slot-scope="scope">
+                <a style="cursor: pointer" @click="deleteOldDependenceHandle(scope.row)">删除</a>
               </template>
             </el-table-column>
           </el-table>
@@ -75,7 +99,7 @@
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
-    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence"></dispatch-config-task-dependent>
+    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence" @refreshOldTaskDependence="getOldTaskSelectDependence"></dispatch-config-task-dependent>
   </el-drawer>
 </template>
 
@@ -103,13 +127,15 @@ export default {
       preDs: '',
       updateUser: '',
       updateTime: '',
-      selectedDpendeceData: [],
+      selectedDpendeceData: [], // 已选新调度任务
+      selectedOldDpendeceData: [], // 已选老调度任务
       dataForm: {
         taskName: '',
         id: '',
         projectSystemName: '',
         taskDescribe: '',
-        selectedDpendeceList: []
+        selectedDpendeceList: [], // 新调度任务列表
+        selectedOldDpendeceList: [] // 老调度任务列表
       },
       dispatchStatusForm: {
         dispatchStatus: 0,
@@ -143,6 +169,7 @@ export default {
           // this.$refs.dispatchConfigAlert.init()
           this.getTaskBaseInfo()
           this.getTaskSelectDependence()
+          this.getOldTaskSelectDependence()
         }
         this.$refs['dataForm1'].resetFields()
         this.$refs['dispatchStatus'].resetFields()
@@ -172,7 +199,7 @@ export default {
         }
       })
     },
-    // 任务依赖列表
+    // 新调度任务依赖列表
     getTaskSelectDependence () {
       taskSelectDependence(this.id).then(({data}) => {
         if (data.code !== 0) {
@@ -181,17 +208,26 @@ export default {
         this.dataForm.selectedDpendeceList = data.data
       })
     },
+    // 老调度任务依赖列表
+    getOldTaskSelectDependence () {
+      // taskSelectDependence(this.id).then(({data}) => {
+      //   if (data.code !== 0) {
+      //     return this.$message.error(data.msg || '获取数据异常')
+      //   }
+      //   this.dataForm.selectedOldDpendeceList = data.data
+      // })
+    },
     // 获取状态数据
     getDispatchStatus (data) {
       this.dispatchStatusForm.dispatchStatus = data.dispatchStatus
       this.dispatchStatusForm.dutyUser = data.dutyUser
     },
-    // 已选依赖选中操作
+    // 已选新调度依赖选中操作
     handleSelectDependenceChange (val) {
       console.log(val)
       this.selectedDpendeceData = val
     },
-    // 删除所选依赖
+    // 删除新调度任务所选依赖
     deleteDependenceHandle (row) {
       let arr = []
       if (row.id) { // 单个删除
@@ -211,11 +247,42 @@ export default {
         }
       })
     },
-    // 新增依赖
+    // 已选老调度依赖选中操作
+    handleSelectOldDependenceChange (val) {
+      this.selectedOldDpendeceData = val
+    },
+    // 删除老调度任务所选依赖
+    deleteOldDependenceHandle (row) {
+      let arr = []
+      if (row.id) { // 单个删除
+        arr = [row.id]
+      } else { // 批量删除
+        if (!this.selectedOldDpendeceData.length) return
+        this.selectedOldDpendeceData.forEach(item => {
+          arr.push(item.id)
+        })
+      }
+      // taskDependenceDelete(arr).then(({data}) => {
+      //   if (data && data.code === 0) {
+      //     this.$message.success(data.msg)
+      //     this.getOldTaskSelectDependence()
+      //   } else {
+      //     this.$message.error(data.msg || '删除失败')
+      //   }
+      // })
+    },
+    // 新增新调度依赖
     addDependenceHandle () {
       this.dispatchConfigTaskDependentVisible = true
       this.$nextTick(() => {
-        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id)
+        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id, true)
+      })
+    },
+    // 新增老调度依赖
+    addOldDependenceHandle () {
+      this.dispatchConfigTaskDependentVisible = true
+      this.$nextTick(() => {
+        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id, false)
       })
     },
     drawerClose () { // 关闭抽屉弹窗
