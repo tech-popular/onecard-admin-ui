@@ -10,7 +10,6 @@ import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
 import { clearLoginInfo, getQueryString } from '@/utils'
 Vue.use(Router)
-console.log(getQueryString('tag'))
 // 开发环境不使用懒加载, 因为懒加载页面太多的话会造成webpack热更新太慢, 所以只有生产环境使用懒加载
 const _import = require('./import-' + process.env.NODE_ENV)
 
@@ -96,6 +95,8 @@ function httpMenu (to, from, next) {
     fnAddDynamicMenuRoutes(JSON.parse(sessionStorage.getItem('menuList')))
     router.options.isAddDynamicMenuRoutes = true
     next({ ...to, replace: true })
+  } else {
+    router.push({ name: 'login' })
   }
 }
 
