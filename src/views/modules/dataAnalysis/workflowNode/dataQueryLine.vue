@@ -3,11 +3,11 @@
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
-    width="500px"
+    width="530px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :rules="dataRules" inline>
       <el-form-item label="连线名称：" prop="name">
-        <el-input v-model.trim="dataForm.name" placeholder="请输入名称" style="width:300px"></el-input>
+        <el-input v-model.trim="dataForm.name" placeholder="只可输入字母、数字、下划线，且不能以数字开头" style="width:350px"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -32,7 +32,7 @@ export default {
       },
       dataRules: {
         name: [
-          { required: true, message: '请输入', trigger: 'blur' }
+          { required: true, pattern: /^([a-zA-z_]{1})([\w]*)$/g, message: '只可输入字母、数字、下划线，且不能以数字开头', trigger: 'blur' }
         ]
       }
     }
