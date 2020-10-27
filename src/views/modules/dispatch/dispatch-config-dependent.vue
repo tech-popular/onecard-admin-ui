@@ -190,21 +190,31 @@ export default {
           depProjectId: item.projectId
         })
       })
-      taskDependenceAdd({
-        list: params
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          this.$message.success(data.msg || '提交成功')
-          if (this.newTask) {
-          this.$emit('refreshTaskDependence')
+      if (this.newTask) {
+        taskDependenceAdd({
+          list: params
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message.success(data.msg || '提交成功')
+            this.$emit('refreshTaskDependence')
+            this.visible = false
           } else {
-          this.$emit('refreshOldTaskDependence')
-         }
-          this.visible = false
-        } else {
-          this.$message.error(data.msg || '提交异常')
-        }
-      })
+            this.$message.error(data.msg || '提交异常')
+          }
+        })
+      } else {
+        // taskDependenceAdd({
+        //   list: params
+        // }).then(({data}) => {
+        //   if (data && data.code === 0) {
+        //     this.$message.success(data.msg || '提交成功')
+        //     this.$emit('refreshOldTaskDependence')
+        //     this.visible = false
+        //   } else {
+        //     this.$message.error(data.msg || '提交异常')
+        //   }
+        // })
+      }
     },
     // 每页数
     sizeChangeHandle (page) {
