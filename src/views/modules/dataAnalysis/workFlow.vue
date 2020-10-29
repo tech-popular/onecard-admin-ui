@@ -261,9 +261,11 @@ export default {
       if (item && item.tag == 'save') {
         let nodeA = mySelf.myDiagram.findNodeForKey(item.data.from)
         let nodeB = mySelf.myDiagram.findNodeForKey(item.data.to)
+        console.log(item)
         nodeA.findLinksTo(nodeB).each(function (link) {
           link.data.data = item.data.config
           link.data.linkText = item.data.config.configItems.name // 对连线的文字赋值
+          console.log(link.data)
           mySelf.myDiagram.model.updateTargetBindings(link.data)
         })
       }

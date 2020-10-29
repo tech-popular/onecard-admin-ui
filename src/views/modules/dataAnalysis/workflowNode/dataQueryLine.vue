@@ -25,6 +25,7 @@ export default {
       title: '',
       from: '',
       to: '',
+      linkText: '',
       visible: false,
       allLinkText: [],
       dataForm: {
@@ -39,13 +40,13 @@ export default {
   },
   methods: {
     init (link, linkTextData) {
-      console.log(linkTextData)
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
       this.allLinkText = linkTextData
-      if (link.data.data) {
-        this.dataForm = link.data.data.configItems
+      if (link.data.linkText) {
+        this.linkText = link.data.linkText
+        this.dataForm.name = link.data.linkText
       }
     },
     saveHandle () {
@@ -65,6 +66,7 @@ export default {
       })
     },
     cancelHandle () {
+      this.dataForm.name = this.linkText
       this.visible = false
       this.$parent.dataQueryLineVisible = false
     }
