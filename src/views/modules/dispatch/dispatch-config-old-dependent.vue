@@ -92,6 +92,7 @@ export default {
       this.taskId = id
       this.visible = true
       this.rightTableData = []
+      // this.leftSearchText = ''
       this.getOldTaskBaseList()
     },
     getOldTaskBaseList () {
