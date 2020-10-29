@@ -244,7 +244,6 @@ export default {
   components: { Treeselect, InputTag },
   methods: {
     init (link, channelCode) {
-      console.log(link)
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
@@ -562,10 +561,10 @@ export default {
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
+        console.log(this.dataForm)
         if (valid) {
-          console.log(this.dataForm)
           let selectVal = this.dataForm.params[0].selectVal
-          let newArr = this.dataForm.selectEnumsList && this.dataForm.selectEnumsList.filter(item => selectVal.includes(item.childrenNum))
+          let newArr = this.dataForm.selectEnumsList && selectVal && this.dataForm.selectEnumsList.filter(item => selectVal.includes(item.childrenNum))
           this.dataForm.selectEnumsList = newArr
           let config = {
             configItems: this.dataForm
