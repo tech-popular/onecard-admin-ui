@@ -67,7 +67,7 @@
             @selection-change="handleSelectOldDependenceChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
             <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+            <!-- <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column> -->
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
                 <a style="cursor: pointer" @click="deleteOldDependenceHandle(scope.row)">删除</a>
@@ -99,7 +99,8 @@
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
-    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence" @refreshOldTaskDependence="getOldTaskSelectDependence"></dispatch-config-task-dependent>
+    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence"></dispatch-config-task-dependent>
+    <dispatch-config-old-task-dependent v-if="dispatchConfigOldTaskDependentVisible" ref="dispatchConfigOldTaskDependent" @refreshOldTaskDependence="getOldTaskSelectDependence"></dispatch-config-old-task-dependent>
   </el-drawer>
 </template>
 
@@ -107,15 +108,19 @@
 import {
   taskBaseInfo,
   taskDependenceDelete,
-  taskSelectDependence
+  taskSelectDependence,
+  taskSelectOldDependence,
+  oldTaskDependenceDelete
 } from '@/api/dispatch/taskManag'
 import dispatchConfigTaskDependent from './dispatch-config-dependent'
+import dispatchConfigOldTaskDependent from './dispatch-config-old-dependent'
 import dispatchConfigPeriod from './dispatch-config-period'
 // import dispatchConfigAlert from './dispatch-config-alert'
 export default {
   components: {
     dispatchConfigTaskDependent,
-    dispatchConfigPeriod
+    dispatchConfigPeriod,
+    dispatchConfigOldTaskDependent
     // dispatchConfigAlert
   },
   data () {
@@ -149,7 +154,8 @@ export default {
           { required: true, message: '请输入任务责任人', trigger: 'blur' }
         ]
       },
-      dispatchConfigTaskDependentVisible: false
+      dispatchConfigTaskDependentVisible: false,
+      dispatchConfigOldTaskDependentVisible: false
     }
   },
   methods: {
@@ -210,12 +216,14 @@ export default {
     },
     // 老调度任务依赖列表
     getOldTaskSelectDependence () {
-      // taskSelectDependence(this.id).then(({data}) => {
-      //   if (data.code !== 0) {
-      //     return this.$message.error(data.msg || '获取数据异常')
-      //   }
-      //   this.dataForm.selectedOldDpendeceList = data.data
-      // })
+      console.log('获取数据异常: ', '获取数据异常')
+      taskSelectOldDependence(this.id).then(({data}) => {
+        if (data.code !== 0) {
+          this.dataForm.selectedOldDpendeceList = []
+          return this.$message.error(data.msg || '获取数据异常')
+        }
+        this.dataForm.selectedOldDpendeceList = data.data
+      })
     },
     // 获取状态数据
     getDispatchStatus (data) {
@@ -257,32 +265,32 @@ export default {
       if (row.id) { // 单个删除
         arr = [row.id]
       } else { // 批量删除
-        if (!this.selectedOldDpendeceData.length) return
-        this.selectedOldDpendeceData.forEach(item => {
+        if (!this.selectedDpendeceData.length) return
+        this.selectedDpendeceData.forEach(item => {
           arr.push(item.id)
         })
       }
-      // taskDependenceDelete(arr).then(({data}) => {
-      //   if (data && data.code === 0) {
-      //     this.$message.success(data.msg)
-      //     this.getOldTaskSelectDependence()
-      //   } else {
-      //     this.$message.error(data.msg || '删除失败')
-      //   }
-      // })
+      oldTaskDependenceDelete(arr).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success(data.msg)
+          this.getOldTaskSelectDependence()
+        } else {
+          this.$message.error(data.msg || '删除失败')
+        }
+      })
     },
     // 新增新调度依赖
     addDependenceHandle () {
       this.dispatchConfigTaskDependentVisible = true
       this.$nextTick(() => {
-        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id, true)
+        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id)
       })
     },
     // 新增老调度依赖
     addOldDependenceHandle () {
-      this.dispatchConfigTaskDependentVisible = true
+      this.dispatchConfigOldTaskDependentVisible = true
       this.$nextTick(() => {
-        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id, false)
+        this.$refs.dispatchConfigOldTaskDependent.init(this.dataForm.id)
       })
     },
     drawerClose () { // 关闭抽屉弹窗
