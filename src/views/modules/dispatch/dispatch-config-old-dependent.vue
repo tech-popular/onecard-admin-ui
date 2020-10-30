@@ -88,7 +88,6 @@ export default {
   },
   methods: {
     init (id) {
-      console.log('老调度')
       this.taskId = id
       this.visible = true
       this.rightTableData = []
@@ -167,7 +166,6 @@ export default {
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.$message.success(data.msg || '提交成功')
-            console.log('提交成功: ', '提交成功')
             this.$emit('refreshOldTaskDependence')
             this.visible = false
           } else {

@@ -87,7 +87,6 @@ export default {
   },
   methods: {
     init (id) {
-      console.log('新调度')
       this.taskId = id
       this.visible = true
       this.rightTableData = []

@@ -216,7 +216,6 @@ export default {
     },
     // 老调度任务依赖列表
     getOldTaskSelectDependence () {
-      console.log('获取数据异常: ', '获取数据异常')
       taskSelectOldDependence(this.id).then(({data}) => {
         if (data.code !== 0) {
           this.dataForm.selectedOldDpendeceList = []
@@ -232,7 +231,6 @@ export default {
     },
     // 已选新调度依赖选中操作
     handleSelectDependenceChange (val) {
-      console.log(val)
       this.selectedDpendeceData = val
     },
     // 删除新调度任务所选依赖
@@ -265,8 +263,8 @@ export default {
       if (row.id) { // 单个删除
         arr = [row.id]
       } else { // 批量删除
-        if (!this.selectedDpendeceData.length) return
-        this.selectedDpendeceData.forEach(item => {
+        if (!this.selectedOldDpendeceData.length) return
+        this.selectedOldDpendeceData.forEach(item => {
           arr.push(item.id)
         })
       }
