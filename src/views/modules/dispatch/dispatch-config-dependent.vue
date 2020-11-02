@@ -169,7 +169,7 @@ export default {
           if (data && data.code === 0) {
             this.$message.success(data.msg || '提交成功')
             this.$emit('refreshTaskDependence')
-            this.visible = false
+            this.closed()
           } else {
             this.$message.error(data.msg || '提交异常')
           }
