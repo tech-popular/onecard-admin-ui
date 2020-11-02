@@ -581,6 +581,18 @@ export default {
   }
 }
 </script>
+<style>
+  .tree-select {
+    width: 290px;
+    line-height: 38px;
+  }
+  .tree-select .vue-treeselect__menu {
+    overflow: auto;
+  }
+  .tree-select .vue-treeselect__label {
+    overflow: inherit;
+  }
+</style>
 <style scoped>
   .cursor-pointer {
     cursor: pointer;
@@ -629,16 +641,6 @@ export default {
     cursor: pointer;
     user-select: none;
   }
-  .tree-select {
-    width: 290px;
-    line-height: 38px;
-  }
-  /* .vue-treeselect__menu {
-    overflow: auto;
-  }
-  .vue-treeselect__label {
-    overflow: initial;
-  } */
   .pane-rules-inline {
     display: inline-block;
     line-height: 40px;
