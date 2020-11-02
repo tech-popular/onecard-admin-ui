@@ -740,6 +740,7 @@ export default {
       } else {
         this.toDs = filterArr.alias
         this.acquisitionTask.outDataTable = ''
+        this.outTableName = ''
       }
     },
     dataSourceNameChange (type, val) {
