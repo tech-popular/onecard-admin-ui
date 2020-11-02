@@ -60,7 +60,7 @@
       </el-col>
     </el-row>
     <div slot="footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="closed">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">提交</el-button>
     </div>
   </el-dialog>
@@ -90,8 +90,6 @@ export default {
     init (id) {
       this.taskId = id
       this.visible = true
-      this.rightTableData = []
-      // this.leftSearchText = ''
       this.getOldTaskBaseList()
     },
     getOldTaskBaseList () {
@@ -183,6 +181,15 @@ export default {
     currentChangeHandle (page) {
       this.pageNo = page
       this.getOldTaskBaseList()
+    },
+    // 关闭窗口
+    closed () {
+      this.visible = false
+      this.rightTableData = []
+      this.leftTableData = []
+      this.leftSearchText = ''
+      this.pageNo = 1
+      this.pageSize = 10
     }
   }
 }
