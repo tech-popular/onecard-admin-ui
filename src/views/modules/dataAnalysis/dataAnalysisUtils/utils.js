@@ -95,7 +95,8 @@ export const nameToLabel = (arr) => {
         toParse(item['children'])
       } else {
         if (Array.isArray(item.children) && item.children.length == 0) {
-          arr.splice(index, 1)// 如果一级的元素为children为[]删除该元素
+          delete arr[index]
+          // arr.splice(index, 1)// 如果一级的元素为children为[]删除该元素
         } else {
           delete item['children']
         }
