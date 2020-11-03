@@ -563,6 +563,7 @@ export default {
           (newVal.zSetScore ? newVal.zSetScore : ' ') +
           '#'
         this.outTableName = outTableName
+        console.log(4, this.outTableName)
       },
       immediate: true,
       deep: true
@@ -575,6 +576,7 @@ export default {
           newVal.idColumn +
           '#'
         this.outTableName = outTableName
+        console.log(3, this.outTableName)
       },
       immediate: true,
       deep: true
@@ -585,6 +587,7 @@ export default {
           (newVal.mcColumn ? newVal.mcColumn : ' ') +
           '#'
         this.outTableName = outTableName
+        console.log(2, this.outTableName)
       },
       immediate: true,
       deep: true
@@ -595,6 +598,7 @@ export default {
           newVal.schma +
           '#'
         this.outTableName = outTableName
+        console.log(1, this.outTableName)
       },
       immediate: true,
       deep: true
@@ -661,6 +665,7 @@ export default {
         this.dataForm.taskDisable = data.data.taskDisable
         this.dataForm.requestedUser = data.data.requestedUser
         this.acquisitionTask = data.data.acquisitionTask
+        this.outTableName = ''
         if (this.acquisitionTask.outDataTable.indexOf('#') > 0) {
           let arr = this.acquisitionTask.outDataTable.split('#')
           if (this.acquisitionTask.outDatasourceType === 'REDIS') {
@@ -686,11 +691,12 @@ export default {
               schma: arr[1]
             }
             this.acquisitionTask.outDataTable = arr[0]
-          } else {
-            console.log(arr, arr[1])
+          } else if (this.acquisitionTask.outDatasourceType === 'MAXCOMPUTE') {
             this.mcData = {
               mcColumn: arr[1]
             }
+            this.acquisitionTask.outDataTable = arr[0]
+          } else {
             this.acquisitionTask.outDataTable = arr[0]
           }
         }
