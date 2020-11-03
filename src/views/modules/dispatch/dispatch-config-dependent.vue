@@ -4,7 +4,9 @@
     width="1000px"
     :append-to-body="true"
     title="新增依赖"
-    :visible.sync="visible">
+    :visible.sync="visible"
+    @close="closed"
+    >
     <el-row :gutter="20">
       <el-col :span="11">
         <el-card class="box-card" shadow="never">
