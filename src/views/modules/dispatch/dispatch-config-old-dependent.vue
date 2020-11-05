@@ -22,8 +22,8 @@
               border
               @selection-change="handleLeftSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务名称"></el-table-column>
+            <!-- <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column> -->
           </el-table>
           <el-pagination
             @size-change="sizeChangeHandle"
@@ -51,7 +51,7 @@
               border
               @selection-change="handleRightSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务名称"></el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
                 <template slot-scope="scope">
                   <a style="cursor: pointer" @click="deleteDependenceHandle(scope.$index)">删除</a>
@@ -69,13 +69,14 @@
 </template>
 <script>
 import {
-  taskBaseList,
-  taskDependenceAdd
+  oldTaskDependenceAdd,
+  oldTaskBaseList
 } from '@/api/dispatch/taskManag'
 export default {
   data () {
     return {
       visible: false,
+      newTask: true,
       taskId: '',
       pageNo: 1, // 当前页
       pageSize: 10, // 默认每页10条
@@ -91,16 +92,12 @@ export default {
     init (id) {
       this.taskId = id
       this.visible = true
-      this.rightTableData = []
-      this.leftSearchText = ''
-      this.pageNo = 1
-      this.pageSize = 10
-      this.getTaskBaseList()
+      this.getOldTaskBaseList()
     },
-    getTaskBaseList () {
-      taskBaseList({
-        taskId: this.taskId,
-        taskName: this.leftSearchText,
+    getOldTaskBaseList () {
+      oldTaskBaseList({
+        // taskId: this.taskId,
+        etlJobName: this.leftSearchText,
         pageNum: this.pageNo,
         pageSize: this.pageSize
       }).then(({data}) => {
@@ -116,7 +113,7 @@ export default {
     // 左侧搜索功能
     searchTableHandle () {
       this.pageNo = 1
-      this.getTaskBaseList()
+      this.getOldTaskBaseList()
     },
     handleLeftSelectChange (val) {
       this.leftSelectedData = val
@@ -147,11 +144,11 @@ export default {
     // 取两个对象数组的并集且去重
     unique (arr) {
       const res = new Map()
-      return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, 1))
+      return arr.filter((arr) => !res.has(arr.etlJobId) && res.set(arr.etlJobId, 1))
     },
     // 从一个对象数组中过滤过另一个对象数组的内容
     filterArr (a, b) {
-      return [...b].filter(x => [...a].every(y => y.id !== x.id))
+      return [...b].filter(x => [...a].every(y => y.etlJobId !== x.etlJobId))
     },
     dataFormSubmit () {
       if (!this.rightTableData.length) {
@@ -161,16 +158,15 @@ export default {
       this.rightTableData.forEach(item => {
         params.push({
           taskId: this.taskId,
-          depTaskId: item.id,
-          depProjectId: item.projectId
+          depOldJobId: item.etlJobId
         })
       })
-        taskDependenceAdd({
+        oldTaskDependenceAdd({
           list: params
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.$message.success(data.msg || '提交成功')
-            this.$emit('refreshTaskDependence')
+            this.$emit('refreshOldTaskDependence')
             this.closed()
           } else {
             this.$message.error(data.msg || '提交异常')
@@ -181,12 +177,12 @@ export default {
     sizeChangeHandle (page) {
       this.pageSize = page
       this.pageNo = 1
-      this.getTaskBaseList()
+      this.getOldTaskBaseList()
     },
     // 当前页
     currentChangeHandle (page) {
       this.pageNo = page
-      this.getTaskBaseList()
+      this.getOldTaskBaseList()
     },
     // 关闭窗口
     closed () {

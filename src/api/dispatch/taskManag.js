@@ -32,3 +32,8 @@ export const taskAlertSave = params => httpPost(base + 'dispatch/task/alert/save
 export const taskAlertUpdate = params => httpPost(base + 'dispatch/task/alert/update', params) // 更新
 export const taskAlertInfo = id => httpGet(base + `dispatch/task/alert/${id}`) // 详情
 export const taskAlertDelete = id => httpDelete(base + `dispatch/task/alert/delete/${id}`) // 删除
+ // 老调度配置
+ export const taskSelectOldDependence = id => httpGet(base + `old/dispatch/task/dependence/selectDependence/${id}`) // 已选老调度依赖列表
+ export const oldTaskBaseList = params => httpPost(base + 'old/dispatch/task/dependence/listOnPage', params) // 基础任务分页列表
+ export const oldTaskDependenceAdd = params => httpPost(base + 'old/dispatch/task/dependence/insertBatch', params) // 依赖任务批量新增
+ export const oldTaskDependenceDelete = params => httpPostFile(base + 'old/dispatch/task/dependence/delete', params) // 依赖任务批量删除

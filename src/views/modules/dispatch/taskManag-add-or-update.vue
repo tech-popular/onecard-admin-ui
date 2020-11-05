@@ -142,12 +142,12 @@
               <el-form-item class="el-redis-item" label="score" v-if="redisData.redisName === 'redisTypeZSet'">
                 <el-input v-model="redisData.zSetScore" placeholder="{score列索引}" clearable></el-input>
               </el-form-item>
-              <el-form-item class="el-redis-item" label="key拼接时间" prop="redisJoinType">
+              <el-form-item class="el-redis-item" label="key拼接时间">
                 <el-select v-model="redisData.redisJoinType" placeholder="key拼接时间" clearable>
                   <el-option v-for="item in redisTypes" :key="item" :label="item" :value="item"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item class="el-redis-item" label="key失效时间" prop="redisUneffectTime">
+              <el-form-item class="el-redis-item" label="key失效时间">
                 <el-input
                   v-model="redisData.redisUneffectTime"
                   placeholder="key失效时间"
@@ -428,12 +428,12 @@ export default {
         redisValue: [
           { required: true, message: '请输入', trigger: 'blur' }
         ],
-        redisJoinType: [
-          {required: true, message: '请选择key拼接时间', trigger: 'change'}
-        ],
-        redisUneffectTime: [
-          {required: true, message: '请输入key失效时间', trigger: 'blur'}
-        ],
+        // redisJoinType: [
+        //   {required: true, message: '请选择key拼接时间', trigger: 'change'}
+        // ],
+        // redisUneffectTime: [
+        //   {required: true, message: '请输入key失效时间', trigger: 'blur'}
+        // ],
         idColumn: [
           {required: true, message: '请输入ID列', trigger: 'blur'}
         ]
