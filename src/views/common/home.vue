@@ -155,6 +155,11 @@ export default {
           name: '神策系统',
           img: require('../../assets/img/shence.jpg'),
           url: 'http://sensors.9f.cn/login/index.html'
+        },
+        {
+          name: 'Zeppelin',
+          img: require('../../assets/img/zepplin.png'),
+          url: 'http://zeppelin.9f.cn'
         }
       ]
     }

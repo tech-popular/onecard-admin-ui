@@ -40,6 +40,8 @@
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 <el-form-item label="用户所属渠道" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
                 <el-select
+                  multiple
+                  :multiple-limit = "channelLimit"
                   v-model="baseForm.channelId"
                   @change="channelIdChange"
                   filterable
@@ -252,6 +254,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
     return {
+      channelLimit: 1,
       isPreviewShow: true,
       loading: false,
       showActionRule: false,
@@ -276,7 +279,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: '',
+        channelId: [],
         desc: ''
       },
       rejectForm: {
@@ -347,7 +350,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: '',
+        channelId: [],
         desc: ''
       }
       this.$nextTick(() => {
@@ -368,7 +371,7 @@ export default {
           })
         } else {
           this.flowId = data.data.flowId
-          this.outMostExpressionTemplate = JSON.parse(data.data.configJson).outMostExpressionTemplate ? JSON.parse(data.data.configJson).outMostExpressionTemplate : 'and'
+          this.outMostExpressionTemplate = data.data.configJson && JSON.parse(data.data.configJson).outMostExpressionTemplate ? JSON.parse(data.data.configJson).outMostExpressionTemplate : 'and'
           this.baseForm = {
             name: data.data.name,
             desc: data.data.desc,
@@ -390,7 +393,7 @@ export default {
             this.loading = false
             return
           }
-          this.baseForm.channelId = data.data.channelId
+          this.baseForm.channelId = data.data.channelId.indexOf(',') > -1 ? data.data.channelId.split(',') : [data.data.channelId]
           if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
@@ -450,25 +453,26 @@ export default {
       // 用户渠道改变时，重新过滤指标数据
       if (this.baseForm.channelId.length === 0) {
         this.channelList.forEach(item => {
-          item.disabled = false
+          if (item.value === '0000') {
+            item.disabled = true
+          } else {
+            item.disabled = false
+          }
         })
       }
       if (this.baseForm.channelId.length === 1) {
-        this.channelList.forEach(item => {
-          if (this.baseForm.channelId[0] === '0000') {
-            if (item.value === '0000') {
+        if (this.baseForm.channelId[0] === '2001' || this.baseForm.channelId[0] === '6001') {
+          this.channelLimit = 2
+          this.channelList.forEach(item => {
+            if (item.value === '2001' || item.value === '6001') {
               item.disabled = false
             } else {
               item.disabled = true
             }
-          } else {
-            if (item.value === '0000') {
-              item.disabled = true
-            } else {
-              item.disabled = false
-            }
-          }
-        })
+          })
+        } else {
+          this.channelLimit = 1
+        }
       }
       this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
       // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId) // 用户行为暂时隐藏
@@ -753,6 +757,7 @@ export default {
             outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
             rejectGroupPackCode: code
           }
+          params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
@@ -775,6 +780,7 @@ export default {
           if (sysUuid && sysArr.includes(sysUuid)) {
             params.username = this.getQueryParams('username') || ''
           }
+          console.log(params)
           this.loading = true
           url(params).then(({ data }) => {
             if (data.status !== '1') {
