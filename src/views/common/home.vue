@@ -159,7 +159,7 @@ export default {
         {
           name: 'Zeppelin',
           img: require('../../assets/img/zepplin.png'),
-          url: 'http://zeppelin.9f.cn/'
+          url: 'http://zeppelin.9f.cn'
         }
       ]
     }
