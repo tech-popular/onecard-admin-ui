@@ -275,12 +275,12 @@
       </el-form>
     </div>
     <div class="footer">
-      <el-button
+      <!-- <el-button
         type="success"
         @click="copyHandle"
         size="small"
         v-if="!!baseForm.id"
-      >复制创建新任务</el-button>
+      >复制创建新任务</el-button> -->
       <el-button type="primary" @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
