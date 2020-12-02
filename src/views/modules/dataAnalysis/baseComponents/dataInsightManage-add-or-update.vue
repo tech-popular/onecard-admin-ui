@@ -130,8 +130,8 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="baseForm.userType !== 'excel'" class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
-      <div class="pane-rules" v-if="baseForm.userType !== 'excel'">
+      <div class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
+      <div class="pane-rules">
           <div class="pane-rules-relation" v-if="showActionRule && showAtterRule">
              <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
           </div>
@@ -640,60 +640,58 @@ export default {
       })
     },
     saveHandle (type) {
-      if (this.baseForm.userType === 'excel') {
-        if (!this.excelFile) {
+      if (this.baseForm.userType === 'excel' && !this.excelFile) {
           this.$message({
             type: 'error',
             message: '请选择要上传的文件'
           })
           return
-        }
-        let flag = true
-        this.$refs.baseForm.validate((valid) => {
-          if (!valid) {
-            flag = false
-          }
-        })
-        this.$refs.rejectForm.validate((valid) => {
-          if (!valid) {
-            flag = false
-          }
-        })
-        if (flag) {
-          let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
-          data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
-          data.append('name', this.baseForm.name)
-          data.append('type', this.baseForm.type)
-          data.append('userType', this.baseForm.userType)
-          data.append('desc', this.baseForm.desc)
-          data.append('channelId', this.baseForm.channelId)
-          data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
-          this.rejectForm.rejectGroupPackageIds.forEach(item => {
-            data.append('rejectGroupPackageIds', item)
-          })
-          let flag = 0
-          if (this.rejectForm.rejectGroupPackageIds.length) {
-            flag = 1
-          }
-          data.append('rejectGroupPackCode', flag)
-          if (this.id) {
-            data.append('id', this.id)
-          }
-          this.loading = true
-          importExcelFile(data).then(res => {
-            if (res.data.status * 1 !== 1) {
-              this.$message({
-                type: 'error',
-                message: res.data.message || '保存失败'
-              })
-              this.loading = false
-            } else {
-              this.id = res.data.data
-              this.saveCollision()
-            }
-          })
-        }
-        return
+        // let flag = true
+        // this.$refs.baseForm.validate((valid) => {
+        //   if (!valid) {
+        //     flag = false
+        //   }
+        // })
+        // this.$refs.rejectForm.validate((valid) => {
+        //   if (!valid) {
+        //     flag = false
+        //   }
+        // })
+        // if (flag) {
+        //   let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
+        //   data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
+        //   data.append('name', this.baseForm.name)
+        //   data.append('type', this.baseForm.type)
+        //   data.append('userType', this.baseForm.userType)
+        //   data.append('desc', this.baseForm.desc)
+        //   data.append('channelId', this.baseForm.channelId)
+        //   data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
+        //   this.rejectForm.rejectGroupPackageIds.forEach(item => {
+        //     data.append('rejectGroupPackageIds', item)
+        //   })
+        //   let flag = 0
+        //   if (this.rejectForm.rejectGroupPackageIds.length) {
+        //     flag = 1
+        //   }
+        //   data.append('rejectGroupPackCode', flag)
+        //   if (this.id) {
+        //     data.append('id', this.id)
+        //   }
+        //   this.loading = true
+        //   importExcelFile(data).then(res => {
+        //     if (res.data.status * 1 !== 1) {
+        //       this.$message({
+        //         type: 'error',
+        //         message: res.data.message || '保存失败'
+        //       })
+        //       this.loading = false
+        //     } else {
+        //       this.id = res.data.data
+        //       this.saveCollision()
+        //     }
+        //   })
+        // }
+        // return
       }
       // 用户属性 用户行为 数据校验
       this.$refs.userAttrRule.isRequired = true
@@ -745,55 +743,99 @@ export default {
           if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
             return false
           }
-          let code = 0
-          if (this.rejectForm.rejectGroupPackageIds.length) {
-            code = 1
+          if (this.baseForm.userType === 'excel') { // excel方式
+            this.excelSaveData()
+          } else {
+            this.indexSaveData(type)
           }
-          let params = {
-            ...this.baseForm,
-            ...this.$refs.userAttrRule.lastSubmitRuleConfig,
-            // ...this.$refs.userActionRule.lastSubmitRuleConfig, //用户行为
-            ...this.rejectForm,
-            outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
-            rejectGroupPackCode: code
-          }
-          params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
-          if (type === 'preview') {
-            this.isPreviewShow = true
-            this.$nextTick(() => {
-              this.$refs.dataPreviewInfo.init(params)
-            })
-            return
-          }
-          params.vestPackCode = params.vestPackCode.join(',')
-          let url = savaDataInfo
-          if (this.id) {
-            url = updateDataInfo
-            params.id = this.id
-            params.flowId = this.flowId
-          }
-          let sysUuid = getQueryString('system_uuid')
-          let sysArr = [
-            'ecf36297-37ea-489e-a350-045b1ab49f75', // 统一后台uuid
-            '95dd8c99-8c51-4394-b2f4-95ba472c2ef4' // 小鱼福卡uuid
-          ]
-          if (sysUuid && sysArr.includes(sysUuid)) {
-            params.username = this.getQueryParams('username') || ''
-          }
-          console.log(params)
-          this.loading = true
-          url(params).then(({ data }) => {
-            if (data.status !== '1') {
-              this.loading = false
-              return this.$message({
-                type: 'error',
-                message: data.message || '数据异常'
-              })
-            } else {
-              this.id = data.data
-              this.saveCollision()
-            }
+        }
+      })
+    },
+    indexSaveData (type) {
+      let code = 0
+      if (this.rejectForm.rejectGroupPackageIds.length) {
+        code = 1
+      }
+      let params = {
+        ...this.baseForm,
+        ...this.$refs.userAttrRule.lastSubmitRuleConfig,
+        // ...this.$refs.userActionRule.lastSubmitRuleConfig, //用户行为
+        ...this.rejectForm,
+        outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
+        rejectGroupPackCode: code
+      }
+      params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
+      if (type === 'preview') {
+        this.isPreviewShow = true
+        this.$nextTick(() => {
+          this.$refs.dataPreviewInfo.init(params)
+        })
+        return
+      }
+      params.vestPackCode = params.vestPackCode.join(',')
+      let url = savaDataInfo
+      if (this.id) {
+        url = updateDataInfo
+        params.id = this.id
+        params.flowId = this.flowId
+      }
+      let sysUuid = getQueryString('system_uuid')
+      let sysArr = [
+        'ecf36297-37ea-489e-a350-045b1ab49f75', // 统一后台uuid
+        '95dd8c99-8c51-4394-b2f4-95ba472c2ef4' // 小鱼福卡uuid
+      ]
+      if (sysUuid && sysArr.includes(sysUuid)) {
+        params.username = this.getQueryParams('username') || ''
+      }
+      console.log(params)
+      this.loading = true
+      url(params).then(({ data }) => {
+        if (data.status !== '1') {
+          this.loading = false
+          return this.$message({
+            type: 'error',
+            message: data.message || '数据异常'
           })
+        } else {
+          this.id = data.data
+          this.saveCollision()
+        }
+      })
+    },
+    excelSaveData () {
+      let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
+      data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
+      data.append('name', this.baseForm.name)
+      data.append('type', this.baseForm.type)
+      data.append('userType', this.baseForm.userType)
+      data.append('desc', this.baseForm.desc)
+      data.append('channelId', this.baseForm.channelId)
+      data.append('ruleConfig', this.$refs.userAttrRule.lastSubmitRuleConfig.ruleConfig)
+      data.append('expression', this.$refs.userAttrRule.lastSubmitRuleConfig.expression)
+      data.append('expressionTemplate', this.$refs.userAttrRule.lastSubmitRuleConfig.expressionTemplate)
+      data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
+      this.rejectForm.rejectGroupPackageIds.forEach(item => {
+        data.append('rejectGroupPackageIds', item)
+      })
+      let flag = 0
+      if (this.rejectForm.rejectGroupPackageIds.length) {
+        flag = 1
+      }
+      data.append('rejectGroupPackCode', flag)
+      if (this.id) {
+        data.append('id', this.id)
+      }
+      this.loading = true
+      importExcelFile(data).then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.$message({
+            type: 'error',
+            message: res.data.message || '保存失败'
+          })
+          this.loading = false
+        } else {
+          this.id = res.data.data
+          this.saveCollision()
         }
       })
     },
