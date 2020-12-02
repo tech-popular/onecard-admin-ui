@@ -11,7 +11,7 @@
     <div class="wrap" v-loading="loading">
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form">
         <div class="base-pane">
-          <h3>基本信息</h3>
+          <h3 ref="baseTitle">基本信息</h3>
             <el-form-item label="下发类型" prop="triggerMode" style="width:50%">
               <el-radio v-model="baseForm.triggerMode" label="0" class="radio-item radio-initiative">主动型</el-radio>
               <el-tooltip placement="top">
@@ -275,6 +275,12 @@
       </el-form>
     </div>
     <div class="footer">
+      <el-button
+        type="success"
+        @click="copyHandle"
+        size="small"
+        v-if="!!baseForm.id"
+      >复制创建新任务</el-button>
       <el-button type="primary" @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
@@ -999,6 +1005,20 @@
               })
             }
           }
+        })
+      },
+      copyHandle () { // 复制功能
+        this.$confirm('流转已复制，点击“确定”开始编辑新流转任务', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => { // 确认创建分群时的操作
+          this.tag = '新建'
+          this.baseForm.transferName = '复制' + this.baseForm.transferName
+          this.baseForm.id = 0
+          this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+        }).catch(() => {
+          console.log('cancel')
         })
       },
       // 关闭
