@@ -1015,7 +1015,7 @@
         }).then(() => { // 确认创建分群时的操作
           this.tag = '新建'
           this.baseForm.transferName = '复制' + this.baseForm.transferName
-          this.baseForm.id = 0
+          this.baseForm.id = ''
           this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
         }).catch(() => {
           console.log('cancel')
