@@ -275,12 +275,12 @@
       </el-form>
     </div>
     <div class="footer">
-      <!-- <el-button
+      <el-button
         type="success"
         @click="copyHandle"
         size="small"
         v-if="!!baseForm.id"
-      >复制创建新任务</el-button> -->
+      >复制创建新任务</el-button>
       <el-button type="primary" @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
@@ -1016,6 +1016,8 @@
           this.tag = '新建'
           this.baseForm.transferName = '复制' + this.baseForm.transferName
           this.baseForm.id = ''
+          this.baseForm.taskUniqueFlag = null
+          this.baseForm.dolphinProcessId = null
           this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
         }).catch(() => {
           console.log('cancel')
