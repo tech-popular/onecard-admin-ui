@@ -75,7 +75,7 @@
             v-if="baseForm.userType === 'excel'"
             class="user-channel"
           >
-            <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px">
+            <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px" @change="channelIdChange" filterable>
               <template v-for="(item, index) in channelList">
                 <el-option :key="index" :label="item.text" :value="item.value"></el-option>
               </template>
@@ -810,7 +810,7 @@ export default {
       data.append('userType', this.baseForm.userType)
       data.append('desc', this.baseForm.desc)
       data.append('channelId', this.baseForm.channelId)
-      data.append('ruleConfig', this.$refs.userAttrRule.lastSubmitRuleConfig.ruleConfig)
+      data.append('ruleConfig', JSON.stringify(this.$refs.userAttrRule.lastSubmitRuleConfig.ruleConfig))
       data.append('expression', this.$refs.userAttrRule.lastSubmitRuleConfig.expression)
       data.append('expressionTemplate', this.$refs.userAttrRule.lastSubmitRuleConfig.expressionTemplate)
       data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
