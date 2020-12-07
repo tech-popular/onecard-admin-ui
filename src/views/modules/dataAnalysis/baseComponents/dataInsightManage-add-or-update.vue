@@ -279,7 +279,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: [],
+        channelId: '',
         desc: ''
       },
       rejectForm: {
@@ -350,7 +350,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: [],
+        channelId: '',
         desc: ''
       }
       this.$nextTick(() => {
@@ -389,11 +389,11 @@ export default {
           }
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
-            this.baseForm.channelId = data.data.channelId
+            // this.baseForm.channelId = data.data.channelId
             this.loading = false
             return
           }
-          this.baseForm.channelId = data.data.channelId.indexOf(',') > -1 ? data.data.channelId.split(',') : [data.data.channelId]
+          this.baseForm.channelId = data.data.channelId // .indexOf(',') > -1 ? data.data.channelId.split(',') : [data.data.channelId]
           if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
@@ -759,7 +759,7 @@ export default {
             outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
             rejectGroupPackCode: code
           }
-          params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
+          params.channelId = params.channelId
           if (type === 'preview') {
             this.isPreviewShow = true
             this.$nextTick(() => {
