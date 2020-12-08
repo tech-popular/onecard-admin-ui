@@ -81,11 +81,11 @@
           <h3 class="pane-preview-title">分群预览</h3>
           <div class="pane-rules-item" v-for="(item, index) in custerInfoList" :key="index">
             <h3>{{item.name}}</h3>
-            <div v-if="item.ruleConfig">
+            <div v-show="item.ruleConfig">
               <h3>满足如下条件的用户</h3>
               <user-attr-rule-pane ref="userAttrRule" :channel-id="baseForm.channelId" :data="item" :from="'api'"></user-attr-rule-pane>
             </div>
-            <div v-else>
+            <div v-show="!item.ruleConfig">
               <p>{{item.tips}}</p>
             </div>
           </div>
