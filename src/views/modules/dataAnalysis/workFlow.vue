@@ -869,11 +869,24 @@ export default {
           that.flowJson.linkDataArray = mySelf.myDiagram.model.linkDataArray
         } else if (fromCategory === 'DATA_QUERY') {
           let lineNum = 0
+          let lineNameArr = []
+          let maxLineNum = 0
           fromNodeLink.findLinksOutOf().each(function (link) {
             lineNum++
+            let linkText = link.data.linkText
+            if (linkText && linkText.substr(0, 6) === 'RESULT') { // 判断是否是默认名称
+              if (!linkText.substr(6)) { // 第一条线
+                lineNameArr.push(0)
+              } else { // 非第一条线
+                if ((typeof parseInt(linkText.substr(6))) === 'number') {
+                  lineNameArr.push(parseInt(linkText.substr(6)))
+                }
+              }
+            }
+            maxLineNum = Math.max(...lineNameArr)
             link.data.linkText = link.data.linkText
             ? link.data.linkText
-            : 'RESULT' + (lineNum === 1 ? '' : lineNum)
+            : 'RESULT' + (lineNum === 1 ? '' : maxLineNum + 1)
             mySelf.myDiagram.model.updateTargetBindings(link.data)
           })
           // e.subject.data.linkText = 'result' + lineNum
