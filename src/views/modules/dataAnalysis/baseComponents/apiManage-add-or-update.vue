@@ -329,11 +329,11 @@ export default {
           this.custerInfoList[index] = curCusterInfo // 获取与templateIds顺序对应的数据，这步不会更新视图
           let newArr = this.custerInfoList.filter(item => item.id)
           if (newArr.length === this.baseForm.templateIds.length) { // 如果数据已经全部获取完
-            this.custerInfoList.splice(0, 1, this.custerInfoList[0]) // 利用这个更新视图
-            this.$nextTick(() => {
-              this.custerLoading = false
-              this.custerInfoList.forEach((citem, cindex) => {
-                this.$refs.userAttrRule[cindex].renderApiData(citem)
+            this.custerInfoList.slice() // 利用这个更新视图
+            this.custerLoading = false
+            this.custerInfoList.forEach((citem, cindex) => {
+              this.$nextTick(() => {
+                citem.ruleConfig && this.$refs.userAttrRule[cindex].renderApiData(citem)
               })
             })
           }
