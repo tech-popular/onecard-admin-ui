@@ -1,10 +1,10 @@
 <template>
   <el-dialog title='查看日志' :fullscreen="true" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-  <div style="width:100%; height:600px;overflow:auto;word-wrap:font-size:12px; break-word;word-break: normal;background:black;color:#fff;" v-html="logText">
+  <div style="width:100%; height:600px;overflow:auto;padding-left:15px;word-wrap:break-word;word-break: normal;background:black;color:#fff;" v-html="logText">
   </div>
-    <div slot="footer" class="foot">
+    <!-- <div slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
-    </div>	 
+    </div>	  --> 
 	</el-dialog>
 </template>
 <script>
