@@ -26,6 +26,7 @@ export default{
   },
   methods: {
     init (dolphinInstanceId) {
+      this.isFullscreen = false
       this.visible = true
       this.logText = ''
       taskBatchLog(dolphinInstanceId).then(({data}) => {
