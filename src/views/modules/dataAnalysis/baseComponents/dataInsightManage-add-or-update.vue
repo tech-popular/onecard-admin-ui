@@ -387,13 +387,12 @@ export default {
               .split(',')
               .filter(item => item != '')
           }
+          this.baseForm.channelId = data.data.channelId
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
-            // this.baseForm.channelId = data.data.channelId
             this.loading = false
             return
           }
-          this.baseForm.channelId = data.data.channelId // .indexOf(',') > -1 ? data.data.channelId.split(',') : [data.data.channelId]
           if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
