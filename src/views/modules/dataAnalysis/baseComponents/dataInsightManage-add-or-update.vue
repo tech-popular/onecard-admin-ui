@@ -39,9 +39,9 @@
               >指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 <el-form-item label="用户所属渠道" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
+                <!-- multiple
+                  :multiple-limit = "channelLimit" -->
                 <el-select
-                  multiple
-                  :multiple-limit = "channelLimit"
                   v-model="baseForm.channelId"
                   @change="channelIdChange"
                   filterable
@@ -254,7 +254,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
     return {
-      channelLimit: 1,
+      // channelLimit: 1,
       isPreviewShow: true,
       loading: false,
       showActionRule: false,
@@ -279,7 +279,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: [],
+        channelId: '',
         desc: ''
       },
       rejectForm: {
@@ -322,7 +322,7 @@ export default {
       // this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
       this.getVestPackAvailable()
       this.getChannelsList()
-      this.getCusterList()
+      this.getCusterList('')
       this.getCollisionList()
       // this.getCollisionParams()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
@@ -350,7 +350,7 @@ export default {
         name: '',
         userType: 'indicator',
         type: 'dynamic',
-        channelId: [],
+        channelId: '',
         desc: ''
       }
       this.$nextTick(() => {
@@ -387,13 +387,11 @@ export default {
               .split(',')
               .filter(item => item != '')
           }
+          this.baseForm.channelId = data.data.channelId
+
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
-            this.baseForm.channelId = data.data.channelId
-            this.loading = false
-            return
           }
-          this.baseForm.channelId = data.data.channelId.indexOf(',') > -1 ? data.data.channelId.split(',') : [data.data.channelId]
           if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
@@ -460,20 +458,22 @@ export default {
           }
         })
       }
-      if (this.baseForm.channelId.length === 1) {
-        if (this.baseForm.channelId[0] === '2001' || this.baseForm.channelId[0] === '6001') {
-          this.channelLimit = 2
-          this.channelList.forEach(item => {
-            if (item.value === '2001' || item.value === '6001') {
-              item.disabled = false
-            } else {
-              item.disabled = true
-            }
-          })
-        } else {
-          this.channelLimit = 1
-        }
-      }
+      // if (this.baseForm.channelId.length === 1) {
+      //   if (this.baseForm.channelId[0] === '2001' || this.baseForm.channelId[0] === '6001') {
+      //     this.channelLimit = 2
+      //     this.channelList.forEach(item => {
+      //       if (item.value === '2001' || item.value === '6001') {
+      //         item.disabled = false
+      //       } else {
+      //         item.disabled = true
+      //       }
+      //     })
+      //   } else {
+      //     this.channelLimit = 1
+      //   }
+      // }
+      this.rejectForm.rejectGroupPackageIds = []
+      this.getCusterList(this.baseForm.channelId)
       this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
       // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId) // 用户行为暂时隐藏
       this.rejectForm.rejectGroupPackageIds = []
@@ -497,8 +497,8 @@ export default {
       this.outMostExpressionTemplate = this.outMostExpressionTemplate === 'and' ? 'or' : 'and'
     },
     // 获取分群名称
-    getCusterList () {
-      custerAvailable().then(({ data }) => {
+    getCusterList (code) {
+      custerAvailable(code).then(({ data }) => {
         if (data.status !== '1') {
           this.custerNameList = []
           return this.$message({
@@ -646,52 +646,6 @@ export default {
             message: '请选择要上传的文件'
           })
           return
-        // let flag = true
-        // this.$refs.baseForm.validate((valid) => {
-        //   if (!valid) {
-        //     flag = false
-        //   }
-        // })
-        // this.$refs.rejectForm.validate((valid) => {
-        //   if (!valid) {
-        //     flag = false
-        //   }
-        // })
-        // if (flag) {
-        //   let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
-        //   data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
-        //   data.append('name', this.baseForm.name)
-        //   data.append('type', this.baseForm.type)
-        //   data.append('userType', this.baseForm.userType)
-        //   data.append('desc', this.baseForm.desc)
-        //   data.append('channelId', this.baseForm.channelId)
-        //   data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
-        //   this.rejectForm.rejectGroupPackageIds.forEach(item => {
-        //     data.append('rejectGroupPackageIds', item)
-        //   })
-        //   let flag = 0
-        //   if (this.rejectForm.rejectGroupPackageIds.length) {
-        //     flag = 1
-        //   }
-        //   data.append('rejectGroupPackCode', flag)
-        //   if (this.id) {
-        //     data.append('id', this.id)
-        //   }
-        //   this.loading = true
-        //   importExcelFile(data).then(res => {
-        //     if (res.data.status * 1 !== 1) {
-        //       this.$message({
-        //         type: 'error',
-        //         message: res.data.message || '保存失败'
-        //       })
-        //       this.loading = false
-        //     } else {
-        //       this.id = res.data.data
-        //       this.saveCollision()
-        //     }
-        //   })
-        // }
-        // return
       }
       // 用户属性 用户行为 数据校验
       this.$refs.userAttrRule.isRequired = true
@@ -764,7 +718,7 @@ export default {
         outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
         rejectGroupPackCode: code
       }
-      params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
+      // params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
       if (type === 'preview') {
         this.isPreviewShow = true
         this.$nextTick(() => {

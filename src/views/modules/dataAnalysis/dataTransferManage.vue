@@ -30,7 +30,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="taskUniqueFlag" header-align="center" align="center" label="蜂巢任务ID"></el-table-column>
+      <!-- <el-table-column prop="taskUniqueFlag" header-align="center" align="center" label="蜂巢任务ID"></el-table-column> -->
       <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
       <el-table-column prop="transferType" header-align="center" align="center" label="下发数据源"></el-table-column>
       <el-table-column prop="dispatchFrequency" header-align="center" align="center" :formatter="dispatchFrequencyFormat" label="调度频率"></el-table-column>

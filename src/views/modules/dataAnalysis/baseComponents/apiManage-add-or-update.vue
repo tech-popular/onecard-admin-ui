@@ -41,8 +41,8 @@
             <el-button type="primary" @click="previewCusterInfo" size="small">预览</el-button>
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
-            <el-radio v-model="baseForm.inParam" label="cust_no" v-if="!!id && baseForm.inParam === 'cust_no'" :disabled="!!id && baseForm.inParam === 'cust_no'">客户编号（cust_no）</el-radio>
-            <el-radio v-model="baseForm.inParam" :label="fitem.value" :disabled="!!id && baseForm.inParam === 'cust_no'" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
+            <!-- <el-radio v-model="baseForm.inParam" label="cust_no" v-if="!!id && baseForm.inParam === 'cust_no'" :disabled="!!id && baseForm.inParam === 'cust_no'">客户编号（cust_no）</el-radio> -->
+            <el-radio v-model="baseForm.inParam" :label="fitem.value" :disabled="allSelectedChannelCode.includes(xiaofankaCode)" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
             <!-- <el-checkbox-group v-model="baseForm.inParam">
               <el-checkbox :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-checkbox>
             </el-checkbox-group> -->
@@ -81,11 +81,11 @@
           <h3 class="pane-preview-title">分群预览</h3>
           <div class="pane-rules-item" v-for="(item, index) in custerInfoList" :key="index">
             <h3>{{item.name}}</h3>
-            <div v-if="item.ruleConfig">
+            <div v-show="item.ruleConfig">
               <h3>满足如下条件的用户</h3>
               <user-attr-rule-pane ref="userAttrRule" :channel-id="baseForm.channelId" :data="item" :from="'api'"></user-attr-rule-pane>
             </div>
-            <div v-else>
+            <div v-show="!item.ruleConfig">
               <p>{{item.tips}}</p>
             </div>
           </div>
@@ -217,7 +217,8 @@ export default {
         // {
         //   code: 'MINUTES', title: '分钟'
         // }
-      ]
+      ],
+      xiaofankaCode: '6001'
     }
   },
   components: { userAttrRulePane, Treeselect },
@@ -315,6 +316,9 @@ export default {
       }
       this.baseForm.outParams = []
       this.outParams = []
+      if (this.allSelectedChannelCode.includes(this.xiaofankaCode)) {
+        this.baseForm.inParam = 'user_id'
+      }
     },
     previewCusterInfo () {
       if (!this.baseForm.templateIds.length) return
@@ -325,11 +329,11 @@ export default {
           this.custerInfoList[index] = curCusterInfo // 获取与templateIds顺序对应的数据，这步不会更新视图
           let newArr = this.custerInfoList.filter(item => item.id)
           if (newArr.length === this.baseForm.templateIds.length) { // 如果数据已经全部获取完
-            this.custerInfoList.splice(0, 1, this.custerInfoList[0]) // 利用这个更新视图
-            this.$nextTick(() => {
-              this.custerLoading = false
-              this.custerInfoList.forEach((citem, cindex) => {
-                this.$refs.userAttrRule[cindex].renderApiData(citem)
+            this.custerInfoList.slice() // 利用这个更新视图
+            this.custerLoading = false
+            this.custerInfoList.forEach((citem, cindex) => {
+              this.$nextTick(() => {
+                citem.ruleConfig && this.$refs.userAttrRule[cindex].renderApiData(citem)
               })
             })
           }
@@ -375,7 +379,7 @@ export default {
         templateIds: []
       }
       this.$nextTick(() => {
-        this.$refs.userAttrRule.init()
+        this.custerInfoList.length && this.$refs.userAttrRule.init()
       })
     },
     getCusterInfo (id, fn) { // 获取分群数据

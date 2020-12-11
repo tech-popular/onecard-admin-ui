@@ -18,7 +18,7 @@ export const uploadFileInfo = params => httpGet(da + 'data/group/listOnPage', pa
 export const importExcelFile = params => httpPostFile(da + 'data/group/import', params)
 export const channelsList = () => httpGet(da + 'common/select/channels')
 export const vestPackAvailable = code => httpGetSeries(da + `vest/pack/select/available`, code)
-export const custerAvailable = () => httpGet(da + `data/group/select/available`) // 分群ID
+export const custerAvailable = code => httpGet(da + `data/group/select/available?channelCode=${code}`) // 分群ID
 export const templateDownload = http.adornUrl(da + 'data/group/template/download?token=' + Vue.cookie.get('token'))
 export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManager/value/candidate', params)
 

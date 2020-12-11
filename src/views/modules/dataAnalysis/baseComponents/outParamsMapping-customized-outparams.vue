@@ -3,11 +3,11 @@
     <div class="last-modifier">最后修改人：{{updator}}</div>
 		<el-form :model="formData" ref="formData">
 			<el-table :data="formData.tableData" border style="width: 100%;">
-        <el-table-column prop="index" header-align="center" align="center" label="序号"></el-table-column>
+        <el-table-column prop="index" header-align="center" align="center" label="序号" width="100px"></el-table-column>
         <el-table-column prop="fieldName" header-align="center" align="center" label="字段名称">
             <template slot-scope="scope">
-              <el-form-item :prop="'tableData.' + scope.$index + '.fieldName'" :rules='rules.fieldName'>
-                <el-input v-model.trim="scope.row.fieldName" placeholder="字段名称"></el-input>
+              <el-form-item :prop="'tableData.' + scope.$index + '.fieldName'" :rules="rules.fieldName">
+                <el-input v-model.trim="scope.row.fieldName" placeholder="可输入字母、数字、下划线，不能以数字开头"></el-input>
               </el-form-item>
             </template>
         </el-table-column>
@@ -34,7 +34,7 @@
             </el-form-item>
           </template>
 				</el-table-column>
-        <el-table-column header-align="center" align="center">
+        <el-table-column header-align="center" align="center" width="200px">
           <template slot="header">
             <i class="el-icon-circle-plus-outline icon-add" @click="addField">添加字段</i>
           </template>
@@ -66,7 +66,9 @@
         rules: {
           fieldName: {
             required: true,
-            message: '请输入字段名称'
+            message: '字段名称不能为空，可输入字母、数字、下划线，不能以数字开头',
+            pattern: /^([a-zA-z_]{1})([\w]*)$/g,
+            trigger: 'blur'
           },
           fieldTitle: {
             required: true,
@@ -172,7 +174,7 @@
         })
       },
       submitData () {
-        this.$refs.formData.validate((valid) => {
+        this.$refs.formData.validate((valid, data) => {
           if (valid) {
             let data = this.formData.tableData
             // 判断是否有重复的数据
@@ -205,6 +207,19 @@
               })
               this.formData.tableData = []
               this.$emit('cancel')
+            })
+          } else {
+            let errorArr = Object.values(data).flat(Infinity)
+            let uniqueError = []
+            for (let elem of errorArr.values()) {
+              if (!uniqueError.includes(elem.message)) {
+                uniqueError.push(elem.message)
+              }
+            }
+            this.$message({
+              message: uniqueError.join('<br/><br/>'),
+              dangerouslyUseHTMLString: true,
+              type: 'error'
             })
           }
         })
