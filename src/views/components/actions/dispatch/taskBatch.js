@@ -19,17 +19,18 @@ export const models = {
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
+      viewLogVisible: false,
       // 操作按钮
       operatesWidth: '220px',
       operates: [
-        // {
-        //   id: 1,
-        //   label: '查看日志',
-        //   type: 'primary',
-        //   method: (id) => {
-        //     this.implementHandle(id)
-        //   }
-        // },
+        {
+          id: 1,
+          label: '查看日志',
+          type: 'primary',
+          method: (row) => {
+            this.implementHandle(row)
+          }
+        }
         // {
         //   id: 2,
         //   label: '依赖快照',
@@ -183,7 +184,7 @@ export const models = {
         this.allSystemList = [ { projectSystemName: '全部', id: '-1' }, ...data.data ]
         let curIndex = this.searchForm.findIndex(item => item.prop === 'projectId')
         this.searchForm.splice(curIndex, 1, { ...this.searchForm[curIndex], options: this.allSystemList })
-        console.log(this.searchForm, this.allSystemList)
+        // console.log(this.searchForm, this.allSystemList)
       })
     },
     // 查询
@@ -227,6 +228,13 @@ export const models = {
           this.totalPage = 0
           this.$message.error(data.msg)
         }
+      })
+    },
+    // 查看日志
+    implementHandle (row) {
+      this.viewLogVisible = true
+      this.$nextTick(() => {
+        this.$refs.viewLog.init(row.dolphinInstanceId)
       })
     }
   }

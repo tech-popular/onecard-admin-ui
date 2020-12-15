@@ -9,12 +9,17 @@
       :page-size="pageSize"
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"/>
+      <taskBatch-view-log v-if="viewLogVisible" ref="viewLog"></taskBatch-view-log>
   </div>
 </template>
 
 <script>
   import { models } from '../../components/actions/dispatch/taskBatch'
+  import taskBatchViewLog from './taskBranch-view-log.vue'
   export default {
-    mixins: [models]
+    mixins: [models],
+    components: {
+      taskBatchViewLog
+    }
   }
 </script>
