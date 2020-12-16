@@ -665,6 +665,7 @@ export default {
             flag = false
           }
         })
+        console.log(ruleFormArr)
         ruleFormArr.forEach(item => {
           item.validate(valid => {
             if (!valid) {
@@ -679,7 +680,7 @@ export default {
         //     }
         //   })
         // })
-        if (ruleFormArr.length === 0) {
+        if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel') {
         // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
           return this.$message({
             message: '请配置用户规则信息',
