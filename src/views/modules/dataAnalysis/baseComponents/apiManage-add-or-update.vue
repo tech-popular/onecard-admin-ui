@@ -393,11 +393,11 @@ export default {
           fn(this.curCusterInfo)
           return
         }
-        if (data.data.userType && data.data.userType === 'excel') {
+        if (data.data.userType && data.data.userType === 'excel' && !data.data.configJson) {
           this.curCusterInfo = {
             id: id,
             name: data.data.name,
-            tips: 'Excel导入分群无预览内容'
+            tips: '此分群暂无预览内容'
           }
           fn(this.curCusterInfo)
           return
@@ -412,6 +412,15 @@ export default {
           return
         }
         let configJson = JSON.parse(data.data.configJson)
+        if (data.data.userType && data.data.userType === 'excel' && (!data.data.configJson || !configJson.ruleConfig)) {
+          this.curCusterInfo = {
+            id: id,
+            name: data.data.name,
+            tips: '此分群暂无预览内容'
+          }
+          fn(this.curCusterInfo)
+          return
+        }
         this.getSelectAllCata((indexList) => {
           let ruleConfig = this.updateInitRulesConfig(configJson.ruleConfig, indexList)
           this.curCusterInfo = {
