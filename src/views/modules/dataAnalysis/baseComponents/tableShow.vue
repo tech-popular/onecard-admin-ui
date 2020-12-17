@@ -280,7 +280,7 @@ export default {
     },
     getRegionList (indexList) {
       indexList && indexList.forEach((item, index) => {
-        if (!item.children && this.regionList.length < 5) {
+        if (!item.children && this.regionList.length < 4) {
           this.regionList.push(item.id)
         } else {
         this.getRegionList(item.children)
