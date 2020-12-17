@@ -240,6 +240,7 @@ export default {
     },
     init (val) {
       this.loading = true
+      this.regionList = []
       this.dialogVisible = true
       this.isShow = true
       this.title = val.name
@@ -262,15 +263,16 @@ export default {
         this.userRateStr = data.data.userRateStr
         this.lastCalTime = data.data.lastCalTime
         // this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : [5486, 5590]
-        this.selectedIndex = this.ruleForm.region
+        // this.selectedIndex = this.ruleForm.region
         // this.getChartInfo()
         this.getTranferLogData()
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
         this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
         this.getSelectAllCata(channelCode, (indexList) => {
-          this.outParamsIndexList = this.updateOutParamsList(indexList)
           this.getRegionList(indexList)
           this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : this.regionList
+          this.selectedIndex = this.ruleForm.region
+          this.outParamsIndexList = this.updateOutParamsList(indexList)
           this.getChartInfo()
           this.$nextTick(() => {
             this.loading = false
