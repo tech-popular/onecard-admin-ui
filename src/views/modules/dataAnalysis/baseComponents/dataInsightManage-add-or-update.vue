@@ -392,7 +392,7 @@ export default {
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
           }
-          if (!data.data.configJson) { // 在真实掉接口时用 || 关系进行数据验证
+          if (!data.data.configJson && data.data.userType !== 'excel') { // 在真实掉接口时用 || 关系进行数据验证
             this.initEmptyData()
             this.loading = false
             return this.$message({

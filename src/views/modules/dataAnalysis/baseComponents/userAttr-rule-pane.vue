@@ -111,6 +111,11 @@ export default {
     },
     renderData (data, channelId) {
       this.channelId = channelId
+      if (!data) {
+        this.channelIdChangeUpdate(channelId)
+        this.$emit('renderEnd')
+        return
+      }
       let configJson = JSON.parse(data)
       this.ruleConfig = configJson.ruleConfig ? configJson.ruleConfig : this.ruleConfig
       this.expression = configJson.expression
