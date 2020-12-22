@@ -108,6 +108,7 @@ export default {
       chartLen: 0,
       seriesData: [],
       originRegion: [],
+      regionList: [], // 可视化筛选数据的默认值
       ruleForm: {
         region: []
       },
@@ -239,6 +240,7 @@ export default {
     },
     init (val) {
       this.loading = true
+      this.regionList = []
       this.dialogVisible = true
       this.isShow = true
       this.title = val.name
@@ -260,18 +262,31 @@ export default {
         this.templateUserNum = data.data.templateUserNum
         this.userRateStr = data.data.userRateStr
         this.lastCalTime = data.data.lastCalTime
-        this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : [5486, 5590]
-        this.selectedIndex = this.ruleForm.region
-        this.getChartInfo()
+        // this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : [5486, 5590]
+        // this.selectedIndex = this.ruleForm.region
+        // this.getChartInfo()
         this.getTranferLogData()
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
         this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
         this.getSelectAllCata(channelCode, (indexList) => {
+          this.getRegionList(indexList)
+          this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : this.regionList
+          this.selectedIndex = this.ruleForm.region
           this.outParamsIndexList = this.updateOutParamsList(indexList)
+          this.getChartInfo()
           this.$nextTick(() => {
             this.loading = false
           })
         })
+      })
+    },
+    getRegionList (indexList) {
+      indexList && indexList.forEach((item, index) => {
+        if (!item.children && this.regionList.length < 4) {
+          this.regionList.push(item.id)
+        } else {
+        this.getRegionList(item.children)
+        }
       })
     },
     isShowData (item) {
