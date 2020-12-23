@@ -251,7 +251,7 @@
       <span slot="footer" class="dialog-footer">
         <!-- <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button> -->
         <el-button @click="visible = false">取消</el-button>
-        <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+        <el-button type="primary"  v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
       </span>
     </el-dialog>
     <!-- 测试 sql -->
@@ -327,6 +327,7 @@ export default {
       visible: false,
       sqlVisible: false,
       activeNames: 2,
+      canUpdate: true, // 查看时不可编辑
       dataFormOrigin: {
         id: 0,
         name: '',
@@ -527,8 +528,9 @@ export default {
       let label = this.redisNames.filter(item => item.value === val)[0].label
       this.redisListData.splice(index, 1, { ...this.redisListData[index], label: label })
     },
-    init (id) {
+    init (id, canUpdate) {
       this.redisListData = []
+      this.canUpdate = id ? canUpdate : true
       this.dataForm = deepClone(this.dataFormOrigin)
       // 数据源权限tenant
       this.$http({

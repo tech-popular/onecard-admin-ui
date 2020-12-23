@@ -94,8 +94,8 @@
             type="text"
             size="small"
             v-if="isAuth('honeycomb:honeycombtask:update')"
-            @click="addOrUpdateHandle(scope.row.id)"
-          >修改</el-button>
+            @click="addOrUpdateHandle(scope.row)"
+          >{{scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}</el-button>
           <el-button
             type="text"
             size="small"
@@ -110,7 +110,7 @@
             @click="startTask(scope.row.id)"
           >启动任务</el-button> -->
           <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
-          <el-button type="text" size="small" @click="taskPermission(scope.row)">权限</el-button>
+          <el-button type="text" size="small" v-if="scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -127,7 +127,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
     <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
-    <assign-permission v-if="assignPermissionVisible" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
+    <assign-permission v-if="assignPermissionVisible" :getUserListApi= "getUserListApi" :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 <style>
@@ -136,6 +136,7 @@
 }
 </style>
 <script>
+import { getUsersList, updateHoneycombAuth } from '@/api/commom/assignPermission'
 import AddOrUpdate from './honeycombtask-add-or-update'
 import TaskProgress from './honeycombtaskprogress'
 import TaskDependent from './honeycombtask-dependent'
@@ -160,9 +161,9 @@ export default {
       taskProgressVisible: false,
       taskDependentVisible: false,
       assignPermissionVisible: false,
-      // getUserListApi: '',
-      // submitDataApi: '',
-      userid: sessionStorage.getItem('id') // v-if="userName === scope.row.createdBy"
+      getUserListApi: getUsersList,
+      submitDataApi: updateHoneycombAuth,
+      userid: sessionStorage.getItem('id')
     }
   },
   components: {
@@ -247,10 +248,12 @@ export default {
       this.dataListSelections = val
     },
     // 新增 / 修改
-    addOrUpdateHandle (id) {
+    addOrUpdateHandle (row) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id)
+        let canUpdate = row.authOtherList.includes(this.userid) || row.authOwner === this.userid
+        console.log('canUpdate: ', canUpdate)
+        this.$refs.addOrUpdate.init(row.id, canUpdate)
       })
     },
     taskProgress (id) {
