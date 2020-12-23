@@ -28,6 +28,7 @@ export default {
             commit('updateId', data.user.userId)
             commit('updateName', data.user.username)
             commit('createTime', data.user.createTime)
+            sessionStorage.setItem('username', data.user.username) // 存储用户名
             resolve(data.user.username)
           } else {
             console.log(data.msg)
