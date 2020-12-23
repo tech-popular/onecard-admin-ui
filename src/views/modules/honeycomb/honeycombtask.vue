@@ -110,7 +110,7 @@
             @click="startTask(scope.row.id)"
           >启动任务</el-button> -->
           <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
-          <el-button type="text" size="small" v-if="userName === scope.row.createdBy"    @click="taskPermission(scope.row.id)">权限</el-button>
+          <el-button type="text" size="small" @click="taskPermission(scope.row)">权限</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -127,6 +127,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
     <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
+    <assign-permission v-if="assignPermissionVisible" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 <style>
@@ -138,6 +139,7 @@
 import AddOrUpdate from './honeycombtask-add-or-update'
 import TaskProgress from './honeycombtaskprogress'
 import TaskDependent from './honeycombtask-dependent'
+import AssignPermission from '../../components/permission/assign-permission'
 export default {
   data () {
     return {
@@ -157,13 +159,17 @@ export default {
       addOrUpdateThresholdVisible: false,
       taskProgressVisible: false,
       taskDependentVisible: false,
-      userName: sessionStorage.getItem('username')
+      assignPermissionVisible: false,
+      // getUserListApi: '',
+      // submitDataApi: '',
+      userid: sessionStorage.getItem('id') // v-if="userName === scope.row.createdBy"
     }
   },
   components: {
     AddOrUpdate,
     TaskProgress,
-    TaskDependent
+    TaskDependent,
+    AssignPermission
   },
   activated () {
     this.getDataList()
@@ -337,9 +343,13 @@ export default {
       })
     },
     // 分配权限
-    taskPermission(id) {
+    taskPermission(row) {
       // 打开权限分配弹框
       // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+      this.assignPermissionVisible = true
+      this.$nextTick(() => {
+      this.$refs.assignPermission.init(row)
+      })
     }
   }
 }
