@@ -64,9 +64,12 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateServiceHandle(scope.row.id)">应用配置</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">
+            {{scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}
+          </el-button>
+          <el-button type="text" size="small" v-if="scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" v-if="scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="addOrUpdateServiceHandle(scope.row.id)">应用配置</el-button>
+          <el-button type="text" size="small" v-if="scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,7 +85,8 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-service v-if="taskServiceVisible" ref="taskService"  @refreshDataList="getDataList"></task-service>
-
+    <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 <style>
@@ -91,8 +95,10 @@
   }
 </style>
 <script>
+  import { updateCanaryAuth } from '@/api/commom/assignPermission'
   import AddOrUpdate from './canarybasetask-add-or-update'
   import TaskService from './canarybaseservice'
+  import AssignPermission from '../../components/permission/assign-permission'
   export default {
     data () {
       return {
@@ -107,12 +113,16 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        taskServiceVisible: false
+        taskServiceVisible: false,
+        submitDataApi: updateCanaryAuth,
+        assignPermissionVisible: false,
+        userid: sessionStorage.getItem('id')
       }
     },
     components: {
       AddOrUpdate,
-      TaskService
+      TaskService,
+      AssignPermission
     },
     activated () {
       this.getDataList()
@@ -177,10 +187,12 @@
         this.getDataList()
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          let canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+          let id = row ? row.id : undefined
+          this.$refs.addOrUpdate.init(id, canUpdate)
         })
       },
       // 同步到es
@@ -236,6 +248,14 @@
               this.$message.error(data.msg)
             }
           })
+        })
+      },
+      taskPermission (row) {
+        // 打开权限分配弹框
+        // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+         this.assignPermissionVisible = true
+         this.$nextTick(() => {
+           this.$refs.assignPermission.init(row)
         })
       }
     }
