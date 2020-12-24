@@ -8,6 +8,7 @@
       <el-form
         :model="dataForm"
         :rules="dataRule"
+        :disabled="!canUpdate"
         ref="dataForm"
         @keyup.enter.native="dataFormSubmit()"
         label-width="150px"
