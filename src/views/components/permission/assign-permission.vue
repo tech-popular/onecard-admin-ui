@@ -3,7 +3,7 @@
     title="操作权限分配"
     :close-on-click-modal="false"
     :visible.sync="visible">
-		<el-form :model="dataForm"  label-width="80px">
+		<el-form :model="dataForm" ref="dataForm" label-width="80px">
 			<el-form-item label="拥有者" prop="authOwner">
 				<el-select 
 			   v-model="dataForm.authOwner"
@@ -32,12 +32,13 @@
 </template>
 
 <script>
+import { getUsersList } from '@/api/commom/assignPermission'
   export default {
     props: {
-      getUserListApi: {
-        type: Function,
-        required: true
-      },
+      // getUserListApi: {
+      //   type: Function,
+      //   required: true
+      // },
       submitDataApi: {
         type: Function,
         required: true
@@ -59,15 +60,19 @@
         this.visible = true
         this.id = row.id
         this.userList = []
-        this.dataForm.authOwner = Number(row.authOwner)
-        row.authOtherList.forEach(element => {
-          this.dataForm.authOtherList.push(Number(element))
-        })
-        let tenantId = sessionStorage.getItem('tenantId')
-        this.getUserListApi(tenantId).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.userList = data.data
-          }
+        this.$nextTick(() => {
+           this.$refs['dataForm'].resetFields()
+           this.dataForm.authOwner = Number(row.authOwner)
+           row.authOtherList.forEach(element => {
+            this.dataForm.authOtherList.push(Number(element))
+           })
+           let tenantId = sessionStorage.getItem('tenantId')
+            // 获取同一租户下的用户
+            getUsersList(tenantId).then(({ data }) => {
+              if (data && data.code === 0) {
+              this.userList = data.data
+             }
+          })
         })
       },
       // 表单提交

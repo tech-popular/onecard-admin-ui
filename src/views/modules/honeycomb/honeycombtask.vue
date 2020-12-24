@@ -99,7 +99,7 @@
           <el-button
             type="text"
             size="small"
-            v-if="isAuth('honeycomb:honeycombtask:delete')"
+            v-if="isAuth('honeycomb:honeycombtask:delete') && (scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid)"
             @click="deleteHandle(scope.row.id)"
           >删除</el-button>
           <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
@@ -109,7 +109,7 @@
             v-if="isAuth('honeycomb:honeycombtask:start')"
             @click="startTask(scope.row.id)"
           >启动任务</el-button> -->
-          <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
+          <el-button type="text" size="small" v-if="scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="taskDependent(scope.row.id)">任务编排</el-button>
           <el-button type="text" size="small" v-if="scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
@@ -127,7 +127,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
     <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
-    <assign-permission v-if="assignPermissionVisible" :getUserListApi= "getUserListApi" :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
+    <assign-permission v-if="assignPermissionVisible"  :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 <style>
@@ -136,7 +136,7 @@
 }
 </style>
 <script>
-import { getUsersList, updateHoneycombAuth } from '@/api/commom/assignPermission'
+import { updateHoneycombAuth } from '@/api/commom/assignPermission'
 import AddOrUpdate from './honeycombtask-add-or-update'
 import TaskProgress from './honeycombtaskprogress'
 import TaskDependent from './honeycombtask-dependent'
@@ -161,7 +161,6 @@ export default {
       taskProgressVisible: false,
       taskDependentVisible: false,
       assignPermissionVisible: false,
-      getUserListApi: getUsersList,
       submitDataApi: updateHoneycombAuth,
       userid: sessionStorage.getItem('id')
     }
@@ -251,9 +250,9 @@ export default {
     addOrUpdateHandle (row) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        let canUpdate = row.authOtherList.includes(this.userid) || row.authOwner === this.userid
-        console.log('canUpdate: ', canUpdate)
-        this.$refs.addOrUpdate.init(row.id, canUpdate)
+        let canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+        let id = row ? row.id : undefined
+        this.$refs.addOrUpdate.init(id, canUpdate)
       })
     },
     taskProgress (id) {

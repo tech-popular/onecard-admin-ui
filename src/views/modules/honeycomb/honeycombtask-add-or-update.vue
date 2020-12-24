@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      :title="!dataForm.id ? '新增' : '修改'"
+      :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"
       :close-on-click-modal="false"
       :visible.sync="visible"
     >
