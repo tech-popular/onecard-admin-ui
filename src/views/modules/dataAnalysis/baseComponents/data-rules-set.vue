@@ -65,7 +65,7 @@
                 </el-form-item>
               </div>
             </div>
-            <!--enums-->
+            <!--enums  枚举类型的fieldType是string或number，但enumTypeNum有值，正常的string或number的enumTypeNum是null-->
             <div v-if="item.enumTypeNum"  class="pane-rules-inline">
               <el-form-item prop="params[0].selectVal" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
                 <el-select v-model="item.params[0].selectVal" multiple class="itemIput" @change="data => selectEnumsChange(data, item)" @visible-change="data => selectEnumsVisible(data, item)">
