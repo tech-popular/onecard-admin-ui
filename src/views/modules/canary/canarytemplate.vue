@@ -70,6 +70,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+           <!-- <el-button type="text" size="small" v-if="scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -84,11 +85,15 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+     <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 
 <script>
+  // import { updateCanaryAuth } from '@/api/commom/assignPermission'
   import AddOrUpdate from './canarytemplate-add-or-update'
+  import AssignPermission from '../../components/permission/assign-permission'
   export default {
     data () {
       return {
@@ -101,11 +106,15 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        // submitDataApi: updateCanaryAuth,
+        assignPermissionVisible: false,
+        userid: sessionStorage.getItem('id')
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AssignPermission
     },
     activated () {
       this.getDataList()
@@ -154,6 +163,11 @@
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
         })
+        // this.$nextTick(() => {
+        //   let canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+        //   let id = row ? row.id : undefined
+        //   this.$refs.addOrUpdate.init(id, canUpdate)
+        // })
       },
       // 删除
       deleteHandle (id) {
