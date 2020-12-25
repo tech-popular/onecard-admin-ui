@@ -28,7 +28,7 @@
           <!--条件内容区-->
           <div v-if="isEmpty(item)" class="pane-rules-inline">
             <!--string-->
-            <div v-if="item.fieldType === 'string' || item.fieldType === ''" class="pane-rules-inline">
+            <div v-if="(item.fieldType === 'string' || item.fieldType === '') && !item.enumTypeNum" class="pane-rules-inline">
               <!--string型等于或不等于可以输入多个-->
               <el-form-item prop="params[0].selectVal" :ref="'stringMultiVal' + item.ruleCode" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.func === 'eq' || item.func === 'neq'">
                 <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'string')" :tag-tips="item.strTips" :valueType="'string'" :add-tag-on-blur="true" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
@@ -44,7 +44,7 @@
               </el-form-item>
             </div>
             <!--number-->
-            <div v-if="item.fieldType === 'number'"  class="pane-rules-inline">
+            <div v-if="item.fieldType === 'number' && !item.enumTypeNum"  class="pane-rules-inline">
               <div v-if="item.func === 'between'"  class="pane-rules-inline">
                 <el-form-item prop="params[0].value" :ref="'paramsl' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, item.params), trigger: 'blur' }">
                   <!--输入时实时更新当前数据，失去焦点时也要处理，所有的number输入都一样，不能用el-input-number会出现大值转十六进制的情况-->
@@ -65,8 +65,8 @@
                 </el-form-item>
               </div>
             </div>
-            <!--enums-->
-            <div v-if="item.fieldType === 'enums'"  class="pane-rules-inline">
+            <!--enums  枚举类型的fieldType是string或number，但enumTypeNum有值，正常的string或number的enumTypeNum是null-->
+            <div v-if="item.enumTypeNum"  class="pane-rules-inline">
               <el-form-item prop="params[0].selectVal" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
                 <el-select v-model="item.params[0].selectVal" multiple class="itemIput" @change="data => selectEnumsChange(data, item)" @visible-change="data => selectEnumsVisible(data, item)">
                   <el-option v-for="(fitem, findex) in item.selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
