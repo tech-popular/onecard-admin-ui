@@ -1,9 +1,9 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" :disabled="!canUpdate"  label-width="80px">
     <el-form-item label="模板名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="模板名称"></el-input>
     </el-form-item>
@@ -22,7 +22,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate"  @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -32,6 +32,7 @@
     data () {
       return {
         visible: false,
+        canUpdate: true, // 查看时不可编辑
         dataForm: {
           id: 0,
           name: '',
@@ -53,8 +54,9 @@
       }
     },
     methods: {
-      init (id) {
+      init (id, canUpdate) {
         this.dataForm.id = id || 0
+        this.canUpdate = id ? canUpdate : true
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
