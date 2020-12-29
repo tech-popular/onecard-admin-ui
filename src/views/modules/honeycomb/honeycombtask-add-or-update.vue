@@ -373,6 +373,11 @@ export default {
         ]
       },
       dataForm: {},
+      rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+      },
       datasourceoptions: [],
       tenantoptions: [],
       computeTypeoptions: [],
@@ -529,9 +534,8 @@ export default {
       let label = this.redisNames.filter(item => item.value === val)[0].label
       this.redisListData.splice(index, 1, { ...this.redisListData[index], label: label })
     },
-    init (id, canUpdate) {
+    init (row, canUpdate) {
       this.redisListData = []
-      this.canUpdate = id ? canUpdate : true
       this.dataForm = deepClone(this.dataFormOrigin)
       // 数据源权限tenant
       this.$http({
@@ -566,7 +570,9 @@ export default {
           this.idRuleoptions = data.taskDicts.task_id_rule
         }
       })
-      this.dataForm.id = id || 0
+      this.dataForm.id = row ? row.id : 0
+      this.canUpdate = row ? canUpdate : true
+      this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
       this.visible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
@@ -736,7 +742,10 @@ export default {
               taskSource: this.dataForm.taskSource,
               targetSql: this.dataForm.targetSql,
               honeycombOutDatasourceEntitys: this.dataForm
-                .honeycombOutDatasourceEntitys
+                .honeycombOutDatasourceEntitys,
+              authOwner: this.rowData.authOwner,
+              authOtherList: this.rowData.authOtherList,
+              authOthers: this.rowData.authOthers
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {

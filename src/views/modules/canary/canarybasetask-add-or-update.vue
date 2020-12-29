@@ -72,6 +72,7 @@
 </template>
 
 <script>
+  import { deepClone } from '@/utils'
   export default {
     data () {
       return {
@@ -92,6 +93,11 @@
           }]
         },
         tenantoptions: [],
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        },
         dataRule: {
           name: [
             { required: true, message: 'name表达式不能为空', trigger: 'blur' }
@@ -115,7 +121,7 @@
           this.dataForm.canaryBaseTaskDatasourceEntities.splice(index, 1)
         }
       },
-      init (id, canUpdate) {
+      init (row, canUpdate) {
         // 数据源权限tenant
         this.$http({
           url: this.$http.adornUrl(`/sys/systenant/select`),
@@ -126,8 +132,9 @@
             this.tenantoptions = data.sysTenantEntities
           }
         })
-        this.dataForm.id = id || 0
-        this.canUpdate = id ? canUpdate : true
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
+        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -174,7 +181,10 @@
                 'tenantId': this.dataForm.tenantId,
                 'createdTime': this.dataForm.createdTime,
                 'updatedTime': this.dataForm.updatedTime,
-                'canaryBaseTaskDatasourceEntities': this.dataForm.canaryBaseTaskDatasourceEntities
+                'canaryBaseTaskDatasourceEntities': this.dataForm.canaryBaseTaskDatasourceEntities,
+                'authOwner': this.rowData.authOwner,
+                'authOtherList': this.rowData.authOtherList,
+                'authOthers': this.rowData.authOthers
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

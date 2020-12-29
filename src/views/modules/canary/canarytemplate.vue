@@ -160,13 +160,9 @@
       // 新增 / 修改
       addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
-        // this.$nextTick(() => {
-        //   this.$refs.addOrUpdate.init(id)
-        // })
         this.$nextTick(() => {
           let canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
-          let id = row ? row.id : undefined
-          this.$refs.addOrUpdate.init(id, canUpdate)
+          this.$refs.addOrUpdate.init(row, canUpdate)
         })
       },
       // 删除

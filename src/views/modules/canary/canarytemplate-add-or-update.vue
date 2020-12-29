@@ -28,6 +28,7 @@
 </template>
 
 <script>
+  import { deepClone } from '@/utils'
   export default {
     data () {
       return {
@@ -50,13 +51,19 @@
           enable: [
             { required: true, message: '是否启用不能为空', trigger: 'blur' }
           ]
+        },
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
         }
       }
     },
     methods: {
-      init (id, canUpdate) {
-        this.dataForm.id = id || 0
-        this.canUpdate = id ? canUpdate : true
+      init (row, canUpdate) {
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
+        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -88,7 +95,10 @@
                 'name': this.dataForm.name,
                 'template': this.dataForm.template,
                 'description': this.dataForm.description,
-                'enable': this.dataForm.enable
+                'enable': this.dataForm.enable,
+                'authOwner': this.rowData.authOwner,
+                'authOtherList': this.rowData.authOtherList,
+                'authOthers': this.rowData.authOthers
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
