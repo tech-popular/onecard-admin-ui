@@ -39,3 +39,5 @@ export const taskAlertDelete = id => httpDelete(base + `dispatch/task/alert/dele
  export const oldTaskDependenceDelete = params => httpPostFile(base + 'old/dispatch/task/dependence/delete', params) // 依赖任务批量删除
  // 查看日志
  export const taskBatchLog = dolphinInstanceId => httpGet(base + `dispatch/task/instance/logs/${dolphinInstanceId}`) // 查看新调度日志
+//  查询Yarn日志
+export const taskBatchYarnLog = dolphinInstanceId => httpGet(base + `dispatch/task/instance/applicationLogs/${dolphinInstanceId}`) // 查看新调度日志

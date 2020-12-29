@@ -20,6 +20,7 @@ export const models = {
       dataListLoading: false,
       addOrUpdateVisible: false,
       viewLogVisible: false,
+      viewYarnLogVisible: false,
       // 操作按钮
       operatesWidth: '220px',
       operates: [
@@ -146,6 +147,7 @@ export const models = {
       ],
       searchHandle: [
         {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
+        {label: 'Yarn日志查询', type: 'primary', handle: () => { this.handleLogSearch() }},
         {label: '重置', type: '', handle: () => { this.resetHandle() }}
       ]
     }
@@ -235,6 +237,13 @@ export const models = {
       this.viewLogVisible = true
       this.$nextTick(() => {
         this.$refs.viewLog.init(row.dolphinInstanceId)
+      })
+    },
+    // Yarn日志查询
+    handleLogSearch () {
+      this.viewYarnLogVisible = true
+      this.$nextTick(() => {
+        this.$refs.viewYarnLog.init()
       })
     }
   }
