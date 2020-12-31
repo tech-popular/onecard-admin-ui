@@ -6,7 +6,7 @@
 			<el-button @click="handleSearch()">查询</el-button>
 		</el-form-item>
 	</el-form>
-  	<div v-if="logTextisible" style="width:100%; height:600px; overflow:auto; padding-left:15px; word-wrap:break-word; word-break: normal; background:black;color:#fff;" v-html="logText">
+  	<div v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.9)"  v-if="logTextisible" style="width:100%; height:600px; overflow:auto; padding-left:15px; word-wrap:break-word; word-break: normal; background:black;color:#fff;" v-html="logText">
     </div>
 	</el-dialog>
 </template>
@@ -18,6 +18,7 @@ export default{
       visible: false,
       isFullscreen: false,
       logTextisible: false,
+      loading: false,
       logText: '',
       dataForm: {
         applicationId: ''
@@ -38,6 +39,7 @@ export default{
       if (!this.dataForm.applicationId) {
         this.$message.error('请输入applicationId后查询')
       } else {
+        this.loading = true
         taskBatchYarnLog(this.dataForm.applicationId).then(({ data }) => {
           if (data.code === 0) {
             this.$message({
@@ -47,10 +49,13 @@ export default{
               onClose: () => {
                 this.logTextisible = true
                 this.isFullscreen = true
+                this.loading = false
                 this.logText = data.data && data.data.replace(/\n/g, '<br>')
               }
             })
           } else {
+            this.logText = ''
+            this.loading = false
             this.$message.error(data.msg)
           }
         })
