@@ -68,7 +68,7 @@
             {{scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}
           </el-button>
           <el-button type="text" size="small" v-if="scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" v-if="scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="addOrUpdateServiceHandle(scope.row.id)">应用配置</el-button>
+          <el-button type="text" size="small"  @click="addOrUpdateServiceHandle(scope.row)">应用配置</el-button>
           <el-button type="text" size="small" v-if="scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
@@ -216,10 +216,11 @@
         })
       },
       // 应用配置
-      addOrUpdateServiceHandle (id) {
+      addOrUpdateServiceHandle (row) {
         this.taskServiceVisible = true
         this.$nextTick(() => {
-          this.$refs.taskService.init(id)
+          let canUpdate = row.authOtherList.includes(this.userid) || row.authOwner === this.userid
+          this.$refs.taskService.init(row.id, canUpdate)
         })
       },
       // 删除
