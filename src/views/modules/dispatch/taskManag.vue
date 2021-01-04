@@ -27,6 +27,8 @@
     />
     <!--调度配置-->
     <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
+    <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="init"></assign-permission>
   </div>
 </template>
 
@@ -34,13 +36,15 @@
 import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
+import AssignPermission from '../../components/permission/assign-permission'
 import { models } from '../../components/actions/dispatch/taskManag'
 export default {
   mixins: [models],
   components: {
     AddOrUpdate,
     ComputAddOrUpdate,
-    dispatchConfigAddOrUpdate
+    dispatchConfigAddOrUpdate,
+    AssignPermission
   }
 }
 </script>

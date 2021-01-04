@@ -63,7 +63,7 @@ import { getUsersList } from '@/api/commom/assignPermission'
         this.$nextTick(() => {
            this.$refs['dataForm'].resetFields()
            this.dataForm.authOwner = Number(row.authOwner)
-           row.authOtherList.forEach(element => {
+           row.authOtherList && row.authOtherList.forEach(element => {
             this.dataForm.authOtherList.push(Number(element))
            })
            let tenantId = sessionStorage.getItem('tenantId')

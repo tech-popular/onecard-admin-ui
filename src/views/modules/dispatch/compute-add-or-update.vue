@@ -7,10 +7,10 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{dataForm.id ? '编辑计算任务' : '新增计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑计算任务' : '新增计算任务' : '查看计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3 id="title">作业信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px">
@@ -34,7 +34,7 @@
         <el-button type="success" @click="mergeSql">代码连贯模式</el-button>
       </div>
       <div class="work-content" v-for="(item, index) in calculateTasks" :key="index">
-        <el-form :model="item" :rules="dataRule" ref="calculateTasks">
+        <el-form :model="item" :rules="dataRule" ref="calculateTasks" :disabled="!canUpdate"> 
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
@@ -88,7 +88,7 @@
           </div>
         </el-form>
       </div>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
@@ -115,7 +115,7 @@
     </div>
     <div class="footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
     <el-dialog
       title="代码连贯模式"
@@ -140,7 +140,7 @@
       </div>
       <div slot="footer">
         <el-button @click="mergeCodeVisible = false">取消</el-button>
-        <el-button type="primary" @click="previewSqlSubmit()">提交</el-button>
+        <el-button type="primary" v-if="canUpdate" @click="previewSqlSubmit()">提交</el-button>
       </div>
     </el-dialog>
   </el-drawer>
@@ -170,6 +170,11 @@ export default {
       visible: false,
       mergeCodeVisible: false,
       id: '',
+      rowData: { // 修改时数据内容
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      },
       formDs: 'mc',
       updateUser: '',
       updateTime: '',
@@ -267,6 +272,7 @@ export default {
         },
         styleSelectedText: true
       },
+      canUpdate: true,
       updateRowNum: 0,
       originpreviewSql: '', // 保留一份原始的连贯数据，用于做对比
       previewSql: '',
@@ -280,8 +286,15 @@ export default {
     }
   },
   methods: {
-    init (id) {
+    init (id, canUpdate) {
       this.id = id ? id.id : ''
+      this.rowData = {
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      }
+      this.rowData = id ? deepClone(id) : this.rowData
+      this.canUpdate = canUpdate
       this.dataForm = deepClone(this.tempDataForm)
       this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
@@ -566,6 +579,10 @@ export default {
         }
         let params = {
           ...this.dataForm,
+          authOwner: this.rowData.authOwner,
+          authOtherList: this.rowData.authOtherList,
+          authOthers: this.rowData.authOthers,
+          tenantId: sessionStorage.getItem('tenantId'),
           taskName: `${this.formDs}_${this.dataForm.taskName}`,
           taskType: 'CALCULATE',
           calculateTasks: this.calculateTasks

@@ -13,3 +13,6 @@ export const updateCanaryTemplateAuth = params => httpPost(da + 'canary/canaryte
 
 // 金丝雀报警渠道权限分配
 export const updateCanaryPipelineAuth = params => httpPost(da + 'canary/canarypipeline/updateCanaryPipelineAuth', params) // 保存权限
+
+// 调度任务管理权限
+export const updateDispatchTaskAuth = params => httpPost(da + 'dispatch/task/updateDispatchTaskAuth', params) // 保存权限

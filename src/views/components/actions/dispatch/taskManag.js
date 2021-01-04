@@ -2,6 +2,9 @@ import {
   list,
   taskExecute
 } from '@/api/dispatch/taskManag'
+import {
+  updateDispatchTaskAuth
+} from '@/api/commom/assignPermission'
 export const models = {
   data() {
     let type = [{
@@ -43,18 +46,25 @@ export const models = {
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalPage: 0,
+      userid: sessionStorage.getItem('id'),
       dataListLoading: false,
       addOrUpdateVisible: false,
       dispatchConfigAddOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
+      submitDataApi: updateDispatchTaskAuth,
+      assignPermissionVisible: false,
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
-      operatesWidth: '320px',
+      operatesWidth: '350px',
       operates: [{
           id: 1,
           label: '编辑任务',
           type: 'primary',
+          size: 'mini',
+          isShow: (id) => {
+            return id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+          },
           method: (id) => {
             if (id.taskType === 'CALCULATE') {
               this.computAddOrUpdateHandle(id)
@@ -65,16 +75,54 @@ export const models = {
         },
         {
           id: 2,
-          label: '调度配置',
-          type: 'success',
+          label: '查看任务',
+          type: 'primary',
+          size: 'mini',
+          isShow: (id) => {
+            return !(id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+          },
           method: (id) => {
-            this.addOrUpdateDispatchConfig(id)
+            if (id.taskType === 'CALCULATE') {
+              this.computAddOrUpdateHandle(id)
+            } else {
+              this.addOrUpdateHandle(id)
+            }
           }
         },
         {
           id: 3,
+          label: '调度配置',
+          type: 'success',
+          size: 'mini',
+          isShow: (id) => {
+            return id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+          },
+          method: (id) => {
+            let canUpdate = id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            this.addOrUpdateDispatchConfig(id, canUpdate)
+          }
+        },
+        {
+          id: 9,
+          label: '查看配置',
+          type: 'success',
+          size: 'mini',
+          isShow: (id) => {
+            return !(id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+          },
+          method: (id) => {
+            let canUpdate = id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            this.addOrUpdateDispatchConfig(id, canUpdate)
+          }
+        },
+        {
+          id: 4,
           label: '执行任务',
           type: 'default',
+          size: 'mini',
+          isShow: (id) => {
+            return id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+          },
           disabled: (id) => {
             if (id.dispatchStatus === 1) {
               return true
@@ -84,9 +132,9 @@ export const models = {
           method: (id) => {
             this.taskExecuteHandle(id)
           }
-        }
+        },
         // {
-        //   id: 4,
+        //   id: 5,
         //   label: '依赖快照',
         //   type: 'info',
         //   method: (snapshot) => {
@@ -94,7 +142,7 @@ export const models = {
         //   }
         // },
         // {
-        //   id: 5,
+        //   id: 6,
         //   label: '编辑依赖',
         //   type: 'warning',
         //   method: (editSnapshot) => {
@@ -102,13 +150,25 @@ export const models = {
         //   }
         // }
         // {
-        //   id: 6,
+        //   id: 7,
         //   label: '删除',
         //   type: 'success',
         //   method: (id) => {
         //     this.taskExecuteHandle(id)
         //   }
         // }
+        {
+          id: 8,
+          label: '授权',
+          type: 'warning',
+          size: 'mini',
+          isShow: (id) => {
+            return id.authOwner === this.userid
+          },
+          method: (id) => {
+            this.taskPermission(id)
+          }
+        }
       ],
       columns: [{
           prop: 'id',
@@ -153,7 +213,7 @@ export const models = {
         {
           prop: 'createUser',
           label: '创建人',
-          width: '150px',
+          width: '130px',
           align: 'center'
         },
         {
@@ -286,7 +346,8 @@ export const models = {
         'name': this.searchData.name,
         'type': this.searchData.type === -1 ? '' : this.searchData.type,
         'user': this.searchData.user,
-        'status': this.searchData.status === -1 ? '' : this.searchData.status
+        'status': this.searchData.status === -1 ? '' : this.searchData.status,
+        'tenantId': sessionStorage.getItem('tenantId')
       }
       this.getList(dataBody)
     },
@@ -311,7 +372,8 @@ export const models = {
     addOrUpdateDispatchConfig (id) {
       this.dispatchConfigAddOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.dispatchConfigAddOrUpdate.init(id)
+        let canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        this.$refs.dispatchConfigAddOrUpdate.init(id, canUpdate)
       })
     },
     // 执行任务
@@ -326,16 +388,19 @@ export const models = {
     },
     // 新增 / 修改同步任务
     addOrUpdateHandle(id) {
+      console.log('id:1 ', id)
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id)
+        let canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        this.$refs.addOrUpdate.init(id, canUpdate)
       })
     },
     // 新增 / 修改计算任务
     computAddOrUpdateHandle(id) {
       this.computAddOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.computAddOrUpdate.init(id)
+        let canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        this.$refs.computAddOrUpdate.init(id, canUpdate)
       })
     },
     // 点击名称跳转到批次
@@ -376,6 +441,15 @@ export const models = {
           this.totalPage = 0
           this.$message.error(data.msg)
         }
+      })
+    },
+    // 数据授权
+    taskPermission(row) {
+      // 打开权限分配弹框
+      // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+      this.assignPermissionVisible = true
+      this.$nextTick(() => {
+        this.$refs.assignPermission.init(row)
       })
     }
     // // 删除接口

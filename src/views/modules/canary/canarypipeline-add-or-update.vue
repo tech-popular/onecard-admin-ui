@@ -81,6 +81,11 @@
       init (row, canUpdate) {
         this.dataForm.id = row ? row.id : 0
         this.canUpdate = row ? canUpdate : true
+        this.rowData = {
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
         this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {

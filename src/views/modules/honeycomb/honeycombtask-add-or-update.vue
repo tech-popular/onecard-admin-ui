@@ -570,6 +570,11 @@ export default {
           this.idRuleoptions = data.taskDicts.task_id_rule
         }
       })
+      this.rowData = {
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      }
       this.dataForm.id = row ? row.id : 0
       this.canUpdate = row ? canUpdate : true
       this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
