@@ -6,6 +6,7 @@
 		<el-form :model="dataForm" ref="dataForm" label-width="80px">
 			<el-form-item label="拥有者" prop="authOwner">
 				<el-select 
+         filterable 
 			   v-model="dataForm.authOwner"
 				 placeholder="请选择"
 				 >
@@ -62,14 +63,14 @@ import { getUsersList } from '@/api/commom/assignPermission'
         this.userList = []
         this.$nextTick(() => {
            this.$refs['dataForm'].resetFields()
-           this.dataForm.authOwner = Number(row.authOwner)
-           row.authOtherList && row.authOtherList.forEach(element => {
-            this.dataForm.authOtherList.push(Number(element))
-           })
            let tenantId = sessionStorage.getItem('tenantId')
             // 获取同一租户下的用户
             getUsersList(tenantId).then(({ data }) => {
               if (data && data.code === 0) {
+                this.dataForm.authOwner = Number(row.authOwner)
+                  row.authOtherList && row.authOtherList.forEach(element => {
+                  this.dataForm.authOtherList.push(Number(element))
+              })
               this.userList = data.data
              }
           })

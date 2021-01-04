@@ -47,6 +47,7 @@ export const models = {
       pageSize: 10, // 默认每页10条
       totalPage: 0,
       userid: sessionStorage.getItem('id'),
+      isAdmin: sessionStorage.getItem('username') === 'admin',
       dataListLoading: false,
       addOrUpdateVisible: false,
       dispatchConfigAddOrUpdateVisible: false,
@@ -63,7 +64,7 @@ export const models = {
           type: 'primary',
           size: 'mini',
           isShow: (id) => {
-            return id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
           },
           method: (id) => {
             if (id.taskType === 'CALCULATE') {
@@ -79,7 +80,7 @@ export const models = {
           type: 'primary',
           size: 'mini',
           isShow: (id) => {
-            return !(id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+            return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
           },
           method: (id) => {
             if (id.taskType === 'CALCULATE') {
@@ -95,10 +96,10 @@ export const models = {
           type: 'success',
           size: 'mini',
           isShow: (id) => {
-            return id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
           },
           method: (id) => {
-            let canUpdate = id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
             this.addOrUpdateDispatchConfig(id, canUpdate)
           }
         },
@@ -108,10 +109,10 @@ export const models = {
           type: 'success',
           size: 'mini',
           isShow: (id) => {
-            return !(id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+            return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
           },
           method: (id) => {
-            let canUpdate = id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
             this.addOrUpdateDispatchConfig(id, canUpdate)
           }
         },
@@ -121,7 +122,7 @@ export const models = {
           type: 'default',
           size: 'mini',
           isShow: (id) => {
-            return id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
           },
           disabled: (id) => {
             if (id.dispatchStatus === 1) {
@@ -163,7 +164,7 @@ export const models = {
           type: 'warning',
           size: 'mini',
           isShow: (id) => {
-            return id.authOwner === this.userid
+            return this.isAdmin || id.authOwner === this.userid
           },
           method: (id) => {
             this.taskPermission(id)
@@ -372,7 +373,10 @@ export const models = {
     addOrUpdateDispatchConfig (id) {
       this.dispatchConfigAddOrUpdateVisible = true
       this.$nextTick(() => {
-        let canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        let canUpdate = true
+        if (!this.isAdmin) {
+          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        }
         this.$refs.dispatchConfigAddOrUpdate.init(id, canUpdate)
       })
     },
@@ -391,7 +395,10 @@ export const models = {
       console.log('id:1 ', id)
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        let canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        let canUpdate = true
+        if (!this.isAdmin) {
+          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        }
         this.$refs.addOrUpdate.init(id, canUpdate)
       })
     },
@@ -399,7 +406,10 @@ export const models = {
     computAddOrUpdateHandle(id) {
       this.computAddOrUpdateVisible = true
       this.$nextTick(() => {
-        let canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        let canUpdate = true
+        if (!this.isAdmin) {
+          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        }
         this.$refs.computAddOrUpdate.init(id, canUpdate)
       })
     },

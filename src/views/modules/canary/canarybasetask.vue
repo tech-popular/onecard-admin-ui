@@ -65,11 +65,11 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">
-            {{scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}
+            {{isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}
           </el-button>
-          <el-button type="text" size="small" v-if="scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button type="text" size="small"  @click="addOrUpdateServiceHandle(scope.row)">应用配置</el-button>
-          <el-button type="text" size="small" v-if="scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -116,7 +116,8 @@
         taskServiceVisible: false,
         submitDataApi: updateCanaryAuth,
         assignPermissionVisible: false,
-        userid: sessionStorage.getItem('id')
+        userid: sessionStorage.getItem('id'),
+        isAdmin: sessionStorage.getItem('username') === 'admin'
       }
     },
     components: {
@@ -190,7 +191,10 @@
       addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          let canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+          }
           this.$refs.addOrUpdate.init(row, canUpdate)
         })
       },
@@ -219,7 +223,10 @@
       addOrUpdateServiceHandle (row) {
         this.taskServiceVisible = true
         this.$nextTick(() => {
-          let canUpdate = row.authOtherList.includes(this.userid) || row.authOwner === this.userid
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+          }
           this.$refs.taskService.init(row.id, canUpdate)
         })
       },

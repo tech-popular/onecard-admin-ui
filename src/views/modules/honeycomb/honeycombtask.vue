@@ -95,11 +95,11 @@
             size="small"
             v-if="isAuth('honeycomb:honeycombtask:update')"
             @click="addOrUpdateHandle(scope.row)"
-          >{{scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}</el-button>
+          >{{isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}</el-button>
           <el-button
             type="text"
             size="small"
-            v-if="isAuth('honeycomb:honeycombtask:delete') && (scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid)"
+            v-if="isAuth('honeycomb:honeycombtask:delete') && (isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid)"
             @click="deleteHandle(scope.row.id)"
           >删除</el-button>
           <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
@@ -109,8 +109,8 @@
             v-if="isAuth('honeycomb:honeycombtask:start')"
             @click="startTask(scope.row.id)"
           >启动任务</el-button> -->
-          <el-button type="text" size="small" v-if="scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="taskDependent(scope.row.id)">任务编排</el-button>
-          <el-button type="text" size="small" v-if="scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="taskDependent(scope.row.id)">任务编排</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -162,7 +162,8 @@ export default {
       taskDependentVisible: false,
       assignPermissionVisible: false,
       submitDataApi: updateHoneycombAuth,
-      userid: sessionStorage.getItem('id')
+      userid: sessionStorage.getItem('id'),
+      isAdmin: sessionStorage.getItem('username') === 'admin'
     }
   },
   components: {
@@ -250,7 +251,10 @@ export default {
     addOrUpdateHandle (row) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        let canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+        let canUpdate = true
+        if (!this.isAdmin) {
+          canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+        }
         this.$refs.addOrUpdate.init(row, canUpdate)
       })
     },
