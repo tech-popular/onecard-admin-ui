@@ -3,7 +3,8 @@ import {
   taskExecute
 } from '@/api/dispatch/taskManag'
 import {
-  updateDispatchTaskAuth
+  updateDispatchTaskAuth,
+  updateDispatchTaskAuths
 } from '@/api/commom/assignPermission'
 export const models = {
   data() {
@@ -46,6 +47,7 @@ export const models = {
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalPage: 0,
+      dataListSelections: [],
       userid: sessionStorage.getItem('id'),
       isAdmin: sessionStorage.getItem('username') === 'admin',
       dataListLoading: false,
@@ -53,6 +55,7 @@ export const models = {
       dispatchConfigAddOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
       submitDataApi: updateDispatchTaskAuth,
+      submitDataApis: updateDispatchTaskAuths,
       assignPermissionVisible: false,
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
@@ -121,14 +124,19 @@ export const models = {
           label: '执行任务',
           type: 'default',
           size: 'mini',
-          isShow: (id) => {
-            return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
-          },
+          // isShow: (id) => {
+          //   return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+          // },
           disabled: (id) => {
-            if (id.dispatchStatus === 1) {
+            console.log(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+            if (this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid) {
+              if (id.dispatchStatus === 1) {
+                return true
+              }
+              return false
+            } else {
               return true
             }
-            return false
           },
           method: (id) => {
             this.taskExecuteHandle(id)
@@ -197,6 +205,7 @@ export const models = {
         {
           prop: 'taskType',
           label: '任务类型',
+          width: '100px',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
@@ -209,12 +218,13 @@ export const models = {
         {
           prop: 'createTime',
           label: '任务创建时间',
+          width: '110px',
           align: 'center'
         },
         {
           prop: 'createUser',
           label: '创建人',
-          width: '130px',
+          width: '120px',
           align: 'center'
         },
         {
@@ -331,6 +341,14 @@ export const models = {
           handle: () => {
             this.computAddOrUpdateHandle()
           }
+        },
+        {
+          label: '批量授权',
+          type: 'primary',
+          isShow: !this.isAdmin,
+          handle: () => {
+            this.multiTaskPermission()
+          }
         }
       ]
     }
@@ -436,6 +454,10 @@ export const models = {
       this.pageNum = val
       this.init()
     },
+    // 多选
+    handleSelectionChange(val) {
+      this.dataListSelections = val
+    },
     // 列表接口
     getList(dataBody) {
       this.dataListLoading = true
@@ -460,6 +482,16 @@ export const models = {
       this.assignPermissionVisible = true
       this.$nextTick(() => {
         this.$refs.assignPermission.init(row)
+      })
+    },
+     // 批量授权
+    multiTaskPermission() {
+      this.assignPermissionVisible = true
+      let ids = this.dataListSelections.map(item => {
+        return item.id
+      })
+      this.$nextTick(() => {
+        this.$refs.assignPermission.init(ids, true)
       })
     }
     // // 删除接口

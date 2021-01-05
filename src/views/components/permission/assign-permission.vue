@@ -36,19 +36,22 @@
 import { getUsersList } from '@/api/commom/assignPermission'
   export default {
     props: {
-      // getUserListApi: {
-      //   type: Function,
-      //   required: true
-      // },
-      submitDataApi: {
+      submitDataApis: { // 批量授权
+        type: Function,
+        required: true
+      },
+      submitDataApi: { // 授权
         type: Function,
         required: true
       }
+
     },
     data () {
       return {
         visible: false,
         id: '',
+        ids: [],
+        isMult: false,
         dataForm: {
           authOtherList: [],
           authOwner: ''
@@ -57,9 +60,10 @@ import { getUsersList } from '@/api/commom/assignPermission'
       }
     },
     methods: {
-      init (row) {
+      init (row, isMult) {
         this.visible = true
-        this.id = row.id
+        isMult ? this.ids = row : this.id = row.id
+        this.isMult = isMult
         this.userList = []
         this.$nextTick(() => {
            this.$refs['dataForm'].resetFields()
@@ -67,10 +71,12 @@ import { getUsersList } from '@/api/commom/assignPermission'
             // 获取同一租户下的用户
             getUsersList(tenantId).then(({ data }) => {
               if (data && data.code === 0) {
-                this.dataForm.authOwner = Number(row.authOwner)
-                  row.authOtherList && row.authOtherList.forEach(element => {
-                  this.dataForm.authOtherList.push(Number(element))
-              })
+                if (!isMult) {
+                  this.dataForm.authOwner = Number(row.authOwner)
+                    row.authOtherList && row.authOtherList.forEach(element => {
+                    this.dataForm.authOtherList.push(Number(element))
+                  })
+                }
               this.userList = data.data
              }
           })
@@ -79,25 +85,44 @@ import { getUsersList } from '@/api/commom/assignPermission'
       // 表单提交
       dataFormSubmit () {
         let params = {
-          id: this.id,
           authOwner: this.dataForm.authOwner,
           authOtherList: this.dataForm.authOtherList
         }
-        this.submitDataApi(params).then(({ data }) => { // 提交数据
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 500,
-              onClose: () => {
-                this.visible = false
-                this.$emit('refreshDataList')
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
+        if (this.isMult) {
+          params.ids = this.ids
+          this.submitDataApis(params).then(({ data }) => { // 提交数据
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        } else {
+          params.id = this.id
+          this.submitDataApi(params).then(({ data }) => { // 提交数据
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }
       }
     }
   }

@@ -42,6 +42,7 @@
           :disabled="dataListSelections.length <= 0"
         >批量删除</el-button>
         <el-button type="primary" @click="syncEs()">同步ES</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -127,7 +128,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
     <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
-    <assign-permission v-if="assignPermissionVisible"  :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
+    <assign-permission v-if="assignPermissionVisible"  :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 <style>
@@ -136,7 +137,7 @@
 }
 </style>
 <script>
-import { updateHoneycombAuth } from '@/api/commom/assignPermission'
+import { updateHoneycombAuth, updateHoneycombAuths } from '@/api/commom/assignPermission'
 import AddOrUpdate from './honeycombtask-add-or-update'
 import TaskProgress from './honeycombtaskprogress'
 import TaskDependent from './honeycombtask-dependent'
@@ -162,6 +163,7 @@ export default {
       taskDependentVisible: false,
       assignPermissionVisible: false,
       submitDataApi: updateHoneycombAuth,
+      submitDataApis: updateHoneycombAuths,
       userid: sessionStorage.getItem('id'),
       isAdmin: sessionStorage.getItem('username') === 'admin'
     }
@@ -353,7 +355,17 @@ export default {
       // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
       this.assignPermissionVisible = true
       this.$nextTick(() => {
-      this.$refs.assignPermission.init(row)
+      this.$refs.assignPermission.init(row, false)
+      })
+    },
+    // 批量授权
+    multiTaskPermission() {
+      this.assignPermissionVisible = true
+      let ids = this.dataListSelections.map(item => {
+        return item.id
+        })
+      this.$nextTick(() => {
+      this.$refs.assignPermission.init(ids, true)
       })
     }
   }

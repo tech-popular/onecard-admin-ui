@@ -16,13 +16,22 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('canary:canarybasetask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="primary" @click="syncEs()">同步ES</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
       border
+      @selection-change="selectionChangeHandle"
       v-loading="dataListLoading"
       style="width: 100%;">
+      <el-table-column
+        v-if="isAdmin"
+        type="selection"
+        header-align="center"
+        align="center"
+        width="50">
+      </el-table-column>
       <el-table-column
         prop="id"
         header-align="center"
@@ -86,7 +95,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-service v-if="taskServiceVisible" ref="taskService"  @refreshDataList="getDataList"></task-service>
     <!-- 授权 -->
-    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 <style>
@@ -95,7 +104,7 @@
   }
 </style>
 <script>
-  import { updateCanaryAuth } from '@/api/commom/assignPermission'
+  import { updateCanaryAuth, updateCanaryAuths } from '@/api/commom/assignPermission'
   import AddOrUpdate from './canarybasetask-add-or-update'
   import TaskService from './canarybaseservice'
   import AssignPermission from '../../components/permission/assign-permission'
@@ -107,14 +116,15 @@
         },
         restaurants: [],
         dataList: [],
+        dataListSelections: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
-        dataListSelections: [],
         addOrUpdateVisible: false,
         taskServiceVisible: false,
         submitDataApi: updateCanaryAuth,
+        submitDataApis: updateCanaryAuths,
         assignPermissionVisible: false,
         userid: sessionStorage.getItem('id'),
         isAdmin: sessionStorage.getItem('username') === 'admin'
@@ -186,6 +196,10 @@
       currentChangeHandle (val) {
         this.pageIndex = val
         this.getDataList()
+      },
+      // 多选
+      selectionChangeHandle (val) {
+        this.dataListSelections = val
       },
       // 新增 / 修改
       addOrUpdateHandle (row) {
@@ -262,7 +276,17 @@
         // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
          this.assignPermissionVisible = true
          this.$nextTick(() => {
-           this.$refs.assignPermission.init(row)
+           this.$refs.assignPermission.init(row, false)
+        })
+      },
+          // 批量授权
+      multiTaskPermission() {
+        this.assignPermissionVisible = true
+        let ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$nextTick(() => {
+          this.$refs.assignPermission.init(ids, true)
         })
       }
     }

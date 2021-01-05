@@ -1,6 +1,13 @@
 <template>
   <div class=''>
-    <el-table :data="list" style="width: 100%" border>
+    <el-table :data="list" style="width: 100%" border @selection-change="selectionChangeHandle">
+      <el-table-column
+       v-if="isSelection"
+      type="selection"
+      header-align="center"
+      align="center"
+      width="50"
+      ></el-table-column>
       <template v-for="(item,index) in columns">
         <el-table-column :prop="item.prop" :key='item.label' :label="item.label" :align="item.align" :width="item.width">
           <template slot-scope="scope">
@@ -42,6 +49,10 @@ export default {
     operatesWidth: {
       type: String,
       default: ''
+    },
+    isSelection: {
+      type: Boolean,
+      default: false
     }
   },
   // 组件
@@ -65,6 +76,12 @@ export default {
         if (ctx.props.item) params.item = ctx.props.item
         return ctx.props.render(h, params)
       }
+    }
+  },
+  methods: {
+    // 多选
+    selectionChangeHandle (val) {
+      this.$emit('selection-change', val)
     }
   }
 }

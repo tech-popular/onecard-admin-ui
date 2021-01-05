@@ -7,7 +7,7 @@
       :searchForm="searchForm"
       :searchHandle="searchHandle"
     ></searchForm>
-    <tab :list="list" :columns="columns" :operates="operates" :operates-width="operatesWidth" />
+    <tab :list="list" :columns="columns" :operates="operates" :operates-width="operatesWidth" :is-selection="isAdmin" @selection-change="handleSelectionChange"/>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -28,7 +28,7 @@
     <!--调度配置-->
     <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
     <!-- 授权 -->
-    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" ref="assignPermission" @refreshDataList="init"></assign-permission>
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="init"></assign-permission>
   </div>
 </template>
 
