@@ -344,7 +344,9 @@ export const models = {
         {
           label: '批量授权',
           type: 'primary',
-          isShow: !this.isAdmin,
+          isShow: () => {
+            return this.isAdmin
+          },
           handle: () => {
             this.multiTaskPermission()
           }

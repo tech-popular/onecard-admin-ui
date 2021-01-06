@@ -35,7 +35,7 @@
           </el-form-item>
         </template>
         <el-form-item v-for='item in searchHandle' :key="item.label">
-            <el-button :type="item.type" :size="item.size || size" v-show="!item.isShow" @click='item.handle()'>{{item.label}}</el-button>
+            <el-button :type="item.type" :size="item.size || size" v-show="!item.isShow || item.isShow()" @click='item.handle()'>{{item.label}}</el-button>
         </el-form-item>
     </el-form>
 </div>
