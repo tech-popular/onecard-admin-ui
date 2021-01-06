@@ -1,6 +1,6 @@
 <template>
     <div class="aviator">
-      <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
+      <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%" :disabled="!canUpdate">
         <el-form-item label="数据源ID" prop="zookeeperQuorumId">
           <el-select v-model="fatherData.zookeeperQuorumId" filterable placeholder="请输入zookeeperName">
             <el-option
@@ -38,7 +38,7 @@
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
     </div>
 </template>
@@ -49,7 +49,8 @@
     props: [
       'hideVisibleClick',
       'fatherData',
-      'dataformType'
+      'dataformType',
+      'canUpdate'
     ],
     data () {
       return {

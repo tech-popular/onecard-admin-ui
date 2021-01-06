@@ -72,9 +72,11 @@ import { getUsersList } from '@/api/commom/assignPermission'
             getUsersList(tenantId).then(({ data }) => {
               if (data && data.code === 0) {
                 if (!isMult) {
-                  this.dataForm.authOwner = Number(row.authOwner)
+                  Number(row.authOwner) ? this.dataForm.authOwner = Number(row.authOwner) : this.dataForm.authOwner = data.data.filter(item => item.username === row.authOwner)[0].id
                     row.authOtherList && row.authOtherList.forEach(element => {
-                    this.dataForm.authOtherList.push(Number(element))
+                    this.dataForm.authOtherList.push(
+                      Number(element) ? Number(element) : data.data.filter(item => item.username === element)[0].id
+                      )
                   })
                 }
               this.userList = data.data
@@ -91,7 +93,7 @@ import { getUsersList } from '@/api/commom/assignPermission'
         if (this.isMult) {
           params.ids = this.ids
           this.submitDataApis(params).then(({ data }) => { // 提交数据
-            if (data && data.code === 0) {
+            if (data && (data.code === 0 || data.status === 0)) {
               this.$message({
                 message: '操作成功',
                 type: 'success',
@@ -108,7 +110,7 @@ import { getUsersList } from '@/api/commom/assignPermission'
         } else {
           params.id = this.id
           this.submitDataApi(params).then(({ data }) => { // 提交数据
-            if (data && data.code === 0) {
+            if (data && (data.code === 0 || data.status === 0)) {
               this.$message({
                 message: '操作成功',
                 type: 'success',

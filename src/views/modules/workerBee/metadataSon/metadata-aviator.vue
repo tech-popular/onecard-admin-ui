@@ -1,6 +1,6 @@
 <template>
     <div class="aviator">
-      <el-form :model="fatherData" ref="fatherData" label-width="30%">
+      <el-form :model="fatherData" ref="fatherData" label-width="30%" :disabled="!canUpdate">
         <el-form-item label="表达式" prop="script" :rules="dataRule.script">
           <el-input v-model="fatherData.script" placeholder="请输入表达式"/>
         </el-form-item>
@@ -35,7 +35,7 @@
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
     </div>
 </template>
@@ -45,7 +45,8 @@
   export default {
     props: [
       'hideVisibleClick',
-      'fatherData'
+      'fatherData',
+      'canUpdate'
     ],
     data () {
       return {

@@ -14,7 +14,7 @@
       </span>
     </el-dialog>
     <el-dialog title="数据关系" :close-on-click-modal="false" :visible.sync="visible" width="60%">
-    <el-button type="primary" style="margin-bottom: 15px;" @click="addOrUpdateHandle()">新增</el-button>
+    <el-button type="primary" style="margin-bottom: 15px;" v-if="canUpdate" @click="addOrUpdateHandle()">新增</el-button>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="id"/>
       <el-table-column prop="flowId" header-align="center" align="center" label="工作流ID"/>
@@ -41,13 +41,13 @@
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-edit" v-if="canUpdate" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="clickSketchMap(scope.row.id)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
-           <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
+           <el-button type="danger" size="mini" icon="el-icon-delete" v-if="canUpdate" circle @click="deleteddialog(scope.row.id)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -87,7 +87,8 @@ export default {
         list: '',
         deletedId: '',
         deleteVisible: false,
-        lookVisible: false
+        lookVisible: false,
+        canUpdate: true
       }
     },
     components: {
@@ -98,7 +99,8 @@ export default {
       this.init()
     },
     methods: {
-      init (id) {
+      init (id, canUpdate) {
+        this.canUpdate = canUpdate
         this.visible = true
         this.flowId = this.$store.state.workFlow.id
         const dataBody = {

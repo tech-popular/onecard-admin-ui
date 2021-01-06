@@ -128,7 +128,6 @@ export const models = {
           //   return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
           // },
           disabled: (id) => {
-            console.log(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
             if (this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid) {
               if (id.dispatchStatus === 1) {
                 return true

@@ -1,6 +1,6 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'"  @close="datano" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+  <el-dialog :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"  @close="datano" :visible.sync="visible">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%" :disabled="!canUpdate">
     <el-form-item label="工作流名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="工作流名称"/>
     </el-form-item>
@@ -60,7 +60,7 @@
     </el-form>
     <span slot="footer">
       <el-button @click="datano()">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -68,6 +68,7 @@
 <script>
   import { saveWorkFlow, getUpdateWorkFlow, getAllSys } from '@/api/workerBee/workFlow'
   import Filter from './filter'
+  import { deepClone } from '@/utils'
   export default {
     data () {
       return {
@@ -128,16 +129,29 @@
           {id: 1, value: 1}
         ],
         ownerAppList: [],
-        flowCodeSys: ''
+        flowCodeSys: '',
+        canUpdate: true, // 查看时不可编辑
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
       }
     },
     components: {
   
     },
     methods: {
-      init (id) {
-        this.updateId = id
-        this.dataForm.id = id || 0
+      init (row, canUpdate) {
+      this.updateId = row ? row.id : ''
+       this.rowData = {
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
+        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -147,7 +161,7 @@
             }
           })
           if (this.dataForm.id) {
-            const dataBody = id
+            const dataBody = row.id
             const updateIds = this.updateId
             getUpdateWorkFlow(dataBody, updateIds).then(({data}) => {
               if (data && data.message === 'success') {
@@ -174,8 +188,14 @@
           if (valid) {
             this.dataForm.flowCode = this.flowCodeSys + this.dataForm.flowCode
             const dataBody = this.dataForm
-            const dataUpdateId = this.updateId
-            saveWorkFlow(dataBody, dataUpdateId).then(({data}) => {
+            // const dataUpdateId = this.updateId
+            let params = {
+              authOwner: this.rowData.authOwner,
+              authOtherList: this.rowData.authOtherList,
+              authOthers: this.rowData.authOthers,
+              dataUpdateId: this.updateId
+            }
+            saveWorkFlow(dataBody, params).then(({data}) => {
               if (data && data.message === 'success') {
                 this.$message({
                   message: '操作成功',
