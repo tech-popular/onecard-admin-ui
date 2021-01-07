@@ -18,9 +18,17 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
         <el-button type="success" @click="addOrUpdateHandle()">新建</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;"  @selection-change="selectionChangeHandle"> 
+      <el-table-column
+        v-if="isAdmin"
+        type="selection"
+        header-align="center"
+        align="center"
+        width="50">
+      </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="任务ID"></el-table-column>
       <el-table-column prop="transferName" header-align="center" align="center" label="任务名称">
         <template slot-scope="scope">
@@ -48,6 +56,7 @@
             inactive-color="#909399"
             inactive-text="关"
             :inactive-value=false
+            :disabled="!(isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)"
             @change="changeSwitch($event,scope.row)"
             class="switchStyle">
           </el-switch>
@@ -55,10 +64,14 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="140" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" @click="addOrUpdateHandle(scope.row,'edit')">编辑</el-button>
+          <el-button type="text" @click="addOrUpdateHandle(scope.row,'edit')">
+            {{
+            (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username) ? '编辑' : '查看'
+            }}</el-button>
           <!-- <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button> -->
-          <el-button type="text" @click="lowerHandle(scope.row)" v-if="scope.row.enable === true">立即下发</el-button>
-          <el-button type="text" @click="lowerHandle(scope.row)" v-else disabled>立即下发</el-button>
+          <el-button type="text" @click="lowerHandle(scope.row)" v-if="scope.row.enable === true && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)">立即下发</el-button>
+          <el-button type="text" v-if="scope.row.enable != true && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" @click="lowerHandle(scope.row)" disabled>立即下发</el-button>
+          <el-button type="text" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -72,12 +85,16 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+      <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 
 <script>
   import { dataTransferManageList, enableDataTransferManage, lowerDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
   import AddOrUpdate from './baseComponents/dataTransferManage-add-or-update'
+  import { updateDataTransferAuth, updateDataTransferAuths } from '@/api/commom/assignPermission'
+  import AssignPermission from '../../components/permission/assign-permission'
   export default {
     data () {
       return {
@@ -91,12 +108,20 @@
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
         totalCount: 0,
+        dataListSelections: [],
         dataListLoading: false,
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        submitDataApi: updateDataTransferAuth,
+        submitDataApis: updateDataTransferAuths,
+        assignPermissionVisible: false,
+        userid: sessionStorage.getItem('id'),
+        username: sessionStorage.getItem('username'),
+        isAdmin: sessionStorage.getItem('username') === 'admin'
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AssignPermission
     },
     mounted () {
       this.getDataList()
@@ -202,7 +227,11 @@
       addOrUpdateHandle (row, tag) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(row, tag)
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = row ? row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
+          }
+          this.$refs.addOrUpdate.init(row, tag, canUpdate)
         })
       },
       /** 查询 */
@@ -220,6 +249,10 @@
         }
         // this.getDataList()
       },
+      // 多选
+      selectionChangeHandle (val) {
+        this.dataListSelections = val
+      },
       // 每页数
       sizeChangeHandle (page) {
         this.pageSize = page
@@ -230,6 +263,24 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
+      },
+      taskPermission (row) {
+        // 打开权限分配弹框
+        // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+         this.assignPermissionVisible = true
+         this.$nextTick(() => {
+           this.$refs.assignPermission.init(row, false)
+        })
+      },
+      // 批量授权
+      multiTaskPermission() {
+        this.assignPermissionVisible = true
+        let ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$nextTick(() => {
+          this.$refs.assignPermission.init(ids, true)
+        })
       }
     }
   }

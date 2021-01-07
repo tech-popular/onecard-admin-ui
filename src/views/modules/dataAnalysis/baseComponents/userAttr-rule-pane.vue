@@ -7,11 +7,11 @@
         <el-input v-model="expression" disabled style="width: 800px" />
       </el-form-item>
       <el-form-item style="float:right">
-        <i class="el-icon-circle-plus cursor-pointer" @click="addRules" v-if="from !== 'api'">添加</i>
+        <i class="el-icon-circle-plus cursor-pointer" @click="addRules" v-if="from !== 'api' && canUpdate">添加</i>
       </el-form-item>
     </el-form>
     <div v-if="ruleConfig.rules && ruleConfig.rules.length > 0">
-      <data-rules-set :data="ruleConfig" ref="rulesSet" :is-require="isRequired" :from="from"></data-rules-set>
+      <data-rules-set :data="ruleConfig" ref="rulesSet" :can-update="canUpdate" :is-require="isRequired" :from="from"></data-rules-set>
     </div>
   </div>
 </template>
@@ -28,6 +28,10 @@ export default {
     from: {
       type: String,
       default: ''
+    },
+    canUpdate: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
