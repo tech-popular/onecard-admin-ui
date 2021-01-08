@@ -37,3 +37,11 @@ export const updateGroupAuths = params => httpPost(da + 'data/group/updateGroupA
 // 用户分析 - 流转列表
 export const updateDataTransferAuth = params => httpPost(da + 'dataTransfer/updateDataTransferAuth', params) // 保存权限
 export const updateDataTransferAuths = params => httpPost(da + 'dataTransfer/updateDataTransferAuths', params)// 批量保存权限
+
+// 用户分析 - API列表
+export const updateApiAuth = params => httpPost(da + 'data/api/updateApiAuth', params) // 保存权限
+export const updateApiAuths = params => httpPost(da + 'data/api/updateApiAuths', params)// 批量保存权限
+
+// 用户分析 - 数据决策引擎
+export const updateDecisionAuth = params => httpPost(da + 'data/decision/updateDecisionAuth', params) // 保存权限
+export const updateDecisionAuths = params => httpPost(da + 'data/decision/updateDecisionAuths', params)// 批量保存权限

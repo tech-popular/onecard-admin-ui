@@ -104,12 +104,12 @@
             @click="deleteHandle(scope.row.id)"
           >删除</el-button>
           <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
-          <!-- <el-button
+          <el-button
             type="text"
             size="small"
-            v-if="isAuth('honeycomb:honeycombtask:start')"
+            v-if="isAuth('honeycomb:honeycombtask:start') && isAdmin"
             @click="startTask(scope.row.id)"
-          >启动任务</el-button> -->
+          >启动任务</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="taskDependent(scope.row.id)">任务编排</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
