@@ -72,12 +72,14 @@ import { getUsersList } from '@/api/commom/assignPermission'
             getUsersList(tenantId).then(({ data }) => {
               if (data && data.code === 0) {
                 if (!isMult) {
-                  Number(row.authOwner) ? this.dataForm.authOwner = Number(row.authOwner) : this.dataForm.authOwner = data.data.filter(item => item.username === row.authOwner)[0].id
-                    row.authOtherList && row.authOtherList.forEach(element => {
-                    this.dataForm.authOtherList.push(
-                      Number(element) ? Number(element) : data.data.filter(item => item.username === element)[0].id
-                      )
-                  })
+                  if (row.authOwner) {
+                    Number(row.authOwner) ? this.dataForm.authOwner = Number(row.authOwner) : this.dataForm.authOwner = data.data.filter(item => item.username === row.authOwner)[0].id
+                      row.authOtherList && row.authOtherList.forEach(element => {
+                      this.dataForm.authOtherList.push(
+                        Number(element) ? Number(element) : data.data.filter(item => item.username === element)[0].id
+                        )
+                    })
+                  }
                 }
               this.userList = data.data
              }

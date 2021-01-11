@@ -64,8 +64,8 @@
       <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-tooltip class="item" effect="dark" :content="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner ===username ? '修改' : '查看'" placement="top">
-            <el-button type="primary" size="mini" circle :icon="isAdmin || scope.row.authOtherList.includes(userid ||username) || scope.row.authOwner === userid || scope.row.authOwner ===username ? 'el-icon-edit' : 'el-icon-share'" @click="addOrUpdateHandle(scope.row)"></el-button>
+          <el-tooltip class="item" effect="dark" :content="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner ===username ? '修改' : '查看'" placement="top">
+            <el-button type="primary" size="mini" circle :icon="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid ||username) || scope.row.authOwner === userid || scope.row.authOwner ===username ? 'el-icon-edit' : 'el-icon-share'" @click="addOrUpdateHandle(scope.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看工作流" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="clickSketchMap(scope.row.id,scope.row)"></el-button>
@@ -73,10 +73,10 @@
           <el-tooltip class="item" effect="dark" content="任务关系" placement="top">
             <el-button type="warning" size="mini" icon="el-icon-sort" circle @click="clickFlowEdit(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner ===username" @click="deleteHandle(scope.row.id)">
+          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner ===username" @click="deleteHandle(scope.row.id)">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username">
+          <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username">
             <el-button type="warning" size="mini" icon="el-icon-connection" circle @click="taskPermission(scope.row)"></el-button>
           </el-tooltip>
           <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
@@ -232,7 +232,7 @@
         this.$nextTick(() => {
           let canUpdate = true
           if (!this.isAdmin) {
-            canUpdate = row ? row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
+            canUpdate = row ? !row.authOwner || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
           }
           this.$refs.addOrUpdate.init(row, canUpdate)
         })
@@ -244,7 +244,7 @@
         this.$nextTick(() => {
           let canUpdate = true
           if (!this.isAdmin) {
-            canUpdate = row ? row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
+            canUpdate = row ? !row.authOwner || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
           }
           this.$refs.taskFlow.init(row.id, canUpdate)
         })

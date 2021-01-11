@@ -106,19 +106,19 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" :content="isAdmin || scope.row.authOtherList.includes(userid || username ) || scope.row.authOwner === userid || scope.row.authOwner === username ? '修改' : '查看'" placement="top">
-            <el-button type="primary" size="mini" :icon="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username ? 'el-icon-edit' : 'el-icon-share'" circle @click="addOrUpdateHandle(scope.row)"></el-button>
+          <el-tooltip class="item" effect="dark" :content="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username ) || scope.row.authOwner === userid || scope.row.authOwner === username ? '修改' : '查看'" placement="top">
+            <el-button type="primary" size="mini" :icon="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username ? 'el-icon-edit' : 'el-icon-share'" circle @click="addOrUpdateHandle(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="启用" placement="top" v-if="scope.row.status === 0 && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" >
+          <el-tooltip class="item" effect="dark" content="启用" placement="top" v-if="scope.row.status === 0 && (!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" >
             <el-button type="success" size="mini" icon="el-icon-open" circle @click="actionOpen(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="禁用" placement="top" v-else-if="scope.row.status !== 0 && isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" >
+          <el-tooltip class="item" effect="dark" content="禁用" placement="top" v-else-if="scope.row.status !== 0 && (!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" >
             <el-button type="warning" size="mini" icon="el-icon-turn-off"  circle @click="storpOff(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row.id)">
+          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row.id)">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username">
+          <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username">
             <el-button type="warning" size="mini" icon="el-icon-connection" circle @click="taskPermission(scope.row)"></el-button>
           </el-tooltip>
         </template>
@@ -247,7 +247,7 @@
         this.$nextTick(() => {
           let canUpdate = true
           if (!this.isAdmin) {
-            canUpdate = row ? row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
+            canUpdate = row ? !row.authOwner || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
           }
           this.$refs.addOrUpdate.init(row, canUpdate)
         })
