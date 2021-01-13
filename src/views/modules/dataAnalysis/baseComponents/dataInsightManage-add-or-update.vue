@@ -328,6 +328,7 @@ export default {
   },
   methods: {
     init (row, tag, canUpdate) {
+      console.log('row: ', row)
       this.id = 0
       this.tag = ''
       this.flowId = ''
@@ -353,7 +354,7 @@ export default {
         this.initEmptyData()
       } else {
         this.id = row.id
-        if (!canUpdate) {
+        if (canUpdate) {
           this.rowData.authOwner = row.authOwner
           this.rowData.authOtherList = row.authOtherList
           this.rowData.authOthers = row.authOthers
