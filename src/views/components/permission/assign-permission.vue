@@ -73,18 +73,32 @@ import { getUsersList } from '@/api/commom/assignPermission'
               if (data && data.code === 0) {
                 if (!isMult) {
                   if (row.authOwner) {
-                    Number(row.authOwner) ? this.dataForm.authOwner = Number(row.authOwner) : this.dataForm.authOwner = data.data.filter(item => item.username === row.authOwner)[0].id
+                    Number(row.authOwner) ? this.dataForm.authOwner = Number(row.authOwner) : this.dataForm.authOwner = this.filterData(data.data, row.authOwner)
                       row.authOtherList && row.authOtherList.forEach(element => {
-                      this.dataForm.authOtherList.push(
-                        Number(element) ? Number(element) : data.data.filter(item => item.username === element)[0].id
-                        )
+                        if (Number(element)) {
+                           this.dataForm.authOtherList.push(Number(element))
+                        } else if (this.filterData(data.data, element)) {
+                          this.dataForm.authOtherList.push(this.filterData(data.data, element))
+                        }
+                      // this.dataForm.authOtherList.push(
+                      //   Number(element) ? Number(element) : this.filterData(data.data, element)
+                      //   )
                     })
                   }
                 }
+
               this.userList = data.data
              }
           })
         })
+      },
+      // 筛选数据
+      filterData (data, authOwner) {
+        let ownerList = data.filter(item => item.username === authOwner)
+        if (ownerList.length > 0) {
+          return ownerList[0].id
+        }
+        // return
       },
       // 表单提交
       dataFormSubmit () {

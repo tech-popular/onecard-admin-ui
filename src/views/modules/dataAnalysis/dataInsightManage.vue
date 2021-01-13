@@ -43,10 +43,10 @@
       <el-table-column prop="updateTime" header-align="center" align="center" label="最后修改时间"></el-table-column>
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" @click="addOrUpdateHandle(scope.row, 'update')">
+          <el-button size="small" type="text" @click="addOrUpdateHandle(scope.row, 'update')">
              {{(isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username) ? '编辑' : '查看'}}
           </el-button>
-          <el-button type="text" v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row)">删除</el-button>
+          <el-button type="text" size="small"  v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row)">删除</el-button>
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">分群概览</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
