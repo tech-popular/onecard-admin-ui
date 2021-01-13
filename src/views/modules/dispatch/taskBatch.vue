@@ -10,16 +10,19 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"/>
       <taskBatch-view-log v-if="viewLogVisible" ref="viewLog"></taskBatch-view-log>
+      <taskBatch-yarn-log v-if="viewYarnLogVisible" ref="viewYarnLog"></taskBatch-yarn-log>
   </div>
 </template>
 
 <script>
   import { models } from '../../components/actions/dispatch/taskBatch'
   import taskBatchViewLog from './taskBranch-view-log.vue'
+  import taskBatchYarnLog from './taskBranch-yarn-log.vue'
   export default {
     mixins: [models],
     components: {
-      taskBatchViewLog
+      taskBatchViewLog,
+      taskBatchYarnLog
     }
   }
 </script>
