@@ -955,6 +955,11 @@
         this.loading = true
         this.outParamsList = []
         if (tag) {
+           if (canUpdate) {
+            this.rowData.authOwner = row.authOwner
+            this.rowData.authOtherList = row.authOtherList
+            this.rowData.authOthers = row.authOthers
+          }
           this.getCusterList(tag, (data) => {
             this.dataDisplay(row) // 选获取到分群列表再去渲染页面
             this.$nextTick(() => {
@@ -962,11 +967,6 @@
             })
           })
         } else {
-          if (canUpdate) {
-            this.rowData.authOwner = row.authOwner
-            this.rowData.authOtherList = row.authOtherList
-            this.rowData.authOthers = row.authOthers
-          }
           this.getCusterList(tag)
           // this.getOutParamsList()
           this.$nextTick(() => {

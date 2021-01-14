@@ -68,7 +68,6 @@
 <script>
   import { saveWorkFlow, getUpdateWorkFlow, getAllSys } from '@/api/workerBee/workFlow'
   import Filter from './filter'
-  import { deepClone } from '@/utils'
   export default {
     data () {
       return {
@@ -85,7 +84,10 @@
           restartable: 0,
           schemaVersion: 0,
           version: '',
-          flowCode: ''
+          flowCode: '',
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
         },
         dataRule: {
           name: [
@@ -130,12 +132,7 @@
         ],
         ownerAppList: [],
         flowCodeSys: '',
-        canUpdate: true, // 查看时不可编辑
-        rowData: { // 修改时数据内容
-          authOwner: '',
-          authOtherList: [],
-          authOthers: ''
-        }
+        canUpdate: true // 查看时不可编辑
       }
     },
     components: {
@@ -143,15 +140,10 @@
     },
     methods: {
       init (row, canUpdate) {
-      this.updateId = row ? row.id : ''
-       this.rowData = {
-          authOwner: '',
-          authOtherList: [],
-          authOthers: ''
-        }
+        console.log('row: ', row)
+        this.updateId = row ? row.id : ''
         this.dataForm.id = row ? row.id : 0
         this.canUpdate = row ? canUpdate : true
-        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -177,6 +169,9 @@
                 this.dataForm.schemaVersion = data.data.schemaVersion
                 this.dataForm.version = data.data.version
                 this.dataForm.flowCode = data.data.flowCode
+                this.dataForm.authOwner = row.authOwner
+                this.dataForm.authOtherList = row.authOtherList
+                this.dataForm.authOthers = row.authOthers
               }
             })
           }
@@ -188,14 +183,8 @@
           if (valid) {
             this.dataForm.flowCode = this.flowCodeSys + this.dataForm.flowCode
             const dataBody = this.dataForm
-            // const dataUpdateId = this.updateId
-            let params = {
-              authOwner: this.rowData.authOwner,
-              authOtherList: this.rowData.authOtherList,
-              authOthers: this.rowData.authOthers,
-              dataUpdateId: this.updateId
-            }
-            saveWorkFlow(dataBody, params).then(({data}) => {
+            const dataUpdateId = this.updateId
+            saveWorkFlow(dataBody, dataUpdateId).then(({data}) => {
               if (data && data.message === 'success') {
                 this.$message({
                   message: '操作成功',
@@ -210,6 +199,9 @@
                     this.flowCodeSys = ''
                     this.dataForm.flowCode = ''
                     this.dataForm.inputParameters = ''
+                    this.dataForm.authOwner = ''
+                    this.dataForm.authOtherList = []
+                    this.dataForm.authOthers = ''
                   }
                 })
               } else {
