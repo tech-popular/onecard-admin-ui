@@ -328,7 +328,6 @@ export default {
   },
   methods: {
     init (row, tag, canUpdate) {
-      console.log('row: ', row)
       this.id = 0
       this.tag = ''
       this.flowId = ''
@@ -772,7 +771,6 @@ export default {
       if (sysUuid && sysArr.includes(sysUuid)) {
         params.username = this.getQueryParams('username') || ''
       }
-      console.log(params)
       this.loading = true
       url(params).then(({ data }) => {
         if (data.status !== '1') {
