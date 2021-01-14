@@ -145,34 +145,34 @@
 
 <script>
 export default {
-	data () {
-		return {
-			visible: false,	
-			editableTabsValue: '1',
-        editableTabs: [{
-          title: 'Tab 1',
-          name: '1',
-          content: {
-						tableList:[],
-						list:[],
-			      activeName: 'second'
-					}}],
+  data () {
+    return {
+      visible: false,
+      editableTabsValue: '1',
+      editableTabs: [{
+        title: 'Tab 1',
+        name: '1',
+        content: {
+          tableList: [],
+          list: [],
+          activeName: 'second'
+        }}],
         tabIndex: 1
-		}
-	},
-	methods: {
-		init (row) {
-			console.log('row: ', row)
-			this.editableTabs
-			this.visible = true
-		},
-		addTab(targetName) {
-        let newTabName = ++this.tabIndex + '';
+    }
+  },
+  methods: {
+    init (row) {
+      console.log('row: ', row)
+      this.editableTabs = row.name
+      this.visible = true
+    },
+    addTab(targetName) {
+        let newTabName = ++this.tabIndex + ''
         this.editableTabs.push({
           title: 'New Tab',
           name: newTabName,
           content: 'New Tab content'
-        });
+        })
         this.editableTabsValue = newTabName
       },
       removeTab(targetName) {
@@ -183,14 +183,14 @@ export default {
             if (tab.name === targetName) {
               let nextTab = tabs[index + 1] || tabs[index - 1]
               if (nextTab) {
-                activeName = nextTab.name;
+                activeName = nextTab.name
               }
             }
           })
         }
-        this.editableTabsValue = activeName;
+        this.editableTabsValue = activeName
         this.editableTabs = tabs.filter(tab => tab.name !== targetName)
       }
-	}
+  }
 }
 </script>
