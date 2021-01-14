@@ -47,6 +47,7 @@ export const models = {
       addOrUpdateVisible: false,
       dispatchConfigAddOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
+      taskManagSnapShotVisible: false,
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
@@ -84,15 +85,15 @@ export const models = {
           method: (id) => {
             this.taskExecuteHandle(id)
           }
+        },
+        {
+          id: 4,
+          label: '依赖快照',
+          type: 'info',
+          method: (id) => {
+            this.snapshotHandle(id)
+          }
         }
-        // {
-        //   id: 4,
-        //   label: '依赖快照',
-        //   type: 'info',
-        //   method: (snapshot) => {
-        //     this.snapshotHandle(snapshot)
-        //   }
-        // },
         // {
         //   id: 5,
         //   label: '编辑依赖',
@@ -344,8 +345,12 @@ export const models = {
       this.$router.push({ name: 'dispatch-taskBatch', query: { name: params.row.taskName } })
     },
     // 依赖快照
-    snapshotHandle(url) {
-      window.open(url, '_blank')
+    snapshotHandle(id) {
+      this.taskManagSnapShotVisible = true
+      this.$nextTick(() => {
+        this.$refs.taskManagSnapShot.init(id)
+      })
+      // window.open(url, '_blank')
     },
     // 编辑依赖
     editSnapshotHandle(url) {

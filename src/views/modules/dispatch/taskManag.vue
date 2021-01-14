@@ -27,6 +27,8 @@
     />
     <!--调度配置-->
     <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
+    <!-- 依赖快照 -->
+    <taskManag-snap-shot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"></taskManag-snap-shot>
   </div>
 </template>
 
@@ -34,13 +36,15 @@
 import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
+import taskManagSnapShot from './taskManag-snap-shot'
 import { models } from '../../components/actions/dispatch/taskManag'
 export default {
   mixins: [models],
   components: {
     AddOrUpdate,
     ComputAddOrUpdate,
-    dispatchConfigAddOrUpdate
+    dispatchConfigAddOrUpdate,
+    taskManagSnapShot
   }
 }
 </script>
