@@ -41,3 +41,7 @@ export const taskAlertDelete = id => httpDelete(base + `dispatch/task/alert/dele
  export const taskBatchLog = dolphinInstanceId => httpGet(base + `dispatch/task/instance/logs/${dolphinInstanceId}`) // 查看新调度日志
 //  查询Yarn日志
 export const taskBatchYarnLog = dolphinInstanceId => httpGet(base + `dispatch/task/instance/applicationLogs/${dolphinInstanceId}`) // 查看新调度日志
+
+// 依赖快照
+export const taskSnapshotNewDepends = params => httpPost(base + 'dispatch/snapshot/newDepends', params) // 任务新调度
+export const taskSnapshotOldDepends = params => httpPost(base + 'dispatch/snapshot/oldDepends', params) // 任务老调度
