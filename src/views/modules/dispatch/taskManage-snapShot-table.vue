@@ -3,8 +3,13 @@
 	<el-table :data="tableList" border	width="100%">
 			 <el-table-column  prop="taskId"  header-align="center" align="center" label="任务ID"></el-table-column>
 			 <el-table-column  prop="taskName"  header-align="center" align="center" label="任务名称"></el-table-column>
-			 <el-table-column  prop="taskType"  header-align="center"  align="center"  label="任务类型"></el-table-column>
-			 <el-table-column  prop="requestedUser"  header-align="center" align="center"  label="负责人"></el-table-column>
+			 <el-table-column  prop="taskType"  header-align="center"  align="center"  label="任务类型">
+         <template slot-scope="scope">
+           <span v-if="type === 'new'">{{scope.row.taskType === 'CALCULATE' ? '计算任务' : '同步任务'}}</span>
+           <span v-else> {{scope.row.taskType}}</span>
+         </template>
+       </el-table-column>
+       <el-table-column  prop="requestedUser"  header-align="center" align="center"  label="负责人"></el-table-column>
 			<el-table-column  prop="dependence"  header-align="center"  align="center"  label="有无依赖">
         <template slot-scope="scope">
           {{scope.row.dependence === 0 ? '有': '无'}}
@@ -22,6 +27,12 @@
         align="center"
         label="本次完成时间">
       </el-table-column>
+      <el-table-column
+        prop="exStatus"
+        header-align="center"
+        align="center"
+        label="任务状态">
+      </el-table-column>
 			 <el-table-column
        v-if="type === 'new'"
         header-align="center"
@@ -29,7 +40,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="button" size="small" @click="addOrUpdateHandle(scope.row)">依赖快照</el-button>
+          <el-button type="primary"  size="small" @click="addOrUpdateHandle(scope.row)">依赖快照</el-button>
         </template>
       </el-table-column>
 			</el-table>

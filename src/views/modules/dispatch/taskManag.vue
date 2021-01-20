@@ -7,7 +7,7 @@
       :searchForm="searchForm"
       :searchHandle="searchHandle"
     ></searchForm>
-    <tab :list="list" :columns="columns" :operates="operates" :operates-width="operatesWidth" />
+    <tab :list="list" :columns="columns" :operates="operates" :fixed="operatesFixed" :operates-width="operatesWidth" />
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
