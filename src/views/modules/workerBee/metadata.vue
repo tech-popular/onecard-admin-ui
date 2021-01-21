@@ -16,12 +16,21 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
         <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
     <el-table
       :data="newList" border
       v-loading="dataListLoading"
+      @selection-change="selectionChangeHandle"
       style="width: 100%;">
+      <el-table-column
+        v-if="isAdmin"
+        type="selection"
+        header-align="center"
+        align="center"
+        width="50">
+      </el-table-column>
       <el-table-column
         prop="id"
         header-align="center"
@@ -97,17 +106,20 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="200" label="操作">
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-tooltip class="item" effect="dark" :content="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username ) || scope.row.authOwner === userid || scope.row.authOwner === username ? '修改' : '查看'" placement="top">
+            <el-button type="primary" size="mini" :icon="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username ? 'el-icon-edit' : 'el-icon-share'" circle @click="addOrUpdateHandle(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="启用" placement="top" v-if="scope.row.status === 0">
+          <el-tooltip class="item" effect="dark" content="启用" placement="top" v-if="scope.row.status === 0 && (!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" >
             <el-button type="success" size="mini" icon="el-icon-open" circle @click="actionOpen(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="禁用" placement="top" v-else>
+          <el-tooltip class="item" effect="dark" content="禁用" placement="top" v-else-if="scope.row.status !== 0 && (!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" >
             <el-button type="warning" size="mini" icon="el-icon-turn-off"  circle @click="storpOff(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row.id)">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username">
+            <el-button type="warning" size="mini" icon="el-icon-connection" circle @click="taskPermission(scope.row)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -122,12 +134,16 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+     <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './metadata-add-or-update'
   import { beeTaskList, deleteBeeTask, getBeeTaskTypeList, updateStatus } from '@/api/workerBee/metadata'
+  import { updateBeeTaskAuth, updateBeeTaskAuths } from '@/api/commom/assignPermission'
+  import AssignPermission from '../../components/permission/assign-permission'
   export default {
     data () {
       return {
@@ -142,11 +158,19 @@
         dataListLoading: false,
         addOrUpdateVisible: false,
         newList: [],
-        visible: false
+        dataListSelections: [],
+        visible: false,
+        submitDataApi: updateBeeTaskAuth,
+        submitDataApis: updateBeeTaskAuths,
+        assignPermissionVisible: false,
+        userid: sessionStorage.getItem('id'),
+        username: sessionStorage.getItem('username'),
+        isAdmin: sessionStorage.getItem('username') === 'admin'
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AssignPermission
     },
     activated () {
       this.getDataList()
@@ -200,6 +224,10 @@
         this.pageNum = val
         this.getDataList()
       },
+      // 多选
+      selectionChangeHandle (val) {
+        this.dataListSelections = val
+      },
       /** 查询 */
       searchHandle () {
         this.pageNum = 1
@@ -214,10 +242,14 @@
         this.getDataList()
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = row ? !row.authOwner || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
+          }
+          this.$refs.addOrUpdate.init(row, canUpdate)
         })
       },
       // 删除
@@ -300,6 +332,24 @@
               this.$message.error(data.message)
             }
           })
+        })
+      },
+      taskPermission (row) {
+        // 打开权限分配弹框
+        // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+         this.assignPermissionVisible = true
+         this.$nextTick(() => {
+           this.$refs.assignPermission.init(row, false)
+        })
+      },
+      // 批量授权
+      multiTaskPermission() {
+        this.assignPermissionVisible = true
+        let ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$nextTick(() => {
+          this.$refs.assignPermission.init(ids, true)
         })
       }
     }

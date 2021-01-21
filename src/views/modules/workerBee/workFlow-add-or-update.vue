@@ -1,6 +1,6 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'"  @close="datano" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
+  <el-dialog :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"  @close="datano" :visible.sync="visible">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%" :disabled="!canUpdate">
     <el-form-item label="工作流名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="工作流名称"/>
     </el-form-item>
@@ -60,7 +60,7 @@
     </el-form>
     <span slot="footer">
       <el-button @click="datano()">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -84,7 +84,10 @@
           restartable: 0,
           schemaVersion: 0,
           version: '',
-          flowCode: ''
+          flowCode: '',
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
         },
         dataRule: {
           name: [
@@ -128,16 +131,19 @@
           {id: 1, value: 1}
         ],
         ownerAppList: [],
-        flowCodeSys: ''
+        flowCodeSys: '',
+        canUpdate: true // 查看时不可编辑
       }
     },
     components: {
   
     },
     methods: {
-      init (id) {
-        this.updateId = id
-        this.dataForm.id = id || 0
+      init (row, canUpdate) {
+        console.log('row: ', row)
+        this.updateId = row ? row.id : ''
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -147,7 +153,7 @@
             }
           })
           if (this.dataForm.id) {
-            const dataBody = id
+            const dataBody = row.id
             const updateIds = this.updateId
             getUpdateWorkFlow(dataBody, updateIds).then(({data}) => {
               if (data && data.message === 'success') {
@@ -163,6 +169,9 @@
                 this.dataForm.schemaVersion = data.data.schemaVersion
                 this.dataForm.version = data.data.version
                 this.dataForm.flowCode = data.data.flowCode
+                this.dataForm.authOwner = row.authOwner
+                this.dataForm.authOtherList = row.authOtherList
+                this.dataForm.authOthers = row.authOthers
               }
             })
           }
@@ -190,6 +199,9 @@
                     this.flowCodeSys = ''
                     this.dataForm.flowCode = ''
                     this.dataForm.inputParameters = ''
+                    this.dataForm.authOwner = ''
+                    this.dataForm.authOtherList = []
+                    this.dataForm.authOthers = ''
                   }
                 })
               } else {

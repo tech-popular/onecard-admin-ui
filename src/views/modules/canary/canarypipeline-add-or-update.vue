@@ -1,9 +1,9 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" :disabled="!canUpdate"  label-width="80px">
     <el-form-item label="方式" prop="channel">
       <!--<el-input v-model="dataForm.channel" placeholder="方式"></el-input>-->
       <el-select v-model="dataForm.channel" placeholder="请选择">
@@ -26,16 +26,18 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
+  import { deepClone } from '@/utils'
   export default {
     data () {
       return {
         visible: false,
+        canUpdate: true, // 查看时不可编辑
         dataForm: {
           id: 0,
           channel: '',
@@ -56,6 +58,11 @@
           ]
         },
         options: [],
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        },
         channelOptions: [{
           value: 1,
           label: '钉钉'
@@ -71,8 +78,15 @@
       }
     },
     methods: {
-      init (id) {
-        this.dataForm.id = id || 0
+      init (row, canUpdate) {
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
+        this.rowData = {
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
+        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -106,7 +120,10 @@
                 'name': this.dataForm.name,
                 'value': this.dataForm.value,
                 'templateId': this.dataForm.templateId,
-                'enable': this.dataForm.enable
+                'enable': this.dataForm.enable,
+                'authOwner': this.rowData.authOwner,
+                'authOtherList': this.rowData.authOtherList,
+                'authOthers': this.rowData.authOthers
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

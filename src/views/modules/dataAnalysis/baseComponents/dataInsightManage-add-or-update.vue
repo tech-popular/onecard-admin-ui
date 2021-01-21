@@ -20,6 +20,7 @@
           ref="baseForm"
           :rules="baseRule"
           class="base-form"
+          :disabled="!canUpdate"
         >
           <el-form-item label="分群名称" prop="name">
             <el-input
@@ -136,7 +137,7 @@
              <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
           </div>
            <div style="flex: 1">
-               <user-attr-rule-pane ref="userAttrRule" :id="id" @renderEnd="renderEnd" @isShowAttrRule="isShowAttrRule"></user-attr-rule-pane>
+               <user-attr-rule-pane ref="userAttrRule" :id="id" :canUpdate="canUpdate" @renderEnd="renderEnd" @isShowAttrRule="isShowAttrRule"></user-attr-rule-pane>
                <!-- 暂时隐藏用户行为 -->
                <!-- <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowActionRule="isShowActionRule"></user-action-rule-pane> -->
            </div>
@@ -144,7 +145,7 @@
       <div class="pane-reject">
         <h3>剔除用户名单</h3>
         <div>
-          <el-form label-width="80px" :model="rejectForm" :rules="baseRule" ref="rejectForm">
+          <el-form label-width="80px" :model="rejectForm" :rules="baseRule" ref="rejectForm" :disabled="!canUpdate">
             <el-form-item label="分群包">
               <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
                 <el-option
@@ -212,11 +213,18 @@
         size="small"
         v-if="!!id && baseForm.userType !== 'excel'"
       >复制创建新分群</el-button>
-      <el-button
+      <!-- <el-button
         type="primary"
         @click="saveHandle('save')"
         size="small"
         v-if="tag !== 'view'"
+        :disabled="loading"
+      >保存</el-button> -->
+      <el-button
+        type="primary"
+        @click="saveHandle('save')"
+        size="small"
+        v-if="canUpdate"
         :disabled="loading"
       >保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
@@ -302,7 +310,13 @@ export default {
           { required: true, message: '请选择用户所属渠道', trigger: 'change' }
         ]
       },
-      channelList: []
+      channelList: [],
+      rowData: { // 修改时authOwner数据内容
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      },
+      canUpdate: true // 可编辑
     }
   },
   components: {
@@ -313,10 +327,14 @@ export default {
     InputTag
   },
   methods: {
-    init (row, tag) {
+    init (row, tag, canUpdate) {
       this.id = 0
       this.tag = ''
       this.flowId = ''
+      this.rowData.authOwner = ''
+      this.canUpdate = canUpdate
+      this.rowData.authOtherList = []
+      this.rowData.authOthers = ''
       this.loading = true
       this.visible = true
       // this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
@@ -335,7 +353,13 @@ export default {
         this.initEmptyData()
       } else {
         this.id = row.id
-        this.drawerTitle = tag === 'view' ? '查看' : '编辑'
+        if (canUpdate) {
+          this.rowData.authOwner = row.authOwner
+          this.rowData.authOtherList = row.authOtherList
+          this.rowData.authOthers = row.authOthers
+        }
+        this.drawerTitle = tag === canUpdate ? '编辑' : '查看'
+        // this.drawerTitle = tag === 'view' ? '查看' : '编辑'
         this.getDataInfo(row.id)
       }
     },
@@ -596,6 +620,10 @@ export default {
         this.drawerTitle = '新建'
         this.baseForm.name = '复制' + this.baseForm.name
         this.id = 0
+        this.canUpdate = true
+        this.rowData.authOwner = ''
+        this.rowData.authOtherList = []
+        this.rowData.authOthers = ''
         this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
       }).catch(() => {
         console.log('cancel')
@@ -712,6 +740,7 @@ export default {
         code = 1
       }
       let params = {
+        ...this.rowData,
         ...this.baseForm,
         ...this.$refs.userAttrRule.lastSubmitRuleConfig,
         // ...this.$refs.userActionRule.lastSubmitRuleConfig, //用户行为
@@ -742,7 +771,6 @@ export default {
       if (sysUuid && sysArr.includes(sysUuid)) {
         params.username = this.getQueryParams('username') || ''
       }
-      console.log(params)
       this.loading = true
       url(params).then(({ data }) => {
         if (data.status !== '1') {

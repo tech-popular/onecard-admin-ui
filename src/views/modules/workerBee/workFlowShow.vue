@@ -17,9 +17,20 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+    <el-table :data="dataList" border 
+      v-loading="dataListLoading"
+      @selection-change="selectionChangeHandle"
+      style="width: 100%;">
+      <el-table-column
+        v-if="isAdmin"
+        type="selection"
+        header-align="center"
+        align="center"
+        width="50">
+      </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="工作流编号"/>
       <el-table-column prop="name" header-align="center" align="center" label="工作流名称">
         <template slot-scope="scope">
@@ -53,17 +64,20 @@
       <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
         <template slot-scope="scope">
           <!-- <el-button v-if="isAuth('cash:instmanage:update')" type="text" @click="clickSketchMap(scope.row)">查看工作流</el-button> -->
-          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-            <el-button type="primary" size="mini" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-tooltip class="item" effect="dark" :content="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner ===username ? '修改' : '查看'" placement="top">
+            <el-button type="primary" size="mini" circle :icon="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid ||username) || scope.row.authOwner === userid || scope.row.authOwner ===username ? 'el-icon-edit' : 'el-icon-share'" @click="addOrUpdateHandle(scope.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="查看工作流" placement="top">
             <el-button type="success" size="mini" icon="el-icon-view" circle @click="clickSketchMap(scope.row.id,scope.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="任务关系" placement="top">
-            <el-button type="warning" size="mini" icon="el-icon-sort" circle @click="clickFlowEdit(scope.row.id)"></el-button>
+            <el-button type="warning" size="mini" icon="el-icon-sort" circle @click="clickFlowEdit(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+          <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="!scope.row.authOwner || isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner ===username" @click="deleteHandle(scope.row.id)">
             <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="deleteddialog(scope.row.id)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username">
+            <el-button type="warning" size="mini" icon="el-icon-connection" circle @click="taskPermission(scope.row)"></el-button>
           </el-tooltip>
           <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
         </template>
@@ -112,6 +126,8 @@
     <taskFlow v-if="visibleEdit" ref="taskFlow"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 
@@ -121,7 +137,8 @@
   import flowTaskFlow from './marketingDecision'
   import AddOrUpdate from './workFlow-add-or-update'
   import { workFlowList, deleteWorkFlow, workFlowShow } from '@/api/workerBee/workFlow'
-
+  import { updateWorkflowAuth, updateWorkflowAuths } from '@/api/commom/assignPermission'
+  import AssignPermission from '../../components/permission/assign-permission'
   export default {
     data () {
       return {
@@ -150,14 +167,21 @@
         dataListLoading: false,
         sketchMap: false,
         addOrUpdateVisible: false,
-        deletedId: ''
+        deletedId: '',
+        submitDataApi: updateWorkflowAuth,
+        submitDataApis: updateWorkflowAuths,
+        assignPermissionVisible: false,
+        userid: sessionStorage.getItem('id'),
+        username: sessionStorage.getItem('username'),
+        isAdmin: sessionStorage.getItem('username') === 'admin'
       }
     },
     components: {
       showFlow,
       taskFlow,
       AddOrUpdate,
-      flowTaskFlow
+      flowTaskFlow,
+      AssignPermission
     },
     mounted () {
       this.getDataList()
@@ -203,18 +227,26 @@
         })
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = row ? !row.authOwner || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
+          }
+          this.$refs.addOrUpdate.init(row, canUpdate)
         })
       },
       // 数据关系
-      clickFlowEdit (id) {
+      clickFlowEdit (row) {
         this.visibleEdit = true
-        this.$store.commit('workFlow/setFlowId', id)
+        this.$store.commit('workFlow/setFlowId', row.id)
         this.$nextTick(() => {
-          this.$refs.taskFlow.init(id)
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = row ? !row.authOwner || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username : true
+          }
+          this.$refs.taskFlow.init(row.id, canUpdate)
         })
       },
       // 删除弹窗获取值
@@ -272,6 +304,28 @@
       clickFlowShow () {
         this.flowTaskFlowVisible = true
         this.flowTaskFlow = true
+      },
+      // 多选
+      selectionChangeHandle (val) {
+        this.dataListSelections = val
+      },
+      taskPermission (row) {
+        // 打开权限分配弹框
+        // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+         this.assignPermissionVisible = true
+         this.$nextTick(() => {
+           this.$refs.assignPermission.init(row, false)
+        })
+      },
+      // 批量授权
+      multiTaskPermission() {
+        this.assignPermissionVisible = true
+        let ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$nextTick(() => {
+          this.$refs.assignPermission.init(ids, true)
+        })
       }
     }
   }

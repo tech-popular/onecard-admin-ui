@@ -1,9 +1,9 @@
 <template>
-  <el-dialog :title="dataFormValue ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
     <el-form-item label="任务定义名称" prop="name">
-      <el-input v-model="dataForm.name" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
-      <el-input v-model="dataForm.name" v-else disabled placeholder="任务"/>
+      <el-input v-model="dataForm.name" :disabled="!canUpdate" onkeyup="this.value=this.value.replace(/\s+/g,'')" v-if="!dataFormValue" placeholder="任务"/>
+      <el-input v-model="dataForm.name"  v-else disabled placeholder="任务"/>
     </el-form-item>
     <el-form-item label="任务类型" prop="type" v-if="dataForm.id">
       <el-select filterable v-model="dataForm.type" placeholder="请选择" disabled>
@@ -11,71 +11,71 @@
       </el-select>
     </el-form-item>
     <el-form-item label="任务类型" prop="type" v-else>
-      <el-select filterable v-model="dataForm.type" placeholder="请选择" @change='clickType()'>
+      <el-select filterable v-model="dataForm.type" :disabled="!canUpdate" placeholder="请选择" @change='clickType()'>
         <el-option v-for="item in ruleTypeList" :value="item.baseValue" :key="item.value" :label="item.baseName"/>
       </el-select>
     </el-form-item>
     <el-form-item label="任务描述" prop="description">
-      <el-input v-model="dataForm.description" placeholder="任务"/>
+      <el-input v-model="dataForm.description" placeholder="任务" :disabled="!canUpdate"/>
     </el-form-item>
     <el-form-item label="任务归属" prop="owner">
-      <el-input v-model="dataForm.owner" placeholder="任务归属"/>
+      <el-input v-model="dataForm.owner" placeholder="任务归属" :disabled="!canUpdate"/>
     </el-form-item>
     <el-form-item label="任务使用者" prop="user">
-      <el-input v-model="dataForm.user" placeholder="任务使用者"/>
+      <el-input v-model="dataForm.user" placeholder="任务使用者" :disabled="!canUpdate"/>
     </el-form-item>
     <el-form-item label="入参数据的key的ID集合" prop="inputParams">
-      <el-input v-model="dataForm.inputParams" placeholder="param1,param2(多个参数逗号隔开)"/>
+      <el-input v-model="dataForm.inputParams" placeholder="param1,param2(多个参数逗号隔开)" :disabled="!canUpdate"/>
     </el-form-item>
     <el-form-item label="出参数据的key的ID集合" prop="outputParams">
-      <el-input v-model="dataForm.outputParams" placeholder="result1,result2(多个结果逗号隔开)"/>
+      <el-input v-model="dataForm.outputParams" placeholder="result1,result2(多个结果逗号隔开)" :disabled="!canUpdate"/>
     </el-form-item>
     <el-form-item label="所属系统" prop="ownerApp">
-      <el-input v-model="dataForm.ownerApp" placeholder="所属系统"/>
+      <el-input v-model="dataForm.ownerApp" placeholder="所属系统" :disabled="!canUpdate"/>
     </el-form-item>
     <el-form-item label="备注" prop="remark">
-      <el-input v-model="dataForm.remark" placeholder="备注"/>
+      <el-input v-model="dataForm.remark" placeholder="备注" :disabled="!canUpdate"/>
     </el-form-item>
     <!-- HTTP 类型1 -->
     <metadata-http
-    v-if="dataForm.type == 'HTTP'" :fatherData='fatherData'
+    v-if="dataForm.type == 'HTTP'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataHttp"/>
     <!-- JDBC 类型2 -->
     <metadata-jdbc
-    v-if="dataForm.type == 'JDBC'" :fatherData='fatherData'
+    v-if="dataForm.type == 'JDBC'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataJdbc"/>
     <!-- KAFKA 类型3 -->
     <metadata-kafka
-    v-if="dataForm.type == 'KAFKA'" :fatherData='fatherData'
+    v-if="dataForm.type == 'KAFKA'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataKafka"/>
     <!-- CASSANDRA 类型4 -->
     <metadata-cassandra
-    v-if="dataForm.type == 'CASSANDRA'" :fatherData='fatherData'
+    v-if="dataForm.type == 'CASSANDRA'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type'  :requestFieldTypes='requestFieldTypes' ref="metadataCassandra"/>
     <!-- GROOVY 类型5 -->
     <metadata-groovy
-    v-if="dataForm.type == 'GROOVY'" :fatherData='fatherData'
+    v-if="dataForm.type == 'GROOVY'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataGroovy"/>
     <!-- AVIATOR 类型6 -->
     <metadata-aviator
-    v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData'
+    v-if="dataForm.type == 'AVIATOR'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataAviator"/>
      <!-- FREEMARKER 类型7 -->
     <metadata-freemarke
-    v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData'
+    v-if="dataForm.type == 'FREEMARKER'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" ref="metadataFreemarke"/>
     <!-- HBASE 类型8 -->
     <metadataHbase
-    v-if="dataForm.type == 'HBASE'" :fatherData='fatherData'
+    v-if="dataForm.type == 'HBASE'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataHbase"/>
     <!-- REDIS 类型9 -->
     <metadataRedis
-    v-if="dataForm.type == 'REDIS'" :fatherData='fatherData'
+    v-if="dataForm.type == 'REDIS'" :fatherData='fatherData' :canUpdate="canUpdate"
     @hideVisibleClick="hideVisible" @dataFormSubmit="dataFormSubmit" :dataformType='dataForm.type' ref="metadataRedis"/>
     </el-form>
     <div v-if="dataForm.type == 'DECISION' || dataForm.type == 'FORK_JOIN' || dataForm.type == 'JOIN' || dataForm.type == ''" slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -90,7 +90,7 @@
   import metadataFreemarke from './metadataSon/metadata-freemarke'
   import metadataHbase from './metadataSon/metadata-hbase'
   import metadataRedis from './metadataSon/metadata-redis'
-
+  import { deepClone } from '@/utils'
   import { getBeeTaskTypeList, infoBeeTask, beeTask } from '@/api/workerBee/metadata'
   import Filter from './filter'
   export default {
@@ -146,7 +146,13 @@
           isQuery: 1,
           requestParamTemplateStatus: 0
         },
-        requestFieldTypes: ''
+        requestFieldTypes: '',
+        canUpdate: true, // 查看时不可编辑
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
       }
     },
     components: {
@@ -161,8 +167,15 @@
       metadataRedis // Redis
     },
     methods: {
-      init (id, value) {
-        this.dataForm.id = id || ''
+      init (row, canUpdate, value) {
+        this.rowData = {
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
+        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.dataFormValue = value
         this.visible = true
         this.$nextTick(() => {
@@ -172,9 +185,9 @@
               this.ruleTypeList = data.data
             }
           })
-          if (id) {
+          if (row) {
             const dataBody = {
-              utcParam: [id]
+              utcParam: [row.id]
             }
             infoBeeTask(dataBody).then(({data}) => {
               if (data && data.status === 0) {
@@ -254,7 +267,10 @@
             }
             let newData = {
               'beeTaskDef': this.dataForm,
-              ...data
+              ...data,
+              authOwner: this.rowData.authOwner,
+              authOtherList: this.rowData.authOtherList,
+              authOthers: this.rowData.authOthers
             }
   
             beeTask(newData, `/beeTask/${!this.dataForm.id ? 'saveBeeTask' : 'updateBeeTask'}`).then(({data}) => {

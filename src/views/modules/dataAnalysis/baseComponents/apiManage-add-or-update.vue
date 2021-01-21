@@ -218,7 +218,12 @@ export default {
         //   code: 'MINUTES', title: '分钟'
         // }
       ],
-      xiaofankaCode: '6001'
+      xiaofankaCode: '6001',
+      rowData: { // 修改时authOwner数据内容
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      }
     }
   },
   components: { userAttrRulePane, Treeselect },
@@ -346,6 +351,9 @@ export default {
       this.flowId = ''
       this.outParams = []
       this.outParamsIndexList = []
+      this.rowData.authOwner = ''
+      this.rowData.authOtherList = []
+      this.rowData.authOthers = ''
       this.loading = true
       this.visible = true
       this.getDepartmentList()
@@ -357,10 +365,12 @@ export default {
         this.loading = false
         this.drawerTitle = '新增'
         this.getCusterList()
-
         this.initEmptyData()
       } else {
         this.id = row.id
+        this.rowData.authOwner = row.authOwner
+        this.rowData.authOtherList = row.authOtherList
+        this.rowData.authOthers = row.authOthers
         this.drawerTitle = tag === 'view' ? '查看' : '编辑'
         this.getCusterList(() => { // 先获取到分群列表，出参数据，再回显
           this.getOutParam(row.id)
@@ -654,7 +664,7 @@ export default {
       if (flag) {
         this.loading = true
         this.baseForm.code = this.code
-        let params = { ...this.baseForm, outParams: Array.from(new Set(this.outParams)) }
+        let params = { ...this.baseForm, ...this.rowData, outParams: Array.from(new Set(this.outParams)) }
         params.inParam = params.inParam
         // params.inParam = params.inParam.join(',')
         let url = savaApiInfo

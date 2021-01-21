@@ -1,7 +1,7 @@
 <template>
   <div class="work-content-1">
     <h3 style="overflow:hidden">调度时间</h3>
-    <el-form label-width="110px" :model="dispatchTimeForm" :rules="dataRule" ref="dispatchTimeForm" class="base-form">
+    <el-form label-width="110px" :model="dispatchTimeForm" :rules="dataRule" ref="dispatchTimeForm" class="base-form" :disabled="!canUpdate">
       <el-form-item label="周期：" prop="jobType">
           <template>
             <el-radio-group v-model="dispatchTimeForm.jobType">
@@ -141,7 +141,8 @@ import { deepClone } from '@/utils'
 export default {
   props: {
     taskId: Number,
-    dispatchStatus: Object
+    dispatchStatus: Object,
+    canUpdate: Boolean
   },
   data () {
     let validateTime = (rule, value, callback) => {
@@ -425,8 +426,10 @@ export default {
       })
       return flag
     },
-    submitData (fn) {
-      let params = { ...this.dispatchStatus, ...this.formatDispatchTime(this.dispatchTimeForm), taskId: this.taskId }
+    submitData (fn, authParams) {
+      console.log('fn: ', fn)
+      console.log('authParams: ', authParams)
+      let params = {...this.dispatchStatus, ...this.formatDispatchTime(this.dispatchTimeForm), taskId: this.taskId, ...authParams}
       taskPeriodSaveOrUpdate(params).then(({data}) => {
         if (data && data.code === 0) {
           // fn()

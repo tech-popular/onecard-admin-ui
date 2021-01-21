@@ -36,7 +36,7 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item>
-          <el-button @click="editTable" type="primary" size="small" v-if="isShow">编辑</el-button>
+          <el-button @click="editTable" type="primary" size="small" v-if="isShow && canUpdate ">编辑</el-button>
           <el-button @click="saveTable" type="primary" size="small" v-if="!isShow">保存</el-button>
           <el-button @click="cancelTable" size="small" v-if="!isShow">取消</el-button>
         </el-form-item>
@@ -122,7 +122,8 @@ export default {
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalCount: 0,
-      dataListLoading: false
+      dataListLoading: false,
+      canUpdate: true // 可编辑
     }
   },
   components: { Treeselect },
@@ -238,13 +239,14 @@ export default {
         return indexListArr
       }
     },
-    init (val) {
+    init (val, canUpdate) {
       this.loading = true
       this.regionList = []
       this.dialogVisible = true
       this.isShow = true
       this.title = val.name
       this.templateId = val.id
+      this.canUpdate = canUpdate
       this.$nextTick(() => {
         this.$refs.ruleForm.clearValidate()
       })

@@ -1,9 +1,9 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm"  :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" :disabled="!canUpdate"  label-width="80px">
     <el-form-item label="name" prop="name">
       <el-input v-model="dataForm.name" placeholder="name"></el-input>
     </el-form-item>
@@ -66,17 +66,19 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
+  import { deepClone } from '@/utils'
   export default {
     data () {
       return {
         visible: false,
         datasourceoptions: [],
+        canUpdate: true, // 查看时不可编辑
         dataForm: {
           id: 0,
           name: '',
@@ -91,6 +93,11 @@
           }]
         },
         tenantoptions: [],
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        },
         dataRule: {
           name: [
             { required: true, message: 'name表达式不能为空', trigger: 'blur' }
@@ -114,7 +121,7 @@
           this.dataForm.canaryBaseTaskDatasourceEntities.splice(index, 1)
         }
       },
-      init (id) {
+      init (row, canUpdate) {
         // 数据源权限tenant
         this.$http({
           url: this.$http.adornUrl(`/sys/systenant/select`),
@@ -125,7 +132,14 @@
             this.tenantoptions = data.sysTenantEntities
           }
         })
-        this.dataForm.id = id || 0
+        this.rowData = {
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
+        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -172,7 +186,10 @@
                 'tenantId': this.dataForm.tenantId,
                 'createdTime': this.dataForm.createdTime,
                 'updatedTime': this.dataForm.updatedTime,
-                'canaryBaseTaskDatasourceEntities': this.dataForm.canaryBaseTaskDatasourceEntities
+                'canaryBaseTaskDatasourceEntities': this.dataForm.canaryBaseTaskDatasourceEntities,
+                'authOwner': this.rowData.authOwner,
+                'authOtherList': this.rowData.authOtherList,
+                'authOthers': this.rowData.authOthers
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

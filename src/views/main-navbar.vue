@@ -158,6 +158,8 @@
               type: 'error',
               message: data.msg || '租户信息保存异常'
             })
+          } else {
+            sessionStorage.setItem('tenantId', val)
           }
         })
       },

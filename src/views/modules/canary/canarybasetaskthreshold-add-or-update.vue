@@ -12,7 +12,7 @@
         </el-form-item>
         <el-form-item>
           <el-button @click="getDataList()">查询</el-button>
-          <el-button  type="primary" @click="addNewThreshold()">新增</el-button>
+          <el-button  type="primary" v-if="canUpdate" @click="addNewThreshold()">新增</el-button>
         </el-form-item>
       </el-form>
       <el-table
@@ -64,7 +64,7 @@
           label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="getThreshold(scope.row.id)">加载</el-button>
-            <el-button type="text" size="small" @click="deleteThreshold(scope.row.id)">删除</el-button>
+            <el-button type="text" size="small" v-if="canUpdate" @click="deleteThreshold(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -173,7 +173,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="innerVisible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </span>
 
   </el-dialog>
@@ -189,6 +189,7 @@
     data () {
       return {
         innerVisible: false,
+        canUpdate: true, // 查看时不可编辑
         dataForm: {
           thresholdEntity: {
             id: '',
@@ -233,8 +234,9 @@
     },
     methods: {
       // 初始化列表
-      init (projectServiceId) {
+      init (projectServiceId, canUpdate) {
         this.dataForm.projectServiceId = projectServiceId
+        this.canUpdate = canUpdate
         this.clearDataForm()
         // level下拉框选型
         this.getAllLevel()

@@ -3,7 +3,7 @@
     <div class="rules-index-relation" v-if="data.rules.length > 1"><span @click="switchSymbol(data.ruleCode)">{{data.relation === 'and' ? '且' : '或'}}</span></div>
     <div style="flex: 1">
       <div v-for="(item, index) in data.rules" :key="index">
-        <el-form :model="item" ref="ruleForm" :inline="true" v-if="!item.rules || !item.rules.length" :disabled="from === 'api'">
+        <el-form :model="item" ref="ruleForm" :inline="true" v-if="!item.rules || !item.rules.length" :disabled="from === 'api' || !canUpdate">
           <el-form-item prop="fieldCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
             <Treeselect
               :options="item.indexList"
@@ -17,7 +17,7 @@
               placeholder="请选择指标"
               @select="node => fieldCodeChange(node, item)"
               class="tree-select"
-              :disabled="from === 'api'"
+              :disabled="from === 'api' || !canUpdate"
           />
           </el-form-item>
           <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
@@ -31,7 +31,7 @@
             <div v-if="(item.fieldType === 'string' || item.fieldType === '') && !item.enumTypeNum" class="pane-rules-inline">
               <!--string型等于或不等于可以输入多个-->
               <el-form-item prop="params[0].selectVal" :ref="'stringMultiVal' + item.ruleCode" :rules="{ required: isRequired, message: '请输入', trigger: 'blur' }" v-if="item.func === 'eq' || item.func === 'neq'">
-                <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'string')" :tag-tips="item.strTips" :valueType="'string'" :add-tag-on-blur="true" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
+                <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'string')" :tag-tips="item.strTips" :valueType="'string'" :add-tag-on-blur="true" :readOnly="from === 'api' || !canUpdate" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
                 <!-- <div class="input-tag-tips" v-if="item.strTips">
                   <el-tooltip placement="top">
                     <div slot="content" v-html="strTipCont(item)" class="tips-content"></div>
@@ -58,7 +58,7 @@
               <div v-else>
                 <!--数值型等于或不等于可以输入多个-->
                 <el-form-item prop="params[0].selectVal" :ref="'numberMultiVal' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-if="item.func === 'eq' || item.func === 'neq'">
-                  <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'number')" :valueType="'number'" :tag-tips="[]" :maxlength="10" :add-tag-on-blur="true" :readOnly="from === 'api'" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
+                  <input-tag v-model="item.params[0].selectVal" @change="inputTagChange(item, 'number')" :valueType="'number'" :tag-tips="[]" :maxlength="10" :add-tag-on-blur="true" :readOnly="from === 'api'  || !canUpdate" :allow-duplicates="true" class="itemIput inputTag" placeholder="可用回车输入多条"></input-tag>
                 </el-form-item>
                 <el-form-item prop="params[0].value" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}" v-else>
                   <el-input v-model="item.params[0].value" :maxlength="10" @input="item.params[0].value = keyupNumberInput(item.params[0].value)" @blur="item.params[0].value = blurNumberInput(item.params[0].value)" class="itemIput"></el-input>
@@ -149,11 +149,11 @@
               <div slot="content" v-html="tipsHtmlCont(item)" class="tips-content"></div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
             </el-tooltip>
-            <span  v-if="from !== 'api'">
+            <span  v-if="from !== 'api' && canUpdate ">
               <i class="el-icon-circle-plus cursor-pointer" @click="addChildrenRules(item, index)" v-if="!isChild || isChild && index === data.rules.length-1"></i>
             </span>
           </el-form-item>
-          <el-form-item style="float: right" v-if="from !== 'api'">
+          <el-form-item style="float: right" v-if="from !== 'api' && canUpdate" >
             <i class="el-icon-close cursor-pointer" @click="deleteRules(item, index)"></i>
           </el-form-item>
         </el-form>
@@ -186,6 +186,10 @@ export default {
     from: {
       type: String,
       default: ''
+    },
+    canUpdate: {
+      type: Boolean,
+      default: true
     }
   },
   data () {

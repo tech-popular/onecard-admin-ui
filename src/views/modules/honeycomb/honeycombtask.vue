@@ -42,6 +42,7 @@
           :disabled="dataListSelections.length <= 0"
         >批量删除</el-button>
         <el-button type="primary" @click="syncEs()">同步ES</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -94,22 +95,23 @@
             type="text"
             size="small"
             v-if="isAuth('honeycomb:honeycombtask:update')"
-            @click="addOrUpdateHandle(scope.row.id)"
-          >修改</el-button>
+            @click="addOrUpdateHandle(scope.row)"
+          >{{isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}</el-button>
           <el-button
             type="text"
             size="small"
-            v-if="isAuth('honeycomb:honeycombtask:delete')"
+            v-if="isAuth('honeycomb:honeycombtask:delete') && (isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid)"
             @click="deleteHandle(scope.row.id)"
           >删除</el-button>
           <el-button type="text" size="small" @click="taskProgress(scope.row.id)">进度</el-button>
-          <!-- <el-button
+          <el-button
             type="text"
             size="small"
-            v-if="isAuth('honeycomb:honeycombtask:start')"
+            v-if="isAuth('honeycomb:honeycombtask:start') && isAdmin"
             @click="startTask(scope.row.id)"
-          >启动任务</el-button> -->
-          <el-button type="text" size="small" @click="taskDependent(scope.row.id)">任务编排</el-button>
+          >启动任务</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="taskDependent(scope.row.id)">任务编排</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -126,6 +128,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <task-progress v-if="taskProgressVisible" ref="taskProgress"></task-progress>
     <task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
+    <assign-permission v-if="assignPermissionVisible"  :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 <style>
@@ -134,9 +137,11 @@
 }
 </style>
 <script>
+import { updateHoneycombAuth, updateHoneycombAuths } from '@/api/commom/assignPermission'
 import AddOrUpdate from './honeycombtask-add-or-update'
 import TaskProgress from './honeycombtaskprogress'
 import TaskDependent from './honeycombtask-dependent'
+import AssignPermission from '../../components/permission/assign-permission'
 export default {
   data () {
     return {
@@ -155,13 +160,19 @@ export default {
       addOrUpdateVisible: false,
       addOrUpdateThresholdVisible: false,
       taskProgressVisible: false,
-      taskDependentVisible: false
+      taskDependentVisible: false,
+      assignPermissionVisible: false,
+      submitDataApi: updateHoneycombAuth,
+      submitDataApis: updateHoneycombAuths,
+      userid: sessionStorage.getItem('id'),
+      isAdmin: sessionStorage.getItem('username') === 'admin'
     }
   },
   components: {
     AddOrUpdate,
     TaskProgress,
-    TaskDependent
+    TaskDependent,
+    AssignPermission
   },
   activated () {
     this.getDataList()
@@ -239,10 +250,14 @@ export default {
       this.dataListSelections = val
     },
     // 新增 / 修改
-    addOrUpdateHandle (id) {
+    addOrUpdateHandle (row) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id)
+        let canUpdate = true
+        if (!this.isAdmin) {
+          canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+        }
+        this.$refs.addOrUpdate.init(row, canUpdate)
       })
     },
     taskProgress (id) {
@@ -332,6 +347,25 @@ export default {
             this.$message.error(data.msg)
           }
         })
+      })
+    },
+    // 分配权限
+    taskPermission(row) {
+      // 打开权限分配弹框
+      // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+      this.assignPermissionVisible = true
+      this.$nextTick(() => {
+      this.$refs.assignPermission.init(row, false)
+      })
+    },
+    // 批量授权
+    multiTaskPermission() {
+      this.assignPermissionVisible = true
+      let ids = this.dataListSelections.map(item => {
+        return item.id
+        })
+      this.$nextTick(() => {
+      this.$refs.assignPermission.init(ids, true)
       })
     }
   }

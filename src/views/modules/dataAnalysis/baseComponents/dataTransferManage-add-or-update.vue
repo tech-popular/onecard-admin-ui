@@ -9,7 +9,7 @@
   >
   <div slot="title" class="drawer-title">{{tag}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
-      <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form">
+      <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form" :disabled="!canUpdate">
         <div class="base-pane">
           <h3 ref="baseTitle">基本信息</h3>
             <el-form-item label="下发类型" prop="triggerMode" style="width:50%">
@@ -50,7 +50,7 @@
                 :load-options="loadOptions"
                 :searchable="true"
                 :clearable="true"
-                :disabled="isR3DefaultOut"
+                :disabled="isR3DefaultOut || !canUpdate"
                 @input="changeOption"
                 @select="outParamsSelect"
                 @deselect="outParamsDeselect"
@@ -281,7 +281,7 @@
         size="small"
         v-if="!!baseForm.id"
       >复制创建新任务</el-button>
-      <el-button type="primary" @click="saveHandle" size="small">保存</el-button>
+      <el-button type="primary" v-if="canUpdate"  @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
@@ -445,7 +445,13 @@
             { validator: validateSqlServer }
           ]
         },
-        isR3DefaultOut: false // 选中R3下发源，且有默认出参时，不可再操作出参
+        isR3DefaultOut: false, // 选中R3下发源，且有默认出参时，不可再操作出参
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        },
+        canUpdate: true // 可编辑
       }
     },
     mounted () {
@@ -739,6 +745,9 @@
         postData.transferType = data.transferType.join(',')
         postData.taskDescribtion = data.taskDescribtion
         postData.outParams = outParams
+        postData.authOwner = this.rowData.authOwner
+        postData.authOtherList = this.rowData.authOtherList
+        postData.authOthers = this.rowData.authOthers
         postData.datasourceParams = []
         if (data.kafkaServer != '' && data.transferType.includes('kafka')) {
           let tempServer = {
@@ -913,7 +922,7 @@
         this.$refs.baseForm.validateField('outParams')
       },
       // 打开抽屉弹窗
-      init (row, tag) {
+      init (row, tag, canUpdate) {
         this.baseForm.taskUniqueFlag = null
         this.baseForm.dolphinProcessId = null
         this.baseForm.id = ''
@@ -937,11 +946,20 @@
         this.baseForm.sqlServer = ''
         this.baseForm.outParams = []
         this.baseForm.templateId = ''
-        this.tag = tag == 'edit' ? '编辑' : '新建'
+        this.rowData.authOwner = ''
+        this.rowData.authOtherList = []
+        this.rowData.authOthers = ''
+        this.tag = canUpdate ? tag == 'edit' ? '编辑' : '新建' : '查看'
+        this.canUpdate = canUpdate
         this.visible = true
         this.loading = true
         this.outParamsList = []
         if (tag) {
+           if (canUpdate) {
+            this.rowData.authOwner = row.authOwner
+            this.rowData.authOtherList = row.authOtherList
+            this.rowData.authOthers = row.authOthers
+          }
           this.getCusterList(tag, (data) => {
             this.dataDisplay(row) // 选获取到分群列表再去渲染页面
             this.$nextTick(() => {
@@ -1018,6 +1036,10 @@
           this.baseForm.id = ''
           this.baseForm.taskUniqueFlag = null
           this.baseForm.dolphinProcessId = null
+          this.canUpdate = true
+          this.rowData.authOwner = ''
+          this.rowData.authOtherList = []
+          this.rowData.authOthers = ''
           this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
         }).catch(() => {
           console.log('cancel')

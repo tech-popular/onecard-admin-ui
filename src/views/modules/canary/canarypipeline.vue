@@ -8,6 +8,7 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('canary:canarypipeline:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('canary:canarypipeline:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -74,8 +75,9 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)"> {{isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid ? '修改' : '查看'}}</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid"   @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -90,11 +92,15 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+     <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 
 <script>
+  import { updateCanaryPipelineAuth, updateCanaryPipelineAuths } from '@/api/commom/assignPermission'
   import AddOrUpdate from './canarypipeline-add-or-update'
+  import AssignPermission from '../../components/permission/assign-permission'
   export default {
     data () {
       return {
@@ -107,11 +113,17 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        submitDataApi: updateCanaryPipelineAuth,
+        submitDataApis: updateCanaryPipelineAuths,
+        assignPermissionVisible: false,
+        userid: sessionStorage.getItem('id'),
+        isAdmin: sessionStorage.getItem('username') === 'admin'
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AssignPermission
     },
     activated () {
       this.getDataList()
@@ -155,10 +167,14 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = row ? row.authOtherList.includes(this.userid) || row.authOwner === this.userid : true
+          }
+          this.$refs.addOrUpdate.init(row, canUpdate)
         })
       },
       // 删除
@@ -189,6 +205,24 @@
               this.$message.error(data.msg)
             }
           })
+        })
+      },
+      taskPermission (row) {
+        // 打开权限分配弹框
+        // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+         this.assignPermissionVisible = true
+         this.$nextTick(() => {
+           this.$refs.assignPermission.init(row, false)
+        })
+      },
+      // 批量授权
+      multiTaskPermission() {
+        this.assignPermissionVisible = true
+        let ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$nextTick(() => {
+          this.$refs.assignPermission.init(ids, true)
         })
       }
     }

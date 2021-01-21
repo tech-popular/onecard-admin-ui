@@ -19,10 +19,10 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button v-if="isAuth('canary:canaryproject:save')" type="primary" @click="addProjectToTaskHandle()">新增</el-button>
+        <el-button v-if="isAuth('canary:canaryproject:save') && canUpdate" type="primary"  @click="addProjectToTaskHandle()">新增</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button  type="primary" @click="copyProjectToTaskHandle()">复制</el-button>
+        <el-button  type="primary" v-if="canUpdate" @click="copyProjectToTaskHandle()">复制</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -74,7 +74,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="setThresholdHandle(scope.row.taskServiceId)">配置阈值</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.taskServiceId)">删除</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.taskServiceId)" v-if="canUpdate">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -112,7 +112,8 @@
         dataListSelections: [],
         newprojectidoptions: [],
         addOrUpdateServiceVisible: false,
-        currentRow: null
+        currentRow: null,
+        canUpdate: true // 查看时不可编辑
       }
     },
     components: {
@@ -120,10 +121,10 @@
     },
     methods: {
       searchData () {
-        this.init(this.dataForm.taskId)
+        this.init(this.dataForm.taskId, this.canUpdate)
       },
       // 获取数据列表
-      init (id) {
+      init (id, canUpdate) {
         // 返回下拉框
         this.$http({
           url: this.$http.adornUrl(`/canary/canaryproject/select`),
@@ -137,6 +138,7 @@
           }
         })
         this.dataForm.taskId = id || 0
+        this.canUpdate = canUpdate
         this.outerVisible = true
         this.dataListLoading = true
         this.$http({
@@ -178,7 +180,7 @@
       setThresholdHandle (id) {
         this.addOrUpdateServiceVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addOrUpdate.init(id, this.canUpdate)
         })
       },
       handleCurrentChange (val) {

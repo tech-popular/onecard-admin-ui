@@ -8,9 +8,11 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
         <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;"  @selection-change="selectionChangeHandle">
+      <el-table-column v-if="isAdmin" type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="API名称"></el-table-column>
       <el-table-column prop="code" header-align="center" align="center" label="接口编码"></el-table-column>
@@ -28,8 +30,9 @@
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" @click="addOrUpdateHandle(scope.row, 'update')">编辑</el-button>
+          <el-button type="text" v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username"  @click="addOrUpdateHandle(scope.row, 'update')">编辑</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+          <el-button type="text" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -42,12 +45,16 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper" />
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+      <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
 </template>
 
 <script>
   import { apiManageList } from '@/api/dataAnalysis/apiManage'
   import AddOrUpdate from './baseComponents/apiManage-add-or-update'
+  import { updateApiAuth, updateApiAuths } from '@/api/commom/assignPermission'
+  import AssignPermission from '../../components/permission/assign-permission'
   export default {
     data () {
       return {
@@ -59,11 +66,19 @@
         pageSize: 10, // 默认每页10条
         totalCount: 0,
         dataListLoading: false,
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        dataListSelections: [],
+        submitDataApi: updateApiAuth,
+        submitDataApis: updateApiAuths,
+        assignPermissionVisible: false,
+        userid: sessionStorage.getItem('id'),
+        username: sessionStorage.getItem('username'),
+        isAdmin: sessionStorage.getItem('username') === 'admin'
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AssignPermission
     },
     mounted () {
       this.getDataList()
@@ -118,6 +133,28 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
+      },
+      // 多选
+      selectionChangeHandle (val) {
+        this.dataListSelections = val
+      },
+      taskPermission (row) {
+        // 打开权限分配弹框
+        // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+         this.assignPermissionVisible = true
+         this.$nextTick(() => {
+           this.$refs.assignPermission.init(row, false)
+        })
+      },
+      // 批量授权
+      multiTaskPermission() {
+        this.assignPermissionVisible = true
+        let ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$nextTick(() => {
+          this.$refs.assignPermission.init(ids, true)
+        })
       }
     }
   }

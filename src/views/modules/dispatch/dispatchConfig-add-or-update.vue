@@ -7,10 +7,10 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{!!id ? '编辑调度配置' : '新增调度配置'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{canUpdate ? !!id ? '编辑调度配置' : '新增调度配置' : '查看调度配置'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <h3 id="title">基础信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="110px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="110px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="任务名称：" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" disabled style="width: 400px">
@@ -30,8 +30,8 @@
       </el-form>
       <div class="work-content-1">
         <h3 style="overflow:hidden">新调度任务依赖
-          <el-button style="float:right" type="danger" @click="deleteDependenceHandle">批量删除</el-button>
-          <el-button style="float:right;margin-right:20px" type="primary" @click="addDependenceHandle">新增依赖</el-button>
+          <el-button style="float:right" type="danger" v-if="canUpdate" @click="deleteDependenceHandle">批量删除</el-button>
+          <el-button style="float:right;margin-right:20px" v-if="canUpdate" type="primary" @click="addDependenceHandle">新增依赖</el-button>
         </h3>
         <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
           <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>
@@ -46,7 +46,7 @@
             <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
-                <a style="cursor: pointer" @click="deleteDependenceHandle(scope.row)">删除</a>
+                <a style="cursor: pointer" v-if="canUpdate" @click="deleteDependenceHandle(scope.row)">删除</a>
               </template>
             </el-table-column>
           </el-table>
@@ -54,8 +54,8 @@
       </div>
             <div class="work-content-1">
         <h3 style="overflow:hidden">老调度任务依赖
-          <el-button style="float:right" type="danger" @click="deleteOldDependenceHandle">批量删除</el-button>
-          <el-button style="float:right;margin-right:20px" type="primary" @click="addOldDependenceHandle">新增依赖</el-button>
+          <el-button style="float:right" type="danger" v-if="canUpdate" @click="deleteOldDependenceHandle">批量删除</el-button>
+          <el-button style="float:right;margin-right:20px" type="primary" v-if="canUpdate"  @click="addOldDependenceHandle">新增依赖</el-button>
         </h3>
         <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
           <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>
@@ -70,17 +70,17 @@
             <!-- <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column> -->
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
-                <a style="cursor: pointer" @click="deleteOldDependenceHandle(scope.row)">删除</a>
+                <a style="cursor: pointer" v-if="canUpdate" @click="deleteOldDependenceHandle(scope.row)">删除</a>
               </template>
             </el-table-column>
           </el-table>
         </div>
       </div>
-      <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" @getStatus="getDispatchStatus" @refreshList="refreshListhandle"></dispatch-config-period>
+      <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" :can-update = "canUpdate" @getStatus="getDispatchStatus" @refreshList="refreshListhandle"></dispatch-config-period>
       <!-- <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id" @refreshList="refreshListhandle"></dispatch-config-alert> -->
       <div class="work-content-1">
         <h3>调度启停</h3>
-        <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus">
+        <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus" :disabled="!canUpdate">
           <div class="work-type-pane">
             <el-form-item label="状态：" prop="dispatchStatus" label-width="100px">
               <el-radio-group v-model="dispatchStatusForm.dispatchStatus">
@@ -97,7 +97,7 @@
     </div>
     <div class="footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
     <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence"></dispatch-config-task-dependent>
     <dispatch-config-old-task-dependent v-if="dispatchConfigOldTaskDependentVisible" ref="dispatchConfigOldTaskDependent" @refreshOldTaskDependence="getOldTaskSelectDependence"></dispatch-config-old-task-dependent>
@@ -112,6 +112,7 @@ import {
   taskSelectOldDependence,
   oldTaskDependenceDelete
 } from '@/api/dispatch/taskManag'
+import { deepClone } from '@/utils'
 import dispatchConfigTaskDependent from './dispatch-config-dependent'
 import dispatchConfigOldTaskDependent from './dispatch-config-old-dependent'
 import dispatchConfigPeriod from './dispatch-config-period'
@@ -127,7 +128,13 @@ export default {
     return {
       visible: false,
       loading: false,
+      canUpdate: true,
       id: '',
+      rowData: { // 修改时数据内容
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      },
       taskType: '',
       preDs: '',
       updateUser: '',
@@ -159,12 +166,19 @@ export default {
     }
   },
   methods: {
-    init (id) {
+    init (id, canUpdate) {
       this.id = id ? id.id : ''
+      this.rowData = {
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      }
+      this.rowData = id ? deepClone(id) : this.rowData
       this.dispatchStatusForm = {
         dispatchStatus: 0,
         dutyUser: ''
       }
+      this.canUpdate = canUpdate
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
@@ -311,7 +325,13 @@ export default {
       })
       if (flag) {
         // 提交周期及状态信息数据
-        this.$refs.dispatchConfigPeriod.submitData()
+        let authParams = {
+          authOwner: this.rowData.authOwner,
+          authOtherList: this.rowData.authOtherList,
+          authOthers: this.rowData.authOthers,
+          tenantId: sessionStorage.getItem('tenantId')
+        }
+        this.$refs.dispatchConfigPeriod.submitData(flag, authParams)
         // this.$refs.dispatchConfigPeriod.submitData(() => {
         //   this.$refs.dispatchConfigAlert.submitData()
         // })

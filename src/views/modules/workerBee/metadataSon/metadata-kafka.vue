@@ -1,6 +1,6 @@
 <template>
     <div class="aviator">
-      <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%">
+      <el-form :model="fatherData" :rules="dataRule" ref="fatherData" label-width="30%" :disabled="!canUpdate">
         <el-form-item label="topic" prop="topic">
           <el-input v-model="fatherData.topic" placeholder="请输入topic"/>
         </el-form-item>
@@ -16,7 +16,7 @@
     </el-form>
     <div slot="footer" class="foot">
       <el-button @click="cancel()">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
     </div>
 </template>
@@ -26,7 +26,8 @@
   export default {
     props: [
       'hideVisibleClick',
-      'fatherData'
+      'fatherData',
+      'canUpdate'
     ],
     data () {
       return {

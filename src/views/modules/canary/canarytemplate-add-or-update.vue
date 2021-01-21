@@ -1,9 +1,9 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" :disabled="!canUpdate"  label-width="80px">
     <el-form-item label="模板名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="模板名称"></el-input>
     </el-form-item>
@@ -22,16 +22,18 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate"  @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
+  import { deepClone } from '@/utils'
   export default {
     data () {
       return {
         visible: false,
+        canUpdate: true, // 查看时不可编辑
         dataForm: {
           id: 0,
           name: '',
@@ -49,12 +51,24 @@
           enable: [
             { required: true, message: '是否启用不能为空', trigger: 'blur' }
           ]
+        },
+        rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
         }
       }
     },
     methods: {
-      init (id) {
-        this.dataForm.id = id || 0
+      init (row, canUpdate) {
+        this.rowData = {
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+        }
+        this.dataForm.id = row ? row.id : 0
+        this.canUpdate = row ? canUpdate : true
+        this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
@@ -86,7 +100,10 @@
                 'name': this.dataForm.name,
                 'template': this.dataForm.template,
                 'description': this.dataForm.description,
-                'enable': this.dataForm.enable
+                'enable': this.dataForm.enable,
+                'authOwner': this.rowData.authOwner,
+                'authOtherList': this.rowData.authOtherList,
+                'authOthers': this.rowData.authOthers
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

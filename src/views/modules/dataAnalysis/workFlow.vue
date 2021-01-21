@@ -375,6 +375,7 @@ export default {
       let params = {
         name: that.saveFormData.name,
         code: that.saveFormData.code,
+        ...this.$store.state.workFlow.rowData, // 数据权限所需参数
         groupId: this.groupId,
         type: this.type.toUpperCase(),
         channelCode: this.channelCode

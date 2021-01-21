@@ -7,10 +7,10 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{!!id ? '编辑同步任务' : '新增同步任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{canUpdate ? !!id ? '编辑同步任务' : '新增同步任务' : '查看同步任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap" v-loading="loading">
       <h3 id="title">作业信息<span v-if="!!id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px">
@@ -31,7 +31,7 @@
         </el-form-item>
       </el-form>
       <div class="work-content-1">
-        <el-form :model="acquisitionTask" :rules="dataRule" ref="acquisitionTask">
+        <el-form :model="acquisitionTask" :rules="dataRule" ref="acquisitionTask" :disabled="!canUpdate">
           <div class="work-type-pane">
             <el-form-item label="数据来源" prop="inDatasourceType" label-width="120px">
               <el-select v-model="acquisitionTask.inDatasourceType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange('in', val)" filterable>
@@ -76,8 +76,8 @@
             </div>
           </el-form-item>
           <el-form-item prop="sqlField" label-width="120px" label="输出字段" ref="sqlFieldEl">
-            <input-tag v-model="acquisitionTask.sqlField" @change="inputTagChange" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="itemIput inputTag" style="display: inline-block;" placeholder="可用回车输入多条，字段顺序请与SQL保持一致"></input-tag>
-            <el-button type="primary" size="mini" @click="sqlParseClick">SQL解析</el-button>
+            <input-tag v-model="acquisitionTask.sqlField" @change="inputTagChange" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" :readOnly = "!canUpdate" class="itemIput inputTag" style="display: inline-block;" placeholder="可用回车输入多条，字段顺序请与SQL保持一致"></input-tag>
+            <el-button type="primary" size="mini" @click="sqlParseClick" >SQL解析</el-button>
           </el-form-item>
           <div class="work-type-pane">
             <el-form-item label="数据去向" prop="outDatasourceType" label-width="120px">
@@ -111,7 +111,7 @@
           </div>
           <!--kafka-->
           <div v-if="acquisitionTask.outDatasourceType==='KAFKA'">
-            <el-form :model="kafkaData" :rules="dataRule" ref="redisForm" label-width="120px">
+            <el-form :model="kafkaData" :rules="dataRule" ref="redisForm" label-width="120px" :disabled="!canUpdate">
               <el-form-item class="el-redis-item" label="是否使用schma" prop="schma">
                 <el-radio-group v-model="kafkaData.schma">
                   <el-radio label="1">是</el-radio>
@@ -122,7 +122,7 @@
           </div>
           <!--redis-->
           <div v-if="acquisitionTask.outDatasourceType==='REDIS'" style="marginLeft: 120px">
-            <el-form :model="redisData" :rules="dataRule" ref="redisForm" label-width="120px">
+            <el-form :model="redisData" :rules="dataRule" ref="redisForm" label-width="120px" :disabled="!canUpdate">
               <el-form-item class="el-redis-item" label="redis数据格式" prop="redisName">
                 <el-select v-model="redisData.redisName" placeholder="redis数据格式" clearable @change="redisNameChange">
                   <el-option
@@ -169,7 +169,7 @@
           <!---->
           <!--elasticsearch-->
           <div v-if="acquisitionTask.outDatasourceType==='ES'" style="marginLeft: 120px">
-            <el-form :model="elasticData" :rules="dataRule" ref="elasticForm" label-width="160px">
+            <el-form :model="elasticData" :rules="dataRule" ref="elasticForm" label-width="160px" :disabled="!canUpdate">
               <el-form-item class="el-redis-item" label="type">
                 <el-input v-model="elasticData.type" placeholder="type" clearable></el-input>
               </el-form-item>
@@ -181,7 +181,7 @@
           <!---->
           <!--mc-->
           <div v-if="acquisitionTask.outDatasourceType==='MAXCOMPUTE'" style="marginLeft: 120px">
-            <el-form :model="mcData" :rules="dataRule" ref="mcForm" label-width="160px">
+            <el-form :model="mcData" :rules="dataRule" ref="mcForm" label-width="160px" :disabled="!canUpdate">
               <el-form-item class="el-redis-item" label="分区列">
                 <el-input v-model="mcData.mcColumn" placeholder="分区列, 若是分区表则必填" clearable></el-input>
               </el-form-item>
@@ -236,7 +236,7 @@
           </div> -->
         </el-form>
       </div>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
@@ -263,7 +263,7 @@
     </div>
     <div class="footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
   </el-drawer>
 </template>
@@ -292,7 +292,13 @@ export default {
     return {
       visible: false,
       loading: false,
+      canUpdate: true, // 查看时不可编辑
       id: '',
+      rowData: { // 修改时数据内容
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      },
       formDs: '',
       toDs: '',
       updateUser: '',
@@ -605,9 +611,16 @@ export default {
     }
   },
   methods: {
-    init (id) {
+    init (id, canUpdate) {
       this.id = id ? id.id : ''
+      this.rowData = {
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      }
+      this.rowData = id ? deepClone(id) : this.rowData
       this.dataForm = deepClone(this.tempDataForm)
+      this.canUpdate = canUpdate
       this.acquisitionTask.outDataTable = ''
       this.redisData = {
         redisName: '',
@@ -864,6 +877,10 @@ export default {
           ...this.dataForm,
           taskName: `${this.formDs}_to_${this.toDs}_${this.dataForm.taskName}`,
           taskType: 'ACQUISITION',
+          authOwner: this.rowData.authOwner,
+          authOtherList: this.rowData.authOtherList,
+          authOthers: this.rowData.authOthers,
+          tenantId: sessionStorage.getItem('tenantId'),
           acquisitionTask: { ...this.acquisitionTask, sqlField: this.acquisitionTask.sqlField.join(',') }
         }
         console.log(222, this.outTableName.trim(), this.outTableName.length)
