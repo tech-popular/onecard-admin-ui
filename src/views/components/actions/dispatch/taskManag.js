@@ -90,7 +90,7 @@ export const models = {
         {
           id: 4,
           label: '依赖快照',
-          type: 'primary',
+          type: 'danger',
           method: (id) => {
             this.snapshotHandle(id)
           }
