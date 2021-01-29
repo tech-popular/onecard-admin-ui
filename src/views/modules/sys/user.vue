@@ -22,6 +22,7 @@
       <el-form-item>
         <el-button @click="searchHandle()" type="primary">查询</el-button>
         <el-button @click="resetHandle()" type="default">重置</el-button>
+        <el-button @click="syncTak()" type="success">同步</el-button>
         <!-- <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
         <!-- <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
@@ -136,7 +137,7 @@
 
 <script>
   import AddOrUpdate from './user-add-or-update'
-  import { getUserList } from '@/api/sys/user'
+  import { getUserList, syncUser } from '@/api/sys/user'
   export default {
     data () {
       return {
@@ -235,6 +236,20 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(val)
+        })
+      },
+      // 同步
+      syncTak () {
+        syncUser().then(({data}) => {
+          if (data && data.status === '1') {
+            this.$message({
+                message: data.message,
+                type: 'success',
+                duration: 1500
+              })
+            } else {
+              this.$message.error(data.message)
+            }
         })
       },
       // 删除
