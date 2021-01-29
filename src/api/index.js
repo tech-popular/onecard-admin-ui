@@ -36,7 +36,7 @@ function httpDelete (url, params, flag = true) {
   })
 }
 // GET 请求
-function httpGet (url, data = {}, timeout = 1000 * 30, flag = true, urlFlag = false) {
+function httpGet (url, data = {}, timeout = 1000 * 60, flag = true, urlFlag = false) {
   if (data.utcParam) { // utcParam 为数组
     const router = data.utcParam.join('/')
     url = `${url}/${router}`
