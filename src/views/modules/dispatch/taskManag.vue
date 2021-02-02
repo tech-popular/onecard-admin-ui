@@ -7,7 +7,7 @@
       :searchForm="searchForm"
       :searchHandle="searchHandle"
     ></searchForm>
-    <tab :list="list" :columns="columns" :operates="operates" :operates-width="operatesWidth" :is-selection="isAdmin" @selection-change="handleSelectionChange"/>
+    <tab :list="list" :columns="columns" :operates="operates" :fixed="operatesFixed" :operates-width="operatesWidth" :is-selection="isAdmin" @selection-change="handleSelectionChange"/>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -29,6 +29,8 @@
     <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
     <!-- 授权 -->
     <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="init"></assign-permission>
+    <!-- 依赖快照 -->
+    <taskManag-snap-shot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"></taskManag-snap-shot>
   </div>
 </template>
 
@@ -37,6 +39,7 @@ import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import AssignPermission from '../../components/permission/assign-permission'
+import taskManagSnapShot from './taskManag-snap-shot'
 import { models } from '../../components/actions/dispatch/taskManag'
 export default {
   mixins: [models],
@@ -44,7 +47,8 @@ export default {
     AddOrUpdate,
     ComputAddOrUpdate,
     dispatchConfigAddOrUpdate,
-    AssignPermission
+    AssignPermission,
+    taskManagSnapShot
   }
 }
 </script>

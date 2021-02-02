@@ -57,6 +57,8 @@ export const models = {
       submitDataApi: updateDispatchTaskAuth,
       submitDataApis: updateDispatchTaskAuths,
       assignPermissionVisible: false,
+      taskManagSnapShotVisible: false,
+      operatesFixed: 'right',
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
@@ -141,16 +143,16 @@ export const models = {
             this.taskExecuteHandle(id)
           }
         },
+        {
+          id: 4,
+          label: '依赖快照',
+          type: 'danger',
+          method: (id) => {
+            this.snapshotHandle(id)
+          }
+        },
         // {
         //   id: 5,
-        //   label: '依赖快照',
-        //   type: 'info',
-        //   method: (snapshot) => {
-        //     this.snapshotHandle(snapshot)
-        //   }
-        // },
-        // {
-        //   id: 6,
         //   label: '编辑依赖',
         //   type: 'warning',
         //   method: (editSnapshot) => {
@@ -180,12 +182,15 @@ export const models = {
       ],
       columns: [{
           prop: 'id',
+          fixed: true,
           label: '任务ID',
           align: 'center',
           width: '100px'
         },
         {
           prop: 'taskName',
+          fixed: true,
+          width: '130px',
           label: '任务名称',
           align: 'center',
           render: (h, params) => {
@@ -204,7 +209,7 @@ export const models = {
         {
           prop: 'taskType',
           label: '任务类型',
-          width: '100px',
+          width: '120px',
           align: 'center',
           render: (h, params) => {
             return h('el-tag', {
@@ -217,7 +222,7 @@ export const models = {
         {
           prop: 'createTime',
           label: '任务创建时间',
-          width: '110px',
+          width: '120px',
           align: 'center'
         },
         {
@@ -438,8 +443,12 @@ export const models = {
       this.$router.push({ name: 'dispatch-taskBatch', query: { name: params.row.taskName } })
     },
     // 依赖快照
-    snapshotHandle(url) {
-      window.open(url, '_blank')
+    snapshotHandle(id) {
+      this.taskManagSnapShotVisible = true
+      this.$nextTick(() => {
+        this.$refs.taskManagSnapShot.init(id)
+      })
+      // window.open(url, '_blank')
     },
     // 编辑依赖
     editSnapshotHandle(url) {

@@ -6,3 +6,4 @@ export const getUserInfoById = id => httpGet(da + `sys/user/info/${id}`) // 用�
 export const saveUserInfo = params => httpPost(da + `sys/user/save`, params) // 保存
 export const updateUserInfo = params => httpPost(da + `sys/user/updateUserInfo`, params)
 export const getUserInfo = () => httpGet(da + `sys/user/info`) // 用户信息
+export const syncUser = () => httpGet(da + 'oa/init') // 同步用户信息

@@ -9,7 +9,7 @@
       width="50"
       ></el-table-column>
       <template v-for="(item,index) in columns">
-        <el-table-column :prop="item.prop" :key='item.label' :label="item.label" :align="item.align" :width="item.width">
+        <el-table-column :prop="item.prop" :fixed="item.fixed" :key='item.label' :label="item.label" :align="item.align" :width="item.width">
           <template slot-scope="scope">
             <template v-if="!item.render">
               <template v-if="item.formatter">
@@ -25,7 +25,7 @@
           </template>
         </el-table-column>
       </template>
-      <el-table-column label="操作" align="center" :width="operatesWidth" v-if="operates.length">
+      <el-table-column label="操作" align="center" :fixed="fixed" :width="operatesWidth" v-if="operates.length">
         <template slot-scope="scope">
           <el-button size="mini" v-for="(btn,index) in operates" v-show="!btn.isShow || btn.isShow && btn.isShow(scope.row)" :type="btn.type" :disabled="btn.disabled && btn.disabled(scope.row)" :key="index" @click.native.prevent="btn.method(scope.row)">{{btn.label}}</el-button>
         </template>
@@ -53,7 +53,8 @@ export default {
     isSelection: {
       type: Boolean,
       default: false
-    }
+    },
+    fixed: {}
   },
   // 组件
   components: {
