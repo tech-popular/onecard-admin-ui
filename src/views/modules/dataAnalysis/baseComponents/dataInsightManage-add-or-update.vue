@@ -320,7 +320,7 @@ export default {
       this.loading = true
       this.visible = true
       // this.isRequired = false // 默认为false,不设置的话，保存后再进入会变
-      this.getVestPackAvailable()
+      this.getVestPackAvailable('')
       this.getChannelsList()
       this.getCusterList('')
       this.getCollisionList()
@@ -388,6 +388,7 @@ export default {
               .filter(item => item != '')
           }
           this.baseForm.channelId = data.data.channelId
+          this.getVestPackAvailable(this.baseForm.channelId)
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
             this.loading = false
@@ -475,13 +476,14 @@ export default {
       // }
       this.rejectForm.rejectGroupPackageIds = []
       this.getCusterList(this.baseForm.channelId)
+      this.getVestPackAvailable(this.baseForm.channelId)
       this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
       // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId) // 用户行为暂时隐藏
       this.rejectForm.rejectGroupPackageIds = []
     },
-    getVestPackAvailable () {
+    getVestPackAvailable (channelId) {
       vestPackAvailable({
-        channelCode: this.baseForm.channelId
+        channelCode: channelId
       }).then(res => {
         if (res.data.status * 1 !== 1) {
           this.vestPackList = []
