@@ -7,7 +7,7 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <!--<el-button v-if="isAuth('canary:middlewareshortlink:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-        <el-button  type="primary" @click="addOrUpdateHandleShortLink()">链接操作</el-button>
+        <el-button  type="primary"  @click="addOrUpdateHandleShortLink()">链接操作</el-button>
         <!-- <el-button v-if="isAuth('canary:middlewareshortlink:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
@@ -70,7 +70,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" v-if="isAdmin" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -105,7 +105,8 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        addOrUpdateShortLinkVisible: false
+        addOrUpdateShortLinkVisible: false,
+        isAdmin: sessionStorage.getItem('username') === 'admin'
       }
     },
     components: {
