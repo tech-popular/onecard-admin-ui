@@ -57,12 +57,13 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
   </div>
 </template>
 
 <script>
   // import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex } from '@/api/dataAnalysis/indexManage'
+  import AddOrUpdate from './baseComponents/intelligentOperation-add-or-update'
   export default {
     data () {
       return {
@@ -78,30 +79,10 @@
         pageSize: 10, // 默认每页10条
         totalCount: 0,
         dataListLoading: false,
-        addOrUpdateVisible: false,
-        fieldTypeList: [ // 数据类型
-          // {
-          //   typeNum: '1',
-          //   typeValue: '类型一'
-          // },
-          // {
-          //   typeNum: '2',
-          //   typeValue: '类型2'
-          // }
-        ],
-        categoryIdList: [ // 指标类别
-          // {
-          //   typeNum: '1',
-          //   typeValue: '类别一'
-          // },
-          // {
-          //   typeNum: '2',
-          //   typeValue: '类别2'
-          // }
-        ]
+        addOrUpdateVisible: false
       }
     },
-    components: {},
+    components: { AddOrUpdate },
     mounted () {
       this.getDataList()
     },
@@ -110,7 +91,7 @@
       getDataList () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.dataListLoading = true
+            // this.dataListLoading = true
             let params = {
               ...this.dataForm,
               'pageNum': this.pageNum,
