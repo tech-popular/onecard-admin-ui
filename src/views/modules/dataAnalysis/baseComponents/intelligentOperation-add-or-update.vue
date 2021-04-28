@@ -271,12 +271,12 @@
               </el-col>
               <el-col :span="10">
                 <el-form-item prop="issuedServer" inline>
-									<el-radio-group v-model="baseForm.issuedServer" @change="issuedServerChange(baseForm.issuedServer)">
-										<el-radio :label="0">短信</el-radio>
-										<el-radio :label="1">电销</el-radio>
-										<el-radio :label="2">AI外呼</el-radio>
-										<el-radio :label="3">push</el-radio>
-									</el-radio-group>
+									<el-checkbox-group v-model="baseForm.issuedServer" @change="issuedServerChange(baseForm.issuedServer)">
+										<el-checkbox :label="0">短信</el-checkbox>
+										<el-checkbox :label="1">电销</el-checkbox>
+										<el-checkbox :label="2">AI外呼</el-checkbox>
+										<el-checkbox :label="3">push</el-checkbox>
+									</el-checkbox-group>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -386,7 +386,7 @@
           sqlServer: '',
           triggerMode: '0', // 下发类型，默认0主动型 1被动
           issuedType: '',
-          issuedServer: ''
+          issuedServer: []
         },
         tag: '新建', // 说明是否是“查看”
         readonly: false, // 不可编辑
