@@ -5,7 +5,7 @@
   window.SITE_CONFIG = {}
 
   // api接口请求地址
-  window.SITE_CONFIG['baseUrl'] = '//192.168.161.218:8000/canary-admin' // 测试环境
+  window.SITE_CONFIG['baseUrl'] = '//unify-manager.sk.9f.cn/canary-admin' // 测试环境
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain'] = './' // 域名
