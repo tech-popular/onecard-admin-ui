@@ -106,6 +106,67 @@
               <a :href="templateUrl">下载模板</a>
             </el-button>
           </el-form-item>
+          <el-form-item>
+            <div class="type-radio-item type-radio-three">
+              <el-radio
+                label="SQL"
+                v-model="baseForm.userType"
+                @change="radioTypeChange"
+                :disabled="!!id"
+              >SQL</el-radio>
+            </div>
+          </el-form-item>
+           <el-form-item
+            label="用户所属渠道"
+            prop="channelId"
+            v-if="baseForm.userType === 'SQL'"
+            label-width="110px;"
+            class="user-channel"
+          >
+            <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px" @change="channelIdChange" filterable>
+              <template v-for="(item, index) in channelList">
+                <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
+              </template>
+            </el-select>
+          </el-form-item>
+          <el-form-item class="user-channel" v-if="baseForm.userType === 'SQL'" prop="sql" label="SQL：" label-width="70px" ref="workBeginSqlForm">
+            <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
+              <codemirror
+                ref="workBeginSql"
+                v-model="baseForm.sql"
+                :options="cmOptions"
+                @changes="cm => workItemChanges(cm, baseForm.sql, 'workBeginSqlForm', 'workBeginSql')"
+                @keydown.native="e => workItemKeyDown(e, 'workBeginSql')"
+                class="code"
+                style="padding-bottom: 0px"
+              ></codemirror>
+            </div>
+          </el-form-item>
+          <div  v-if="baseForm.userType === 'SQL'" class="work-type-pane-source">
+            <el-form-item prop="datasourceType" label="数据来源">
+              <el-select v-model="baseForm.datasourceType">
+                <el-option label="maxComputer" value="maxComputer">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item prop="tableSpace">
+            <el-select v-model="baseForm.tableSpace">
+              <el-option 
+                v-for="(item,index) in tableSpaceList"
+                :key="index"
+                :label="item.value"
+                :value="item.value"
+                >
+              </el-option>
+            </el-select>
+            </el-form-item>
+          </div>
+          <el-form-item v-if="baseForm.userType === 'SQL'" prop="outParam" label="输出数据" style="margin-left:80px;">
+            <el-radio  v-model="baseForm.outParam" label="uuid">uuid</el-radio>
+            <el-radio  v-model="baseForm.outParam" label="user_id" >user_id</el-radio>
+            <el-radio  v-model="baseForm.outParam" label="cert_id">cert_id</el-radio>
+            <el-radio  v-model="baseForm.outParam" label="mobile">mobile</el-radio>
+          </el-form-item>
           <el-form-item label="计算类型" prop="type">
             <el-radio-group
               v-model="baseForm.type"
@@ -130,6 +191,7 @@
             </p>
           </el-form-item>
         </el-form>
+
       </div>
       <div class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
       <div class="pane-rules">
@@ -255,11 +317,24 @@ import {
   collisionList,
   collisionParams,
   collisionSave,
-  collisionUpdate
+  collisionUpdate,
+  databaseInitInfo,
+  importSqlInfo
 } from '@/api/dataAnalysis/dataInsightManage'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import { codemirror } from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/idea.css'
+import 'codemirror/addon/hint/show-hint.css'
+import 'codemirror/addon/hint/anyword-hint.js'
+require('codemirror/addon/edit/matchbrackets')
+require('codemirror/addon/selection/active-line')
+require('codemirror/mode/sql/sql.js')
+require('codemirror/addon/hint/show-hint.js')
+require('codemirror/addon/hint/sql-hint.js')
 export default {
+  name: 'codeMirror',
   data () {
     return {
       // channelLimit: 1,
@@ -288,7 +363,11 @@ export default {
         userType: 'indicator',
         type: 'dynamic',
         channelId: '',
-        desc: ''
+        desc: '',
+        sql: '',
+        datasourceType: '',
+        tableSpace: '',
+        outParam: ''
       },
       rejectForm: {
         rejectGroupPackageIds: [],
@@ -308,9 +387,54 @@ export default {
         ],
         channelId: [
           { required: true, message: '请选择用户所属渠道', trigger: 'change' }
+        ],
+        sql: [
+          { required: true, message: '请输入SQL', trigger: 'change' }
+        ],
+        datasourceType: [
+          { required: true, message: '请选择数据来源', trigger: 'change' }
+        ],
+        // tableSpace: [
+        //   { required: true, message: '请选择数据来源', trigger: 'change' }
+        // ],
+        outParam: [
+          { required: true, message: '请选择输出数据', trigger: 'change' }
         ]
       },
       channelList: [],
+      tableSpaceList: [],
+       cmOptions: {
+        theme: 'idea',
+        mode: 'text/x-sparksql',
+        lineWrapping: true,
+        lineNumbers: true,
+        autofocus: false,
+        smartIndent: false,
+        autocorrect: true,
+        spellcheck: true,
+        extraKeys: {
+          Tab: 'autocomplete'
+        },
+        lint: true,
+        gutters: [
+          'CodeMirror-lint-markers',
+          'CodeMirror-linenumbers',
+          'CodeMirror-foldgutter'
+        ],
+        foldGutter: true,
+        autoCloseBrackets: true,
+        autoCloseTags: true,
+        matchTags: { bothTags: true },
+        matchBrackets: true,
+        styleActiveLine: true,
+        autoRefresh: true,
+        highlightSelectionMatches: {
+          minChars: 2,
+          style: 'matchhighlight',
+          showToken: true
+        },
+        styleSelectedText: true
+      },
       rowData: { // 修改时authOwner数据内容
         authOwner: '',
         authOtherList: [],
@@ -324,7 +448,8 @@ export default {
     userActionRulePane,
     Treeselect,
     dataPreviewInfo,
-    InputTag
+    InputTag,
+    codemirror
   },
   methods: {
     init (row, tag, canUpdate) {
@@ -342,6 +467,7 @@ export default {
       this.getChannelsList()
       this.getCusterList('')
       this.getCollisionList()
+      this.getSqlImport()
       // this.getCollisionParams()
       this.$nextTick(() => { // 默认将基本信息的错误提示消除
         this.$refs.baseForm.clearValidate()
@@ -400,7 +526,11 @@ export default {
             name: data.data.name,
             desc: data.data.desc,
             userType: data.data.userType,
-            type: data.data.type
+            type: data.data.type,
+            sql: data.data.sqlImportParam.sql,
+            datasourceType: data.data.sqlImportParam.datasourceType,
+            tableSpace: data.data.sqlImportParam.tableSpace,
+            outParam: data.data.sqlImportParam.outParam
           }
           this.rejectForm.rejectGroupPackageIds =
             data.data.rejectGroupPackageIds || []
@@ -439,6 +569,41 @@ export default {
     },
     renderEnd () {
       this.loading = false
+    },
+    getSqlImport () {
+      databaseInitInfo().then(({data}) => {
+        if (data.status !== '1') {
+          this.tableSpaceList = []
+          return this.$message({
+            type: 'error',
+            message: data.message || '数据异常'
+          })
+        }
+        this.tableSpaceList = data.data.touchActionList
+      })
+    },
+     workItemChanges (cm, sql, refForm, selfRef) { // 内容更新时，不为空时将报错信息去除
+      if (sql !== '') {
+        this.$refs[refForm].clearValidate()
+      }
+      if (!sql) {
+        this.$nextTick(() => {
+          this.$refs[selfRef].codemirror.setOption('lint', false)
+        })
+      } else {
+        this.$refs[selfRef].codemirror.setOption('lint', false)
+        this.$nextTick(() => {
+          this.$refs[selfRef].codemirror.setOption('lint', true)
+        })
+      }
+    },
+    // 按下键盘事件处理函数
+    workItemKeyDown (event, ref) {
+      const keyCode = event.keyCode || event.which || event.charCode
+      const keyCombination = event.ctrlKey || event.altKey || event.metaKey
+      if (!keyCombination && keyCode > 64 && keyCode < 123) {
+        this.$refs[ref].codemirror.showHint({ completeSingle: false })
+      }
     },
     isShowActionRule (val) {
       if (val) {
@@ -730,6 +895,8 @@ export default {
           }
           if (this.baseForm.userType === 'excel') { // excel方式
             this.excelSaveData()
+          } else if (this.baseForm.userType === 'SQL') {
+            this.saveSql()
           } else {
             this.indexSaveData(type)
           }
@@ -824,6 +991,47 @@ export default {
         }
       })
     },
+    saveSql () {
+      let code = 0
+      if (this.rejectForm.rejectGroupPackageIds.length) {
+        code = 1
+      }
+      let sqlImportParam = {
+        'datasourceType': this.baseForm.datasourceType,
+        'tableSpace': this.baseForm.tableSpace,
+        'sql': this.baseForm.sql,
+        'outParam': this.baseForm.outParam
+      }
+      let params = {
+        ...this.rowData,
+        name: this.baseForm.name,
+        userType: this.baseForm.userType,
+        type: this.baseForm.type,
+        channelId: this.baseForm.channelId,
+        desc: this.baseForm.desc,
+        ...this.$refs.userAttrRule.lastSubmitRuleConfig,
+        // ...this.$refs.userActionRule.lastSubmitRuleConfig, //用户行为
+        ...this.rejectForm,
+        sqlImportParam: sqlImportParam,
+        outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
+        rejectGroupPackCode: code
+      }
+      params.vestPackCode = params.vestPackCode.join(',')
+      this.loading = true
+      console.log('params: ', params)
+      importSqlInfo(params).then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.$message({
+            type: 'error',
+            message: res.data.message || '保存失败'
+          })
+          this.loading = false
+        } else {
+          this.id = res.data.data
+          this.saveCollision()
+        }
+      })
+    },
     drawerClose () {
       this.visible = false
       this.$parent.addOrUpdateVisible = false
@@ -903,6 +1111,9 @@ export default {
   margin-top: 12px;
 }
 .insight-manage-drawer .type-radio-two {
+  margin-top: 10px;
+}
+.insight-manage-drawer .type-radio-three {
   margin-top: 10px;
 }
 .insight-manage-drawer .upload-excel {
@@ -1004,5 +1215,13 @@ export default {
   width: 340px;
   line-height: 22px;
   border: 1px solid #dcdfe6
+}
+.work-type-pane-source {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: 80px;
 }
 </style>
