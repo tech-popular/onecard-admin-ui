@@ -30,7 +30,7 @@
               class="base-pane-item"
             />
           </el-form-item>
-          <el-form-item label="分群类型" prop="userType">
+          <el-form-item label="分群类型" prop="userType" :class="baseForm.userType === 'excel' ? 'type-radio-item-userType-active' : 'type-radio-item-userType'">
             <div class="type-radio-item type-radio-one">
               <el-radio
                 label="indicator"
@@ -144,13 +144,13 @@
           </el-form-item>
           <div  v-if="baseForm.userType === 'SQL'" class="work-type-pane-source">
             <el-form-item prop="datasourceType" label="数据来源">
-              <el-select v-model="baseForm.datasourceType">
+              <el-select v-model="baseForm.datasourceType" style="width:300px;">
                 <el-option label="maxComputer" value="maxComputer">
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="tableSpace">
-            <el-select v-model="baseForm.tableSpace">
+            <el-form-item prop="tableSpace" >
+            <el-select v-model="baseForm.tableSpace" style="width:300px;">
               <el-option 
                 v-for="(item,index) in tableSpaceList"
                 :key="index"
@@ -1017,6 +1017,9 @@ export default {
         rejectGroupPackCode: code
       }
       params.vestPackCode = params.vestPackCode.join(',')
+      if (this.id) {
+        params.id = this.id
+      }
       this.loading = true
       console.log('params: ', params)
       importSqlInfo(params).then(res => {
@@ -1223,5 +1226,11 @@ export default {
   justify-content: flex-start;
   align-items: center;
   margin-left: 80px;
+}
+.type-radio-item-userType {
+  margin-bottom: 0 !important;
+}
+.type-radio-item-userType-active {
+  margin-bottom: 22px !important;
 }
 </style>
