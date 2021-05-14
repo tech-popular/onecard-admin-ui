@@ -129,19 +129,6 @@
               </template>
             </el-select>
           </el-form-item>
-          <el-form-item class="user-channel" v-if="baseForm.userType === 'SQL'" prop="sql" label="SQL：" label-width="70px" ref="workBeginSqlForm">
-            <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
-              <codemirror
-                ref="workBeginSql"
-                v-model="baseForm.sql"
-                :options="cmOptions"
-                @changes="cm => workItemChanges(cm, baseForm.sql, 'workBeginSqlForm', 'workBeginSql')"
-                @keydown.native="e => workItemKeyDown(e, 'workBeginSql')"
-                class="code"
-                style="padding-bottom: 0px"
-              ></codemirror>
-            </div>
-          </el-form-item>
           <div  v-if="baseForm.userType === 'SQL'" class="work-type-pane-source">
             <el-form-item prop="datasourceType" label="数据来源">
               <el-select v-model="baseForm.datasourceType" style="width:300px;">
@@ -161,6 +148,19 @@
             </el-select>
             </el-form-item>
           </div>
+          <el-form-item class="user-channel" v-if="baseForm.userType === 'SQL'" prop="sql" label="SQL：" label-width="70px" ref="workBeginSqlForm">
+            <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
+              <codemirror
+                ref="workBeginSql"
+                v-model="baseForm.sql"
+                :options="cmOptions"
+                @changes="cm => workItemChanges(cm, baseForm.sql, 'workBeginSqlForm', 'workBeginSql')"
+                @keydown.native="e => workItemKeyDown(e, 'workBeginSql')"
+                class="code"
+                style="padding-bottom: 0px"
+              ></codemirror>
+            </div>
+          </el-form-item>
           <el-form-item v-if="baseForm.userType === 'SQL'" prop="outParam" label="输出数据" style="margin-left:80px;">
             <el-radio  v-model="baseForm.outParam" label="uuid">uuid</el-radio>
             <el-radio  v-model="baseForm.outParam" label="user_id" >user_id</el-radio>
@@ -170,7 +170,7 @@
           <el-form-item label="计算类型" prop="type">
             <el-radio-group
               v-model="baseForm.type"
-              :disabled="!!id || baseForm.userType === 'excel'"
+              :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'SQL'"
             >
               <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
@@ -875,7 +875,7 @@ export default {
         //     }
         //   })
         // })
-        if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel') {
+        if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel' && this.baseForm.userType !== 'SQL') {
         // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
           return this.$message({
             message: '请配置用户规则信息',
@@ -1225,7 +1225,7 @@ export default {
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
-  margin-left: 80px;
+  margin-left: 70px;
 }
 .type-radio-item-userType {
   margin-bottom: 0 !important;
