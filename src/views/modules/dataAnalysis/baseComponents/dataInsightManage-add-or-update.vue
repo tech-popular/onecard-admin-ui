@@ -267,7 +267,7 @@
         type="success"
         @click="saveHandle('preview')"
         size="small"
-        v-if="baseForm.userType !== 'excel'"
+        v-if="baseForm.userType !== 'excel' && baseForm.userType !== 'SQL'"
       >数据预览</el-button>
       <el-button
         type="primary"
