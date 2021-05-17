@@ -109,7 +109,7 @@
           <el-form-item>
             <div class="type-radio-item type-radio-three">
               <el-radio
-                label="SQL"
+                label="sql"
                 v-model="baseForm.userType"
                 @change="radioTypeChange"
                 :disabled="!!id"
@@ -119,7 +119,7 @@
            <el-form-item
             label="用户所属渠道"
             prop="channelId"
-            v-if="baseForm.userType === 'SQL'"
+            v-if="baseForm.userType === 'sql'"
             label-width="110px;"
             class="user-channel"
           >
@@ -129,14 +129,14 @@
               </template>
             </el-select>
           </el-form-item>
-          <div  v-if="baseForm.userType === 'SQL'" class="work-type-pane-source">
+          <div  v-if="baseForm.userType === 'sql'" class="work-type-pane-source">
             <el-form-item prop="datasourceType" label="数据来源">
               <el-select v-model="baseForm.datasourceType" style="width:300px;">
                 <el-option label="maxComputer" value="maxComputer">
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="tableSpace" >
+            <el-form-item prop="tableSpace" label="表空间">
             <el-select v-model="baseForm.tableSpace" style="width:300px;">
               <el-option 
                 v-for="(item,index) in tableSpaceList"
@@ -148,7 +148,7 @@
             </el-select>
             </el-form-item>
           </div>
-          <el-form-item class="user-channel" v-if="baseForm.userType === 'SQL'" prop="sql" label="SQL：" label-width="70px" ref="workBeginSqlForm">
+          <el-form-item class="user-channel" v-if="baseForm.userType === 'sql'" prop="sql" label="SQL：" label-width="70px" ref="workBeginSqlForm">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
                 ref="workBeginSql"
@@ -160,8 +160,11 @@
                 style="padding-bottom: 0px"
               ></codemirror>
             </div>
+            <p class="data-description-tips">
+             默认选中sql语句中输出的第一个字段作为映射字段
+            </p>
           </el-form-item>
-          <el-form-item v-if="baseForm.userType === 'SQL'" prop="outParam" label="输出数据" style="margin-left:80px;">
+          <el-form-item v-if="baseForm.userType === 'sql'" prop="outParam" label="输出数据" style="margin-left:80px;">
             <el-radio  v-model="baseForm.outParam" label="uuid">uuid</el-radio>
             <el-radio  v-model="baseForm.outParam" label="user_id" >user_id</el-radio>
             <el-radio  v-model="baseForm.outParam" label="cert_id">cert_id</el-radio>
@@ -170,7 +173,7 @@
           <el-form-item label="计算类型" prop="type">
             <el-radio-group
               v-model="baseForm.type"
-              :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'SQL'"
+              :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'sql'"
             >
               <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
@@ -267,7 +270,7 @@
         type="success"
         @click="saveHandle('preview')"
         size="small"
-        v-if="baseForm.userType !== 'excel' && baseForm.userType !== 'SQL'"
+        v-if="baseForm.userType !== 'excel' && baseForm.userType !== 'sql'"
       >数据预览</el-button>
       <el-button
         type="primary"
@@ -875,7 +878,7 @@ export default {
         //     }
         //   })
         // })
-        if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel' && this.baseForm.userType !== 'SQL') {
+        if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel' && this.baseForm.userType !== 'sql') {
         // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
           return this.$message({
             message: '请配置用户规则信息',
@@ -895,7 +898,7 @@ export default {
           }
           if (this.baseForm.userType === 'excel') { // excel方式
             this.excelSaveData()
-          } else if (this.baseForm.userType === 'SQL') {
+          } else if (this.baseForm.userType === 'sql') {
             this.saveSql()
           } else {
             this.indexSaveData(type)
