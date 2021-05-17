@@ -12,7 +12,11 @@
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form" :disabled="!canUpdate">
         <div class="base-pane">
           <h3 ref="baseTitle">基本信息</h3>
-            <el-form-item label="下发类型" prop="triggerMode" style="width:50%">
+            <el-form-item label="决策方式" prop="decisionType" style="width:50%">
+              <el-radio v-model="baseForm.decisionType" label="0">下发数据源</el-radio>
+              <el-radio v-model="baseForm.decisionType" label="1"  style="margin-left:5px;">决策画布</el-radio>
+            </el-form-item>
+            <el-form-item v-if="baseForm.decisionType === '0'" label="下发类型" prop="triggerMode" style="width:50%">
               <el-radio v-model="baseForm.triggerMode" label="0" class="radio-item radio-initiative">主动型</el-radio>
               <el-tooltip placement="top">
                 <div slot="content">根据调度时间配置进行数据下发</div>
@@ -41,7 +45,7 @@
             <el-form-item label="任务名称" prop="transferName" style="width:50%">
               <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
             </el-form-item>
-            <el-form-item label="分群出参" prop="outParams">
+            <!-- <el-form-item label="分群出参" prop="outParams">
               <Treeselect
                 :options="outParamsList"
                 :disable-branch-nodes="true"
@@ -59,13 +63,13 @@
                 placeholder="请选择"
                 class="base-pane-item"
               />
-            </el-form-item>
-            <el-form-item label="任务描述">
+            </el-form-item> -->
+            <el-form-item label="任务描述" v-if="baseForm.decisionType === '0'">
               <el-input type="textarea"  class="base-pane-item" v-model="baseForm.taskDescribtion" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
               <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.taskDescribtion.length"></span>个字符</p>
             </el-form-item>
         </div>
-        <div class="base-pane" v-if="baseForm.triggerMode !== '1'">
+        <div class="base-pane" v-if="baseForm.triggerMode !== '1' || baseForm.decisionType === '1' ">
           <h3>调度时间</h3>
             <el-form-item label="周期">
               <template>
@@ -186,7 +190,7 @@
               </el-col>
             </el-row>
         </div>
-        <div class="pane-rules">
+        <div class="pane-rules" v-if="baseForm.decisionType === '0'">
           <h3>下发数据源</h3>
           <el-row :gutter="20">
             <el-col style="width: 8.33333%;">
@@ -281,7 +285,8 @@
         size="small"
         v-if="!!baseForm.id"
       >复制创建新任务</el-button>
-      <el-button type="primary" v-if="canUpdate"  @click="saveHandle" size="small">保存</el-button>
+      <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '1'"  @click="decisionCanvas" size="small">决策画布</el-button>
+      <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '0'"  @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
@@ -366,7 +371,8 @@
           topic: '',
           mysqlServer: '', // sftp数据源地址
           sqlServer: '',
-          triggerMode: '0' // 下发类型，默认0主动型 1被动
+          triggerMode: '0', // 下发类型，默认0主动型 1被动
+          decisionType: '0'
         },
         tag: '新建', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -1044,6 +1050,10 @@
         }).catch(() => {
           console.log('cancel')
         })
+      },
+      // 决策画布
+      decisionCanvas () {
+        console.log('cancel')
       },
       // 关闭
       cancelHandle () {
