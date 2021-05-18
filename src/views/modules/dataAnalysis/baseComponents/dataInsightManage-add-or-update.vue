@@ -525,7 +525,6 @@ export default {
         } else {
           this.flowId = data.data.flowId
           this.outMostExpressionTemplate = data.data.configJson && JSON.parse(data.data.configJson).outMostExpressionTemplate ? JSON.parse(data.data.configJson).outMostExpressionTemplate : 'and'
-            console.log('data.data.sqlImportParam: ', data.data.sqlImportParam)
           this.baseForm = {
             name: data.data.name,
             desc: data.data.desc,
