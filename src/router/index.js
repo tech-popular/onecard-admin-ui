@@ -47,7 +47,8 @@ const mainRoutes = {
     { path: '/phoenix-visual', component: _import('modules/phoenix/visual'), name: 'phoenix-visual', meta: { title: '可视化工具', isTab: true } },
     { path: '/phoenix-spectaculars', component: _import('modules/phoenix/spectaculars'), name: 'phoenix-spectaculars', meta: { title: '看板', isTab: true } },
     { path: '/phoenix-spectaculars0', component: _import('modules/phoenix/spectaculars0'), name: 'phoenix-spectaculars0', meta: { title: '彩虹评级', isTab: true } },
-    { path: '/dataAnalysis-workFlow', component: _import('modules/dataAnalysis/workFlow'), name: 'dataAnalysis-workFlow', meta: { title: '决策配置', isTab: false } }
+    { path: '/dataAnalysis-workFlow', component: _import('modules/dataAnalysis/workFlow'), name: 'dataAnalysis-workFlow', meta: { title: '决策配置', isTab: false } },
+    { path: '/dataAnalysis-canvasFlow', component: _import('modules/dataAnalysis/canvasFlow'), name: 'dataAnalysis-canvasFlow', meta: { title: '决策画布', isTab: false } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

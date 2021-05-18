@@ -51,6 +51,7 @@ export default {
   },
   methods: {
     init (data) {
+      console.log('data: ', data)
       this.visible = true
       this.key = data.key
       if (data.data) {

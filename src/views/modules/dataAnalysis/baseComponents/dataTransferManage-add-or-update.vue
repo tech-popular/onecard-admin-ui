@@ -406,6 +406,9 @@
         transferLogVisible: false,
         transferLogList: [],
         baseRule: {
+          decisionType: [
+            { required: true, message: '请选择决策方式', trigger: 'change' }
+          ],
           templateId: [
             { required: true, message: '请选择分群名称', trigger: 'change' }
           ],
@@ -1054,6 +1057,21 @@
       // 决策画布
       decisionCanvas () {
         console.log('cancel')
+        this.$refs['baseForm'].validate((valid) => {
+          if (valid) {
+            this.$store.commit('canvasFlow/setSaveDate', this.baseForm)
+            if (this.id) {
+              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.id, time: new Date().getTime() } })
+            } else {
+              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { time: new Date().getTime() } })
+            }
+          }
+        })
+        // const params = {
+        //   authOthers: tag ? row.authOthers : '',
+        //   authOwner: tag ? row.authOwner : '',
+        //   authOtherList: tag ? row.authOtherList : []
+        // }
       },
       // 关闭
       cancelHandle () {
