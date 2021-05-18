@@ -525,16 +525,27 @@ export default {
         } else {
           this.flowId = data.data.flowId
           this.outMostExpressionTemplate = data.data.configJson && JSON.parse(data.data.configJson).outMostExpressionTemplate ? JSON.parse(data.data.configJson).outMostExpressionTemplate : 'and'
+            console.log('data.data.sqlImportParam: ', data.data.sqlImportParam)
           this.baseForm = {
             name: data.data.name,
             desc: data.data.desc,
             userType: data.data.userType,
             type: data.data.type,
-            sql: data.data.sqlImportParam.sql,
-            datasourceType: data.data.sqlImportParam.datasourceType,
-            tableSpace: data.data.sqlImportParam.tableSpace,
-            outParam: data.data.sqlImportParam.outParam
+            sql: data.data.userType === 'sql' ? data.data.sqlImportParam.sql : '',
+            datasourceType: data.data.userType === 'sql' ? data.data.sqlImportParam.datasourceType : '',
+            tableSpace: data.data.userType === 'sql' ? data.data.sqlImportParam.tableSpace : '',
+            outParam: data.data.userType === 'sql' ? data.data.sqlImportParam.outParam : ''
+            // sql: data.data.sqlImportParam.sql,
+            // datasourceType: data.data.sqlImportParam.datasourceType,
+            // tableSpace: data.data.sqlImportParam.tableSpace,
+            // outParam: data.data.sqlImportParam.outParam
           }
+          // if (data.data.userType === 'sql') {
+          //   this.baseForm.sql = data.data.sqlImportParam.sql
+          //   this.baseForm.datasourceType = data.data.sqlImportParam.datasourceType
+          //   this.baseForm.tableSpace = data.data.sqlImportParam.tableSpace
+          //   this.baseForm.outParam = data.data.sqlImportParam.outParam
+          // }
           this.rejectForm.rejectGroupPackageIds =
             data.data.rejectGroupPackageIds || []
           if (!data.data.vestPackCode || data.data.vestPackCode === null) {
