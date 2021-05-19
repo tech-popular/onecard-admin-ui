@@ -17,21 +17,23 @@
     <multi-branch-rate @close="closeMultiBranchRate" v-if="multiBranchRateVisible" ref="multiBranchRateEl"></multi-branch-rate>
     <data-query-line @close="closeDataQueryLine" v-if="dataQueryLineVisible" ref="dataQueryLineEl"></data-query-line>
     <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
+    <filter-choice-node  @close="closeAllNode" v-if="filterChoiceNodeVisible" ref="filterChoiceNodeEl"></filter-choice-node>
   </div>
 </template>
 <script>
 // import { deepClone } from '@/utils'
 import { palette } from './dataAnalysisUtils/canvasPalette' // 侧边栏模板数据 MULTI_BRANCH
-import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
-// import groupChoiceNode from './workflowNode/groupChoiceNode'
-// import inParamsNode from './workflowNode/inparamsNode'
-import dataQueryNode from './workflowNode/dataQueryNode'
-import outParamsNode from './workflowNode/outparamsNode'
-import multiBranchNode from './workflowNode/multiBranchNode'
-import multiBranchCondition from './workflowNode/multiBranchCondition'
-import multiBranchRate from './workflowNode/multiBranchRate'
-import dataQueryLine from './workflowNode/dataQueryLine'
-import saveData from './workflowNode/saveData'
+import { custerList, flowView } from '@/api/dataAnalysis/dataDecisionManage'
+// import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
+// import groupChoiceNode from './canvasflowNode/groupChoiceNode'
+import dataQueryNode from './canvasflowNode/dataQueryNode'
+import filterChoiceNode from './canvasflowNode/filterChoiceNode'
+import outParamsNode from './canvasflowNode/outparamsNode'
+import multiBranchNode from './canvasflowNode/multiBranchNode'
+import multiBranchCondition from './canvasflowNode/multiBranchCondition'
+import multiBranchRate from './canvasflowNode/multiBranchRate'
+import dataQueryLine from './canvasflowNode/dataQueryLine'
+import saveData from './canvasflowNode/saveData'
 var that = null
 var mySelf = null
 var go = window.go
@@ -63,6 +65,7 @@ export default {
       multiBranchRateVisible: false,
       dataQueryLineVisible: false,
       saveDataVisible: false,
+      filterChoiceNodeVisible: false,
       currentName: '',
       selectCuster: [],
       nodeTitle: '',
@@ -83,7 +86,7 @@ export default {
       }
     }
   },
-  components: { dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, dataQueryLine, saveData },
+  components: { dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, dataQueryLine, saveData, filterChoiceNode },
   created () {
     that = this
   },
@@ -146,30 +149,30 @@ export default {
         let _data = node.data
         _data.data = item.data.config
         // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
-        if (_data.category === 'GROUP_CHOICE') {
-          // 获取json外的公共参数
-          this.type = item.type
-          this.selectCuster = item.data.config.custerArr
-          this.groupId = item.data.config.configItems.groupId
-          if (that.channelCode && that.channelCode !== item.data.config.configItems.channelCode) {
-            that.flowJson.linkDataArray.forEach(item => {
-              if (item.type === 'condition') {
-                item.data = null
-                item.linkText = '<' + item.num + '> ' + that.defaultCondition
-                mySelf.myDiagram.model.updateTargetBindings(item)
-              }
-            })
-          }
-          this.channelCode = item.data.config.configItems.channelCode
-          node.findTreeParts().each(function (cNode) {
-            if (cNode.data.category === 'FILTER_CHOICE' && cNode.data.data) {
-              let itemGroupId = cNode.data.data.configItems.groupId
-              if (itemGroupId && !that.groupId.includes(itemGroupId)) {
-                cNode.data.data = null
-                cNode.data.nodeName = '分群节点'
-                mySelf.myDiagram.model.updateTargetBindings(cNode.data)
-              }
-            }
+        // if (_data.category === 'GROUP_CHOICE') {
+        //   // 获取json外的公共参数
+        //   this.type = item.type
+        //   this.selectCuster = item.data.config.custerArr
+        //   this.groupId = item.data.config.configItems.groupId
+        //   if (that.channelCode && that.channelCode !== item.data.config.configItems.channelCode) {
+        //     that.flowJson.linkDataArray.forEach(item => {
+        //       if (item.type === 'condition') {
+        //         item.data = null
+        //         item.linkText = '<' + item.num + '> ' + that.defaultCondition
+        //         mySelf.myDiagram.model.updateTargetBindings(item)
+        //       }
+        //     })
+        //   }
+        //   this.channelCode = item.data.config.configItems.channelCode
+        //   node.findTreeParts().each(function (cNode) {
+        //     if (cNode.data.category === 'FILTER_CHOICE' && cNode.data.data) {
+        //       let itemGroupId = cNode.data.data.configItems.groupId
+        //       if (itemGroupId && !that.groupId.includes(itemGroupId)) {
+        //         cNode.data.data = null
+        //         cNode.data.nodeName = '分群节点'
+        //         mySelf.myDiagram.model.updateTargetBindings(cNode.data)
+        //       }
+        //     }
             // 若分群更改为静态时，其所有子孙节点 分流节点 全部置空，且删除连线
             // if (cNode.data.category === 'MULTI_BRANCH' && cNode.data.data && cNode.data.data.configItems.flowType === 'condition') {
             //   let fnode = mySelf.myDiagram.findNodeForKey(cNode.data.key)
@@ -187,11 +190,11 @@ export default {
             //   cNode.data.nodeName = '分流节点'
             //   mySelf.myDiagram.model.updateTargetBindings(cNode.data)
             // }
-          })
-        }
-        if (_data.category === 'FILTER_CHOICE') { // 根据选中的分群，更新分群节点的名称
-          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
-        }
+        //   })
+        // }
+        // if (_data.category === 'FILTER_CHOICE') { // 根据选中的分群，更新分群节点的名称
+        //   mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
+        // }
         if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
           let filterArr = that.flowTypeArr.filter(item => item.key === key)
           let curFlowType = filterArr.length ? filterArr[0].flowType : ''
@@ -283,7 +286,7 @@ export default {
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
-      let pChildOneArr = []
+      // let pChildOneArr = []
       let pNullLinkArr = []
       let pFlowLinkArr = []
       let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
@@ -294,19 +297,20 @@ export default {
         }
         let node = mySelf.myDiagram.findNodeForKey(item.key)
         if (item.category !== 'OUT_PARAM') {
-          if (item.category === 'FILTER_CHOICE') { // 分群节点必须有两个节点，否则报错
-            // 兼容修改数据查询时，把部分分群节点内容置空的情况
-            if (item.data && !item.data.configItems.groupId) {
-              pNullArr.push(item.nodeName)
-            }
-            let linkNum = 0
-            node.findLinksOutOf().each(function (link) {
-              linkNum++
-            })
-            if (linkNum < 2) {
-              pChildOneArr.push(item.nodeName)
-            }
-          } else if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
+          // if (item.category === 'FILTER_CHOICE') { // 分群节点必须有两个节点，否则报错
+          //   // 兼容修改数据查询时，把部分分群节点内容置空的情况
+          //   if (item.data && !item.data.configItems.groupId) {
+          //     pNullArr.push(item.nodeName)
+          //   }
+          //   let linkNum = 0
+          //   node.findLinksOutOf().each(function (link) {
+          //     linkNum++
+          //   })
+          //   if (linkNum < 2) {
+          //     pChildOneArr.push(item.nodeName)
+          //   }
+          // } else
+           if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
             if (!item.data) {
               pNullArr.push(item.nodeName)
             }
@@ -340,9 +344,9 @@ export default {
           }
         }
       })
-      if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置连线信息！`)
-      if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
-      if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
+      // if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置连线信息！`)
+      // if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
+      // if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
       if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
       if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
@@ -350,10 +354,11 @@ export default {
       if (that.id) { // 修改保存
         that.saveFlowInfoData()
       } else { // 新建保存
-        that.saveDataVisible = true
-        that.$nextTick(() => {
-          that.$refs.saveDataEl.init()
-        })
+        // that.saveDataVisible = true
+        // that.$nextTick(() => {
+        //   // that.$refs.saveDataEl.init()
+        // })
+        that.saveFlowInfoData()
       }
     },
     closeSave (data) {
@@ -374,24 +379,28 @@ export default {
       }
       params.configJson = jsonData
       let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
+      console.log('dataQueryNode: ', dataQueryNode)
       let linkTextData = []
-      dataQueryNode.findLinksOutOf().each(function (link) {
-        linkTextData.push(link.data.linkText)
-      })
-      params.outParams = linkTextData
-      let url = this.id ? editFlowInfo : saveFlowInfo
-      if (this.id) {
-        params.id = this.id
+      if (dataQueryNode) {
+        dataQueryNode.findLinksOutOf().each(function (link) {
+          linkTextData.push(link.data.linkText)
+        })
       }
-      url(params).then(({data}) => {
-        if (data.status !== '1') {
-          return this.$message.error(data.message || '保存失败')
-        }
-        this.$message.success(data.message)
-        setTimeout(() => {
-          that.$router.replace({ path: 'dataAnalysis-dataDecisionManage' })
-        }, 300)
-      })
+      params.outParams = linkTextData
+      console.log('params: ', params)
+      // let url = this.id ? editFlowInfo : saveFlowInfo
+      // if (this.id) {
+      //   params.id = this.id
+      // }
+      // url(params).then(({data}) => {
+      //   if (data.status !== '1') {
+      //     return this.$message.error(data.message || '保存失败')
+      //   }
+      //   this.$message.success(data.message)
+      //   setTimeout(() => {
+      //     that.$router.replace({ path: 'dataAnalysis-dataDecisionManage' })
+      //   }, 300)
+      // })
     },
     // 加载
     load () {
@@ -522,6 +531,11 @@ export default {
             ),
             textBlock(true)
           ),
+          {
+            doubleClick: function (e, node) { // 点击开始时触发事件
+              that.doubleClickNodeEvent(e, node, 'filterChoiceNodeVisible', 'filterChoiceNodeEl')
+            }
+          },
           // four named ports, one on each side:
           makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
           makePort('L', go.Spot.Left, go.Spot.LeftSide, true, true),
@@ -859,9 +873,9 @@ export default {
               let filterArr = that.flowTypeArr.filter(item => item.key === link.data.from)
               let curFlowType = filterArr.length ? filterArr[0].flowType : ''
               if (curFlowType === 'condition') {
-                if (!that.channelCode) {
-                  return that.$message.error('请先配置数据查询节点！')
-                }
+                // if (!that.channelCode) {
+                //   return that.$message.error('请先配置数据查询节点！')
+                // }
                 that.multiBranchConditionVisible = true
                 that.$nextTick(() => {
                   that.$refs['multiBranchConditionEl'].init(link, that.channelCode)
