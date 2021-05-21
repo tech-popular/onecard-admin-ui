@@ -32,3 +32,5 @@ export const collisionList = () => httpGet(da + 'data/collision/list')
 export const collisionParams = (collisionPackId, groupId) => httpGet(da + `data/collision/params?collisionPackId=${collisionPackId}&groupId=${groupId}`)
 export const collisionSave = (params, collisionPackId) => httpPost(da + `data/collision/config/group?collisionPackId=${collisionPackId}`, params, false)
 export const collisionUpdate = (params, collisionPackId, groupId) => httpPut(da + `data/collision/config/group?groupId=${groupId}&collisionPackId=${collisionPackId}`, params, false)
+export const importSqlInfo = params => httpPost(da + 'data/group/sql/import', params) // 保存SQL
+export const databaseInitInfo = () => httpGet(da + 'oa/databaseInitInfo') // 库表管理初始化
