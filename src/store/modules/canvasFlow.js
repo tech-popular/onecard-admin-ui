@@ -7,7 +7,8 @@ export default {
       authOtherList: [],
       authOthers: ''
     },
-    saveDate: {}
+    saveDate: {},
+    editData: {}
   },
 
   mutations: {
@@ -20,6 +21,9 @@ export default {
     setSaveDate (state, params) {
       state.saveDate = params
       console.log('state.saveDate: ', state.saveDate)
+    },
+    setEditData (state, params) {
+      state.editData = params
     }
   }
 }

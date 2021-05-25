@@ -13,8 +13,8 @@
         <div class="base-pane">
           <h3 ref="baseTitle">基本信息</h3>
             <el-form-item label="决策方式" prop="decisionType" style="width:50%">
-              <el-radio v-model="baseForm.decisionType" label="0">下发数据源</el-radio>
-              <el-radio v-model="baseForm.decisionType" label="1"  style="margin-left:5px;">决策画布</el-radio>
+              <el-radio v-model="baseForm.decisionType" @change="decisionTypeChange" label="0">下发数据源</el-radio>
+              <el-radio v-model="baseForm.decisionType" @change="decisionTypeChange" label="1"  style="margin-left:5px;">决策画布</el-radio>
             </el-form-item>
             <el-form-item v-if="baseForm.decisionType === '0'" label="下发类型" prop="triggerMode" style="width:50%">
               <el-radio v-model="baseForm.triggerMode" label="0" class="radio-item radio-initiative">主动型</el-radio>
@@ -91,7 +91,7 @@
                       value-format="timestamp"
                       placeholder="选择日期时间">
                     </el-date-picker>
-                    （未指定运行时间，默认立即下发）
+                    {{baseForm.decisionType === '0' ? '（未指定运行时间，默认立即下发）': '（未指定运行时间，默认立即运营）' }}
                   </el-form-item>
                 </div>
               </el-col>
@@ -283,7 +283,7 @@
         type="success"
         @click="copyHandle"
         size="small"
-        v-if="!!baseForm.id"
+        v-if="!!baseForm.id && baseForm.decisionType === '0'"
       >复制创建新任务</el-button>
       <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '1'"  @click="decisionCanvas" size="small">决策画布</el-button>
       <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '0'"  @click="saveHandle" size="small">保存</el-button>
@@ -678,6 +678,16 @@
           }
         }
       },
+      // 下发方式改变 任务名称改变
+      decisionTypeChange (selVal) {
+        let obj = {}
+        if (this.baseForm.templateId) {
+          obj = this.templateIdList.find((item) => {
+            return item.value === this.baseForm.templateId
+          })
+          this.baseForm.transferName = obj.text + (selVal === '0' ? '下发任务' : '智能运营任务')
+        }
+      },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
         console.log(this.templateIdList)
@@ -694,7 +704,7 @@
           this.baseForm.increModel = 0
           return item.value === selVal
         })
-        this.baseForm.transferName = obj.text + '下发任务'
+        this.baseForm.transferName = obj.text + (this.baseForm.decisionType === '0' ? '下发任务' : '智能运营任务')
         // 改变分群名称时，出参及sqlserver选项都初始化，因为他们依赖分群
         this.getOutParamsList()
         this.baseForm.outParams = []
@@ -746,6 +756,7 @@
       formatPostData (data, outParams) {
         let postData = {}
         postData.id = data.id ? data.id : ''
+        postData.decisionType = data.decisionType
         postData.triggerMode = data.triggerMode
         postData.taskUniqueFlag = data.taskUniqueFlag
         postData.dolphinProcessId = data.dolphinProcessId
@@ -844,6 +855,7 @@
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
+            this.baseForm.decisionType = disData.decisionType
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.dolphinProcessId = disData.dolphinProcessId
             this.baseForm.templateId = disData.templateId
@@ -851,6 +863,9 @@
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
+            if (disData.decisionType === '1') {
+              this.$store.commit('canvasFlow/setEditData', disData.configJson)
+            }
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
             let custerType = this.templateIdList.filter(item => item.value === disData.templateId)[0].type
@@ -1059,9 +1074,11 @@
         console.log('cancel')
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
-            this.$store.commit('canvasFlow/setSaveDate', this.baseForm)
-            if (this.id) {
-              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.id, time: new Date().getTime() } })
+           let params = this.formatPostData(this.baseForm, [])
+            this.$store.commit('canvasFlow/setRowData', this.rowData)
+            this.$store.commit('canvasFlow/setSaveDate', params)
+            if (this.baseForm.id) {
+              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.baseForm.id, time: new Date().getTime() } })
             } else {
               this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { time: new Date().getTime() } })
             }

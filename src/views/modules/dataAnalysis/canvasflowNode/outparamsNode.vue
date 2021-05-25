@@ -3,28 +3,27 @@
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
+    v-loading="dataLoading"
     width="800px"
     :close-on-click-modal="false">
-    <el-form :model="dataForm" ref="dataForm" label-position="right" label-width="100px" :rules="dataRules">
-      <el-form-item prop="issueType" label="方式">
-        <el-select v-model="dataForm.issueType" placeholder="请选择下发方式" style="width: 300px">
-          <el-option v-for="(item, index) in issueTypeList" :key="index" :value="item.value" :label="item.text"></el-option>
+    <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules">
+      <el-form-item prop="type" label="方式">
+        <el-select v-model="dataForm.type" placeholder="请选择下发方式" style="width: 300px">
+          <el-option v-for="(item, index) in issueTypeList" :key="index" :value="item.value" :label="item.lable"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="issueChannel" label="渠道">
-        <el-select v-model="dataForm.issueChannel" placeholder="请选择渠道" style="width: 300px">
-          <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item.value" :label="item.text"></el-option>
+      <el-form-item v-if="dataForm.type === 'sms'" prop="channelId" label="渠道" >
+        <el-select v-model="dataForm.channelId" @change="getDate" placeholder="请选择渠道" style="width: 300px">
+          <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="issueTemplate" label="模板">
-        <el-select v-model="dataForm.issueTemplate" placeholder="请选择模板" style="width: 300px">
-          <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.value" :label="item.text"></el-option>
+      <el-form-item prop="tempCode" v-if="dataForm.type === 'sms'" label="模板">
+        <el-select v-model="dataForm.tempCode" @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
+          <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="issueAutograph" label="签名">
-        <el-select v-model="dataForm.issueAutograph" placeholder="请选择签名" style="width: 300px">
-          <el-option v-for="(item, index) in issueAutographList" :key="index" :value="item.value" :label="item.text"></el-option>
-        </el-select>
+      <el-form-item prop="smsTemplate" v-if="dataForm.type === 'sms'" label="模板详情">
+        <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" ></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -34,33 +33,39 @@
   </el-dialog>
 </template>
 <script>
+import { getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
 export default {
   data () {
     return {
       id: '',
       key: '',
       visible: false,
+      dataLoading: false,
       dataForm: {
-        issueType: '',
-        issueChannel: '',
-        issueTemplate: '',
-        issueAutograph: ''
+        type: 'sms',
+        channelId: '',
+        tempCode: '',
+        smsTemplate: ''
       },
-      issueTypeList: [],
+      issueTypeList: [
+        {value: 'sms', lable: '短信'},
+        {value: 'tel', lable: '电销'},
+        {value: 'ai', lable: 'AI'}
+      ],
       issueChannelList: [],
       issueTemplateList: [],
       issueAutographList: [],
       dataRules: {
-        issueType: [
+        type: [
           { required: true, message: '请选择下发方式', trigger: 'change' }
         ],
-        issueChannel: [
+        channelId: [
           { required: true, message: '请选择渠道', trigger: 'change' }
         ],
-        issueTemplate: [
+        tempCode: [
           { required: true, message: '请选择模板', trigger: 'change' }
         ],
-        issueAutograph: [
+        smsTemplate: [
           { required: true, message: '请选择签名', trigger: 'change' }
         ]
       }
@@ -69,10 +74,33 @@ export default {
   methods: {
     init (data) {
       this.visible = true
+      this.dataLoading = true
       this.key = data.key
+      this.getAllSmsChannels()
       if (data.data) {
-        this.dataForm.outValue = data.data.configItems.outValue
+        this.dataForm = data.data.configItems
+        if (this.dataForm.type === 'sms') {
+          this.getDate(data.data.configItems.channelId)
+        }
       }
+    },
+    getAllSmsChannels() {
+       getAllSmsChannels().then(({data}) => {
+        if (data.status === '1') {
+          this.issueChannelList = data.data
+          this.dataLoading = false
+        }
+      })
+    },
+    getDate (value) {
+      getSmsCodeInfo(value).then(({data}) => {
+        if (data.status === '1') {
+          this.issueTemplateList = data.data
+        }
+      })
+    },
+    getSmsTemplate () {
+      this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
     },
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {

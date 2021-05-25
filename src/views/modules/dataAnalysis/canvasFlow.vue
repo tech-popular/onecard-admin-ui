@@ -23,7 +23,7 @@
 <script>
 // import { deepClone } from '@/utils'
 import { palette } from './dataAnalysisUtils/canvasPalette' // 侧边栏模板数据 MULTI_BRANCH
-import { custerList, flowView } from '@/api/dataAnalysis/dataDecisionManage'
+import { addCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
 // import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
 // import groupChoiceNode from './canvasflowNode/groupChoiceNode'
 import dataQueryNode from './canvasflowNode/dataQueryNode'
@@ -34,6 +34,7 @@ import multiBranchCondition from './canvasflowNode/multiBranchCondition'
 import multiBranchRate from './canvasflowNode/multiBranchRate'
 import dataQueryLine from './canvasflowNode/dataQueryLine'
 import saveData from './canvasflowNode/saveData'
+import { deepClone } from './dataAnalysisUtils/utils'
 var that = null
 var mySelf = null
 var go = window.go
@@ -48,7 +49,7 @@ export default {
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
         nodeDataArray: [
-          {'key': '1', 'loc': '0 0', 'category': 'GROUP_CHOICE', 'nodeName': this.$store.state.canvasFlow.saveDate.transferName.split('下')[0]}
+          {'key': '1', 'loc': '0 0', 'category': 'GROUP_CHOICE', 'nodeName': this.$store.state.canvasFlow.saveDate.transferName.split('智')[0]}
         ],
         linkDataArray: []
       },
@@ -74,13 +75,18 @@ export default {
       defaultCondition: '请输入分流条件',
       saveFormData: {
         name: '',
-        code: ''
+        flowCode: ''
       },
+      issueTypeList: [
+        {value: 'sms', lable: '短信'},
+        {value: 'tel', lable: '电销'},
+        {value: 'ai', lable: 'AI'}
+      ],
       saveFormValidate: {
         name: [
           { required: true, message: '流程名称不能为空', trigger: 'blur' }
         ],
-        code: [
+        flowCode: [
           { required: true, message: '流程编号不能为空，只可输入字母、数字、下划线', pattern: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/, trigger: 'blur' }
         ]
       }
@@ -99,48 +105,66 @@ export default {
   },
   methods: {
     getFlow (id) {
-      this.loading = true
-      flowView(id).then(({data}) => {
-        if (data.status !== '1') {
-          this.loading = false
-          return this.$message.error(data.msg)
+      let data = deepClone(this.$store.state.canvasFlow.editData)
+      data.nodeDataArray.forEach(item => {
+        if (item.category === 'GROUP_CHOICE') {
+          item.nodeName = this.$store.state.canvasFlow.saveDate.transferName.split('智')[0]
         }
-        if (!data.data.configJson) {
-          this.loading = false
-          return this.$message.error('JSON信息不存在')
-        }
-        this.type = data.data.type
-        that.flowTypeArr = data.data.configJson.flowTypeArr || []
-        that.flowJson = data.data.configJson
-        this.$nextTick(() => {
-          this.diagramInit()
-          mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(that.flowJson))
-          // this.load()
-          this.loading = false
-        })
-        this.saveFormData.name = data.data.name
-        this.saveFormData.code = data.data.code
-        this.channelCode = data.data.channelCode
+      })
+      that.flowTypeArr = data.flowTypeArr || []
+      that.flowJson = data
+      this.$nextTick(() => {
+        this.diagramInit()
+        mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(that.flowJson))
+        // this.load()
+        this.loading = false
+      })
+      this.saveFormData.name = data.name
+      this.saveFormData.flowCode = data.flowCode
+    },
+    // getFlow (id) {
+    //   this.loading = true
+    //   flowView(id).then(({data}) => {
+    //     if (data.status !== '1') {
+    //       this.loading = false
+    //       return this.$message.error(data.msg)
+    //     }
+    //     if (!data.data.configJson) {
+    //       this.loading = false
+    //       return this.$message.error('JSON信息不存在')
+    //     }
+    //     this.type = data.data.type
+    //     that.flowTypeArr = data.data.configJson.flowTypeArr || []
+    //     that.flowJson = data.data.configJson
+    //     this.$nextTick(() => {
+    //       this.diagramInit()
+    //       mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(that.flowJson))
+    //       // this.load()
+    //       this.loading = false
+    //     })
+    //     this.saveFormData.name = data.data.name
+    //     this.saveFormData.flowCode = data.data.flowCode
+        // this.channelCode = data.data.channelCode
         // this.groupId = data.groupId
-        this.groupId = data.data.configJson.nodeDataArray.filter(item => item.key === '2')[0].data.configItems.groupId
-        this.getCusterList(data.data.channelCode)
-      })
-    },
-    getCusterList (code) { // 回显时用的
-      custerList(code).then(({data}) => {
-        if (data.status * 1 !== 1) {
-          this.custerList = []
-          return
-        }
-        this.custerList = data.data
-        let arr = []
-        this.groupId.forEach(item => {
-          let obj = this.custerList.filter(citem => citem.value === item)[0]
-          arr.push(obj)
-        })
-        this.selectCuster = arr
-      })
-    },
+        // this.groupId = data.data.configJson.nodeDataArray.filter(item => item.key === '2')[0].data.configItems.groupId
+        // this.getCusterList(data.data.channelCode)
+      // })
+    // },
+    // getCusterList (code) { // 回显时用的
+    //   custerList(code).then(({data}) => {
+    //     if (data.status * 1 !== 1) {
+    //       this.custerList = []
+    //       return
+    //     }
+    //     this.custerList = data.data
+    //     let arr = []
+    //     this.groupId.forEach(item => {
+    //       let obj = this.custerList.filter(citem => citem.value === item)[0]
+    //       arr.push(obj)
+    //     })
+    //     this.selectCuster = arr
+    //   })
+    // },
     closeAllNode (item) {
       if (item && item.tag == 'save') {
         let key = item.data.key
@@ -148,6 +172,15 @@ export default {
         let node1 = mySelf.myDiagram.findNodeForKey(key).part.data
         let _data = node.data
         _data.data = item.data.config
+        if (_data.category === 'OUT_PARAM') { // 根据选中的运营方式，改变节点名称
+          let outParamName = ''
+          this.issueTypeList.forEach(items => {
+            if (items.value === item.data.config.configItems.type) {
+              outParamName = items.lable
+            }
+          })
+          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', outParamName)
+        }
         // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
         // if (_data.category === 'GROUP_CHOICE') {
         //   // 获取json外的公共参数
@@ -195,36 +228,36 @@ export default {
         // if (_data.category === 'FILTER_CHOICE') { // 根据选中的分群，更新分群节点的名称
         //   mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
         // }
-        if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
-          let filterArr = that.flowTypeArr.filter(item => item.key === key)
-          let curFlowType = filterArr.length ? filterArr[0].flowType : ''
-          if (curFlowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
-            node.findLinksOutOf().each(function (link) {
-              if (curFlowType !== item.data.config.configItems.flowType) {
-                link.data.data = null
-                if (item.data.config.configItems.flowType === 'condition') {
-                  link.data.linkText = that.defaultCondition
-                  link.data.type = 'condition'
-                } else {
-                  link.data.linkText = that.defaultRate
-                  link.data.type = 'rate'
-                }
-                mySelf.myDiagram.model.updateTargetBindings(link.data)
-              }
-            })
-            let index = that.flowTypeArr.findIndex(item => item.key === key)
-            that.flowTypeArr.splice(index, 1, {
-              flowType: item.data.config.configItems.flowType,
-              key: key
-            })
-          } else {
-            that.flowTypeArr.push({
-              flowType: item.data.config.configItems.flowType,
-              key: key
-            })
-          }
-          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.flowName)
-        }
+        // if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
+        //   let filterArr = that.flowTypeArr.filter(item => item.key === key)
+        //   let curFlowType = filterArr.length ? filterArr[0].flowType : ''
+        //   if (curFlowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
+        //     node.findLinksOutOf().each(function (link) {
+        //       if (curFlowType !== item.data.config.configItems.flowType) {
+        //         link.data.data = null
+        //         if (item.data.config.configItems.flowType === 'condition') {
+        //           link.data.linkText = that.defaultCondition
+        //           link.data.type = 'condition'
+        //         } else {
+        //           link.data.linkText = that.defaultRate
+        //           link.data.type = 'rate'
+        //         }
+        //         mySelf.myDiagram.model.updateTargetBindings(link.data)
+        //       }
+        //     })
+        //     let index = that.flowTypeArr.findIndex(item => item.key === key)
+        //     that.flowTypeArr.splice(index, 1, {
+        //       flowType: item.data.config.configItems.flowType,
+        //       key: key
+        //     })
+        //   } else {
+        //     that.flowTypeArr.push({
+        //       flowType: item.data.config.configItems.flowType,
+        //       key: key
+        //     })
+        //   }
+        //   mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.flowName)
+        // }
       }
     },
     // 分流条件弹窗关闭事件
@@ -288,82 +321,91 @@ export default {
       let pNullArr = []
       // let pChildOneArr = []
       let pNullLinkArr = []
-      let pFlowLinkArr = []
-      let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
-      let pFlowLinkRateIs100 = []
+      // let pFlowLinkArr = []
+      // let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
+      // let pFlowLinkRateIs100 = []
       nodeDataArray.map(item => {
-        if (!item.data) {
-          pNullArr.push(item.nodeName)
-        }
-        let node = mySelf.myDiagram.findNodeForKey(item.key)
-        if (item.category !== 'OUT_PARAM') {
-          // if (item.category === 'FILTER_CHOICE') { // 分群节点必须有两个节点，否则报错
-          //   // 兼容修改数据查询时，把部分分群节点内容置空的情况
-          //   if (item.data && !item.data.configItems.groupId) {
-          //     pNullArr.push(item.nodeName)
-          //   }
-          //   let linkNum = 0
-          //   node.findLinksOutOf().each(function (link) {
-          //     linkNum++
-          //   })
-          //   if (linkNum < 2) {
-          //     pChildOneArr.push(item.nodeName)
-          //   }
-          // } else
-           if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
-            if (!item.data) {
-              pNullArr.push(item.nodeName)
-            }
-            let linkNum = 0
-            let linkIs100 = 0
-            node.findLinksOutOf().each(function (link) {
-              linkNum++
-              if (link.data.type === 'condition' && !link.data.data) { // 按条件分流时，判断条件是否填写完成
-                pFlowlinkConditionIsFinished.push(item.nodeName)
-              }
-              if (link.data.type === 'rate') { // 判断比率是否总和为100
-                let rate = link.data.data ? link.data.data.configItems.rate : 0
-                linkIs100 += rate
-              }
-            })
-            if (linkNum < 2) { // 分流至少2个子节点
-              pFlowLinkArr.push(item.nodeName)
-            }
-            let type = item.data && item.data.configItems.flowType
-            if (type !== 'condition' && linkIs100 !== 100) {
-              pFlowLinkRateIs100.push(item.nodeName)
-            }
-          } else { // 其他节点若无连线信息则报错
-            let linkNum1 = 0
-            node.findLinksOutOf().each(function (link) {
-              linkNum1++
-            })
-            if (linkNum1 === 0) {
-              pNullLinkArr.push(item.nodeName)
-            }
+        if (item.category !== 'GROUP_CHOICE') {
+          if (!item.data) {
+            pNullArr.push(item.nodeName)
           }
+        } else {
+          let groupId = this.$store.state.canvasFlow.saveDate.templateId
+          let configItems = {
+              groupId: groupId
+          }
+          let data = {
+            configItems: configItems
+          }
+          item.data = data
         }
+        // let node = mySelf.myDiagram.findNodeForKey(item.key)
+        // if (item.category !== 'OUT_PARAM') {
+        //   if (item.category === 'FILTER_CHOICE') { // 分群节点必须有两个节点，否则报错
+        //     // 兼容修改数据查询时，把部分分群节点内容置空的情况
+        //     if (item.data && !item.data.configItems.groupId) {
+        //       pNullArr.push(item.nodeName)
+        //     }
+        //     let linkNum = 0
+        //     node.findLinksOutOf().each(function (link) {
+        //       linkNum++
+        //     })
+        //     if (linkNum < 2) {
+        //       pChildOneArr.push(item.nodeName)
+        //     }
+        //   } else if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
+        //     if (!item.data) {
+        //       pNullArr.push(item.nodeName)
+        //     }
+        //     let linkNum = 0
+        //     let linkIs100 = 0
+        //     node.findLinksOutOf().each(function (link) {
+        //       linkNum++
+        //       if (link.data.type === 'condition' && !link.data.data) { // 按条件分流时，判断条件是否填写完成
+        //         pFlowlinkConditionIsFinished.push(item.nodeName)
+        //       }
+        //       if (link.data.type === 'rate') { // 判断比率是否总和为100
+        //         let rate = link.data.data ? link.data.data.configItems.rate : 0
+        //         linkIs100 += rate
+        //       }
+        //     })
+        //     if (linkNum < 2) { // 分流至少2个子节点
+        //       pFlowLinkArr.push(item.nodeName)
+        //     }
+        //     let type = item.data && item.data.configItems.flowType
+        //     if (type !== 'condition' && linkIs100 !== 100) {
+        //       pFlowLinkRateIs100.push(item.nodeName)
+        //     }
+        //   } else { // 其他节点若无连线信息则报错
+        //     let linkNum1 = 0
+        //     node.findLinksOutOf().each(function (link) {
+        //       linkNum1++
+        //     })
+        //     if (linkNum1 === 0) {
+        //       pNullLinkArr.push(item.nodeName)
+        //     }
+        //   }
+        // }
       })
-      // if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置连线信息！`)
-      // if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
+      if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置运营方式！`)
+      if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
       // if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
-      if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
-      if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
-      if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
+      // if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
+      // if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
+      // if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // 判断连线的内容
       if (that.id) { // 修改保存
         that.saveFlowInfoData()
       } else { // 新建保存
-        // that.saveDataVisible = true
-        // that.$nextTick(() => {
-        //   // that.$refs.saveDataEl.init()
-        // })
-        that.saveFlowInfoData()
+        that.saveDataVisible = true
+        that.$nextTick(() => {
+          that.$refs.saveDataEl.init()
+        })
       }
     },
     closeSave (data) {
       that.saveFormData.name = data.name
-      that.saveFormData.code = data.code
+      that.saveFormData.flowCode = data.flowCode
       that.saveFlowInfoData()
     },
     saveFlowInfoData () {
@@ -371,15 +413,16 @@ export default {
       jsonData.flowTypeArr = this.flowTypeArr
       let params = {
         name: that.saveFormData.name,
-        code: that.saveFormData.code,
-        ...this.$store.state.workFlow.rowData, // 数据权限所需参数
-        groupId: this.groupId,
-        type: this.type.toUpperCase(),
-        channelCode: this.channelCode
+        flowCode: that.saveFormData.flowCode,
+        ...this.$store.state.canvasFlow.rowData, // 数据权限所需参数
+        ...this.$store.state.canvasFlow.saveDate
+        // groupId: this.groupId,
+        // type: this.type.toUpperCase(),
+        // channelCode: this.channelCode
       }
       params.configJson = jsonData
+      params.transferType = 'kafka'
       let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
-      console.log('dataQueryNode: ', dataQueryNode)
       let linkTextData = []
       if (dataQueryNode) {
         dataQueryNode.findLinksOutOf().each(function (link) {
@@ -387,20 +430,19 @@ export default {
         })
       }
       params.outParams = linkTextData
-      console.log('params: ', params)
       // let url = this.id ? editFlowInfo : saveFlowInfo
-      // if (this.id) {
-      //   params.id = this.id
-      // }
-      // url(params).then(({data}) => {
-      //   if (data.status !== '1') {
-      //     return this.$message.error(data.message || '保存失败')
-      //   }
-      //   this.$message.success(data.message)
-      //   setTimeout(() => {
-      //     that.$router.replace({ path: 'dataAnalysis-dataDecisionManage' })
-      //   }, 300)
-      // })
+      if (this.id) {
+        params.id = this.id
+      }
+      addCanvasInfo(params).then(({data}) => {
+        if (data.status !== '1') {
+          return this.$message.error(data.message || '保存失败')
+        }
+        this.$message.success(data.message)
+        setTimeout(() => {
+          that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
+        }, 300)
+      })
     },
     // 加载
     load () {
