@@ -49,7 +49,7 @@ export default {
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
         nodeDataArray: [
-          {'key': '1', 'loc': '0 0', 'category': 'GROUP_CHOICE', 'nodeName': this.$store.state.canvasFlow.saveDate.transferName.split('智')[0]}
+          {'key': '1', 'loc': '0 0', 'category': 'GROUP_CHOICE', 'nodeName': this.$store.state.canvasFlow.saveDate.transferName.split('智能运营任务')[0]}
         ],
         linkDataArray: []
       },
