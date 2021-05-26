@@ -108,7 +108,7 @@ export default {
       let data = deepClone(this.$store.state.canvasFlow.editData)
       data.nodeDataArray.forEach(item => {
         if (item.category === 'GROUP_CHOICE') {
-          item.nodeName = this.$store.state.canvasFlow.saveDate.transferName.split('智')[0]
+          item.nodeName = this.$store.state.canvasFlow.saveDate.transferName.split('智能运营任务')[0]
         }
       })
       that.flowTypeArr = data.flowTypeArr || []
