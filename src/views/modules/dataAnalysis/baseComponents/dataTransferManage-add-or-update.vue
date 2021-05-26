@@ -12,9 +12,9 @@
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form" :disabled="!canUpdate">
         <div class="base-pane">
           <h3 ref="baseTitle">基本信息</h3>
-            <el-form-item label="决策方式" prop="decisionType" style="width:50%">
-              <el-radio v-model="baseForm.decisionType" :disabled="baseForm.id" @change="decisionTypeChange" label="0">下发数据源</el-radio>
-              <el-radio v-model="baseForm.decisionType" :disabled="baseForm.id" @change="decisionTypeChange" label="1"  style="margin-left:5px;">决策画布</el-radio>
+            <el-form-item label="决策方式" prop="decisionType" style="width:50%" >
+              <el-radio v-model="baseForm.decisionType" :disabled="!!baseForm.id" @change="decisionTypeChange" label="0">下发数据源</el-radio>
+              <el-radio v-model="baseForm.decisionType" :disabled="!!baseForm.id"  @change="decisionTypeChange" label="1"  style="margin-left:5px;">决策画布</el-radio>
             </el-form-item>
             <el-form-item v-if="baseForm.decisionType === '0'" label="下发类型" prop="triggerMode" style="width:50%">
               <el-radio v-model="baseForm.triggerMode" label="0" class="radio-item radio-initiative">主动型</el-radio>
