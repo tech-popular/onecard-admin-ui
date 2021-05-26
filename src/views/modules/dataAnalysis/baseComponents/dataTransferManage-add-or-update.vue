@@ -13,8 +13,8 @@
         <div class="base-pane">
           <h3 ref="baseTitle">基本信息</h3>
             <el-form-item label="决策方式" prop="decisionType" style="width:50%">
-              <el-radio v-model="baseForm.decisionType" @change="decisionTypeChange" label="0">下发数据源</el-radio>
-              <el-radio v-model="baseForm.decisionType" @change="decisionTypeChange" label="1"  style="margin-left:5px;">决策画布</el-radio>
+              <el-radio v-model="baseForm.decisionType" :disabled="baseForm.id" @change="decisionTypeChange" label="0">下发数据源</el-radio>
+              <el-radio v-model="baseForm.decisionType" :disabled="baseForm.id" @change="decisionTypeChange" label="1"  style="margin-left:5px;">决策画布</el-radio>
             </el-form-item>
             <el-form-item v-if="baseForm.decisionType === '0'" label="下发类型" prop="triggerMode" style="width:50%">
               <el-radio v-model="baseForm.triggerMode" label="0" class="radio-item radio-initiative">主动型</el-radio>
@@ -45,7 +45,7 @@
             <el-form-item label="任务名称" prop="transferName" style="width:50%">
               <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
             </el-form-item>
-            <!-- <el-form-item label="分群出参" prop="outParams">
+            <el-form-item label="分群出参" v-if="baseForm.decisionType === '0'" prop="outParams">
               <Treeselect
                 :options="outParamsList"
                 :disable-branch-nodes="true"
@@ -63,7 +63,7 @@
                 placeholder="请选择"
                 class="base-pane-item"
               />
-            </el-form-item> -->
+            </el-form-item>
             <el-form-item label="任务描述" v-if="baseForm.decisionType === '0'">
               <el-input type="textarea"  class="base-pane-item" v-model="baseForm.taskDescribtion" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
               <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.taskDescribtion.length"></span>个字符</p>
@@ -855,7 +855,7 @@
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
-            this.baseForm.decisionType = disData.decisionType
+            this.baseForm.decisionType = disData.decisionType ? disData.decisionType : '0'
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.dolphinProcessId = disData.dolphinProcessId
             this.baseForm.templateId = disData.templateId
