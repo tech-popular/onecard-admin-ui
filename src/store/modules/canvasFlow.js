@@ -8,7 +8,11 @@ export default {
       authOthers: ''
     },
     saveDate: {},
-    editData: {}
+    editData: {
+      beeFlowName: '',
+      beeFlowCode: '',
+      configJson: {}
+    }
   },
 
   mutations: {
@@ -22,7 +26,9 @@ export default {
       state.saveDate = params
     },
     setEditData (state, params) {
-      state.editData = params
+      state.editData.beeFlowName = params.beeFlowName
+      state.editData.beeFlowCode = params.beeFlowCode
+      state.editData.configJson = params.configJson
     }
   }
 }

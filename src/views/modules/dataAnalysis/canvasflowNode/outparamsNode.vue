@@ -8,12 +8,12 @@
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules">
       <el-form-item prop="type" label="方式">
-        <el-select v-model="dataForm.type" placeholder="请选择下发方式" style="width: 300px">
+        <el-select v-model="dataForm.type" @change="dateType" placeholder="请选择下发方式" style="width: 300px">
           <el-option v-for="(item, index) in issueTypeList" :key="index" :value="item.value" :label="item.lable"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item v-if="dataForm.type === 'sms'" prop="channelId" label="渠道" >
-        <el-select v-model="dataForm.channelId" @change="getDate" placeholder="请选择渠道" style="width: 300px">
+        <el-select v-model="dataForm.channelId" @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
@@ -54,7 +54,6 @@ export default {
       ],
       issueChannelList: [],
       issueTemplateList: [],
-      issueAutographList: [],
       dataRules: {
         type: [
           { required: true, message: '请选择下发方式', trigger: 'change' }
@@ -64,10 +63,10 @@ export default {
         ],
         tempCode: [
           { required: true, message: '请选择模板', trigger: 'change' }
-        ],
-        smsTemplate: [
-          { required: true, message: '请选择签名', trigger: 'change' }
         ]
+        // smsTemplate: [
+        //   { required: true, message: '请选择签名', trigger: 'change' }
+        // ]
       }
     }
   },
@@ -80,7 +79,7 @@ export default {
       if (data.data) {
         this.dataForm = data.data.configItems
         if (this.dataForm.type === 'sms') {
-          this.getDate(data.data.configItems.channelId)
+          this.getDate(data.data.configItems.channelId, false)
         }
       }
     },
@@ -92,12 +91,22 @@ export default {
         }
       })
     },
-    getDate (value) {
+    getDate (value, isChange) {
       getSmsCodeInfo(value).then(({data}) => {
         if (data.status === '1') {
           this.issueTemplateList = data.data
+          if (isChange) {
+            this.dataForm.tempCode = ''
+            this.dataForm.smsTemplate = ''
+          }
         }
       })
+    },
+    dateType () {
+      this.dataForm.channelId = ''
+      this.dataForm.tempCode = ''
+      this.dataForm.smsTemplate = ''
+      this.issueTemplateList = []
     },
     getSmsTemplate () {
       this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate

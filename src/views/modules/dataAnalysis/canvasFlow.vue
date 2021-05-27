@@ -74,8 +74,8 @@ export default {
       defaultRate: '0%',
       defaultCondition: '请输入分流条件',
       saveFormData: {
-        name: '',
-        flowCode: ''
+        beeFlowName: '',
+        beeFlowCode: ''
       },
       issueTypeList: [
         {value: 'sms', lable: '短信'},
@@ -83,10 +83,10 @@ export default {
         {value: 'ai', lable: 'AI'}
       ],
       saveFormValidate: {
-        name: [
+        beeFlowName: [
           { required: true, message: '流程名称不能为空', trigger: 'blur' }
         ],
-        flowCode: [
+        beeFlowCode: [
           { required: true, message: '流程编号不能为空，只可输入字母、数字、下划线', pattern: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/, trigger: 'blur' }
         ]
       }
@@ -106,21 +106,21 @@ export default {
   methods: {
     getFlow (id) {
       let data = deepClone(this.$store.state.canvasFlow.editData)
-      data.nodeDataArray.forEach(item => {
+      data.configJson.nodeDataArray.forEach(item => {
         if (item.category === 'GROUP_CHOICE') {
           item.nodeName = this.$store.state.canvasFlow.saveDate.transferName.split('智能运营任务')[0]
         }
       })
-      that.flowTypeArr = data.flowTypeArr || []
-      that.flowJson = data
+      that.flowTypeArr = data.configJson.flowTypeArr || []
+      that.flowJson = data.configJson
       this.$nextTick(() => {
         this.diagramInit()
         mySelf.myDiagram.model = go.Model.fromJson(JSON.stringify(that.flowJson))
         // this.load()
         this.loading = false
       })
-      this.saveFormData.name = data.name
-      this.saveFormData.flowCode = data.flowCode
+      this.saveFormData.beeFlowName = data.beeFlowName
+      this.saveFormData.beeFlowCode = data.beeFlowCode
     },
     // getFlow (id) {
     //   this.loading = true
@@ -142,8 +142,8 @@ export default {
     //       // this.load()
     //       this.loading = false
     //     })
-    //     this.saveFormData.name = data.data.name
-    //     this.saveFormData.flowCode = data.data.flowCode
+    //     this.saveFormData.beeFlowName = data.data.beeFlowName
+    //     this.saveFormData.beeFlowCode = data.data.beeFlowCode
         // this.channelCode = data.data.channelCode
         // this.groupId = data.groupId
         // this.groupId = data.data.configJson.nodeDataArray.filter(item => item.key === '2')[0].data.configItems.groupId
@@ -404,16 +404,16 @@ export default {
       }
     },
     closeSave (data) {
-      that.saveFormData.name = data.name
-      that.saveFormData.flowCode = data.flowCode
+      that.saveFormData.beeFlowName = data.beeFlowName
+      that.saveFormData.beeFlowCode = data.beeFlowCode
       that.saveFlowInfoData()
     },
     saveFlowInfoData () {
       let jsonData = JSON.parse(mySelf.myDiagram.model.toJson())
       jsonData.flowTypeArr = this.flowTypeArr
       let params = {
-        name: that.saveFormData.name,
-        flowCode: that.saveFormData.flowCode,
+        beeFlowName: that.saveFormData.beeFlowName,
+        beeFlowCode: that.saveFormData.beeFlowCode,
         ...this.$store.state.canvasFlow.rowData, // 数据权限所需参数
         ...this.$store.state.canvasFlow.saveDate
         // groupId: this.groupId,

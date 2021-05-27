@@ -864,7 +864,7 @@
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
             if (disData.decisionType === '1') {
-              this.$store.commit('canvasFlow/setEditData', disData.configJson)
+              this.$store.commit('canvasFlow/setEditData', disData)
             }
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
