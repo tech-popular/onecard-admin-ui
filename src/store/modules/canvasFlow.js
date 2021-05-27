@@ -11,6 +11,7 @@ export default {
     editData: {
       beeFlowName: '',
       beeFlowCode: '',
+      beeFlowId: '',
       configJson: {}
     }
   },
@@ -28,6 +29,7 @@ export default {
     setEditData (state, params) {
       state.editData.beeFlowName = params.beeFlowName
       state.editData.beeFlowCode = params.beeFlowCode
+      state.editData.beeFlowId = params.beeFlowId
       state.editData.configJson = params.configJson
     }
   }

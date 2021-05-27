@@ -433,6 +433,7 @@ export default {
       // let url = this.id ? editFlowInfo : saveFlowInfo
       if (this.id) {
         params.id = this.id
+        params.beeFlowId = this.$store.state.canvasFlow.editData.beeFlowId
       }
       addCanvasInfo(params).then(({data}) => {
         if (data.status !== '1') {
