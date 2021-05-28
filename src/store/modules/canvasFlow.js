@@ -8,6 +8,7 @@ export default {
       authOthers: ''
     },
     saveDate: {},
+    groupNodeName: '',
     editData: {
       beeFlowName: '',
       beeFlowCode: '',
@@ -22,6 +23,9 @@ export default {
     },
     setRowData (state, params) {
       state.rowData = params
+    },
+    setGroupNodeName (state, params) {
+      state.groupNodeName = params
     },
     setSaveDate (state, params) {
       state.saveDate = params

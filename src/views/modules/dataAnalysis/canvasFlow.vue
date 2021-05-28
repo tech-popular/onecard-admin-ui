@@ -49,7 +49,7 @@ export default {
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
         nodeDataArray: [
-          {'key': '1', 'loc': '0 0', 'category': 'GROUP_CHOICE', 'nodeName': this.$store.state.canvasFlow.saveDate.transferName.split('智能运营任务')[0]}
+          {'key': '1', 'loc': '0 0', 'category': 'GROUP_CHOICE', 'nodeName': this.$store.state.canvasFlow.groupNodeName}
         ],
         linkDataArray: []
       },
@@ -108,7 +108,7 @@ export default {
       let data = deepClone(this.$store.state.canvasFlow.editData)
       data.configJson.nodeDataArray.forEach(item => {
         if (item.category === 'GROUP_CHOICE') {
-          item.nodeName = this.$store.state.canvasFlow.saveDate.transferName.split('智能运营任务')[0]
+          item.nodeName = this.$store.state.canvasFlow.groupNodeName
         }
       })
       that.flowTypeArr = data.configJson.flowTypeArr || []
@@ -339,7 +339,16 @@ export default {
           }
           item.data = data
         }
-        // let node = mySelf.myDiagram.findNodeForKey(item.key)
+        let node = mySelf.myDiagram.findNodeForKey(item.key)
+        if (item.category !== 'OUT_PARAM') {
+          let linkNum1 = 0
+           node.findLinksOutOf().each(function (link) {
+            linkNum1++
+          })
+          if (linkNum1 === 0) {
+            pNullLinkArr.push(item.nodeName)
+          }
+        }
         // if (item.category !== 'OUT_PARAM') {
         //   if (item.category === 'FILTER_CHOICE') { // 分群节点必须有两个节点，否则报错
         //     // 兼容修改数据查询时，把部分分群节点内容置空的情况

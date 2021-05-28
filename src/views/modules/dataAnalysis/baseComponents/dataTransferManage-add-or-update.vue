@@ -1074,7 +1074,14 @@
         console.log('cancel')
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
-           let params = this.formatPostData(this.baseForm, [])
+            let params = this.formatPostData(this.baseForm, [])
+            let obj = {}
+            if (this.baseForm.templateId) {
+              obj = this.templateIdList.find((item) => {
+              return item.value === this.baseForm.templateId
+              })
+            }
+            this.$store.commit('canvasFlow/setGroupNodeName', obj.text)
             this.$store.commit('canvasFlow/setRowData', this.rowData)
             this.$store.commit('canvasFlow/setSaveDate', params)
             if (this.baseForm.id) {
