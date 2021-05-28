@@ -12,7 +12,11 @@
       <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form" :disabled="!canUpdate">
         <div class="base-pane">
           <h3 ref="baseTitle">基本信息</h3>
-            <el-form-item label="下发类型" prop="triggerMode" style="width:50%">
+            <el-form-item label="决策方式" prop="decisionType" style="width:50%" >
+              <el-radio v-model="baseForm.decisionType" :disabled="!!baseForm.id" @change="decisionTypeChange" label="0">下发数据源</el-radio>
+              <el-radio v-model="baseForm.decisionType" :disabled="!!baseForm.id"  @change="decisionTypeChange" label="1"  style="margin-left:5px;">决策画布</el-radio>
+            </el-form-item>
+            <el-form-item v-if="baseForm.decisionType === '0'" label="下发类型" prop="triggerMode" style="width:50%">
               <el-radio v-model="baseForm.triggerMode" label="0" class="radio-item radio-initiative">主动型</el-radio>
               <el-tooltip placement="top">
                 <div slot="content">根据调度时间配置进行数据下发</div>
@@ -41,7 +45,7 @@
             <el-form-item label="任务名称" prop="transferName" style="width:50%">
               <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
             </el-form-item>
-            <el-form-item label="分群出参" prop="outParams">
+            <el-form-item label="分群出参" v-if="baseForm.decisionType === '0'" prop="outParams">
               <Treeselect
                 :options="outParamsList"
                 :disable-branch-nodes="true"
@@ -60,12 +64,12 @@
                 class="base-pane-item"
               />
             </el-form-item>
-            <el-form-item label="任务描述">
+            <el-form-item label="任务描述" v-if="baseForm.decisionType === '0'">
               <el-input type="textarea"  class="base-pane-item" v-model="baseForm.taskDescribtion" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
               <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.taskDescribtion.length"></span>个字符</p>
             </el-form-item>
         </div>
-        <div class="base-pane" v-if="baseForm.triggerMode !== '1'">
+        <div class="base-pane" v-if="baseForm.triggerMode !== '1' || baseForm.decisionType === '1' ">
           <h3>调度时间</h3>
             <el-form-item label="周期">
               <template>
@@ -87,7 +91,7 @@
                       value-format="timestamp"
                       placeholder="选择日期时间">
                     </el-date-picker>
-                    （未指定运行时间，默认立即下发）
+                    {{baseForm.decisionType === '0' ? '（未指定运行时间，默认立即下发）': '（未指定运行时间，默认立即运营）' }}
                   </el-form-item>
                 </div>
               </el-col>
@@ -186,7 +190,7 @@
               </el-col>
             </el-row>
         </div>
-        <div class="pane-rules">
+        <div class="pane-rules" v-if="baseForm.decisionType === '0'">
           <h3>下发数据源</h3>
           <el-row :gutter="20">
             <el-col style="width: 8.33333%;">
@@ -279,9 +283,10 @@
         type="success"
         @click="copyHandle"
         size="small"
-        v-if="!!baseForm.id"
+        v-if="!!baseForm.id && baseForm.decisionType === '0'"
       >复制创建新任务</el-button>
-      <el-button type="primary" v-if="canUpdate"  @click="saveHandle" size="small">保存</el-button>
+      <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '1'"  @click="decisionCanvas" size="small">决策画布</el-button>
+      <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '0'"  @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
@@ -366,7 +371,8 @@
           topic: '',
           mysqlServer: '', // sftp数据源地址
           sqlServer: '',
-          triggerMode: '0' // 下发类型，默认0主动型 1被动
+          triggerMode: '0', // 下发类型，默认0主动型 1被动
+          decisionType: '0'
         },
         tag: '新建', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -400,6 +406,9 @@
         transferLogVisible: false,
         transferLogList: [],
         baseRule: {
+          decisionType: [
+            { required: true, message: '请选择决策方式', trigger: 'change' }
+          ],
           templateId: [
             { required: true, message: '请选择分群名称', trigger: 'change' }
           ],
@@ -669,6 +678,16 @@
           }
         }
       },
+      // 下发方式改变 任务名称改变
+      decisionTypeChange (selVal) {
+        let obj = {}
+        if (this.baseForm.templateId) {
+          obj = this.templateIdList.find((item) => {
+            return item.value === this.baseForm.templateId
+          })
+          this.baseForm.transferName = obj.text + (selVal === '0' ? '下发任务' : '智能运营任务')
+        }
+      },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
         console.log(this.templateIdList)
@@ -685,7 +704,7 @@
           this.baseForm.increModel = 0
           return item.value === selVal
         })
-        this.baseForm.transferName = obj.text + '下发任务'
+        this.baseForm.transferName = obj.text + (this.baseForm.decisionType === '0' ? '下发任务' : '智能运营任务')
         // 改变分群名称时，出参及sqlserver选项都初始化，因为他们依赖分群
         this.getOutParamsList()
         this.baseForm.outParams = []
@@ -737,6 +756,7 @@
       formatPostData (data, outParams) {
         let postData = {}
         postData.id = data.id ? data.id : ''
+        postData.decisionType = data.decisionType
         postData.triggerMode = data.triggerMode
         postData.taskUniqueFlag = data.taskUniqueFlag
         postData.dolphinProcessId = data.dolphinProcessId
@@ -835,6 +855,7 @@
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
+            this.baseForm.decisionType = disData.decisionType ? disData.decisionType : '0'
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.dolphinProcessId = disData.dolphinProcessId
             this.baseForm.templateId = disData.templateId
@@ -842,6 +863,9 @@
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             this.baseForm.transferType = disData.transferType.split(',')
+            if (disData.decisionType === '1') {
+              this.$store.commit('canvasFlow/setEditData', disData)
+            }
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
             let custerType = this.templateIdList.filter(item => item.value === disData.templateId)[0].type
@@ -1044,6 +1068,34 @@
         }).catch(() => {
           console.log('cancel')
         })
+      },
+      // 决策画布
+      decisionCanvas () {
+        console.log('cancel')
+        this.$refs['baseForm'].validate((valid) => {
+          if (valid) {
+            let params = this.formatPostData(this.baseForm, [])
+            let obj = {}
+            if (this.baseForm.templateId) {
+              obj = this.templateIdList.find((item) => {
+              return item.value === this.baseForm.templateId
+              })
+            }
+            this.$store.commit('canvasFlow/setGroupNodeName', obj.text)
+            this.$store.commit('canvasFlow/setRowData', this.rowData)
+            this.$store.commit('canvasFlow/setSaveDate', params)
+            if (this.baseForm.id) {
+              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.baseForm.id, time: new Date().getTime() } })
+            } else {
+              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { time: new Date().getTime() } })
+            }
+          }
+        })
+        // const params = {
+        //   authOthers: tag ? row.authOthers : '',
+        //   authOwner: tag ? row.authOwner : '',
+        //   authOtherList: tag ? row.authOtherList : []
+        // }
       },
       // 关闭
       cancelHandle () {
