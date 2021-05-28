@@ -3,16 +3,15 @@
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
-    v-loading="dataLoading"
     width="800px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules">
       <el-form-item prop="type" label="方式">
-        <el-select v-model="dataForm.type" @change="dateType" placeholder="请选择下发方式" style="width: 300px">
+        <el-select v-model="dataForm.type"  placeholder="请选择方式" style="width: 300px">
           <el-option v-for="(item, index) in issueTypeList" :key="index" :value="item.value" :label="item.lable"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item v-if="dataForm.type === 'sms'" prop="channelId" label="渠道" >
+      <!-- <el-form-item v-if="dataForm.type === 'sms'" prop="channelId" label="渠道" >
         <el-select v-model="dataForm.channelId" @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
@@ -24,7 +23,7 @@
       </el-form-item>
       <el-form-item prop="smsTemplate" v-if="dataForm.type === 'sms'" label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" ></el-input>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
     <div slot="footer">
       <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
@@ -40,7 +39,7 @@ export default {
       id: '',
       key: '',
       visible: false,
-      dataLoading: false,
+      // dataLoading: false,
       dataForm: {
         type: 'sms',
         channelId: '',
@@ -56,7 +55,7 @@ export default {
       issueTemplateList: [],
       dataRules: {
         type: [
-          { required: true, message: '请选择下发方式', trigger: 'change' }
+          { required: true, message: '请选择方式', trigger: 'change' }
         ],
         channelId: [
           { required: true, message: '请选择渠道', trigger: 'change' }
@@ -73,21 +72,21 @@ export default {
   methods: {
     init (data) {
       this.visible = true
-      this.dataLoading = true
+      // this.dataLoading = true
       this.key = data.key
-      this.getAllSmsChannels()
+      // this.getAllSmsChannels()
       if (data.data) {
         this.dataForm = data.data.configItems
-        if (this.dataForm.type === 'sms') {
-          this.getDate(data.data.configItems.channelId, false)
-        }
+        // if (this.dataForm.type === 'sms') {
+        //   this.getDate(data.data.configItems.channelId, false)
+        // }
       }
     },
     getAllSmsChannels() {
        getAllSmsChannels().then(({data}) => {
         if (data.status === '1') {
           this.issueChannelList = data.data
-          this.dataLoading = false
+          // this.dataLoading = false
         }
       })
     },
@@ -102,6 +101,7 @@ export default {
         }
       })
     },
+    // 改变下发方式
     dateType () {
       this.dataForm.channelId = ''
       this.dataForm.tempCode = ''
