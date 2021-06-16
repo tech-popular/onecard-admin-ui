@@ -7,22 +7,17 @@
     width="800px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules">
-      <el-form-item prop="type" label="方式">
-        <el-select v-model="dataForm.type"  placeholder="请选择方式" style="width: 300px">
-          <el-option v-for="(item, index) in issueTypeList" :key="index" :value="item.value" :label="item.lable"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item v-if="dataForm.type === 'sms'" prop="channelId" label="渠道" >
+      <el-form-item  prop="channelId" label="渠道" >
         <el-select v-model="dataForm.channelId" @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="tempCode" v-if="dataForm.type === 'sms'" label="模板">
+      <el-form-item prop="tempCode"  label="模板">
         <el-select v-model="dataForm.tempCode" @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
           <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="smsTemplate" v-if="dataForm.type === 'sms'" label="模板详情">
+      <el-form-item prop="smsTemplate"  label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" ></el-input>
       </el-form-item>
     </el-form>
@@ -42,22 +37,13 @@ export default {
       visible: false,
       dataLoading: false,
       dataForm: {
-        type: 'sms',
         channelId: '',
         tempCode: '',
         smsTemplate: ''
       },
-      issueTypeList: [
-        {value: 'sms', lable: '短信'},
-        {value: 'tel', lable: '电销'},
-        {value: 'ai', lable: 'AI'}
-      ],
       issueChannelList: [],
       issueTemplateList: [],
       dataRules: {
-        type: [
-          { required: true, message: '请选择方式', trigger: 'change' }
-        ],
         channelId: [
           { required: true, message: '请选择渠道', trigger: 'change' }
         ],
@@ -71,17 +57,17 @@ export default {
     }
   },
   methods: {
-    init (data) {
+    init () {
       this.visible = true
-      this.dataLoading = true
-      this.key = data.key
-      this.getAllSmsChannels()
-      if (data.data) {
-        this.dataForm = data.data.configItems
-        if (this.dataForm.type === 'sms') {
-          this.getDate(data.data.configItems.channelId, false)
-        }
-      }
+      // this.dataLoading = true
+      // this.key = data.key
+      // this.getAllSmsChannels()
+      // if (data.data) {
+      //   this.dataForm = data.data.configItems
+      //   if (this.dataForm.type === 'sms') {
+      //     this.getDate(data.data.configItems.channelId, false)
+      //   }
+      // }
     },
     getAllSmsChannels() {
        getAllSmsChannels().then(({data}) => {

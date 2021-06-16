@@ -42,10 +42,14 @@
                 </el-option>
               </el-select>
             </el-form-item>
+            <el-form-item label="下发方式"  v-if="baseForm.decisionType === '0'" prop="distributionMethod">
+              <el-radio v-model="baseForm.distributionMethod" label="0">普通下发</el-radio>
+              <el-radio v-model="baseForm.distributionMethod" label="1">智能下发</el-radio>
+            </el-form-item>
             <el-form-item label="任务名称" prop="transferName" style="width:50%">
               <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
             </el-form-item>
-            <el-form-item label="分群出参" v-if="baseForm.decisionType === '0'" prop="outParams">
+            <el-form-item label="分群出参" v-if="baseForm.decisionType === '0' && baseForm.distributionMethod === '0'" prop="outParams">
               <Treeselect
                 :options="outParamsList"
                 :disable-branch-nodes="true"
@@ -192,7 +196,7 @@
         </div>
         <div class="pane-rules" v-if="baseForm.decisionType === '0'">
           <h3>下发数据源</h3>
-          <el-row :gutter="20">
+          <el-row :gutter="20" v-if="baseForm.distributionMethod === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="kafka" name="transferType" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
@@ -217,7 +221,7 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-row :gutter="20">
+          <el-row :gutter="20" v-if="baseForm.distributionMethod === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
                   <el-checkbox label="mysql" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
@@ -241,7 +245,7 @@
               </el-form-item>
             </el-col>
             </el-row>
-            <el-row :gutter="20">
+            <el-row :gutter="20" v-if="baseForm.distributionMethod === '0'">
               <el-col style="width: 8.33333%;">
                 <el-form-item class="label-remove-margin" prop="transferType">
                     <el-checkbox label="sqlServer" v-model="baseForm.transferType" @change="transferTypeChage" style="margin-left: 8px;"></el-checkbox>
@@ -267,6 +271,11 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-form-item label="智能下发" prop="intelligentDistribution" v-if="baseForm.distributionMethod === '1'">             
+              <el-checkbox v-model="baseForm.intelligentDistribution" label="sms" @change="changeIntelligentDistribution">短信</el-checkbox>
+              <el-checkbox v-model="baseForm.intelligentDistribution" label="tel">电销</el-checkbox>
+              <el-checkbox v-model="baseForm.intelligentDistribution" label="ai">AI</el-checkbox>
+            </el-form-item>
             <el-form-item label="下发模式" prop="increModel">
               <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
               <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
@@ -290,6 +299,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
+    <intelligentDistributionAddOrUpdate ref="intelligentDistributionAddOrUpdate" v-if="intelligentDistributionAddOrUpdateVisible"></intelligentDistributionAddOrUpdate>
   </el-drawer>
 </template>
 <script>
@@ -298,6 +308,7 @@
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import transferLog from './data-transfer-r3-log'
+  import intelligentDistributionAddOrUpdate from './intelligentDistribution-add-or-update'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -354,6 +365,7 @@
           dolphinProcessId: null,
           transferName: '', // 任务名称
           templateId: '', // 分群名称
+          distributionMethod: '0', // 下发方式
           outParams: [],
           taskDescribtion: '', // 描述
           jobType: 1, // 周期
@@ -366,6 +378,7 @@
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
+          intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // kafka数据源地址
           topic: '',
@@ -404,6 +417,7 @@
         mysqlServerList: [],
         sqlServerList: [],
         transferLogVisible: false,
+        intelligentDistributionAddOrUpdateVisible: false,
         transferLogList: [],
         baseRule: {
           decisionType: [
@@ -414,6 +428,9 @@
           ],
           transferName: [
             { required: true, message: '请输入任务名称', trigger: 'blur' }
+          ],
+          distributionMethod: [
+            { required: true, message: '请选择下发方式', trigger: 'change' }
           ],
           outParams: [
             { required: true, message: '请选择分群出参', trigger: 'input' }
@@ -443,6 +460,9 @@
           ],
           transferType: [
             { type: 'array', required: true, message: '请选择下发数据源', trigger: 'change' }
+          ],
+          intelligentDistribution: [
+            { type: 'array', required: true, message: '请选择业务下发方式', trigger: 'change' }
           ],
           kafkaServer: [
             { validator: validateKafkaServer }
@@ -475,7 +495,7 @@
 
     },
 
-    components: { Treeselect, transferLog },
+    components: { Treeselect, transferLog, intelligentDistributionAddOrUpdate },
 
     methods: {
       // 树加载
@@ -1091,11 +1111,15 @@
             }
           }
         })
-        // const params = {
-        //   authOthers: tag ? row.authOthers : '',
-        //   authOwner: tag ? row.authOwner : '',
-        //   authOtherList: tag ? row.authOtherList : []
-        // }
+      },
+      changeIntelligentDistribution (val) { // 业务下发方式短信弹框
+        if (val) {
+          console.log('val: ', val)
+          this.intelligentDistributionAddOrUpdateVisible = true
+          this.$nextTick(() => {
+            this.$refs.intelligentDistributionAddOrUpdate.init()
+          })
+        }
       },
       // 关闭
       cancelHandle () {

@@ -225,39 +225,39 @@ export default {
             // }
         //   })
         // }
-        // if (_data.category === 'FILTER_CHOICE') { // 根据选中的分群，更新分群节点的名称
-        //   mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
-        // }
-        // if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
-        //   let filterArr = that.flowTypeArr.filter(item => item.key === key)
-        //   let curFlowType = filterArr.length ? filterArr[0].flowType : ''
-        //   if (curFlowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
-        //     node.findLinksOutOf().each(function (link) {
-        //       if (curFlowType !== item.data.config.configItems.flowType) {
-        //         link.data.data = null
-        //         if (item.data.config.configItems.flowType === 'condition') {
-        //           link.data.linkText = that.defaultCondition
-        //           link.data.type = 'condition'
-        //         } else {
-        //           link.data.linkText = that.defaultRate
-        //           link.data.type = 'rate'
-        //         }
-        //         mySelf.myDiagram.model.updateTargetBindings(link.data)
-        //       }
-        //     })
-        //     let index = that.flowTypeArr.findIndex(item => item.key === key)
-        //     that.flowTypeArr.splice(index, 1, {
-        //       flowType: item.data.config.configItems.flowType,
-        //       key: key
-        //     })
-        //   } else {
-        //     that.flowTypeArr.push({
-        //       flowType: item.data.config.configItems.flowType,
-        //       key: key
-        //     })
-        //   }
-        //   mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.flowName)
-        // }
+        if (_data.category === 'FILTER_CHOICE') { // 根据选中的过滤节点，更新过滤节点的名称
+          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
+        }
+        if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
+          let filterArr = that.flowTypeArr.filter(item => item.key === key)
+          let curFlowType = filterArr.length ? filterArr[0].flowType : ''
+          if (curFlowType) { // 分流类型存在时，改变了分流类型，则需要重置连线上的条件显示
+            node.findLinksOutOf().each(function (link) {
+              if (curFlowType !== item.data.config.configItems.flowType) {
+                link.data.data = null
+                if (item.data.config.configItems.flowType === 'condition') {
+                  link.data.linkText = that.defaultCondition
+                  link.data.type = 'condition'
+                } else {
+                  link.data.linkText = that.defaultRate
+                  link.data.type = 'rate'
+                }
+                mySelf.myDiagram.model.updateTargetBindings(link.data)
+              }
+            })
+            let index = that.flowTypeArr.findIndex(item => item.key === key)
+            that.flowTypeArr.splice(index, 1, {
+              flowType: item.data.config.configItems.flowType,
+              key: key
+            })
+          } else {
+            that.flowTypeArr.push({
+              flowType: item.data.config.configItems.flowType,
+              key: key
+            })
+          }
+          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.flowName)
+        }
       }
     },
     // 分流条件弹窗关闭事件
@@ -319,11 +319,11 @@ export default {
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
-      // let pChildOneArr = []
+      let pChildOneArr = []
       let pNullLinkArr = []
-      // let pFlowLinkArr = []
-      // let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
-      // let pFlowLinkRateIs100 = []
+      let pFlowLinkArr = []
+      let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
+      let pFlowLinkRateIs100 = []
       nodeDataArray.map(item => {
         if (item.category !== 'GROUP_CHOICE') {
           if (!item.data) {
@@ -340,68 +340,68 @@ export default {
           item.data = data
         }
         let node = mySelf.myDiagram.findNodeForKey(item.key)
-        if (item.category !== 'OUT_PARAM') {
-          let linkNum1 = 0
-           node.findLinksOutOf().each(function (link) {
-            linkNum1++
-          })
-          if (linkNum1 === 0) {
-            pNullLinkArr.push(item.nodeName)
-          }
-        }
         // if (item.category !== 'OUT_PARAM') {
-        //   if (item.category === 'FILTER_CHOICE') { // 分群节点必须有两个节点，否则报错
-        //     // 兼容修改数据查询时，把部分分群节点内容置空的情况
-        //     if (item.data && !item.data.configItems.groupId) {
-        //       pNullArr.push(item.nodeName)
-        //     }
-        //     let linkNum = 0
-        //     node.findLinksOutOf().each(function (link) {
-        //       linkNum++
-        //     })
-        //     if (linkNum < 2) {
-        //       pChildOneArr.push(item.nodeName)
-        //     }
-        //   } else if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
-        //     if (!item.data) {
-        //       pNullArr.push(item.nodeName)
-        //     }
-        //     let linkNum = 0
-        //     let linkIs100 = 0
-        //     node.findLinksOutOf().each(function (link) {
-        //       linkNum++
-        //       if (link.data.type === 'condition' && !link.data.data) { // 按条件分流时，判断条件是否填写完成
-        //         pFlowlinkConditionIsFinished.push(item.nodeName)
-        //       }
-        //       if (link.data.type === 'rate') { // 判断比率是否总和为100
-        //         let rate = link.data.data ? link.data.data.configItems.rate : 0
-        //         linkIs100 += rate
-        //       }
-        //     })
-        //     if (linkNum < 2) { // 分流至少2个子节点
-        //       pFlowLinkArr.push(item.nodeName)
-        //     }
-        //     let type = item.data && item.data.configItems.flowType
-        //     if (type !== 'condition' && linkIs100 !== 100) {
-        //       pFlowLinkRateIs100.push(item.nodeName)
-        //     }
-        //   } else { // 其他节点若无连线信息则报错
-        //     let linkNum1 = 0
-        //     node.findLinksOutOf().each(function (link) {
-        //       linkNum1++
-        //     })
-        //     if (linkNum1 === 0) {
-        //       pNullLinkArr.push(item.nodeName)
-        //     }
+        //   let linkNum1 = 0
+        //    node.findLinksOutOf().each(function (link) {
+        //     linkNum1++
+        //   })
+        //   if (linkNum1 === 0) {
+        //     pNullLinkArr.push(item.nodeName)
         //   }
         // }
+        if (item.category !== 'OUT_PARAM') {
+          if (item.category === 'FILTER_CHOICE') { // 过滤节点必须有两个节点，否则报错
+            // 兼容修改数据查询时，把部分过滤节点内容置空的情况
+            if (item.data && !item.data.configItems.groupId) {
+              pNullArr.push(item.nodeName)
+            }
+            let linkNum = 0
+            node.findLinksOutOf().each(function (link) {
+              linkNum++
+            })
+            if (linkNum < 2) {
+              pChildOneArr.push(item.nodeName)
+            }
+          } else if (item.category === 'MULTI_BRANCH') { // 分流节点时，判断连线上的条件是否完成，且比率相加为100
+            if (!item.data) {
+              pNullArr.push(item.nodeName)
+            }
+            let linkNum = 0
+            let linkIs100 = 0
+            node.findLinksOutOf().each(function (link) {
+              linkNum++
+              if (link.data.type === 'condition' && !link.data.data) { // 按条件分流时，判断条件是否填写完成
+                pFlowlinkConditionIsFinished.push(item.nodeName)
+              }
+              if (link.data.type === 'rate') { // 判断比率是否总和为100
+                let rate = link.data.data ? link.data.data.configItems.rate : 0
+                linkIs100 += rate
+              }
+            })
+            if (linkNum < 2) { // 分流至少2个子节点
+              pFlowLinkArr.push(item.nodeName)
+            }
+            let type = item.data && item.data.configItems.flowType
+            if (type !== 'condition' && linkIs100 !== 100) {
+              pFlowLinkRateIs100.push(item.nodeName)
+            }
+          } else { // 其他节点若无连线信息则报错
+            let linkNum1 = 0
+            node.findLinksOutOf().each(function (link) {
+              linkNum1++
+            })
+            if (linkNum1 === 0) {
+              pNullLinkArr.push(item.nodeName)
+            }
+          }
+        }
       })
       if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置运营方式！`)
       if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
-      // if (pChildOneArr.length) return this.$message.error(`每个分群节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
-      // if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
-      // if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
-      // if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
+      if (pChildOneArr.length) return this.$message.error(`每个过滤节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
+      if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
+      if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
+      if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // 判断连线的内容
       if (that.id) { // 修改保存
         that.saveFlowInfoData()
