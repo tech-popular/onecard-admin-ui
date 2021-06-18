@@ -2,10 +2,7 @@
   <div class="index-wrap">
     <el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="ID">
-        <el-input v-model="dataForm.id" placeholder="" clearable />
-      </el-form-item>
-      <el-form-item label="名称">
-        <el-input v-model="dataForm.name" placeholder="" clearable />
+        <el-input v-model="dataForm.resourceCode" placeholder="" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -48,12 +45,12 @@
 
 <script>
   import AddOrUpdate from './baseComponents/resourceBind-add-or-update'
+  import { getDataList } from '@/api/dataAnalysis/sourceBinding'
   export default {
     data () {
       return {
         dataForm: {
-          id: '',
-          name: ''
+          resourceCode: '',
         },
         dataList: [],
         pageNum: 1, // 当前页
@@ -80,19 +77,16 @@
               'pageNum': this.pageNum,
               'pageSize': this.pageSize
             }
-            if (!params.categoryId) {
-              params.categoryId = ''
-            }
-            // indexManageList(params, false).then(({data}) => {
-            //   if (!data || (data && (data.status !== '1' || !data.data))) {
-            //     this.dataList = []
-            //     this.totalCount = 0
-            //   } else {
-            //     this.dataList = data.data.list
-            //     this.totalCount = data.data.total
-            //   }
-            //   this.dataListLoading = false
-            // })
+            getDataList(params).then(({data}) => {
+              if (!data || (data && (data.status !== '1' || !data.data))) {
+                this.dataList = []
+                this.totalCount = 0
+              } else {
+                this.dataList = data.data.list
+                this.totalCount = data.data.total
+              }
+              this.dataListLoading = false
+            })
           }
         })
       },
@@ -114,8 +108,7 @@
       resetHandle () {
         this.pageNum = 1
         this.dataForm = {
-          id: '',
-          name: ''
+          resourceCode: ''
         }
         // this.getDataList()
       },
