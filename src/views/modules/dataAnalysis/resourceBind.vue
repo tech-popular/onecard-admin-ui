@@ -24,7 +24,7 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="resourceId" header-align="center " align="center" label="ID"></el-table-column>
+      <el-table-column prop="resourceId" header-align="center" width="80" align="center" label="ID"></el-table-column>
       <el-table-column prop="resourceName" header-align="center" align="center" label="名称">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -49,6 +49,7 @@
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'edit')">编辑</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+          <el-button type="text" @click="deletedateHandle(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -67,7 +68,7 @@
 
 <script>
   import AddOrUpdate from './baseComponents/resourceBind-add-or-update'
-  import { getDataList } from '@/api/dataAnalysis/sourceBinding'
+  import { getDataList, deleteDataInfo } from '@/api/dataAnalysis/sourceBinding'
   export default {
     data () {
       return {
@@ -121,7 +122,30 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(row, tag)
-          // this.$refs.addOrUpdate.getCategoryIdList(row)
+        })
+      },
+      // 删除数据
+      deletedateHandle (row) {
+        this.$confirm(`确认删除短信名称为【${row.resourceName}】的数据?`, '提示', {
+          confirmButtonText: '删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteDataInfo(row.id).then(({data}) => {
+            if (data.status !== '1') {
+              return this.$message({
+                type: 'error',
+                message: data.message
+              })
+            }
+            this.$message({
+              type: 'success',
+              message: data.message
+            })
+            this.getDataList()
+          })
+        }).catch(() => {
+          // console.log('quxiao')
         })
       },
       /** 查询 */
@@ -137,7 +161,6 @@
           type: '',
           resourceName: ''
         }
-        // this.getDataList()
       },
       // 每页数
       sizeChangeHandle (page) {

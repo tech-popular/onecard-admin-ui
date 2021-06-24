@@ -936,7 +936,6 @@
                 this.baseForm.intelligentDistribution.push(item.type)
                 if (item.type === 'sms') {
                   this.setSmsTemplteVisible = true
-                  console.log('this.setSmsTemplteVisible: ', this.setSmsTemplteVisible)
                 }
               }
             })
@@ -1161,7 +1160,7 @@
           this.intelligentDistributionAddOrUpdateVisible = true
           let data = this.intelligentDistributionParams.filter(item => item.type === 'sms')
           this.$nextTick(() => {
-            this.$refs.intelligentDistributionAddOrUpdate.init(this.channelCode, data)
+            this.$refs.intelligentDistributionAddOrUpdate.init(this.channelCode, data, this.canUpdate)
         })
       },
       changetelDistribution(val) {
@@ -1182,6 +1181,7 @@
         if (!data) {
           this.baseForm.intelligentDistribution = this.baseForm.intelligentDistribution.filter(item => item !== 'sms')
           this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'sms')
+          this.setSmsTemplteVisible = false
         } else {
           this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'sms')
           this.intelligentDistributionParams.push(data)

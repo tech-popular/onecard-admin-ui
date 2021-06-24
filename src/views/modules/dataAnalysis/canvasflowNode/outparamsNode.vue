@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item>
       <el-form-item v-if="dataForm.type === 'sms'" prop="channelId" label="渠道" >
-        <el-select v-model="dataForm.channelId" @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
+        <el-select v-model="dataForm.channelId" @change="getSmsCodeDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
@@ -145,21 +145,17 @@ export default {
         this.dataForm.tempCode = data.data.configItems.tempCode
         this.dataForm.channelId = data.data.configItems.channelId
         if (this.dataForm.type === 'sms') {
-          this.getDate(data.data.configItems.channelId, false)
-          // this.getOutParamsList(data.data, this.$store.state.canvasFlow.outParams)
+          this.getSmsCodeDate(data.data.configItems.channelId, false)
         }
       }
     },
-     // 回显查看
+     // 回显查看，获取所有详情
     getLookData (id) {
       getSmsAllMessage(id).then(res => {
         if (res.data.status === '1') {
-          console.log('res.data: ', res.data)
           this.resourceName = res.data.data.bindingConfig.resourceName
           this.resourceCode = res.data.data.bindingConfig.resourceCode
           this.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
-          // this.dataForm.channelId = res.data.data.resourceData.channelId
-          // this.dataForm.smsTemplate = res.data.data.resourceData.smsTemplate
           this.paramsNum = res.data.data.resourceData.smsTemplate.split('%s').length - 1
           if (res.data.data.bindingIndex.length) {
               this.paramsNum ? this.paramsVisible = true : this.paramsVisible = false
@@ -170,6 +166,7 @@ export default {
         }
       })
     },
+    // 获取短信渠道列表
     getAllSmsChannels() {
        getAllSmsChannels().then(({data}) => {
         if (data.status === '1') {
@@ -178,7 +175,8 @@ export default {
         }
       })
     },
-    getDate (value, isChange) {
+    // 短信模板
+    getSmsCodeDate (value, isChange) {
       getSmsCodeInfo(value).then(({data}) => {
         if (data.status === '1') {
           this.issueTemplateList = data.data
@@ -212,6 +210,7 @@ export default {
       this.addResourcebind = false
       this.smsOutParams = []
     },
+    // 短信模板详情及是否配置参数
     getSmsTemplate () {
       this.viewVisible = false
       this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
@@ -328,9 +327,6 @@ export default {
               obj.id = item.id
               obj.label = item.name
             }
-            // if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-            //   obj.children = this.filterAllCata(item.dataCataLogList)
-            //   arr.push(obj)
             if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
               obj.children = this.filterAllCata(item.dataCata) // 指标集合
               arr.push(obj)

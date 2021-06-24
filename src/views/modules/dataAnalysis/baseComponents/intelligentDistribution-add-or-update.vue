@@ -2,13 +2,13 @@
   <el-dialog title="模板配置"
     :modal-append-to-body='false'
     :append-to-body="true"
-    :visible.sync="visible"
+    :visible="visible"
     v-loading="dataLoading"
     width="800px"
     :close-on-click-modal="false">
-    <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules">
+    <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules" :disabled="!canUpdate">
       <el-form-item  prop="channelId" label="渠道" >
-        <el-select v-model="dataForm.channelId" @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
+        <el-select v-model="dataForm.channelId" @change="getSmsCodeDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
@@ -45,7 +45,7 @@
     </el-form-item>
     </el-form>
     <div slot="footer">
-      <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
+      <el-button type="primary" @click="saveHandle" size="small" v-if="canUpdate">确定</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-dialog>
@@ -61,6 +61,7 @@ export default {
     return {
       id: '',
       visible: false,
+      canUpdate: true,
       dataLoading: false,
       channelCode: '',
       viewVisible: false,
@@ -102,9 +103,10 @@ export default {
         callback()
       }
     },
-    init (channelCode, data) {
+    init (channelCode, data, canUpdate) {
       this.dataLoading = true
       this.addResourcebind = false
+      this.canUpdate = canUpdate
       this.channelCode = channelCode
       this.isEdit = false
       this.dataForm = {
@@ -119,24 +121,25 @@ export default {
       this.outParamsList = []
       this.visible = true
       this.getAllSmsChannels()
-      if (data.length) {
+      if (data.length) { // 修改
         this.isEdit = true
         this.dataForm.type = data[0].type
         this.dataForm.tempCode = data[0].topic
         this.getLookData(data)
-        // this.getDate(this.dataForm.channelId, false)
-        // this.getOutParamsList(data, this.$store.state.dataTransferManage.outParams)
+      } else {
+        this.getOutParamsList()
       }
     },
+    /* 获取短信所有渠道 */
     getAllSmsChannels() {
        getAllSmsChannels().then(({data}) => {
         if (data.status === '1') {
           this.issueChannelList = data.data
-          this.dataLoading = false
         }
       })
     },
-    getDate (value, isChange) {
+    /* 根据渠道获取模板 */
+    getSmsCodeDate (value, isChange) {
       getSmsCodeInfo(value).then(({data}) => {
         if (data.status === '1') {
           this.issueTemplateList = data.data
@@ -152,27 +155,30 @@ export default {
         }
       })
     },
-    // 回显查看
+    // 回显时获取短信详细信息
     getLookData (row) {
       getSmsAllMessage(row[0].id).then(res => {
         if (res.data.status === '1') {
-          console.log('res.data: ', res.data)
           this.resourceName = res.data.data.bindingConfig.resourceName
           this.resourceCode = res.data.data.bindingConfig.resourceCode
           this.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
           this.dataForm.channelId = res.data.data.resourceData.channelId
           this.dataForm.smsTemplate = res.data.data.resourceData.smsTemplate
           this.paramsNum = res.data.data.resourceData.smsTemplate.split('%s').length - 1
-          this.getDate(res.data.data.resourceData.channelId, false)
+          this.getSmsCodeDate(res.data.data.resourceData.channelId, false)
           if (res.data.data.bindingIndex.length) {
               this.paramsNum ? this.paramsVisible = true : this.paramsVisible = false
               this.viewVisible = true
               this.addResourcebind = true
+              this.dataLoading = true
+              this.getOutParamsList(row, res.data.data.bindingIndex)
+            } else {
+              this.dataLoading = false
             }
-          this.getOutParamsList(row, res.data.data.bindingIndex)
         }
       })
     },
+    // 根据所选短信模板获取详情及判断是否进行参数配置
     getSmsTemplate () {
       this.viewVisible = false
       this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
@@ -192,13 +198,13 @@ export default {
             if (!this.paramsNum) {
               this.paramsVisible = false
             } else {
-              this.getOutParamsList()
               this.paramsVisible = true
             }
           }
         }
       })
     },
+    // 保存
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
@@ -254,6 +260,7 @@ export default {
         } else {
           this.outParamsList = []
         }
+        this.dataLoading = false
       })
     },
     // 清洗数据，按selectVue的格式重新组织指标数据
@@ -276,9 +283,6 @@ export default {
               obj.id = item.id
               obj.label = item.name
             }
-            // if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
-            //   obj.children = this.filterAllCata(item.dataCataLogList)
-            //   arr.push(obj)
             if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
               obj.children = this.filterAllCata(item.dataCata) // 指标集合
               arr.push(obj)
@@ -306,6 +310,9 @@ export default {
       })
       this.dataForm.outParams = Array.from(new Set(out))
       this.outParamsList = this.updateOutParamsList(outList)
+      this.$nextTick(() => {
+        this.dataLoading = false
+      })
     },
     // 获取出参，默认展开列表
     updateOutParamsList (indexList) {
@@ -338,9 +345,11 @@ export default {
     outParamsDeselect (node) {
       this.outParams = this.outParams.filter(item => item !== node.fieldId)
     },
+    // 取消
     cancelHandle () {
       this.visible = false
       this.$parent.outparamsNodeVisible = false
+      this.$refs['dataForm'].resetFields()
       if (!this.isEdit) {
         this.$emit('close', false)
       }
