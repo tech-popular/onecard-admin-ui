@@ -84,7 +84,7 @@
 			</el-form-item>
 		</el-form>
 		<div slot="footer" class="foot">
-      <el-button type="primary" @click="submitData">提交</el-button>
+      <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
 	</el-dialog>

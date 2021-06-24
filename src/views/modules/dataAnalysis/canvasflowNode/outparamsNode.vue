@@ -56,7 +56,7 @@
   </el-dialog>
 </template>
 <script>
-import { dataTransferManageOutParams, getAllSmsChannels, getSmsCodeInfo, getSmsMessage } from '@/api/dataAnalysis/dataTransferManage'
+import { dataTransferManageOutParams, getAllSmsChannels, getSmsCodeInfo, getSmsMessage, getSmsAllMessage } from '@/api/dataAnalysis/dataTransferManage'
 import { addDataInfo } from '@/api/dataAnalysis/sourceBinding'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -70,6 +70,7 @@ export default {
       channelCode: '',
       dataLoading: false,
       viewVisible: false,
+      isEdit: false,
       smsOutParams: [],
       dataForm: {
         type: 'sms',
@@ -106,9 +107,6 @@ export default {
          outParams: [
           { required: true, message: '请选择分群出参', trigger: 'input' }
         ]
-        // smsTemplate: [
-        //   { required: true, message: '请选择签名', trigger: 'change' }
-        // ]
       }
     }
   },
@@ -126,10 +124,18 @@ export default {
       this.dataLoading = true
       this.addResourcebind = false
       this.paramsVisible = false
+      this.isEdit = false
       this.channelCode = this.$store.state.canvasFlow.channelCode
       this.resourceCode = ''
       this.resourceId = ''
       this.resourceName = ''
+      this.dataForm = {
+        type: 'sms',
+        channelId: '',
+        tempCode: '',
+        smsTemplate: '',
+        outParams: [] // 绑定的出参
+      }
       this.key = data.key
       this.smsOutParams = []
       this.outParams = []
@@ -138,12 +144,31 @@ export default {
         this.dataForm.type = data.data.configItems.type
         this.dataForm.tempCode = data.data.configItems.tempCode
         this.dataForm.channelId = data.data.configItems.channelId
-        this.dataForm.outParams = []
         if (this.dataForm.type === 'sms') {
           this.getDate(data.data.configItems.channelId, false)
-          this.getOutParamsList(data.data, this.$store.state.canvasFlow.outParams)
+          // this.getOutParamsList(data.data, this.$store.state.canvasFlow.outParams)
         }
       }
+    },
+     // 回显查看
+    getLookData (id) {
+      getSmsAllMessage(id).then(res => {
+        if (res.data.status === '1') {
+          console.log('res.data: ', res.data)
+          this.resourceName = res.data.data.bindingConfig.resourceName
+          this.resourceCode = res.data.data.bindingConfig.resourceCode
+          this.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
+          // this.dataForm.channelId = res.data.data.resourceData.channelId
+          // this.dataForm.smsTemplate = res.data.data.resourceData.smsTemplate
+          this.paramsNum = res.data.data.resourceData.smsTemplate.split('%s').length - 1
+          if (res.data.data.bindingIndex.length) {
+              this.paramsNum ? this.paramsVisible = true : this.paramsVisible = false
+              this.viewVisible = true
+              this.addResourcebind = true
+            }
+          this.getOutParamsList(id, res.data.data.bindingIndex)
+        }
+      })
     },
     getAllSmsChannels() {
        getAllSmsChannels().then(({data}) => {
@@ -168,12 +193,8 @@ export default {
             this.addResourcebind = false
           } else {
             this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
-            if (this.$store.state.canvasFlow.outParams.length) {
-              this.paramsNum = this.dataForm.smsTemplate.split('%s').length - 1
-              this.paramsNum ? this.paramsVisible = true : this.paramsVisible = false
-              this.viewVisible = true
-              this.addResourcebind = true
-            }
+            this.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].id.toString()
+            this.getLookData(this.resourceId)
           }
         }
       })
@@ -233,7 +254,7 @@ export default {
               params: smsOutParam
             }
           }
-          if (this.addResourcebind) {
+          if (this.addResourcebind && !this.viewVisible) {
               if (this.outParams.length !== this.paramsNum) {
                 return this.$message.error(`请选择${this.paramsNum}个参数`)
               }
@@ -260,7 +281,6 @@ export default {
                       }
                     })
                   } else {
-                    this.$store.commit('canvasFlow/setOutParams', [])
                     this.$message.error(data.message || '数据异常')
                   }
                 })
@@ -333,7 +353,7 @@ export default {
       let out = []
       this.outParams = []
       data.forEach(item => {
-        out.push(item.id)
+        out.push(item.englishName + '-' + item.id)
         this.outParams.push(item.fieldId)
         this.smsOutParams.push({
           englishName: item.englishName,

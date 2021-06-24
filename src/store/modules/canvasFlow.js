@@ -43,7 +43,6 @@ export default {
     },
     setOutParams (state, params) {
       state.outParams = params
-      console.log('state.outParams: ', state.outParams)
     }
   }
 }

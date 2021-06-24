@@ -20,3 +20,4 @@ export const getAllSmsChannels = () => httpGet(da + `data/decision/canvas/getAll
 export const getSmsCodeInfo = (channelId) => httpGet(da + `data/decision/canvas/getSmsCodeInfoByChannelId/${channelId}`) // 短信code
 export const addCanvasInfo = (params) => httpPost(da + 'data/decision/canvas/info', params) // 决策画布提交
 export const getSmsMessage = (resourceId) => httpGet(da + `resource/binding/fetchByResourceId/${resourceId}`) // 校验是否已进行资源绑定
+export const getSmsAllMessage = (resourceId) => httpGet(da + `resource/binding/fetchDescByResourceId/${resourceId}`) // 获取短信所有详细信息

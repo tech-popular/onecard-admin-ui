@@ -6,6 +6,7 @@ import user from './modules/user'
 import reportChart from './modules/report-chart'
 import workFlow from './modules/workFlow'
 import canvasFlow from './modules/canvasFlow'
+import dataTransferManage from './modules/dataTransferManage'
 
 Vue.use(Vuex)
 
@@ -15,7 +16,8 @@ export default new Vuex.Store({
     user,
     reportChart,
     workFlow,
-    canvasFlow
+    canvasFlow,
+    dataTransferManage
   },
   mutations: {
     // 重置vuex本地储存状态

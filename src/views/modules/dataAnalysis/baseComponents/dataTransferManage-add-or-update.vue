@@ -272,7 +272,10 @@
               </el-col>
             </el-row>
             <el-form-item label="智能下发" prop="intelligentDistribution" v-if="baseForm.transferCategory === '1'">             
-              <el-checkbox v-model="baseForm.intelligentDistribution" label="sms"  @change="changesmsDistribution">短信</el-checkbox>
+              <el-checkbox v-model="baseForm.intelligentDistribution" label="sms" @change="changesmsDistribution" style="margin-right:0">短信</el-checkbox>
+                <span style="color:red;font-size:10px;margin-right:30px;">
+                <i style="font-style: normal;color:blue;cursor:pointer" v-if="setSmsTemplteVisible" @click="setSmsTemplte">配置短信模板</i>
+              </span>
               <el-checkbox v-model="baseForm.intelligentDistribution" label="tel" @change="changetelDistribution">电销</el-checkbox>
               <el-checkbox v-model="baseForm.intelligentDistribution" label="ai" @change="changeAiDistribution">AI</el-checkbox>
             </el-form-item>
@@ -357,6 +360,7 @@
         loading: false,
         visible: true,
         isStatic: false,
+        setSmsTemplteVisible: false,
         channelCode: '',
         // originOutParamsList: [],
         baseForm: {
@@ -711,7 +715,6 @@
       },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
-        console.log(this.templateIdList)
         let obj = {}
         obj = this.templateIdList.find((item) => {
           if (item.value === selVal) {
@@ -931,8 +934,13 @@
                 this.isR3DefaultOut = true
               } else if (disData.transferCategory == '1') {
                 this.baseForm.intelligentDistribution.push(item.type)
+                if (item.type === 'sms') {
+                  this.setSmsTemplteVisible = true
+                  console.log('this.setSmsTemplteVisible: ', this.setSmsTemplteVisible)
+                }
               }
             })
+            this.intelligentDistributionParams = deepClone(disData.datasourceParams)
             let tempTime = disData.taskScheduleConfig
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONCE_ONLY':
@@ -1047,6 +1055,9 @@
         console.log(this.formatPostData(this.baseForm, this.outParams))
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
+            let hasSmsTemplte = this.baseForm.intelligentDistribution.filter(item => item === 'sms')
+            let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
+            if (hasSmsTemplte.length && !smsMessage.length) return this.$message.error('请配置短信模板')
             let params = this.formatPostData(this.baseForm, this.outParams)
             console.log(params)
             this.loading = true
@@ -1137,17 +1148,21 @@
           if (!this.channelCode) {
             this.$nextTick(() => {
               this.baseForm.intelligentDistribution = this.baseForm.intelligentDistribution.filter(item => item !== 'sms')
-              console.log('this.baseForm.intelligentDistribution: ', this.baseForm.intelligentDistribution)
             })
             return this.$message.error('请先选择分群名称')
           }
-          this.intelligentDistributionAddOrUpdateVisible = true
-          this.$nextTick(() => {
-            this.$refs.intelligentDistributionAddOrUpdate.init(this.channelCode, this.baseForm)
-          })
+          this.setSmsTemplteVisible = true
         } else {
+          this.setSmsTemplteVisible = false
           this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'sms')
         }
+      },
+      setSmsTemplte () {
+          this.intelligentDistributionAddOrUpdateVisible = true
+          let data = this.intelligentDistributionParams.filter(item => item.type === 'sms')
+          this.$nextTick(() => {
+            this.$refs.intelligentDistributionAddOrUpdate.init(this.channelCode, data)
+        })
       },
       changetelDistribution(val) {
         if (val) {
@@ -1166,7 +1181,9 @@
       getintelligentDistribution (data) {
         if (!data) {
           this.baseForm.intelligentDistribution = this.baseForm.intelligentDistribution.filter(item => item !== 'sms')
+          this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'sms')
         } else {
+          this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'sms')
           this.intelligentDistributionParams.push(data)
         }
       },
