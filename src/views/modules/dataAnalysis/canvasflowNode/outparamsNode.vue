@@ -70,6 +70,7 @@ export default {
       channelCode: '',
       dataLoading: false,
       viewVisible: false,
+      smsOutParams: [],
       dataForm: {
         type: 'sms',
         channelId: '',
@@ -121,17 +122,26 @@ export default {
     },
     init (data) {
       this.visible = true
+      this.viewVisible = false
       this.dataLoading = true
+      this.addResourcebind = false
+      this.paramsVisible = false
       this.channelCode = this.$store.state.canvasFlow.channelCode
       this.resourceCode = ''
       this.resourceId = ''
       this.resourceName = ''
       this.key = data.key
+      this.smsOutParams = []
+      this.outParams = []
       this.getAllSmsChannels()
       if (data.data) {
-        this.dataForm = data.data.configItems
+        this.dataForm.type = data.data.configItems.type
+        this.dataForm.tempCode = data.data.configItems.tempCode
+        this.dataForm.channelId = data.data.configItems.channelId
+        this.dataForm.outParams = []
         if (this.dataForm.type === 'sms') {
           this.getDate(data.data.configItems.channelId, false)
+          this.getOutParamsList(data.data, this.$store.state.canvasFlow.outParams)
         }
       }
     },
@@ -150,6 +160,20 @@ export default {
           if (isChange) {
             this.dataForm.tempCode = ''
             this.dataForm.smsTemplate = ''
+            this.viewVisible = false
+            this.outParams = []
+            this.smsOutParams = []
+            this.dataForm.outParams = []
+            this.paramsVisible = false
+            this.addResourcebind = false
+          } else {
+            this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
+            if (this.$store.state.canvasFlow.outParams.length) {
+              this.paramsNum = this.dataForm.smsTemplate.split('%s').length - 1
+              this.paramsNum ? this.paramsVisible = true : this.paramsVisible = false
+              this.viewVisible = true
+              this.addResourcebind = true
+            }
           }
         }
       })
@@ -162,8 +186,13 @@ export default {
       this.dataForm.outParams = []
       this.outParams = []
       this.issueTemplateList = []
+      this.paramsVisible = false
+      this.viewVisible = false
+      this.addResourcebind = false
+      this.smsOutParams = []
     },
     getSmsTemplate () {
+      this.viewVisible = false
       this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
       this.resourceCode = this.dataForm.tempCode
       this.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsDesc
@@ -190,11 +219,18 @@ export default {
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
+          let smsOutParam = ''
+          if (this.smsOutParams.length) {
+            this.smsOutParams.forEach((item, index) => {
+              index ? smsOutParam = smsOutParam + '##' + '${' + item.englishName + '}' : smsOutParam = smsOutParam + '${' + item.englishName + '}'
+            })
+          }
           let config = {
             configItems: {
               type: this.dataForm.type,
               channelId: this.dataForm.channelId,
-              tempCode: this.dataForm.tempCode
+              tempCode: this.dataForm.tempCode,
+              params: smsOutParam
             }
           }
           if (this.addResourcebind) {
@@ -219,26 +255,22 @@ export default {
                       onClose: () => {
                         this.visible = false
                         this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
+                        this.$store.commit('canvasFlow/setOutParams', this.smsOutParams)
                         this.$refs['dataForm'].resetFields()
                       }
                     })
                   } else {
+                    this.$store.commit('canvasFlow/setOutParams', [])
                     this.$message.error(data.message || '数据异常')
                   }
                 })
             } else {
               this.visible = false
+              this.$store.commit('canvasFlow/setOutParams', [])
               this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
               this.$refs['dataForm'].resetFields()
             }
         }
-        // if (valid) {
-        //   let config = {
-        //     configItems: this.dataForm
-        //   }
-        //   this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
-        //   this.$parent.outparamsNodeVisible = false
-        // }
       })
     },
     // 获取分群出参 指标列表
@@ -301,8 +333,15 @@ export default {
       let out = []
       this.outParams = []
       data.forEach(item => {
-        out.push(item.englishName + '-' + item.id)
-        this.outParams.push(item.id)
+        out.push(item.id)
+        this.outParams.push(item.fieldId)
+        this.smsOutParams.push({
+          englishName: item.englishName,
+          fieldId: item.fieldId,
+          id: item.id,
+          fieldCode: item.fieldCode,
+          sourceTable: item.sourceTable
+        })
       })
       this.dataForm.outParams = Array.from(new Set(out))
       this.outParamsList = this.updateOutParamsList(outList)
@@ -330,6 +369,13 @@ export default {
     // 选中出参
     outParamsSelect (node) {
       this.outParams.push(node.fieldId)
+      this.smsOutParams.push({
+        englishName: node.englishName,
+        fieldId: node.fieldId,
+        id: node.id,
+        fieldCode: node.fieldCode,
+        sourceTable: node.sourceTable
+      })
       if (this.outParams.length) {
         this.$refs.dataForm.clearValidate('outParams')
       }
@@ -337,6 +383,7 @@ export default {
     // 删除出参
     outParamsDeselect (node) {
       this.outParams = this.outParams.filter(item => item !== node.fieldId)
+      this.smsOutParams = this.smsOutParams.filter(item => item.englishName !== node.englishName)
     },
     cancelHandle () {
       this.visible = false

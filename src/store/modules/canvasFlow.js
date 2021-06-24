@@ -15,7 +15,8 @@ export default {
       beeFlowCode: '',
       beeFlowId: '',
       configJson: {}
-    }
+    },
+    outParams: []
   },
 
   mutations: {
@@ -39,6 +40,10 @@ export default {
     },
     setChannelCode (state, params) {
       state.channelCode = params
+    },
+    setOutParams (state, params) {
+      state.outParams = params
+      console.log('state.outParams: ', state.outParams)
     }
   }
 }

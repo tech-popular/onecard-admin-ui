@@ -816,7 +816,6 @@
           }
         } else {
           let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
-          console.log('smsMessage: ', smsMessage)
           this.intelligentDistributionParams.forEach(item => {
             if (item.type === 'sms') {
                postData.datasourceParams.push(item)
@@ -892,7 +891,7 @@
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
-            this.baseForm.transferCategory = disData.transferCategory.toString()
+            this.baseForm.transferCategory = disData.transferCategory ? disData.transferCategory.toString() : '0'
             this.baseForm.decisionType = disData.decisionType ? disData.decisionType : '0'
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.dolphinProcessId = disData.dolphinProcessId

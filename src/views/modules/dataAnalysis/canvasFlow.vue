@@ -431,14 +431,18 @@ export default {
       }
       params.configJson = jsonData
       params.transferType = 'kafka'
-      let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
-      let linkTextData = []
-      if (dataQueryNode) {
-        dataQueryNode.findLinksOutOf().each(function (link) {
-          linkTextData.push(link.data.linkText)
+      // let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
+      // let linkTextData = []
+      // if (dataQueryNode) {
+      //   dataQueryNode.findLinksOutOf().each(function (link) {
+      //     linkTextData.push(link.data.linkText)
+      //   })
+      // }
+      if (this.$store.state.canvasFlow.outParams.length) {
+        this.$store.state.canvasFlow.outParams.forEach(item => {
+          params.outParams.push({value: item.value, id: item.fieldId, sourceTable: item.sourceTable})
         })
       }
-      params.outParams = linkTextData
       // let url = this.id ? editFlowInfo : saveFlowInfo
       if (this.id) {
         params.id = this.id
@@ -449,6 +453,7 @@ export default {
           return this.$message.error(data.message || '保存失败')
         }
         this.$message.success(data.message)
+        this.$store.commit('canvasFlow/setOutParams', [])
         setTimeout(() => {
           that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
         }, 300)
