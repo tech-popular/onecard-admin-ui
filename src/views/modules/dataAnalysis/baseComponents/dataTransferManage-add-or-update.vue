@@ -42,14 +42,14 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="下发方式"  v-if="baseForm.decisionType === '0'" prop="distributionMethod">
-              <el-radio v-model="baseForm.distributionMethod" label="0">普通下发</el-radio>
-              <el-radio v-model="baseForm.distributionMethod" label="1">智能下发</el-radio>
+            <el-form-item label="下发方式"  v-if="baseForm.decisionType === '0'" prop="transferCategory">
+              <el-radio v-model="baseForm.transferCategory" label="0">普通下发</el-radio>
+              <el-radio v-model="baseForm.transferCategory" label="1">智能下发</el-radio>
             </el-form-item>
             <el-form-item label="任务名称" prop="transferName" style="width:50%">
               <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
             </el-form-item>
-            <el-form-item label="分群出参" v-if="baseForm.decisionType === '0' && baseForm.distributionMethod === '0'" prop="outParams">
+            <el-form-item label="分群出参" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '0'" prop="outParams">
               <Treeselect
                 :options="outParamsList"
                 :disable-branch-nodes="true"
@@ -196,7 +196,7 @@
         </div>
         <div class="pane-rules" v-if="baseForm.decisionType === '0'">
           <h3>下发数据源</h3>
-          <el-row :gutter="20" v-if="baseForm.distributionMethod === '0'">
+          <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="kafka" name="transferType" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
@@ -221,7 +221,7 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-row :gutter="20" v-if="baseForm.distributionMethod === '0'">
+          <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
                   <el-checkbox label="mysql" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
@@ -245,7 +245,7 @@
               </el-form-item>
             </el-col>
             </el-row>
-            <el-row :gutter="20" v-if="baseForm.distributionMethod === '0'">
+            <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
               <el-col style="width: 8.33333%;">
                 <el-form-item class="label-remove-margin" prop="transferType">
                     <el-checkbox label="sqlServer" v-model="baseForm.transferType" @change="transferTypeChage" style="margin-left: 8px;"></el-checkbox>
@@ -271,10 +271,10 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="智能下发" prop="intelligentDistribution" v-if="baseForm.distributionMethod === '1'">             
-              <el-checkbox v-model="baseForm.intelligentDistribution" label="sms" @change="changeIntelligentDistribution">短信</el-checkbox>
-              <el-checkbox v-model="baseForm.intelligentDistribution" label="tel">电销</el-checkbox>
-              <el-checkbox v-model="baseForm.intelligentDistribution" label="ai">AI</el-checkbox>
+            <el-form-item label="智能下发" prop="intelligentDistribution" v-if="baseForm.transferCategory === '1'">             
+              <el-checkbox v-model="baseForm.intelligentDistribution" label="sms"  @change="changesmsDistribution">短信</el-checkbox>
+              <el-checkbox v-model="baseForm.intelligentDistribution" label="tel" @change="changetelDistribution">电销</el-checkbox>
+              <el-checkbox v-model="baseForm.intelligentDistribution" label="ai" @change="changeAiDistribution">AI</el-checkbox>
             </el-form-item>
             <el-form-item label="下发模式" prop="increModel">
               <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
@@ -299,7 +299,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
-    <intelligentDistributionAddOrUpdate ref="intelligentDistributionAddOrUpdate" v-if="intelligentDistributionAddOrUpdateVisible"></intelligentDistributionAddOrUpdate>
+    <intelligentDistributionAddOrUpdate ref="intelligentDistributionAddOrUpdate" v-if="intelligentDistributionAddOrUpdateVisible" @close="getintelligentDistribution"></intelligentDistributionAddOrUpdate>
   </el-drawer>
 </template>
 <script>
@@ -365,7 +365,7 @@
           dolphinProcessId: null,
           transferName: '', // 任务名称
           templateId: '', // 分群名称
-          distributionMethod: '0', // 下发方式
+          transferCategory: '0', // 下发方式
           outParams: [],
           taskDescribtion: '', // 描述
           jobType: 1, // 周期
@@ -416,6 +416,7 @@
         kafkaServerList: [],
         mysqlServerList: [],
         sqlServerList: [],
+        intelligentDistributionParams: [],
         transferLogVisible: false,
         intelligentDistributionAddOrUpdateVisible: false,
         transferLogList: [],
@@ -429,7 +430,7 @@
           transferName: [
             { required: true, message: '请输入任务名称', trigger: 'blur' }
           ],
-          distributionMethod: [
+          transferCategory: [
             { required: true, message: '请选择下发方式', trigger: 'change' }
           ],
           outParams: [
@@ -778,6 +779,7 @@
         postData.id = data.id ? data.id : ''
         postData.decisionType = data.decisionType
         postData.triggerMode = data.triggerMode
+        postData.transferCategory = data.transferCategory
         postData.taskUniqueFlag = data.taskUniqueFlag
         postData.dolphinProcessId = data.dolphinProcessId
         postData.transferName = data.transferName
@@ -789,27 +791,42 @@
         postData.authOtherList = this.rowData.authOtherList
         postData.authOthers = this.rowData.authOthers
         postData.datasourceParams = []
-        if (data.kafkaServer != '' && data.transferType.includes('kafka')) {
-          let tempServer = {
-            type: 'kafka',
-            id: data.kafkaServer,
-            topic: data.topic
+        if (data.transferCategory === '0') {
+          if (data.kafkaServer != '' && data.transferType.includes('kafka')) {
+            let tempServer = {
+              type: 'kafka',
+              id: data.kafkaServer,
+              topic: data.topic
+            }
+            postData.datasourceParams.push(tempServer)
           }
-          postData.datasourceParams.push(tempServer)
-        }
-        if (data.mysqlServer != '' && data.transferType.includes('mysql')) {
-          let tempServer = {
-            type: 'mysql',
-            id: data.mysqlServer
+          if (data.mysqlServer != '' && data.transferType.includes('mysql')) {
+            let tempServer = {
+              type: 'mysql',
+              id: data.mysqlServer
+            }
+            postData.datasourceParams.push(tempServer)
           }
-          postData.datasourceParams.push(tempServer)
-        }
-        if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
-          let tempServer = {
-            type: 'sqlServer',
-            id: data.sqlServer
+          if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
+            let tempServer = {
+              type: 'sqlServer',
+              id: data.sqlServer
+            }
+            postData.datasourceParams.push(tempServer)
           }
-          postData.datasourceParams.push(tempServer)
+        } else {
+          let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
+          console.log('smsMessage: ', smsMessage)
+          this.intelligentDistributionParams.forEach(item => {
+            if (item.type === 'sms') {
+               postData.datasourceParams.push(item)
+            } else if (item.type === 'tel') {
+              postData.datasourceParams.push({type: 'tel', id: smsMessage.length ? smsMessage[0].id + 1 : 1})
+            } else if (item.type === 'ai') {
+              postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 2})
+            }
+          })
+          postData.transferType = 'kafka'
         }
         postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
@@ -875,6 +892,7 @@
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
+            this.baseForm.transferCategory = disData.transferCategory.toString()
             this.baseForm.decisionType = disData.decisionType ? disData.decisionType : '0'
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.dolphinProcessId = disData.dolphinProcessId
@@ -912,6 +930,8 @@
               } else if (item.type == 'sqlServer') {
                 this.baseForm.sqlServer = item.id
                 this.isR3DefaultOut = true
+              } else if (disData.transferCategory == '1') {
+                this.baseForm.intelligentDistribution.push(item.type)
               }
             })
             let tempTime = disData.taskScheduleConfig
@@ -1104,6 +1124,7 @@
             this.$store.commit('canvasFlow/setGroupNodeName', obj.text)
             this.$store.commit('canvasFlow/setRowData', this.rowData)
             this.$store.commit('canvasFlow/setSaveDate', params)
+            this.$store.commit('canvasFlow/setChannelCode', this.channelCode)
             if (this.baseForm.id) {
               this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.baseForm.id, time: new Date().getTime() } })
             } else {
@@ -1112,13 +1133,42 @@
           }
         })
       },
-      changeIntelligentDistribution (val) { // 业务下发方式短信弹框
+      changesmsDistribution (val) { // 业务下发方式短信弹框
         if (val) {
-          console.log('val: ', val)
+          if (!this.channelCode) {
+            this.$nextTick(() => {
+              this.baseForm.intelligentDistribution = this.baseForm.intelligentDistribution.filter(item => item !== 'sms')
+              console.log('this.baseForm.intelligentDistribution: ', this.baseForm.intelligentDistribution)
+            })
+            return this.$message.error('请先选择分群名称')
+          }
           this.intelligentDistributionAddOrUpdateVisible = true
           this.$nextTick(() => {
-            this.$refs.intelligentDistributionAddOrUpdate.init()
+            this.$refs.intelligentDistributionAddOrUpdate.init(this.channelCode, this.baseForm)
           })
+        } else {
+          this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'sms')
+        }
+      },
+      changetelDistribution(val) {
+        if (val) {
+          this.intelligentDistributionParams.push({type: 'tel'})
+        } else {
+          this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'tel')
+        }
+      },
+      changeAiDistribution(val) {
+        if (val) {
+          this.intelligentDistributionParams.push({type: 'ai'})
+        } else {
+          this.intelligentDistributionParams = this.intelligentDistributionParams.filter(item => item.type !== 'ai')
+        }
+      },
+      getintelligentDistribution (data) {
+        if (!data) {
+          this.baseForm.intelligentDistribution = this.baseForm.intelligentDistribution.filter(item => item !== 'sms')
+        } else {
+          this.intelligentDistributionParams.push(data)
         }
       },
       // 关闭
