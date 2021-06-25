@@ -217,6 +217,9 @@ export default {
       this.resourceCode = this.dataForm.tempCode
       this.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsDesc
       this.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].id.toString()
+      this.smsOutParams = []
+      this.outParams = []
+      this.dataForm.outParams = []
       getSmsMessage(this.resourceId).then(({data}) => {
         if (data && data.status === '1') {
           if (data.data.length > 0) {
@@ -227,7 +230,6 @@ export default {
             this.paramsNum = this.dataForm.smsTemplate.split('%s').length - 1
             if (!this.paramsNum) {
               this.paramsVisible = false
-              this.outParams = []
             } else {
               this.getOutParamsList()
               this.paramsVisible = true
