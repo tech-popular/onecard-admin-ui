@@ -17,7 +17,7 @@
         <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
         <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
       </div>
-  </el-dialog>
+  </el-dialog> 
 </template>
 <script>
 export default {

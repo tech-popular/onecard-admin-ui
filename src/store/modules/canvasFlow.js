@@ -9,12 +9,14 @@ export default {
     },
     saveDate: {},
     groupNodeName: '',
+    channelCode: '',
     editData: {
       beeFlowName: '',
       beeFlowCode: '',
       beeFlowId: '',
       configJson: {}
-    }
+    },
+    outParams: []
   },
 
   mutations: {
@@ -35,6 +37,12 @@ export default {
       state.editData.beeFlowCode = params.beeFlowCode
       state.editData.beeFlowId = params.beeFlowId
       state.editData.configJson = params.configJson
+    },
+    setChannelCode (state, params) {
+      state.channelCode = params
+    },
+    setOutParams (state, params) {
+      state.outParams = params
     }
   }
 }

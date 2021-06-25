@@ -2,29 +2,24 @@
   <el-dialog title="模板配置"
     :modal-append-to-body='false'
     :append-to-body="true"
-    :visible.sync="visible"
+    :visible="visible"
     v-loading="dataLoading"
     width="800px"
     :close-on-click-modal="false">
-    <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules">
-      <el-form-item prop="type" label="方式">
-        <el-select v-model="dataForm.type"  placeholder="请选择方式" style="width: 300px">
-          <el-option v-for="(item, index) in issueTypeList" :key="index" :value="item.value" :label="item.lable"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item v-if="dataForm.type === 'sms'" prop="channelId" label="渠道" >
+    <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules" :disabled="!canUpdate">
+      <el-form-item  prop="channelId" label="渠道" >
         <el-select v-model="dataForm.channelId" @change="getSmsCodeDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="tempCode" v-if="dataForm.type === 'sms'" label="模板">
+      <el-form-item prop="tempCode"  label="模板">
         <el-select v-model="dataForm.tempCode" @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
           <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="smsTemplate" v-if="dataForm.type === 'sms'" label="模板详情">
+      <el-form-item prop="smsTemplate"  label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" ></el-input>
-         <p style="margin:0" v-if="addResourcebind">
+        <p style="margin:0" v-if="addResourcebind">
             需要选择
           <span style="color:red" v-text="paramsNum"></span> 个参数
         </p>
@@ -50,7 +45,7 @@
     </el-form-item>
     </el-form>
     <div slot="footer">
-      <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
+      <el-button type="primary" @click="saveHandle" size="small" v-if="canUpdate">确定</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-dialog>
@@ -65,52 +60,42 @@ export default {
   data () {
     return {
       id: '',
-      key: '',
       visible: false,
-      channelCode: '',
+      canUpdate: true,
       dataLoading: false,
+      channelCode: '',
       viewVisible: false,
-      isEdit: false,
-      smsOutParams: [],
       dataForm: {
-        type: 'sms',
         channelId: '',
         tempCode: '',
         smsTemplate: '',
         outParams: [] // 绑定的出参
       },
+      isEdit: false,
       paramsNum: 0,
       paramsVisible: false,
       outParamsList: [],
       outParams: [], // 分群出参提交格式
       addResourcebind: false,
+      issueChannelList: [],
+      issueTemplateList: [],
       resourceName: '',
       resourceCode: '',
       resourceId: '',
-      issueTypeList: [
-        {value: 'sms', lable: '短信'},
-        {value: 'tel', lable: '电销'},
-        {value: 'ai', lable: 'AI'}
-      ],
-      issueChannelList: [],
-      issueTemplateList: [],
       dataRules: {
-        type: [
-          { required: true, message: '请选择方式', trigger: 'change' }
-        ],
         channelId: [
           { required: true, message: '请选择渠道', trigger: 'change' }
         ],
         tempCode: [
           { required: true, message: '请选择模板', trigger: 'change' }
         ],
-         outParams: [
+        outParams: [
           { required: true, message: '请选择分群出参', trigger: 'input' }
         ]
       }
     }
   },
- components: { Treeselect },
+  components: { Treeselect },
   methods: {
      // 树加载
     async loadOptions ({ action, parentNode, callback }) {
@@ -118,64 +103,42 @@ export default {
         callback()
       }
     },
-    init (data) {
-      this.visible = true
-      this.viewVisible = false
+    init (channelCode, data, canUpdate) {
       this.dataLoading = true
       this.addResourcebind = false
-      this.paramsVisible = false
+      this.canUpdate = canUpdate
+      this.channelCode = channelCode
       this.isEdit = false
-      this.channelCode = this.$store.state.canvasFlow.channelCode
-      this.resourceCode = ''
-      this.resourceId = ''
-      this.resourceName = ''
       this.dataForm = {
-        type: 'sms',
         channelId: '',
         tempCode: '',
         smsTemplate: '',
         outParams: [] // 绑定的出参
       }
-      this.key = data.key
-      this.smsOutParams = []
-      this.outParams = []
+      this.resourceCode = ''
+      this.resourceId = ''
+      this.resourceName = ''
+      this.outParamsList = []
+      this.visible = true
       this.getAllSmsChannels()
-      if (data.data) {
-        this.dataForm.type = data.data.configItems.type
-        this.dataForm.tempCode = data.data.configItems.tempCode
-        this.dataForm.channelId = data.data.configItems.channelId
-        if (this.dataForm.type === 'sms') {
-          this.getSmsCodeDate(data.data.configItems.channelId, false)
-        }
+      if (data.length) { // 修改
+        this.isEdit = true
+        this.dataForm.type = data[0].type
+        this.dataForm.tempCode = data[0].topic
+        this.getLookData(data)
+      } else {
+        this.getOutParamsList()
       }
     },
-     // 回显查看，获取所有详情
-    getLookData (id) {
-      getSmsAllMessage(id).then(res => {
-        if (res.data.status === '1') {
-          this.resourceName = res.data.data.bindingConfig.resourceName
-          this.resourceCode = res.data.data.bindingConfig.resourceCode
-          this.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
-          this.paramsNum = res.data.data.resourceData.smsTemplate.split('%s').length - 1
-          if (res.data.data.bindingIndex.length) {
-              this.paramsNum ? this.paramsVisible = true : this.paramsVisible = false
-              this.viewVisible = true
-              this.addResourcebind = true
-            }
-          this.getOutParamsList(id, res.data.data.bindingIndex)
-        }
-      })
-    },
-    // 获取短信渠道列表
+    /* 获取短信所有渠道 */
     getAllSmsChannels() {
        getAllSmsChannels().then(({data}) => {
         if (data.status === '1') {
           this.issueChannelList = data.data
-          this.dataLoading = false
         }
       })
     },
-    // 短信模板
+    /* 根据渠道获取模板 */
     getSmsCodeDate (value, isChange) {
       getSmsCodeInfo(value).then(({data}) => {
         if (data.status === '1') {
@@ -185,39 +148,43 @@ export default {
             this.dataForm.smsTemplate = ''
             this.viewVisible = false
             this.outParams = []
-            this.smsOutParams = []
             this.dataForm.outParams = []
             this.paramsVisible = false
             this.addResourcebind = false
-          } else {
-            this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
-            this.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].id.toString()
-            this.getLookData(this.resourceId)
           }
         }
       })
     },
-    // 改变下发方式
-    dateType () {
-      this.dataForm.channelId = ''
-      this.dataForm.tempCode = ''
-      this.dataForm.smsTemplate = ''
-      this.dataForm.outParams = []
-      this.outParams = []
-      this.issueTemplateList = []
-      this.paramsVisible = false
-      this.viewVisible = false
-      this.addResourcebind = false
-      this.smsOutParams = []
+    // 回显时获取短信详细信息
+    getLookData (row) {
+      getSmsAllMessage(row[0].id).then(res => {
+        if (res.data.status === '1') {
+          this.resourceName = res.data.data.bindingConfig.resourceName
+          this.resourceCode = res.data.data.bindingConfig.resourceCode
+          this.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
+          this.dataForm.channelId = res.data.data.resourceData.channelId
+          this.dataForm.smsTemplate = res.data.data.resourceData.smsTemplate
+          this.paramsNum = res.data.data.resourceData.smsTemplate.split('%s').length - 1
+          this.getSmsCodeDate(res.data.data.resourceData.channelId, false)
+          if (res.data.data.bindingIndex.length) {
+              this.paramsNum ? this.paramsVisible = true : this.paramsVisible = false
+              this.viewVisible = true
+              this.addResourcebind = true
+              this.dataLoading = true
+              this.getOutParamsList(row, res.data.data.bindingIndex)
+            } else {
+              this.dataLoading = false
+            }
+        }
+      })
     },
-    // 短信模板详情及是否配置参数
+    // 根据所选短信模板获取详情及判断是否进行参数配置
     getSmsTemplate () {
       this.viewVisible = false
       this.dataForm.smsTemplate = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsTemplate
       this.resourceCode = this.dataForm.tempCode
       this.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsDesc
       this.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].id.toString()
-      this.smsOutParams = []
       this.outParams = []
       this.dataForm.outParams = []
       getSmsMessage(this.resourceId).then(({data}) => {
@@ -231,66 +198,52 @@ export default {
             if (!this.paramsNum) {
               this.paramsVisible = false
             } else {
-              this.getOutParamsList()
               this.paramsVisible = true
             }
           }
         }
       })
     },
+    // 保存
     saveHandle () {
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
-          let smsOutParam = ''
-          if (this.smsOutParams.length) {
-            this.smsOutParams.forEach((item, index) => {
-              index ? smsOutParam = smsOutParam + '##' + '${' + item.englishName + '}' : smsOutParam = smsOutParam + '${' + item.englishName + '}'
-            })
-          }
-          let config = {
-            configItems: {
-              type: this.dataForm.type,
-              channelId: this.dataForm.channelId,
-              tempCode: this.dataForm.tempCode,
-              params: smsOutParam
-            }
-          }
           if (this.addResourcebind && !this.viewVisible) {
-              if (this.outParams.length !== this.paramsNum) {
-                return this.$message.error(`请选择${this.paramsNum}个参数`)
-              }
-              let params = {
-                id: this.dataForm.id,
-                type: 'sms',
-                resourceName: this.resourceName,
-                resourceCode: this.resourceCode,
-                channelCode: this.channelCode,
-                resourceId: this.resourceId,
-                bindingIndex: this.outParams.join(',')
-              }
-              addDataInfo(params).then(({data}) => {
-                  if (data && data.status === '1') {
-                    this.$message({
-                      message: '操作成功',
-                      type: 'success',
-                      duration: 1500,
-                      onClose: () => {
-                        this.visible = false
-                        this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
-                        this.$store.commit('canvasFlow/setOutParams', this.smsOutParams)
-                        this.$refs['dataForm'].resetFields()
-                      }
-                    })
-                  } else {
-                    this.$message.error(data.message || '数据异常')
-                  }
-                })
-            } else {
-              this.visible = false
-              this.$store.commit('canvasFlow/setOutParams', [])
-              this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
-              this.$refs['dataForm'].resetFields()
+            if (this.outParams.length !== this.paramsNum) {
+              return this.$message.error(`请选择${this.paramsNum}个参数`)
             }
+            let params = {
+              id: this.dataForm.id,
+              type: 'sms',
+              resourceName: this.resourceName,
+              resourceCode: this.resourceCode,
+              channelCode: this.channelCode,
+              resourceId: this.resourceId,
+              bindingIndex: this.outParams.join(',')
+            }
+            addDataInfo(params).then(({data}) => {
+                if (data && data.status === '1') {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('close', {id: this.resourceId, type: 'sms', topic: this.resourceCode})
+                      this.$refs['dataForm'].resetFields()
+                    }
+                  })
+                } else {
+                  this.$message.error(data.message || '数据异常')
+                }
+              })
+          } else {
+            this.visible = false
+            this.$store.commit('dataTransferManage/setOutParams', [])
+            this.$emit('close', {id: this.resourceId, type: 'sms', topic: this.resourceCode})
+            this.$refs['dataForm'].resetFields()
+          }
+          this.$parent.outparamsNodeVisible = false
         }
       })
     },
@@ -307,6 +260,7 @@ export default {
         } else {
           this.outParamsList = []
         }
+        this.dataLoading = false
       })
     },
     // 清洗数据，按selectVue的格式重新组织指标数据
@@ -352,17 +306,13 @@ export default {
       this.outParams = []
       data.forEach(item => {
         out.push(item.englishName + '-' + item.id)
-        this.outParams.push(item.fieldId)
-        this.smsOutParams.push({
-          englishName: item.englishName,
-          fieldId: item.fieldId,
-          id: item.id,
-          fieldCode: item.fieldCode,
-          sourceTable: item.sourceTable
-        })
+        this.outParams.push(item.id)
       })
       this.dataForm.outParams = Array.from(new Set(out))
       this.outParamsList = this.updateOutParamsList(outList)
+      this.$nextTick(() => {
+        this.dataLoading = false
+      })
     },
     // 获取出参，默认展开列表
     updateOutParamsList (indexList) {
@@ -387,13 +337,6 @@ export default {
     // 选中出参
     outParamsSelect (node) {
       this.outParams.push(node.fieldId)
-      this.smsOutParams.push({
-        englishName: node.englishName,
-        fieldId: node.fieldId,
-        id: node.id,
-        fieldCode: node.fieldCode,
-        sourceTable: node.sourceTable
-      })
       if (this.outParams.length) {
         this.$refs.dataForm.clearValidate('outParams')
       }
@@ -401,11 +344,15 @@ export default {
     // 删除出参
     outParamsDeselect (node) {
       this.outParams = this.outParams.filter(item => item !== node.fieldId)
-      this.smsOutParams = this.smsOutParams.filter(item => item.englishName !== node.englishName)
     },
+    // 取消
     cancelHandle () {
       this.visible = false
       this.$parent.outparamsNodeVisible = false
+      this.$refs['dataForm'].resetFields()
+      if (!this.isEdit) {
+        this.$emit('close', false)
+      }
     }
   }
 }
