@@ -819,7 +819,6 @@
           }
         } else {
           let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
-          console.log('this.intelligentDistributionParams: ', this.intelligentDistributionParams)
           this.intelligentDistributionParams.forEach(item => {
             if (item.type === 'sms') {
                postData.datasourceParams.push(item)
@@ -829,7 +828,6 @@
               postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 2})
             }
           })
-          console.log('postData.datasourceParams: ', postData.datasourceParams);
           postData.transferType = 'kafka'
         }
         postData.increModel = data.increModel
@@ -1026,6 +1024,9 @@
         this.visible = true
         this.loading = true
         this.outParamsList = []
+        this.intelligentDistributionAddOrUpdateVisible = false
+        this.intelligentDistributionParams = []
+        this.baseForm.intelligentDistribution = []
         if (tag) {
            if (canUpdate) {
             this.rowData.authOwner = row.authOwner
@@ -1062,7 +1063,6 @@
             let params = this.formatPostData(this.baseForm, this.outParams)
             console.log(params)
             this.loading = true
-            return
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
                 this.loading = false
