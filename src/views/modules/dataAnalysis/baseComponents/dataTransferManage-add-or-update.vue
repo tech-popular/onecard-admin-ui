@@ -825,9 +825,9 @@
             if (item.type === 'sms') {
                postData.datasourceParams.push(item)
             } else if (item.type === 'tel') {
-              postData.datasourceParams.push({type: 'tel', id: smsMessage.length ? smsMessage[0].id + 1 : 1})
+              postData.datasourceParams.push({type: 'tel', id: smsMessage.length ? smsMessage[0].id + 1 : 200})
             } else if (item.type === 'ai') {
-              postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 2})
+              postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 300})
             }
           })
           postData.transferType = 'kafka'
