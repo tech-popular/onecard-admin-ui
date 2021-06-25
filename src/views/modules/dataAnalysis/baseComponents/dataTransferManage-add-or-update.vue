@@ -365,6 +365,7 @@
         // originOutParamsList: [],
         baseForm: {
           id: '',
+          beeFlowId: '', // 工蜂流程Id
           taskUniqueFlag: null, // 蜂巢任务ID
           dolphinProcessId: null,
           transferName: '', // 任务名称
@@ -780,6 +781,7 @@
       formatPostData (data, outParams) {
         let postData = {}
         postData.id = data.id ? data.id : ''
+        postData.beeFlowId = data.beeFlowId ? data.beeFlowId : ''
         postData.decisionType = data.decisionType
         postData.triggerMode = data.triggerMode
         postData.transferCategory = data.transferCategory
@@ -894,6 +896,7 @@
           if (data && data.status === '1') {
             let disData = data.data
             this.baseForm.id = disData.id
+            this.baseForm.beeFlowId = disData.beeFlowId
             this.baseForm.transferCategory = disData.transferCategory ? disData.transferCategory.toString() : '0'
             this.baseForm.decisionType = disData.decisionType ? disData.decisionType : '0'
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
