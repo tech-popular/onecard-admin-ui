@@ -273,8 +273,8 @@
             </el-row>
             <el-form-item label="智能下发" prop="intelligentDistribution" v-if="baseForm.transferCategory === '1'">             
               <el-checkbox v-model="baseForm.intelligentDistribution" label="sms" @change="changesmsDistribution" style="margin-right:0">短信</el-checkbox>
-                <span style="color:red;font-size:10px;margin-right:30px;">
-                <i style="font-style: normal;color:blue;cursor:pointer" v-if="setSmsTemplteVisible" @click="setSmsTemplte">配置短信模板</i>
+                <span style="font-size:14px;margin-right:30px;">
+                <i style="font-style: normal;cursor:pointer" v-if="setSmsTemplteVisible" @click="setSmsTemplte">(配置)</i>
               </span>
               <el-checkbox v-model="baseForm.intelligentDistribution" label="tel" @change="changetelDistribution">电销</el-checkbox>
               <el-checkbox v-model="baseForm.intelligentDistribution" label="ai" @change="changeAiDistribution">AI</el-checkbox>
@@ -819,6 +819,7 @@
           }
         } else {
           let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
+          console.log('this.intelligentDistributionParams: ', this.intelligentDistributionParams)
           this.intelligentDistributionParams.forEach(item => {
             if (item.type === 'sms') {
                postData.datasourceParams.push(item)
@@ -828,6 +829,7 @@
               postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 2})
             }
           })
+          console.log('postData.datasourceParams: ', postData.datasourceParams);
           postData.transferType = 'kafka'
         }
         postData.increModel = data.increModel
@@ -1060,6 +1062,7 @@
             let params = this.formatPostData(this.baseForm, this.outParams)
             console.log(params)
             this.loading = true
+            return
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
                 this.loading = false

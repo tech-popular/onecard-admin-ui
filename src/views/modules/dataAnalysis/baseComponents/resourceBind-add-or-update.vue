@@ -73,6 +73,7 @@
 						:searchable="true"
 						:clearable="true"
 						:disabled="viewVisible"
+            @open="openParamsSelect"
 						@input="changeOption"
 						@select="outParamsSelect"
 						@deselect="outParamsDeselect"
@@ -404,6 +405,11 @@ export default {
     // 删除出参
     outParamsDeselect (node) {
       this.outParams = this.outParams.filter(item => item !== node.fieldId)
+    },
+    // 打开出参菜单
+    openParamsSelect () {
+      console.log('122211')
+      if (!this.dataForm.channelCode) return this.$message.error('请先选择所属渠道')
     },
     submitData () {
       this.$refs['dataForm'].validate((valid) => {
