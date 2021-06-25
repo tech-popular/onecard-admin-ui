@@ -49,7 +49,7 @@
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'edit')">编辑</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
-          <el-button type="text" @click="deletedateHandle(scope.row)">删除</el-button>
+          <!-- <el-button type="text" @click="deletedateHandle(scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
