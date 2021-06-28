@@ -49,7 +49,7 @@
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'edit')">编辑</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
-          <!-- <el-button type="text" @click="deletedateHandle(scope.row)">删除</el-button> -->
+          <el-button type="text" @click="deletedateHandle(scope.row)" v-if="isAdmin" >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -83,6 +83,7 @@
         totalCount: 0,
         dataListLoading: false,
         addOrUpdateVisible: false,
+        isAdmin: sessionStorage.getItem('username') === 'admin',
         typeList: [
           {lable: 'kafka', value: 'kafka'},
           {lable: 'mysql', value: 'mysql'},
@@ -126,7 +127,7 @@
       },
       // 删除数据
       deletedateHandle (row) {
-        this.$confirm(`确认删除短信名称为【${row.resourceName}】的数据?`, '提示', {
+        this.$confirm(`确认删除名称为【${row.resourceName}】的数据?`, '提示', {
           confirmButtonText: '删除',
           cancelButtonText: '取消',
           type: 'warning'
