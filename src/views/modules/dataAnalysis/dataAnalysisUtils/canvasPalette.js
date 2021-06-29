@@ -16,11 +16,11 @@ export const palette = [
   //   category: 'GROUP_CHOICE',
   //   nodeName: '分群节点'
   // },
-  {
-    key: '4',
-    category: 'FILTER_CHOICE',
-    nodeName: '过滤节点'
-  },
+  // {
+  //   key: '4',
+  //   category: 'FILTER_CHOICE',
+  //   nodeName: '过滤节点'
+  // },
   {
     key: '5',
     category: 'OUT_PARAM',
