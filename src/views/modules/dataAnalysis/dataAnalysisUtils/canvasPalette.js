@@ -5,12 +5,12 @@ export const palette = [
   //   nodeName: '入参',
   //   key: '1'
   // },
-  {
-    key: '2',
-    category: 'MULTI_BRANCH',
-    path: 'flowNode.png',
-    nodeName: '分流节点'
-  },
+  // {
+  //   key: '2',
+  //   category: 'MULTI_BRANCH',
+  //   path: 'flowNode.png',
+  //   nodeName: '分流节点'
+  // },
   // {
   //   key: '3',
   //   category: 'GROUP_CHOICE',
