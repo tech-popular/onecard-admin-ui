@@ -221,7 +221,7 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
+          <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
                   <el-checkbox label="mysql" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
@@ -244,8 +244,8 @@
                   </el-select>
               </el-form-item>
             </el-col>
-            </el-row>
-            <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
+            </el-row> -->
+            <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
               <el-col style="width: 8.33333%;">
                 <el-form-item class="label-remove-margin" prop="transferType">
                     <el-checkbox label="sqlServer" v-model="baseForm.transferType" @change="transferTypeChage" style="margin-left: 8px;"></el-checkbox>
@@ -270,7 +270,7 @@
                     <el-button type="success" class="transfer-log" @click="viewLog" size="mini" v-if="baseForm.transferType.includes('sqlServer') && baseForm.sqlServer">下发日志</el-button>
                 </el-form-item>
               </el-col>
-            </el-row>
+            </el-row> -->
             <el-form-item label="智能下发" prop="intelligentDistribution" v-if="baseForm.transferCategory === '1'">             
               <el-checkbox v-model="baseForm.intelligentDistribution" label="sms" @change="changesmsDistribution" style="margin-right:0">短信</el-checkbox>
                 <span style="font-size:14px;margin-right:30px;">
