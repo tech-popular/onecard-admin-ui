@@ -46,12 +46,12 @@
 				</el-select>
 			</el-form-item>
 			 <el-form-item  prop="channelId" v-if="dataForm.type === 'sms'" label="短信渠道" :rules="{ required: true, message: '请选择短信渠道', trigger: 'blur' }">
-        <el-select v-model="dataForm.channelId" @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
+        <el-select v-model="dataForm.channelId" filterable  @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item prop="resourceCode" v-if="dataForm.type === 'sms'" label="短信模板" :rules="{ required: true, message: '请选择短信模板', trigger: 'blur' }">
-        <el-select v-model="dataForm.resourceCode" @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
+        <el-select v-model="dataForm.resourceCode" filterable  @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
           <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
         </el-select>
       </el-form-item>
@@ -103,6 +103,8 @@ export default {
       paramsVisible: true,
       viewVisible: false,
       tag: '',
+      createTime: '', // 创建时间
+      createUser: '', // 创建人
       dataForm: {
         id: '',
         type: 'kafka',
@@ -139,6 +141,7 @@ export default {
       }
     },
     init (row, tag) {
+      console.log('row: ', row)
       this.paramsVisible = true
       this.getChannelsList()
       this.getKafkaServerList()
@@ -160,9 +163,13 @@ export default {
         resourceCode: '',
         outParams: []
       }
+      this.createTime = ''
+      this.createUser = ''
       this.outParams = []
       this.visible = true
       if (row) {
+        this.createTime = row.createTime
+        this.createUser = row.createUser
         this.getLookData(row)
       }
     },
@@ -426,7 +433,6 @@ export default {
             resourceId: this.dataForm.resourceId.toString(),
             bindingIndex: this.outParams.join(',')
           }
-          console.log('params: ', params)
           if (!this.dataForm.id) {
               addDataInfo(params).then(({data}) => {
                 if (data && data.status === '1') {
@@ -445,6 +451,8 @@ export default {
                 }
               })
             } else {
+              params.createTime = this.createTime
+              params.createUser = this.createUser
               editDataInfo(params).then(({data}) => {
                 if (data && data.status === '1') {
                   this.$message({

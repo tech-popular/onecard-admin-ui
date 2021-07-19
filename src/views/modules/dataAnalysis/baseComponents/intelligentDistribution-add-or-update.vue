@@ -8,12 +8,12 @@
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" label-position="left" label-width="100px" :rules="dataRules" :disabled="!canUpdate">
       <el-form-item  prop="channelId" label="渠道" >
-        <el-select v-model="dataForm.channelId" @change="getSmsCodeDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
+        <el-select v-model="dataForm.channelId" filterable  @change="getSmsCodeDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item prop="tempCode"  label="模板">
-        <el-select v-model="dataForm.tempCode" @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
+        <el-select v-model="dataForm.tempCode" filterable @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
           <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
         </el-select>
       </el-form-item>
