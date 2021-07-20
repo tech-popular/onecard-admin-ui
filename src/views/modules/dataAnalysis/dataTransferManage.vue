@@ -72,6 +72,7 @@
           <el-button type="text" @click="lowerHandle(scope.row)" v-if="scope.row.enable === true && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)">立即下发</el-button>
           <el-button type="text" v-if="scope.row.enable != true && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" @click="lowerHandle(scope.row)" disabled>立即下发</el-button>
           <el-button type="text" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
+          <el-button type="text" @click="taskProgress(scope.row)">执行进度</el-button> 
         </template>
       </el-table-column>
     </el-table>
@@ -87,6 +88,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
       <!-- 授权 -->
     <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
+    <dataTransferManage-task-progress v-if="taskProgressVisible" ref="taskProgress"></dataTransferManage-task-progress>
   </div>
 </template>
 
@@ -95,6 +97,7 @@
   import AddOrUpdate from './baseComponents/dataTransferManage-add-or-update'
   import { updateDataTransferAuth, updateDataTransferAuths } from '@/api/commom/assignPermission'
   import AssignPermission from '../../components/permission/assign-permission'
+  import dataTransferManageTaskProgress from './baseComponents/dataTransferManage-task-progress'
   export default {
     data () {
       return {
@@ -111,6 +114,7 @@
         dataListSelections: [],
         dataListLoading: false,
         addOrUpdateVisible: false,
+        taskProgressVisible: false,
         submitDataApi: updateDataTransferAuth,
         submitDataApis: updateDataTransferAuths,
         assignPermissionVisible: false,
@@ -121,7 +125,8 @@
     },
     components: {
       AddOrUpdate,
-      AssignPermission
+      AssignPermission,
+      dataTransferManageTaskProgress
     },
     mounted () {
       this.getDataList()
@@ -280,6 +285,13 @@
         })
         this.$nextTick(() => {
           this.$refs.assignPermission.init(ids, true)
+        })
+      },
+      // 执行进度
+      taskProgress (row) {
+        this.taskProgressVisible = true
+        this.$nextTick(() => {
+          this.$refs.taskProgress.init(row)
         })
       }
     }
