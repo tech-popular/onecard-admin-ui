@@ -14,8 +14,22 @@
       <el-form-item label="名称">
         <el-input v-model="dataForm.resourceName" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="Code">
-        <el-input v-model="dataForm.resourceCode" placeholder="" clearable />
+      <el-form-item label="渠道">
+        <el-select
+					v-model="dataForm.channelCode"
+					@change="channelIdChange"
+					filterable
+          clearable
+				>
+					<template v-for="(item, index) in channelList">
+						<el-option
+							:key="index"
+							:label="item.text"
+							:value="item.value"
+							:disabled="item.disabled"
+						></el-option>
+					</template>
+				</el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
@@ -33,6 +47,8 @@
           </el-tooltip>
         </template>
       </el-table-column>
+      <el-table-column prop="type" header-align="center" align="center" label="类型"></el-table-column>
+      <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"></el-table-column>
       <el-table-column prop="bindingIndex" header-align="center" align="center" label="出参">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -68,16 +84,17 @@
 
 <script>
   import AddOrUpdate from './baseComponents/resourceBind-add-or-update'
-  import { getDataList, deleteDataInfo } from '@/api/dataAnalysis/sourceBinding'
+  import { getDataList, deleteDataInfo, getChannelist } from '@/api/dataAnalysis/sourceBinding'
   export default {
     data () {
       return {
         dataForm: {
-          resourceCode: '',
+          channelCode: '',
           type: '',
           resourceName: ''
         },
         dataList: [],
+        channelList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
         totalCount: 0,
@@ -86,7 +103,7 @@
         isAdmin: sessionStorage.getItem('username') === 'admin',
         typeList: [
           {lable: 'kafka', value: 'kafka'},
-          {lable: 'mysql', value: 'mysql'},
+          // {lable: 'mysql', value: 'mysql'},
           {lable: 'sms', value: 'sms'}
         ]
       }
@@ -95,7 +112,7 @@
       AddOrUpdate
     },
     mounted () {
-      this.getDataList()
+      this.getChannelsList()
     },
     methods: {
       // 获取数据列表
@@ -111,12 +128,36 @@
             this.dataList = []
             this.totalCount = 0
           } else {
+            data.data.list.map(item => {
+              this.channelList.forEach(citem => {
+                if (item.channelCode === citem.value) {
+                  item.channelCode = citem.lable
+                }
+              })
+            })
             this.dataList = data.data.list
             this.totalCount = data.data.total
           }
             this.dataListLoading = false
         })
       },
+    getChannelsList () {
+      getChannelist().then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.channelList = []
+          return
+        }
+        this.channelList = res.data.data.map(item => {
+          if (item.value === '0000') {
+            item.disabled = true
+          } else {
+            item.disabled = false
+          }
+          return item
+        })
+        this.getDataList()
+      })
+    },
 
       // 新增 / 修改
       addOrUpdateHandle (row, tag) {
@@ -158,7 +199,7 @@
       resetHandle () {
         this.pageNum = 1
         this.dataForm = {
-          resourceCode: '',
+          channelCode: '',
           type: '',
           resourceName: ''
         }

@@ -10,7 +10,7 @@
         </el-input> -->
 			</el-form-item>
 			<el-form-item label="浮动比例">
-				<el-input-number  :min="0" :max="100" :step="1" v-model="dataForm.percent" style="width: 200px" @blur="rateBlur">
+				<el-input-number  :min="0" :precision= "0" :max="100" :step="1" v-model="dataForm.percent" style="width: 200px" @blur="rateBlur">
         </el-input-number>&nbsp;%
 			</el-form-item>
 		</el-form>
@@ -41,7 +41,7 @@ export default {
       id: '',
       dataList: [],
       dataForm: {
-        percent: '20',
+        percent: '',
         metricRound: 0
       }
     }
@@ -57,12 +57,17 @@ export default {
       dataTransferManageTaskProgress(id).then(({data}) => {
         if (data.status === '1') {
           this.dataList = data.data.transferHistoryCounts
-          this.dataForm.percent = data.data.percent * 100
+          this.dataForm.percent = data.data.percent ? data.data.percent * 100 : '30'
           this.dataForm.metricRound = data.data.metricRound
         }
       })
     },
-    rateBlur () {},
+    rateBlur () {
+      // let rate = this.dataForm.percent + ''
+      // if (rate.indexOf('.') > -1) {
+        this.dataForm.percent =  this.dataForm.percent.replace(/^0(0+)|[^\d]+/g, '')
+      // }
+		},
     submitData () {
       let params = {
         percent: this.dataForm.percent / 100
