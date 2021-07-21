@@ -72,6 +72,7 @@ export default {
       viewVisible: false,
       isEdit: false,
       smsOutParams: [],
+      systemCode: '',
       dataForm: {
         type: 'sms',
         channelId: '',
@@ -129,6 +130,7 @@ export default {
       this.resourceCode = ''
       this.resourceId = ''
       this.resourceName = ''
+      this.systemCode = ''
       this.dataForm = {
         type: 'sms',
         channelId: '',
@@ -144,6 +146,7 @@ export default {
         this.dataForm.type = data.data.configItems.type
         this.dataForm.tempCode = data.data.configItems.tempCode
         this.dataForm.channelId = data.data.configItems.channelId
+        this.dataForm.systemCode = data.data.configItems.systemCode
         if (this.dataForm.type === 'sms') {
           this.getSmsCodeDate(data.data.configItems.channelId, false)
         }
@@ -217,6 +220,7 @@ export default {
       this.resourceCode = this.dataForm.tempCode
       this.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].smsDesc
       this.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].id.toString()
+      this.systemCode = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.tempCode)[0].systemCode
       this.smsOutParams = []
       this.outParams = []
       this.dataForm.outParams = []
@@ -252,6 +256,7 @@ export default {
               type: this.dataForm.type,
               channelId: this.dataForm.channelId,
               tempCode: this.dataForm.tempCode,
+              systemCode: this.systemCode,
               params: smsOutParam
             }
           }
