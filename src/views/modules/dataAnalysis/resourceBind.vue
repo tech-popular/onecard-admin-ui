@@ -17,7 +17,6 @@
       <el-form-item label="渠道">
         <el-select
 					v-model="dataForm.channelCode"
-					@change="channelIdChange"
 					filterable
           clearable
 				>
@@ -91,7 +90,8 @@
         dataForm: {
           channelCode: '',
           type: '',
-          resourceName: ''
+          resourceName: '',
+          resourceCode: ''
         },
         dataList: [],
         channelList: [],
@@ -201,7 +201,8 @@
         this.dataForm = {
           channelCode: '',
           type: '',
-          resourceName: ''
+          resourceName: '',
+          resourceCode: ''
         }
       },
       // 每页数

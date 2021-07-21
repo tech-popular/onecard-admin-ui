@@ -65,9 +65,9 @@ export default {
     rateBlur () {
       // let rate = this.dataForm.percent + ''
       // if (rate.indexOf('.') > -1) {
-        this.dataForm.percent =  this.dataForm.percent.replace(/^0(0+)|[^\d]+/g, '')
+        this.dataForm.percent = this.dataForm.percent.replace(/^0(0+)|[^\d]+/g, '')
       // }
-		},
+    },
     submitData () {
       let params = {
         percent: this.dataForm.percent / 100
