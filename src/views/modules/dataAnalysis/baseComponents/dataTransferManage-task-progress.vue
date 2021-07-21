@@ -6,6 +6,10 @@
 		<el-form :model="dataForm" ref="dataForm" label-width="80px" :inline="true">
 			<el-form-item label="平均值">
 				<span>{{dataForm.metricRound}}</span>
+				<el-tooltip placement="top">
+					<div slot="content">平均值默认为前7次下发数量平均值（异常数据除外）</div>
+					<i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+        </el-tooltip>
 				<!-- <el-input   v-model="dataForm.metricRound" disabled style="width: 200px">
         </el-input> -->
 			</el-form-item>
@@ -15,8 +19,7 @@
 			</el-form-item>
 		</el-form>
 		<el-table :data="dataList" border>
-			<el-table-column prop="id" header-align="center" align="center"  label="任务ID"></el-table-column>
-			<el-table-column prop="transferId" header-align="center" align="center"  label="任务名称"></el-table-column>
+			<el-table-column prop="transferId" header-align="center" align="center"  label="流转ID"></el-table-column>
 			<el-table-column prop="createTime" header-align="center" align="center"  label="执行时间"></el-table-column>
 			<el-table-column prop="count" header-align="center" align="center"  label="分群下发数量 "></el-table-column>
 			<el-table-column prop="enable" header-align="center" align="center"  label="状态">
@@ -57,12 +60,14 @@ export default {
       dataTransferManageTaskProgress(id).then(({data}) => {
         if (data.status === '1') {
           this.dataList = data.data.transferHistoryCounts
-          this.dataForm.percent = data.data.percent * 100
+          this.dataForm.percent = data.data.percent ? data.data.percent * 100 : '30'
           this.dataForm.metricRound = data.data.metricRound
         }
       })
     },
-    rateBlur () {},
+    rateBlur () {
+      this.dataForm.percent = this.dataForm.percent.replace(/^0(0+)|[^\d]+/g, '')
+    },
     submitData () {
       let params = {
         percent: this.dataForm.percent / 100

@@ -194,22 +194,15 @@
               </el-col>
             </el-row>
         </div>
-        <div class="pane-rules" v-if="baseForm.decisionType === '0'">
+        <div  v-if="baseForm.decisionType === '0'">
           <h3>下发数据源</h3>
           <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
-            <el-col style="width: 8.33333%;">
-              <el-form-item  prop="transferType">
-                <el-checkbox label="kafka" name="transferType" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
-              </el-form-item>
-            </el-col>
-            <el-col :span="5">
-              <el-form-item prop="kafkaServer">
+              <el-form-item prop="kafkaServer" label="kafka">
                 <el-select
                   v-model= "baseForm.kafkaServer"
                   collapse-tags
                   filterable
                   @change="kafkaServerChange"
-                  style="margin-left: 5px; width:220px;"
                   placeholder="请选择">
                   <el-option
                     v-for="item in kafkaServerList"
@@ -219,7 +212,6 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-            </el-col>
           </el-row>
           <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
@@ -315,13 +307,13 @@
   export default {
     data () {
       // 验证枚举类型的函数
-      let validateKafkaServer = (rule, value, callback) => {
-        if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
-          callback(new Error('请选择数据源'))
-        } else {
-          callback()
-        }
-      }
+      // let validateKafkaServer = (rule, value, callback) => {
+      //   if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
+      //     callback(new Error('请选择数据源'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
 
       let validateMysqlServer = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
@@ -470,8 +462,11 @@
           intelligentDistribution: [
             { type: 'array', required: true, message: '请选择业务下发方式', trigger: 'change' }
           ],
+          // kafkaServer: [
+          //   { validator: validateKafkaServer }
+          // ],
           kafkaServer: [
-            { validator: validateKafkaServer }
+            { required: true, message: '请选择数据源', trigger: 'change' }
           ],
           mysqlServer: [
             { validator: validateMysqlServer }
