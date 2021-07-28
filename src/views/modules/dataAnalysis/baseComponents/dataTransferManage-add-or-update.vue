@@ -314,7 +314,6 @@
       //     callback()
       //   }
       // }
-
       let validateMysqlServer = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
           callback(new Error('请选择数据源'))
@@ -374,7 +373,7 @@
           endTime: '',
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
-          transferType: [], // 下发数据源
+          transferType: ['kafka'], // 下发数据源
           intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // kafka数据源地址

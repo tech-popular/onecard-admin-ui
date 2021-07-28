@@ -2,16 +2,16 @@
   <el-dialog :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"  @close="datano" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%" :disabled="!canUpdate">
     <el-form-item label="工作流名称" prop="name">
-      <el-input v-model="dataForm.name" placeholder="工作流名称"/>
+      <el-input v-model.trim="dataForm.name" placeholder="工作流名称"/>
     </el-form-item>
      <el-form-item label="拥有者" prop="owner">
-      <el-input v-model="dataForm.owner" placeholder="拥有者"/>
+      <el-input v-model.trim="dataForm.owner" placeholder="拥有者"/>
     </el-form-item>
     <el-form-item label="使用者" prop="user">
-      <el-input v-model="dataForm.user" placeholder="使用者"/>
+      <el-input v-model.trim="dataForm.user" placeholder="使用者"/>
     </el-form-item>
     <el-form-item label="工作流入参">
-      <el-input v-model="dataForm.inputParameters" placeholder="多个参数用英文逗号隔开，例：name,costumerId"/>
+      <el-input v-model.trim="dataForm.inputParameters" placeholder="多个参数用英文逗号隔开，例：name,costumerId"/>
     </el-form-item>
     <el-form-item v-if="!dataForm.id" label="组合工作流编码" prop="flowCode" >
       <el-row :gutter="20">
@@ -24,7 +24,7 @@
         </el-col>
         <el-col :span="11" style="float: right;">
           <div class="grid-content bg-purple">
-            <el-input v-model="dataForm.flowCode" placeholder="只能输入英文 数字 和下划线" style="width:100%;"/>
+            <el-input v-model.trim="dataForm.flowCode" placeholder="只能输入英文 数字 和下划线" style="width:100%;"/>
           </div>
         </el-col>
       </el-row>
@@ -33,10 +33,10 @@
       <span>{{flowCodeSys+dataForm.flowCode}}</span>
     </el-form-item>
     <el-form-item label="返回结果" prop="outputParameters">
-      <el-input v-model="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
+      <el-input v-model.trim="dataForm.outputParameters" placeholder="json格式，例：{'phome':17611112222,'name':'xiaoming'}"/>
     </el-form-item>
      <el-form-item label="版本" prop="version">
-        <el-select filterable v-model="dataForm.version" placeholder="请选择">
+        <el-select filterable v-model.trim="dataForm.version" placeholder="请选择">
           <el-option v-for="item in versionList" :value="item.id" :key="item.value" :label="item.id"/>
         </el-select>
     </el-form-item>
@@ -44,10 +44,10 @@
       <el-input v-model="dataForm.description" placeholder="描述"/>
     </el-form-item>
      <el-form-item label="创建人姓名" prop="createdBy">
-      <el-input v-model="dataForm.createdBy" placeholder="创建人姓名" disabled/>
+      <el-input v-model.trim="dataForm.createdBy" placeholder="创建人姓名" disabled/>
     </el-form-item>
     <el-form-item label="归属系统" prop="ownerApp">
-        <el-select filterable v-model="dataForm.ownerApp" placeholder="请选择">
+        <el-select filterable v-model.trim="dataForm.ownerApp" placeholder="请选择">
           <el-option v-for="item in ownerAppList" :value="item.sysName" :key="item.sysName" :label="item.sysName"/>
         </el-select>
     </el-form-item>
@@ -91,38 +91,38 @@
         },
         dataRule: {
           name: [
-            { required: true, message: '工作流名称不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '工作流名称不能为空', trigger: 'blur' }
+            // { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           owner: [
-            { required: true, message: '拥有者不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '拥有者不能为空', trigger: 'blur' }
+            // { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           user: [
-            { required: true, message: '使用者不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '使用者不能为空', trigger: 'blur' }
+            // { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           // inputParameters: [
           //   { required: true, message: '工作流入参不能为空', trigger: 'blur' },
           //   { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           // ],
           outputParameters: [
-            { required: true, message: '返回结果不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '返回结果不能为空', trigger: 'blur' }
+            // { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           version: [
-            { required: true, message: '版本不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+            { required: true, message: '版本不能为空', trigger: 'blur' }
+            // { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           createdBy: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+            // { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           ownerApp: [
-            { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
+            // { required: false, validator: Filter.NullKongGeRule, trigger: 'change' }
           ],
           flowCode: [
             { required: true, message: '工作流编码不能为空', trigger: 'blur' },
-            { required: true, validator: Filter.NullKongGeRule, trigger: 'change' },
+            // { required: true, validator: Filter.NullKongGeRule, trigger: 'change' },
             { required: true, validator: Filter.FlowCode, trigger: 'change' }
           ]
         },

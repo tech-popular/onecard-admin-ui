@@ -21,7 +21,7 @@
 			<el-form-item label="下发类型" prop="type"> 
 				<el-select v-model="dataForm.type" @change="changeType">
 					<el-option label="kafka" value="kafka">kafka</el-option>
-					<el-option label="mysql" value="mysql">mysql</el-option>
+					<!-- <el-option label="mysql" value="mysql">mysql</el-option> -->
 					<el-option label="sms" value="sms">sms</el-option>
 				</el-select>
 			</el-form-item>
@@ -35,7 +35,7 @@
 					</el-option>
 				</el-select>
 			</el-form-item>
-			<el-form-item v-if="dataForm.type === 'mysql'" label="数据源" prop="resourceId" :rules="{ required: true, message: '请选择数据源', trigger: 'blur' }">
+			<!-- <el-form-item v-if="dataForm.type === 'mysql'" label="数据源" prop="resourceId" :rules="{ required: true, message: '请选择数据源', trigger: 'blur' }">
 				<el-select v-model="dataForm.resourceId" @change="mysqlServerChange">
 				  <el-option
 						v-for="item in mysqlServerList"
@@ -44,7 +44,7 @@
 						:value="item.id">
 					</el-option>
 				</el-select>
-			</el-form-item>
+			</el-form-item> -->
 			 <el-form-item  prop="channelId" v-if="dataForm.type === 'sms'" label="短信渠道" :rules="{ required: true, message: '请选择短信渠道', trigger: 'blur' }">
         <el-select v-model="dataForm.channelId" filterable  @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 300px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
@@ -91,7 +91,7 @@
 	</el-dialog>
 </template>
 <script>
-import { dataTransferManageOutParams, dataTransferManageKafka, dataTransferManageMysql, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
+import { dataTransferManageOutParams, dataTransferManageKafka, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
 import { getChannelist, addDataInfo, editDataInfo, lookDataList } from '@/api/dataAnalysis/sourceBinding'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -145,7 +145,7 @@ export default {
       this.paramsVisible = true
       this.getChannelsList()
       this.getKafkaServerList()
-      this.getMysqlServerList()
+      // this.getMysqlServerList()
       this.getAllSmsChannels()
       this.outParamsList = []
       this.tag = row ? tag : ''
@@ -232,17 +232,17 @@ export default {
       this.dataForm.resourceName = arr[0].name
       this.dataForm.resourceCode = arr[0].code
     },
-    // mysql 数据源
-    getMysqlServerList () {
-      let params = {
-        type: 'mysql'
-      }
-      dataTransferManageMysql(params).then(({data}) => {
-        if (data && data.status === '1') {
-          this.mysqlServerList = data.data
-        }
-      })
-    },
+    // // mysql 数据源
+    // getMysqlServerList () {
+    //   let params = {
+    //     type: 'mysql'
+    //   }
+    //   dataTransferManageMysql(params).then(({data}) => {
+    //     if (data && data.status === '1') {
+    //       this.mysqlServerList = data.data
+    //     }
+    //   })
+    // },
     // 短信渠道
     getAllSmsChannels() {
       getAllSmsChannels().then(({data}) => {
@@ -360,7 +360,8 @@ export default {
     // 类型改变
     changeType (value) {
       this.paramsVisible = true
-      if (value === 'mysql' || value === 'kafka') {
+      // if (value === 'mysql' || value === 'kafka') {
+      if (value === 'kafka') {
         this.dataForm = {
           id: this.dataForm.id,
           channelCode: this.dataForm.channelCode,

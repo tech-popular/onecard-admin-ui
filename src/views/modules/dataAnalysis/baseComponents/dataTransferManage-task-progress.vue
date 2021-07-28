@@ -14,7 +14,7 @@
         </el-input> -->
 			</el-form-item>
 			<el-form-item label="浮动比例">
-				<el-input-number  :min="0" :max="100" :step="1" v-model="dataForm.percent" style="width: 200px" @blur="rateBlur">
+				<el-input-number  :min="0" :precision= "0" :max="100" :step="1" v-model="dataForm.percent" style="width: 200px" @blur="rateBlur">
         </el-input-number>&nbsp;%
 			</el-form-item>
 		</el-form>
@@ -44,7 +44,7 @@ export default {
       id: '',
       dataList: [],
       dataForm: {
-        percent: '20',
+        percent: '',
         metricRound: 0
       }
     }
