@@ -381,7 +381,7 @@
           endTime: '',
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
-          transferType: ['kafka'], // 下发数据源
+          transferType: [], // 下发数据源
           intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // kafka数据源地址
@@ -473,7 +473,7 @@
           //   { validator: validateKafkaServer }
           // ],
            kafkaServer: [
-           { type: 'array', required: true, message: '请选择数据源', trigger: 'change' }
+           {  required: true, message: '请选择数据源', trigger: 'change' }
           ],
           mysqlServer: [
             { validator: validateMysqlServer }
@@ -799,7 +799,7 @@
         postData.authOthers = this.rowData.authOthers
         postData.datasourceParams = []
         if (data.transferCategory === '0') {
-          if (data.kafkaServer != '' && data.transferType.includes('kafka')) {
+          if (data.kafkaServer != '') {
             let tempServer = {
               type: 'kafka',
               id: data.kafkaServer,
@@ -807,20 +807,20 @@
             }
             postData.datasourceParams.push(tempServer)
           }
-          if (data.mysqlServer != '' && data.transferType.includes('mysql')) {
-            let tempServer = {
-              type: 'mysql',
-              id: data.mysqlServer
-            }
-            postData.datasourceParams.push(tempServer)
-          }
-          if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
-            let tempServer = {
-              type: 'sqlServer',
-              id: data.sqlServer
-            }
-            postData.datasourceParams.push(tempServer)
-          }
+          // if (data.mysqlServer != '' && data.transferType.includes('mysql')) {
+          //   let tempServer = {
+          //     type: 'mysql',
+          //     id: data.mysqlServer
+          //   }
+          //   postData.datasourceParams.push(tempServer)
+          // }
+          // if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
+          //   let tempServer = {
+          //     type: 'sqlServer',
+          //     id: data.sqlServer
+          //   }
+          //   postData.datasourceParams.push(tempServer)
+          // }
         } else {
           let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
           this.intelligentDistributionParams.forEach(item => {
@@ -832,8 +832,9 @@
               postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 300})
             }
           })
-          postData.transferType = 'kafka'
+          // postData.transferType = 'kafka'
         }
+        postData.transferType = 'kafka'
         postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
