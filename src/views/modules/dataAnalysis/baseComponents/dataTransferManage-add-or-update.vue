@@ -381,7 +381,7 @@
           endTime: '',
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
-          transferType: [], // 下发数据源
+          transferType: ['kafka'], // 下发数据源
           intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // kafka数据源地址
