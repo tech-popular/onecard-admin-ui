@@ -473,7 +473,7 @@
           //   { validator: validateKafkaServer }
           // ],
            kafkaServer: [
-           {  required: true, message: '请选择数据源', trigger: 'change' }
+           { required: true, message: '请选择数据源', trigger: 'change' }
           ],
           mysqlServer: [
             { validator: validateMysqlServer }

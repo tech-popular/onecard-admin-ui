@@ -131,7 +131,7 @@
             data.data.list.map(item => {
               this.channelList.forEach(citem => {
                 if (item.channelCode === citem.value) {
-                  item.channelCode = citem.lable
+                  item.channelCode = citem.text
                 }
               })
             })
