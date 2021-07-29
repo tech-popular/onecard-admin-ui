@@ -28,26 +28,22 @@
 					<el-option label="sms" value="sms">sms</el-option>
 				</el-select>
 			</el-form-item>
-     <el-row :gutter="20" >
-        <el-col :span="10">
-          <el-form-item v-if="dataForm.type === 'kafka'" label="topic" prop="resourceId" :rules="{ required: true, message: '请选择topic', trigger: 'blur' }">
-            <el-select v-model="dataForm.resourceId" @change="kafkaServerChange">
-              <el-option
-                v-for="item in kafkaServerList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-              </el-option>
-            </el-select>
-			    </el-form-item>
-        </el-col>
-        <el-col :span="10" v-if="dataForm.resourceId">
-          <el-form-item label="Code">
-            <el-input v-model="dataForm.resourceCode" disabled=""></el-input>
-          </el-form-item>
-        </el-col>
-     </el-row>
-			
+      <div style="display:flex">
+        <el-form-item v-if="dataForm.type === 'kafka'" label="topic" prop="resourceId" :rules="{ required: true, message: '请选择topic', trigger: 'blur' }">
+          <el-select v-model="dataForm.resourceId" @change="kafkaServerChange">
+            <el-option
+              v-for="item in kafkaServerList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <span style="font-size:14px;margin-right:30px;">
+          <i style="font-style: normal;line-height:50px;padding-left:10px;color:#a5a8af;" v-if="dataForm.type === 'kafka' && dataForm.resourceId">{{target}}</i>
+        </span>
+      </div>
+
 			<!-- <el-form-item v-if="dataForm.type === 'mysql'" label="数据源" prop="resourceId" :rules="{ required: true, message: '请选择数据源', trigger: 'blur' }">
 				<el-select v-model="dataForm.resourceId" @change="mysqlServerChange">
 				  <el-option
@@ -118,6 +114,7 @@ export default {
       tag: '',
       createTime: '', // 创建时间
       createUser: '', // 创建人
+      target: '',
       dataForm: {
         id: '',
         type: 'kafka',
@@ -174,8 +171,9 @@ export default {
         resourceId: '',
         resourceName: '',
         resourceCode: '',
-        outParams: [],
+        outParams: []
       }
+      this.target = ''
       this.createTime = ''
       this.createUser = ''
       this.outParams = []
@@ -204,6 +202,9 @@ export default {
           }
           this.getOutParamsList(row, res.data.data.bindingIndex)
         }
+        this.$nextTick(() => {
+          this.target = this.kafkaServerList.filter(item => item.id == this.dataForm.resourceId)[0].target
+        })
       })
     },
     getChannelsList () {
@@ -237,6 +238,7 @@ export default {
     kafkaServerChange (value) {
       let arr = this.kafkaServerList.filter(item => item.id === value)
       this.dataForm.resourceCode = arr[0].code
+      this.target = arr[0].target
     },
     // // mysql选择时
     // mysqlServerChange (value) {
@@ -397,6 +399,7 @@ export default {
           smsTemplate: '' // 模板详情
         }
       }
+      this.target = ''
       this.outParams = []
     },
     getSmsTemplate () {
