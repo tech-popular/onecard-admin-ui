@@ -1,7 +1,10 @@
 <template>
 	<el-dialog :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
 		<el-form label-width="120px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
-			<el-form-item label="所属渠道" prop="channelCode" :rules="{ required: true, message: '请选择所属渠道', trigger: 'blur' }">
+			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
+				<el-input v-model="dataForm.resourceName" placeholder="请输入名称"></el-input>
+			</el-form-item>
+      <el-form-item label="所属渠道" prop="channelCode" :rules="{ required: true, message: '请选择所属渠道', trigger: 'blur' }">
 				<el-select
 					v-model="dataForm.channelCode"
 					@change="channelIdChange"
@@ -25,16 +28,22 @@
 					<el-option label="sms" value="sms">sms</el-option>
 				</el-select>
 			</el-form-item>
-			<el-form-item v-if="dataForm.type === 'kafka'" label="topic" prop="resourceId" :rules="{ required: true, message: '请选择topic', trigger: 'blur' }">
-				<el-select v-model="dataForm.resourceId" @change="kafkaServerChange">
-				  <el-option
-						v-for="item in kafkaServerList"
-						:key="item.id"
-						:label="item.name"
-						:value="item.id">
-					</el-option>
-				</el-select>
-			</el-form-item>
+      <div style="display:flex">
+        <el-form-item v-if="dataForm.type === 'kafka'" label="topic" prop="resourceId" :rules="{ required: true, message: '请选择topic', trigger: 'blur' }">
+          <el-select v-model="dataForm.resourceId" @change="kafkaServerChange">
+            <el-option
+              v-for="item in kafkaServerList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <span style="font-size:14px;margin-right:30px;">
+          <i style="font-style: normal;line-height:50px;padding-left:10px;color:#a5a8af;" v-if="dataForm.type === 'kafka' && dataForm.resourceId">{{target}}</i>
+        </span>
+      </div>
+
 			<!-- <el-form-item v-if="dataForm.type === 'mysql'" label="数据源" prop="resourceId" :rules="{ required: true, message: '请选择数据源', trigger: 'blur' }">
 				<el-select v-model="dataForm.resourceId" @change="mysqlServerChange">
 				  <el-option
@@ -105,6 +114,7 @@ export default {
       tag: '',
       createTime: '', // 创建时间
       createUser: '', // 创建人
+      target: '',
       dataForm: {
         id: '',
         type: 'kafka',
@@ -163,6 +173,7 @@ export default {
         resourceCode: '',
         outParams: []
       }
+      this.target = ''
       this.createTime = ''
       this.createUser = ''
       this.outParams = []
@@ -191,6 +202,9 @@ export default {
           }
           this.getOutParamsList(row, res.data.data.bindingIndex)
         }
+        this.$nextTick(() => {
+          this.target = this.kafkaServerList.filter(item => item.id == this.dataForm.resourceId)[0].target
+        })
       })
     },
     getChannelsList () {
@@ -223,15 +237,15 @@ export default {
     // kafka选择时
     kafkaServerChange (value) {
       let arr = this.kafkaServerList.filter(item => item.id === value)
-      this.dataForm.resourceName = arr[0].name
       this.dataForm.resourceCode = arr[0].code
+      this.target = arr[0].target
     },
-    // mysql选择时
-    mysqlServerChange (value) {
-      let arr = this.mysqlServerList.filter(item => item.id === value)
-      this.dataForm.resourceName = arr[0].name
-      this.dataForm.resourceCode = arr[0].code
-    },
+    // // mysql选择时
+    // mysqlServerChange (value) {
+    //   let arr = this.mysqlServerList.filter(item => item.id === value)
+    //   this.dataForm.resourceName = arr[0].name
+    //   this.dataForm.resourceCode = arr[0].code
+    // },
     // // mysql 数据源
     // getMysqlServerList () {
     //   let params = {
@@ -385,6 +399,7 @@ export default {
           smsTemplate: '' // 模板详情
         }
       }
+      this.target = ''
       this.outParams = []
     },
     getSmsTemplate () {
@@ -396,7 +411,7 @@ export default {
       } else {
         this.paramsVisible = true
       }
-      this.dataForm.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].smsDesc
+      // this.dataForm.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].smsDesc
       this.dataForm.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].id
     },
     changeOption () {
