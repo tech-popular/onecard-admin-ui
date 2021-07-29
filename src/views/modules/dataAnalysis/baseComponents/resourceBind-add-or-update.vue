@@ -59,11 +59,17 @@
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="resourceCode" v-if="dataForm.type === 'sms'" label="短信模板" :rules="{ required: true, message: '请选择短信模板', trigger: 'blur' }">
-        <el-select v-model="dataForm.resourceCode" filterable  @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
-          <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
-        </el-select>
-      </el-form-item>
+    
+      <div style="display:flex">
+        <el-form-item prop="resourceCode" v-if="dataForm.type === 'sms'" label="短信模板" :rules="{ required: true, message: '请选择短信模板', trigger: 'blur' }">
+          <el-select v-model="dataForm.resourceCode" filterable  @change="getSmsTemplate" placeholder="请选择模板" style="width: 300px">
+            <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
+          </el-select>
+        </el-form-item>
+          <span style="font-size:14px;margin-right:30px;">
+            <i style="font-style: normal;line-height:50px;padding-left:10px;color:#a5a8af;" v-if="dataForm.type === 'sms' && dataForm.resourceCode">{{dataForm.resourceCode}}</i>
+          </span>
+      </div>
       <el-form-item prop="smsTemplate" v-if="dataForm.type === 'sms'" label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" >
 				</el-input>
@@ -203,7 +209,9 @@ export default {
           this.getOutParamsList(row, res.data.data.bindingIndex)
         }
         this.$nextTick(() => {
-          this.target = this.kafkaServerList.filter(item => item.id == this.dataForm.resourceId)[0].target
+          if (row.type === 'kafka') {
+            this.target = this.kafkaServerList.filter(item => item.id == this.dataForm.resourceId)[0].target
+          }
         })
       })
     },
@@ -273,6 +281,7 @@ export default {
           if (isChange) {
             this.dataForm.resourceCode = ''
             this.dataForm.smsTemplate = ''
+            this.target = ''
           }
         }
       })
