@@ -197,11 +197,9 @@
         <div class="pane-rules" v-if="baseForm.decisionType === '0'">
           <h3>下发方式</h3>
           <el-row :gutter="20">
-            <el-col style="width: 8.33333%;">
+             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
-                <el-checkbox label="kafka" name="transferType"
-                @change="checked=>changeDistribution(checked, 'kafka')"
-                v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
+                <el-checkbox label="kafka" name="transferType" @change="checked=>changeDistribution(checked, 'kafka')" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -222,15 +220,33 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="10">
-              <el-form-item  >
+            <el-col :span="16" v-if="baseForm.kafkaServer">
+              <!-- <el-form-item  >
                 <el-input
                   type="textarea"
                   disabled
                   autosize
                   v-model="baseForm.kafkaParams">
                 </el-input>
-              </el-form-item>
+              </el-form-item> -->
+              <el-form-item prop="kafkaParams">
+              <Treeselect
+                :options="outParamsList"
+                :disable-branch-nodes="true"
+                :show-count="true"
+                :multiple="true"
+                :load-options="loadOptions"
+                :searchable="true"
+                :clearable="true"
+                disabled
+                @select="outParamsSelect"
+                @deselect="outParamsDeselect"
+                noChildrenText="暂无数据"
+                v-model="baseForm.kafkaParams"
+                placeholder="请选择"
+                class="base-pane-item"
+              />
+            </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="20">
@@ -259,15 +275,33 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="10">
-              <el-form-item>
+            <el-col :span="16" v-if="baseForm.smsId">
+              <!-- <el-form-item>
                 <el-input
                   type="textarea"
                   disabled
                   autosize
                   v-model="baseForm.smsParams">
                 </el-input>
-              </el-form-item>
+              </el-form-item> -->
+              <el-form-item  prop="smsParams">
+              <Treeselect
+                :options="outParamsList"
+                :disable-branch-nodes="true"
+                :show-count="true"
+                :multiple="true"
+                :load-options="loadOptions"
+                :searchable="true"
+                :clearable="true"
+                disabled
+                @select="outParamsSelect"
+                @deselect="outParamsDeselect"
+                noChildrenText="暂无数据"
+                v-model="baseForm.smsParams"
+                placeholder="请选择"
+                class="base-pane-item"
+              />
+            </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="20">
@@ -504,12 +538,12 @@
           // intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // 已绑定的kafka
-          kafkaParams: '', // kafka出参
+          kafkaParams: [], // kafka出参
           topic: '',
           // mysqlServer: '', // sftp数据源地址
           // sqlServer: '',
           smsId: '', // 短信绑定ID
-          smsParams: '', // 所选短信绑定的出参
+          smsParams: [], // 所选短信绑定的出参
           triggerMode: '0', // 下发类型，默认0主动型 1被动
           decisionType: '0'
         },
@@ -759,15 +793,13 @@
        // // 修改，回显时查询分群出参选中
     getOutParamsEditList (data, outList, type) {
       let out = []
-      this.outParams = []
       data.forEach(item => {
-        out.push(item.chineseName)
-        this.outParams.push(item.id)
+        out.push(item.englishName + '-' + item.id)
       })
       if (type === 'kafka') {
-        this.baseForm.kafkaParams = Array.from(new Set(out)).join(',')
+        this.baseForm.kafkaParams = Array.from(new Set(out))
       } else if (type === 'sms') {
-        this.baseForm.smsParams = Array.from(new Set(out)).join(',')
+        this.baseForm.smsParams = Array.from(new Set(out))
       }
     },
       // // kafka 数据源
@@ -868,13 +900,13 @@
         })
         this.baseForm.transferName = obj.text + (this.baseForm.decisionType === '0' ? '下发任务' : '智能运营任务')
         // 改变分群名称时，出参及sqlserver选项都初始化，因为他们依赖分群
-        // this.getOutParamsList()
+        this.getOutParamsList()
         this.baseForm.outParams = []
         this.outParams = []
         this.baseForm.kafkaServer = ''
-        this.baseForm.kafkaParams = ''
+        this.baseForm.kafkaParams = []
         this.baseForm.smsId = ''
-        this.baseForm.smsParams = ''
+        this.baseForm.smsParams = []
         this.kafkaServerList = []
         this.smsIdList = []
         this.baseForm.transferType = []
@@ -1200,9 +1232,9 @@
         // this.baseForm.mysqlServer = ''
         // this.baseForm.sqlServer = ''
         // this.baseForm.outParams = []
-        this.baseForm.kafkaParams = ''
+        this.baseForm.kafkaParams = []
         this.baseForm.smsId = ''
-        this.baseForm.smsParams = ''
+        this.baseForm.smsParams = []
         this.baseForm.templateId = ''
         this.rowData.authOwner = ''
         this.rowData.authOtherList = []
@@ -1336,27 +1368,30 @@
       },
       changeDistribution (checked, val, i) { // 业务下发方式短信弹框
         if (this.channelCode) {
-          if (checked && (val === 'kafka' || val === 'sms')) {
-            let params = {
-              type: val,
-              channelCode: this.channelCode
-            }
-            selectResourceBindingList(params).then(({data}) => {
-              if (val === 'kafka') {
-                this.kafkaServerList = data.data
-              } else if (val === 'sms') {
-                this.smsIdList = data.data
+          if (checked) {
+            if (val === 'kafka' || val === 'sms') {
+              let params = {
+                type: val,
+                channelCode: this.channelCode
               }
-            })
+              selectResourceBindingList(params).then(({data}) => {
+                if (val === 'kafka') {
+                  this.kafkaServerList = data.data
+                } else if (val === 'sms') {
+                  this.smsIdList = data.data
+                }
+              })
+            }
           } else {
             // this.baseForm.transferType = this.baseForm.transferType.filter(item => item !== val)
             if (val === 'kafka') {
               this.baseForm.kafkaServer = ''
-              this.baseForm.kafkaParams = ''
+              this.baseForm.kafkaParams = []
+              console.log('this.baseForm: ', this.baseForm)
               this.kafkaServerList = []
             } else if (val === 'sms') {
               this.baseForm.smsId = ''
-              this.baseForm.smsParams = ''
+              this.baseForm.smsParams = []
               this.smsIdList = []
             }
           }
