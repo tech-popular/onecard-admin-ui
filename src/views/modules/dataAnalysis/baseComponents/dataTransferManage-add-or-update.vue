@@ -429,14 +429,14 @@
       // 验证枚举类型的函数
       let validateKafkaServer = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
-          callback(new Error('请选择数据源'))
+          callback(new Error('请选择下发方式'))
         } else {
           callback()
         }
       }
       let validateSmaId = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('sms') > -1 && this.baseForm.smsId === '') {
-          callback(new Error('请选择数据源'))
+          callback(new Error('请选择下发方式'))
         } else {
           callback()
         }
