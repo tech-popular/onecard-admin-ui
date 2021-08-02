@@ -501,7 +501,7 @@
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
-          intelligentDistribution: [], // 业务下发
+          // intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // 已绑定的kafka
           kafkaParams: '', // kafka出参
@@ -587,11 +587,11 @@
             { validator: validateTime }
           ],
           transferType: [
-            { required: true, message: '请选择下发方式', trigger: 'change' }
+            { type: 'array', required: true, message: '请选择下发方式', trigger: 'change' }
           ],
-          intelligentDistribution: [
-            { type: 'array', required: true, message: '请选择业务下发方式', trigger: 'change' }
-          ],
+          // intelligentDistribution: [
+          //   { type: 'array', required: true, message: '请选择业务下发方式', trigger: 'change' }
+          // ],
           kafkaServer: [
             { validator: validateKafkaServer }
           ],
