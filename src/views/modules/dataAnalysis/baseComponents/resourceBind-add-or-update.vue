@@ -40,7 +40,7 @@
           </el-select>
         </el-form-item>
         <span style="font-size:14px;margin-right:30px;">
-          <i style="font-style: normal;line-height:50px;padding-left:10px;color:#a5a8af;" v-if="dataForm.type === 'kafka' && dataForm.resourceId">{{target}}</i>
+          <i style="font-style: normal;line-height:40px;padding-left:10px;" v-if="dataForm.type === 'kafka' && dataForm.resourceId">{{target}}</i>
         </span>
       </div>
 
@@ -67,7 +67,7 @@
           </el-select>
         </el-form-item>
           <span style="font-size:14px;margin-right:30px;">
-            <i style="font-style: normal;line-height:50px;padding-left:10px;color:#a5a8af;" v-if="dataForm.type === 'sms' && dataForm.resourceCode">{{dataForm.resourceCode}}</i>
+            <i style="font-style: normal;line-height:40px;padding-left:10px;" v-if="dataForm.type === 'sms' && dataForm.resourceCode">{{dataForm.resourceCode}}</i>
           </span>
       </div>
       <el-form-item prop="smsTemplate" v-if="dataForm.type === 'sms'" label="模板详情">
