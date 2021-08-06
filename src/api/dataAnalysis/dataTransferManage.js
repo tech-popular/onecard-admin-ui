@@ -16,8 +16,8 @@ export const dataTransferManageKafka = (params) => httpGet(da + `dataTransferDat
 export const dataTransferManageMysql = (params) => httpGetSeries(da + `dataTransferDatasourceConfig/getAllDatasourceConfig`, params) // mysql地址
 export const defaultOutParams = (channelCode, datasourceId) => httpGetSeries(da + `dataTransfer/out/default/datasource/${datasourceId}`, channelCode) // 渠道多选，传参方式改变
 export const r3Log = params => httpPost(da + 'r3log/list', params)
-export const getAllSmsChannels = () => httpGet(da + `data/decision/canvas/getAllSmsChannels`) // 短信渠道
-export const getSmsCodeInfo = (channelId) => httpGet(da + `data/decision/canvas/getSmsCodeInfoByChannelId/${channelId}`) // 短信code
+export const getAllSmsChannels = () => httpGet(da + `data/resource/smart/getAllSmsChannels`) // 短信渠道
+export const getSmsCodeInfo = (channelId) => httpGet(da + `data/resource/smart/getSmsCodeInfoByChannelId/${channelId}`) // 短信code
 export const addCanvasInfo = (params) => httpPost(da + 'data/decision/canvas/info', params) // 决策画布提交
 export const getSmsMessage = (resourceId) => httpGet(da + `resource/binding/fetchByResourceId/${resourceId}`) // 校验是否已进行资源绑定
 export const getSmsAllMessage = (resourceId) => httpGet(da + `resource/binding/fetchDescByResourceId/${resourceId}`) // 获取短信所有详细信息

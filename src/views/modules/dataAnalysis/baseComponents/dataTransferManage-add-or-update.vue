@@ -42,10 +42,10 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <!-- <el-form-item label="下发方式"  v-if="baseForm.decisionType === '0'" prop="transferCategory">
+            <el-form-item label="下发方式"  v-if="baseForm.decisionType === '0'" prop="transferCategory">
               <el-radio v-model="baseForm.transferCategory" label="0">普通下发</el-radio>
               <el-radio v-model="baseForm.transferCategory" label="1">智能下发</el-radio>
-            </el-form-item> -->
+            </el-form-item>
             <el-form-item label="任务名称" prop="transferName" style="width:50%">
               <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
             </el-form-item>
@@ -522,7 +522,7 @@
           dolphinProcessId: null,
           transferName: '', // 任务名称
           templateId: '', // 分群名称
-          // transferCategory: '0', // 下发方式
+          transferCategory: '0', // 下发方式
           outParams: [],
           taskDescribtion: '', // 描述
           jobType: 1, // 周期
@@ -591,9 +591,9 @@
           transferName: [
             { required: true, message: '请输入任务名称', trigger: 'blur' }
           ],
-          // transferCategory: [
-          //   { required: true, message: '请选择下发方式', trigger: 'change' }
-          // ],
+          transferCategory: [
+            { required: true, message: '请选择下发方式', trigger: 'change' }
+          ],
           outParams: [
             { required: true, message: '请选择分群出参', trigger: 'input' }
           ],
@@ -959,7 +959,7 @@
         postData.beeFlowId = data.beeFlowId ? data.beeFlowId : ''
         postData.decisionType = data.decisionType
         postData.triggerMode = data.triggerMode
-        // postData.transferCategory = data.transferCategory
+        postData.transferCategory = data.transferCategory
         postData.taskUniqueFlag = data.taskUniqueFlag
         postData.dolphinProcessId = data.dolphinProcessId
         postData.transferName = data.transferName
@@ -1079,7 +1079,7 @@
             let disData = data.data
             this.baseForm.id = disData.id
             this.baseForm.beeFlowId = disData.beeFlowId
-            // this.baseForm.transferCategory = disData.transferCategory ? disData.transferCategory.toString() : '0'
+            this.baseForm.transferCategory = disData.transferCategory ? disData.transferCategory.toString() : '0'
             this.baseForm.decisionType = disData.decisionType ? disData.decisionType : '0'
             this.baseForm.taskUniqueFlag = disData.taskUniqueFlag
             this.baseForm.dolphinProcessId = disData.dolphinProcessId

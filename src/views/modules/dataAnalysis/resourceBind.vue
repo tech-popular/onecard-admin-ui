@@ -34,6 +34,7 @@
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
 				<el-button type="success" @click="addOrUpdateHandle()">新建</el-button>
+        <el-button type="primary" v-if="isAdmin" @click="processConfigHandle()">流程配置</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -48,14 +49,14 @@
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="center" label="类型"></el-table-column>
       <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"></el-table-column>
-      <el-table-column prop="bindingIndex" header-align="center" align="center" label="出参">
+      <!-- <el-table-column prop="bindingIndex" header-align="center" align="center" label="出参">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.bindingIndex)" slot="content"></div>
             <div class="text-to-long-cut">{{scope.row.bindingIndex}}</div>
           </el-tooltip>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateUser" header-align="center" align="center" label="修改人"></el-table-column>
@@ -78,11 +79,13 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <Process-config v-if="processConfigVisible" ref="processConfig"></Process-config>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './baseComponents/resourceBind-add-or-update'
+  import ProcessConfig from './baseComponents/resoureBind-process-config'
   import { getDataList, deleteDataInfo, getChannelist } from '@/api/dataAnalysis/sourceBinding'
   export default {
     data () {
@@ -100,6 +103,7 @@
         totalCount: 0,
         dataListLoading: false,
         addOrUpdateVisible: false,
+        processConfigVisible: false,
         isAdmin: sessionStorage.getItem('username') === 'admin',
         typeList: [
           {lable: 'kafka', value: 'kafka'},
@@ -109,7 +113,8 @@
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      ProcessConfig
     },
     mounted () {
       this.getChannelsList()
@@ -164,6 +169,13 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(row, tag)
+        })
+      },
+      // 流程配置
+      processConfigHandle () {
+        this.processConfigVisible = true
+        this.$nextTick(() => {
+          this.$refs.processConfig.init()
         })
       },
       // 删除数据
