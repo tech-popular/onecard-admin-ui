@@ -209,7 +209,7 @@
                   collapse-tags
                   filterable
                   @change="kafkaSelectChange"
-                  style="margin-left: 5px;margin-right:10px; width:270px;"
+                  style="margin-right:10px; width:270px;"
                   placeholder="请选择">
                   <el-option
                     v-for="item in kafkaServerList"
@@ -233,14 +233,14 @@
                 style="margin-left: 8px;">短信</el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="6" style="display:flex;">
               <el-form-item prop="smsId">
                 <el-select
                   v-model= "baseForm.smsId"
                   collapse-tags
                   filterable
                   @change="smsSelectChange"
-                  style="margin-right: 10px;width:270px;"
+                  style="margin-right:10px;width:270px;"
                   placeholder="请选择">
                   <el-option
                     v-for="item in smsIdList"
@@ -271,7 +271,7 @@
                   collapse-tags
                   filterable
                   @change="telSelectChange"
-                  style="margin-left: 5px;margin-right:10px;  width:270px;"
+                  style="margin-right:10px;  width:270px;"
                   placeholder="请选择">
                   <el-option
                     v-for="item in telIdList"
@@ -302,7 +302,7 @@
                   collapse-tags
                   filterable
                   @change="aiSelectChange"
-                  style="margin-left: 5px;margin-right:10px; width:270px;"
+                  style="margin-right:10px; width:270px;"
                   placeholder="请选择">
                   <el-option
                     v-for="item in aiIdList"
@@ -421,20 +421,34 @@
   export default {
     data () {
       // 验证枚举类型的函数
-      // let validateKafkaServer = (rule, value, callback) => {
-      //   if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
-      //     callback(new Error('请选择下发方式'))
-      //   } else {
-      //     callback()
-      //   }
-      // }
-      // let validateSmaId = (rule, value, callback) => {
-      //   if (this.baseForm.transferType.indexOf('sms') > -1 && this.baseForm.smsId === '') {
-      //     callback(new Error('请选择下发方式'))
-      //   } else {
-      //     callback()
-      //   }
-      // }
+      let validateKafkaServer = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
+          callback(new Error('请选择'))
+        } else {
+          callback()
+        }
+      }
+      let validateSmaId = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('sms') > -1 && this.baseForm.smsId === '') {
+          callback(new Error('请选择'))
+        } else {
+          callback()
+        }
+      }
+      let validateTelId = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('tel') > -1 && this.baseForm.telId === '') {
+          callback(new Error('请选择'))
+        } else {
+          callback()
+        }
+      }
+      let validateAiId = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('ai') > -1 && this.baseForm.aiId === '') {
+          callback(new Error('请选择'))
+        } else {
+          callback()
+        }
+      }
       // let validateMysqlServer = (rule, value, callback) => {
       //   if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
       //     callback(new Error('请选择数据源'))
@@ -585,19 +599,25 @@
           endTime: [
             // {type: 'date', required: true, message: '请选择结束时间', trigger: 'change'},
             { validator: validateTime }
-          ]
+          ],
           // transferType: [
           //   { type: 'array', required: true, message: '请选择下发方式', trigger: 'change' }
           // ]
           // intelligentDistribution: [
           //   { type: 'array', required: true, message: '请选择业务下发方式', trigger: 'change' }
           // ],
-          // kafkaServer: [
-          //   { validator: validateKafkaServer }
-          // ],
-          // smsId: [
-          //   { validator: validateSmaId }
-          // ]
+          kafkaServer: [
+            { validator: validateKafkaServer }
+          ],
+          smsId: [
+            { validator: validateSmaId }
+          ],
+           telId: [
+            { validator: validateTelId }
+          ],
+           aiId: [
+            { validator: validateAiId }
+          ]
           //  kafkaServer: [
           //  { required: true, message: '请选择数据源', trigger: 'change' }
           // ],
@@ -1285,11 +1305,8 @@
         console.log(this.formatPostData(this.baseForm, this.outParams))
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
-            // let hasSmsTemplte = this.baseForm.intelligentDistribution.filter(item => item === 'sms')
-            // let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
-            // if (hasSmsTemplte.length && !smsMessage.length) return this.$message.error('请配置短信模板')
-            // let params = this.formatPostData(this.baseForm, this.outParams)
-              let params = this.formatPostData(this.baseForm)
+            if (this.baseForm.decisionType === '0' && !this.baseForm.transferType.length) return this.$message.error('请选择下发方式')
+            let params = this.formatPostData(this.baseForm)
             console.log(params)
             this.loading = true
             if (!this.baseForm.id) {
