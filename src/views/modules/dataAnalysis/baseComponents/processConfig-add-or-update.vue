@@ -20,10 +20,10 @@
 				</el-form-item>
 			<el-form-item label="类型" prop="type"> 
 				<el-select v-model="dataForm.type"  style="width: 400px">
-					<el-option label="sms" value="sms">sms</el-option>
-          <el-option label="tel" value="tel">电销</el-option>
-          <el-option label="ai" value="ai">AI</el-option>
-					<el-option label="push" value="push">push</el-option>
+					<el-option label="短信" value="sms"></el-option>
+          <el-option label="电销" value="tel"></el-option>
+          <el-option label="AI" value="ai"></el-option>
+					<el-option label="push" value="push"></el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item  prop="params"  label="出参">

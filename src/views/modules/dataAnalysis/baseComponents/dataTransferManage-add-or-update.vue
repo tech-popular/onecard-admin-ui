@@ -42,9 +42,9 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="下发方式"  v-if="baseForm.decisionType === '0'" prop="transferCategory">
-              <el-radio v-model="baseForm.transferCategory" label="0">普通下发</el-radio>
-              <el-radio v-model="baseForm.transferCategory" label="1">智能下发</el-radio>
+            <el-form-item label="下发方式"  v-if="baseForm.decisionType === '0'"  prop="transferCategory">
+              <el-radio v-model="baseForm.transferCategory" @change="changeTransferCategory" label="0">普通下发</el-radio>
+              <el-radio v-model="baseForm.transferCategory" @change="changeTransferCategory" label="1">智能下发</el-radio>
             </el-form-item>
             <el-form-item label="任务名称" prop="transferName" style="width:50%">
               <el-input v-model.trim="baseForm.transferName" class="base-pane-item"/>
@@ -194,22 +194,22 @@
               </el-col>
             </el-row>
         </div>
-        <div class="pane-rules" v-if="baseForm.decisionType === '0'">
+        <div class="pane-rules" >
           <h3>下发方式</h3>
-          <el-row :gutter="20">
+          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '0'">
              <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="kafka" name="transferType" @change="checked=>changeDistribution(checked, 'kafka')" v-model="baseForm.transferType" style="margin-left: 8px;"></el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="10" style="display:flex">
               <el-form-item prop="kafkaServer">
                 <el-select
                   v-model= "baseForm.kafkaServer"
                   collapse-tags
                   filterable
-                  @change="kafkaServerChange"
-                  style="margin-left: 5px; width:270px;"
+                  @change="kafkaSelectChange"
+                  style="margin-left: 5px;margin-right:10px; width:270px;"
                   placeholder="请选择">
                   <el-option
                     v-for="item in kafkaServerList"
@@ -219,37 +219,13 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-            </el-col>
-            <el-col :span="16" v-if="baseForm.kafkaServer">
-              <!-- <el-form-item  >
-                <el-input
-                  type="textarea"
-                  disabled
-                  autosize
-                  v-model="baseForm.kafkaParams">
-                </el-input>
-              </el-form-item> -->
-              <el-form-item prop="kafkaParams">
-              <Treeselect
-                :options="outParamsList"
-                :disable-branch-nodes="true"
-                :show-count="true"
-                :multiple="true"
-                :load-options="loadOptions"
-                :searchable="true"
-                :clearable="true"
-                disabled
-                @select="outParamsSelect"
-                @deselect="outParamsDeselect"
-                noChildrenText="暂无数据"
-                v-model="baseForm.kafkaParams"
-                placeholder="请选择"
-                class="base-pane-item"
-              />
-            </el-form-item>
+               <el-tooltip placement="top" v-if="baseForm.kafkaServer">
+                <div slot="content">{{baseForm.kafkaParams}}</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
             </el-col>
           </el-row>
-          <el-row :gutter="20">
+          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="sms" name="transferType" v-model="baseForm.transferType" 
@@ -257,14 +233,14 @@
                 style="margin-left: 8px;">短信</el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="6" >
+            <el-col :span="6">
               <el-form-item prop="smsId">
                 <el-select
                   v-model= "baseForm.smsId"
                   collapse-tags
                   filterable
                   @change="smsSelectChange"
-                  style="margin-left: 5px; width:270px;"
+                  style="margin-right: 10px;width:270px;"
                   placeholder="请选择">
                   <el-option
                     v-for="item in smsIdList"
@@ -274,89 +250,73 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-            </el-col>
-            <el-col :span="16" v-if="baseForm.smsId">
-              <!-- <el-form-item>
-                <el-input
-                  type="textarea"
-                  disabled
-                  autosize
-                  v-model="baseForm.smsParams">
-                </el-input>
-              </el-form-item> -->
-              <el-form-item  prop="smsParams">
-              <Treeselect
-                :options="outParamsList"
-                :disable-branch-nodes="true"
-                :show-count="true"
-                :multiple="true"
-                :load-options="loadOptions"
-                :searchable="true"
-                :clearable="true"
-                disabled
-                @select="outParamsSelect"
-                @deselect="outParamsDeselect"
-                noChildrenText="暂无数据"
-                v-model="baseForm.smsParams"
-                placeholder="请选择"
-                class="base-pane-item"
-              />
-            </el-form-item>
+               <el-tooltip placement="top" v-if="baseForm.smsId">
+                <div slot="content">{{baseForm.smsParams}}</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
             </el-col>
           </el-row>
-          <el-row :gutter="20">
-            <el-col style="width: 8.33333%;">
+          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
+             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="tel" name="transferType" v-model="baseForm.transferType" 
                 @change="checked=>changeDistribution(checked, 'tel')"
                 style="margin-left: 8px;">电销</el-checkbox>
               </el-form-item>
             </el-col>
-            <!-- <el-col :span="6">
-              <el-form-item prop="kafkaServer">
+            <el-col :span="6" style="display:flex;">
+              <el-form-item prop="telId">
                 <el-select
-                  v-model= "baseForm.kafkaServer"
+                  v-model= "baseForm.telId"
                   collapse-tags
                   filterable
-                  @change="kafkaServerChange"
-                  style="margin-left: 5px; width:220px;"
+                  @change="telSelectChange"
+                  style="margin-left: 5px;margin-right:10px;  width:270px;"
                   placeholder="请选择">
                   <el-option
-                    v-for="item in kafkaServerList"
+                    v-for="item in telIdList"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id">
                   </el-option>
                 </el-select>
               </el-form-item>
-            </el-col> -->
+               <el-tooltip placement="top" v-if="baseForm.telId">
+                <div slot="content">{{baseForm.telParams}}</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+            </el-col>
           </el-row>
-          <el-row :gutter="20">
-            <el-col style="width: 8.33333%;">
+          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
+             <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="ai" name="transferType" v-model="baseForm.transferType" 
                 @change="checked=>changeDistribution(checked, 'ai')"
                 style="margin-left: 8px;">AI</el-checkbox>
               </el-form-item>
             </el-col>
-            <!-- <el-col :span="6">
-              <el-form-item prop="kafkaServer">
+            <el-col :span="6" style="display:flex;">
+              <el-form-item prop="aiId">
                 <el-select
-                  v-model= "baseForm.kafkaServer"
+                  v-model= "baseForm.aiId"
                   collapse-tags
                   filterable
-                  @change="kafkaServerChange"
-                  style="margin-left: 5px; width:220px;"
+                  @change="aiSelectChange"
+                  style="margin-left: 5px;margin-right:10px; width:270px;"
                   placeholder="请选择">
                   <el-option
-                    v-for="item in kafkaServerList"
+                    v-for="item in aiIdList"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id">
                   </el-option>
                 </el-select>
               </el-form-item>
-            </el-col> -->
+               <el-tooltip placement="top" v-if="baseForm.aiId">
+                <div slot="content">{{baseForm.aiParams}}</div>
+                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+              </el-tooltip>
+            </el-col>
           </el-row>
           <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
@@ -461,20 +421,20 @@
   export default {
     data () {
       // 验证枚举类型的函数
-      let validateKafkaServer = (rule, value, callback) => {
-        if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
-          callback(new Error('请选择下发方式'))
-        } else {
-          callback()
-        }
-      }
-      let validateSmaId = (rule, value, callback) => {
-        if (this.baseForm.transferType.indexOf('sms') > -1 && this.baseForm.smsId === '') {
-          callback(new Error('请选择下发方式'))
-        } else {
-          callback()
-        }
-      }
+      // let validateKafkaServer = (rule, value, callback) => {
+      //   if (this.baseForm.transferType.indexOf('kafka') > -1 && this.baseForm.kafkaServer === '') {
+      //     callback(new Error('请选择下发方式'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
+      // let validateSmaId = (rule, value, callback) => {
+      //   if (this.baseForm.transferType.indexOf('sms') > -1 && this.baseForm.smsId === '') {
+      //     callback(new Error('请选择下发方式'))
+      //   } else {
+      //     callback()
+      //   }
+      // }
       // let validateMysqlServer = (rule, value, callback) => {
       //   if (this.baseForm.transferType.indexOf('mysql') > -1 && this.baseForm.mysqlServer === '') {
       //     callback(new Error('请选择数据源'))
@@ -538,12 +498,16 @@
           // intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // 已绑定的kafka
-          kafkaParams: [], // kafka出参
+          kafkaParams: '', // kafka出参
           topic: '',
           // mysqlServer: '', // sftp数据源地址
           // sqlServer: '',
           smsId: '', // 短信绑定ID
-          smsParams: [], // 所选短信绑定的出参
+          smsParams: '',
+          telId: '',
+          telParams: '',
+          aiId: '',
+          aiParams: '',
           triggerMode: '0', // 下发类型，默认0主动型 1被动
           decisionType: '0'
         },
@@ -577,6 +541,8 @@
         mysqlServerList: [],
         sqlServerList: [],
         smsIdList: [],
+        telIdList: [],
+        aiIdList: [],
         intelligentDistributionParams: [],
         transferLogVisible: false,
         // intelligentDistributionAddOrUpdateVisible: false,
@@ -619,19 +585,19 @@
           endTime: [
             // {type: 'date', required: true, message: '请选择结束时间', trigger: 'change'},
             { validator: validateTime }
-          ],
-          transferType: [
-            { type: 'array', required: true, message: '请选择下发方式', trigger: 'change' }
-          ],
+          ]
+          // transferType: [
+          //   { type: 'array', required: true, message: '请选择下发方式', trigger: 'change' }
+          // ]
           // intelligentDistribution: [
           //   { type: 'array', required: true, message: '请选择业务下发方式', trigger: 'change' }
           // ],
-          kafkaServer: [
-            { validator: validateKafkaServer }
-          ],
-          smsId: [
-            { validator: validateSmaId }
-          ]
+          // kafkaServer: [
+          //   { validator: validateKafkaServer }
+          // ],
+          // smsId: [
+          //   { validator: validateSmaId }
+          // ]
           //  kafkaServer: [
           //  { required: true, message: '请选择数据源', trigger: 'change' }
           // ],
@@ -755,18 +721,16 @@
         })
       },
       // 获取分群出参 指标列表
-      getOutParamsList (row) {
+      getOutParamsList (sourceBindingIds) {
         let code = this.channelCode.split(',').filter(item => item !== '')
         dataTransferManageOutParams({ channelCode: code, flag: this.baseForm.id ? '-1' : '1' }).then(({data}) => {
           if (data && data.status === '1') {
-            // if (row) {
-            //   // this.originOutParamsList = data.data
-            //   this.getOutParamsEditList(row.id, this.filterAllCata(data.data))
-            // } else {
-              // this.originOutParamsList = data.data
-              this.outParamsList = this.filterAllCata(data.data)
-            // }
-            // console.log(this.originOutParamsList)
+            this.outParamsList = this.filterAllCata(data.data)
+            if (sourceBindingIds) {
+              this.baseForm.transferType.forEach(item => {
+                this.dataTransferDisplay(item, sourceBindingIds)
+            })
+            }
           } else {
             this.outParamsList = []
           }
@@ -791,16 +755,17 @@
       //   })
       // },
        // // 修改，回显时查询分群出参选中
-    getOutParamsEditList (data, outList, type) {
-      let out = []
-      data.forEach(item => {
-        out.push(item.englishName + '-' + item.id)
+    getOutParamsEditList (data, outList, arr) {
+      outList && outList.forEach(item => {
+        if (!item.children) {
+          if (data.filter(x => x === item.id).length) {
+            arr.push(item.label)
+          }
+        } else {
+          this.getOutParamsEditList(data, item.children, arr)
+        }
       })
-      if (type === 'kafka') {
-        this.baseForm.kafkaParams = Array.from(new Set(out))
-      } else if (type === 'sms') {
-        this.baseForm.smsParams = Array.from(new Set(out))
-      }
+      return arr
     },
       // // kafka 数据源
       // getKafkaServerList () {
@@ -873,7 +838,7 @@
           }
         }
       },
-      // 下发方式改变 任务名称改变
+      // 决策方式改变 任务名称改变
       decisionTypeChange (selVal) {
         let obj = {}
         if (this.baseForm.templateId) {
@@ -882,6 +847,21 @@
           })
           this.baseForm.transferName = obj.text + (selVal === '0' ? '下发任务' : '智能运营任务')
         }
+      },
+      // 下发方式改变
+      changeTransferCategory (val) {
+        this.baseForm.kafkaServer = ''
+        this.baseForm.kafkaParams = ''
+        this.baseForm.smsId = ''
+        this.baseForm.telId = ''
+        this.baseForm.aiId = ''
+        this.baseForm.smsParams = ''
+        this.baseForm.telParams = ''
+        this.baseForm.aiParams = ''
+        this.kafkaServerList = []
+        this.smsIdList = []
+        this.telIdList = []
+        this.aiIdList = []
       },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
@@ -903,12 +883,18 @@
         this.getOutParamsList()
         this.baseForm.outParams = []
         this.outParams = []
-        this.baseForm.kafkaServer = ''
-        this.baseForm.kafkaParams = []
+         this.baseForm.kafkaServer = ''
+        this.baseForm.kafkaParams = ''
         this.baseForm.smsId = ''
-        this.baseForm.smsParams = []
+        this.baseForm.telId = ''
+        this.baseForm.aiId = ''
+        this.baseForm.smsParams = ''
+        this.baseForm.telParams = ''
+        this.baseForm.aiParams = ''
         this.kafkaServerList = []
         this.smsIdList = []
+        this.telIdList = []
+        this.aiIdList = []
         this.baseForm.transferType = []
         this.isR3DefaultOut = false
         // this.outParamsList = this.filterAllCata(this.originOutParamsList)
@@ -977,6 +963,12 @@
         }
         if (data.smsId != '' && data.transferType.includes('sms')) {
           postData.sourceBindingIds.push(data.smsId)
+        }
+        if (data.telId != '' && data.transferType.includes('tel')) {
+          postData.sourceBindingIds.push(data.telId)
+        }
+        if (data.aiId != '' && data.transferType.includes('ai')) {
+          postData.sourceBindingIds.push(data.aiId)
         }
         // if (data.transferCategory === '0') {
             // let tempServer = {
@@ -1101,7 +1093,7 @@
             // }
             this.templateIdList = this.templateIdList
             // 要先拿到this.channelCode,才能去获取对应的出参列表
-            this.getOutParamsList(row)
+            this.getOutParamsList(disData.sourceBindingIds)
             if (custerType === 'static') {
               this.isStatic = true
             } else {
@@ -1124,9 +1116,6 @@
             //     }
             //   }
             // })
-            this.baseForm.transferType.forEach(item => {
-              this.dataTransferDisplay(item, disData.sourceBindingIds)
-            })
             let tempTime = disData.taskScheduleConfig
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONCE_ONLY':
@@ -1186,9 +1175,10 @@
              data.data.filter(item => {
               if (sourceBindingIds.indexOf(item.id) > -1) {
                 this.baseForm.kafkaServer = item.id
-                getSmsAllMessage(item.resourceId).then(({data}) => {
-                  this.getOutParamsEditList(data.data.bindingIndex, this.outParamsList, type)
-                })
+                this.kafkaSelectChange()
+                // getSmsAllMessage(item.resourceId).then(({data}) => {
+                //   this.getOutParamsEditList(data.data.bindingIndex, this.outParamsList, type)
+                // })
               }
             })
           } else if (type === 'sms') {
@@ -1196,9 +1186,23 @@
             data.data.filter(item => {
               if (sourceBindingIds.indexOf(item.id) > -1) {
                 this.baseForm.smsId = item.id
-                getSmsAllMessage(item.resourceId).then(({data}) => {
-                  this.getOutParamsEditList(data.data.bindingIndex, this.outParamsList, type)
-                })
+                this.smsSelectChange()
+              }
+            })
+          } else if (type === 'tel') {
+            this.telIdList = data.data
+            data.data.filter(item => {
+              if (sourceBindingIds.indexOf(item.id) > -1) {
+                this.baseForm.telId = item.id
+                this.telSelectChange()
+              }
+            })
+          } else if (type === 'ai') {
+            this.aiIdList = data.data
+            data.data.filter(item => {
+              if (sourceBindingIds.indexOf(item.id) > -1) {
+                this.baseForm.aiId = item.id
+                this.aiSelectChange()
               }
             })
           }
@@ -1235,6 +1239,10 @@
         this.baseForm.kafkaParams = []
         this.baseForm.smsId = ''
         this.baseForm.smsParams = []
+        this.baseForm.telId = ''
+        this.baseForm.telParams = []
+        this.baseForm.aiId = ''
+        this.baseForm.aiParams = []
         this.baseForm.templateId = ''
         this.rowData.authOwner = ''
         this.rowData.authOtherList = []
@@ -1369,30 +1377,39 @@
       changeDistribution (checked, val, i) { // 业务下发方式短信弹框
         if (this.channelCode) {
           if (checked) {
-            if (val === 'kafka' || val === 'sms') {
-              let params = {
-                type: val,
-                channelCode: this.channelCode
-              }
-              selectResourceBindingList(params).then(({data}) => {
-                if (val === 'kafka') {
-                  this.kafkaServerList = data.data
-                } else if (val === 'sms') {
-                  this.smsIdList = data.data
-                }
-              })
+            let params = {
+              type: val,
+              channelCode: this.channelCode
             }
+            selectResourceBindingList(params).then(({data}) => {
+              if (val === 'kafka') {
+                this.kafkaServerList = data.data
+              } else if (val === 'sms') {
+                this.smsIdList = data.data
+              } else if (val === 'tel') {
+                this.telIdList = data.data
+              } else if (val === 'ai') {
+                this.aiIdList = data.data
+              }
+            })
           } else {
             // this.baseForm.transferType = this.baseForm.transferType.filter(item => item !== val)
             if (val === 'kafka') {
               this.baseForm.kafkaServer = ''
-              this.baseForm.kafkaParams = []
-              console.log('this.baseForm: ', this.baseForm)
+              this.baseForm.kafkaParams = ''
               this.kafkaServerList = []
             } else if (val === 'sms') {
               this.baseForm.smsId = ''
-              this.baseForm.smsParams = []
+              this.baseForm.smsParams = ''
               this.smsIdList = []
+            } else if (val === 'tel') {
+              this.baseForm.telId = ''
+              this.baseForm.telParams = ''
+              this.telIdList = []
+            } else if (val === 'ai') {
+              this.baseForm.aiId = ''
+              this.baseForm.aiParams = ''
+              this.aiIdList = []
             }
           }
         } else {
@@ -1401,18 +1418,74 @@
         }
       },
       // kafka选择时
-      kafkaServerChange (value) {
+      kafkaSelectChange (value) {
         let arr = this.kafkaServerList.filter(item => item.id === this.baseForm.kafkaServer)
         getSmsAllMessage(arr[0].resourceId).then(({data}) => {
-          this.getOutParamsEditList(data.data.bindingIndex, this.outParamsList, 'kafka')
+          let out = []
+          let paramsData = data.data.extraParams + data.data.fixedParams
+          if (paramsData) {
+            let outParamsData = paramsData.split(',')
+            outParamsData.forEach(item => {
+              out.push(item.split('@')[0] + '-' + item.split('@')[1])
+            })
+            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+            console.log('arr1: ', arr1)
+            this.baseForm.kafkaParams = arr1.join(',')
+          } else {
+            this.baseForm.kafkaParams = ''
+          }
         })
       },
       smsSelectChange () {
         let arr = this.smsIdList.filter(item => item.id === this.baseForm.smsId)
         getSmsAllMessage(arr[0].resourceId).then(({data}) => {
-          this.getOutParamsEditList(data.data.bindingIndex, this.outParamsList, 'sms')
+          let out = []
+          let paramsData = data.data.extraParams + data.data.fixedParams
+          if (paramsData) {
+            let outParamsData = paramsData.split(',')
+            outParamsData.forEach(item => {
+              out.push(item.split('@')[0] + '-' + item.split('@')[1])
+            })
+            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+            this.baseForm.smsParams = arr1.join(',')
+          } else {
+            this.baseForm.smsParams = ''
+          }
         })
-        // this.baseForm.smsParams = arr[0].bindingIndex
+      },
+      telSelectChange () {
+        let arr = this.smsIdList.filter(item => item.id === this.baseForm.telId)
+        getSmsAllMessage(arr[0].resourceId).then(({data}) => {
+          let out = []
+          let paramsData = data.data.extraParams + data.data.fixedParams
+          if (paramsData) {
+            let outParamsData = paramsData.split(',')
+            outParamsData.forEach(item => {
+              out.push(item.split('@')[0] + '-' + item.split('@')[1])
+            })
+            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+            this.baseForm.telParams = arr1.join(',')
+          } else {
+            this.baseForm.telParams = ''
+          }
+        })
+      },
+      aiSelectChange () {
+        let arr = this.smsIdList.filter(item => item.id === this.baseForm.aiId)
+        getSmsAllMessage(arr[0].resourceId).then(({data}) => {
+          let out = []
+          let paramsData = data.data.extraParams + data.data.fixedParams
+          if (paramsData) {
+            let outParamsData = paramsData.split(',')
+            outParamsData.forEach(item => {
+              out.push(item.split('@')[0] + '-' + item.split('@')[1])
+            })
+            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+            this.baseForm.aiParams = arr1.join(',')
+          } else {
+            this.baseForm.aiParams = ''
+          }
+        })
       },
       // 关闭
       cancelHandle () {
