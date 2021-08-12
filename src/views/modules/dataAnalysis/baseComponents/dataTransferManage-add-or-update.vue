@@ -206,8 +206,8 @@
               <el-form-item prop="kafkaServer">
                 <el-select
                   v-model= "baseForm.kafkaServer"
-                  collapse-tags
                   filterable
+                  clearable
                   @change="kafkaSelectChange"
                   style="margin-right:10px; width:270px;"
                   placeholder="请选择">
@@ -219,10 +219,13 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-               <el-tooltip placement="top" v-if="baseForm.kafkaServer">
-                <div slot="content">{{baseForm.kafkaParams}}</div>
-                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
-              </el-tooltip>
+              <div>
+                <el-tooltip placement="top" v-if="baseForm.kafkaServer">
+                  <div slot="content">{{baseForm.kafkaParams}}</div>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+                </el-tooltip>
+                <div v-if="this.baseForm.transferType.indexOf('kafka') > -1 " style="margin-top:5px;cursor:pointer;font-size:10px;color:#8c8c94;" @click="editConfigure('kafka')">配置</div>
+              </div>
             </el-col>
           </el-row>
           <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
@@ -233,11 +236,11 @@
                 style="margin-left: 8px;">短信</el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="6" style="display:flex;">
+            <el-col :span="10" style="display:flex;">
               <el-form-item prop="smsId">
                 <el-select
                   v-model= "baseForm.smsId"
-                  collapse-tags
+                  clearable
                   filterable
                   @change="smsSelectChange"
                   style="margin-right:10px;width:270px;"
@@ -250,10 +253,13 @@
                   </el-option>
                 </el-select>
               </el-form-item>
+              <div>
                <el-tooltip placement="top" v-if="baseForm.smsId">
                 <div slot="content">{{baseForm.smsParams}}</div>
                 <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
               </el-tooltip>
+                <div v-if="this.baseForm.transferType.indexOf('sms') > -1 " style="margin-top:5px;cursor:pointer;font-size:10px;color:#8c8c94;" @click="editConfigure('sms')">配置</div>
+              </div>
             </el-col>
           </el-row>
           <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
@@ -261,14 +267,14 @@
               <el-form-item  prop="transferType">
                 <el-checkbox label="tel" name="transferType" v-model="baseForm.transferType" 
                 @change="checked=>changeDistribution(checked, 'tel')"
-                style="margin-left: 8px;">电销</el-checkbox>
+                style="margin-left:8px;">电销</el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="6" style="display:flex;">
+            <el-col :span="10" style="display:flex;">
               <el-form-item prop="telId">
                 <el-select
                   v-model= "baseForm.telId"
-                  collapse-tags
+                  clearable
                   filterable
                   @change="telSelectChange"
                   style="margin-right:10px;  width:270px;"
@@ -276,15 +282,18 @@
                   <el-option
                     v-for="item in telIdList"
                     :key="item.id"
-                    :label="item.name"
+                    :label="item.resourceName"
                     :value="item.id">
                   </el-option>
                 </el-select>
               </el-form-item>
-               <el-tooltip placement="top" v-if="baseForm.telId">
-                <div slot="content">{{baseForm.telParams}}</div>
-                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
-              </el-tooltip>
+              <div>
+                <el-tooltip placement="top" v-if="baseForm.telId">
+                  <div slot="content">{{baseForm.telParams}}</div>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+                </el-tooltip>
+                <div v-if="this.baseForm.transferType.indexOf('tel') > -1 " style="margin-top:5px;cursor:pointer;font-size:10px;color:#8c8c94;" @click="editConfigure('tel')">配置</div>
+              </div>
             </el-col>
           </el-row>
           <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
@@ -295,11 +304,11 @@
                 style="margin-left: 8px;">AI</el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="6" style="display:flex;">
+            <el-col :span="10" style="display:flex;">
               <el-form-item prop="aiId">
                 <el-select
                   v-model= "baseForm.aiId"
-                  collapse-tags
+                  clearable
                   filterable
                   @change="aiSelectChange"
                   style="margin-right:10px; width:270px;"
@@ -307,15 +316,52 @@
                   <el-option
                     v-for="item in aiIdList"
                     :key="item.id"
-                    :label="item.name"
+                    :label="item.resourceName"
                     :value="item.id">
                   </el-option>
                 </el-select>
               </el-form-item>
-               <el-tooltip placement="top" v-if="baseForm.aiId">
-                <div slot="content">{{baseForm.aiParams}}</div>
-                <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
-              </el-tooltip>
+               <div>
+                <el-tooltip placement="top" v-if="baseForm.aiId">
+                  <div slot="content">{{baseForm.aiParams}}</div>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+                </el-tooltip>
+                <div v-if="this.baseForm.transferType.indexOf('ai') > -1 " style="margin-top:5px;cursor:pointer;font-size:10px;color:#8c8c94;" @click="editConfigure('ai')">配置</div>
+              </div>
+            </el-col>
+          </el-row>
+           <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
+             <el-col style="width: 8.33333%;">
+              <el-form-item  prop="transferType">
+                <el-checkbox label="push" name="transferType" v-model="baseForm.transferType" 
+                @change="checked=>changeDistribution(checked, 'push')"
+                style="margin-left: 8px;">Push</el-checkbox>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10" style="display:flex;">
+              <el-form-item prop="pushId">
+                <el-select
+                  v-model= "baseForm.pushId"
+                  clearable
+                  filterable
+                  @change="aiSelectChange"
+                  style="margin-right:10px; width:270px;"
+                  placeholder="请选择">
+                  <el-option
+                    v-for="item in pushIdList"
+                    :key="item.id"
+                    :label="item.resourceName"
+                    :value="item.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+               <div>
+                <el-tooltip placement="top" v-if="baseForm.pushId">
+                  <div slot="content">{{baseForm.pushParams}}</div>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+                </el-tooltip>
+                <div v-if="this.baseForm.transferType.indexOf('push') > -1 " style="margin-top:5px;cursor:pointer;font-size:10px;color:#8c8c94;" @click="editConfigure('push')">配置</div>
+              </div>
             </el-col>
           </el-row>
           <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
@@ -399,7 +445,11 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <transfer-log v-if="transferLogVisible" ref="transferLog" :data="transferLogList"></transfer-log>
-    <!-- <intelligentDistributionAddOrUpdate ref="intelligentDistributionAddOrUpdate" v-if="intelligentDistributionAddOrUpdateVisible" @close="getintelligentDistribution"></intelligentDistributionAddOrUpdate> -->
+    <kafkaNode v-if="kafkaNodeVisible" ref="kafkaNode" @updateList="changeDistribution"></kafkaNode>
+    <smsNode v-if="smsNodeVisible" ref="smsNode" @updateList="changeDistribution"></smsNode>
+    <telNode v-if="telNodeVisible" ref="telNode" @updateList="changeDistribution"></telNode>
+    <aiNode v-if="aiNodeVisible" ref="aiNode" @updateList="changeDistribution"></aiNode>
+    <pushNode v-if="pushNodeVisible" ref="pushNode" @updateList="changeDistribution"></pushNode>
   </el-drawer>
 </template>
 <script>
@@ -410,14 +460,18 @@
   // dataTransferManageMysql,
   infoDataTransferManage,
   // defaultOutParams,
-  selectResourceBindingList,
-  getSmsAllMessage
+  selectResourceBindingList
+  // getSmsAllMessage
   } from '@/api/dataAnalysis/dataTransferManage'
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import transferLog from './data-transfer-r3-log'
-  // import intelligentDistributionAddOrUpdate from './intelligentDistribution-add-or-update'
+  import kafkaNode from './transconfigureNode/kafkaNode'
+  import smsNode from './transconfigureNode/smsNode'
+  import telNode from './transconfigureNode/telNode'
+  import aiNode from './transconfigureNode/aiNode'
+  import pushNode from './transconfigureNode/pushNode'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -444,6 +498,13 @@
       }
       let validateAiId = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('ai') > -1 && this.baseForm.aiId === '') {
+          callback(new Error('请选择'))
+        } else {
+          callback()
+        }
+      }
+       let validatePushId = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('push') > -1 && this.baseForm.pushId === '') {
           callback(new Error('请选择'))
         } else {
           callback()
@@ -522,6 +583,8 @@
           telParams: '',
           aiId: '',
           aiParams: '',
+          pushId: '',
+          pushParams: '',
           triggerMode: '0', // 下发类型，默认0主动型 1被动
           decisionType: '0'
         },
@@ -557,10 +620,15 @@
         smsIdList: [],
         telIdList: [],
         aiIdList: [],
+        pushIdList: [],
         intelligentDistributionParams: [],
         transferLogVisible: false,
-        // intelligentDistributionAddOrUpdateVisible: false,
         transferLogList: [],
+        kafkaNodeVisible: false,
+        smsNodeVisible: false,
+        telNodeVisible: false,
+        aiNodeVisible: false,
+        pushNodeVisible: false,
         baseRule: {
           decisionType: [
             { required: true, message: '请选择决策方式', trigger: 'change' }
@@ -617,6 +685,9 @@
           ],
            aiId: [
             { validator: validateAiId }
+          ],
+          pushId: [
+            {validator: validatePushId}
           ]
           //  kafkaServer: [
           //  { required: true, message: '请选择数据源', trigger: 'change' }
@@ -649,7 +720,7 @@
 
     },
 
-    components: { Treeselect, transferLog },
+    components: { Treeselect, transferLog, kafkaNode, smsNode, telNode, aiNode, pushNode },
 
     methods: {
       // 树加载
@@ -778,7 +849,7 @@
     getOutParamsEditList (data, outList, arr) {
       outList && outList.forEach(item => {
         if (!item.children) {
-          if (data.filter(x => x === item.id).length) {
+          if (data.filter(x => x == item.fieldId).length) {
             arr.push(item.label)
           }
         } else {
@@ -867,6 +938,11 @@
           })
           this.baseForm.transferName = obj.text + (selVal === '0' ? '下发任务' : '智能运营任务')
         }
+        if (selVal === '0') {
+          this.baseForm.transferType = ['kafka']
+        } else {
+          this.baseForm.transferType = []
+        }
       },
       // 下发方式改变
       changeTransferCategory (val) {
@@ -875,13 +951,21 @@
         this.baseForm.smsId = ''
         this.baseForm.telId = ''
         this.baseForm.aiId = ''
+        this.baseForm.pushId = ''
         this.baseForm.smsParams = ''
         this.baseForm.telParams = ''
         this.baseForm.aiParams = ''
+        this.baseForm.pushParams = ''
         this.kafkaServerList = []
         this.smsIdList = []
         this.telIdList = []
         this.aiIdList = []
+        this.pushIdList = []
+        if (val === '0') {
+          this.baseForm.transferType = ['kafka']
+        } else {
+          this.baseForm.transferType = []
+        }
       },
       // 分群名称改变任务名称改变
       currentSel (selVal) {
@@ -908,17 +992,23 @@
         this.baseForm.smsId = ''
         this.baseForm.telId = ''
         this.baseForm.aiId = ''
+        this.baseForm.pushId = ''
         this.baseForm.smsParams = ''
         this.baseForm.telParams = ''
         this.baseForm.aiParams = ''
+        this.baseForm.pushParams = ''
         this.kafkaServerList = []
         this.smsIdList = []
         this.telIdList = []
         this.aiIdList = []
-        this.baseForm.transferType = []
+        this.pushIdList = []
         this.isR3DefaultOut = false
-        // this.outParamsList = this.filterAllCata(this.originOutParamsList)
-        // console.log(this.outParamsList, this.originOutParamsList)
+        if (this.baseForm.transferCategory === '0') {
+          this.baseForm.transferType = ['kafka']
+          this.changeDistribution(true, 'kafka')
+        } else {
+          this.baseForm.transferType = []
+        }
       },
       // 选中出参
       outParamsSelect (node) {
@@ -989,6 +1079,9 @@
         }
         if (data.aiId != '' && data.transferType.includes('ai')) {
           postData.sourceBindingIds.push(data.aiId)
+        }
+        if (data.pushId != '' && data.transferType.includes('push')) {
+          postData.sourceBindingIds.push(data.pushId)
         }
         // if (data.transferCategory === '0') {
             // let tempServer = {
@@ -1225,6 +1318,14 @@
                 this.aiSelectChange()
               }
             })
+          } else if (type === 'push') {
+            this.pushIdList = data.data
+            data.data.filter(item => {
+              if (sourceBindingIds.indexOf(item.id) > -1) {
+                this.baseForm.pushId = item.id
+                this.pushSelectChange()
+              }
+            })
           }
         })
       },
@@ -1248,6 +1349,7 @@
         this.baseForm.timeInterval = ''
         this.baseForm.dayOfWeeks = []
         this.baseForm.dayOfMonths = []
+        // this.baseForm.transferType = ['kafka']
         this.baseForm.transferType = []
         this.isStatic = false
         this.baseForm.increModel = 0
@@ -1256,13 +1358,15 @@
         // this.baseForm.mysqlServer = ''
         // this.baseForm.sqlServer = ''
         // this.baseForm.outParams = []
-        this.baseForm.kafkaParams = []
+        this.baseForm.kafkaParams = ''
         this.baseForm.smsId = ''
-        this.baseForm.smsParams = []
+        this.baseForm.smsParams = ''
         this.baseForm.telId = ''
-        this.baseForm.telParams = []
+        this.baseForm.telParams = ''
         this.baseForm.aiId = ''
-        this.baseForm.aiParams = []
+        this.baseForm.aiParams = ''
+        this.baseForm.pushId = ''
+        this.baseForm.pushParams = ''
         this.baseForm.templateId = ''
         this.rowData.authOwner = ''
         this.rowData.authOtherList = []
@@ -1272,7 +1376,6 @@
         this.visible = true
         this.loading = true
         this.outParamsList = []
-        // this.intelligentDistributionAddOrUpdateVisible = false
         // this.intelligentDistributionParams = []
         // this.baseForm.intelligentDistribution = []
         if (tag) {
@@ -1391,7 +1494,7 @@
           }
         })
       },
-      changeDistribution (checked, val, i) { // 业务下发方式短信弹框
+      changeDistribution (checked, val) { // 业务下发方式短信弹框
         if (this.channelCode) {
           if (checked) {
             let params = {
@@ -1407,6 +1510,8 @@
                 this.telIdList = data.data
               } else if (val === 'ai') {
                 this.aiIdList = data.data
+              } else if (val === 'push') {
+                this.pushIdList = data.data
               }
             })
           } else {
@@ -1427,6 +1532,10 @@
               this.baseForm.aiId = ''
               this.baseForm.aiParams = ''
               this.aiIdList = []
+            } else if (val === 'push') {
+              this.baseForm.pushId = ''
+              this.baseForm.pushParams = ''
+              this.pushIdList = []
             }
           }
         } else {
@@ -1436,73 +1545,158 @@
       },
       // kafka选择时
       kafkaSelectChange (value) {
-        let arr = this.kafkaServerList.filter(item => item.id === this.baseForm.kafkaServer)
-        getSmsAllMessage(arr[0].resourceId).then(({data}) => {
-          let out = []
-          let paramsData = data.data.extraParams + data.data.fixedParams
+        if (this.baseForm.kafkaServer) {
+          let arr = this.kafkaServerList.filter(item => item.id === this.baseForm.kafkaServer)
+          let paramsData = arr[0].extraParams + arr[0].fixedParams
           if (paramsData) {
-            let outParamsData = paramsData.split(',')
-            outParamsData.forEach(item => {
-              out.push(item.split('@')[0] + '-' + item.split('@')[1])
-            })
-            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
-            console.log('arr1: ', arr1)
+            let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.kafkaParams = arr1.join(',')
           } else {
             this.baseForm.kafkaParams = ''
           }
-        })
+        }
+        //   getSmsAllMessage(arr[0].resourceId).then(({data}) => {
+        //     let out = []
+        //     let paramsData = data.data.extraParams + data.data.fixedParams
+        //     if (paramsData) {
+        //       let outParamsData = paramsData.split(',')
+        //       outParamsData.forEach(item => {
+        //         out.push(item.split('@')[0] + '-' + item.split('@')[1])
+        //       })
+        //       let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+        //       this.baseForm.kafkaParams = arr1.join(',')
+        //     } else {
+        //       this.baseForm.kafkaParams = ''
+        //     }
+        //   })
+        // }
       },
       smsSelectChange () {
-        let arr = this.smsIdList.filter(item => item.id === this.baseForm.smsId)
-        getSmsAllMessage(arr[0].resourceId).then(({data}) => {
-          let out = []
-          let paramsData = data.data.extraParams + data.data.fixedParams
+        if (this.baseForm.smsId) {
+          let arr = this.smsIdList.filter(item => item.id === this.baseForm.smsId)
+          let paramsData = arr[0].extraParams + arr[0].fixedParams
           if (paramsData) {
-            let outParamsData = paramsData.split(',')
-            outParamsData.forEach(item => {
-              out.push(item.split('@')[0] + '-' + item.split('@')[1])
-            })
-            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+            let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.smsParams = arr1.join(',')
           } else {
             this.baseForm.smsParams = ''
           }
-        })
+          // getSmsAllMessage(arr[0].resourceId).then(({data}) => {
+          //   console.log('data: ', data)
+          //   let out = []
+          //   let paramsData = data.data.extraParams + data.data.fixedParams
+          //   if (paramsData) {
+          //     let outParamsData = paramsData.split(',')
+          //     outParamsData.forEach(item => {
+          //       out.push(item.split('@')[0] + '-' + item.split('@')[1])
+          //     })
+          //     let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+          //     this.baseForm.smsParams = arr1.join(',')
+          //   } else {
+          //     this.baseForm.smsParams = ''
+          //   }
+          // })
+        }
       },
       telSelectChange () {
-        let arr = this.smsIdList.filter(item => item.id === this.baseForm.telId)
-        getSmsAllMessage(arr[0].resourceId).then(({data}) => {
-          let out = []
-          let paramsData = data.data.extraParams + data.data.fixedParams
+        if (this.baseForm.telId) {
+          let arr = this.telIdList.filter(item => item.id === this.baseForm.telId)
+          let paramsData = arr[0].extraParams + arr[0].fixedParams
           if (paramsData) {
-            let outParamsData = paramsData.split(',')
-            outParamsData.forEach(item => {
-              out.push(item.split('@')[0] + '-' + item.split('@')[1])
-            })
-            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+            let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.telParams = arr1.join(',')
           } else {
             this.baseForm.telParams = ''
           }
-        })
+          // getSmsAllMessage(arr[0].resourceId).then(({data}) => {
+          //   let out = []
+          //   let paramsData = data.data.extraParams + data.data.fixedParams
+          //   if (paramsData) {
+          //     let outParamsData = paramsData.split(',')
+          //     outParamsData.forEach(item => {
+          //       out.push(item.split('@')[0] + '-' + item.split('@')[1])
+          //     })
+          //     let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+          //     this.baseForm.telParams = arr1.join(',')
+          //   } else {
+          //     this.baseForm.telParams = ''
+          //   }
+          // })
+        }
       },
       aiSelectChange () {
-        let arr = this.smsIdList.filter(item => item.id === this.baseForm.aiId)
-        getSmsAllMessage(arr[0].resourceId).then(({data}) => {
-          let out = []
-          let paramsData = data.data.extraParams + data.data.fixedParams
+        if (this.baseForm.aiId) {
+          let arr = this.aiIdList.filter(item => item.id === this.baseForm.aiId)
+          let paramsData = arr[0].extraParams + arr[0].fixedParams
           if (paramsData) {
-            let outParamsData = paramsData.split(',')
-            outParamsData.forEach(item => {
-              out.push(item.split('@')[0] + '-' + item.split('@')[1])
-            })
-            let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+            let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.aiParams = arr1.join(',')
           } else {
             this.baseForm.aiParams = ''
           }
-        })
+          // getSmsAllMessage(arr[0].resourceId).then(({data}) => {
+          //   let out = []
+          //   let paramsData = data.data.extraParams + data.data.fixedParams
+          //   if (paramsData) {
+          //     let outParamsData = paramsData.split(',')
+          //     outParamsData.forEach(item => {
+          //       out.push(item.split('@')[0] + '-' + item.split('@')[1])
+          //     })
+          //     let arr1 = this.getOutParamsEditList(out, this.outParamsList, [])
+          //     this.baseForm.aiParams = arr1.join(',')
+          //   } else {
+          //     this.baseForm.aiParams = ''
+          //   }
+          // })
+        }
+      },
+      pushSelectChange () {
+        if (this.baseForm.pushId) {
+          let arr = this.aiIdList.filter(item => item.id === this.baseForm.pushId)
+          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          if (paramsData) {
+            let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
+            this.baseForm.pushParams = arr1.join(',')
+          } else {
+            this.baseForm.pushParams = ''
+          }
+        }
+      },
+      //  下发方式配置
+      editConfigure (val) {
+        if (this.channelCode) {
+          if (val === 'kafka') {
+            this.kafkaNodeVisible = true
+            this.$nextTick(() => {
+              this.$refs.kafkaNode.init(this.channelCode, this.baseForm.kafkaServer)
+            })
+          } else if (val === 'sms') {
+            this.smsNodeVisible = true
+            this.$nextTick(() => {
+              this.$refs.smsNode.init(this.channelCode, this.baseForm.smsId)
+            })
+          } else if (val === 'tel') {
+            this.telNodeVisible = true
+            this.$nextTick(() => {
+              this.$refs.telNode.init(this.channelCode, this.baseForm.telId)
+            })
+          } else if (val === 'ai') {
+            this.aiNodeVisible = true
+            this.$nextTick(() => {
+              this.$refs.aiNode.init(this.channelCode, this.baseForm.aiId)
+            })
+          } else if (val === 'push') {
+            this.pushNodeVisible = true
+            this.$nextTick(() => {
+              this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId)
+            })
+          }
+        } else {
+          this.$message.error('请选择分群名称')
+        }
+      },
+      getintelligentDistribution () {
+
       },
       // 关闭
       cancelHandle () {

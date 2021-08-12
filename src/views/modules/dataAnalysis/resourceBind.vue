@@ -57,10 +57,10 @@
           </el-tooltip>
         </template>
       </el-table-column> -->
-      <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>
-      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
-      <el-table-column prop="updateUser" header-align="center" align="center" label="修改人"></el-table-column>
-      <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
+      <el-table-column prop="fixedParams" header-align="center" align="center" label="固定出参"></el-table-column>
+      <el-table-column prop="extraParams" header-align="center" align="center" label="额外出参"></el-table-column>
+      <!-- <el-table-column prop="updateUser" header-align="center" align="center" label="修改人"></el-table-column> -->
+      <!-- <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column> -->
       <el-table-column header-align="center" align="center" width="100" label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'edit')">编辑</el-button>
