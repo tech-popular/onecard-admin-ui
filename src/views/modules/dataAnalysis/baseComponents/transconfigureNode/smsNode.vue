@@ -4,7 +4,7 @@
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
-      <el-form-item label="配置方式">
+      <el-form-item label="配置方式" prop="editType">
         <el-radio v-model="dataForm.editType" @change="changeEditType"  label="0">标准模板</el-radio>
         <el-radio v-model="dataForm.editType" @change="changeEditType"  label="1">自定义模板</el-radio>
       </el-form-item>
@@ -106,6 +106,8 @@ export default {
         resourceId: '',
         resourceName: '',
         resourceCode: '',
+        channelId: '',
+        smsTemplate: '',
         editType: '0', // 编辑类型
         productNo: '', // 签名
         cusSmsType: '', // 短信类型
@@ -162,6 +164,8 @@ export default {
         resourceId: '',
         resourceName: '',
         resourceCode: '',
+        channelId: '',
+        smsTemplate: '',
         editType: '0', // 编辑类型
         productNo: '', // 签名
         cusSmsType: '', // 短信类型

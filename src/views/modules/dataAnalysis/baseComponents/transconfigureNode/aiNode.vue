@@ -4,7 +4,7 @@
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
-      <el-form-item prop="resourceId" label="电销模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
+      <el-form-item prop="resourceId" label="AI模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
           <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
             <el-option v-for="(item, index) in aiDataList" :key="index" :value="item.id" :label="item.name"></el-option>
           </el-select>

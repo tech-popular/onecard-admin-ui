@@ -1,6 +1,6 @@
 <template>
-	<el-dialog :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form label-width="120px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
+	<el-dialog width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+		<el-form label-width="160px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
@@ -30,10 +30,7 @@
           <el-option label="push" value="push">push</el-option>
 				</el-select>
 			</el-form-item>
-       <el-form-item label="配置方式" v-if="dataForm.type === 'sms' || dataForm.type === 'push'">
-        <el-radio v-model="dataForm.editType" @change="changeEditType"  label="0">标准模板</el-radio>
-        <el-radio v-model="dataForm.editType" @change="changeEditType"  label="1">自定义模板</el-radio>
-      </el-form-item>
+      <!-- kafka -->
       <div style="display:flex">
         <el-form-item v-if="dataForm.editType === '0' && dataForm.type === 'kafka'" label="topic" prop="resourceId" :rules="{ required: true, message: '请选择topic', trigger: 'blur' }">
           <el-select v-model="dataForm.resourceId" @change="kafkaServerChange" style="margin-right:15px;width: 400px;">
@@ -50,6 +47,11 @@
           <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
         </el-tooltip>
       </div>
+      <!-- 短信 -->
+      <el-form-item label="配置方式" v-if="dataForm.type === 'sms'" prop="editType">
+        <el-radio v-model="dataForm.editType" @change="changeEditType"  label="0">标准模板</el-radio>
+        <el-radio v-model="dataForm.editType" @change="changeEditType"  label="1">自定义模板</el-radio>
+      </el-form-item>
 			 <el-form-item  prop="channelId" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="短信渠道" :rules="{ required: true, message: '请选择短信渠道', trigger: 'blur' }">
         <el-select v-model="dataForm.channelId" filterable  @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 400px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
@@ -74,12 +76,7 @@
             <span style="color:red" v-text="paramsNum"></span> 个参数
           </p>
       </el-form-item>
-      <el-form-item prop="resourceId" v-if="dataForm.type === 'tel' || dataForm.type === 'ai' " :label=" dataForm.type === 'tel'? '电销'  +'模板' : 'AI' +'模板'" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
-          <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
-          </el-select>
-        </el-form-item>
-      <el-form-item label="短信类型" v-if="dataForm.editType === '1' && dataForm.type === 'sms'"  prop="cusSmsType">
+       <el-form-item label="短信类型" v-if="dataForm.editType === '1' && dataForm.type === 'sms'"  prop="cusSmsType">
         <el-select v-model="dataForm.cusSmsType"  filterable @change="changecusSmsType"  placeholder="请选择" style="width: 400px;margin-right:15px;">
             <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
         </el-select>
@@ -92,6 +89,18 @@
         <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
           <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="65" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
         </el-form-item>
+        <!-- 电销或ai -->
+      <el-form-item prop="resourceId" v-if="dataForm.type === 'tel' || dataForm.type === 'ai' " :label=" dataForm.type === 'tel'? '电销'  +'模板' : 'AI' +'模板'" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
+        <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
+          <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <!-- push -->
+      <el-form-item label="推送方式：" prop="flag" v-if="dataForm.type === 'push'" :rules="{ required: true, message: '请选择推送方式', trigger: 'blur' }">
+        <el-checkbox v-model="dataForm.flag" label="pushFlag" @change="checked=>changeDistribution(checked, 'pushFlag')">push</el-checkbox>
+        <el-checkbox v-model="dataForm.flag " label="msgFlag" @change="checked=>changeDistribution(checked, 'msgFlag')">个人消息</el-checkbox>
+      </el-form-item>
+    <!-- 参数 -->
       <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
 				  <Treeselect
 						:options="outParamsList"
@@ -127,6 +136,48 @@
 						class="base-pane-item"
 					/>
 			</el-form-item>
+      <div v-if="dataForm.type === 'push' && dataForm.flag.includes('pushFlag')">
+        <el-divider content-position="center">push</el-divider>
+        <el-form-item label="Push类型：" prop="pushType" :rules="{ required: true, message: '请选择Push类型', trigger: 'blur' }">
+          <el-select v-model="dataForm.pushType">
+            <el-option value="PUM" label="服务通知"></el-option>
+            <el-option value='SYS' label="系统公告"></el-option>
+            <el-option value="ACTIVITY" label="精选活动"></el-option>
+            <el-option value="BONUS" label="专属福利"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Push标题：" prop="pushTitle" :rules="{ required: true, message: '请输入Push标题', trigger: 'blur' }">
+          <el-input v-model="dataForm.pushTitle" placeholder="请输入Push标题"></el-input>
+        </el-form-item>
+        <el-form-item label="查看详情跳转目标：" prop="pageType" v-if="dataForm.pushType === 'ACTIVITY' || dataForm.pushType === 'BONUS'" :rules="{ required: true, message: '请选择查看详情跳转目标', trigger: 'blur' }">
+          <el-radio label="internal" v-model="dataForm.pageType">新H5</el-radio>
+          <el-radio label="external" v-model="dataForm.pageType">外部H5</el-radio>
+        </el-form-item>
+        <el-form-item label="查看详情跳转链接：" prop="linkUrl" v-if="dataForm.pushType === 'ACTIVITY' || dataForm.pushType === 'BONUS'" :rules="{ required: true, message: '请输入查看详情跳转链接', trigger: 'blur' }">
+          <el-input v-model="dataForm.linkUrl" ></el-input>
+        </el-form-item>
+        <el-form-item label="内容：" prop="pushContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
+          <el-input type="textarea"  v-model="dataForm.pushContent" :autosize="{ minRows: 3}"  show-word-limit />
+        </el-form-item>
+      </div>
+      <div v-if="dataForm.type === 'push' && dataForm.flag.includes('msgFlag')">
+        <el-divider content-position="center">个人消息</el-divider>
+        <el-form-item label="App跳转目标：" prop="pageType" :rules="{ required: true, message: '请选择App跳转目标', trigger: 'blur' }">
+          <el-radio label="native" v-model="dataForm.pageType">原生页</el-radio>
+          <el-radio label="internal" v-model="dataForm.pageType">新H5</el-radio>
+          <el-radio label="h5" v-model="dataForm.pageType">老H5</el-radio>
+          <el-radio label="external" v-model="dataForm.pageType">外部H5</el-radio>
+        </el-form-item>
+        <el-form-item label="App跳转链接：" prop="msgUrl" :rules="{ required: true, message: '请输入App跳转链接', trigger: 'blur' }">
+          <el-input v-model="dataForm.msgUrl" ></el-input>
+        </el-form-item>
+        <el-form-item label="标题：" prop="msgTitle" :rules="{ required: true, message: '请输入标题', trigger: 'blur' }">
+          <el-input v-model="dataForm.msgTitle" placeholder="请输入标题"></el-input>
+        </el-form-item>
+      <el-form-item label="内容：" prop="msgContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
+            <el-input type="textarea"  v-model="dataForm.msgContent" :autosize="{ minRows: 3}"  show-word-limit />
+        </el-form-item>
+      </div>
 		</el-form>
 		<div slot="footer" class="foot">
       <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
@@ -157,14 +208,26 @@ export default {
         resourceId: '',
         resourceName: '',
         resourceCode: '',
+        channelId: '',
+        smsTemplate: '',
         editType: '0', // 编辑类型
         productNo: '', // 签名
         cusSmsType: '', // 短信类型
         smsContent: '', // 短信内容
         fixedParams: [], // 固定出参
         extraParams: [], // 额外出参
-        channelCode: '' // 用户渠道
+        channelCode: '', // 用户渠道
         // outParams: [] // 绑定的出参
+        /* push参数 */
+        pushType: '',
+        pushTitle: '',
+        pageType: '',
+        flag: [],
+        linkUrl: '',
+        pushContent: '',
+        msgTitle: '',
+        msgUrl: '',
+        msgContent: ''
       },
       paramsNum: 0,
       outParamsList: [],
@@ -231,12 +294,24 @@ export default {
         resourceId: '',
         resourceName: '',
         resourceCode: '',
+        channelId: '',
+        smsTemplate: '',
         editType: '0', // 编辑类型
         productNo: '', // 签名
         cusSmsType: '', // 短信类型
         smsContent: '', // 短信内容
         extraParams: [],
-        fixedParams: []
+        fixedParams: [],
+        /* push参数 */
+        pushType: '',
+        pushTitle: '',
+        pageType: '',
+        flag: [],
+        linkUrl: '',
+        pushContent: '',
+        msgTitle: '',
+        msgUrl: '',
+        msgContent: ''
       }
       this.target = ''
       this.createTime = ''
@@ -261,13 +336,29 @@ export default {
           this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
           this.dataForm.type = res.data.data.bindingConfig.type
           if (res.data.data.bindingConfig.content) {
+            let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             if (row.type === 'sms') {
               this.dataForm.editType = '1'
               this.extraParamsVisible = false
-              let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
               this.dataForm.cusSmsType = bindingContent.cusSmsType
               this.dataForm.productNo = bindingContent.productNo
               this.dataForm.smsContent = bindingContent.smsContent
+            }
+            if (row.type === 'push') {
+              this.dataForm.pushType = bindingContent.pushType
+              this.dataForm.pushTitle = bindingContent.pushTitle
+              this.dataForm.pageType = bindingContent.pushExtraKeys.pageType
+              this.dataForm.linkUrl = bindingContent.pushExtraKeys.linkUrl
+              this.dataForm.pushContent = bindingContent.pushContent
+              this.dataForm.msgUrl = bindingContent.msgUrl
+              this.dataForm.msgContent = bindingContent.msgContent
+              this.dataForm.msgTitle = bindingContent.msgTitle
+              if (bindingContent.pushFlag === 'Y') {
+                this.dataForm.flag.push('pushFlag')
+              }
+              if (bindingContent.msgFlag === 'Y') {
+                this.dataForm.flag.push('msgFlag')
+              }
             }
           } else {
             this.dataForm.editType = '0'
@@ -484,8 +575,7 @@ export default {
     },
     // 类型改变
     changeType (value) {
-      console.log('value: ', value)
-      if (value === 'tel' || value === 'ai') {
+      if (value === 'tel' || value === 'ai' || value === 'push') {
         this.extraParamsVisible = false
       } else {
         this.extraParamsVisible = true
@@ -495,22 +585,38 @@ export default {
         channelCode: this.dataForm.channelCode,
         type: this.dataForm.type,
         resourceName: this.dataForm.resourceName,
-        editType: '0',
         resourceId: '',
         resourceCode: '',
-        extraParams: []
+        channelId: '',
+        smsTemplate: '',
+        editType: '0', // 编辑类型
+        productNo: '', // 签名
+        cusSmsType: '', // 短信类型
+        smsContent: '', // 短信内容
+        extraParams: [],
+        fixedParams: [],
+        /* push参数 */
+        pushType: '',
+        pushTitle: '',
+        pageType: '',
+        flag: [],
+        linkUrl: '',
+        pushContent: '',
+        msgTitle: '',
+        msgUrl: '',
+        msgContent: ''
       }
       this.target = ''
       this.extraParams = []
       this.getFixedParams()
-      if (value === 'sms') {
-        this.dataForm.productNo = ''
-        this.dataForm.cusSmsType = ''
-        this.dataForm.smsContent = ''
-        this.dataForm.fixedParams = []
-        this.dataForm.channelId = ''
-        this.dataForm.smsTemplate = ''
-      }
+      // if (value === 'sms') {
+      //   this.dataForm.productNo = ''
+      //   this.dataForm.cusSmsType = ''
+      //   this.dataForm.smsContent = ''
+      //   this.dataForm.fixedParams = []
+      //   this.dataForm.channelId = ''
+      //   this.dataForm.smsTemplate = ''
+      // }
       if (value === 'tel' || value === 'ai') {
         getResourceInfoFromType(value).then(({data}) => {
           if (data && data.status === '1') {
@@ -540,9 +646,9 @@ export default {
         }
       }
     },
+    // 短信自定义
     changecusSmsType (val) {
       if (val) {
-    // 操作选中角色发生变化
         this.$set(this.dataForm, this.dataForm.cusSmsType, val)
       } else {
         this.$set(this.dataForm, this.dataForm.cusSmsType, '')
@@ -560,6 +666,21 @@ export default {
         this.$set(this.dataForm, this.dataForm.smsContent, val)
       } else {
         this.$set(this.dataForm, this.dataForm.smsContent, '')
+      }
+    },
+    // push通知方式
+    changeDistribution (checked, val) {
+      if (!checked && val === 'pushFlag') {
+        this.dataForm.pushType = ''
+        this.dataForm.pushTitle = ''
+        this.dataForm.pageType = ''
+        this.dataForm.linkUrl = ''
+        this.dataForm.pushContent = ''
+      }
+      if (!checked && val === 'msgFlag') {
+        this.dataForm.msgUrl = ''
+        this.dataForm.msgContent = ''
+        this.dataForm.msgTitle = ''
       }
     },
     // 固定参数
@@ -638,10 +759,26 @@ export default {
           if (this.dataForm.type === 'sms' && this.extraParams.length !== this.paramsNum) {
             return this.$message.error(`请选择${this.paramsNum}个参数`)
           }
-           let congiger = {
+          let smsContent = {
             'cusSmsType': this.dataForm.cusSmsType,
             'productNo': this.dataForm.productNo,
             'smsContent': this.dataForm.smsContent
+          }
+          let pushContent = {
+            pushFlag: this.dataForm.flag.includes('pushFlag') ? 'Y' : 'N',
+            msgFlag: this.dataForm.flag.includes('msgFlag') ? 'Y' : 'N',
+            pushType: this.dataForm.pushType,
+            pushTitle: this.dataForm.pushTitle,
+            // pageType: this.dataForm.pageType,
+            // linkUrl: this.dataForm.linkUrl,
+            pushContent: this.dataForm.pushContent,
+            msgTitle: this.dataForm.msgTitle,
+            msgUrl: this.dataForm.msgUrl,
+            msgContent: this.dataForm.msgContent,
+            pushExtraKeys: {
+              pageType: this.dataForm.pageType,
+              linkUrl: this.dataForm.linkUrl
+            }
           }
           let params = {
             id: this.dataForm.id,
@@ -649,10 +786,18 @@ export default {
             resourceName: this.dataForm.resourceName,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
-            resourceId: this.dataForm.editType === '0' ? this.dataForm.resourceId.toString() : null,
+            resourceId: this.dataForm.resourceId.toString(),
             fixedParams: this.fixedParams.join(','),
             extraParams: this.extraParams.join(','),
-            content: this.dataForm.editType === '0' ? '' : JSON.stringify(congiger)
+            content: ''
+          }
+          if (this.dataForm.type === 'sms') {
+            params.content = this.dataForm.editType === '0' ? '' : JSON.stringify(smsContent)
+            params.resourceId = this.dataForm.editType === '0' ? params.resourceId : null
+          }
+          if (this.dataForm.type === 'push') {
+            params.content = JSON.stringify(pushContent)
+            params.resourceId = null
           }
           if (!this.dataForm.id) {
               addDataInfo(params).then(({data}) => {

@@ -1,6 +1,6 @@
 <template>
-	<el-dialog title="配置" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form label-width="140px" :model="baseForm"  ref="baseForm">
+	<el-dialog title="配置" width = "70%" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+		<el-form label-width="160px" :model="baseForm"  ref="baseForm">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="baseForm.resourceName" placeholder="请输入名称"></el-input>
 			</el-form-item>
@@ -155,8 +155,8 @@ export default {
           let bindContent = JSON.parse(res.data.data.bindingConfig.content)
           this.baseForm.pushType = bindContent.pushType
           this.baseForm.pushTitle = bindContent.pushTitle
-          this.baseForm.pageType = bindContent.pageType
-          this.baseForm.linkUrl = bindContent.linkUrl
+          this.baseForm.pageType = bindContent.pushExtraKeys.pageType
+          this.baseForm.linkUrl = bindContent.pushExtraKeys.linkUrl
           this.baseForm.pushContent = bindContent.pushContent
           this.baseForm.msgUrl = bindContent.msgUrl
           this.baseForm.msgContent = bindContent.msgContent
@@ -305,12 +305,14 @@ export default {
             msgFlag: this.baseForm.flag.includes('msgFlag') ? 'Y' : 'N',
             pushType: this.baseForm.pushType,
             pushTitle: this.baseForm.pushTitle,
-            pageType: this.baseForm.pageType,
-            linkUrl: this.baseForm.linkUrl,
             pushContent: this.baseForm.pushContent,
             msgTitle: this.baseForm.msgTitle,
             msgUrl: this.baseForm.msgUrl,
-            msgContent: this.baseForm.msgContent
+            msgContent: this.baseForm.msgContent,
+            pushExtraKeys: {
+              pageType: this.baseForm.pageType,
+              linkUrl: this.baseForm.linkUrl
+            }
           }
           let params = {
             id: this.baseForm.id,
