@@ -293,7 +293,7 @@ export default {
     },
     // 删除出参
     outParamsDeselect (node) {
-      this.params = this.params.filter(item => item !== node.fieldId)
+      this.params = this.params.filter(item => item != node.fieldId)
     },
     // 打开出参菜单
     openParamsSelect () {
