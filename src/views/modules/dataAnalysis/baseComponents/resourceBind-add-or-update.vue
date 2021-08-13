@@ -1,6 +1,6 @@
 <template>
 	<el-dialog  width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form  label-width="160px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
+		<el-form  v-loading="dataLoading" label-width="160px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
@@ -198,6 +198,7 @@ export default {
       extraParamsVisible: false,
       fixedParamsvisible: false,
       viewVisible: false,
+      dataLoading: false,
       tag: '',
       createTime: '', // 创建时间
       createUser: '', // 创建人
@@ -323,6 +324,7 @@ export default {
       if (row) {
         this.createTime = row.createTime
         this.createUser = row.createUser
+        this.dataLoading = true
         this.getLookData(row)
       }
     },
@@ -562,6 +564,7 @@ export default {
       //   out.push(item.englishName + '-' + item.id)
       //   type === 'extraParams' ? this.extraParams.push(item.id) : this.fixedParams.push(item.id)
       // })
+      this.dataLoading = false
     },
     // 获取出参，默认展开列表
     updateOutParamsList (data, indexList) {
