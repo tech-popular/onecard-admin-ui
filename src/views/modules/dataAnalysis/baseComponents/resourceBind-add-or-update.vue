@@ -1,6 +1,6 @@
 <template>
-	<el-dialog width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form label-width="160px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
+	<el-dialog  width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+		<el-form  label-width="160px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
@@ -195,7 +195,7 @@ export default {
   data () {
     return {
       visible: false,
-      extraParamsVisible: true,
+      extraParamsVisible: false,
       fixedParamsvisible: false,
       viewVisible: false,
       tag: '',
@@ -273,8 +273,8 @@ export default {
       }
     },
     init (row, tag) {
-      this.extraParamsVisible = true
       this.fixedParamsvisible = false
+      this.extraParamsVisible = false
       this.getChannelsList()
       this.getSmsSignInfo()
       this.getSmsStyleInfo()
@@ -446,7 +446,6 @@ export default {
       getAllSmsChannels().then(({data}) => {
         if (data.status === '1') {
           this.issueChannelList = data.data
-          this.dataLoading = false
         }
       })
     },
@@ -540,6 +539,11 @@ export default {
            this.extraParams.push(item.split('@')[1])
         })
         this.dataForm.extraParams = Array.from(new Set(out))
+        this.outParamsList = this.updateOutParamsList(this.dataForm.extraParams, outList)
+        this.extraParamsVisible = true
+      } else {
+        this.dataForm.extraParams = []
+        this.extraParamsVisible = false
       }
       if (fixedParams) {
         let out = []
@@ -549,18 +553,18 @@ export default {
            this.fixedParams.push(item.split('@')[1])
         })
         this.dataForm.fixedParams = Array.from(new Set(out))
+        this.outParamsList = this.updateOutParamsList(this.dataForm.fixedParams, outList)
         this.fixedParamsvisible = true
       }
       // data.forEach(item => {
       //   out.push(item.englishName + '-' + item.id)
       //   type === 'extraParams' ? this.extraParams.push(item.id) : this.fixedParams.push(item.id)
       // })
-      this.outParamsList = this.updateOutParamsList(outList)
     },
     // 获取出参，默认展开列表
-    updateOutParamsList (indexList) {
+    updateOutParamsList (data, indexList) {
       let indexListArr = deepClone(indexList)
-      this.dataForm.extraParams.forEach(item => {
+      data.forEach(item => {
         let indexPath = findVueSelectItemIndex(indexListArr, item) + ''
         let indexPathArr = indexPath.split(',')
         let a = indexListArr
