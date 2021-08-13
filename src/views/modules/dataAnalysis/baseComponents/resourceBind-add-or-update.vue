@@ -340,6 +340,7 @@ export default {
             if (row.type === 'sms') {
               this.dataForm.editType = '1'
               this.extraParamsVisible = false
+              this.dataForm.resourceName = this.dataForm.resourceName.split('自定义短信_')[1]
               this.dataForm.cusSmsType = bindingContent.cusSmsType
               this.dataForm.productNo = bindingContent.productNo
               this.dataForm.smsContent = bindingContent.smsContent
@@ -365,6 +366,7 @@ export default {
             this.dataForm.resourceCode = res.data.data.bindingConfig.resourceCode
             this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
             if (row.type === 'sms') {
+              this.dataForm.resourceName = this.dataForm.resourceName.split('标准短信_')[1]
               this.dataForm.channelId = res.data.data.resourceData.channelId
               this.dataForm.smsTemplate = res.data.data.resourceData.smsTemplate
               this.paramsNum = res.data.data.resourceData.smsTemplate.split('%s').length - 1
@@ -797,6 +799,7 @@ export default {
           }
           if (this.dataForm.type === 'sms') {
             params.content = this.dataForm.editType === '0' ? '' : JSON.stringify(smsContent)
+            params.resourceName = this.dataForm.editType === '0' ? '标准短信_' + this.dataForm.resourceName : '自定义短信_' + this.dataForm.resourceName
             params.resourceId = this.dataForm.editType === '0' ? params.resourceId : null
           }
           if (this.dataForm.type === 'push') {

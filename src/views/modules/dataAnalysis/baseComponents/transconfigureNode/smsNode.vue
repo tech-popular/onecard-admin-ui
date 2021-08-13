@@ -210,17 +210,18 @@ export default {
           console.log('res.data: ', res.data)
           this.dataForm.id = res.data.data.bindingConfig.id
           this.dataForm.channelCode = res.data.data.bindingConfig.channelCode
-          this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
           this.dataForm.type = res.data.data.bindingConfig.type
           if (res.data.data.bindingConfig.content) {
             this.dataForm.editType = '1'
             this.extraParamsVisible = false
+            this.dataForm.resourceName = res.data.data.bindingConfig.resourceName.split('自定义短信_')[1]
             let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             this.dataForm.cusSmsType = bindingContent.cusSmsType
             this.dataForm.productNo = bindingContent.productNo
             this.dataForm.smsContent = bindingContent.smsContent
           } else {
             this.dataForm.editType = '0'
+            this.dataForm.resourceName = res.data.data.bindingConfig.resourceName.split('标准短信_')[1]
             this.dataForm.resourceCode = res.data.data.bindingConfig.resourceCode
             this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
             this.dataForm.channelId = res.data.data.resourceData.channelId
@@ -440,7 +441,7 @@ export default {
           let params = {
             id: this.dataForm.id,
             type: this.dataForm.type,
-            resourceName: this.dataForm.resourceName,
+            resourceName: this.dataForm.editType === '0' ? '标准短信_' + this.dataForm.resourceName : '自定义短信_' + this.dataForm.resourceName,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
             resourceId: this.dataForm.editType === '0' ? this.dataForm.resourceId.toString() : null,
