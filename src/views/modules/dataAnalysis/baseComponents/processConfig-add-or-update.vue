@@ -1,6 +1,6 @@
 <template>
-	<el-dialog :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form label-width="100px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
+	<el-dialog  :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+		<el-form v-loading="dataLoading" label-width="100px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
       <el-form-item label="所属渠道" prop="channelCode" :rules="{ required: true, message: '请选择所属渠道', trigger: 'blur' }">
 				<el-select
 					v-model="dataForm.channelCode"
@@ -81,6 +81,7 @@ export default {
     return {
       visible: false,
       viewVisible: false,
+      dataLoading: false,
       tag: '',
       createTime: '', // 创建时间
       createUser: '', // 创建人
@@ -142,6 +143,7 @@ export default {
       this.datasourceList = []
       this.visible = true
       if (row) {
+        this.dataLoading = true
         this.getLookData(row)
       }
     },
@@ -181,11 +183,13 @@ export default {
         if (data && data.status === '1') {
           if (row) {
             this.getOutParamsEditList(value, this.filterAllCata(data.data))
+            this.dataLoading = false
           } else {
             this.outParamsList = this.filterAllCata(data.data)
           }
         } else {
           this.outParamsList = []
+          this.dataLoading = false
         }
       })
     },

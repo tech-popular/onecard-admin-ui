@@ -471,11 +471,13 @@ export default {
         if (data && data.status === '1') {
           if (row) {
             this.getOutParamsEditList(extraParams, fixedParams, this.filterAllCata(data.data))
+            this.dataLoading = false
           } else {
             this.outParamsList = this.filterAllCata(data.data)
           }
         } else {
           this.outParamsList = []
+          this.dataLoading = false
         }
       })
     },
@@ -564,7 +566,6 @@ export default {
       //   out.push(item.englishName + '-' + item.id)
       //   type === 'extraParams' ? this.extraParams.push(item.id) : this.fixedParams.push(item.id)
       // })
-      this.dataLoading = false
     },
     // 获取出参，默认展开列表
     updateOutParamsList (data, indexList) {

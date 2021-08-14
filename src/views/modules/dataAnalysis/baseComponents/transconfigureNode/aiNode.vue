@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="配置" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form label-width="120px" :model="dataForm"  ref="dataForm">
+		<el-form  v-loading="dataLoading" label-width="120px" :model="dataForm"  ref="dataForm">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
@@ -42,6 +42,7 @@ export default {
     return {
       visible: false,
       fixedParamsvisible: false,
+      dataLoading: false,
       target: '',
       dataForm: {
         id: '',
@@ -82,6 +83,7 @@ export default {
       this.target = ''
       this.fixedParams = []
       this.fixedParamsvisible = false
+      this.dataLoading = true
       this.getAiList()
       this.aiDataList = []
       this.visible = true
@@ -123,8 +125,10 @@ export default {
             this.outParamsList = this.filterAllCata(data.data)
             this.getFixedParams()
           }
+          this.dataLoading = false
         } else {
           this.outParamsList = []
+          this.dataLoading = false
         }
       })
     },
