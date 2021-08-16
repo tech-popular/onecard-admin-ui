@@ -224,7 +224,7 @@
                   <div slot="content">{{baseForm.kafkaParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('kafka') > -1 && canUpdate" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('kafka')">配置</div>
+                <div v-if="this.baseForm.transferType.indexOf('kafka') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('kafka')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -258,7 +258,7 @@
                 <div slot="content">{{baseForm.smsParams}}</div>
                 <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
               </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('sms') > -1 && canUpdate " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('sms')">配置</div>
+                <div v-if="this.baseForm.transferType.indexOf('sms') > -1 " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('sms')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -292,7 +292,7 @@
                   <div slot="content">{{baseForm.telParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('tel') > -1 && canUpdate" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('tel')">配置</div>
+                <div v-if="this.baseForm.transferType.indexOf('tel') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('tel')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -326,7 +326,7 @@
                   <div slot="content">{{baseForm.aiParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('ai') > -1 && canUpdate " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('ai')">配置</div>
+                <div v-if="this.baseForm.transferType.indexOf('ai') > -1 " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('ai')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -360,7 +360,7 @@
                   <div slot="content">{{baseForm.pushParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('push') > -1 && canUpdate" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('push')">配置</div>
+                <div v-if="this.baseForm.transferType.indexOf('push') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('push')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -1668,27 +1668,27 @@
           if (val === 'kafka') {
             this.kafkaNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.kafkaNode.init(this.channelCode, this.baseForm.kafkaServer)
+              this.$refs.kafkaNode.init(this.channelCode, this.baseForm.kafkaServer, this.canUpdate)
             })
           } else if (val === 'sms') {
             this.smsNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.smsNode.init(this.channelCode, this.baseForm.smsId)
+              this.$refs.smsNode.init(this.channelCode, this.baseForm.smsId, this.canUpdate)
             })
           } else if (val === 'tel') {
             this.telNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.telNode.init(this.channelCode, this.baseForm.telId)
+              this.$refs.telNode.init(this.channelCode, this.baseForm.telId, this.canUpdate)
             })
           } else if (val === 'ai') {
             this.aiNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.aiNode.init(this.channelCode, this.baseForm.aiId)
+              this.$refs.aiNode.init(this.channelCode, this.baseForm.aiId, this.canUpdate)
             })
           } else if (val === 'push') {
             this.pushNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId)
+              this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId, this.canUpdate)
             })
           }
         } else {

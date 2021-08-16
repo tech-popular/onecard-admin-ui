@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="配置" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form  v-loading="dataLoading" label-width="120px" :model="dataForm"  :rules="baseRule" ref="dataForm">
+		<el-form  v-loading="dataLoading" label-width="120px" :model="dataForm"  :rules="baseRule" :disabled="!canUpdate" ref="dataForm">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
@@ -32,6 +32,7 @@
 						@input="changeOption"
 						@select="outParamsSelect"
 						@deselect="outParamsDeselect"
+            :disabled="!canUpdate"
 						noChildrenText="暂无数据"
 						v-model="dataForm.extraParams"
 						placeholder="请选择"
@@ -40,7 +41,7 @@
 			</el-form-item>
 		</el-form>
 		<div slot="footer" class="foot">
-      <el-button type="primary" @click="submitData">提交</el-button>
+      <el-button type="primary" @click="submitData" v-if="canUpdate">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
 	</el-dialog>
@@ -56,6 +57,7 @@ export default {
     return {
       visible: false,
       dataLoading: false,
+      canUpdate: true,
       target: '',
       dataForm: {
         id: '',
@@ -85,8 +87,9 @@ export default {
         callback()
       }
     },
-    init (channelCode, kafkaId) {
+    init (channelCode, kafkaId, canUpdate) {
       this.outParamsList = []
+      this.canUpdate = canUpdate
       this.dataForm = {
         id: kafkaId,
         channelCode: channelCode,

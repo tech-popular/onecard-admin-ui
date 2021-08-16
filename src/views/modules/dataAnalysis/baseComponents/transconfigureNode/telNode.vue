@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="配置" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form v-loading="dataLoading" label-width="120px" :model="dataForm"  ref="dataForm">
+		<el-form v-loading="dataLoading" label-width="120px" :model="dataForm" :disabled="!canUpdate"  ref="dataForm">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
@@ -26,7 +26,7 @@
 			</el-form-item>
 		</el-form>
 		<div slot="footer" class="foot">
-      <el-button type="primary" @click="submitData" >提交</el-button>
+      <el-button type="primary" v-if="canUpdate" @click="submitData" >提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
 	</el-dialog>
@@ -43,6 +43,7 @@ export default {
       visible: false,
       fixedParamsvisible: false,
       dataLoading: false,
+      canUpdate: true,
       target: '',
       dataForm: {
         id: '',
@@ -69,8 +70,9 @@ export default {
         callback()
       }
     },
-    init (channelCode, id) {
+    init (channelCode, id, canUpdate) {
       this.dataLoading = true
+      this.canUpdate = canUpdate
       this.dataForm = {
         id: id,
         channelCode: channelCode,

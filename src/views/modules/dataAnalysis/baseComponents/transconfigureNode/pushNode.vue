@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="配置" width = "800px" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form v-loading="dataLoading" label-width="160px" :model="baseForm"  ref="baseForm">
+		<el-form v-loading="dataLoading" label-width="160px" :model="baseForm" :disabled="!canUpdate"  ref="baseForm">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="baseForm.resourceName" placeholder="请输入名称"></el-input>
 			</el-form-item>
@@ -67,7 +67,7 @@
 		</div>
 		</el-form>
 		<div slot="footer" class="foot">
-      <el-button type="primary" @click="submitData" >提交</el-button>
+      <el-button type="primary" @click="submitData" v-if="canUpdate">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
 	</el-dialog>
@@ -84,6 +84,7 @@ export default {
       visible: false,
       fixedParamsvisible: false,
       dataLoading: false,
+      canUpdate: true,
       target: '',
       baseForm: {
         id: '',
@@ -118,7 +119,7 @@ export default {
         callback()
       }
     },
-    init (channelCode, id) {
+    init (channelCode, id, canUpdate) {
       this.baseForm = {
         id: '',
         type: 'push',
@@ -127,16 +128,15 @@ export default {
         pushType: '',
         pushTitle: '',
         pageType: '',
-        // pushFlag: '',
         flag: [],
         linkUrl: '',
         pushContent: '',
-        // msgFlag: '',
         msgTitle: '',
         msgUrl: '',
         msgContent: '',
         fixedParams: []
       }
+      this.canUpdate = canUpdate
       this.fixedParams = []
       this.dataLoading = true
       this.visible = true

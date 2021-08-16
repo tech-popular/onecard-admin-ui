@@ -77,7 +77,7 @@
           </p>
       </el-form-item>
        <el-form-item label="短信类型" v-if="dataForm.editType === '1' && dataForm.type === 'sms'"  prop="cusSmsType">
-        <el-select v-model="dataForm.cusSmsType"  filterable @change="changecusSmsType"  placeholder="请选择" style="width: 400px;margin-right:15px;">
+        <el-select v-model="dataForm.cusSmsType"  filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
             <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
@@ -205,7 +205,7 @@ export default {
       target: '',
       dataForm: {
         id: '',
-        type: 'kafka',
+        type: '',
         resourceId: '',
         resourceName: '',
         resourceCode: '',
@@ -291,7 +291,7 @@ export default {
       this.dataForm = {
         id: '',
         channelCode: '',
-        type: 'kafka',
+        type: '',
         resourceId: '',
         resourceName: '',
         resourceCode: '',
@@ -332,7 +332,7 @@ export default {
     getLookData (row) {
       lookDataList(row.id).then(res => {
         if (res.data.status === '1') {
-          console.log('res.data: ', res.data)
+          // console.log('res.data: ', res.data)
           this.dataForm.id = row.id
           this.dataForm.channelCode = res.data.data.bindingConfig.channelCode
           this.dataForm.resourceName = res.data.data.bindingConfig.resourceName

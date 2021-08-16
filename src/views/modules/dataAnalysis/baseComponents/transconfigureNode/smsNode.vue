@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="配置" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form  v-loading="dataLoading" label-width="120px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
+		<el-form  v-loading="dataLoading" label-width="120px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="!canUpdate">
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
@@ -69,7 +69,7 @@
 						:load-options="loadOptions"
 						:searchable="true"
 						:clearable="true"
-						:disabled="viewVisible"
+						:disabled="!canUpdate"
 						@input="changeOption"
 						@select="outParamsSelect"
 						@deselect="outParamsDeselect"
@@ -81,7 +81,7 @@
 			</el-form-item>
 		</el-form>
 		<div slot="footer" class="foot">
-      <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
+      <el-button type="primary" @click="submitData" v-if="canUpdate">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
 	</el-dialog>
@@ -98,7 +98,7 @@ export default {
       visible: false,
       extraParamsVisible: true,
       fixedParamsvisible: false,
-      viewVisible: false,
+      canUpdate: true,
       dataLoading: false,
       target: '',
       dataForm: {
@@ -151,9 +151,10 @@ export default {
         callback()
       }
     },
-    init (channelCode, id) {
+    init (channelCode, id, canUpdate) {
       this.extraParamsVisible = true
       this.fixedParamsvisible = false
+      this.canUpdate = canUpdate
       this.getAllSmsChannels()
       this.getSmsSignInfo()
       this.getSmsStyleInfo()
