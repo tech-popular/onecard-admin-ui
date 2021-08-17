@@ -965,6 +965,7 @@
         this.pushIdList = []
         if (val === '0') {
           this.baseForm.transferType = ['kafka']
+          this.changeDistribution(true, 'kafka')
         } else {
           this.baseForm.transferType = []
         }
