@@ -146,15 +146,15 @@
             <el-option value="BONUS" label="专属福利"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="Push标题：" prop="pushTitle" :rules="{ required: true, message: '请输入Push标题', trigger: 'blur' }">
-          <el-input v-model="dataForm.pushTitle" placeholder="请输入Push标题"></el-input>
-        </el-form-item>
         <el-form-item label="查看详情跳转目标：" prop="pageType" v-if="dataForm.pushType === 'ACTIVITY' || dataForm.pushType === 'BONUS'" :rules="{ required: true, message: '请选择查看详情跳转目标', trigger: 'blur' }">
           <el-radio label="internal" v-model="dataForm.pageType">新H5</el-radio>
           <el-radio label="external" v-model="dataForm.pageType">外部H5</el-radio>
         </el-form-item>
         <el-form-item label="查看详情跳转链接：" prop="linkUrl" v-if="dataForm.pushType === 'ACTIVITY' || dataForm.pushType === 'BONUS'" :rules="{ required: true, message: '请输入查看详情跳转链接', trigger: 'blur' }">
           <el-input v-model="dataForm.linkUrl" ></el-input>
+        </el-form-item>
+        <el-form-item label="Push标题：" prop="pushTitle" :rules="{ required: true, message: '请输入Push标题', trigger: 'blur' }">
+          <el-input v-model="dataForm.pushTitle" placeholder="请输入Push标题"></el-input>
         </el-form-item>
         <el-form-item label="内容：" prop="pushContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
           <el-input type="textarea"  v-model="dataForm.pushContent" :autosize="{ minRows: 3}"  show-word-limit />
@@ -321,6 +321,9 @@ export default {
       this.fixedParams = []
       this.telOrAiList = []
       this.visible = true
+      this.$nextTick(() => {
+        console.log(this.$refs.dataForm[0].data, '12')
+      })
       if (row) {
         this.createTime = row.createTime
         this.createUser = row.createUser
