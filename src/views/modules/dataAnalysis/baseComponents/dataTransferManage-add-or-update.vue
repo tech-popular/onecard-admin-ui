@@ -8,8 +8,8 @@
     class="data-transfer-manage-drawer"
   >
   <div slot="title" class="drawer-title">{{tag}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
-    <div class="wrap" v-loading="loading">
-      <el-form label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form" :disabled="!canUpdate">
+    <div class="wrap">
+      <el-form v-loading="loading" label-width="80px" :model="baseForm" :rules="baseRule" ref="baseForm" class="base-form" :disabled="!canUpdate">
         <div class="base-pane">
           <h3 ref="baseTitle">基本信息</h3>
             <el-form-item label="决策方式" prop="decisionType" style="width:50%" >
@@ -803,9 +803,9 @@
           } else {
             this.templateIdList = []
           }
-          this.$nextTick(() => {
-            this.loading = false
-          })
+          // this.$nextTick(() => {
+          //   this.loading = false
+          // })
           if (fn) {
             fn(this.templateIdList)
           }
@@ -1283,50 +1283,52 @@
           channelCode: this.channelCode
         }
         selectResourceBindingList(params).then(({data}) => {
-          if (type === 'kafka') {
-            this.kafkaServerList = data.data
-             data.data.filter(item => {
-              if (sourceBindingIds.indexOf(item.id) > -1) {
-                this.baseForm.kafkaServer = item.id
-                this.kafkaSelectChange()
-                // getSmsAllMessage(item.resourceId).then(({data}) => {
-                //   this.getOutParamsEditList(data.data.bindingIndex, this.outParamsList, type)
-                // })
-              }
-            })
-          } else if (type === 'sms') {
-            this.smsIdList = data.data
-            data.data.filter(item => {
-              if (sourceBindingIds.indexOf(item.id) > -1) {
-                this.baseForm.smsId = item.id
-                this.smsSelectChange()
-              }
-            })
-          } else if (type === 'tel') {
-            this.telIdList = data.data
-            data.data.filter(item => {
-              if (sourceBindingIds.indexOf(item.id) > -1) {
-                this.baseForm.telId = item.id
-                this.telSelectChange()
-              }
-            })
-          } else if (type === 'ai') {
-            this.aiIdList = data.data
-            data.data.filter(item => {
-              if (sourceBindingIds.indexOf(item.id) > -1) {
-                this.baseForm.aiId = item.id
-                this.aiSelectChange()
-              }
-            })
-          } else if (type === 'push') {
-            this.pushIdList = data.data
-            data.data.filter(item => {
-              if (sourceBindingIds.indexOf(item.id) > -1) {
-                this.baseForm.pushId = item.id
-                this.pushSelectChange()
-              }
-            })
+          if (data && data.status === '1') {
+            if (type === 'kafka') {
+              this.kafkaServerList = data.data
+               data.data.filter(item => {
+                if (sourceBindingIds.indexOf(item.id) > -1) {
+                  this.baseForm.kafkaServer = item.id
+                  this.kafkaSelectChange()
+                }
+              })
+            } else if (type === 'sms') {
+              this.smsIdList = data.data
+              data.data.filter(item => {
+                if (sourceBindingIds.indexOf(item.id) > -1) {
+                  this.baseForm.smsId = item.id
+                  this.smsSelectChange()
+                }
+              })
+            } else if (type === 'tel') {
+              this.telIdList = data.data
+              data.data.filter(item => {
+                if (sourceBindingIds.indexOf(item.id) > -1) {
+                  this.baseForm.telId = item.id
+                  this.telSelectChange()
+                }
+              })
+            } else if (type === 'ai') {
+              this.aiIdList = data.data
+              data.data.filter(item => {
+                if (sourceBindingIds.indexOf(item.id) > -1) {
+                  this.baseForm.aiId = item.id
+                  this.aiSelectChange()
+                }
+              })
+            } else if (type === 'push') {
+              this.pushIdList = data.data
+              data.data.filter(item => {
+                if (sourceBindingIds.indexOf(item.id) > -1) {
+                  this.baseForm.pushId = item.id
+                  this.pushSelectChange()
+                }
+              })
+            }
           }
+          this.$nextTick(() => {
+            this.loading = false
+          })
         })
       },
       // // 分群出参

@@ -322,7 +322,7 @@ export default {
       this.telOrAiList = []
       this.visible = true
       this.$nextTick(() => {
-        console.log(this.$refs.dataForm[0].data, '12')
+        console.log(this.$refs.dataForm.data, '12')
       })
       if (row) {
         this.createTime = row.createTime

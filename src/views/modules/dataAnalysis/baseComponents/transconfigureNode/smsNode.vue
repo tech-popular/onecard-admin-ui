@@ -221,7 +221,7 @@ export default {
             let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             this.dataForm.cusSmsType = bindingContent.cusSmsType
             this.dataForm.productNo = bindingContent.productNo
-            this.dataForm.smsContent = bindingContent.smsContent
+            this.dataForm.smsContent = bindingContent.content
           } else {
             this.dataForm.editType = '0'
             this.dataForm.resourceName = res.data.data.bindingConfig.resourceName.split('标准短信_')[1]
@@ -440,7 +440,7 @@ export default {
           let congiger = {
             'cusSmsType': this.dataForm.cusSmsType,
             'productNo': this.dataForm.productNo,
-            'smsContent': this.dataForm.smsContent
+            'content': this.dataForm.smsContent
           }
           let params = {
             id: this.dataForm.id,

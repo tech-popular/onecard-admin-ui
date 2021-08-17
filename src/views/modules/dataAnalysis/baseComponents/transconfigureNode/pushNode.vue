@@ -304,6 +304,10 @@ export default {
     submitData () {
       this.$refs['baseForm'].validate((valid) => {
         if (valid) {
+          // let pushExtraKeys = {
+          //     pageType: this.baseForm.pageType,
+          //     linkUrl: this.baseForm.linkUrl
+          //   }
           let content = {
             pushFlag: this.baseForm.flag.includes('pushFlag') ? 'Y' : 'N',
             msgFlag: this.baseForm.flag.includes('msgFlag') ? 'Y' : 'N',
@@ -313,6 +317,7 @@ export default {
             msgTitle: this.baseForm.msgTitle,
             msgUrl: this.baseForm.msgUrl,
             msgContent: this.baseForm.msgContent,
+            // pushExtraKeys: JSON.stringify(pushExtraKeys)
             pushExtraKeys: {
               pageType: this.baseForm.pageType,
               linkUrl: this.baseForm.linkUrl
