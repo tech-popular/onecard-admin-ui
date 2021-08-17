@@ -803,9 +803,11 @@
           } else {
             this.templateIdList = []
           }
-          // this.$nextTick(() => {
-          //   this.loading = false
-          // })
+          if (!tag) {
+            this.$nextTick(() => {
+              this.loading = false
+            })
+          }
           if (fn) {
             fn(this.templateIdList)
           }
