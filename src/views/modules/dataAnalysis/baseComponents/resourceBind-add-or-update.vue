@@ -348,7 +348,7 @@ export default {
               this.dataForm.resourceName = this.dataForm.resourceName.split('自定义短信_')[1]
               this.dataForm.cusSmsType = bindingContent.cusSmsType
               this.dataForm.productNo = bindingContent.productNo
-              this.dataForm.smsContent = bindingContent.smsContent
+              this.dataForm.smsContent = bindingContent.content
             }
             if (row.type === 'push') {
               this.dataForm.pushType = bindingContent.pushType
