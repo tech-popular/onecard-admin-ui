@@ -348,10 +348,11 @@ export default {
               this.dataForm.smsContent = bindingContent.content
             }
             if (row.type === 'push') {
+              let pushExtraKeys = JSON.parse(bindingContent.pushExtraKeys)
               this.dataForm.pushType = bindingContent.pushType
               this.dataForm.pushTitle = bindingContent.pushTitle
-              this.dataForm.pageType = bindingContent.pushExtraKeys.pageType
-              this.dataForm.linkUrl = bindingContent.pushExtraKeys.linkUrl
+              this.dataForm.pageType = pushExtraKeys.pageType
+              this.dataForm.linkUrl = pushExtraKeys.linkUrl
               this.dataForm.pushContent = bindingContent.pushContent
               this.dataForm.msgUrl = bindingContent.msgUrl
               this.dataForm.msgContent = bindingContent.msgContent
@@ -774,6 +775,10 @@ export default {
             'productNo': this.dataForm.productNo,
             'smsContent': this.dataForm.smsContent
           }
+          let pushExtraKeys = {
+              pageType: this.baseForm.pageType,
+              linkUrl: this.baseForm.linkUrl
+          }
           let pushContent = {
             pushFlag: this.dataForm.flag.includes('pushFlag') ? 'Y' : 'N',
             msgFlag: this.dataForm.flag.includes('msgFlag') ? 'Y' : 'N',
@@ -785,10 +790,7 @@ export default {
             msgTitle: this.dataForm.msgTitle,
             msgUrl: this.dataForm.msgUrl,
             msgContent: this.dataForm.msgContent,
-            pushExtraKeys: {
-              pageType: this.dataForm.pageType,
-              linkUrl: this.dataForm.linkUrl
-            }
+            pushExtraKeys: JSON.stringify(pushExtraKeys)
           }
           let params = {
             id: this.dataForm.id,

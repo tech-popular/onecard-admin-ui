@@ -155,10 +155,11 @@ export default {
           this.baseForm.resourceName = res.data.data.bindingConfig.resourceName
           this.baseForm.type = res.data.data.bindingConfig.type
           let bindContent = JSON.parse(res.data.data.bindingConfig.content)
+          let pushExtraKeys = JSON.parse(bindContent.pushExtraKeys)
           this.baseForm.pushType = bindContent.pushType
           this.baseForm.pushTitle = bindContent.pushTitle
-          this.baseForm.pageType = bindContent.pushExtraKeys.pageType
-          this.baseForm.linkUrl = bindContent.pushExtraKeys.linkUrl
+          this.baseForm.pageType = pushExtraKeys.pageType
+          this.baseForm.linkUrl = pushExtraKeys.linkUrl
           this.baseForm.pushContent = bindContent.pushContent
           this.baseForm.msgUrl = bindContent.msgUrl
           this.baseForm.msgContent = bindContent.msgContent
@@ -187,6 +188,7 @@ export default {
         } else {
           this.outParamsList = []
           this.dataLoading = false
+          return this.$message.error(`请联系管理员配置固定流程参数`)
         }
       })
     },
@@ -304,10 +306,13 @@ export default {
     submitData () {
       this.$refs['baseForm'].validate((valid) => {
         if (valid) {
-          // let pushExtraKeys = {
-          //     pageType: this.baseForm.pageType,
-          //     linkUrl: this.baseForm.linkUrl
-          //   }
+          if (this.fixedParams.length === 0) {
+            return this.$message.error(`请联系管理员配置固定流程参数`)
+          }
+          let pushExtraKeys = {
+              pageType: this.baseForm.pageType,
+              linkUrl: this.baseForm.linkUrl
+            }
           let content = {
             pushFlag: this.baseForm.flag.includes('pushFlag') ? 'Y' : 'N',
             msgFlag: this.baseForm.flag.includes('msgFlag') ? 'Y' : 'N',
@@ -317,11 +322,11 @@ export default {
             msgTitle: this.baseForm.msgTitle,
             msgUrl: this.baseForm.msgUrl,
             msgContent: this.baseForm.msgContent,
-            // pushExtraKeys: JSON.stringify(pushExtraKeys)
-            pushExtraKeys: {
-              pageType: this.baseForm.pageType,
-              linkUrl: this.baseForm.linkUrl
-            }
+            pushExtraKeys: JSON.stringify(pushExtraKeys)
+            // pushExtraKeys: {
+            //   pageType: this.baseForm.pageType,
+            //   linkUrl: this.baseForm.linkUrl
+            // }
           }
           let params = {
             id: this.baseForm.id,
