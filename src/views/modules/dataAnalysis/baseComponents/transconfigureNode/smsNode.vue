@@ -210,7 +210,7 @@ export default {
     getLookData (id) {
       lookDataList(id).then(res => {
         if (res.data.status === '1') {
-          console.log('res.data: ', res.data)
+          // console.log('res.data: ', res.data)
           this.dataForm.id = res.data.data.bindingConfig.id
           this.dataForm.channelCode = res.data.data.bindingConfig.channelCode
           this.dataForm.type = res.data.data.bindingConfig.type

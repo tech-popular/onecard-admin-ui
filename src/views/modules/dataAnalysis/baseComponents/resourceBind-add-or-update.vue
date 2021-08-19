@@ -321,9 +321,6 @@ export default {
       this.fixedParams = []
       this.telOrAiList = []
       this.visible = true
-      this.$nextTick(() => {
-        console.log(this.$refs.dataForm.data, '12')
-      })
       if (row) {
         this.createTime = row.createTime
         this.createUser = row.createUser

@@ -1410,12 +1410,11 @@
       },
       // 保存
       saveHandle () {
-        console.log(this.formatPostData(this.baseForm, this.outParams))
+        // console.log(this.formatPostData(this.baseForm, this.outParams))
         this.$refs['baseForm'].validate((valid) => {
           if (valid) {
             if (this.baseForm.decisionType === '0' && !this.baseForm.transferType.length) return this.$message.error('请选择下发方式')
             let params = this.formatPostData(this.baseForm)
-            console.log(params)
             this.loading = true
             if (!this.baseForm.id) {
               addDataTransferManage(params).then(({data}) => {
