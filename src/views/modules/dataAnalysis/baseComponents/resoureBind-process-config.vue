@@ -109,10 +109,10 @@
         deleteVisible: false,
         lookVisible: false,
         typeList: [
-          {lable: 'sms', value: 'sms'},
-          {lable: 'tel', value: '电销'},
-          {lable: 'ai', value: 'AI'}
-          // {lable: 'push', value: 'push'}
+          {lable: '短信', value: 'sms'},
+          {lable: '电销', value: 'tel'},
+          {lable: 'AI', value: 'ai'},
+          {lable: 'Push', value: 'push'}
         ]
       }
     },

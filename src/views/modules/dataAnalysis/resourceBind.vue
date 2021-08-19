@@ -107,8 +107,10 @@
         isAdmin: sessionStorage.getItem('username') === 'admin',
         typeList: [
           {lable: 'kafka', value: 'kafka'},
-          // {lable: 'mysql', value: 'mysql'},
-          {lable: 'sms', value: 'sms'}
+          {lable: '短信', value: 'sms'},
+          {lable: '电销', value: 'tel'},
+          {lable: 'AI', value: 'ai'},
+          {lable: 'Push', value: 'push'}
         ]
       }
     },
