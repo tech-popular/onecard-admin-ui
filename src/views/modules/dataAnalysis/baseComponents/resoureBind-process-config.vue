@@ -13,7 +13,7 @@
         <el-button type="primary" @click="deleted()">确 定</el-button>
       </span>
     </el-dialog> -->
-    <el-dialog title="流程配置" :close-on-click-modal="false" :visible.sync="visible" width="60%">
+    <el-dialog title="流程配置" :close-on-click-modal="false" :visible.sync="visible" width="70%">
 		<el-form :inline="true" :model="dataForm" ref="dataForm">
       <el-form-item label="类型" prop="type">
         <el-select  v-model="dataForm.type" clearable>
@@ -48,11 +48,11 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" align="center" label="id"/>
-      <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"/>
-      <el-table-column prop="type" header-align="center" align="center" label="类型"/>
-      <el-table-column prop="params" header-align="center" align="center" label="出参"/>
-      <el-table-column prop="datasourceType" header-align="center" align="center" label="通道"/>
+      <el-table-column prop="id" width="80" header-align="center" align="center" label="id"/>
+      <el-table-column prop="channelCode" header-align="center" align="center" width="200" label="渠道"/>
+      <el-table-column prop="type" header-align="center" align="center" width="150" label="类型"/>
+      <el-table-column prop="params" header-align="center" align="left" label="出参"/>
+      <el-table-column prop="datasourceType" header-align="center" align="center" width="150" label="通道"/>
       <!-- <el-table-column prop="datasourceId" header-align="center" align="center" label="任务ID"/> -->
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
@@ -145,6 +145,7 @@
                   item.channelCode = citem.text
                 }
               })
+              item.params = item.params.split(',').join('\n')
             })
             this.dataList = data.data.list
             this.totalCount = data.data.total
@@ -221,5 +222,8 @@
 <style scoped>
   .el-button+.el-button{
     margin: 0 !important;
+  }
+  .el-table .cell{
+    white-space: pre-line;
   }
 </style>

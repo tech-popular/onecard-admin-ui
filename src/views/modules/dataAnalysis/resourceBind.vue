@@ -47,8 +47,8 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="type" header-align="center" align="center" label="类型"></el-table-column>
-      <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"></el-table-column>
+      <el-table-column prop="type" header-align="center" align="center"  width="150" label="类型"></el-table-column>
+      <el-table-column prop="channelCode" header-align="center" align="center" width="150" label="渠道"></el-table-column>
       <!-- <el-table-column prop="bindingIndex" header-align="center" align="center" label="出参">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -57,8 +57,8 @@
           </el-tooltip>
         </template>
       </el-table-column> -->
-      <el-table-column prop="fixedParams" header-align="center" align="center" label="固定出参"></el-table-column>
-      <el-table-column prop="extraParams" header-align="center" align="center" label="额外出参"></el-table-column>
+      <el-table-column prop="fixedParams" header-align="center" align="left" label="固定出参"></el-table-column>
+      <el-table-column prop="extraParams" header-align="center" align="left" label="额外出参"></el-table-column>
       <!-- <el-table-column prop="updateUser" header-align="center" align="center" label="修改人"></el-table-column> -->
       <!-- <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column> -->
       <el-table-column header-align="center" align="center" width="100" label="操作">
@@ -139,6 +139,8 @@
                   item.channelCode = citem.text
                 }
               })
+              item.fixedParams = item.fixedParams.split(',').join('\n')
+              item.extraParams = item.extraParams.split(',').join('\n')
             })
             this.dataList = data.data.list
             this.totalCount = data.data.total
@@ -242,6 +244,9 @@
     & .vue-treeselect__placeholder{
       height: 40px;
       line-height: 40px;
+    }
+    & .el-table .cell{
+      white-space: pre-line;
     }
   }
 </style>
