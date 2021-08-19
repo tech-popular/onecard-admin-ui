@@ -379,6 +379,7 @@ export default {
             this.fixedParamsvisible = false
             this.dataForm.fixedParams = []
             this.fixedParams = []
+            return this.$message.error(`请联系管理员配置固定流程参数`)
           }
         }
       })
@@ -434,6 +435,9 @@ export default {
     submitData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          if (this.fixedParams.length === 0) {
+            return this.$message.error(`请联系管理员配置固定流程参数`)
+          }
           if (this.dataForm.type === 'sms' && this.extraParams.length !== this.paramsNum) {
             return this.$message.error(`请选择${this.paramsNum}个参数`)
           }

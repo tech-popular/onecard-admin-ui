@@ -188,7 +188,6 @@ export default {
         } else {
           this.outParamsList = []
           this.dataLoading = false
-          return this.$message.error(`请联系管理员配置固定流程参数`)
         }
       })
     },
@@ -285,6 +284,7 @@ export default {
             this.fixedParamsvisible = false
             this.baseForm.fixedParams = []
             this.fixedParams = []
+            return this.$message.error(`请联系管理员配置固定流程参数`)
           }
         }
       })
