@@ -71,7 +71,7 @@
           <!-- <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button> -->
           <el-button type="text" @click="lowerHandle(scope.row)" v-if="scope.row.enable === true && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)">立即下发</el-button>
           <el-button type="text" v-if="scope.row.enable != true && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)" @click="lowerHandle(scope.row)" disabled>立即下发</el-button>
-          <el-button type="text" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
+          <el-button type="text" style="margin-left:0px;"  v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
           <el-button type="text" @click="taskProgress(scope.row)">执行进度</el-button> 
         </template>
       </el-table-column>
