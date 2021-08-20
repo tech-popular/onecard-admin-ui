@@ -279,7 +279,6 @@ export default {
       this.getChannelsList()
       this.getSmsSignInfo()
       this.getSmsStyleInfo()
-      this.getKafkaServerList()
       this.getAllSmsChannels()
       this.outParamsList = []
       this.tag = row ? tag : ''
@@ -326,6 +325,8 @@ export default {
         this.createUser = row.createUser
         this.dataLoading = true
         this.getLookData(row)
+      } else {
+        this.getKafkaServerList()
       }
     },
     // 回显
@@ -383,14 +384,14 @@ export default {
                 }
               })
             }
+            if (res.data.data.bindingConfig.type === 'kafka') {
+              this.getKafkaServerList(res.data.data.bindingConfig.resourceId)
+            } else {
+              this.getKafkaServerList()
+            }
           }
           this.getOutParamsList(row, res.data.data.extraParams, res.data.data.fixedParams)
         }
-        this.$nextTick(() => {
-          if (row.type === 'kafka') {
-            this.target = this.kafkaServerList.filter(item => item.id == this.dataForm.resourceId)[0].target
-          }
-        })
       })
     },
     getChannelsList () {
@@ -410,13 +411,16 @@ export default {
       })
     },
       // kafka 数据源
-    getKafkaServerList () {
+    getKafkaServerList (resourceId) {
       let params = {
         type: 'kafka'
       }
       dataTransferManageKafka(params).then(({data}) => {
         if (data && data.status === '1') {
           this.kafkaServerList = data.data
+          if (resourceId) {
+            this.target = data.data.filter(item => item.id == resourceId)[0].target
+          }
         }
       })
     },

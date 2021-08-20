@@ -103,10 +103,11 @@ export default {
       this.extraParams = []
       this.dataLoading = true
       this.getOutParamsList()
-      this.getKafkaServerList()
       this.visible = true
       if (kafkaId) {
         this.getLookData(kafkaId)
+      } else {
+        this.getKafkaServerList()
       }
     },
     // 回显
@@ -120,20 +121,21 @@ export default {
           this.dataForm.type = res.data.data.bindingConfig.type
           this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
           this.getOutParamsList(res.data.data.extraParams)
+          this.getKafkaServerList(res.data.data.bindingConfig.resourceId)
         }
-        this.$nextTick(() => {
-          this.target = this.kafkaServerList.filter(item => item.id == this.dataForm.resourceId)[0].target
-        })
       })
     },
       // kafka 数据源
-    getKafkaServerList () {
+    getKafkaServerList (resourceId) {
       let params = {
         type: 'kafka'
       }
       dataTransferManageKafka(params).then(({data}) => {
         if (data && data.status === '1') {
           this.kafkaServerList = data.data
+          if (resourceId) {
+             this.target = this.kafkaServerList.filter(item => item.id == resourceId)[0].target
+          }
         }
       })
     },
