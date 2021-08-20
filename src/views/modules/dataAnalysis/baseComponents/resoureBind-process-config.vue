@@ -53,7 +53,7 @@
       <el-table-column prop="type" header-align="center" align="center" width="150" label="类型"/>
       <el-table-column prop="params" header-align="center" align="left" label="出参"/>
       <el-table-column prop="datasourceType" header-align="center" align="center" width="150" label="通道"/>
-      <!-- <el-table-column prop="datasourceId" header-align="center" align="center" label="任务ID"/> -->
+      <el-table-column prop="target" header-align="center" align="center" width="150" label="目标"/>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -87,6 +87,7 @@
 
 <script>
   import { getProgressConfigList, getChannelist, deleteSmartFlow } from '@/api/dataAnalysis/sourceBinding'
+  import { dataTransferManageKafka } from '@/api/dataAnalysis/dataTransferManage'
   import AddOrUpdate from './processConfig-add-or-update'
   // import Look from './taskFlow-look'
 
@@ -108,6 +109,7 @@
         deletedId: '',
         deleteVisible: false,
         lookVisible: false,
+        canUpdate: [],
         typeList: [
           {lable: '短信', value: 'sms'},
           {lable: '电销', value: 'tel'},
@@ -122,6 +124,7 @@
     },
     mounted () {
       this.getChannelsList()
+      this.getDatasourceList()
     },
     methods: {
       init () {
@@ -146,6 +149,7 @@
                 }
               })
               item.params = item.params.split(',').join('\n')
+              item.target = this.datasourceList.filter(citem => citem.id === item.datasourceId)[0].name
             })
             this.dataList = data.data.list
             this.totalCount = data.data.total
@@ -154,6 +158,16 @@
           })
         })
       },
+      getDatasourceList () {
+        let params = {
+          type: 'kafka'
+        }
+        dataTransferManageKafka(params).then(({data}) => {
+          if (data && data.status === '1') {
+            this.datasourceList = data.data
+          }
+      })
+    },
       getChannelsList () {
         getChannelist().then(res => {
           if (res.data.status * 1 !== 1) {
