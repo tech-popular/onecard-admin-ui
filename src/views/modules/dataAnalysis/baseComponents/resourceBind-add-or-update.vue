@@ -777,8 +777,8 @@ export default {
             'smsContent': this.dataForm.smsContent
           }
           let pushExtraKeys = {
-              pageType: this.baseForm.pageType,
-              linkUrl: this.baseForm.linkUrl
+              pageType: this.dataForm.pageType,
+              linkUrl: this.dataForm.linkUrl
           }
           let pushContent = {
             pushFlag: this.dataForm.flag.includes('pushFlag') ? 'Y' : 'N',
