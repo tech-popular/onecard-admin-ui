@@ -38,8 +38,8 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" width="80" align="center" label="ID"></el-table-column>
-      <el-table-column prop="resourceName" header-align="center" align="center" label="名称">
+      <el-table-column prop="id" header-align="center" width="50" align="center" label="ID"></el-table-column>
+      <el-table-column prop="resourceName" header-align="center" width="150" align="center" label="名称">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.resourceName)" slot="content"></div>
