@@ -277,10 +277,6 @@ export default {
       this.fixedParamsvisible = false
       this.extraParamsVisible = false
       this.getChannelsList()
-      this.getSmsSignInfo()
-      this.getSmsStyleInfo()
-      this.getKafkaServerList()
-      this.getAllSmsChannels()
       this.outParamsList = []
       this.tag = row ? tag : ''
       if (this.tag === 'view') {
@@ -340,6 +336,9 @@ export default {
           if (res.data.data.bindingConfig.content) {
             let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             if (row.type === 'sms') {
+              this.getSmsSignInfo()
+              this.getSmsStyleInfo()
+              this.getAllSmsChannels()
               this.dataForm.editType = '1'
               this.extraParamsVisible = false
               this.dataForm.resourceName = this.dataForm.resourceName.split('自定义短信_')[1]
@@ -369,6 +368,9 @@ export default {
             this.dataForm.resourceCode = res.data.data.bindingConfig.resourceCode
             this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
             if (row.type === 'sms') {
+              this.getSmsSignInfo()
+              this.getSmsStyleInfo()
+              this.getAllSmsChannels()
               this.dataForm.resourceName = this.dataForm.resourceName.split('标准短信_')[1]
               this.dataForm.channelId = res.data.data.resourceData.channelId
               this.dataForm.smsTemplate = res.data.data.resourceData.smsTemplate
@@ -383,14 +385,12 @@ export default {
                 }
               })
             }
+            if (res.data.data.bindingConfig.type === 'kafka') {
+              this.getKafkaServerList(res.data.data.bindingConfig.resourceId)
+            }
           }
           this.getOutParamsList(row, res.data.data.extraParams, res.data.data.fixedParams)
         }
-        this.$nextTick(() => {
-          if (row.type === 'kafka') {
-            this.target = this.kafkaServerList.filter(item => item.id == this.dataForm.resourceId)[0].target
-          }
-        })
       })
     },
     getChannelsList () {
@@ -410,13 +410,16 @@ export default {
       })
     },
       // kafka 数据源
-    getKafkaServerList () {
+    getKafkaServerList (resourceId) {
       let params = {
         type: 'kafka'
       }
       dataTransferManageKafka(params).then(({data}) => {
         if (data && data.status === '1') {
           this.kafkaServerList = data.data
+          if (resourceId) {
+            this.target = data.data.filter(item => item.id == resourceId)[0].target
+          }
         }
       })
     },
@@ -620,14 +623,14 @@ export default {
       this.target = ''
       this.extraParams = []
       this.getFixedParams()
-      // if (value === 'sms') {
-      //   this.dataForm.productNo = ''
-      //   this.dataForm.cusSmsType = ''
-      //   this.dataForm.smsContent = ''
-      //   this.dataForm.fixedParams = []
-      //   this.dataForm.channelId = ''
-      //   this.dataForm.smsTemplate = ''
-      // }
+      if (value === 'sms') {
+        this.getSmsSignInfo()
+        this.getSmsStyleInfo()
+        this.getAllSmsChannels()
+      }
+      if (value === 'kafka') {
+        this.getKafkaServerList()
+      }
       if (value === 'tel' || value === 'ai') {
         getResourceInfoFromType(value).then(({data}) => {
           if (data && data.status === '1') {
