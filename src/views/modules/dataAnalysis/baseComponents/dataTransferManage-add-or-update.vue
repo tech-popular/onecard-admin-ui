@@ -1506,16 +1506,25 @@
               channelCode: this.channelCode
             }
             selectResourceBindingList(params).then(({data}) => {
-              if (val === 'kafka') {
-                this.kafkaServerList = data.data
-              } else if (val === 'sms') {
-                this.smsIdList = data.data
-              } else if (val === 'tel') {
-                this.telIdList = data.data
-              } else if (val === 'ai') {
-                this.aiIdList = data.data
-              } else if (val === 'push') {
-                this.pushIdList = data.data
+              if (data && data.status === '1') {
+                if (val === 'kafka') {
+                  this.kafkaServerList = data.data
+                } else if (val === 'sms') {
+                  this.smsIdList = data.data
+                } else if (val === 'tel') {
+                  this.telIdList = data.data
+                } else if (val === 'ai') {
+                  this.aiIdList = data.data
+                } else if (val === 'push') {
+                  this.pushIdList = data.data
+                }
+              } else {
+                this.$message.error(data.message)
+                this.kafkaServerList = []
+                this.smsIdList = []
+                this.telIdList = []
+                this.aiIdList = []
+                this.pushIdList = []
               }
             })
           } else {
@@ -1551,7 +1560,10 @@
       kafkaSelectChange (value) {
         if (this.baseForm.kafkaServer) {
           let arr = this.kafkaServerList.filter(item => item.id === this.baseForm.kafkaServer)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.kafkaParams = arr1.join(',')
@@ -1578,7 +1590,10 @@
       smsSelectChange () {
         if (this.baseForm.smsId) {
           let arr = this.smsIdList.filter(item => item.id === this.baseForm.smsId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.smsParams = arr1.join(',')
@@ -1605,7 +1620,10 @@
       telSelectChange () {
         if (this.baseForm.telId) {
           let arr = this.telIdList.filter(item => item.id === this.baseForm.telId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.telParams = arr1.join(',')
@@ -1631,7 +1649,10 @@
       aiSelectChange () {
         if (this.baseForm.aiId) {
           let arr = this.aiIdList.filter(item => item.id === this.baseForm.aiId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.aiParams = arr1.join(',')
@@ -1657,7 +1678,10 @@
       pushSelectChange () {
         if (this.baseForm.pushId) {
           let arr = this.pushIdList.filter(item => item.id === this.baseForm.pushId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.pushParams = arr1.join(',')

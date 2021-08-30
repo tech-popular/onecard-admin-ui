@@ -59,6 +59,7 @@ export default {
       groupId: [],
       type: '', // 分群类型
       flowTypeArr: [], // 分流类型
+      transferType: [], // 下发类型
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
       multiBranchNodeVisible: false,
@@ -80,7 +81,8 @@ export default {
       issueTypeList: [
         {value: 'sms', lable: '短信'},
         {value: 'tel', lable: '电销'},
-        {value: 'ai', lable: 'AI'}
+        {value: 'ai', lable: 'AI'},
+        {value: 'push', lable: 'Push'}
       ],
       saveFormValidate: {
         beeFlowName: [
@@ -324,6 +326,7 @@ export default {
       let pFlowLinkArr = []
       let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
       let pFlowLinkRateIs100 = []
+      this.transferType = []
       nodeDataArray.map(item => {
         if (item.category !== 'GROUP_CHOICE') {
           if (!item.data) {
@@ -394,6 +397,9 @@ export default {
               pNullLinkArr.push(item.nodeName)
             }
           }
+        } else {
+          console.log('item: ', item)
+          this.transferType.push(item.data.configItems.type)
         }
       })
       if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置运营方式！`)
@@ -430,7 +436,7 @@ export default {
         // channelCode: this.channelCode
       }
       params.configJson = jsonData
-      params.transferType = 'kafka'
+      params.transferType = this.transferType.join(',')
       // let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
       // let linkTextData = []
       // if (dataQueryNode) {

@@ -25,4 +25,4 @@ export const getSmsAllMessage = (resourceId) => httpGet(da + `resource/binding/f
 export const dataTransferManageTaskProgress = (id) => httpGet(da + `dataTransfer/execution/progress/${id}`) // 历史记录
 export const dataTransferManageExecutionMetric = (id, percent) => httpGet(da + `dataTransfer/execution/metric/${id}`, percent) // 历史记录
 //  获取已绑定资源
-export const selectResourceBindingList = (params) => httpGet(da + `resource/binding/selectResourceBindingList`, params) // 历史记录
+export const selectResourceBindingList = (params) => httpGet(da + `resource/binding/selectResourceBindingList`, params)

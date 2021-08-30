@@ -141,8 +141,8 @@
                   item.channelCode = citem.text
                 }
               })
-              item.fixedParams = item.fixedParams.split(',').join('\n')
-              item.extraParams = item.extraParams.split(',').join('\n')
+              item.fixedParams = item.fixedParams && item.fixedParams.split(',').join('\n')
+              item.extraParams = item.extraParams && item.extraParams.split(',').join('\n')
             })
             this.dataList = data.data.list
             this.totalCount = data.data.total

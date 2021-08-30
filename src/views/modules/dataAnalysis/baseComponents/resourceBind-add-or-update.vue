@@ -800,6 +800,7 @@ export default {
             id: this.dataForm.id,
             type: this.dataForm.type,
             resourceName: this.dataForm.resourceName,
+            channelId: this.dataForm.channelId,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
             resourceId: this.dataForm.resourceId.toString(),

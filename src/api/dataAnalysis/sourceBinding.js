@@ -20,3 +20,5 @@ export const lookFlowList = (id) => httpGet(da + `resource/binding/getSmartFlow/
 // 自定义配置
 export const getSmsSignInfo = () => httpGet(da + `data/resource/smart/getSmsSignInfo`) // 短信签名
 export const getSmsStyleInfo = () => httpGet(da + `data/resource/smart/getSmsStyleInfo`) // 短信类型
+// 查询资源绑定的topic
+export const selectSmartTransferTopic = (params) => httpGet(da + `resource/binding/selectSmartTransferTopic`, params)
