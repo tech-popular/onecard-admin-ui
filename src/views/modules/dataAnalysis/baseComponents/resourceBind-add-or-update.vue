@@ -89,11 +89,23 @@
         <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
           <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="65" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
         </el-form-item>
-        <!-- 电销或ai -->
-      <el-form-item prop="resourceId" v-if="dataForm.type === 'tel' || dataForm.type === 'ai' " :label=" dataForm.type === 'tel'? '电销'  +'模板' : 'AI' +'模板'" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
+        <!-- ai -->
+      <el-form-item prop="resourceId" v-if="dataForm.type === 'ai' " label="AI模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
         <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
           <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
+      </el-form-item>
+      <!-- 电销 -->
+      <el-form-item prop="telTemplateValue" v-if="dataForm.type === 'tel'" label="电销模板">
+        <el-autocomplete
+          class="inline-input"
+          style="width: 400px;"
+          v-model="dataForm.telTemplateValue"
+          :fetch-suggestions="querySearch"
+          placeholder="请输入内容"
+          @select="handleSelect"
+          @blur="blurInputTle"
+    ></el-autocomplete>
       </el-form-item>
       <!-- push -->
       <el-form-item label="推送方式：" prop="flag" v-if="dataForm.type === 'push'" :rules="{ required: true, message: '请选择推送方式', trigger: 'blur' }">
@@ -228,7 +240,8 @@ export default {
         pushContent: '',
         msgTitle: '',
         msgUrl: '',
-        msgContent: ''
+        msgContent: '',
+        telTemplateValue: ''
       },
       paramsNum: 0,
       outParamsList: [],
@@ -261,6 +274,9 @@ export default {
         ],
         smsContent: [
           { required: true, message: '请输入短信内容', trigger: 'blur' }
+        ],
+        telTemplateValue: [
+          { required: true, message: '请选择模板内容', trigger: 'input' }
         ]
       }
     }
@@ -308,7 +324,8 @@ export default {
         pushContent: '',
         msgTitle: '',
         msgUrl: '',
-        msgContent: ''
+        msgContent: '',
+        telTemplateValue: ''
       }
       this.target = ''
       this.createTime = ''
@@ -381,6 +398,14 @@ export default {
               this.extraParamsVisible = false
               getResourceInfoFromType(res.data.data.bindingConfig.type).then(({data}) => {
                 if (data && data.status === '1') {
+                  data.data && data.data.forEach(item => {
+                    item.value = item.name
+                    if (item.code == this.dataForm.resourceCode) {
+                      this.dataForm.telTemplateValue = item.name
+                    } else {
+                      this.dataForm.telTemplateValue = this.dataForm.resourceCode
+                    }
+                  })
                   this.telOrAiList = data.data
                 }
               })
@@ -742,9 +767,36 @@ export default {
       // this.dataForm.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].smsDesc
       this.dataForm.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].id
     },
-     // 电销或AI模板
+     // AI模板
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
+    },
+    // 电销
+    querySearch(queryString, cb) {
+        let telOrAiList = this.telOrAiList
+        telOrAiList.length && telOrAiList.forEach(item => {
+           item.value = item.name
+        })
+        let results = queryString ? telOrAiList.filter(this.createFilter(queryString)) : telOrAiList
+        // 调用 callback 返回建议列表的数据
+        cb(results)
+      },
+    createFilter(queryString) {
+      return (telOrAiList) => {
+        return (telOrAiList.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
+    handleSelect(item) {
+      this.dataForm.telTemplateValue = item.value
+      this.dataForm.resourceCode = item.code
+      this.dataForm.resourceId = item.id
+    },
+    blurInputTle(e) {
+      if (e.target.value) {
+        this.dataForm.telTemplateValue = e.target.value
+        this.dataForm.resourceCode = e.target.value
+        this.dataForm.resourceId = ''
+      }
     },
     changeOption () {
       // 出参选择
@@ -802,7 +854,7 @@ export default {
             resourceName: this.dataForm.resourceName,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
-            resourceId: this.dataForm.resourceId.toString(),
+            resourceId: this.dataForm.resourceId ? this.dataForm.resourceId.toString() : null,
             fixedParams: this.fixedParams.join(','),
             extraParams: this.extraParams.join(','),
             content: ''

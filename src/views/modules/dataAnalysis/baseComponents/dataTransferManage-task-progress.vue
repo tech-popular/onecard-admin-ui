@@ -22,6 +22,8 @@
 			<el-table-column prop="transferId" header-align="center" align="center"  label="流转ID"></el-table-column>
 			<el-table-column prop="createTime" header-align="center" align="center"  label="执行时间"></el-table-column>
 			<el-table-column prop="count" header-align="center" align="center"  label="分群下发数量 "></el-table-column>
+      <el-table-column prop="count" header-align="center" align="center"  label="分群下发数量 "></el-table-column>
+      <el-table-column prop="count" header-align="center" align="center"  label="分群下发数量 "></el-table-column>
 			<el-table-column prop="enable" header-align="center" align="center"  label="状态">
 				<template slot-scope="scope">
           <el-tag v-if="scope.row.enable === 1" size="small" >正常</el-tag>
