@@ -326,6 +326,8 @@ export default {
       let pFlowLinkArr = []
       let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
       let pFlowLinkRateIs100 = []
+      let pOutParamsArr = []
+      let pOutParamsRepeatArr = []
       this.transferType = []
       nodeDataArray.map(item => {
         if (item.category !== 'GROUP_CHOICE') {
@@ -398,8 +400,12 @@ export default {
             }
           }
         } else {
-          console.log('item: ', item)
           this.transferType.push(item.data.configItems.type)
+          if (pOutParamsArr.indexOf(item.nodeName) > -1) {
+            pOutParamsRepeatArr.push(item.nodeName)
+          } else {
+            pOutParamsArr.push(item.nodeName)
+          }
         }
       })
       if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置运营方式！`)
@@ -408,7 +414,8 @@ export default {
       if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
       if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
-      // 判断连线的内容
+      if (pOutParamsRepeatArr.length) return this.$message.error(`节点【“${Array.from(new Set(pOutParamsRepeatArr)).join('”、“')}”】重复！！`)
+     // 判断连线的内容
       if (that.id) { // 修改保存
         that.saveFlowInfoData()
       } else { // 新建保存

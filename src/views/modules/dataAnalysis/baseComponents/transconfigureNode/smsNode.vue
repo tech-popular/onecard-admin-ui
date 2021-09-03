@@ -257,8 +257,8 @@ export default {
             this.dataForm.resourceCode = ''
             this.dataForm.smsTemplate = ''
             this.target = ''
-            this.dataForm.fixedParams = []
-            this.fixedParams = []
+            // this.dataForm.fixedParams = []
+            // this.fixedParams = []
           }
         }
       })

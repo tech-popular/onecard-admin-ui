@@ -192,16 +192,18 @@ export default {
       }
     },
     sourceSelectChange () {
-      let arr = this.seletDataList.filter(item => item.id === this.dataForm.selectSourceData)
-      let paramsData = arr[0].extraParams
-      if (arr[0].fixedParams) {
-        paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
-      }
-      if (paramsData) {
-        let arr1 = this.getParamsEditList(paramsData.split(','), this.outParamsList, [])
-        this.dataForm.outParamsData = arr1.join(',')
-      } else {
-        this.dataForm.outParamsData = ''
+      if (this.dataForm.selectSourceData) {
+        let arr = this.seletDataList.filter(item => item.id === this.dataForm.selectSourceData)
+        let paramsData = arr[0].extraParams
+        if (arr[0].fixedParams) {
+          paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+        }
+        if (paramsData) {
+          let arr1 = this.getParamsEditList(paramsData.split(','), this.outParamsList, [])
+          this.dataForm.outParamsData = arr1.join(',')
+        } else {
+          this.dataForm.outParamsData = ''
+        }
       }
     },
       // 获取分群出参 指标列表
