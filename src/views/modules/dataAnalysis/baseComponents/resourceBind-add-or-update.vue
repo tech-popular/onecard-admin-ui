@@ -21,13 +21,14 @@
 					</template>
 				</el-select>
 				</el-form-item>
-			<el-form-item label="下发类型" prop="type"> 
+			<el-form-item label="类型" prop="type"> 
 				<el-select v-model="dataForm.type" @change="changeType" style="width: 400px">
 					<el-option label="kafka" value="kafka"></el-option>
 					<el-option label="短信" value="sms"></el-option>
           <el-option label="电销" value="tel"></el-option>
           <el-option label="ai" value="ai"></el-option>
-          <el-option label="push" value="push">push</el-option>
+          <el-option label="push" value="push"></el-option>
+          <el-option label="HTTP" value="http"></el-option>
 				</el-select>
 			</el-form-item>
       <!-- kafka -->
@@ -95,6 +96,43 @@
           <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
+      <!-- HTTP -->
+      <div v-if="dataForm.type === 'http'">
+        <el-form-item label="URL" prop="url" :rules="baseRule.url">
+          <el-input v-model="dataForm.url" placeholder="请输入URL" @blur="urlParamsBlur"/>
+        </el-form-item>
+        <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
+        <el-input v-model="dataForm.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
+        </el-form-item>
+        <el-form-item label="请求head入参" prop="requestHeadFields">
+        <el-input v-model="dataForm.requestHeadFields" placeholder="请输入请求head入参"/>
+        </el-form-item>
+        <el-form-item label="入参生成方式">
+          <el-radio-group v-model="dataForm.requestParamTemplateStatus">
+            <el-radio :label="0">普通生成</el-radio>
+            <el-radio :label="1">模板生成</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="baseRule.responseFields">
+        <el-input v-model="dataForm.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
+        </el-form-item>
+        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="baseRule.responseType"> 
+          <el-select v-model="dataForm.responseType" placeholder="请选择响应参数的数据类型">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+         </el-form-item>
+        <el-form-item label="判断表达式" prop="expression" :rules="baseRule.expression">
+          <el-input v-model="dataForm.expression" placeholder="请输入缓存生成的key需要的字段"/>
+        </el-form-item>
+        <el-form-item label="switch判断项集合" prop="switchTemplate" :rules="baseRule.switchTemplate">
+          <el-input v-model="dataForm.switchTemplate" placeholder="请输入缓存生成的key需要的字段"/>
+        </el-form-item>
+      </div>
       <!-- push -->
       <el-form-item label="推送方式：" prop="flag" v-if="dataForm.type === 'push'" :rules="{ required: true, message: '请选择推送方式', trigger: 'blur' }">
         <el-checkbox v-model="dataForm.flag" label="pushFlag" @change="checked=>changeDistribution(checked, 'pushFlag')">push</el-checkbox>
@@ -176,7 +214,8 @@
         </el-form-item>
       <el-form-item label="内容：" prop="msgContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
             <el-input type="textarea"  v-model="dataForm.msgContent" :autosize="{ minRows: 3}"  show-word-limit />
-        </el-form-item>
+      </el-form-item>
+      <!--  -->
       </div>
 		</el-form>
 		<div slot="footer" class="foot">
@@ -193,6 +232,31 @@ import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
+    /**
+   * 空格校验
+   * @param rule
+   * @param value
+   * @param callback
+   * @constructor
+   */
+    let NullKongGeRule = (rule, value, callback) => {
+      const nullValue = /^[^\s]+$/
+      if (value !== '' && value !== null && value !== undefined) {
+        if (!nullValue.test(value)) {
+          callback(new Error('不能输入含空格'))
+        }
+      }
+      callback()
+    }
+    // let FlowCode = (rule, value, callback) => {
+    //   const nullValue = /^\w+$/
+    //   if (value !== '' && value !== null && value !== undefined) {
+    //     if (!nullValue.test(value)) {
+    //       callback(new Error('请输入正确格式'))
+    //     }
+    //   }
+    //   callback()
+    // }
     return {
       visible: false,
       extraParamsVisible: false,
@@ -228,7 +292,16 @@ export default {
         pushContent: '',
         msgTitle: '',
         msgUrl: '',
-        msgContent: ''
+        msgContent: '',
+        // HTTP参数
+        url: '',  // url
+        requestFields: '',
+        requestHeadFields: '',
+        responseFields: '',
+        requestParamTemplateStatus: 1,
+        responseType: '', // 两个选项map和list 默认是map
+        expression: '', // 判断表达式
+        switchTemplate: ''  // switch判断项集合
       },
       paramsNum: 0,
       outParamsList: [],
@@ -243,6 +316,13 @@ export default {
       mysqlServerList: [],
       cusSmsTypeList: [], // 短信类型list
       productNoList: [], // 短信签名list
+      options: [{
+        value: 'map',
+        label: 'map'
+      }, {
+        value: 'list',
+        label: 'list'
+      }],
       baseRule: { // 基本信息校验规则
         type: [
           { required: true, message: '请选择下发类型', trigger: 'blur' }
@@ -261,6 +341,20 @@ export default {
         ],
         smsContent: [
           { required: true, message: '请输入短信内容', trigger: 'blur' }
+        ],
+        url: [
+          { required: true, message: '请输入URL地址', trigger: 'blur' },
+          { required: true, validator: NullKongGeRule, trigger: 'change' }
+        ],
+        responseType: [
+          { required: true, message: '请选择响应参数的数据类型', trigger: 'blur' },
+          { required: false, validator: NullKongGeRule, trigger: 'change' }
+        ],
+        expression: [
+          { required: true, message: '请输入判断表达式', trigger: 'blur' }
+        ],
+        switchTemplate: [
+          { required: true, message: '请输入switch判断项集合', trigger: 'blur' }
         ]
       }
     }
@@ -308,11 +402,21 @@ export default {
         pushContent: '',
         msgTitle: '',
         msgUrl: '',
-        msgContent: ''
+        msgContent: '',
+         // HTTP参数
+        url: '',  // url
+        requestFields: '',
+        requestHeadFields: '',
+        responseFields: '',
+        requestParamTemplateStatus: 1,
+        responseType: '', // 两个选项map和list 默认是map
+        expression: '', // 判断表达式
+        switchTemplate: ''  // switch判断项集合
       }
       this.target = ''
       this.createTime = ''
       this.createUser = ''
+      this.paramsNum = 0
       this.extraParams = []
       this.fixedParams = []
       this.telOrAiList = []
@@ -361,6 +465,19 @@ export default {
               }
               if (bindingContent.msgFlag === 'Y') {
                 this.dataForm.flag.push('msgFlag')
+              }
+            }
+            if (row.type === 'http') {
+              this.dataForm.url = bindingContent.url
+              this.dataForm.requestFields = bindingContent.requestFields
+              this.dataForm.requestHeadFields = bindingContent.requestHeadFields
+              this.dataForm.responseFields = bindingContent.responseFields
+              this.dataForm.requestParamTemplateStatus = bindingContent.requestParamTemplateStatus
+              this.dataForm.responseType = bindingContent.responseType
+              this.dataForm.expression = bindingContent.expression
+              this.dataForm.switchTemplate = bindingContent.switchTemplate
+              if (res.data.data.bindingConfig.extraParams) {
+                this.paramsNum = bindingContent.url.match(/{(.*?)}/g).length
               }
             }
           } else {
@@ -589,7 +706,7 @@ export default {
     },
     // 类型改变
     changeType (value) {
-      if (value === 'tel' || value === 'ai' || value === 'push') {
+      if (value === 'tel' || value === 'ai' || value === 'push' || value === 'http') {
         this.extraParamsVisible = false
       } else {
         this.extraParamsVisible = true
@@ -618,7 +735,16 @@ export default {
         pushContent: '',
         msgTitle: '',
         msgUrl: '',
-        msgContent: ''
+        msgContent: '',
+         // HTTP参数
+        url: '',  // url
+        requestFields: '',
+        requestHeadFields: '',
+        responseFields: '',
+        requestParamTemplateStatus: 1,
+        responseType: '', // 两个选项map和list 默认是map
+        expression: '', // 判断表达式
+        switchTemplate: ''  // switch判断项集合
       }
       this.target = ''
       this.extraParams = []
@@ -699,7 +825,7 @@ export default {
     },
     // 固定参数
     getFixedParams() {
-      if (this.dataForm.type !== 'kafka' && this.dataForm.channelCode && this.dataForm.type) {
+      if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.dataForm.channelCode && this.dataForm.type) {
         let out = []
         this.fixedParams = []
         let params = {
@@ -746,6 +872,19 @@ export default {
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
+    // HTTP
+    urlParamsBlur () {
+      let urlParams = this.dataForm.url.match(/{(.*?)}/g)
+      if (urlParams && urlParams.length) {
+        this.extraParamsVisible = true
+        this.paramsNum = urlParams.length
+      } else {
+        this.extraParamsVisible = false
+        this.extraParams = []
+        this.dataForm.extraParams = []
+        this.paramsNum = 0
+      }
+    },
     changeOption () {
       // 出参选择
       this.$refs.dataForm.clearValidate('extraParams')
@@ -768,16 +907,27 @@ export default {
     submitData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.dataForm.type !== 'kafka' && this.fixedParams.length === 0) {
+          if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.fixedParams.length === 0) {
             return this.$message.error(`请联系管理员配置固定流程参数`)
           }
-          if (this.dataForm.type === 'sms' && this.extraParams.length !== this.paramsNum) {
+          if ((this.dataForm.type === 'sms' || this.dataForm.type === 'http') && this.extraParams.length !== this.paramsNum) {
+            console.log('this.paramsNum: ', this.paramsNum)
             return this.$message.error(`请选择${this.paramsNum}个参数`)
           }
           let smsContent = {
             'cusSmsType': this.dataForm.cusSmsType,
             'productNo': this.dataForm.productNo,
             'smsContent': this.dataForm.smsContent
+          }
+          let httpContent = {
+            url: this.dataForm.url,
+            requestFields: this.dataForm.requestFields,
+            requestHeadFields: this.dataForm.requestHeadFields,
+            responseFields: this.dataForm.responseFields,
+            requestParamTemplateStatus: this.dataForm.requestParamTemplateStatus,
+            responseType: this.dataForm.responseType,
+            expression: this.dataForm.expression,
+            switchTemplate: this.dataForm.switchTemplate
           }
           let pushExtraKeys = {
               pageType: this.dataForm.pageType,
@@ -815,6 +965,10 @@ export default {
           }
           if (this.dataForm.type === 'push') {
             params.content = JSON.stringify(pushContent)
+            params.resourceId = null
+          }
+          if (this.dataForm.type === 'http') {
+            params.content = JSON.stringify(httpContent)
             params.resourceId = null
           }
           if (!this.dataForm.id) {

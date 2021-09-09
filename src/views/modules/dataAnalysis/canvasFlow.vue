@@ -11,6 +11,7 @@
       <div id="myDiagramDiv"></div>
     </div>
     <data-query-node @close="closeAllNode" v-if="dataQueryNodeVisible" ref="dataQueryNodeEl"></data-query-node>
+    <http-query-node @close="closeAllNode" v-if="httpQueryNodeVisible" ref="httpQueryNodeEl"></http-query-node>
     <out-params-node @close="closeAllNode" v-if="outparamsNodeVisible" ref="outparamsNodeEl"></out-params-node>
     <multi-branch-node @close="closeAllNode" v-if="multiBranchNodeVisible" ref="multiBranchNodeEl"></multi-branch-node>
     <multi-branch-condition @close="closeMultiBranchCondition" v-if="multiBranchConditionVisible" ref="multiBranchConditionEl"></multi-branch-condition>
@@ -33,6 +34,7 @@ import multiBranchNode from './canvasflowNode/multiBranchNode'
 import multiBranchCondition from './canvasflowNode/multiBranchCondition'
 import multiBranchRate from './canvasflowNode/multiBranchRate'
 import dataQueryLine from './canvasflowNode/dataQueryLine'
+import httpQueryNode from './canvasflowNode/httpQueryNode'
 import saveData from './canvasflowNode/saveData'
 import { deepClone } from './dataAnalysisUtils/utils'
 var that = null
@@ -68,6 +70,7 @@ export default {
       dataQueryLineVisible: false,
       saveDataVisible: false,
       filterChoiceNodeVisible: false,
+      httpQueryNodeVisible: false,
       currentName: '',
       selectCuster: [],
       nodeTitle: '',
@@ -94,7 +97,7 @@ export default {
       }
     }
   },
-  components: { dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, dataQueryLine, saveData, filterChoiceNode },
+  components: { dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, dataQueryLine, saveData, filterChoiceNode, httpQueryNode },
   created () {
     that = this
   },
@@ -576,46 +579,9 @@ export default {
           }).makeTwoWay()
         )
       }
-      // category:FILTER_CHOICE
+          // category:GROUP_CHOICE
       mySelf.myDiagram.nodeTemplateMap.add(
-        'FILTER_CHOICE', // the default category
-        $(
-          go.Node,
-          'Table',
-          nodeStyle(),
-          {
-            selectionAdornmentTemplate: nodeSelectionAdornmentTemplate
-          },
-          $(
-            go.Panel,
-            'Auto',
-            $(
-              go.Shape,
-              'Diamond',
-              {
-                fill: 'rgb(136, 89, 242)',
-                strokeWidth: 0,
-                cursor: 'move',
-                minSize: new go.Size(120, NaN)
-              }
-            ),
-            textBlock(true)
-          ),
-          {
-            doubleClick: function (e, node) { // 点击开始时触发事件
-              that.doubleClickNodeEvent(e, node, 'filterChoiceNodeVisible', 'filterChoiceNodeEl')
-            }
-          },
-          // four named ports, one on each side:
-          makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
-          makePort('L', go.Spot.Left, go.Spot.LeftSide, true, true),
-          makePort('R', go.Spot.Right, go.Spot.RightSide, true, true),
-          makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
-        )
-      )
-      // GROUP_CHOICE
-      mySelf.myDiagram.nodeTemplateMap.add(
-        'GROUP_CHOICE',
+        'GROUP_CHOICE', // the default category
         $(
           go.Node,
           'Table',
@@ -633,11 +599,80 @@ export default {
                 fill: 'rgb(8, 104, 211)',
                 strokeWidth: 0,
                 cursor: 'move',
-                minSize: new go.Size(120, NaN)
+                minSize: new go.Size(100, NaN)
+              }
+            ),
+            textBlock(true)
+          ),
+          // four named ports, one on each side:
+          makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
+        )
+      )
+      // category:HTTP_QUERY
+      mySelf.myDiagram.nodeTemplateMap.add(
+        'HTTP_QUERY', // the default category
+        $(
+          go.Node,
+          'Table',
+          nodeStyle(),
+          {
+            selectionAdornmentTemplate: nodeSelectionAdornmentTemplate
+          },
+          $(
+            go.Panel,
+            'Auto',
+            $(
+              go.Shape,
+              'RoundedRectangle',
+              {
+                fill: 'rgb(179, 129, 224)',
+                strokeWidth: 0,
+                cursor: 'move',
+                minSize: new go.Size(100, NaN)
+              }
+            ),
+            textBlock(true)
+          ),
+          {
+            doubleClick: function (e, node) { // 点击开始时触发事件
+              that.doubleClickNodeEvent(e, node, 'httpQueryNodeVisible', 'httpQueryNodeEl')
+            }
+          },
+          // four named ports, one on each side:
+          makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
+          makePort('L', go.Spot.Left, go.Spot.LeftSide, true, true),
+          makePort('R', go.Spot.Right, go.Spot.RightSide, true, true),
+          makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
+        )
+      )
+      // FORK_JOIN
+      mySelf.myDiagram.nodeTemplateMap.add(
+        'FORK_JOIN',
+        $(
+          go.Node,
+          'Table',
+          nodeStyle(),
+          {
+            selectionAdornmentTemplate: nodeSelectionAdornmentTemplate
+          },
+          $(
+            go.Panel,
+            'Auto',
+            $(
+              go.Shape,
+              'RoundedRectangle',
+              {
+                fill: 'rgb(85, 136, 234)',
+                strokeWidth: 0,
+                cursor: 'move',
+                minSize: new go.Size(100, NaN)
               }
             ),
             textBlock(false)
           ),
+          makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
+          makePort('L', go.Spot.Left, go.Spot.LeftSide, true, true),
+          makePort('R', go.Spot.Right, go.Spot.RightSide, true, true),
           makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
         )
       )

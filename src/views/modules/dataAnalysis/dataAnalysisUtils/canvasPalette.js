@@ -5,12 +5,22 @@ export const palette = [
   //   nodeName: '入参',
   //   key: '1'
   // },
-  // {
-  //   key: '2',
-  //   category: 'MULTI_BRANCH',
-  //   path: 'flowNode.png',
-  //   nodeName: '分流节点'
-  // },
+  {
+    key: '2',
+    category: 'MULTI_BRANCH',
+    path: 'flowNode.png',
+    nodeName: '分流节点'
+  },
+  {
+    key: '3',
+    category: 'HTTP_QUERY',
+    nodeName: '调用风控http'
+  },
+  {
+    key: '4',
+    category: 'FORK_JOIN',
+    nodeName: '组装信息'
+  },
   // {
   //   key: '3',
   //   category: 'GROUP_CHOICE',
