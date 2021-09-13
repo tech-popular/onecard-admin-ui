@@ -18,7 +18,6 @@
     <multi-branch-rate @close="closeMultiBranchRate" v-if="multiBranchRateVisible" ref="multiBranchRateEl"></multi-branch-rate>
     <data-query-line @close="closeDataQueryLine" v-if="dataQueryLineVisible" ref="dataQueryLineEl"></data-query-line>
     <save-data @close="closeSave" v-if="saveDataVisible" ref="saveDataEl"></save-data>
-    <filter-choice-node  @close="closeAllNode" v-if="filterChoiceNodeVisible" ref="filterChoiceNodeEl"></filter-choice-node>
   </div>
 </template>
 <script>
@@ -28,7 +27,6 @@ import { addCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
 // import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
 // import groupChoiceNode from './canvasflowNode/groupChoiceNode'
 import dataQueryNode from './canvasflowNode/dataQueryNode'
-import filterChoiceNode from './canvasflowNode/filterChoiceNode'
 import outParamsNode from './canvasflowNode/outparamsNode'
 import multiBranchNode from './canvasflowNode/multiBranchNode'
 import multiBranchCondition from './canvasflowNode/multiBranchCondition'
@@ -69,7 +67,6 @@ export default {
       multiBranchRateVisible: false,
       dataQueryLineVisible: false,
       saveDataVisible: false,
-      filterChoiceNodeVisible: false,
       httpQueryNodeVisible: false,
       currentName: '',
       selectCuster: [],
@@ -97,7 +94,7 @@ export default {
       }
     }
   },
-  components: { dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, dataQueryLine, saveData, filterChoiceNode, httpQueryNode },
+  components: { dataQueryNode, outParamsNode, multiBranchNode, multiBranchCondition, multiBranchRate, dataQueryLine, saveData, httpQueryNode },
   created () {
     that = this
   },
@@ -186,52 +183,8 @@ export default {
           })
           mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', outParamName)
         }
-        // 修改数据查询时，若有的分群已选内容不在数据查询中，则重置分群节点的数据
-        // if (_data.category === 'GROUP_CHOICE') {
-        //   // 获取json外的公共参数
-        //   this.type = item.type
-        //   this.selectCuster = item.data.config.custerArr
-        //   this.groupId = item.data.config.configItems.groupId
-        //   if (that.channelCode && that.channelCode !== item.data.config.configItems.channelCode) {
-        //     that.flowJson.linkDataArray.forEach(item => {
-        //       if (item.type === 'condition') {
-        //         item.data = null
-        //         item.linkText = '<' + item.num + '> ' + that.defaultCondition
-        //         mySelf.myDiagram.model.updateTargetBindings(item)
-        //       }
-        //     })
-        //   }
-        //   this.channelCode = item.data.config.configItems.channelCode
-        //   node.findTreeParts().each(function (cNode) {
-        //     if (cNode.data.category === 'FILTER_CHOICE' && cNode.data.data) {
-        //       let itemGroupId = cNode.data.data.configItems.groupId
-        //       if (itemGroupId && !that.groupId.includes(itemGroupId)) {
-        //         cNode.data.data = null
-        //         cNode.data.nodeName = '分群节点'
-        //         mySelf.myDiagram.model.updateTargetBindings(cNode.data)
-        //       }
-        //     }
-            // 若分群更改为静态时，其所有子孙节点 分流节点 全部置空，且删除连线
-            // if (cNode.data.category === 'MULTI_BRANCH' && cNode.data.data && cNode.data.data.configItems.flowType === 'condition') {
-            //   let fnode = mySelf.myDiagram.findNodeForKey(cNode.data.key)
-            //   let removeLinks = []
-            //   fnode.findLinksOutOf().each(function(link) {
-            //     removeLinks.push(link.data)
-            //   })
-            //   mySelf.myDiagram.model.removeLinkDataCollection(removeLinks)
-            //   let index = that.flowTypeArr.findIndex(item => item.key === cNode.data.key)
-            //   that.flowTypeArr.splice(index, 1, {
-            //     flowType: item.data.config.configItems.flowType,
-            //     key: key
-            //   })
-            //   cNode.data.data = null
-            //   cNode.data.nodeName = '分流节点'
-            //   mySelf.myDiagram.model.updateTargetBindings(cNode.data)
-            // }
-        //   })
-        // }
-        if (_data.category === 'FILTER_CHOICE') { // 根据选中的过滤节点，更新过滤节点的名称
-          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.curName)
+        if (_data.category === 'HTTP_QUERY') { // 根据选中的过滤节点，更新过滤节点的名称
+          mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.configItems.resourceName)
         }
         if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
           let filterArr = that.flowTypeArr.filter(item => item.key === key)
@@ -348,17 +301,8 @@ export default {
           item.data = data
         }
         let node = mySelf.myDiagram.findNodeForKey(item.key)
-        // if (item.category !== 'OUT_PARAM') {
-        //   let linkNum1 = 0
-        //    node.findLinksOutOf().each(function (link) {
-        //     linkNum1++
-        //   })
-        //   if (linkNum1 === 0) {
-        //     pNullLinkArr.push(item.nodeName)
-        //   }
-        // }
         if (item.category !== 'OUT_PARAM') {
-          if (item.category === 'FILTER_CHOICE') { // 过滤节点必须有两个节点，否则报错
+          if (item.category === 'FORK_JOIN') { // 过滤节点至少有两个节点，否则报错
             // 兼容修改数据查询时，把部分过滤节点内容置空的情况
             if (item.data && !item.data.configItems.groupId) {
               pNullArr.push(item.nodeName)
@@ -405,19 +349,19 @@ export default {
         } else {
           this.transferType.push(item.data.configItems.type)
           if (pOutParamsArr.indexOf(item.nodeName) > -1) {
+
             pOutParamsRepeatArr.push(item.nodeName)
-          } else {
-            pOutParamsArr.push(item.nodeName)
           }
         }
       })
+
       if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置运营方式！`)
       if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
-      if (pChildOneArr.length) return this.$message.error(`每个过滤节点需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
+      if (pChildOneArr.length) return this.$message.error(`每个组装信息节点至少需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
       if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
       if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
-      if (pOutParamsRepeatArr.length) return this.$message.error(`节点【“${Array.from(new Set(pOutParamsRepeatArr)).join('”、“')}”】重复！！`)
+      // if (pOutParamsRepeatArr.length) return this.$message.error(`节点【“${Array.from(new Set(pOutParamsRepeatArr)).join('”、“')}”】重复！！`)
      // 判断连线的内容
       if (that.id) { // 修改保存
         that.saveFlowInfoData()
@@ -761,8 +705,8 @@ export default {
           if (e.modelChange === 'linkFromKey') {
             // that.linkDrawnChange(e.object.from, e.newValue, e)
             let newFromNode = mySelf.myDiagram.findNodeForKey(e.newValue)
-            let fromCategory = newFromNode.data.category
-            let groupLinkDataText = []
+            // let fromCategory = newFromNode.data.category
+            // let groupLinkDataText = []
             let flowLinkDataText = []
             that.flowJson.linkDataArray.forEach(citem => {
               if (newFromNode.category === 'MULTI_BRANCH' && citem.from === e.newValue) {
@@ -789,48 +733,41 @@ export default {
                 }
                 flowLinkDataText.push(citem.linkText)
               }
-              if (newFromNode.category === 'FILTER_CHOICE' && citem.from === e.newValue) {
-                if (groupLinkDataText.length === 0) {
-                  citem.linkText = 'TRUE'
-                  mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
-                } else if (groupLinkDataText.length === 1) {
-                  if (citem.to === e.object.to) { // 只更新本条线内容
-                    citem.linkText = groupLinkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-                    mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
-                  }
-                } else if (groupLinkDataText.length == 2) { // 限制最多可连接两条线
-                  let curLink = that.flowJson.linkDataArray.filter(item => item.to === e.object.to)[0]
-                  that.$message.error('最多可连接两个子节点')
-                  return mySelf.myDiagram.model.removeLinkData(curLink)
-                }
-                groupLinkDataText.push(citem.linkText)
-              }
+              // if (newFromNode.category === 'FORK_JOIN' && citem.from === e.newValue) {
+              //   console.log('newFromNode.category: ', newFromNode.category)
+              //   if (groupLinkDataText.length === 0) {
+              //     citem.linkText = 'TRUE'
+              //     mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+              //   } else if (groupLinkDataText.length === 1) {
+              //     if (citem.to === e.object.to) { // 只更新本条线内容
+              //       citem.linkText = groupLinkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
+              //       mySelf.myDiagram.model.updateTargetBindings(citem)  // 更新线上的文字，没有的话默认内容无法更改出来
+              //     }
+              //   } else if (groupLinkDataText.length == 2) { // 限制最多可连接两条线
+              //     let curLink = that.flowJson.linkDataArray.filter(item => item.to === e.object.to)[0]
+              //     that.$message.error('最多可连接两个子节点')
+              //     return mySelf.myDiagram.model.removeLinkData(curLink)
+              //   }
+                // citem.linkText = that.defaultRate
+                // citem.type = 'rate'
+                // citem.data = null
+                // groupLinkDataText.push(citem.linkText)
+              // }
             })
-            if (fromCategory === 'IN_PARAM') {
-              let linkOutData = []
-              newFromNode.findLinksOutOf().each(function (link) {
-                if (linkOutData.length == 1) { // 限制最多可连接一条线
-                  that.$message.error('最多可连接一个子节点')
-                  mySelf.myDiagram.model.removeLinkData(link.data)
-                  return
-                }
-                linkOutData.push(link.data)
-              })
+            if (e.modelChange === 'linkToKey') {
+              let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
+              let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
+              let fromCategory = fromNode.data.category
+              if (fromCategory === 'IN_PARAM') {
+                that.linkDrawnChange(e.object.from, e.newValue, e)
+              }
+              that.isOnlyOneInLink(newToNode)
+              // // 修改连线时，若将false连到分流上，则提示
+              // if (newToNode.category === 'MULTI_BRANCH' && e.object.linkText === 'FALSE') {
+              //   mySelf.myDiagram.model.removeLinkData(e.object)
+              //   return that.$message.error('分流节点只能走TRUE分支！')
+              // }
             }
-          }
-          if (e.modelChange === 'linkToKey') {
-            let fromNode = mySelf.myDiagram.findNodeForKey(e.object.from)
-            let newToNode = mySelf.myDiagram.findNodeForKey(e.newValue)
-            let fromCategory = fromNode.data.category
-            if (fromCategory === 'IN_PARAM') {
-              that.linkDrawnChange(e.object.from, e.newValue, e)
-            }
-            that.isOnlyOneInLink(newToNode)
-            // // 修改连线时，若将false连到分流上，则提示
-            // if (newToNode.category === 'MULTI_BRANCH' && e.object.linkText === 'FALSE') {
-            //   mySelf.myDiagram.model.removeLinkData(e.object)
-            //   return that.$message.error('分流节点只能走TRUE分支！')
-            // }
           }
         })
       })
@@ -868,24 +805,27 @@ export default {
         let fromCategory = fromNodeLink.data.category
         // 所有节点只能有一个上级节点
         that.isOnlyOneInLink(toNodeLink)
-        if (fromCategory === 'FILTER_CHOICE') { // 将状态判断的连线内容保存，保存时判断用
-          let linkOutData = []
-          let linkDataText = []
+        if (fromCategory === 'FORK_JOIN') { // 将状态判断的连线内容保存，保存时判断用
+          let lineNum = 0
+          let lineNameArr = []
+          let maxLineNum = 0
           fromNodeLink.findLinksOutOf().each(function (link) {
+            lineNum++
+            let linkText = link.data.linkText
+            if (linkText && linkText.substr(0, 6) === 'RESULT') { // 判断是否是默认名称
+              if (!linkText.substr(6)) { // 第一条线
+                lineNameArr.push(0)
+              } else { // 非第一条线
+                if ((typeof parseInt(linkText.substr(6))) === 'number') {
+                  lineNameArr.push(parseInt(linkText.substr(6)))
+                }
+              }
+            }
+            maxLineNum = Math.max(...lineNameArr)
             link.data.linkText = link.data.linkText
             ? link.data.linkText
-            : 'TRUE'
-            if (linkOutData.length == 1) {
-              link.data.linkText = linkDataText[0] === 'TRUE' ? 'FALSE' : 'TRUE' // 将第二条线赋值为Flase
-              mySelf.myDiagram.model.updateTargetBindings(link.data)  // 更新线上的文字，没有的话默认内容无法更改出来
-            }
-            if (linkOutData.length == 2) { // 限制最多可连接两条线
-              that.$message.error('最多可连接两个子节点')
-              mySelf.myDiagram.model.removeLinkData(link.data)
-              return
-            }
-            linkOutData.push(link.data)
-            linkDataText.push(link.data.linkText)
+            : 'RESULT' + (lineNum === 1 ? '' : maxLineNum + 1)
+            mySelf.myDiagram.model.updateTargetBindings(link.data)
           })
         } else if (fromCategory === 'MULTI_BRANCH') {
           // 从分流拉连线时，默认显示为默认值

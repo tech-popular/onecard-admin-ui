@@ -239,15 +239,17 @@ export default {
       let configItems = {}
       configItems.id = postData.selectSourceData
       configItems.type = postData.type
+      configItems.resourceName = arr[0].resourceName
       configItems.topic = postData.topic
-      configItems.url = arr[0].url
-      configItems.requestFields = arr[0].requestFields
-      configItems.requestHeadFields = arr[0].requestHeadFields
-      configItems.responseFields = arr[0].responseFields
-      configItems.requestParamTemplateStatus = arr[0].requestParamTemplateStatus
-      configItems.responseType = arr[0].responseType
-      configItems.expression = arr[0].expression
-      configItems.switchTemplate = arr[0].switchTemplate
+      let bindingContent = JSON.parse(arr[0].content)
+      configItems.url = bindingContent.url
+      configItems.requestFields = bindingContent.requestFields
+      configItems.requestHeadFields = bindingContent.requestHeadFields
+      configItems.responseFields = bindingContent.responseFields
+      configItems.requestParamTemplateStatus = bindingContent.requestParamTemplateStatus
+      configItems.responseType = bindingContent.responseType
+      configItems.expression = bindingContent.expression
+      configItems.switchTemplate = bindingContent.switchTemplate
       return configItems
     },
     saveHandle () {
@@ -257,17 +259,16 @@ export default {
           let config = {
             configItems: params
           }
-          this.$store.commit('canvasFlow/setOutParams', [])
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
           this.dataLoading = false
-          this.$parent.outparamsNodeVisible = false
+          this.$parent.httpQueryNodeVisible = false
           this.$refs['dataForm'].resetFields()
         }
       })
     },
     cancelHandle () {
       this.visible = false
-      this.$parent.outparamsNodeVisible = false
+      this.$parent.httpQueryNodeVisible = false
     }
   }
 }
