@@ -60,6 +60,8 @@ export default {
       type: '', // 分群类型
       flowTypeArr: [], // 分流类型
       transferType: [], // 下发类型
+      sourceBindingIds: [], // 绑定的id
+      outDataArray: [],
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
       multiBranchNodeVisible: false,
@@ -75,8 +77,8 @@ export default {
       defaultRate: '0%',
       defaultCondition: '请输入分流条件',
       saveFormData: {
-        beeFlowName: '',
-        beeFlowCode: ''
+        name: '',
+        code: ''
       },
       issueTypeList: [
         {value: 'sms', lable: '短信'},
@@ -85,10 +87,10 @@ export default {
         {value: 'push', lable: 'Push'}
       ],
       saveFormValidate: {
-        beeFlowName: [
+        name: [
           { required: true, message: '流程名称不能为空', trigger: 'blur' }
         ],
-        beeFlowCode: [
+        code: [
           { required: true, message: '流程编号不能为空，只可输入字母、数字、下划线', pattern: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/, trigger: 'blur' }
         ]
       }
@@ -121,8 +123,8 @@ export default {
         // this.load()
         this.loading = false
       })
-      this.saveFormData.beeFlowName = data.beeFlowName
-      this.saveFormData.beeFlowCode = data.beeFlowCode
+      this.saveFormData.name = data.name
+      this.saveFormData.code = data.code
     },
     // getFlow (id) {
     //   this.loading = true
@@ -144,8 +146,8 @@ export default {
     //       // this.load()
     //       this.loading = false
     //     })
-    //     this.saveFormData.beeFlowName = data.data.beeFlowName
-    //     this.saveFormData.beeFlowCode = data.data.beeFlowCode
+    //     this.saveFormData.name = data.data.name
+    //     this.saveFormData.code = data.data.code
         // this.channelCode = data.data.channelCode
         // this.groupId = data.groupId
         // this.groupId = data.data.configJson.nodeDataArray.filter(item => item.key === '2')[0].data.configItems.groupId
@@ -284,13 +286,15 @@ export default {
       let pFlowLinkRateIs100 = []
       let pOutParamsArr = []
       let pOutParamsRepeatArr = []
+      this.outDataArray = []
       this.transferType = []
+      this.sourceBindingIds = []
       nodeDataArray.map(item => {
-        if (item.category !== 'GROUP_CHOICE') {
+        if (item.category !== 'GROUP_CHOICE' && item.category !== 'FORK_JOIN') {
           if (!item.data) {
             pNullArr.push(item.nodeName)
           }
-        } else {
+        } else if (item.category === 'GROUP_CHOICE') {
           let groupId = this.$store.state.canvasFlow.saveDate.templateId
           let configItems = {
               groupId: groupId
@@ -304,9 +308,9 @@ export default {
         if (item.category !== 'OUT_PARAM') {
           if (item.category === 'FORK_JOIN') { // 过滤节点至少有两个节点，否则报错
             // 兼容修改数据查询时，把部分过滤节点内容置空的情况
-            if (item.data && !item.data.configItems.groupId) {
-              pNullArr.push(item.nodeName)
-            }
+            // if (item.data && !item.data.configItems.groupId) {
+            //   pNullArr.push(item.nodeName)
+            // }
             let linkNum = 0
             node.findLinksOutOf().each(function (link) {
               linkNum++
@@ -347,21 +351,36 @@ export default {
             }
           }
         } else {
+          this.outDataArray.push(item)
           this.transferType.push(item.data.configItems.type)
-          if (pOutParamsArr.indexOf(item.nodeName) > -1) {
-
-            pOutParamsRepeatArr.push(item.nodeName)
-          }
+          this.sourceBindingIds.push(item.data.configItems.id)
+          let nodeLink = mySelf.myDiagram.findNodeForKey(item.key)  // 获取节点对象
+          let nodeA = nodeLink.findNodesInto().each(function (node) { return node })
+          pOutParamsArr.push(
+            nodeA.value.data.key + '_' + item.nodeName
+          )
         }
       })
-
+      // let pOutParamsRepeatKeyArr = delObj(pOutParamsArr)
+      if (pOutParamsArr.length) {
+        let pOutParamsKeyArr = []
+        pOutParamsArr.map(item => {
+          if (pOutParamsKeyArr.indexOf(item) > -1) {
+            let nodeParamsName = item.split('_')[1]
+            pOutParamsRepeatArr.push(nodeParamsName)
+          } else {
+            pOutParamsKeyArr.push(item)
+          }
+        })
+      }
       if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置运营方式！`)
       if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
       if (pChildOneArr.length) return this.$message.error(`每个组装信息节点至少需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
       if (pFlowLinkArr.length) return this.$message.error(`分流至少有两个节点，请为节点【“${Array.from(new Set(pFlowLinkArr)).join('”、“')}”】配置子节点信息！`)
       if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
-      // if (pOutParamsRepeatArr.length) return this.$message.error(`节点【“${Array.from(new Set(pOutParamsRepeatArr)).join('”、“')}”】重复！！`)
+      // if (pOutParamsRepeatArr.length) return this.$message.error(`同一节点【“${Array.from(new Set(pOutParamsRepeatArr)).join('”、“')}”】重复！！`)
+      if (pOutParamsRepeatArr.length) return this.$message.error(`同一节点下不可配置重复运营方式`)
      // 判断连线的内容
       if (that.id) { // 修改保存
         that.saveFlowInfoData()
@@ -373,24 +392,30 @@ export default {
       }
     },
     closeSave (data) {
-      that.saveFormData.beeFlowName = data.beeFlowName
-      that.saveFormData.beeFlowCode = data.beeFlowCode
+      that.saveFormData.name = data.name
+      that.saveFormData.code = data.code
       that.saveFlowInfoData()
     },
     saveFlowInfoData () {
       let jsonData = JSON.parse(mySelf.myDiagram.model.toJson())
       jsonData.flowTypeArr = this.flowTypeArr
+      jsonData.outDataArray = this.outDataArray
       let params = {
-        beeFlowName: that.saveFormData.beeFlowName,
-        beeFlowCode: that.saveFormData.beeFlowCode,
-        ...this.$store.state.canvasFlow.rowData, // 数据权限所需参数
-        ...this.$store.state.canvasFlow.saveDate
+        name: that.saveFormData.name,
+        code: that.saveFormData.code,
+        templateId: this.$store.state.canvasFlow.saveDate.templateId,
+        taskScheduleConfig: this.$store.state.canvasFlow.saveDate.taskScheduleConfig,
+        increModel: this.$store.state.canvasFlow.saveDate.increModel,
+        id: this.$store.state.canvasFlow.saveDate.id
+        // ...this.$store.state.canvasFlow.rowData, // 数据权限所需参数
+        // ...this.$store.state.canvasFlow.saveDate
         // groupId: this.groupId,
         // type: this.type.toUpperCase(),
         // channelCode: this.channelCode
       }
       params.configJson = jsonData
-      params.transferType = this.transferType.join(',')
+      params.sourceBindingIds = this.sourceBindingIds
+      // params.transferType = this.transferType.join(',')
       // let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
       // let linkTextData = []
       // if (dataQueryNode) {

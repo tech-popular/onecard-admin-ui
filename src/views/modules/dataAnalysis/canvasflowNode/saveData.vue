@@ -6,11 +6,11 @@
     width="500px"
     :close-on-click-modal="false">
       <el-form ref="saveForm" :model="saveForm" :rules="saveFormValidate" label-width="100px">
-          <el-form-item prop="beeFlowName" label="流程名称">
-              <el-input v-model="saveForm.beeFlowName" placeholder="请输入流程名称" />
+          <el-form-item prop="name" label="流程名称">
+              <el-input v-model="saveForm.name" placeholder="请输入流程名称" />
           </el-form-item>
-          <el-form-item prop="beeFlowCode" label="流程编号">
-              <el-input v-model="saveForm.beeFlowCode" placeholder="请输入流程编号，只可输入字母、数字、下划线" />
+          <el-form-item prop="code" label="流程编号">
+              <el-input v-model="saveForm.code" placeholder="请输入流程编号，只可输入字母、数字、下划线" />
           </el-form-item>
       </el-form>
       <div slot="footer">
@@ -25,14 +25,14 @@ export default {
     return {
       visible: false,
       saveForm: {
-        beeFlowName: '',
-        beeFlowCode: ''
+        name: '',
+        code: ''
       },
       saveFormValidate: {
-        beeFlowName: [
+        name: [
           { required: true, message: '请输入流程名称', trigger: 'blur' }
         ],
-        beeFlowCode: [
+        code: [
           { required: true, pattern: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/, message: '请输入流程编号，只可输入字母、数字、下划线', trigger: 'blur' }
         ]
       }
