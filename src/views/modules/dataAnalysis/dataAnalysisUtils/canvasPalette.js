@@ -14,12 +14,12 @@ export const palette = [
   {
     key: '3',
     category: 'HTTP_QUERY',
-    nodeName: '调用风控http'
+    nodeName: 'http任务'
   },
   {
     key: '4',
     category: 'FORK_JOIN',
-    nodeName: '组装信息'
+    nodeName: '合并任务'
   },
   // {
   //   key: '3',

@@ -24,8 +24,6 @@
 // import { deepClone } from '@/utils'
 import { palette } from './dataAnalysisUtils/canvasPalette' // 侧边栏模板数据 MULTI_BRANCH
 import { addCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
-// import { custerList, saveFlowInfo, flowView, editFlowInfo } from '@/api/dataAnalysis/dataDecisionManage'
-// import groupChoiceNode from './canvasflowNode/groupChoiceNode'
 import dataQueryNode from './canvasflowNode/dataQueryNode'
 import outParamsNode from './canvasflowNode/outparamsNode'
 import multiBranchNode from './canvasflowNode/multiBranchNode'
@@ -307,10 +305,6 @@ export default {
         let node = mySelf.myDiagram.findNodeForKey(item.key)
         if (item.category !== 'OUT_PARAM') {
           if (item.category === 'FORK_JOIN') { // 过滤节点至少有两个节点，否则报错
-            // 兼容修改数据查询时，把部分过滤节点内容置空的情况
-            // if (item.data && !item.data.configItems.groupId) {
-            //   pNullArr.push(item.nodeName)
-            // }
             let linkNum = 0
             node.findLinksOutOf().each(function (link) {
               linkNum++
@@ -407,22 +401,10 @@ export default {
         taskScheduleConfig: this.$store.state.canvasFlow.saveDate.taskScheduleConfig,
         increModel: this.$store.state.canvasFlow.saveDate.increModel,
         id: this.$store.state.canvasFlow.saveDate.id
-        // ...this.$store.state.canvasFlow.rowData, // 数据权限所需参数
-        // ...this.$store.state.canvasFlow.saveDate
-        // groupId: this.groupId,
-        // type: this.type.toUpperCase(),
-        // channelCode: this.channelCode
       }
       params.configJson = jsonData
       params.sourceBindingIds = this.sourceBindingIds
       // params.transferType = this.transferType.join(',')
-      // let dataQueryNode = mySelf.myDiagram.findNodeForKey('2')
-      // let linkTextData = []
-      // if (dataQueryNode) {
-      //   dataQueryNode.findLinksOutOf().each(function (link) {
-      //     linkTextData.push(link.data.linkText)
-      //   })
-      // }
       if (this.$store.state.canvasFlow.outParams.length) {
         this.$store.state.canvasFlow.outParams.forEach(item => {
           params.outParams.push({value: item.value, id: item.fieldId, sourceTable: item.sourceTable})
@@ -915,9 +897,10 @@ export default {
             mySelf.myDiagram.model.updateTargetBindings(link.data)
           })
           // e.subject.data.linkText = 'result' + lineNum
-        } else { // 非状态判断时，只允许有一个子节点
-          that.linkDrawnChange(fromKey, toKey, e)
         }
+        // else if() { // 非状态判断时，只允许有一个子节点
+        //   that.linkDrawnChange(fromKey, toKey, e)
+        // }
       })
       mySelf.myDiagram.linkTemplate = $(
         go.Link, //  the whole link panel
