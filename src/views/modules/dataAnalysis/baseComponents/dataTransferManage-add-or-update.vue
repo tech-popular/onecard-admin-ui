@@ -460,7 +460,8 @@
   // dataTransferManageMysql,
   infoDataTransferManage,
   // defaultOutParams,
-  selectResourceBindingList
+  selectResourceBindingList,
+  validTransferName
   // getSmsAllMessage
   } from '@/api/dataAnalysis/dataTransferManage'
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
@@ -827,6 +828,9 @@
           } else {
             this.outParamsList = []
           }
+          if (this.baseForm.decisionType === '1') {
+            this.loading = false
+          }
         })
       },
       // // 修改，回显时查询分群出参选中
@@ -1086,42 +1090,6 @@
         if (data.pushId != '' && data.transferType.includes('push')) {
           postData.sourceBindingIds.push(data.pushId)
         }
-        // if (data.transferCategory === '0') {
-            // let tempServer = {
-            //   type: 'kafka',
-            //   id: data.kafkaServer,
-            //   topic: data.topic
-            // }
-          // postData.datasourceParams.push(tempServer)
-            // }
-            // if (data.mysqlServer != '' && data.transferType.includes('mysql')) {
-            //   let tempServer = {
-            //     type: 'mysql',
-            //     id: data.mysqlServer
-            //   }
-            //   postData.datasourceParams.push(tempServer)
-            // }
-            // if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
-            //   let tempServer = {
-            //     type: 'sqlServer',
-            //     id: data.sqlServer
-            //   }
-            //   postData.datasourceParams.push(tempServer)
-            // }
-        // else {
-        //   let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
-        //   this.intelligentDistributionParams.forEach(item => {
-        //     if (item.type === 'sms') {
-        //        postData.datasourceParams.push(item)
-        //     } else if (item.type === 'tel') {
-        //       postData.datasourceParams.push({type: 'tel', id: smsMessage.length ? smsMessage[0].id + 1 : 200})
-        //     } else if (item.type === 'ai') {
-        //       postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 300})
-        //     }
-        //   })
-        //   // postData.transferType = 'kafka'
-        // }
-        // postData.transferType = 'kafka'
         postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
@@ -1195,9 +1163,10 @@
             this.baseForm.transferName = disData.transferName
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
-            this.baseForm.transferType = disData.transferType.split(',')
             if (disData.decisionType === '1') {
               this.$store.commit('canvasFlow/setEditData', disData)
+            } else {
+              this.baseForm.transferType = (disData.transferType || '').split(',')
             }
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
@@ -1216,22 +1185,6 @@
               this.isStatic = false
             }
             this.baseForm.increModel = disData.increModel == -1 ? 0 : disData.increModel
-            // disData.sourceBindingIds.forEach((item, index) => {
-            //   if (item == 'kafka') {
-            //     // this.baseForm.kafkaServer = item.id
-            //     // this.baseForm.topic = item.topic
-            //   } else if (item.type == 'mysql') {
-            //     this.baseForm.mysqlServer = item.id
-            //   } else if (item.type == 'sqlServer') {
-            //     this.baseForm.sqlServer = item.id
-            //     this.isR3DefaultOut = true
-            //   } else if (disData.transferCategory == '1') {
-            //     this.baseForm.intelligentDistribution.push(item.type)
-            //     if (item.type === 'sms') {
-            //       this.setSmsTemplteVisible = true
-            //     }
-            //   }
-            // })
             let tempTime = disData.taskScheduleConfig
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONCE_ONLY':
@@ -1487,13 +1440,19 @@
               })
             }
             this.$store.commit('canvasFlow/setGroupNodeName', obj.text)
-            this.$store.commit('canvasFlow/setRowData', this.rowData)
+            // this.$store.commit('canvasFlow/setRowData', this.rowData)
             this.$store.commit('canvasFlow/setSaveDate', params)
             this.$store.commit('canvasFlow/setChannelCode', this.channelCode)
-            if (this.baseForm.id) {
-              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.baseForm.id, time: new Date().getTime() } })
+            if (!this.baseForm.id) {
+              validTransferName(this.baseForm.transferName).then(({data}) => {
+                if (data && data.status === '1') {
+                  this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { time: new Date().getTime() } })
+                } else {
+                  this.$message.error(data.message)
+                }
+              })
             } else {
-              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { time: new Date().getTime() } })
+              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.baseForm.id, time: new Date().getTime() } })
             }
           }
         })

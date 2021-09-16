@@ -5,11 +5,11 @@
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
        <el-form-item label="URL" prop="url" :rules="baseRule.url">
-          <el-input v-model="dataForm.url" placeholder="请输入URL" @blur="urlParamsBlur"/>
+          <el-input v-model="dataForm.url" placeholder="请输入URL"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
-        <el-input v-model="dataForm.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
-        </el-form-item>
+        <!-- <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
+          <el-input v-model="dataForm.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
+        </el-form-item> -->
         <el-form-item label="请求head入参" prop="requestHeadFields">
         <el-input v-model="dataForm.requestHeadFields" placeholder="请输入请求head入参"/>
         </el-form-item>
@@ -19,8 +19,11 @@
             <el-radio :label="1">模板生成</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item prop="templateContent" label="模板内容" v-if="dataForm.requestParamTemplateStatus == '1'">
+          <el-input type="textarea"  class="base-pane-item" v-model="dataForm.templateContent"  :autosize="{ minRows: 2}" />
+        </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="baseRule.responseFields">
-        <el-input v-model="dataForm.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
+          <el-input v-model="dataForm.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
         </el-form-item>
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="baseRule.responseType"> 
           <el-select v-model="dataForm.responseType" placeholder="请选择响应参数的数据类型">
@@ -38,7 +41,7 @@
         <el-form-item label="switch判断项集合" prop="switchTemplate" :rules="baseRule.switchTemplate">
           <el-input v-model="dataForm.switchTemplate" placeholder="请输入缓存生成的key需要的字段"/>
         </el-form-item>
-      <el-form-item  prop="extraParams"  label="额外出参" v-if="extraParamsVisible">
+      <el-form-item  prop="extraParams"  label="额外出参">
 				  <Treeselect
 						:options="outParamsList"
 						:disable-branch-nodes="true"
@@ -90,7 +93,6 @@ export default {
     }
     return {
       visible: false,
-      extraParamsVisible: false,
       canUpdate: true,
       dataLoading: false,
       dataForm: {
@@ -100,9 +102,10 @@ export default {
         resourceName: '',
         extraParams: [],
         url: '',  // url
-        requestFields: '',
+        // requestFields: '',
         requestHeadFields: '',
         responseFields: '',
+        templateContent: '',
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
@@ -132,6 +135,12 @@ export default {
         ],
         switchTemplate: [
           { required: true, message: '请输入switch判断项集合', trigger: 'blur' }
+        ],
+        templateContent: [
+          { required: true, message: '请输入模板内容', trigger: 'blur' }
+        ],
+        extraParams: [
+          { required: true, message: '请选择分群出参', trigger: 'input' }
         ]
       }
     }
@@ -145,7 +154,6 @@ export default {
       }
     },
     init (channelCode, id, canUpdate) {
-      this.extraParamsVisible = false
       this.canUpdate = canUpdate
       this.outParamsList = []
       this.dataForm = {
@@ -155,9 +163,10 @@ export default {
         resourceName: '',
         extraParams: [],
         url: '',  // url
-        requestFields: '',
+        // requestFields: '',
         requestHeadFields: '',
         responseFields: '',
+        templateContent: '',
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
@@ -183,33 +192,29 @@ export default {
           this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
           let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
           this.dataForm.url = bindingContent.url
-          this.dataForm.requestFields = bindingContent.requestFields
+          // this.dataForm.requestFields = bindingContent.requestFields
           this.dataForm.requestHeadFields = bindingContent.requestHeadFields
+          this.dataForm.templateContent = bindingContent.templateContent
           this.dataForm.responseFields = bindingContent.responseFields
           this.dataForm.requestParamTemplateStatus = bindingContent.requestParamTemplateStatus
           this.dataForm.responseType = bindingContent.responseType
           this.dataForm.expression = bindingContent.expression
           this.dataForm.switchTemplate = bindingContent.switchTemplate
-          if (res.data.data.bindingConfig.extraParams) {
-            this.paramsNum = bindingContent.url.match(/{(.*?)}/g).length
-          }
           this.getOutParamsList(res.data.data.extraParams)
         }
       })
     },
     // 根据URL判断出参个数
-    urlParamsBlur () {
-      let urlParams = this.dataForm.url.match(/{(.*?)}/g)
-      if (urlParams && urlParams.length) {
-        this.extraParamsVisible = true
-        this.paramsNum = urlParams.length
-      } else {
-        this.extraParamsVisible = false
-        this.extraParams = []
-        this.dataForm.extraParams = []
-        this.paramsNum = 0
-      }
-    },
+    // urlParamsBlur () {
+    //   let urlParams = this.dataForm.url.match(/{(.*?)}/g)
+    //   if (urlParams && urlParams.length) {
+    //     this.paramsNum = urlParams.length
+    //   } else {
+    //     this.extraParams = []
+    //     this.dataForm.extraParams = []
+    //     this.paramsNum = 0
+    //   }
+    // },
     // 获取分群出参 指标列表
     getOutParamsList (extraParams) {
       dataTransferManageOutParams({ channelCode: this.dataForm.channelCode, flag: this.dataForm.id ? '-1' : '1' }).then(({data}) => {
@@ -311,14 +316,12 @@ export default {
     submitData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.extraParams.length !== this.paramsNum) {
-            return this.$message.error(`请选择${this.paramsNum}个参数`)
-          }
           let httpContent = {
             url: this.dataForm.url,
-            requestFields: this.dataForm.requestFields,
+            // requestFields: this.dataForm.requestFields,
             requestHeadFields: this.dataForm.requestHeadFields,
             responseFields: this.dataForm.responseFields,
+            templateContent: this.dataForm.requestParamTemplateStatus == '1' ? this.dataForm.templateContent : '',
             requestParamTemplateStatus: this.dataForm.requestParamTemplateStatus,
             responseType: this.dataForm.responseType,
             expression: this.dataForm.expression,

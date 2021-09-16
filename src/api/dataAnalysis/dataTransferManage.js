@@ -19,6 +19,7 @@ export const r3Log = params => httpPost(da + 'r3log/list', params)
 export const getAllSmsChannels = () => httpGet(da + `data/resource/smart/getAllSmsChannels`) // 短信渠道
 export const getSmsCodeInfo = (channelId) => httpGet(da + `data/resource/smart/getSmsCodeInfoByChannelId/${channelId}`) // 短信code
 export const addCanvasInfo = (params) => httpPost(da + 'data/decision/canvas/add', params) // 决策画布提交
+export const updateCanvasInfo = (params) => httpPost(da + 'data/decision/canvas/update', params) // 决策画布提交
 export const getSmsMessage = (resourceId) => httpGet(da + `resource/binding/fetchByResourceId/${resourceId}`) // 校验是否已进行资源绑定
 export const getSmsAllMessage = (resourceId) => httpGet(da + `resource/binding/fetchDescByResourceId/${resourceId}`) // 获取短信所有详细信息
 // 执行进度
@@ -26,3 +27,5 @@ export const dataTransferManageTaskProgress = (id) => httpGet(da + `dataTransfer
 export const dataTransferManageExecutionMetric = (id, percent) => httpGet(da + `dataTransfer/execution/metric/${id}`, percent) // 历史记录
 //  获取已绑定资源
 export const selectResourceBindingList = (params) => httpGet(da + `resource/binding/selectResourceBindingList`, params)
+// 决策画布校验任务名称是否重复
+export const validTransferName = (transferName) => httpGet(da + `dataTransfer/valid/${transferName}`)

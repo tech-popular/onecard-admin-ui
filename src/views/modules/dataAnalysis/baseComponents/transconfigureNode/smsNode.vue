@@ -27,7 +27,7 @@
       <el-form-item prop="smsTemplate" v-if="dataForm.editType === '0'" label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" >
 				</el-input>
-					<p style="margin:0">
+					<p style="margin:0" v-if="dataForm.resourceCode">
               需要选择
             <span style="color:red" v-text="paramsNum"></span> 个参数
           </p>

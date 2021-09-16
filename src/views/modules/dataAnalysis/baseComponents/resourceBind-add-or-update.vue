@@ -72,7 +72,7 @@
       <el-form-item prop="smsTemplate" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" >
 				</el-input>
-					<p style="margin:0">
+					<p style="margin:0" v-if="dataForm.resourceCode">
               需要选择
             <span style="color:red" v-text="paramsNum"></span> 个参数
           </p>
@@ -99,11 +99,31 @@
       <!-- HTTP -->
       <div v-if="dataForm.type === 'http'">
         <el-form-item label="URL" prop="url" :rules="baseRule.url">
-          <el-input v-model="dataForm.url" placeholder="请输入URL" @blur="urlParamsBlur"/>
+          <el-input v-model="dataForm.url" placeholder="请输入URL"/>
         </el-form-item>
-        <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
+        <!-- <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
         <el-input v-model="dataForm.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
-        </el-form-item>
+        </el-form-item> -->
+        <el-form-item  prop="extraParams"  label="请求入参">
+				  <Treeselect
+						:options="outParamsList"
+						:disable-branch-nodes="true"
+						:show-count="true"
+						:multiple="true"
+						:load-options="loadOptions"
+						:searchable="true"
+						:clearable="true"
+						:disabled="viewVisible"
+            @open="openParamsSelect"
+						@input="changeOption"
+						@select="outParamsSelect"
+						@deselect="outParamsDeselect"
+						noChildrenText="暂无数据"
+						v-model="dataForm.extraParams"
+						placeholder="请选择"
+						class="base-pane-item"
+					/>
+			</el-form-item>
         <el-form-item label="请求head入参" prop="requestHeadFields">
         <el-input v-model="dataForm.requestHeadFields" placeholder="请输入请求head入参"/>
         </el-form-item>
@@ -112,6 +132,9 @@
             <el-radio :label="0">普通生成</el-radio>
             <el-radio :label="1">模板生成</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item prop="templateContent" label="模板内容" v-if="dataForm.requestParamTemplateStatus == '1'" :rules="baseRule.templateContent">
+          <el-input type="textarea"  class="base-pane-item" v-model="dataForm.templateContent"  :autosize="{ minRows: 2}" />
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="baseRule.responseFields">
         <el-input v-model="dataForm.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
@@ -295,9 +318,10 @@ export default {
         msgContent: '',
         // HTTP参数
         url: '',  // url
-        requestFields: '',
+        // requestFields: '',
         requestHeadFields: '',
         responseFields: '',
+        templateContent: '',
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
@@ -355,6 +379,9 @@ export default {
         ],
         switchTemplate: [
           { required: true, message: '请输入switch判断项集合', trigger: 'blur' }
+        ],
+        templateContent: [
+          { required: true, message: '请输入模板内容', trigger: 'blur' }
         ]
       }
     }
@@ -405,9 +432,10 @@ export default {
         msgContent: '',
          // HTTP参数
         url: '',  // url
-        requestFields: '',
+        // requestFields: '',
         requestHeadFields: '',
         responseFields: '',
+        templateContent: '',
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
@@ -469,16 +497,14 @@ export default {
             }
             if (row.type === 'http') {
               this.dataForm.url = bindingContent.url
-              this.dataForm.requestFields = bindingContent.requestFields
+              // this.dataForm.requestFields = bindingContent.requestFields
               this.dataForm.requestHeadFields = bindingContent.requestHeadFields
               this.dataForm.responseFields = bindingContent.responseFields
+              this.dataForm.templateContent = bindingContent.templateContent
               this.dataForm.requestParamTemplateStatus = bindingContent.requestParamTemplateStatus
               this.dataForm.responseType = bindingContent.responseType
               this.dataForm.expression = bindingContent.expression
               this.dataForm.switchTemplate = bindingContent.switchTemplate
-              if (res.data.data.bindingConfig.extraParams) {
-                this.paramsNum = bindingContent.url.match(/{(.*?)}/g).length
-              }
             }
           } else {
             this.dataForm.editType = '0'
@@ -738,9 +764,10 @@ export default {
         msgContent: '',
          // HTTP参数
         url: '',  // url
-        requestFields: '',
+        // requestFields: '',
         requestHeadFields: '',
         responseFields: '',
+        templateContent: '',
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
@@ -872,19 +899,19 @@ export default {
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
-    // HTTP
-    urlParamsBlur () {
-      let urlParams = this.dataForm.url.match(/{(.*?)}/g)
-      if (urlParams && urlParams.length) {
-        this.extraParamsVisible = true
-        this.paramsNum = urlParams.length
-      } else {
-        this.extraParamsVisible = false
-        this.extraParams = []
-        this.dataForm.extraParams = []
-        this.paramsNum = 0
-      }
-    },
+    // // HTTP
+    // urlParamsBlur () {
+    //   let urlParams = this.dataForm.url.match(/{(.*?)}/g)
+    //   if (urlParams && urlParams.length) {
+    //     this.extraParamsVisible = true
+    //     this.paramsNum = urlParams.length
+    //   } else {
+    //     this.extraParamsVisible = false
+    //     this.extraParams = []
+    //     this.dataForm.extraParams = []
+    //     this.paramsNum = 0
+    //   }
+    // },
     changeOption () {
       // 出参选择
       this.$refs.dataForm.clearValidate('extraParams')
@@ -910,8 +937,7 @@ export default {
           if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.fixedParams.length === 0) {
             return this.$message.error(`请联系管理员配置固定流程参数`)
           }
-          if ((this.dataForm.type === 'sms' || this.dataForm.type === 'http') && this.extraParams.length !== this.paramsNum) {
-            console.log('this.paramsNum: ', this.paramsNum)
+          if ((this.dataForm.type === 'sms') && this.extraParams.length !== this.paramsNum) {
             return this.$message.error(`请选择${this.paramsNum}个参数`)
           }
           let smsContent = {
@@ -921,9 +947,10 @@ export default {
           }
           let httpContent = {
             url: this.dataForm.url,
-            requestFields: this.dataForm.requestFields,
+            // requestFields: this.dataForm.requestFields,
             requestHeadFields: this.dataForm.requestHeadFields,
             responseFields: this.dataForm.responseFields,
+            templateContent: this.dataForm.requestParamTemplateStatus == '1' ? this.dataForm.templateContent : '',
             requestParamTemplateStatus: this.dataForm.requestParamTemplateStatus,
             responseType: this.dataForm.responseType,
             expression: this.dataForm.expression,

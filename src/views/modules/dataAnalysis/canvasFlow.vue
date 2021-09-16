@@ -23,7 +23,7 @@
 <script>
 // import { deepClone } from '@/utils'
 import { palette } from './dataAnalysisUtils/canvasPalette' // 侧边栏模板数据 MULTI_BRANCH
-import { addCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
+import { addCanvasInfo, updateCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
 import dataQueryNode from './canvasflowNode/dataQueryNode'
 import outParamsNode from './canvasflowNode/outparamsNode'
 import multiBranchNode from './canvasflowNode/multiBranchNode'
@@ -59,6 +59,7 @@ export default {
       flowTypeArr: [], // 分流类型
       transferType: [], // 下发类型
       sourceBindingIds: [], // 绑定的id
+      // httpRequestFields: [], // http的请求参数的fieldId数组
       outDataArray: [],
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
@@ -75,7 +76,7 @@ export default {
       defaultRate: '0%',
       defaultCondition: '请输入分流条件',
       saveFormData: {
-        name: '',
+        // name: '',
         code: ''
       },
       issueTypeList: [
@@ -85,9 +86,9 @@ export default {
         {value: 'push', lable: 'Push'}
       ],
       saveFormValidate: {
-        name: [
-          { required: true, message: '流程名称不能为空', trigger: 'blur' }
-        ],
+        // name: [
+        //   { required: true, message: '流程名称不能为空', trigger: 'blur' }
+        // ],
         code: [
           { required: true, message: '流程编号不能为空，只可输入字母、数字、下划线', pattern: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/, trigger: 'blur' }
         ]
@@ -121,7 +122,7 @@ export default {
         // this.load()
         this.loading = false
       })
-      this.saveFormData.name = data.name
+      // this.saveFormData.name = data.name
       this.saveFormData.code = data.code
     },
     // getFlow (id) {
@@ -287,12 +288,14 @@ export default {
       this.outDataArray = []
       this.transferType = []
       this.sourceBindingIds = []
+      // this.httpRequestFields = []
       nodeDataArray.map(item => {
-        if (item.category !== 'GROUP_CHOICE' && item.category !== 'FORK_JOIN') {
-          if (!item.data) {
-            pNullArr.push(item.nodeName)
-          }
-        } else if (item.category === 'GROUP_CHOICE') {
+        // if (item.category !== 'GROUP_CHOICE' && item.category !== 'FORK_JOIN') {
+        //   if (!item.data) {
+        //     pNullArr.push(item.nodeName)
+        //   }
+        // } else
+        if (item.category === 'GROUP_CHOICE') {
           let groupId = this.$store.state.canvasFlow.saveDate.templateId
           let configItems = {
               groupId: groupId
@@ -335,6 +338,12 @@ export default {
             if (type !== 'condition' && linkIs100 !== 100) {
               pFlowLinkRateIs100.push(item.nodeName)
             }
+          } else if (item.category === 'HTTP_QUERY') {
+            if (!item.data) {
+              pNullArr.push(item.nodeName)
+            } else {
+              this.sourceBindingIds.push(item.data.configItems.id)
+            }
           } else { // 其他节点若无连线信息则报错
             let linkNum1 = 0
             node.findLinksOutOf().each(function (link) {
@@ -345,14 +354,18 @@ export default {
             }
           }
         } else {
-          this.outDataArray.push(item)
-          this.transferType.push(item.data.configItems.type)
-          this.sourceBindingIds.push(item.data.configItems.id)
-          let nodeLink = mySelf.myDiagram.findNodeForKey(item.key)  // 获取节点对象
-          let nodeA = nodeLink.findNodesInto().each(function (node) { return node })
-          pOutParamsArr.push(
-            nodeA.value.data.key + '_' + item.nodeName
-          )
+          if (item.data) {
+            this.outDataArray.push(item)
+            this.transferType.push(item.data.configItems.type)
+            this.sourceBindingIds.push(item.data.configItems.id)
+            let nodeLink = mySelf.myDiagram.findNodeForKey(item.key)  // 获取节点对象
+            let nodeA = nodeLink.findNodesInto().each(function (node) { return node })
+            pOutParamsArr.push(
+              nodeA.value.data.key + '_' + item.nodeName
+            )
+          } else {
+            pNullArr.push(item.nodeName)
+          }
         }
       })
       // let pOutParamsRepeatKeyArr = delObj(pOutParamsArr)
@@ -386,7 +399,7 @@ export default {
       }
     },
     closeSave (data) {
-      that.saveFormData.name = data.name
+      // that.saveFormData.name = data.name
       that.saveFormData.code = data.code
       that.saveFlowInfoData()
     },
@@ -395,15 +408,18 @@ export default {
       jsonData.flowTypeArr = this.flowTypeArr
       jsonData.outDataArray = this.outDataArray
       let params = {
-        name: that.saveFormData.name,
+        // name: that.saveFormData.name,
         code: that.saveFormData.code,
         templateId: this.$store.state.canvasFlow.saveDate.templateId,
         taskScheduleConfig: this.$store.state.canvasFlow.saveDate.taskScheduleConfig,
         increModel: this.$store.state.canvasFlow.saveDate.increModel,
-        id: this.$store.state.canvasFlow.saveDate.id
+        id: this.$store.state.canvasFlow.saveDate.id,
+        decisionType: this.$store.state.canvasFlow.saveDate.decisionType,
+        transferName: this.$store.state.canvasFlow.saveDate.transferName
       }
       params.configJson = jsonData
       params.sourceBindingIds = this.sourceBindingIds
+      // params.httpRequestFields = this.httpRequestFields.join(',')
       // params.transferType = this.transferType.join(',')
       if (this.$store.state.canvasFlow.outParams.length) {
         this.$store.state.canvasFlow.outParams.forEach(item => {
@@ -415,16 +431,29 @@ export default {
         params.id = this.id
         params.beeFlowId = this.$store.state.canvasFlow.editData.beeFlowId
       }
-      addCanvasInfo(params).then(({data}) => {
-        if (data.status !== '1') {
-          return this.$message.error(data.message || '保存失败')
-        }
-        this.$message.success(data.message)
-        this.$store.commit('canvasFlow/setOutParams', [])
-        setTimeout(() => {
-          that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
-        }, 300)
-      })
+      if (!this.id) {
+        addCanvasInfo(params).then(({data}) => {
+          if (data.status !== '1') {
+            return this.$message.error(data.message || '保存失败')
+          }
+          this.$message.success(data.message)
+          this.$store.commit('canvasFlow/setOutParams', [])
+          setTimeout(() => {
+            that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
+          }, 300)
+        })
+      } else {
+        updateCanvasInfo(params).then(({data}) => {
+          if (data.status !== '1') {
+            return this.$message.error(data.message || '保存失败')
+          }
+          this.$message.success(data.message)
+          this.$store.commit('canvasFlow/setOutParams', [])
+          setTimeout(() => {
+            that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
+          }, 300)
+        })
+      }
     },
     // 加载
     load () {
@@ -740,6 +769,25 @@ export default {
                 }
                 flowLinkDataText.push(citem.linkText)
               }
+              // else if (newFromNode.category === 'HTTP_QUERY' && citem.from === e.newValue) {
+              //   let linkText = ''
+              //   let filterArr = that.flowTypeArr.filter(item => item.key === citem.from)
+              //   let curFlowType = filterArr.length ? filterArr[0].flowType : ''
+              //   if (flowLinkDataText.length < 5 && citem.to === e.object.to) {
+              //     console.log('e.object: ', e.object);
+              //     console.log('citem: ', citem);
+              //     // let httpSwitchTemplate = fromNodeLink.data.data.configItems.switchTemplate.split(',')
+              //     // linkText = httpSwitchTemplate.length >= lineNum ? httpSwitchTemplate[lineNum - 1] : ''
+              //     // citem.linkText = linkText // 对连线的文字赋值
+              //     // mySelf.myDiagram.model.updateTargetBindings(citem) // 更新连线上的文字
+              //   } else {
+              //     if (citem.to === e.object.to) {
+              //       that.$message.error('最多可连接5个子节点')
+              //       return mySelf.myDiagram.model.removeLinkData(citem)
+              //     }
+              //   }
+              //   flowLinkDataText.push(citem.linkText)
+              // }
               // if (newFromNode.category === 'FORK_JOIN' && citem.from === e.newValue) {
               //   console.log('newFromNode.category: ', newFromNode.category)
               //   if (groupLinkDataText.length === 0) {
@@ -897,6 +945,27 @@ export default {
             mySelf.myDiagram.model.updateTargetBindings(link.data)
           })
           // e.subject.data.linkText = 'result' + lineNum
+        } else if (fromCategory === 'HTTP_QUERY') {
+          if (!fromNodeLink.data.data) {
+            that.$message.error('请先选择http任务再连线!')
+            return mySelf.myDiagram.model.removeLinkData(e.subject.data)
+          }
+          let lineNum = 0
+          let linkOutData = []
+          fromNodeLink.findLinksOutOf().each(function (link) {
+            lineNum++
+            if (linkOutData.length == 5) { // 限制最多可连接5条线
+              that.$message.error('最多可连接5个子节点')
+              mySelf.myDiagram.model.removeLinkData(link.data)
+              return
+            }
+            linkOutData.push(link.data)
+            let httpSwitchTemplate = fromNodeLink.data.data.configItems.switchTemplate.split(',')
+            link.data.linkText = httpSwitchTemplate.length >= lineNum ? httpSwitchTemplate[lineNum - 1] : ''
+            link.data.num = lineNum
+            e.subject.data.num = lineNum
+            mySelf.myDiagram.model.updateTargetBindings(link.data)
+          })
         }
         // else if() { // 非状态判断时，只允许有一个子节点
         //   that.linkDrawnChange(fromKey, toKey, e)
@@ -1068,7 +1137,7 @@ export default {
     showLinkLabel (e) { // 显示连线上的文字
       var label = e.subject.findObject('LABEL')
       if (label !== null) {
-        label.visible = e.subject.fromNode.data.category === 'FILTER_CHOICE' || e.subject.fromNode.data.category === 'MULTI_BRANCH' || e.subject.fromNode.data.category === 'GROUP_CHOICE'// 除了状态处理显示外。其他的都不显示
+        label.visible = e.subject.fromNode.data.category === 'HTTP_QUERY' || e.subject.fromNode.data.category === 'MULTI_BRANCH' || e.subject.fromNode.data.category === 'GROUP_CHOICE'// 除了状态处理显示外。其他的都不显示
       }
     },
     doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件
@@ -1109,6 +1178,15 @@ export default {
             if (link.data.linkText.substr(0, 1) === '<') {
               link.data.linkText = link.data.linkText.substr(0, 1) + link.data.num + link.data.linkText.substr(2)
             }
+            mySelf.myDiagram.model.updateTargetBindings(link.data)
+          }
+        })
+      } else if (fromNode.data.category === 'HTTP_QUERY') {
+         fromNode.findLinksOutOf().each(function (link) {
+          if (link.data.num > data.num) {
+            link.data.num = link.data.num - 1
+            let httpSwitchTemplate = fromNode.data.data.configItems.switchTemplate.split(',')
+            link.data.linkText = httpSwitchTemplate.length >= link.data.num ? httpSwitchTemplate[link.data.num - 1] : ''
             mySelf.myDiagram.model.updateTargetBindings(link.data)
           }
         })
