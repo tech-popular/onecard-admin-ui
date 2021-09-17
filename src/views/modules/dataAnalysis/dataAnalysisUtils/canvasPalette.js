@@ -21,24 +21,9 @@ export const palette = [
     category: 'FORK_JOIN',
     nodeName: '合并任务'
   },
-  // {
-  //   key: '3',
-  //   category: 'GROUP_CHOICE',
-  //   nodeName: '分群节点'
-  // },
-  // {
-  //   key: '4',
-  //   category: 'FILTER_CHOICE',
-  //   nodeName: '过滤节点'
-  // },
   {
     key: '5',
     category: 'OUT_PARAM',
     nodeName: '运营\n方式'
   }
-  // {
-  //   key: '6',
-  //   category: 'OUT_KAFKA',
-  //   nodeName: '下发\nkafka'
-  // }
 ]

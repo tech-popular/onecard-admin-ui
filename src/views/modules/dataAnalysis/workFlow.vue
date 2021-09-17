@@ -53,7 +53,7 @@ export default {
         ],
         linkDataArray: [{
           from: '1',
-          to: '2'
+          to: ''
         }]
       },
       tag: this.$route.query.tag,

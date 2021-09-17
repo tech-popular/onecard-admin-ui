@@ -23,7 +23,7 @@
 <script>
 // import { deepClone } from '@/utils'
 import { palette } from './dataAnalysisUtils/canvasPalette' // 侧边栏模板数据 MULTI_BRANCH
-import { addCanvasInfo, updateCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
+import { addCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
 import dataQueryNode from './canvasflowNode/dataQueryNode'
 import outParamsNode from './canvasflowNode/outparamsNode'
 import multiBranchNode from './canvasflowNode/multiBranchNode'
@@ -276,6 +276,7 @@ export default {
     // 保存
     save () {
       let nodeDataArray = mySelf.myDiagram.model.nodeDataArray
+      let linkDataArray = mySelf.myDiagram.model.linkDataArray
       // 判断节点数据是否存在，若无数据则提示配置
       let pNullArr = []
       let pChildOneArr = []
@@ -288,6 +289,7 @@ export default {
       this.outDataArray = []
       this.transferType = []
       this.sourceBindingIds = []
+      let linkDataSortArray = [] // linkDataArray重新排序数组
       // this.httpRequestFields = []
       nodeDataArray.map(item => {
         // if (item.category !== 'GROUP_CHOICE' && item.category !== 'FORK_JOIN') {
@@ -380,6 +382,16 @@ export default {
           }
         })
       }
+      // 对linkDataArray进行重新排序
+      linkDataArray.map(item => {
+        if (item.from === '1') {
+          linkDataSortArray.unshift(item)
+        } else {
+          linkDataSortArray.push(item)
+        }
+      })
+      mySelf.myDiagram.model.linkDataArray = linkDataSortArray
+      that.flowJson.linkDataArray = linkDataSortArray
       if (pNullLinkArr.length) return this.$message.error(`请为节点【“${Array.from(new Set(pNullLinkArr)).join('”、“')}”】配置运营方式！`)
       if (pNullArr.length) return this.$message.error(`请配置节点【“${Array.from(new Set(pNullArr)).join('”、“')}”】的内容！`)
       if (pChildOneArr.length) return this.$message.error(`每个组装信息节点至少需有两个子节点，请配置节点【“${pChildOneArr.join('”、“')}”】的子节点！`)
@@ -419,7 +431,6 @@ export default {
       }
       params.configJson = jsonData
       params.sourceBindingIds = this.sourceBindingIds
-      // params.httpRequestFields = this.httpRequestFields.join(',')
       // params.transferType = this.transferType.join(',')
       if (this.$store.state.canvasFlow.outParams.length) {
         this.$store.state.canvasFlow.outParams.forEach(item => {
@@ -428,32 +439,19 @@ export default {
       }
       // let url = this.id ? editFlowInfo : saveFlowInfo
       if (this.id) {
-        params.id = this.id
+        // params.id = this.id
         params.beeFlowId = this.$store.state.canvasFlow.editData.beeFlowId
       }
-      if (!this.id) {
-        addCanvasInfo(params).then(({data}) => {
-          if (data.status !== '1') {
-            return this.$message.error(data.message || '保存失败')
-          }
-          this.$message.success(data.message)
-          this.$store.commit('canvasFlow/setOutParams', [])
-          setTimeout(() => {
-            that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
-          }, 300)
-        })
-      } else {
-        updateCanvasInfo(params).then(({data}) => {
-          if (data.status !== '1') {
-            return this.$message.error(data.message || '保存失败')
-          }
-          this.$message.success(data.message)
-          this.$store.commit('canvasFlow/setOutParams', [])
-          setTimeout(() => {
-            that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
-          }, 300)
-        })
-      }
+      addCanvasInfo(params).then(({data}) => {
+        if (data.status !== '1') {
+          return this.$message.error(data.message || '保存失败')
+        }
+        this.$message.success(data.message)
+        this.$store.commit('canvasFlow/setOutParams', [])
+        setTimeout(() => {
+          that.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
+        }, 300)
+      })
     },
     // 加载
     load () {
