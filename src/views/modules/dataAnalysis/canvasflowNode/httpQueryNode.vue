@@ -250,6 +250,7 @@ export default {
       configItems.responseType = bindingContent.responseType
       configItems.expression = bindingContent.expression
       configItems.switchTemplate = bindingContent.switchTemplate
+      configItems.templateContent = bindingContent.templateContent
       return configItems
     },
     saveHandle () {
