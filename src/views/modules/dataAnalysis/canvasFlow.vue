@@ -4,7 +4,7 @@
       <div class="left-tool">
         <div class="flow-save">
           <div><el-button class="flow-btn-goback" type="warning" icon="md-arrow-round-back" @click="goback">返回</el-button></div>
-          <div><el-button class="flow-btn-save" type="primary" icon="ios-cube-outline" @click="save" v-if="tag !== 'view'">保存</el-button></div>
+          <div><el-button class="flow-btn-save" type="primary" icon="ios-cube-outline" @click="save" v-if="canUpdate">保存</el-button></div>
         </div>
         <div id="myPaletteDiv"></div>
       </div>
@@ -51,15 +51,14 @@ export default {
         ],
         linkDataArray: []
       },
-      tag: this.$route.query.tag,
+      // tag: this.$route.query.tag,
+      canUpdate: this.$store.state.canvasFlow.saveDate.canUpdate,
       id: this.$route.query.id,
       channelCode: '',
       groupId: [],
       type: '', // 分群类型
       flowTypeArr: [], // 分流类型
-      transferType: [], // 下发类型
       sourceBindingIds: [], // 绑定的id
-      // httpRequestFields: [], // http的请求参数的fieldId数组
       outDataArray: [],
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
@@ -185,6 +184,14 @@ export default {
           mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', outParamName)
         }
         if (_data.category === 'HTTP_QUERY') { // 根据选中的过滤节点，更新过滤节点的名称
+          let lineNum = 0
+          node.findLinksOutOf().each(function (link) {
+            lineNum++
+            let httpSwitchTemplate = item.data.config.configItems.switchTemplate.split(',')
+            link.data.linkText = httpSwitchTemplate.length >= lineNum ? httpSwitchTemplate[lineNum - 1] : ''
+            link.data.num = lineNum
+            mySelf.myDiagram.model.updateTargetBindings(link.data)
+          })
           mySelf.myDiagram.model.setDataProperty(node1, 'nodeName', item.data.config.configItems.resourceName)
         }
         if (_data.category === 'MULTI_BRANCH') { // 获取分流的类型
@@ -259,7 +266,7 @@ export default {
     },
     // 返回
     goback () {
-      if (this.tag === 'view') {
+      if (!this.canUpdate) {
         this.$router.replace({ path: 'dataAnalysis-dataTransferManage' })
       } else {
         that.$confirm('流程未保存，确认返回？', '提示', {
@@ -287,10 +294,8 @@ export default {
       let pOutParamsArr = []
       let pOutParamsRepeatArr = []
       this.outDataArray = []
-      this.transferType = []
       this.sourceBindingIds = []
-      let linkDataSortArray = [] // linkDataArray重新排序数组
-      // this.httpRequestFields = []
+      let linkDataSortArray = [] // linkDataArray重新排序
       nodeDataArray.map(item => {
         // if (item.category !== 'GROUP_CHOICE' && item.category !== 'FORK_JOIN') {
         //   if (!item.data) {
@@ -358,7 +363,6 @@ export default {
         } else {
           if (item.data) {
             this.outDataArray.push(item)
-            this.transferType.push(item.data.configItems.type)
             this.sourceBindingIds.push(item.data.configItems.id)
             let nodeLink = mySelf.myDiagram.findNodeForKey(item.key)  // 获取节点对象
             let nodeA = nodeLink.findNodesInto().each(function (node) { return node })
@@ -370,7 +374,7 @@ export default {
           }
         }
       })
-      // let pOutParamsRepeatKeyArr = delObj(pOutParamsArr)
+      // 同一节点下配置的决策方式不能重复
       if (pOutParamsArr.length) {
         let pOutParamsKeyArr = []
         pOutParamsArr.map(item => {
@@ -382,7 +386,7 @@ export default {
           }
         })
       }
-      // 对linkDataArray进行重新排序
+      // 对linkDataArray进行重新排序 整体连线从上到下，可以不分左右顺序
       linkDataArray.map(item => {
         if (item.from === '1') {
           linkDataSortArray.unshift(item)
@@ -425,13 +429,12 @@ export default {
         templateId: this.$store.state.canvasFlow.saveDate.templateId,
         taskScheduleConfig: this.$store.state.canvasFlow.saveDate.taskScheduleConfig,
         increModel: this.$store.state.canvasFlow.saveDate.increModel,
-        id: this.$store.state.canvasFlow.saveDate.id,
+        // id: this.$store.state.canvasFlow.saveDate.id,
         decisionType: this.$store.state.canvasFlow.saveDate.decisionType,
         transferName: this.$store.state.canvasFlow.saveDate.transferName
       }
       params.configJson = jsonData
       params.sourceBindingIds = this.sourceBindingIds
-      // params.transferType = this.transferType.join(',')
       if (this.$store.state.canvasFlow.outParams.length) {
         this.$store.state.canvasFlow.outParams.forEach(item => {
           params.outParams.push({value: item.value, id: item.fieldId, sourceTable: item.sourceTable})
@@ -439,7 +442,7 @@ export default {
       }
       // let url = this.id ? editFlowInfo : saveFlowInfo
       if (this.id) {
-        // params.id = this.id
+        params.id = this.id
         params.beeFlowId = this.$store.state.canvasFlow.editData.beeFlowId
       }
       addCanvasInfo(params).then(({data}) => {
@@ -609,7 +612,7 @@ export default {
                 minSize: new go.Size(100, NaN)
               }
             ),
-            textBlock(true)
+            textBlock(false)
           ),
           {
             doubleClick: function (e, node) { // 点击开始时触发事件

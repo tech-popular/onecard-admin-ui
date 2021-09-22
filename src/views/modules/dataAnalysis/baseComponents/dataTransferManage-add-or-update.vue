@@ -440,7 +440,7 @@
         size="small"
         v-if="!!baseForm.id && baseForm.decisionType === '0'"
       >复制创建新任务</el-button>
-      <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '1'"  @click="decisionCanvas" size="small">决策画布</el-button>
+      <el-button type="primary" v-if="baseForm.decisionType === '1'"  @click="decisionCanvas" size="small">决策画布</el-button>
       <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '0'"  @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
@@ -1439,6 +1439,7 @@
               return item.value === this.baseForm.templateId
               })
             }
+            params.canUpdate = this.canUpdate
             this.$store.commit('canvasFlow/setGroupNodeName', obj.text)
             // this.$store.commit('canvasFlow/setRowData', this.rowData)
             this.$store.commit('canvasFlow/setSaveDate', params)
