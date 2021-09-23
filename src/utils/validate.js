@@ -40,18 +40,18 @@ export function isInnerIPFn() {
    var BASE_URL = ''
   // 获取当前页面url
   var curPageUrl = window.location.href
-  console.log('curPageUrl-0  ', curPageUrl)
+  // console.log('curPageUrl-0  ', curPageUrl)
 
   var reg1 = /(http|ftp|https|www):\/\//g // 去掉前缀
   curPageUrl = curPageUrl.replace(reg1, '')
-  console.log('curPageUrl-1' + curPageUrl)
+  // console.log('curPageUrl-1' + curPageUrl)
 
   var reg2 = /\:+/g // 替换冒号为一点
   curPageUrl = curPageUrl.replace(reg2, '.')
-  console.log('curPageUrl-2  ' + curPageUrl)
+  // console.log('curPageUrl-2  ' + curPageUrl)
 
   curPageUrl = curPageUrl.split('.')// 通过一点来划分数组
-  console.log('curPageUrl:', curPageUrl)
+  // console.log('curPageUrl:', curPageUrl)
 
   var ipAddress = curPageUrl[0] + '.' + curPageUrl[1] + '.' + curPageUrl[2] + '.' + curPageUrl[3]
 
@@ -86,7 +86,7 @@ export function isInnerIPFn() {
     //  BASE_URL = 'http://222.240.233.67:9010' // 外网
     BASE_URL = false // 外网
   }
-  console.log('BASE_URL:', BASE_URL)
+  // console.log('BASE_URL:', BASE_URL)
   return BASE_URL
 }
 

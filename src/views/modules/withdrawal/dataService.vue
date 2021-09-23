@@ -2,8 +2,8 @@
   <div class="mod-config">
     <el-form :inline="true">
       <el-form-item>
-        <el-button type="primary"  @click="addOrUpdateHandle()">新建提数申请</el-button>
-        <el-button type="primary" @click="searchHistory()">我的历史提数</el-button>
+        <el-button type="primary"  @click="addOrUpdateHandle">新建提数申请</el-button>
+        <el-button type="primary" @click="searchHistory">我的历史提数</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -22,23 +22,13 @@
         </template>
       </el-table-column>
       <el-table-column prop="ipAddress" header-align="center" align="center" label="申请时间"></el-table-column>
-      <el-table-column
-        prop="cron"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="提数类型"
-      ></el-table-column>
-      <el-table-column
-        prop="sql"
-        header-align="center"
-        align="center"
-        label="接收时间">
-      </el-table-column>
+      <el-table-column prop="cron" header-align="center" align="center" show-overflow-tooltip label="提数类型"></el-table-column>
+      <el-table-column prop="sql" header-align="center" align="center" label="接收时间"></el-table-column>
 			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="申请状态"></el-table-column>
 			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="是否失效"></el-table-column>
-			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="申请状态"></el-table-column>
-			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="申请状态"></el-table-column>
+			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="失效原因"></el-table-column>
+			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="距离失效日期"></el-table-column>
+      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="接收人"></el-table-column>
       <!-- <el-table-column prop="enable" header-align="center" align="center" label="是否启用">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.enable === 1" size="small">正常</el-tag>
@@ -56,6 +46,7 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
 		<addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate"></addOrUpdate>
+    <dataServiceHistory v-if="dataServiceHistoryVisible" ref="dataServiceHistory"></dataServiceHistory>
   </div>
 </template>
 <style>
@@ -65,6 +56,7 @@
 </style>
 <script>
 import addOrUpdate from './dataService-add-or-update'
+import dataServiceHistory from './dataService-history'
 // import isInnerIPFn from '../../../utils/validate'
 export default {
   data () {
@@ -75,10 +67,11 @@ export default {
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      dataServiceHistoryVisible: false
     }
   },
-  components: {addOrUpdate},
+  components: { addOrUpdate, dataServiceHistory },
   activated () {
     this.getDataList()
   },
@@ -108,6 +101,10 @@ export default {
       })
     },
     searchHistory () {
+      this.dataServiceHistoryVisible = true
+      this.$nextTick(() => {
+        this.$refs.dataServiceHistory.init()
+      })
     }
   }
 }
