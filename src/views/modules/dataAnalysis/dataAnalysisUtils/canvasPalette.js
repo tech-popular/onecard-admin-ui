@@ -14,7 +14,7 @@ export const palette = [
   {
     key: '3',
     category: 'HTTP_QUERY',
-    nodeName: 'http任务'
+    nodeName: '过滤节点'
   },
   {
     key: '4',

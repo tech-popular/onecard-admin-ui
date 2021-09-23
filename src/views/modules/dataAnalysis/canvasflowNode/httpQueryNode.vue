@@ -1,6 +1,6 @@
 <template>
 	<el-dialog 
-	  title="调用风控http"
+	  title="过滤节点"
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
@@ -9,7 +9,7 @@
 		<el-form :model="dataForm" v-loading="dataLoading"  ref="dataForm"  label-width="80px" :rules="dataRules">
       <el-row :gutter="20">
         <el-col :span="20" style="display:flex;">
-          <el-form-item prop="selectSourceData" label="http">
+          <el-form-item prop="selectSourceData" label="http任务">
             <el-select
               v-model="dataForm.selectSourceData"
               clearable
