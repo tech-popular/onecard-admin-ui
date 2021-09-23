@@ -346,6 +346,9 @@ export default {
       }, {
         value: 'list',
         label: 'list'
+      }, {
+        value: 'object',
+        label: 'object'
       }],
       baseRule: { // 基本信息校验规则
         type: [
