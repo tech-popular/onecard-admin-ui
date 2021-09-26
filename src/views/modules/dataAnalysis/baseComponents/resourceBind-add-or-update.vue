@@ -97,14 +97,14 @@
         </el-select>
       </el-form-item>
       <!-- 红包卡券 -->
-      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType">
-        <el-select v-model="dataForm.cardType" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
+      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="resourceCode" :rules="{ required: true, message: '请选择类型', trigger: 'blur' }">
+        <el-select v-model="dataForm.resourceCode" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardTypeList" :key="index" :value="item.rsId" :label="item.typeName"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'card'" prop="cardName">
         <el-select v-model="dataForm.cardName" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardVoucherNameList" :key="index" :value="item.code" :label="item.name"></el-option>
+            <el-option v-for="(item, index) in cardNameList" :key="index" :value="item.code" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
       <!-- HTTP -->
@@ -260,7 +260,7 @@
 </template>
 <script>
 import { dataTransferManageOutParams, dataTransferManageKafka, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
-import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo } from '@/api/dataAnalysis/sourceBinding'
+import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo, getCardInfo } from '@/api/dataAnalysis/sourceBinding'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -355,7 +355,7 @@ export default {
       cusSmsTypeList: [], // 短信类型list
       productNoList: [], // 短信签名list
       cardTypeList: [], // 红包卡券类型list
-      cardVoucherNameList: [], // 红包卡券name的list
+      cardNameList: [], // 红包卡券name的list
       httpResponseTypeOptions: [{
         value: 'map',
         label: 'map'
@@ -384,6 +384,37 @@ export default {
       }, {
         value: 'card',
         label: '红包/卡券'
+      }],
+      cardChianNameList: [{
+        id: '1',
+        label: '还款红包'
+      }, {
+        id: '2',
+        label: '借款红包'
+      }, {
+        id: '3',
+        label: '免息红包'
+      }, {
+        id: '4',
+        label: '提额红包'
+      }, {
+        id: '5',
+        label: '商城满减红包'
+      }, {
+        id: '6',
+        label: '接口红包'
+      }, {
+        id: '7',
+        label: '积分（无资源）'
+      }, {
+        id: '8',
+        label: '接口资源提额红包 '
+      }, {
+        id: '9',
+        label: '降息红包'
+      }, {
+        id: '12',
+        label: '减息券'
       }],
       baseRule: { // 基本信息校验规则
         type: [
@@ -954,10 +985,23 @@ export default {
     },
     //  红包卡券
     getcardVoucherData () {
-
+      getCardInfo().then(({data}) => {
+        if (data && data.status === '1') {
+          data.data.forEach(item => {
+            this.cardChianNameList.filter(citem => {
+              if (item.rsType == citem.id) {
+                item.typeName = citem.label
+              }
+            })
+          })
+          this.cardTypeList = data.data
+        } else {
+          this.cardTypeList = []
+        }
+      })
     },
     cardTypeChange () {
-
+      
     },
     changeOption () {
       // 出参选择

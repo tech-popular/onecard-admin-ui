@@ -22,3 +22,5 @@ export const getSmsSignInfo = () => httpGet(da + `data/resource/smart/getSmsSign
 export const getSmsStyleInfo = () => httpGet(da + `data/resource/smart/getSmsStyleInfo`) // 短信类型
 // 查询资源绑定的topic
 export const selectSmartTransferTopic = (params) => httpGet(da + `resource/binding/selectSmartTransferTopic`, params)
+// 红包卡券
+export const getCardInfo = () => httpGet(da + `data/resource/smart/getCardInfo`) // 短信类型
