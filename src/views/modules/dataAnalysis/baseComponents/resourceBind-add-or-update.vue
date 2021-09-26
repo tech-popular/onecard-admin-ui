@@ -348,10 +348,7 @@ export default {
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
-        switchTemplate: '',  // switch判断项集合
-        // 红包卡券
-        cardType: '',
-        cardName: ''
+        switchTemplate: '' // switch判断项集合
       },
       paramsNum: 0,
       outParamsList: [],
@@ -465,12 +462,8 @@ export default {
         templateContent: [
           { required: true, message: '请输入模板内容', trigger: 'blur' }
         ],
-        // 红包卡券
-        cardType: [
-          { required: true, message: '请选择红包/卡券类型', trigger: 'blur' }
-        ],
-        cardName: [
-          { required: true, message: '请选择红包/卡券名称', trigger: 'blur' }
+        telTemplateValue: [
+          { required: true, message: '请选择模板内容', trigger: 'input' }
         ]
       }
     }
@@ -529,9 +522,7 @@ export default {
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
-        switchTemplate: '',  // switch判断项集合
-        cardType: '',
-        cardName: ''
+        switchTemplate: '' // switch判断项集合
       }
       this.target = ''
       this.createTime = ''
@@ -616,6 +607,14 @@ export default {
               this.extraParamsVisible = false
               getResourceInfoFromType(res.data.data.bindingConfig.type).then(({data}) => {
                 if (data && data.status === '1') {
+                  data.data && data.data.forEach(item => {
+                    item.value = item.name
+                    if (item.code == this.dataForm.resourceCode) {
+                      this.dataForm.telTemplateValue = item.name
+                    } else {
+                      this.dataForm.telTemplateValue = this.dataForm.resourceCode
+                    }
+                  })
                   this.telOrAiList = data.data
                 }
               })
@@ -889,7 +888,7 @@ export default {
         })
       }
       if (value === 'card') {
-        this.getcardVoucherData ()
+        this.getcardVoucherData()
       }
     },
      // 编辑类型改变
@@ -931,6 +930,33 @@ export default {
         this.$set(this.dataForm, this.dataForm.smsContent, val)
       } else {
         this.$set(this.dataForm, this.dataForm.smsContent, '')
+      }
+    },
+     // 电销
+    querySearch(queryString, cb) {
+      let telOrAiList = this.telOrAiList
+      telOrAiList.length && telOrAiList.forEach(item => {
+        item.value = item.name
+      })
+      let results = queryString ? telOrAiList.filter(this.createFilter(queryString)) : telOrAiList
+      // 调用 callback 返回建议列表的数据
+      cb(results)
+    },
+    createFilter(queryString) {
+      return (telOrAiList) => {
+        return (telOrAiList.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
+    handleSelect(item) {
+      this.dataForm.telTemplateValue = item.value
+      this.dataForm.resourceCode = item.code
+      this.dataForm.resourceId = item.id
+    },
+    blurInputTle(e) {
+      if (e.target.value) {
+        this.dataForm.telTemplateValue = e.target.value
+        this.dataForm.resourceCode = e.target.value
+        this.dataForm.resourceId = ''
       }
     },
     // push通知方式
@@ -1014,8 +1040,7 @@ export default {
         }
       })
     },
-    cardTypeChange () {
-      
+    cardTypeChange () {      
     },
     changeOption () {
       // 出参选择

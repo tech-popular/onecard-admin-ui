@@ -243,13 +243,13 @@ export default {
   },
   components: { Treeselect, InputTag },
   methods: {
-    init (link, channelCode) {
+    init (link) {
       this.visible = true
       this.from = link.data.from
       this.to = link.data.to
       this.num = link.data.num
       this.dataForm = this.dataFormTemp
-      this.channelCode = channelCode
+      this.channelCode =  this.$store.state.canvasFlow.channelCode
       if (link.data.data) {
         this.loading = true
         this.dataForm = link.data.data.configItems
@@ -264,7 +264,7 @@ export default {
     },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata({
-        channelCode: this.$store.state.canvasFlow.saveDate.channelCode,
+        channelCode:  this.$store.state.canvasFlow.channelCode,
         flag: this.id ? '-1' : '1'
       }).then(({data}) => {
         if (data.status !== '1') {
@@ -277,7 +277,8 @@ export default {
         }
       })
     },
-    filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
+     // 清洗数据，按selectVue的格式重新组织指标数据
+    filterAllCata (tree) {
       let arr = []
       if (!!tree && tree.length !== 0) {
         tree.forEach((item, index) => {
@@ -292,22 +293,24 @@ export default {
             obj.dataStandar = item.dataStandar
             obj.fieldId = item.id
             obj.channelCode = item.channelCode
-            obj.enable = item.enable
           } else {
             obj.id = item.id
             obj.label = item.name
           }
+          // if (this.filterAllCata(item.dataCataLogList).length) { // 指标层 ，无children
+          //   obj.children = this.filterAllCata(item.dataCataLogList)
+          //   arr.push(obj)
           if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
             obj.children = this.filterAllCata(item.dataCata) // 指标集合
             arr.push(obj)
           } else if (this.filterAllCata(item.dataIndex).length) {
             obj.children = this.filterAllCata(item.dataIndex) // 指标集合
             arr.push(obj)
-          } else { // 指标父级层
+          } else {
             if (!item.fieldType) {
               obj.children = null
             } else {
-              arr.push(obj) // 每个指标都放在集合中
+              arr.push(obj)
             }
           }
         })
