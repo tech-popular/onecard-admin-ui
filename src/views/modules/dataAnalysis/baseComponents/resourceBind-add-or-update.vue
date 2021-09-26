@@ -91,11 +91,22 @@
           <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="65" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
         </el-form-item>
         <!-- 电销或ai -->
-      <el-form-item prop="resourceId" v-if="dataForm.type === 'tel' || dataForm.type === 'ai' " :label=" dataForm.type === 'tel'? '电销'  +'模板' : 'AI' +'模板'" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
+      <el-form-item prop="resourceId" v-if="dataForm.type === 'ai' "  label="AI模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
         <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
           <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
+            <el-form-item prop="telTemplateValue" v-if="dataForm.type === 'tel'" label="电销模板" :rules="{ required: true, message: '请选择模板', trigger: 'input' }">
+          <el-autocomplete
+          class="inline-input"
+          style="width: 400px;"
+          v-model="dataForm.telTemplateValue"
+          :fetch-suggestions="querySearch"
+          placeholder="请输入内容"
+          @select="handleSelect"
+          @blur="blurInputTle"
+          ></el-autocomplete>
+        </el-form-item>
       <!-- 红包卡券 -->
       <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="resourceCode" :rules="{ required: true, message: '请选择类型', trigger: 'blur' }">
         <el-select v-model="dataForm.resourceCode" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
@@ -317,6 +328,7 @@ export default {
         extraParams: [], // 额外出参
         channelCode: '', // 用户渠道
         // outParams: [] // 绑定的出参
+        telTemplateValue: '',
         /* push参数 */
         pushType: '',
         pushTitle: '',
@@ -497,6 +509,7 @@ export default {
         smsContent: '', // 短信内容
         extraParams: [],
         fixedParams: [],
+        telTemplateValue: '',
         /* push参数 */
         pushType: '',
         pushTitle: '',
@@ -831,6 +844,7 @@ export default {
         smsContent: '', // 短信内容
         extraParams: [],
         fixedParams: [],
+        telTemplateValue: '',
         /* push参数 */
         pushType: '',
         pushTitle: '',
