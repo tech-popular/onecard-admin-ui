@@ -364,6 +364,40 @@
               </div>
             </el-col>
           </el-row>
+          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
+             <el-col style="width: 8.33333%;">
+              <el-form-item  prop="transferType">
+                <el-checkbox label="push" name="transferType" v-model="baseForm.transferType" 
+                @change="checked=>changeDistribution(checked, 'cardVoucher')"
+                style="margin-left: 8px;">红包/卡券</el-checkbox>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10" style="display:flex;">
+              <el-form-item prop="cardVoucherId">
+                <el-select
+                  v-model= "baseForm.cardVoucherId"
+                  clearable
+                  filterable
+                  @change="cardVoucherSelectChange"
+                  style="margin-right:10px; width:270px;"
+                  placeholder="请选择">
+                  <el-option
+                    v-for="item in cardVoucherIdList"
+                    :key="item.id"
+                    :label="item.resourceName"
+                    :value="item.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+               <div>
+                <el-tooltip placement="top" v-if="baseForm.cardVoucherId">
+                  <div slot="content">{{baseForm.cardVoucherIdParams}}</div>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+                </el-tooltip>
+                <div v-if="this.baseForm.transferType.indexOf('cardVoucher') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('cardVoucher')">{{canUpdate? '配置' : '查看' }}</div>
+              </div>
+            </el-col>
+          </el-row>
           <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
@@ -450,6 +484,7 @@
     <telNode v-if="telNodeVisible" ref="telNode" @updateList="changeDistribution"></telNode>
     <aiNode v-if="aiNodeVisible" ref="aiNode" @updateList="changeDistribution"></aiNode>
     <pushNode v-if="pushNodeVisible" ref="pushNode" @updateList="changeDistribution"></pushNode>
+    <cardVoucherNode v-if="cardVoucherVisible" ref="cardVoucherNode" @updateList="changeDistribution"></cardVoucherNode>
   </el-drawer>
 </template>
 <script>
@@ -473,6 +508,7 @@
   import telNode from './transconfigureNode/telNode'
   import aiNode from './transconfigureNode/aiNode'
   import pushNode from './transconfigureNode/pushNode'
+  import cardVoucherNode from './transconfigureNode/cardVoucherNode'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -506,6 +542,13 @@
       }
        let validatePushId = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('push') > -1 && this.baseForm.pushId === '') {
+          callback(new Error('请选择'))
+        } else {
+          callback()
+        }
+      }
+      let validatecardVoucherId = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('cardVoucher') > -1 && this.baseForm.cardVoucherId === '') {
           callback(new Error('请选择'))
         } else {
           callback()
@@ -586,6 +629,8 @@
           aiParams: '',
           pushId: '',
           pushParams: '',
+          cardVoucherId: '',
+          cardVoucherIdParams: '',
           triggerMode: '0', // 下发类型，默认0主动型 1被动
           decisionType: '0'
         },
@@ -622,6 +667,7 @@
         telIdList: [],
         aiIdList: [],
         pushIdList: [],
+        cardVoucherIdList: [],
         intelligentDistributionParams: [],
         transferLogVisible: false,
         transferLogList: [],
@@ -630,6 +676,7 @@
         telNodeVisible: false,
         aiNodeVisible: false,
         pushNodeVisible: false,
+        cardVoucherVisible: false,
         baseRule: {
           decisionType: [
             { required: true, message: '请选择决策方式', trigger: 'change' }
@@ -689,6 +736,9 @@
           ],
           pushId: [
             {validator: validatePushId}
+          ],
+          cardVoucherId: [
+            {validator: validatecardVoucherId}
           ]
           //  kafkaServer: [
           //  { required: true, message: '请选择数据源', trigger: 'change' }
@@ -721,7 +771,7 @@
 
     },
 
-    components: { Treeselect, transferLog, kafkaNode, smsNode, telNode, aiNode, pushNode },
+    components: { Treeselect, transferLog, kafkaNode, smsNode, telNode, aiNode, pushNode, cardVoucherNode },
 
     methods: {
       // 树加载
@@ -1325,6 +1375,8 @@
         this.baseForm.aiParams = ''
         this.baseForm.pushId = ''
         this.baseForm.pushParams = ''
+        this.baseForm.cardVoucherId = ''
+        this.baseForm.cardVoucherIdParams = ''
         this.baseForm.templateId = ''
         this.rowData.authOwner = ''
         this.rowData.authOtherList = []
@@ -1677,6 +1729,11 @@
             this.pushNodeVisible = true
             this.$nextTick(() => {
               this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId, this.canUpdate)
+            })
+          } else if (val === 'cardVoucher') {
+            this.cardVoucherVisible = true
+            this.$nextTick(() => {
+              this.$refs.cardVoucherNode.init(this.channelCode, this.baseForm.cardVoucherId, this.canUpdate)
             })
           }
         } else {

@@ -23,12 +23,12 @@
 				</el-form-item>
 			<el-form-item label="类型" prop="type"> 
 				<el-select v-model="dataForm.type" @change="changeType" style="width: 400px">
-					<el-option label="kafka" value="kafka"></el-option>
-					<el-option label="短信" value="sms"></el-option>
-          <el-option label="电销" value="tel"></el-option>
-          <el-option label="ai" value="ai"></el-option>
-          <el-option label="push" value="push"></el-option>
-          <el-option label="HTTP" value="http"></el-option>
+          <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
 				</el-select>
 			</el-form-item>
       <!-- kafka -->
@@ -96,6 +96,17 @@
           <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
+      <!-- 红包卡券 -->
+      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType">
+        <el-select v-model="dataForm.cardType" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'card'" prop="cardName">
+        <el-select v-model="dataForm.cardName" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardVoucherNameList" :key="index" :value="item.code" :label="item.name"></el-option>
+        </el-select>
+      </el-form-item>
       <!-- HTTP -->
       <div v-if="dataForm.type === 'http'">
         <el-form-item label="URL" prop="url" :rules="baseRule.url">
@@ -142,7 +153,7 @@
         <el-form-item label="响应参数的数据类型" prop="responseType" :rules="baseRule.responseType"> 
           <el-select v-model="dataForm.responseType" placeholder="请选择响应参数的数据类型">
             <el-option
-              v-for="item in options"
+              v-for="item in httpResponseTypeOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value">
@@ -325,7 +336,10 @@ export default {
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
-        switchTemplate: ''  // switch判断项集合
+        switchTemplate: '',  // switch判断项集合
+        // 红包卡券
+        cardType: '',
+        cardName: ''
       },
       paramsNum: 0,
       outParamsList: [],
@@ -340,7 +354,9 @@ export default {
       mysqlServerList: [],
       cusSmsTypeList: [], // 短信类型list
       productNoList: [], // 短信签名list
-      options: [{
+      cardTypeList: [], // 红包卡券类型list
+      cardVoucherNameList: [], // 红包卡券name的list
+      httpResponseTypeOptions: [{
         value: 'map',
         label: 'map'
       }, {
@@ -349,6 +365,25 @@ export default {
       }, {
         value: 'object',
         label: 'object'
+      }],
+      typeOptions: [{
+        value: 'sms',
+        label: '短信'
+      }, {
+        value: 'tel',
+        label: '电销'
+      }, {
+        value: 'ai',
+        label: 'AI'
+      }, {
+        value: 'push',
+        label: 'Push'
+      }, {
+        value: 'http',
+        label: 'HTTP'
+      }, {
+        value: 'card',
+        label: '红包/卡券'
       }],
       baseRule: { // 基本信息校验规则
         type: [
@@ -369,6 +404,7 @@ export default {
         smsContent: [
           { required: true, message: '请输入短信内容', trigger: 'blur' }
         ],
+        //  HTTP
         url: [
           { required: true, message: '请输入URL地址', trigger: 'blur' },
           { required: true, validator: NullKongGeRule, trigger: 'change' }
@@ -385,6 +421,13 @@ export default {
         ],
         templateContent: [
           { required: true, message: '请输入模板内容', trigger: 'blur' }
+        ],
+        // 红包卡券
+        cardType: [
+          { required: true, message: '请选择红包/卡券类型', trigger: 'blur' }
+        ],
+        cardName: [
+          { required: true, message: '请选择红包/卡券名称', trigger: 'blur' }
         ]
       }
     }
@@ -442,7 +485,9 @@ export default {
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
-        switchTemplate: ''  // switch判断项集合
+        switchTemplate: '',  // switch判断项集合
+        cardType: '',
+        cardName: ''
       }
       this.target = ''
       this.createTime = ''
@@ -774,7 +819,9 @@ export default {
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
-        switchTemplate: ''  // switch判断项集合
+        switchTemplate: '',  // switch判断项集合
+        cardType: '',
+        cardName: ''
       }
       this.target = ''
       this.extraParams = []
@@ -795,6 +842,9 @@ export default {
             this.telOrAiList = []
           }
         })
+      }
+      if (value === 'card') {
+        this.getcardVoucherData ()
       }
     },
      // 编辑类型改变
@@ -902,19 +952,13 @@ export default {
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
-    // // HTTP
-    // urlParamsBlur () {
-    //   let urlParams = this.dataForm.url.match(/{(.*?)}/g)
-    //   if (urlParams && urlParams.length) {
-    //     this.extraParamsVisible = true
-    //     this.paramsNum = urlParams.length
-    //   } else {
-    //     this.extraParamsVisible = false
-    //     this.extraParams = []
-    //     this.dataForm.extraParams = []
-    //     this.paramsNum = 0
-    //   }
-    // },
+    //  红包卡券
+    getcardVoucherData () {
+
+    },
+    cardTypeChange () {
+
+    },
     changeOption () {
       // 出参选择
       this.$refs.dataForm.clearValidate('extraParams')
