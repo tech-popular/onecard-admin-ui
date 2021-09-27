@@ -390,10 +390,12 @@ export default {
       }, {
         value: 'http',
         label: 'HTTP'
-      }, {
-        value: 'card',
-        label: '红包/卡券'
-      }],
+      }
+      // {
+      //   value: 'card',
+      //   label: '红包/卡券'
+      // }
+      ],
       cardChianNameList: [{
         id: '1',
         label: '还款红包'
@@ -1040,8 +1042,13 @@ export default {
         }
       })
     },
-    cardTypeChange () {      
-    },
+    // cardTypeChange () {
+    //   this.cardTypeList.forEach(item => {
+    //     if (item.rsId === this.dataForm.resourceCode) {
+    //       this.cardNameList.push(item)
+    //     }
+    //   })
+    // },
     changeOption () {
       // 出参选择
       this.$refs.dataForm.clearValidate('extraParams')

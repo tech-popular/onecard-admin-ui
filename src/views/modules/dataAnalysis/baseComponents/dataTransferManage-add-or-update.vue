@@ -364,7 +364,7 @@
               </div>
             </el-col>
           </el-row>
-          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
+          <!-- <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
              <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
                 <el-checkbox label="push" name="transferType" v-model="baseForm.transferType" 
@@ -397,7 +397,7 @@
                 <div v-if="this.baseForm.transferType.indexOf('cardVoucher') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('cardVoucher')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
-          </el-row>
+          </el-row> -->
           <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">

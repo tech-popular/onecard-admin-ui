@@ -249,7 +249,7 @@ export default {
       this.to = link.data.to
       this.num = link.data.num
       this.dataForm = this.dataFormTemp
-      this.channelCode =  this.$store.state.canvasFlow.channelCode
+      this.channelCode = this.$store.state.canvasFlow.channelCode
       if (link.data.data) {
         this.loading = true
         this.dataForm = link.data.data.configItems
@@ -264,7 +264,7 @@ export default {
     },
     getSelectAllCata (fn) { // 获取所有指标
       selectAllCata({
-        channelCode:  this.$store.state.canvasFlow.channelCode,
+        channelCode: this.$store.state.canvasFlow.channelCode,
         flag: this.id ? '-1' : '1'
       }).then(({data}) => {
         if (data.status !== '1') {
