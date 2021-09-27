@@ -24,7 +24,7 @@
           <el-option label="电销" value="tel"></el-option>
           <el-option label="AI" value="ai"></el-option>
 					<el-option label="push" value="push"></el-option>
-          <!-- <el-option label="红包/卡券" value="card"></el-option> -->
+          <el-option label="红包/卡券" value="card"></el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item  prop="params"  label="出参">

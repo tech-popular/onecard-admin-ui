@@ -59,6 +59,7 @@ export default {
       type: '', // 分群类型
       flowTypeArr: [], // 分流类型
       sourceBindingIds: [], // 绑定的id
+      transferType: [],
       outDataArray: [],
       dataQueryNodeVisible: false,
       outparamsNodeVisible: false,
@@ -82,7 +83,8 @@ export default {
         {value: 'sms', lable: '短信'},
         {value: 'tel', lable: '电销'},
         {value: 'ai', lable: 'AI'},
-        {value: 'push', lable: 'Push'}
+        {value: 'push', lable: 'Push'},
+        {value: 'card', lable: '红包/卡券'}
       ],
       saveFormValidate: {
         // name: [
@@ -295,6 +297,7 @@ export default {
       // let pOutParamsRepeatArr = []
       this.outDataArray = []
       this.sourceBindingIds = []
+      this.transferType = []
       let linkDataSortArray = [] // linkDataArray重新排序
       nodeDataArray.map(item => {
         // if (item.category !== 'GROUP_CHOICE' && item.category !== 'FORK_JOIN') {
@@ -364,6 +367,7 @@ export default {
           if (item.data) {
             this.outDataArray.push(item)
             this.sourceBindingIds.push(item.data.configItems.id)
+            this.transferType.push(item.data.configItems.type)
             let nodeLink = mySelf.myDiagram.findNodeForKey(item.key)  // 获取节点对象
             let nodeA = nodeLink.findNodesInto().each(function (node) { return node })
             pOutParamsArr.push(
@@ -434,6 +438,7 @@ export default {
         transferName: this.$store.state.canvasFlow.saveDate.transferName
       }
       params.configJson = jsonData
+      params.transferType = this.transferType.join(',')
       params.sourceBindingIds = this.sourceBindingIds
       if (this.$store.state.canvasFlow.outParams.length) {
         this.$store.state.canvasFlow.outParams.forEach(item => {

@@ -364,25 +364,25 @@
               </div>
             </el-col>
           </el-row>
-          <!-- <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
+          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
              <el-col style="width: 8.33333%;">
               <el-form-item  prop="transferType">
-                <el-checkbox label="push" name="transferType" v-model="baseForm.transferType" 
-                @change="checked=>changeDistribution(checked, 'cardVoucher')"
+                <el-checkbox label="card" name="transferType" v-model="baseForm.transferType" 
+                @change="checked=>changeDistribution(checked, 'card')"
                 style="margin-left: 8px;">红包/卡券</el-checkbox>
               </el-form-item>
             </el-col>
             <el-col :span="10" style="display:flex;">
-              <el-form-item prop="cardVoucherId">
+              <el-form-item prop="cardId">
                 <el-select
-                  v-model= "baseForm.cardVoucherId"
+                  v-model= "baseForm.cardId"
                   clearable
                   filterable
-                  @change="cardVoucherSelectChange"
+                  @change="cardSelectChange"
                   style="margin-right:10px; width:270px;"
                   placeholder="请选择">
                   <el-option
-                    v-for="item in cardVoucherIdList"
+                    v-for="item in cardIdList"
                     :key="item.id"
                     :label="item.resourceName"
                     :value="item.id">
@@ -390,14 +390,14 @@
                 </el-select>
               </el-form-item>
                <div>
-                <el-tooltip placement="top" v-if="baseForm.cardVoucherId">
-                  <div slot="content">{{baseForm.cardVoucherIdParams}}</div>
+                <el-tooltip placement="top" v-if="baseForm.cardId">
+                  <div slot="content">{{baseForm.cardIdParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('cardVoucher') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('cardVoucher')">{{canUpdate? '配置' : '查看' }}</div>
+                <div v-if="this.baseForm.transferType.indexOf('card') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('card')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
-          </el-row> -->
+          </el-row>
           <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
@@ -548,7 +548,7 @@
         }
       }
       let validatecardVoucherId = (rule, value, callback) => {
-        if (this.baseForm.transferType.indexOf('cardVoucher') > -1 && this.baseForm.cardVoucherId === '') {
+        if (this.baseForm.transferType.indexOf('card') > -1 && this.baseForm.cardId === '') {
           callback(new Error('请选择'))
         } else {
           callback()
@@ -629,8 +629,8 @@
           aiParams: '',
           pushId: '',
           pushParams: '',
-          cardVoucherId: '',
-          cardVoucherIdParams: '',
+          cardId: '',
+          cardIdParams: '',
           triggerMode: '0', // 下发类型，默认0主动型 1被动
           decisionType: '0'
         },
@@ -667,7 +667,7 @@
         telIdList: [],
         aiIdList: [],
         pushIdList: [],
-        cardVoucherIdList: [],
+        cardIdList: [],
         intelligentDistributionParams: [],
         transferLogVisible: false,
         transferLogList: [],
@@ -737,7 +737,7 @@
           pushId: [
             {validator: validatePushId}
           ],
-          cardVoucherId: [
+          cardId: [
             {validator: validatecardVoucherId}
           ]
           //  kafkaServer: [
@@ -1140,6 +1140,9 @@
         if (data.pushId != '' && data.transferType.includes('push')) {
           postData.sourceBindingIds.push(data.pushId)
         }
+        if (data.cardId != '' && data.transferType.includes('card')) {
+          postData.sourceBindingIds.push(data.cardId)
+        }
         postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
@@ -1330,6 +1333,14 @@
                   this.pushSelectChange()
                 }
               })
+            } else if (type === 'card') {
+              this.cardIdList = data.data
+              data.data.filter(item => {
+                if (sourceBindingIds.indexOf(item.id) > -1) {
+                  this.baseForm.cardId = item.id
+                  this.cardSelectChange()
+                }
+              })
             }
           }
           this.$nextTick(() => {
@@ -1375,8 +1386,8 @@
         this.baseForm.aiParams = ''
         this.baseForm.pushId = ''
         this.baseForm.pushParams = ''
-        this.baseForm.cardVoucherId = ''
-        this.baseForm.cardVoucherIdParams = ''
+        this.baseForm.cardId = ''
+        this.baseForm.cardIdParams = ''
         this.baseForm.templateId = ''
         this.rowData.authOwner = ''
         this.rowData.authOtherList = []
@@ -1529,14 +1540,24 @@
                   this.aiIdList = data.data
                 } else if (val === 'push') {
                   this.pushIdList = data.data
+                } else if (val === 'card') {
+                  this.cardIdList = data.data
                 }
               } else {
                 this.$message.error(data.message)
-                this.kafkaServerList = []
-                this.smsIdList = []
-                this.telIdList = []
-                this.aiIdList = []
-                this.pushIdList = []
+                 if (val === 'kafka') {
+                  this.kafkaServerList = []
+                } else if (val === 'sms') {
+                  this.smsIdList = []
+                } else if (val === 'tel') {
+                  this.telIdList = []
+                } else if (val === 'ai') {
+                  this.aiIdList = []
+                } else if (val === 'push') {
+                  this.pushIdList = []
+                } else if (val === 'card') {
+                  this.cardIdList = []
+                }
               }
             })
           } else {
@@ -1561,6 +1582,10 @@
               this.baseForm.pushId = ''
               this.baseForm.pushParams = ''
               this.pushIdList = []
+            } else if (val === 'card') {
+              this.baseForm.cardId = ''
+              this.baseForm.cardIdParams = ''
+              this.cardIdList = []
             }
           }
         } else {
@@ -1702,6 +1727,22 @@
           }
         }
       },
+      // 红包卡券
+      cardSelectChange () {
+         if (this.baseForm.cardId) {
+          let arr = this.cardIdList.filter(item => item.id === this.baseForm.cardId)
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
+          if (paramsData) {
+            let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
+            this.baseForm.cardIdParams = arr1.join(',')
+          } else {
+            this.baseForm.cardIdParams = ''
+          }
+        }
+      },
       //  下发方式配置
       editConfigure (val) {
         if (this.channelCode) {
@@ -1730,18 +1771,15 @@
             this.$nextTick(() => {
               this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId, this.canUpdate)
             })
-          } else if (val === 'cardVoucher') {
+          } else if (val === 'card') {
             this.cardVoucherVisible = true
             this.$nextTick(() => {
-              this.$refs.cardVoucherNode.init(this.channelCode, this.baseForm.cardVoucherId, this.canUpdate)
+              this.$refs.cardVoucherNode.init(this.channelCode, this.baseForm.cardId, this.canUpdate)
             })
           }
         } else {
           this.$message.error('请选择分群名称')
         }
-      },
-      getintelligentDistribution () {
-
       },
       // 关闭
       cancelHandle () {
