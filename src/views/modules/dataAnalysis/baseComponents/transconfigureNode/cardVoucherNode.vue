@@ -4,17 +4,16 @@
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
-      <el-form-item prop="telTemplateValue" label="电销模板" :rules="{ required: true, message: '请选择模板', trigger: 'input' }">
-          <el-autocomplete
-            class="inline-input"
-            style="width: 400px;"
-            v-model="dataForm.telTemplateValue"
-            :fetch-suggestions="querySearch"
-            placeholder="请输入内容"
-            @select="handleSelect"
-            @blur="blurInputTle"
-          ></el-autocomplete>
-        </el-form-item>
+      <el-form-item v-if="dataForm.type === 'cardVoucher'" label="红包/卡券类型" prop="cardVoucherType">
+        <el-select v-model="dataForm.cardVoucherType" filterable  @change="changeCardVoucherType"  placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardVoucherTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'cardVoucher'" prop="cardVoucherName">
+        <el-select v-model="dataForm.cardVoucherName" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardVoucherNameList" :key="index" :value="item.code" :label="item.name"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
 				  <Treeselect
 						:options="outParamsList"
@@ -59,14 +58,13 @@ export default {
         resourceCode: '',
         fixedParams: [], // 固定出参
         channelCode: '', // 用户渠道
-        // outParams: [] // 绑定的出参
-        telTemplateValue: ''
+        cardVoucherType: '',
+        cardVoucherName: ''
       },
-      paramsNum: 0,
       outParamsList: [],
       fixedParams: [], // 固定出参
-      telOrAiList: [],
-      channelList: []
+      cardVoucherTypeList: [], // 红包卡券类型list
+      cardVoucherNameList: [] // 红包卡券name的list
     }
   },
   components: { Treeselect },
@@ -83,25 +81,26 @@ export default {
       this.dataForm = {
         id: id,
         channelCode: channelCode,
-        type: 'tel',
+        type: 'cardVoucher',
         resourceId: '',
         resourceName: '',
         resourceCode: '',
         fixedParams: [],
-        telTemplateValue: ''
+        cardVoucherType: '',
+        cardVoucherName: ''
       }
       this.outParamsList = []
       this.target = ''
       this.fixedParams = []
       this.fixedParamsvisible = false
-      this.getTelList()
+      // this.getTelList()
       this.telOrAiList = []
       this.visible = true
-      if (id) {
-        this.getLookData(id)
-      } else {
-        this.getOutParamsList()
-      }
+      // if (id) {
+      //   this.getLookData(id)
+      // } else {
+      //   this.getOutParamsList()
+      // }
     },
     // 回显
     getLookData (id) {
@@ -115,14 +114,6 @@ export default {
           this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
           getResourceInfoFromType(res.data.data.bindingConfig.type).then(({data}) => {
             if (data && data.status === '1') {
-              data.data && data.data.forEach(item => {
-                item.value = item.name
-                if (item.code == this.dataForm.resourceCode) {
-                  this.dataForm.telTemplateValue = item.name
-                } else {
-                  this.dataForm.telTemplateValue = this.dataForm.resourceCode
-                }
-              })
               this.telOrAiList = data.data
             }
           })
@@ -257,36 +248,9 @@ export default {
         }
       })
     },
-    //  // 电销或AI模板
-    // changeTelTemplate () {
-    //   this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
-    // },
-       // 电销
-    querySearch(queryString, cb) {
-        let telOrAiList = this.telOrAiList
-        telOrAiList.length && telOrAiList.forEach(item => {
-           item.value = item.name
-        })
-        let results = queryString ? telOrAiList.filter(this.createFilter(queryString)) : telOrAiList
-        // 调用 callback 返回建议列表的数据
-        cb(results)
-      },
-    createFilter(queryString) {
-      return (telOrAiList) => {
-        return (telOrAiList.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
-      }
-    },
-    handleSelect(item) {
-      this.dataForm.telTemplateValue = item.value
-      this.dataForm.resourceCode = item.code
-      this.dataForm.resourceId = item.id
-    },
-    blurInputTle(e) {
-      if (e.target.value) {
-        this.dataForm.telTemplateValue = e.target.value
-        this.dataForm.resourceCode = e.target.value
-        this.dataForm.resourceId = ''
-      }
+     // 电销或AI模板
+    changeTelTemplate () {
+      this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
     submitData () {
       this.$refs['dataForm'].validate((valid) => {
@@ -300,7 +264,7 @@ export default {
             resourceName: this.dataForm.resourceName,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
-            resourceId: this.dataForm.resourceId ? this.dataForm.resourceId.toString() : null,
+            resourceId: this.dataForm.resourceId.toString(),
             fixedParams: this.fixedParams.join(','),
             extraParams: ''
           }
@@ -313,7 +277,7 @@ export default {
                     duration: 1500,
                     onClose: () => {
                       this.visible = false
-                      this.$emit('updateList', true, 'tel')
+                      this.$emit('updateList', true, 'cardVoucher')
                       this.$refs['dataForm'].resetFields()
                     }
                   })
@@ -330,7 +294,7 @@ export default {
                     duration: 1500,
                     onClose: () => {
                       this.visible = false
-                      this.$emit('updateList', true, 'tel')
+                      this.$emit('updateList', true, 'cardVoucher')
                       this.$refs['dataForm'].resetFields()
                     }
                   })

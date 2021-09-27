@@ -1,19 +1,15 @@
 <template>
-  <el-dialog title="模板配置"
+	<el-dialog 
+	  title="过滤节点"
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
-    width="800px"
+    width="600px"
     :close-on-click-modal="false">
-    <el-form :model="dataForm" v-loading="dataLoading"  ref="dataForm" label-position="left" label-width="80px" :rules="dataRules">
-      <el-form-item prop="type" label="方式">
-        <el-select v-model="dataForm.type"  @change="changeType" placeholder="请选择方式" style="width: 300px">
-          <el-option v-for="(item, index) in issueTypeList" :key="index" :value="item.value" :label="item.lable"></el-option>
-        </el-select>
-      </el-form-item>
-     <el-row :gutter="20">
+		<el-form :model="dataForm" v-loading="dataLoading"  ref="dataForm"  label-width="80px" :rules="dataRules">
+      <el-row :gutter="20">
         <el-col :span="20" style="display:flex;">
-          <el-form-item prop="selectSourceData" label="资源">
+          <el-form-item prop="selectSourceData" label="http任务">
             <el-select
               v-model="dataForm.selectSourceData"
               clearable
@@ -30,11 +26,11 @@
             </el-select>
           </el-form-item>
             <div>
-            <el-tooltip placement="top" v-if="dataForm.selectSourceData">
+            <el-tooltip placement="top" v-if="dataForm.selectSourceData && dataForm.outParamsData">
               <div slot="content">{{dataForm.outParamsData}}</div>
               <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
             </el-tooltip>
-            <div v-if="dataForm.type" style="margin-top:2px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure">配置</div>
+            <div style="margin-top:2px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure">配置</div>
           </div>
         </el-col>
       </el-row>
@@ -43,11 +39,8 @@
       <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
-    <smsNode v-if="smsNodeVisible" ref="smsNode" @updateList="changeType"></smsNode>
-    <telNode v-if="telNodeVisible" ref="telNode" @updateList="changeType"></telNode>
-    <aiNode v-if="aiNodeVisible" ref="aiNode" @updateList="changeType"></aiNode>
-    <pushNode v-if="pushNodeVisible" ref="pushNode" @updateList="changeType"></pushNode>
-  </el-dialog>
+		 <httpNode v-if="httpNodeVisible" ref="httpNode" @updateList="changeType"></httpNode>
+	</el-dialog>
 </template>
 <script>
 import { dataTransferManageOutParams, selectResourceBindingList } from '@/api/dataAnalysis/dataTransferManage'
@@ -55,10 +48,7 @@ import { lookDataList, selectSmartTransferTopic } from '@/api/dataAnalysis/sourc
 // import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import smsNode from '../baseComponents/transconfigureNode/smsNode'
-import telNode from '../baseComponents/transconfigureNode/telNode'
-import aiNode from '../baseComponents/transconfigureNode/aiNode'
-import pushNode from '../baseComponents/transconfigureNode/pushNode'
+import httpNode from '../baseComponents/transconfigureNode/httpNode'
 export default {
   data () {
     return {
@@ -68,9 +58,6 @@ export default {
       channelCode: '',
       dataLoading: false,
       canUpdate: true,
-      // viewVisible: false,
-      // isEdit: false,
-      // smsOutParams: [],
       dataForm: {
         type: '',
         topic: '',
@@ -79,28 +66,16 @@ export default {
       },
       outParamsList: [],
       outParams: [], // 分群出参提交格式
-      issueTypeList: [
-        {value: 'sms', lable: '短信'},
-        {value: 'tel', lable: '电销'},
-        {value: 'ai', lable: 'AI'},
-        {value: 'push', lable: 'Push'}
-      ],
       seletDataList: [],
-      smsNodeVisible: false,
-      telNodeVisible: false,
-      aiNodeVisible: false,
-      pushNodeVisible: false,
+      httpNodeVisible: false,
       dataRules: {
-        type: [
-          { required: true, message: '请选择方式', trigger: 'change' }
-        ],
         selectSourceData: [
           { required: true, message: '请选择绑定资源', trigger: 'change' }
         ]
       }
     }
   },
- components: { Treeselect, smsNode, telNode, aiNode, pushNode },
+ components: { Treeselect, httpNode },
   methods: {
      // 树加载
     async loadOptions ({ action, parentNode, callback }) {
@@ -114,10 +89,10 @@ export default {
       this.channelCode = this.$store.state.canvasFlow.channelCode
       this.key = data.key
       this.outParams = []
+      this.changeType(true)
       if (data.data) {
         this.dataForm.type = data.data.configItems.type
         this.dataForm.selectSourceData = data.data.configItems.id
-        this.changeType(data.data.configItems.type, true)
         lookDataList(this.dataForm.selectSourceData).then(res => {
           if (res.data.status === '1') {
             let paramsData = res.data.data.bindingConfig.extraParams
@@ -139,11 +114,11 @@ export default {
         this.getOutParamsList()
       }
     },
-     // 改变下发方式
-    changeType (type, isChange) {
+    // 改变下发方式
+    changeType (isChange) {
       let params = {
         channelCode: this.channelCode,
-        type: this.dataForm.type
+        type: 'http'
       }
       if (!isChange) {
         this.dataForm.selectSourceData = ''
@@ -164,32 +139,10 @@ export default {
       })
     },
     editConfigure () {
-      switch (this.dataForm.type) {
-        case 'sms':
-          this.smsNodeVisible = true
-          this.$nextTick(() => {
-            this.$refs.smsNode.init(this.channelCode, this.dataForm.selectSourceData, this.canUpdate)
-          })
-          break
-        case 'tel':
-          this.telNodeVisible = true
-          this.$nextTick(() => {
-            this.$refs.telNode.init(this.channelCode, this.dataForm.selectSourceData, this.canUpdate)
-          })
-          break
-        case 'ai':
-          this.aiNodeVisible = true
-          this.$nextTick(() => {
-            this.$refs.aiNode.init(this.channelCode, this.dataForm.selectSourceData, this.canUpdate)
-          })
-          break
-        case 'push':
-          this.pushNodeVisible = true
-          this.$nextTick(() => {
-            this.$refs.pushNode.init(this.channelCode, this.dataForm.selectSourceData, this.canUpdate)
-          })
-          break
-      }
+      this.httpNodeVisible = true
+      this.$nextTick(() => {
+        this.$refs.httpNode.init(this.channelCode, this.dataForm.selectSourceData, this.canUpdate)
+      })
     },
     sourceSelectChange () {
       if (this.dataForm.selectSourceData) {
@@ -286,36 +239,18 @@ export default {
       let configItems = {}
       configItems.id = postData.selectSourceData
       configItems.type = postData.type
+      configItems.resourceName = arr[0].resourceName
       configItems.topic = postData.topic
-      if (postData.type === 'push') {
-        configItems.content = arr[0].content
-      } else {
-        if (postData.type === 'sms' && arr[0].content) {
-          let contentData = JSON.parse(arr[0].content)
-            configItems.cusSmsType = contentData.cusSmsType
-            configItems.content = contentData.content
-            configItems.resourceName = arr[0].resourceName
-            configItems.productNo = contentData.productNo
-        } else {
-          lookDataList(postData.selectSourceData).then(({data}) => {
-            if (data && data.status === '1') {
-              configItems.tempCode = data.data.bindingConfig.resourceCode
-                if (data.data.bindingConfig.type === 'sms') {
-                  configItems.channelId = data.data.resourceData.channelId
-                  configItems.systemCode = data.data.resourceData.systemCode
-                  let params = ''
-                  if (data.data.bindingConfig.extraParams) {
-                    let arr1 = this.getParamsEditList(data.data.bindingConfig.extraParams.split(','), this.outParamsList, [], true)
-                    arr1.forEach((item, index) => {
-                      index ? params = params + '##' + '${' + item.englishName + '}' : params = params + '${' + item.englishName + '}'
-                    })
-                  }
-                configItems.params = params
-              }
-            }
-          })
-        }
-      }
+      let bindingContent = JSON.parse(arr[0].content)
+      configItems.url = bindingContent.url
+      configItems.requestFields = bindingContent.requestFields
+      configItems.requestHeadFields = bindingContent.requestHeadFields
+      configItems.responseFields = bindingContent.responseFields
+      configItems.requestParamTemplateStatus = bindingContent.requestParamTemplateStatus
+      configItems.responseType = bindingContent.responseType
+      configItems.expression = bindingContent.expression
+      configItems.switchTemplate = bindingContent.switchTemplate
+      configItems.templateContent = bindingContent.templateContent
       return configItems
     },
     saveHandle () {
@@ -325,17 +260,16 @@ export default {
           let config = {
             configItems: params
           }
-          this.$store.commit('canvasFlow/setOutParams', [])
           this.$emit('close', { tag: 'save', data: { config: config, key: this.key } })
           this.dataLoading = false
-          this.$parent.outparamsNodeVisible = false
+          this.$parent.httpQueryNodeVisible = false
           this.$refs['dataForm'].resetFields()
         }
       })
     },
     cancelHandle () {
       this.visible = false
-      this.$parent.outparamsNodeVisible = false
+      this.$parent.httpQueryNodeVisible = false
     }
   }
 }

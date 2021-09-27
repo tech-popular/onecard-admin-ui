@@ -27,7 +27,7 @@
       <el-form-item prop="smsTemplate" v-if="dataForm.editType === '0'" label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" >
 				</el-input>
-					<p style="margin:0">
+					<p style="margin:0" v-if="dataForm.resourceCode">
               需要选择
             <span style="color:red" v-text="paramsNum"></span> 个参数
           </p>
@@ -257,6 +257,8 @@ export default {
             this.dataForm.resourceCode = ''
             this.dataForm.smsTemplate = ''
             this.target = ''
+            // this.dataForm.fixedParams = []
+            // this.fixedParams = []
           }
         }
       })
@@ -392,6 +394,8 @@ export default {
         this.extraParams = []
       } else {
         this.extraParamsVisible = true
+        this.dataForm.extraParams = []
+        this.extraParams = []
       }
       // this.dataForm.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].smsDesc
       this.dataForm.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].id
@@ -450,6 +454,7 @@ export default {
             id: this.dataForm.id,
             type: this.dataForm.type,
             resourceName: this.dataForm.editType === '0' ? '标准短信_' + this.dataForm.resourceName : '自定义短信_' + this.dataForm.resourceName,
+            channelId: this.dataForm.channelId,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
             resourceId: this.dataForm.editType === '0' ? this.dataForm.resourceId.toString() : null,

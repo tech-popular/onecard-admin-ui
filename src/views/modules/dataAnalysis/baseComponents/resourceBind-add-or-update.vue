@@ -21,13 +21,14 @@
 					</template>
 				</el-select>
 				</el-form-item>
-			<el-form-item label="下发类型" prop="type"> 
+			<el-form-item label="类型" prop="type"> 
 				<el-select v-model="dataForm.type" @change="changeType" style="width: 400px">
-					<el-option label="kafka" value="kafka"></el-option>
-					<el-option label="短信" value="sms"></el-option>
-          <el-option label="电销" value="tel"></el-option>
-          <el-option label="ai" value="ai"></el-option>
-          <el-option label="push" value="push">push</el-option>
+          <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
 				</el-select>
 			</el-form-item>
       <!-- kafka -->
@@ -71,7 +72,7 @@
       <el-form-item prop="smsTemplate" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" >
 				</el-input>
-					<p style="margin:0">
+					<p style="margin:0" v-if="dataForm.resourceCode">
               需要选择
             <span style="color:red" v-text="paramsNum"></span> 个参数
           </p>
@@ -105,7 +106,7 @@
           placeholder="请输入内容"
           @select="handleSelect"
           @blur="blurInputTle"
-    ></el-autocomplete>
+        ></el-autocomplete>
       </el-form-item>
       <!-- push -->
       <el-form-item label="推送方式：" prop="flag" v-if="dataForm.type === 'push'" :rules="{ required: true, message: '请选择推送方式', trigger: 'blur' }">
@@ -188,7 +189,8 @@
         </el-form-item>
       <el-form-item label="内容：" prop="msgContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
             <el-input type="textarea"  v-model="dataForm.msgContent" :autosize="{ minRows: 3}"  show-word-limit />
-        </el-form-item>
+      </el-form-item>
+      <!--  -->
       </div>
 		</el-form>
 		<div slot="footer" class="foot">
@@ -199,12 +201,37 @@
 </template>
 <script>
 import { dataTransferManageOutParams, dataTransferManageKafka, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
-import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo } from '@/api/dataAnalysis/sourceBinding'
+import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo, getCardInfo } from '@/api/dataAnalysis/sourceBinding'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   data () {
+    /**
+   * 空格校验
+   * @param rule
+   * @param value
+   * @param callback
+   * @constructor
+   */
+    let NullKongGeRule = (rule, value, callback) => {
+      const nullValue = /^[^\s]+$/
+      if (value !== '' && value !== null && value !== undefined) {
+        if (!nullValue.test(value)) {
+          callback(new Error('不能输入含空格'))
+        }
+      }
+      callback()
+    }
+    // let FlowCode = (rule, value, callback) => {
+    //   const nullValue = /^\w+$/
+    //   if (value !== '' && value !== null && value !== undefined) {
+    //     if (!nullValue.test(value)) {
+    //       callback(new Error('请输入正确格式'))
+    //     }
+    //   }
+    //   callback()
+    // }
     return {
       visible: false,
       extraParamsVisible: false,
@@ -231,6 +258,7 @@ export default {
         extraParams: [], // 额外出参
         channelCode: '', // 用户渠道
         // outParams: [] // 绑定的出参
+        telTemplateValue: '',
         /* push参数 */
         pushType: '',
         pushTitle: '',
@@ -241,7 +269,16 @@ export default {
         msgTitle: '',
         msgUrl: '',
         msgContent: '',
-        telTemplateValue: ''
+        // HTTP参数
+        url: '',  // url
+        // requestFields: '',
+        requestHeadFields: '',
+        responseFields: '',
+        templateContent: '',
+        requestParamTemplateStatus: 1,
+        responseType: '', // 两个选项map和list 默认是map
+        expression: '', // 判断表达式
+        switchTemplate: '' // switch判断项集合
       },
       paramsNum: 0,
       outParamsList: [],
@@ -256,6 +293,70 @@ export default {
       mysqlServerList: [],
       cusSmsTypeList: [], // 短信类型list
       productNoList: [], // 短信签名list
+      cardTypeList: [], // 红包卡券类型list
+      cardNameList: [], // 红包卡券name的list
+      httpResponseTypeOptions: [{
+        value: 'map',
+        label: 'map'
+      }, {
+        value: 'list',
+        label: 'list'
+      }, {
+        value: 'object',
+        label: 'object'
+      }],
+      typeOptions: [{
+        value: 'sms',
+        label: '短信'
+      }, {
+        value: 'tel',
+        label: '电销'
+      }, {
+        value: 'ai',
+        label: 'AI'
+      }, {
+        value: 'push',
+        label: 'Push'
+      }, {
+        value: 'http',
+        label: 'HTTP'
+      }
+      // {
+      //   value: 'card',
+      //   label: '红包/卡券'
+      // }
+      ],
+      cardChianNameList: [{
+        id: '1',
+        label: '还款红包'
+      }, {
+        id: '2',
+        label: '借款红包'
+      }, {
+        id: '3',
+        label: '免息红包'
+      }, {
+        id: '4',
+        label: '提额红包'
+      }, {
+        id: '5',
+        label: '商城满减红包'
+      }, {
+        id: '6',
+        label: '接口红包'
+      }, {
+        id: '7',
+        label: '积分（无资源）'
+      }, {
+        id: '8',
+        label: '接口资源提额红包 '
+      }, {
+        id: '9',
+        label: '降息红包'
+      }, {
+        id: '12',
+        label: '减息券'
+      }],
       baseRule: { // 基本信息校验规则
         type: [
           { required: true, message: '请选择下发类型', trigger: 'blur' }
@@ -274,6 +375,24 @@ export default {
         ],
         smsContent: [
           { required: true, message: '请输入短信内容', trigger: 'blur' }
+        ],
+        //  HTTP
+        url: [
+          { required: true, message: '请输入URL地址', trigger: 'blur' },
+          { required: true, validator: NullKongGeRule, trigger: 'change' }
+        ],
+        responseType: [
+          { required: true, message: '请选择响应参数的数据类型', trigger: 'blur' },
+          { required: false, validator: NullKongGeRule, trigger: 'change' }
+        ],
+        expression: [
+          { required: true, message: '请输入判断表达式', trigger: 'blur' }
+        ],
+        switchTemplate: [
+          { required: true, message: '请输入switch判断项集合', trigger: 'blur' }
+        ],
+        templateContent: [
+          { required: true, message: '请输入模板内容', trigger: 'blur' }
         ],
         telTemplateValue: [
           { required: true, message: '请选择模板内容', trigger: 'input' }
@@ -315,6 +434,7 @@ export default {
         smsContent: '', // 短信内容
         extraParams: [],
         fixedParams: [],
+        telTemplateValue: '',
         /* push参数 */
         pushType: '',
         pushTitle: '',
@@ -325,11 +445,21 @@ export default {
         msgTitle: '',
         msgUrl: '',
         msgContent: '',
-        telTemplateValue: ''
+         // HTTP参数
+        url: '',  // url
+        // requestFields: '',
+        requestHeadFields: '',
+        responseFields: '',
+        templateContent: '',
+        requestParamTemplateStatus: 1,
+        responseType: '', // 两个选项map和list 默认是map
+        expression: '', // 判断表达式
+        switchTemplate: '' // switch判断项集合
       }
       this.target = ''
       this.createTime = ''
       this.createUser = ''
+      this.paramsNum = 0
       this.extraParams = []
       this.fixedParams = []
       this.telOrAiList = []
@@ -379,6 +509,17 @@ export default {
               if (bindingContent.msgFlag === 'Y') {
                 this.dataForm.flag.push('msgFlag')
               }
+            }
+            if (row.type === 'http') {
+              this.dataForm.url = bindingContent.url
+              // this.dataForm.requestFields = bindingContent.requestFields
+              this.dataForm.requestHeadFields = bindingContent.requestHeadFields
+              this.dataForm.responseFields = bindingContent.responseFields
+              this.dataForm.templateContent = bindingContent.templateContent
+              this.dataForm.requestParamTemplateStatus = bindingContent.requestParamTemplateStatus
+              this.dataForm.responseType = bindingContent.responseType
+              this.dataForm.expression = bindingContent.expression
+              this.dataForm.switchTemplate = bindingContent.switchTemplate
             }
           } else {
             this.dataForm.editType = '0'
@@ -614,7 +755,7 @@ export default {
     },
     // 类型改变
     changeType (value) {
-      if (value === 'tel' || value === 'ai' || value === 'push') {
+      if (value === 'tel' || value === 'ai' || value === 'push' || value === 'http') {
         this.extraParamsVisible = false
       } else {
         this.extraParamsVisible = true
@@ -634,6 +775,7 @@ export default {
         smsContent: '', // 短信内容
         extraParams: [],
         fixedParams: [],
+        telTemplateValue: '',
         /* push参数 */
         pushType: '',
         pushTitle: '',
@@ -643,7 +785,19 @@ export default {
         pushContent: '',
         msgTitle: '',
         msgUrl: '',
-        msgContent: ''
+        msgContent: '',
+         // HTTP参数
+        url: '',  // url
+        // requestFields: '',
+        requestHeadFields: '',
+        responseFields: '',
+        templateContent: '',
+        requestParamTemplateStatus: 1,
+        responseType: '', // 两个选项map和list 默认是map
+        expression: '', // 判断表达式
+        switchTemplate: '',  // switch判断项集合
+        cardType: '',
+        cardName: ''
       }
       this.target = ''
       this.extraParams = []
@@ -664,6 +818,9 @@ export default {
             this.telOrAiList = []
           }
         })
+      }
+      if (value === 'card') {
+        this.getcardVoucherData()
       }
     },
      // 编辑类型改变
@@ -707,6 +864,33 @@ export default {
         this.$set(this.dataForm, this.dataForm.smsContent, '')
       }
     },
+     // 电销
+    querySearch(queryString, cb) {
+      let telOrAiList = this.telOrAiList
+      telOrAiList.length && telOrAiList.forEach(item => {
+        item.value = item.name
+      })
+      let results = queryString ? telOrAiList.filter(this.createFilter(queryString)) : telOrAiList
+      // 调用 callback 返回建议列表的数据
+      cb(results)
+    },
+    createFilter(queryString) {
+      return (telOrAiList) => {
+        return (telOrAiList.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
+    handleSelect(item) {
+      this.dataForm.telTemplateValue = item.value
+      this.dataForm.resourceCode = item.code
+      this.dataForm.resourceId = item.id
+    },
+    blurInputTle(e) {
+      if (e.target.value) {
+        this.dataForm.telTemplateValue = e.target.value
+        this.dataForm.resourceCode = e.target.value
+        this.dataForm.resourceId = ''
+      }
+    },
     // push通知方式
     changeDistribution (checked, val) {
       if (!checked && val === 'pushFlag') {
@@ -724,7 +908,7 @@ export default {
     },
     // 固定参数
     getFixedParams() {
-      if (this.dataForm.type !== 'kafka' && this.dataForm.channelCode && this.dataForm.type) {
+      if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.dataForm.channelCode && this.dataForm.type) {
         let out = []
         this.fixedParams = []
         let params = {
@@ -771,33 +955,30 @@ export default {
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
-    // 电销
-    querySearch(queryString, cb) {
-        let telOrAiList = this.telOrAiList
-        telOrAiList.length && telOrAiList.forEach(item => {
-           item.value = item.name
-        })
-        let results = queryString ? telOrAiList.filter(this.createFilter(queryString)) : telOrAiList
-        // 调用 callback 返回建议列表的数据
-        cb(results)
-      },
-    createFilter(queryString) {
-      return (telOrAiList) => {
-        return (telOrAiList.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
-      }
+    //  红包卡券
+    getcardVoucherData () {
+      getCardInfo().then(({data}) => {
+        if (data && data.status === '1') {
+          data.data.forEach(item => {
+            this.cardChianNameList.filter(citem => {
+              if (item.rsType == citem.id) {
+                item.typeName = citem.label
+              }
+            })
+          })
+          this.cardTypeList = data.data
+        } else {
+          this.cardTypeList = []
+        }
+      })
     },
-    handleSelect(item) {
-      this.dataForm.telTemplateValue = item.value
-      this.dataForm.resourceCode = item.code
-      this.dataForm.resourceId = item.id
-    },
-    blurInputTle(e) {
-      if (e.target.value) {
-        this.dataForm.telTemplateValue = e.target.value
-        this.dataForm.resourceCode = e.target.value
-        this.dataForm.resourceId = ''
-      }
-    },
+    // cardTypeChange () {
+    //   this.cardTypeList.forEach(item => {
+    //     if (item.rsId === this.dataForm.resourceCode) {
+    //       this.cardNameList.push(item)
+    //     }
+    //   })
+    // },
     changeOption () {
       // 出参选择
       this.$refs.dataForm.clearValidate('extraParams')
@@ -820,16 +1001,27 @@ export default {
     submitData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.dataForm.type !== 'kafka' && this.fixedParams.length === 0) {
+          if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.fixedParams.length === 0) {
             return this.$message.error(`请联系管理员配置固定流程参数`)
           }
-          if (this.dataForm.type === 'sms' && this.extraParams.length !== this.paramsNum) {
+          if ((this.dataForm.type === 'sms') && this.extraParams.length !== this.paramsNum) {
             return this.$message.error(`请选择${this.paramsNum}个参数`)
           }
           let smsContent = {
             'cusSmsType': this.dataForm.cusSmsType,
             'productNo': this.dataForm.productNo,
             'smsContent': this.dataForm.smsContent
+          }
+          let httpContent = {
+            url: this.dataForm.url,
+            // requestFields: this.dataForm.requestFields,
+            requestHeadFields: this.dataForm.requestHeadFields,
+            responseFields: this.dataForm.responseFields,
+            templateContent: this.dataForm.requestParamTemplateStatus == '1' ? this.dataForm.templateContent : '',
+            requestParamTemplateStatus: this.dataForm.requestParamTemplateStatus,
+            responseType: this.dataForm.responseType,
+            expression: this.dataForm.expression,
+            switchTemplate: this.dataForm.switchTemplate
           }
           let pushExtraKeys = {
               pageType: this.dataForm.pageType,
@@ -852,6 +1044,7 @@ export default {
             id: this.dataForm.id,
             type: this.dataForm.type,
             resourceName: this.dataForm.resourceName,
+            channelId: this.dataForm.channelId,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
             resourceId: this.dataForm.resourceId ? this.dataForm.resourceId.toString() : null,
@@ -866,6 +1059,10 @@ export default {
           }
           if (this.dataForm.type === 'push') {
             params.content = JSON.stringify(pushContent)
+            params.resourceId = null
+          }
+          if (this.dataForm.type === 'http') {
+            params.content = JSON.stringify(httpContent)
             params.resourceId = null
           }
           if (!this.dataForm.id) {
