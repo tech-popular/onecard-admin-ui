@@ -292,7 +292,7 @@ export default {
       let pFlowlinkConditionIsFinished = [] // 分流条件是否填写完成
       let pFlowLinkRateIs100 = []
       let pOutParamsArr = []
-      let pOutParamsRepeatArr = []
+      // let pOutParamsRepeatArr = []
       this.outDataArray = []
       this.sourceBindingIds = []
       let linkDataSortArray = [] // linkDataArray重新排序
@@ -375,17 +375,17 @@ export default {
         }
       })
       // 同一节点下配置的决策方式不能重复
-      if (pOutParamsArr.length) {
-        let pOutParamsKeyArr = []
-        pOutParamsArr.map(item => {
-          if (pOutParamsKeyArr.indexOf(item) > -1) {
-            let nodeParamsName = item.split('_')[1]
-            pOutParamsRepeatArr.push(nodeParamsName)
-          } else {
-            pOutParamsKeyArr.push(item)
-          }
-        })
-      }
+      // if (pOutParamsArr.length) {
+      //   let pOutParamsKeyArr = []
+      //   pOutParamsArr.map(item => {
+      //     if (pOutParamsKeyArr.indexOf(item) > -1) {
+      //       let nodeParamsName = item.split('_')[1]
+      //       pOutParamsRepeatArr.push(nodeParamsName)
+      //     } else {
+      //       pOutParamsKeyArr.push(item)
+      //     }
+      //   })
+      // }
       // 对linkDataArray进行重新排序 整体连线从上到下，可以不分左右顺序
       linkDataArray.map(item => {
         if (item.from === '1') {
@@ -403,7 +403,7 @@ export default {
       if (pFlowlinkConditionIsFinished.length) return this.$message.error(`请完善节点【“${Array.from(new Set(pFlowlinkConditionIsFinished)).join('”、“')}”】的条件！`)
       if (pFlowLinkRateIs100.length) return this.$message.error(`节点【“${Array.from(new Set(pFlowLinkRateIs100)).join('”、“')}”】的条件比率相加应为100%，请重新填写！！`)
       // if (pOutParamsRepeatArr.length) return this.$message.error(`同一节点【“${Array.from(new Set(pOutParamsRepeatArr)).join('”、“')}”】重复！！`)
-      if (pOutParamsRepeatArr.length) return this.$message.error(`同一节点下不可配置重复运营方式`)
+      // if (pOutParamsRepeatArr.length) return this.$message.error(`同一节点下不可配置重复运营方式`)
      // 判断连线的内容
       if (that.id) { // 修改保存
         that.saveFlowInfoData()
