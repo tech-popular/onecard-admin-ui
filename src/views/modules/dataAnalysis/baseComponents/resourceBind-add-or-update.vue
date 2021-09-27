@@ -1010,7 +1010,7 @@ export default {
           let smsContent = {
             'cusSmsType': this.dataForm.cusSmsType,
             'productNo': this.dataForm.productNo,
-            'smsContent': this.dataForm.smsContent
+            'content': this.dataForm.smsContent
           }
           let httpContent = {
             url: this.dataForm.url,
