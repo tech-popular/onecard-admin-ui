@@ -106,8 +106,79 @@
           placeholder="请输入内容"
           @select="handleSelect"
           @blur="blurInputTle"
-        ></el-autocomplete>
+          ></el-autocomplete>
+        </el-form-item>
+      <!-- 红包卡券 -->
+      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType" >
+        <el-select v-model="dataForm.cardType" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardTypeList" :key="index" :label="item.label" :value="item.value"></el-option>
+        </el-select>
       </el-form-item>
+      <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'card'" prop="resourceCode" :rules="{ required: true, message: '请选择名称', trigger: 'blur' }">
+        <el-select v-model="dataForm.resourceCode" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardNameList" :key="index" :value="item.rsId" :label="item.rsName"></el-option>
+        </el-select>
+      </el-form-item>
+      <!-- HTTP -->
+      <div v-if="dataForm.type === 'http'">
+        <el-form-item label="URL" prop="url" :rules="baseRule.url">
+          <el-input v-model="dataForm.url" placeholder="请输入URL"/>
+        </el-form-item>
+        <!-- <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
+        <el-input v-model="dataForm.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
+        </el-form-item> -->
+        <el-form-item  prop="extraParams"  label="请求入参">
+				  <Treeselect
+						:options="outParamsList"
+						:disable-branch-nodes="true"
+						:show-count="true"
+						:multiple="true"
+						:load-options="loadOptions"
+						:searchable="true"
+						:clearable="true"
+						:disabled="viewVisible"
+            @open="openParamsSelect"
+						@input="changeOption"
+						@select="outParamsSelect"
+						@deselect="outParamsDeselect"
+						noChildrenText="暂无数据"
+						v-model="dataForm.extraParams"
+						placeholder="请选择"
+						class="base-pane-item"
+					/>
+			</el-form-item>
+        <el-form-item label="请求head入参" prop="requestHeadFields">
+        <el-input v-model="dataForm.requestHeadFields" placeholder="请输入请求head入参"/>
+        </el-form-item>
+        <el-form-item label="入参生成方式">
+          <el-radio-group v-model="dataForm.requestParamTemplateStatus">
+            <el-radio :label="0">普通生成</el-radio>
+            <el-radio :label="1">模板生成</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item prop="templateContent" label="模板内容" v-if="dataForm.requestParamTemplateStatus == '1'" :rules="baseRule.templateContent">
+          <el-input type="textarea"  class="base-pane-item" v-model="dataForm.templateContent"  :autosize="{ minRows: 2}" />
+        </el-form-item>
+        <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="baseRule.responseFields">
+        <el-input v-model="dataForm.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
+        </el-form-item>
+        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="baseRule.responseType"> 
+          <el-select v-model="dataForm.responseType" placeholder="请选择响应参数的数据类型">
+            <el-option
+              v-for="item in httpResponseTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+         </el-form-item>
+        <el-form-item label="判断表达式" prop="expression" :rules="baseRule.expression">
+          <el-input v-model="dataForm.expression" placeholder="请输入缓存生成的key需要的字段"/>
+        </el-form-item>
+        <el-form-item label="switch判断项集合" prop="switchTemplate" :rules="baseRule.switchTemplate">
+          <el-input v-model="dataForm.switchTemplate" placeholder="请输入缓存生成的key需要的字段"/>
+        </el-form-item>
+      </div>
       <!-- push -->
       <el-form-item label="推送方式：" prop="flag" v-if="dataForm.type === 'push'" :rules="{ required: true, message: '请选择推送方式', trigger: 'blur' }">
         <el-checkbox v-model="dataForm.flag" label="pushFlag" @change="checked=>changeDistribution(checked, 'pushFlag')">push</el-checkbox>
@@ -278,7 +349,8 @@ export default {
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
-        switchTemplate: '' // switch判断项集合
+        switchTemplate: '', // switch判断项集合
+        cardType: ''
       },
       paramsNum: 0,
       outParamsList: [],
@@ -293,8 +365,8 @@ export default {
       mysqlServerList: [],
       cusSmsTypeList: [], // 短信类型list
       productNoList: [], // 短信签名list
-      cardTypeList: [], // 红包卡券类型list
       cardNameList: [], // 红包卡券name的list
+      cardDataList: [],
       httpResponseTypeOptions: [{
         value: 'map',
         label: 'map'
@@ -320,41 +392,41 @@ export default {
       }, {
         value: 'http',
         label: 'HTTP'
+      },
+      {
+        value: 'card',
+        label: '红包/卡券'
       }
-      // {
-      //   value: 'card',
-      //   label: '红包/卡券'
-      // }
       ],
-      cardChianNameList: [{
-        id: '1',
+      cardTypeList: [{
+        value: 1,
         label: '还款红包'
       }, {
-        id: '2',
+        value: 2,
         label: '借款红包'
       }, {
-        id: '3',
+        value: 3,
         label: '免息红包'
       }, {
-        id: '4',
+        value: 4,
         label: '提额红包'
       }, {
-        id: '5',
+        value: 5,
         label: '商城满减红包'
       }, {
-        id: '6',
+        value: 6,
         label: '接口红包'
       }, {
-        id: '7',
+        value: 7,
         label: '积分（无资源）'
       }, {
-        id: '8',
+        value: 8,
         label: '接口资源提额红包 '
       }, {
-        id: '9',
+        value: 9,
         label: '降息红包'
       }, {
-        id: '12',
+        value: 12,
         label: '减息券'
       }],
       baseRule: { // 基本信息校验规则
@@ -396,6 +468,9 @@ export default {
         ],
         telTemplateValue: [
           { required: true, message: '请选择模板内容', trigger: 'input' }
+        ],
+        cardType: [
+          { required: true, message: '请选择类型', trigger: 'blur' }
         ]
       }
     }
@@ -454,7 +529,8 @@ export default {
         requestParamTemplateStatus: 1,
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
-        switchTemplate: '' // switch判断项集合
+        switchTemplate: '', // switch判断项集合
+        cardType: ''
       }
       this.target = ''
       this.createTime = ''
@@ -553,6 +629,10 @@ export default {
             }
             if (res.data.data.bindingConfig.type === 'kafka') {
               this.getKafkaServerList(res.data.data.bindingConfig.resourceId)
+            }
+            if (res.data.data.bindingConfig.type === 'card') {
+              this.extraParamsVisible = false
+              this.getcardVoucherData('edit')
             }
           }
           this.getOutParamsList(row, res.data.data.extraParams, res.data.data.fixedParams)
@@ -755,7 +835,7 @@ export default {
     },
     // 类型改变
     changeType (value) {
-      if (value === 'tel' || value === 'ai' || value === 'push' || value === 'http') {
+      if (value === 'tel' || value === 'ai' || value === 'push' || value === 'http' || value === 'card') {
         this.extraParamsVisible = false
       } else {
         this.extraParamsVisible = true
@@ -796,8 +876,7 @@ export default {
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
         switchTemplate: '',  // switch判断项集合
-        cardType: '',
-        cardName: ''
+        cardType: ''
       }
       this.target = ''
       this.extraParams = []
@@ -956,29 +1035,30 @@ export default {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
     //  红包卡券
-    getcardVoucherData () {
+    getcardVoucherData (edit) {
       getCardInfo().then(({data}) => {
         if (data && data.status === '1') {
-          data.data.forEach(item => {
-            this.cardChianNameList.filter(citem => {
-              if (item.rsType == citem.id) {
-                item.typeName = citem.label
-              }
-            })
-          })
-          this.cardTypeList = data.data
+          this.cardDataList = data.data
+          if (edit === 'edit') {
+            this.dataForm.cardType = data.data.filter(item => item.rsId === this.dataForm.resourceCode)[0].rsType
+            this.cardTypeChange('edit')
+          }
         } else {
-          this.cardTypeList = []
+          this.cardDataList = []
         }
       })
     },
-    // cardTypeChange () {
-    //   this.cardTypeList.forEach(item => {
-    //     if (item.rsId === this.dataForm.resourceCode) {
-    //       this.cardNameList.push(item)
-    //     }
-    //   })
-    // },
+    cardTypeChange (edit) {
+      this.cardNameList = []
+      if (edit !== 'edit') {
+        this.dataForm.resourceCode = ''
+      }
+      this.cardDataList.forEach(item => {
+        if (item.rsType === this.dataForm.cardType) {
+          this.cardNameList.push(item)
+        }
+      })
+    },
     changeOption () {
       // 出参选择
       this.$refs.dataForm.clearValidate('extraParams')
@@ -1055,15 +1135,15 @@ export default {
           if (this.dataForm.type === 'sms') {
             params.content = this.dataForm.editType === '0' ? '' : JSON.stringify(smsContent)
             params.resourceName = this.dataForm.editType === '0' ? '标准短信_' + this.dataForm.resourceName : '自定义短信_' + this.dataForm.resourceName
-            params.resourceId = this.dataForm.editType === '0' ? params.resourceId : null
+            // params.resourceId = this.dataForm.editType === '0' ? params.resourceId : null
           }
           if (this.dataForm.type === 'push') {
             params.content = JSON.stringify(pushContent)
-            params.resourceId = null
+            // params.resourceId = null
           }
           if (this.dataForm.type === 'http') {
             params.content = JSON.stringify(httpContent)
-            params.resourceId = null
+            // params.resourceId = null
           }
           if (!this.dataForm.id) {
               addDataInfo(params).then(({data}) => {

@@ -74,7 +74,7 @@
       :current-page="pageNum"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
-      :total="totalPage"
+      :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper"/>
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
@@ -99,7 +99,7 @@
         channelList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
-        totalPage: 0,
+        totalCount: 0,
         dataForm: {
           channelCode: '',
           type: ''
@@ -149,10 +149,13 @@
                 }
               })
               item.params = item.params.split(',').join('\n')
-              item.target = this.datasourceList.filter(citem => citem.id === item.datasourceId)[0].name
+              if (this.datasourceList.length) {
+                item.target = this.datasourceList.filter(citem => citem.id === item.datasourceId)[0].name
+                console.log('this.datasourceList: ', this.datasourceList)
+              }
             })
             this.dataList = data.data.list
-            this.totalCount = data.data.total
+            this.totalCount = data.data.totalCount
           }
             this.dataListLoading = false
           })

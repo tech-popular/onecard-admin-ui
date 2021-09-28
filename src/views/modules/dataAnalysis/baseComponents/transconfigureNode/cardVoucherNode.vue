@@ -4,14 +4,15 @@
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
-      <el-form-item v-if="dataForm.type === 'cardVoucher'" label="红包/卡券类型" prop="cardVoucherType">
-        <el-select v-model="dataForm.cardVoucherType" filterable  @change="changeCardVoucherType"  placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardVoucherTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
+      <!-- 红包卡券 -->
+      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType" >
+        <el-select v-model="dataForm.cardType" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardTypeList" :key="index" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'cardVoucher'" prop="cardVoucherName">
-        <el-select v-model="dataForm.cardVoucherName" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardVoucherNameList" :key="index" :value="item.code" :label="item.name"></el-option>
+      <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'card'" prop="resourceCode" :rules="{ required: true, message: '请选择名称', trigger: 'blur' }">
+        <el-select v-model="dataForm.resourceCode" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cardNameList" :key="index" :value="item.rsId" :label="item.rsName"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
@@ -38,7 +39,7 @@
 </template>
 <script>
 import { dataTransferManageOutParams } from '@/api/dataAnalysis/dataTransferManage'
-import { addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType } from '@/api/dataAnalysis/sourceBinding'
+import { addDataInfo, editDataInfo, lookDataList, getFixedParams, getCardInfo } from '@/api/dataAnalysis/sourceBinding'
 import { deepClone, findVueSelectItemIndex } from '../../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -52,19 +53,49 @@ export default {
       target: '',
       dataForm: {
         id: '',
-        type: 'tel',
+        type: 'card',
         resourceId: '',
         resourceName: '',
         resourceCode: '',
         fixedParams: [], // 固定出参
         channelCode: '', // 用户渠道
-        cardVoucherType: '',
-        cardVoucherName: ''
+        cardType: ''
       },
       outParamsList: [],
       fixedParams: [], // 固定出参
-      cardVoucherTypeList: [], // 红包卡券类型list
-      cardVoucherNameList: [] // 红包卡券name的list
+      cardDataList: [], // 红包卡券类型list
+      cardNameList: [], // 红包卡券name的list
+      cardTypeList: [{
+        value: 1,
+        label: '还款红包'
+      }, {
+        value: 2,
+        label: '借款红包'
+      }, {
+        value: 3,
+        label: '免息红包'
+      }, {
+        value: 4,
+        label: '提额红包'
+      }, {
+        value: 5,
+        label: '商城满减红包'
+      }, {
+        value: 6,
+        label: '接口红包'
+      }, {
+        value: 7,
+        label: '积分（无资源）'
+      }, {
+        value: 8,
+        label: '接口资源提额红包 '
+      }, {
+        value: 9,
+        label: '降息红包'
+      }, {
+        value: 12,
+        label: '减息券'
+      }]
     }
   },
   components: { Treeselect },
@@ -81,26 +112,25 @@ export default {
       this.dataForm = {
         id: id,
         channelCode: channelCode,
-        type: 'cardVoucher',
+        type: 'card',
         resourceId: '',
         resourceName: '',
         resourceCode: '',
         fixedParams: [],
-        cardVoucherType: '',
-        cardVoucherName: ''
+        cardType: ''
       }
       this.outParamsList = []
       this.target = ''
       this.fixedParams = []
       this.fixedParamsvisible = false
-      // this.getTelList()
       this.telOrAiList = []
       this.visible = true
-      // if (id) {
-      //   this.getLookData(id)
-      // } else {
-      //   this.getOutParamsList()
-      // }
+      if (id) {
+        this.getLookData(id)
+      } else {
+        this.getcardVoucherData()
+        this.getOutParamsList()
+      }
     },
     // 回显
     getLookData (id) {
@@ -111,17 +141,34 @@ export default {
           this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
           this.dataForm.resourceCode = res.data.data.bindingConfig.resourceCode
           this.dataForm.type = res.data.data.bindingConfig.type
-          this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
-          getResourceInfoFromType(res.data.data.bindingConfig.type).then(({data}) => {
-            if (data && data.status === '1') {
-              this.telOrAiList = data.data
-            }
-          })
+          this.dataForm.resourceId = null
+          this.getcardVoucherData('edit')
           this.getOutParamsList(res.data.data.fixedParams)
         }
-        // this.$nextTick(() => {
-        //   this.target = this.telOrAiList.filter(item => item.id == this.dataForm.resourceId)[0].target
-        // })
+      })
+    },
+     getcardVoucherData (edit) {
+      getCardInfo().then(({data}) => {
+        if (data && data.status === '1') {
+          this.cardDataList = data.data
+          if (edit === 'edit') {
+            this.dataForm.cardType = data.data.filter(item => item.rsId === this.dataForm.resourceCode)[0].rsType
+            this.cardTypeChange('edit')
+          }
+        } else {
+          this.cardDataList = []
+        }
+      })
+    },
+    cardTypeChange (edit) {
+      this.cardNameList = []
+      if (edit !== 'edit') {
+        this.dataForm.resourceCode = ''
+      }
+      this.cardDataList.forEach(item => {
+        if (item.rsType === this.dataForm.cardType) {
+          this.cardNameList.push(item)
+        }
       })
     },
     // 获取分群出参 指标列表
@@ -212,15 +259,6 @@ export default {
       })
       return indexListArr
     },
-    getTelList () {
-      getResourceInfoFromType('tel').then(({data}) => {
-        if (data && data.status === '1') {
-          this.telOrAiList = data.data
-        } else {
-          this.telOrAiList = []
-        }
-      })
-    },
     // 固定参数
     getFixedParams() {
       let out = []
@@ -264,7 +302,7 @@ export default {
             resourceName: this.dataForm.resourceName,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
-            resourceId: this.dataForm.resourceId.toString(),
+            resourceId: null,
             fixedParams: this.fixedParams.join(','),
             extraParams: ''
           }
@@ -277,7 +315,7 @@ export default {
                     duration: 1500,
                     onClose: () => {
                       this.visible = false
-                      this.$emit('updateList', true, 'cardVoucher')
+                      this.$emit('updateList', true, 'card')
                       this.$refs['dataForm'].resetFields()
                     }
                   })
@@ -294,7 +332,7 @@ export default {
                     duration: 1500,
                     onClose: () => {
                       this.visible = false
-                      this.$emit('updateList', true, 'cardVoucher')
+                      this.$emit('updateList', true, 'card')
                       this.$refs['dataForm'].resetFields()
                     }
                   })

@@ -47,6 +47,7 @@
     <telNode v-if="telNodeVisible" ref="telNode" @updateList="changeType"></telNode>
     <aiNode v-if="aiNodeVisible" ref="aiNode" @updateList="changeType"></aiNode>
     <pushNode v-if="pushNodeVisible" ref="pushNode" @updateList="changeType"></pushNode>
+    <cardNode v-if="cardNodeVisible" ref="cardNode" @updateList="changeType"></cardNode>
   </el-dialog>
 </template>
 <script>
@@ -59,6 +60,7 @@ import smsNode from '../baseComponents/transconfigureNode/smsNode'
 import telNode from '../baseComponents/transconfigureNode/telNode'
 import aiNode from '../baseComponents/transconfigureNode/aiNode'
 import pushNode from '../baseComponents/transconfigureNode/pushNode'
+import cardNode from '../baseComponents/transconfigureNode/cardVoucherNode'
 export default {
   data () {
     return {
@@ -83,13 +85,15 @@ export default {
         {value: 'sms', lable: '短信'},
         {value: 'tel', lable: '电销'},
         {value: 'ai', lable: 'AI'},
-        {value: 'push', lable: 'Push'}
+        {value: 'push', lable: 'Push'},
+        {value: 'card', lable: '红包/卡券'}
       ],
       seletDataList: [],
       smsNodeVisible: false,
       telNodeVisible: false,
       aiNodeVisible: false,
       pushNodeVisible: false,
+      cardNodeVisible: false,
       dataRules: {
         type: [
           { required: true, message: '请选择方式', trigger: 'change' }
@@ -100,7 +104,7 @@ export default {
       }
     }
   },
- components: { Treeselect, smsNode, telNode, aiNode, pushNode },
+ components: { Treeselect, smsNode, telNode, aiNode, pushNode, cardNode },
   methods: {
      // 树加载
     async loadOptions ({ action, parentNode, callback }) {
@@ -187,6 +191,12 @@ export default {
           this.pushNodeVisible = true
           this.$nextTick(() => {
             this.$refs.pushNode.init(this.channelCode, this.dataForm.selectSourceData, this.canUpdate)
+          })
+          break
+        case 'card':
+          this.cardNodeVisible = true
+          this.$nextTick(() => {
+            this.$refs.cardNode.init(this.channelCode, this.dataForm.selectSourceData, this.canUpdate)
           })
           break
       }
