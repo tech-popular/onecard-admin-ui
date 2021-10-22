@@ -718,11 +718,12 @@ export default {
     getOutParamsList (row, extraParams, fixedParams) {
       dataTransferManageOutParams({ channelCode: this.dataForm.channelCode, flag: this.dataForm.id ? '-1' : '1' }).then(({data}) => {
         if (data && data.status === '1') {
+          this.outParamsList = this.filterAllCata(data.data)
           if (row) {
-            this.getOutParamsEditList(extraParams, fixedParams, this.filterAllCata(data.data))
+            this.getFixedParams()
+            // this.getOutParamsEditList(extraParams, fixedParams, this.filterAllCata(data.data))
+            this.getOutParamsEditList(extraParams, this.filterAllCata(data.data))
             this.dataLoading = false
-          } else {
-            this.outParamsList = this.filterAllCata(data.data)
           }
         } else {
           this.outParamsList = []
@@ -785,7 +786,7 @@ export default {
       this.getFixedParams()
     },
     // // 修改，回显时查询分群出参选中
-    getOutParamsEditList (extraParams, fixedParams, outList) {
+    getOutParamsEditList (extraParams, outList) {
       if (extraParams) {
         let out = []
         let fixedData = extraParams.split(',')
@@ -800,17 +801,17 @@ export default {
         this.dataForm.extraParams = []
         this.extraParamsVisible = false
       }
-      if (fixedParams) {
-        let out = []
-        let fixedData = fixedParams.split(',')
-        fixedData.forEach(item => {
-          out.push(item.split('@')[0] + '-' + item.split('@')[1])
-           this.fixedParams.push(item.split('@')[1])
-        })
-        this.dataForm.fixedParams = Array.from(new Set(out))
-        this.outParamsList = this.updateOutParamsList(this.dataForm.fixedParams, outList)
-        this.fixedParamsvisible = true
-      }
+      // if (fixedParams) {
+      //   let out = []
+      //   let fixedData = fixedParams.split(',')
+      //   fixedData.forEach(item => {
+      //     out.push(item.split('@')[0] + '-' + item.split('@')[1])
+      //      this.fixedParams.push(item.split('@')[1])
+      //   })
+      //   this.dataForm.fixedParams = Array.from(new Set(out))
+      //   this.outParamsList = this.updateOutParamsList(this.dataForm.fixedParams, outList)
+      //   this.fixedParamsvisible = true
+      // }
       // data.forEach(item => {
       //   out.push(item.englishName + '-' + item.id)
       //   type === 'extraParams' ? this.extraParams.push(item.id) : this.fixedParams.push(item.id)
@@ -1002,6 +1003,7 @@ export default {
                 this.fixedParams.push(item.split('@')[1])
               })
               this.dataForm.fixedParams = Array.from(new Set(out))
+              console.log('this.dataForm.fixedParams: ', this.dataForm.fixedParams)
               this.fixedParamsvisible = true
             } else {
               this.fixedParamsvisible = false
