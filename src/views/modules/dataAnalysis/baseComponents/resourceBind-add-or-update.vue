@@ -634,7 +634,7 @@ export default {
               this.getcardVoucherData('edit')
             }
           }
-          this.getOutParamsList(row, res.data.data.extraParams, res.data.data.fixedParams)
+          this.getOutParamsList(row, res.data.data.extraParams)
         }
       })
     },
@@ -715,7 +715,7 @@ export default {
       })
     },
     // 获取分群出参 指标列表
-    getOutParamsList (row, extraParams, fixedParams) {
+    getOutParamsList (row, extraParams) {
       dataTransferManageOutParams({ channelCode: this.dataForm.channelCode, flag: this.dataForm.id ? '-1' : '1' }).then(({data}) => {
         if (data && data.status === '1') {
           this.outParamsList = this.filterAllCata(data.data)
