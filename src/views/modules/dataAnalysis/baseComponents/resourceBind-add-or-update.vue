@@ -90,14 +90,15 @@
         <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
           <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="65" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
         </el-form-item>
-        <!-- 电销或ai -->
-      <el-form-item prop="resourceId" v-if="dataForm.type === 'ai' "  label="AI模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
+        <!-- ai -->
+      <el-form-item prop="resourceId" v-if="dataForm.type === 'ai' " label="AI模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
         <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
           <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
-            <el-form-item prop="telTemplateValue" v-if="dataForm.type === 'tel'" label="电销模板" :rules="{ required: true, message: '请选择模板', trigger: 'input' }">
-          <el-autocomplete
+      <!-- 电销 -->
+      <el-form-item prop="telTemplateValue" v-if="dataForm.type === 'tel'" label="电销模板">
+        <el-autocomplete
           class="inline-input"
           style="width: 400px;"
           v-model="dataForm.telTemplateValue"
@@ -1031,7 +1032,7 @@ export default {
       // this.dataForm.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].smsDesc
       this.dataForm.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].id
     },
-     // 电销或AI模板
+     // AI模板
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },

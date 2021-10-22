@@ -6,6 +6,10 @@
 		<el-form :model="dataForm" ref="dataForm" label-width="80px" :inline="true">
 			<el-form-item label="平均值">
 				<span>{{dataForm.metricRound}}</span>
+				<el-tooltip placement="top">
+					<div slot="content">平均值默认为前7次下发数量平均值（异常数据除外）</div>
+					<i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+        </el-tooltip>
 				<!-- <el-input   v-model="dataForm.metricRound" disabled style="width: 200px">
         </el-input> -->
 			</el-form-item>
@@ -15,13 +19,14 @@
 			</el-form-item>
 		</el-form>
 		<el-table :data="dataList" border>
-			<el-table-column prop="id" header-align="center" align="center"  label="任务ID"></el-table-column>
-			<el-table-column prop="transferId" header-align="center" align="center"  label="任务名称"></el-table-column>
+			<el-table-column prop="transferId" header-align="center" align="center"  label="流转ID"></el-table-column>
 			<el-table-column prop="createTime" header-align="center" align="center"  label="执行时间"></el-table-column>
-			<el-table-column prop="count" header-align="center" align="center"  label="分群下发数量 "></el-table-column>
+			<el-table-column prop="count" header-align="center" align="center"  label="分群下发数量"></el-table-column>
+      <el-table-column prop="smsCount" header-align="center" align="center"  v-if="transferType.includes('sms')" label="短信(推送数/成功数/失败数) "></el-table-column>
+      <el-table-column prop="pushCount" header-align="center" align="center" v-if="transferType.includes('push')" label="push(推送数/成功数/失败数) "></el-table-column>
 			<el-table-column prop="enable" header-align="center" align="center"  label="状态">
 				<template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small" >正常</el-tag>
+          <el-tag v-if="scope.row.enable === 1" size="small">正常</el-tag>
           <el-tag v-else size="small" type="danger">异常</el-tag>
         </template>
 			</el-table-column>
@@ -40,6 +45,7 @@ export default {
       visible: false,
       id: '',
       dataList: [],
+      transferType: [],
       dataForm: {
         percent: '',
         metricRound: 0
@@ -48,10 +54,11 @@ export default {
   },
   methods: {
     init (row) {
-      this.visible = true
+      this.transferType = row.transferType.split(',')
       this.dataList = []
       this.id = row.id
       this.getTableData(row.id)
+      this.visible = true
     },
     getTableData (id) {
       dataTransferManageTaskProgress(id).then(({data}) => {
@@ -63,10 +70,7 @@ export default {
       })
     },
     rateBlur () {
-      // let rate = this.dataForm.percent + ''
-      // if (rate.indexOf('.') > -1) {
-        this.dataForm.percent = this.dataForm.percent.replace(/^0(0+)|[^\d]+/g, '')
-      // }
+      this.dataForm.percent = this.dataForm.percent.replace(/^0(0+)|[^\d]+/g, '')
     },
     submitData () {
       let params = {
