@@ -298,7 +298,7 @@ export default {
       configItems.type = postData.type
       configItems.topic = postData.topic
       if (postData.type === 'push') {
-        configItems.content = arr[0].content
+        configItems.content = JSON.parse(arr[0].content)
       } else {
         if (postData.type === 'sms' && arr[0].content) {
           let contentData = JSON.parse(arr[0].content)
