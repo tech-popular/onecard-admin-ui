@@ -378,6 +378,10 @@ export default {
         label: 'object'
       }],
       typeOptions: [{
+        value: 'kafka',
+        label: 'kafka'
+      },
+      {
         value: 'sms',
         label: '短信'
       }, {
