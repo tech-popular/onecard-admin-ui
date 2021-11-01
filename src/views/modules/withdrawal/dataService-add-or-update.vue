@@ -109,13 +109,13 @@
               </el-col>
             </el-row>
            </div>
-           <div v-else>
-             <el-form-item label="申请原因" prop="applyReason">
+           <div v-else style="margin-top: 30px">
+             <el-form-item label="申请原因" prop="applyReason" style="width:50%">
                <el-input v-model="baseForm.applyReason"></el-input>
              </el-form-item>
-             <el-form-item label="提数类型" prop="withdrawalType" label-width="120px" style="width:50%" >
-                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="0">自定义SQL</el-radio>
-                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">FTP</el-radio>
+             <el-form-item label="提数类型" prop="withdrawalType"  style="width:50%" >
+                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="0">一次性</el-radio>
+                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">周期性</el-radio>
             </el-form-item>
            </div>
         </div>
@@ -147,6 +147,7 @@ require('codemirror/addon/hint/sql-hint.js')
         visible: true,
         isInnerIP: false,
         secendStepVisible: false,
+        dataListLoading: false,
         baseForm: {
           id: '',
           withdrawalMethod: '0',
