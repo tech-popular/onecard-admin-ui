@@ -300,31 +300,31 @@ export default {
       if (postData.type === 'push') {
         configItems.content = JSON.parse(arr[0].content)
       } else {
-        if (postData.type === 'sms' && arr[0].content) {
-          let contentData = JSON.parse(arr[0].content)
-            configItems.cusSmsType = contentData.cusSmsType
-            configItems.content = contentData.content
-            configItems.resourceName = arr[0].resourceName
-            configItems.productNo = contentData.productNo
-        } else {
-          lookDataList(postData.selectSourceData).then(({data}) => {
-            if (data && data.status === '1') {
-              configItems.tempCode = data.data.bindingConfig.resourceCode
-                if (data.data.bindingConfig.type === 'sms') {
-                  configItems.channelId = data.data.resourceData.channelId
-                  configItems.systemCode = data.data.resourceData.systemCode
-                  let params = ''
-                  if (data.data.bindingConfig.extraParams) {
-                    let arr1 = this.getParamsEditList(data.data.bindingConfig.extraParams.split(','), this.outParamsList, [], true)
-                    arr1.forEach((item, index) => {
-                      index ? params = params + '##' + '${' + item.englishName + '}' : params = params + '${' + item.englishName + '}'
-                    })
-                  }
-                configItems.params = params
+        lookDataList(postData.selectSourceData).then(({data}) => {
+          if (data && data.status === '1') {
+            configItems.tempCode = data.data.bindingConfig.resourceCode
+            if (data.data.bindingConfig.type === 'sms') {
+              if (data.data.bindingConfig.content) {
+                let contentData = JSON.parse(arr[0].content)
+                configItems.cusSmsType = contentData.cusSmsType
+                configItems.content = contentData.content
+                configItems.resourceName = arr[0].resourceName
+                configItems.productNo = contentData.productNo
+              } else {
+                configItems.channelId = data.data.resourceData.channelId
+                configItems.systemCode = data.data.resourceData.systemCode
               }
+              let params = ''
+              if (data.data.bindingConfig.extraParams) {
+                let arr1 = this.getParamsEditList(data.data.bindingConfig.extraParams.split(','), this.outParamsList, [], true)
+                arr1.forEach((item, index) => {
+                  index ? params = params + '##' + '${' + item.englishName + '}' : params = params + '${' + item.englishName + '}'
+                })
+              }
+              configItems.params = params
             }
-          })
-        }
+          }
+        })
       }
       return configItems
     },
