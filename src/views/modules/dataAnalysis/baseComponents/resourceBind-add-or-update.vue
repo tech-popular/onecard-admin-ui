@@ -89,7 +89,7 @@
           </el-select>
         </el-form-item>
           <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
-            <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="65" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
+            <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="300" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
           </el-form-item>
           <el-form-item  prop="extraParams"  label="额外出参">
 				  <Treeselect
