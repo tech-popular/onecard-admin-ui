@@ -4,7 +4,32 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
-  
+			<el-form-item label="上级菜单：" prop="parentId" >
+				<el-cascader
+          style="width: 100%"
+          v-model="dataForm.parentId"
+          :options="menuList"
+          :props="menuListTreeProps"
+					@change="parentTreeChange"
+        >
+        </el-cascader>
+			</el-form-item>
+			<el-form-item label="菜单名称" prop="name">
+        <el-input v-model="dataForm.name" placeholder="菜单名称"></el-input>
+      </el-form-item>
+			<el-form-item  label="菜单链接" prop="url">
+        <el-input v-model="dataForm.url" placeholder="菜单链接"></el-input>
+      </el-form-item>
+			<el-form-item label="计算任务" prop="calculate" >
+			  <el-select v-model="dataForm.calculate" filterable  multiple placeholder="请选择计算任务" style="width: 100%">
+					<el-option
+						v-for="item in calculateList"
+						:key="item.value"
+						:label="item.label"
+						:value="item.value">
+					</el-option>
+				</el-select>
+			</el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -26,9 +51,34 @@
       return {
         visible: false,
         dataForm: {
-          id: 0
+          id: 0,
+          parentId: '',
+          name: '',
+          url: '',
+          calculate: []
         },
-        dataRule: {}
+        menuList: [],
+        menuParentList: [], // 保留选中的级联中完整内容
+        calculateList: [],
+        menuListTreeProps: {
+          label: 'name',
+          value: 'id',
+          children: 'children'
+        },
+        dataRule: {
+          parentId: [
+            { required: true, message: '上级菜单不能为空', trigger: 'change' }
+          ],
+          name: [
+            { required: true, message: '菜单名称不能为空', trigger: 'blur' }
+          ],
+          url: [
+            { required: true, message: '菜单链接不能为空', trigger: 'blur' }
+          ],
+          calculate: [
+            { required: true, message: '计算任务不能为空', trigger: 'blur' }
+          ]
+        }
       }
     },
     methods: {
@@ -38,6 +88,10 @@
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
         })
+      },
+      // 所属父级
+      parentTreeChange (val) {
+        this.menuParentList = val
       },
       // 表单提交
       dataFormSubmit () {
