@@ -18,6 +18,7 @@
        <el-time-picker
 					is-range
 					style="width:100%"
+					format="HH:mm：ss"
 					v-model="dataForm.periodTime"
 					range-separator="至"
 					start-placeholder="开始时间"

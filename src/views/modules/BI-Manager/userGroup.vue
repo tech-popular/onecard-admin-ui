@@ -98,7 +98,8 @@
 }
 </style>
 <script>
-import AddOrUpdate from './userGroup-add-or-update'
+// import AddOrUpdate from './userGroup-add-or-update'
+import AddOrUpdate from './assign-permissions'
 export default {
   data () {
     return {

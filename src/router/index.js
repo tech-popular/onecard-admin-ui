@@ -68,6 +68,11 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  // 适应新BI系统的登录后跳转
+  console.log('from: ', from)
+  if (from.query.id) {
+    // window.location.href = 'https://www.baidu.com/'
+  }
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储

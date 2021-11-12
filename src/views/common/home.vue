@@ -160,6 +160,11 @@ export default {
           name: 'Zeppelin',
           img: require('../../assets/img/zepplin.png'),
           url: 'http://zeppelin.9f.cn'
+        },
+        {
+          name: '新BI系统',
+          img: require('../../assets/img/newBI.png'),
+          url: 'http://zeppelin.9f.cn'
         }
       ]
     }
