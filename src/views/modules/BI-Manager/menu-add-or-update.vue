@@ -4,7 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
-			<el-form-item label="上级菜单：" prop="parentId" >
+			<el-form-item label="上级菜单："  prop="parentId" >
 				<el-cascader
           style="width: 100%"
           v-model="dataForm.parentId"
@@ -20,8 +20,8 @@
 			<el-form-item  label="菜单链接" prop="url">
         <el-input v-model="dataForm.url" placeholder="菜单链接"></el-input>
       </el-form-item>
-			<el-form-item label="计算任务" prop="calculate" >
-			  <el-select v-model="dataForm.calculate" filterable  multiple placeholder="请选择计算任务" style="width: 100%">
+			<el-form-item label="计算任务" prop="taskIds" >
+			  <el-select v-model="dataForm.taskIds" filterable  multiple placeholder="请选择计算任务" style="width: 100%">
 					<el-option
 						v-for="item in calculateList"
 						:key="item.value"
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+  // import { savaBiInfo, updateBiInfo, findAllRecursionList } from '@/api/BI-Manager/menu'
   export default {
     data () {
       // var validateUrl = (rule, value, callback) => {
@@ -55,7 +56,7 @@
           parentId: '',
           name: '',
           url: '',
-          calculate: []
+          taskIds: []
         },
         menuList: [],
         menuParentList: [], // 保留选中的级联中完整内容
@@ -66,16 +67,16 @@
           children: 'children'
         },
         dataRule: {
-          parentId: [
-            { required: true, message: '上级菜单不能为空', trigger: 'change' }
-          ],
+          // parentId: [
+          //   { required: true, message: '上级菜单不能为空', trigger: 'change' }
+          // ],
           name: [
             { required: true, message: '菜单名称不能为空', trigger: 'blur' }
           ],
           url: [
             { required: true, message: '菜单链接不能为空', trigger: 'blur' }
           ],
-          calculate: [
+          taskIds: [
             { required: true, message: '计算任务不能为空', trigger: 'blur' }
           ]
         }
