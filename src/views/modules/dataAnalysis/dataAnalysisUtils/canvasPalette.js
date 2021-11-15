@@ -25,5 +25,10 @@ export const palette = [
     key: '5',
     category: 'OUT_PARAM',
     nodeName: '运营\n方式'
+  },
+  {
+    key: '6',
+    category: 'END_NODE',
+    nodeName: '结束'
   }
 ]

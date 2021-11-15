@@ -300,11 +300,6 @@ export default {
       this.transferType = []
       let linkDataSortArray = [] // linkDataArray重新排序
       nodeDataArray.map(item => {
-        // if (item.category !== 'GROUP_CHOICE' && item.category !== 'FORK_JOIN') {
-        //   if (!item.data) {
-        //     pNullArr.push(item.nodeName)
-        //   }
-        // } else
         if (item.category === 'GROUP_CHOICE') {
           let groupId = this.$store.state.canvasFlow.saveDate.templateId
           let configItems = {
@@ -359,7 +354,7 @@ export default {
             node.findLinksOutOf().each(function (link) {
               linkNum1++
             })
-            if (linkNum1 === 0) {
+            if (linkNum1 === 0 && item.category !== 'END_NODE') {
               pNullLinkArr.push(item.nodeName)
             }
           }
@@ -737,6 +732,34 @@ export default {
           },
           makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
           makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
+        )
+      )
+       // END_NODE
+      mySelf.myDiagram.nodeTemplateMap.add(
+        'END_NODE',
+        $(
+          go.Node,
+          'Table',
+          nodeStyle(),
+          {
+            selectionAdornmentTemplate: nodeSelectionAdornmentTemplate
+          },
+         $(
+            go.Panel,
+            'Auto',
+            $(
+              go.Shape,
+              'Circle',
+              {
+                minSize: new go.Size(50, 50),
+                fill: '#e6a23c',
+                cursor: 'move',
+                strokeWidth: 0
+              }
+            ),
+            textBlock(false)
+          ),
+          makePort('T', go.Spot.Top, go.Spot.TopSide, false, true)
         )
       )
       mySelf.myDiagram.addModelChangedListener(function (evt) { // 监听新拖拽到画布的节点
