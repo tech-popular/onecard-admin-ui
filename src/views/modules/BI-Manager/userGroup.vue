@@ -1,16 +1,16 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
-      <el-form-item label="用户名称: ">
+      <!-- <el-form-item label="用户名称: ">
         <el-input
           v-model="dataForm.user"
           class="input-with-select"
           @keyup.enter.native="getDataList()"
         ></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="用户组名称: ">
         <el-input
-          v-model="dataForm.userGroup"
+          v-model="dataForm.name"
           class="input-with-select"
           @keyup.enter.native="getDataList()"
         ></el-input>
@@ -40,14 +40,14 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="cron"
+        prop="tenantId"
         header-align="center"
         align="center"
         show-overflow-tooltip
         label="所属租户"
       ></el-table-column>
       <el-table-column
-        prop="sql"
+        prop="memberNum"
         header-align="center"
         align="center"
         label="成员人数">
@@ -90,6 +90,7 @@
     ></el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <assign-permissions v-if="assignPermissionsVisible" ref="assignPermissions" @refreshDataList="getDataList"></assign-permissions>
   </div>
 </template>
 <style>
@@ -98,14 +99,15 @@
 }
 </style>
 <script>
-// import AddOrUpdate from './userGroup-add-or-update'
-import AddOrUpdate from './assign-permissions'
+import { getUserGroupList, deleteUsersById } from '@/api/BI-Manager/userGroup'
+import AddOrUpdate from './userGroup-add-or-update'
+import assignPermissions from './assign-permissions'
 export default {
   data () {
     return {
       dataForm: {
-        user: '',
-        userGroup: ''
+        // user: '',
+        name: ''
       },
       dataList: [],
       pageIndex: 1,
@@ -114,11 +116,13 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
+      assignPermissionsVisible: false,
       taskDependentVisible: false
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    assignPermissions
   },
   activated () {
     this.getDataList()
@@ -131,7 +135,23 @@ export default {
     },
     // 获取数据列表
     getDataList () {
-      // this.dataListLoading = true
+      this.dataListLoading = true
+       let params = {
+          'name': this.dataForm.name,
+          'page': this.pageIndex,
+          'pageSize': this.pageSize
+        }
+        getUserGroupList(params).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.totalCount = data.data.totalCount
+            this.dataList = data.data.list
+            this.dataListLoading = false
+          } else {
+            this.dataList = []
+            this.totalCount = 0
+            this.dataListLoading = false
+          }
+        })
     },
     // 每页数
     sizeChangeHandle (val) {
@@ -150,7 +170,35 @@ export default {
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(row)
       })
-    }
+    },
+    taskDependent (id) {
+      this.assignPermissionsVisible = true
+      this.$nextTick(() => {
+        this.$refs.assignPermissions.init(id)
+      })
+    },
+    // 删除
+      deleteHandle (id) {
+        this.$confirm(`确定对[id=${id}]进行[删除]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteUsersById(id).then(({ data }) => {
+            if (data.code !== 0) {
+              return this.$message({
+                type: 'error',
+                message: data.msg
+              })
+            }
+            this.$message({
+              type: 'success',
+              message: data.msg
+            })
+            this.getDataList()
+          })
+        }).catch(() => {})
+      }
   }
 }
 </script>

@@ -24,9 +24,9 @@
 			  <el-select v-model="dataForm.taskIds" filterable  multiple placeholder="请选择计算任务" style="width: 100%">
 					<el-option
 						v-for="item in calculateList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value">
+						:key="item.id"
+						:label="item.name"
+						:value="item.id">
 					</el-option>
 				</el-select>
 			</el-form-item>
@@ -39,7 +39,7 @@
 </template>
 
 <script>
-  // import { savaBiInfo, updateBiInfo, findAllRecursionList } from '@/api/BI-Manager/menu'
+  import { savaBiInfo, updateBiInfo, lookDataInfo, findAllRecursionList, taskManageList } from '@/api/BI-Manager/menu'
   export default {
     data () {
       // var validateUrl = (rule, value, callback) => {
@@ -53,7 +53,7 @@
         visible: false,
         dataForm: {
           id: 0,
-          parentId: '',
+          parentId: [],
           name: '',
           url: '',
           taskIds: []
@@ -62,6 +62,7 @@
         menuParentList: [], // 保留选中的级联中完整内容
         calculateList: [],
         menuListTreeProps: {
+          checkStrictly: true,
           label: 'name',
           value: 'id',
           children: 'children'
@@ -83,21 +84,127 @@
       }
     },
     methods: {
-      init (id) {
-        this.dataForm.id = id || 0
+      init (row) {
+        this.getRecursionList()
+        this.getTaskManageList()
         this.visible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
+        if (row) {
+          this.dataForm.id = row.id
+          this.getDataInfo(row)
+        } else {
+          this.$nextTick(() => {
+            this.dataForm.id = 0
+            this.$refs['dataForm'].resetFields()
+          })
+        }
+      },
+      getDataInfo (row) {
+        lookDataInfo(row.id).then(({ data }) => {
+          if (data && data.code === 0) {
+            let parentIdData = data.data.menuParentList.split(',')
+            let taskIdsData = data.data.taskIds.split(';')
+            this.dataForm.name = data.data.name
+            this.dataForm.url = data.data.url
+            this.dataForm.parentId = parentIdData.length ? parentIdData.map(item => { return +item }) : []
+            this.menuParentList = data.data.menuParentList.split(',')
+            this.dataForm.taskIds = taskIdsData.length ? taskIdsData.map(item => { return +item }) : []
+            // this.getTaskManageList(data.data.taskIds.split(';'))
+          }
+        })
+      },
+      // 获取上级菜单
+      getRecursionList () {
+        findAllRecursionList().then(({ data }) => {
+          if (data && data.code === 0) {
+            this.menuList = this.filterMenuList(data.data)
+          }
+        })
+      },
+      filterMenuList (tree) {
+        let arr = []
+        if (!!tree && tree.length !== 0) {
+          tree.forEach((item, index) => {
+            let obj = {}
+            obj.id = item.id
+            obj.name = item.name
+            if (item.children.length) {
+              obj.children = this.filterMenuList(item.children)
+              arr.push(obj)
+            } else {
+              arr.push(obj)
+            }
+          })
+        }
+        return arr
+      },
+      getTaskManageList () {
+        let params = {
+          page: 1,
+          limit: 10,
+          key: '',
+          id: ''
+        }
+        taskManageList(params).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.calculateList = data.page.list
+          } else {
+            this.calculateList = []
+          }
         })
       },
       // 所属父级
       parentTreeChange (val) {
         this.menuParentList = val
+        console.log('this.menuParentList: ', this.menuParentList)
       },
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            let params = {
+              'parentId': this.dataForm.parentId.length ? this.menuParentList[this.menuParentList.length - 1].toString() : '0',
+              'name': this.dataForm.name,
+              'url': this.dataForm.url,
+              'grade': this.dataForm.parentId.length || 1,
+              'taskIds': this.dataForm.taskIds.join(';'),
+              'menuParentList': this.menuParentList.join(',')
+            }
+              console.log('params: ', params)
+            if (!this.dataForm.id) {
+              savaBiInfo(params).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.$emit('refreshDataList')
+                      this.visible = false
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg || '数据异常')
+                }
+              })
+            } else {
+              params.id = this.dataForm.id
+              params.flag = 0
+              updateBiInfo(params).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.$emit('refreshDataList')
+                      this.visible = false
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg || '数据异常')
+                }
+              })
+            }
           }
         })
       }

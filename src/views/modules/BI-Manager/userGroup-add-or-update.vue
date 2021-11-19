@@ -1,26 +1,27 @@
 <template>
 <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
+  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
     <el-form-item label="用户组名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
 		<el-form-item label="用户组所属租户" prop="tenantId">
-      <el-select v-model="dataForm.tenantId"  placeholder="请选择" style="width:100%" filterable>
+      <el-select v-model="dataForm.tenantId"  placeholder="请选择" style="width:100%" filterable @change="getUserSelectList">
         <el-option
           v-for="item in tenantIdList"
-          :key="item.value"
-          :label="item.lable"
-          :value="item.value">
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+          >
         </el-option>
       </el-select>
     </el-form-item>
-     <el-form-item label="用户组成员" prop="userId">
-      <el-select v-model="dataForm.userId" multiple placeholder="请选择" style="width:100%" filterable>
+     <el-form-item label="用户组成员" prop="userIds">
+      <el-select v-model="dataForm.userIds" multiple placeholder="请选择" style="width:100%" filterable>
         <el-option
           v-for="item in userIdList"
-          :key="item.value"
-          :label="item.lable"
-          :value="item.value">
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
         </el-option>
       </el-select>
     </el-form-item>
@@ -39,6 +40,7 @@
 </template>
 
 <script>
+import { savaUserGroupInfo, updateUserGroupInfo, lookDataInfo, getSelectTenantDown, getUsersList } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
     return {
@@ -48,7 +50,7 @@ export default {
         name: '',
         enable: 1,
         tenantId: '',
-        userId: []
+        userIds: []
       },
       tenantIdList: [],
       userIdList: [],
@@ -58,7 +60,7 @@ export default {
           message: '用户组名称不能为空',
           trigger: 'blur'
         }],
-        userId: [{
+        userIds: [{
           required: true,
           message: '请选择用户组成员',
           trigger: 'blur'
@@ -77,17 +79,97 @@ export default {
     }
   },
   methods: {
-    init (id) {
-      this.dataForm.id = id || 0
+    init (row) {
+      this.SelectTenantDown()
       this.visible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].resetFields()
+      if (row) {
+        this.getDataInfo(row.id)
+      } else {
+        this.$nextTick(() => {
+          this.dataForm.id = 0
+          this.$refs['dataForm'].resetFields()
+        })
+      }
+    },
+    getDataInfo (id) {
+      lookDataInfo(id).then(({ data }) => {
+        if (data && data.code === 0) {
+          let userIdsData = data.data.userIds.split(',')
+          this.dataForm.id = data.data.id
+          this.dataForm.name = data.data.name
+          this.dataForm.enable = data.data.enable
+          this.dataForm.tenantId = data.data.tenantId
+          this.getUserSelectList()
+          this.dataForm.userIds = userIdsData.map(item =>{return +item })
+        }
+      })
+    },
+    // 获取租户list
+    SelectTenantDown () {
+      getSelectTenantDown().then(({ data }) => {
+        if (data && data.code === 0) {
+          this.tenantIdList = data.data
+        } else {
+          this.tenantIdList = []
+        }
+      })
+    },
+    getUserSelectList () {
+      getUsersList(this.dataForm.tenantId).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.userIdList = data.data
+        } else {
+          this.userIdList = []
+        }
       })
     },
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          console.log('this.dataForm.userIds: ', this.dataForm);
+          let params = {
+            'name': this.dataForm.name,
+            'tenantId': this.dataForm.tenantId,
+            'enable': this.dataForm.enable,
+            'userIds': this.dataForm.userIds.join(',')
+            }
+            console.log('params: ', params)
+            if (!this.dataForm.id) {
+              savaUserGroupInfo(params).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.$emit('refreshDataList')
+                      this.visible = false
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg || '数据异常')
+                }
+              })
+            } else {
+              params.id = this.dataForm.id
+              params.flag = 0
+              updateUserGroupInfo(params).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.$emit('refreshDataList')
+                      this.visible = false
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg || '数据异常')
+                }
+              })
+            }
         }
       })
     }
