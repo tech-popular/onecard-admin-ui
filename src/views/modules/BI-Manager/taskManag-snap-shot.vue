@@ -15,11 +15,11 @@
 	<el-tabs v-model="item.content.activeName"  @tab-click="tabhandleClick">
     <el-tab-pane label="上游任务" name="first">
 			<h3>任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="up" type="new" @addTab = "addTab" ref="taskSnapshotUpDepends"></taskManageSnapShotTable>
+			<taskManageSnapShotTable :dataApi ="taskSnapshotNewDepends" :taskId="taskId" taskType="up" @addTab = "addTab" ref="taskSnapshotUpNewDepends"></taskManageSnapShotTable>
 		</el-tab-pane>
     <el-tab-pane label="下游任务" name="second">
 			<h3>任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="down" type="new" @addTab = "addTab" ref="taskSnapshotUpDepends"></taskManageSnapShotTable>
+			<taskManageSnapShotTable :dataApi ="taskSnapshotNewDepends" :taskId="taskId" taskType="down" @addTab = "addTab" ref="taskSnapshotDownNewDepends"></taskManageSnapShotTable>
 		</el-tab-pane>
   </el-tabs>
   </el-tab-pane>
@@ -29,6 +29,7 @@
 
 <script>
 import taskManageSnapShotTable from './taskManage-snapShot-table.vue'
+import { taskSnapshotNewDepends } from '@/api/dispatch/taskManag'
 export default {
   data () {
     return {
@@ -36,7 +37,7 @@ export default {
       taskId: '',
       editableTabsValue: '1',
       closable: false,
-      taskSnapshotDepends: '',
+      taskSnapshotNewDepends: taskSnapshotNewDepends,
       editableTabs: [{
         title: '',
         name: '1',
@@ -52,7 +53,7 @@ export default {
   methods: {
     init (row) {
       this.editableTabs = [{
-        title: row.taskName,
+        title: row.name,
         name: '1',
         content: {
           activeName: 'first',
@@ -65,7 +66,8 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         // 上游任务
-        this.$refs.taskSnapshotUpDepends[0].init()
+        this.$refs.taskSnapshotUpNewDepends[0].init()
+        this.$refs.taskSnapshotUpOldDepends[0].init()
       })
     },
     // 点击依赖快照
@@ -83,7 +85,8 @@ export default {
         this.closable = true
         this.$nextTick(() => {
           this.tabClickIndex = this.editableTabs.length - 1
-          this.$refs.taskSnapshotUpDepends[this.tabClickIndex].init()
+          this.$refs.taskSnapshotUpNewDepends[this.tabClickIndex].init()
+          this.$refs.taskSnapshotUpOldDepends[this.tabClickIndex].init()
         })
         this.editableTabsValue = newTabName
       },
@@ -93,7 +96,8 @@ export default {
         this.taskId = this.editableTabs[this.tabClickIndex].content.id
         this.editableTabs[this.tabClickIndex].content.activeName = 'first'
         this.$nextTick(() => {
-          this.$refs.taskSnapshotUpDepends[this.tabClickIndex].init()
+          this.$refs.taskSnapshotUpNewDepends[this.tabClickIndex].init()
+          this.$refs.taskSnapshotUpOldDepends[this.tabClickIndex].init()
         })
       },
       // 删除任务
@@ -129,11 +133,13 @@ export default {
         console.log('上下 ', this.tabClickIndex)
         if (tab.index === '0') {
           this.$nextTick(() => {
-            this.$refs.taskSnapshotUpDepends[this.tabClickIndex].init()
+            this.$refs.taskSnapshotUpNewDepends[this.tabClickIndex].init()
+            this.$refs.taskSnapshotUpOldDepends[this.tabClickIndex].init()
           })
         } else {
           this.$nextTick(() => {
             this.$refs.taskSnapshotDownNewDepends[this.tabClickIndex].init()
+            this.$refs.taskSnapshotDownOldDepends[this.tabClickIndex].init()
           })
         }
       }

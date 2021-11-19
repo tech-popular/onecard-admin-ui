@@ -92,13 +92,14 @@
           <el-button
             type="text"
             size="small"
+            @click="startTask(scope.row.id)"
           >手动执行</el-button>
 					<el-button
             type="text"
             size="small"
 						@click="taskDependent(scope.row.id)"
           >依赖任务</el-button>
-          <el-button type="text" size="small" @click="taskDependent(scope.row.id)">依赖任务进度</el-button>
+          <el-button type="text" size="small" @click="SnapShotHandle(scope.row)">依赖任务进度</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -115,6 +116,8 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
 		<!-- 任务依赖 -->
 		<task-dependent v-if="taskDependentVisible" ref="taskDependent"></task-dependent>
+    <!-- 依赖任务进度 -->
+    <taskManagSnapShot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"></taskManagSnapShot>
   </div>
 </template>
 <style>
@@ -123,8 +126,10 @@
 }
 </style>
 <script>
+import { taskManageList, selectTaskName, starttask } from '@/api/BI-Manager/taskManage'
 import AddOrUpdate from './taskManage-add-or-update'
 import TaskDependent from './taskManage-dependent'
+import taskManagSnapShot from './taskManag-snap-shot'
 export default {
   data () {
     return {
@@ -140,31 +145,59 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
-      taskDependentVisible: false
+      taskDependentVisible: false,
+      taskManagSnapShotVisible: false
     }
   },
   components: {
     AddOrUpdate,
-    TaskDependent
+    TaskDependent,
+    taskManagSnapShot
   },
   activated () {
     this.getDataList()
   },
-  mounted () {},
+  mounted () {
+    this.loadAll()
+  },
   methods: {
-    querySearchAsync (queryString, cb) {},
-    createFilter(queryString) {
-      return (restaurant) => {
-        return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+    // 获取数据列表
+    getDataList () {
+      this.dataListLoading = true
+      let params = {
+        page: this.pageIndex,
+        limit: this.pageSize,
+        key: this.dataForm.key,
+        id: this.dataForm.id
       }
+      taskManageList(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.dataList = data.page.list
+          this.totalPage = data.page.totalCount
+        } else {
+          this.dataList = []
+          this.totalPage = 0
+        }
+        this.dataListLoading = false
+      })
+    },
+    loadAll () {
+      selectTaskName(this.dataForm.key).then(({ data }) => {
+        if (data && data.code === 0) {
+            this.restaurants = data.searchData
+          }
+      })
+    },
+    querySearchAsync (queryString, cb) {
+      this.loadAll()
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        cb(this.restaurants)
+      }, 3000 * Math.random())
     },
     handleSelect (item) {
       this.dataForm.key = item.name
       this.getDataList()
-    },
-    // 获取数据列表
-    getDataList () {
-      // this.dataListLoading = true
     },
     // 每页数
     sizeChangeHandle (val) {
@@ -194,6 +227,29 @@ export default {
         this.$refs.taskDependent.init(id)
       })
     },
+    SnapShotHandle (row) {
+      this.taskManagSnapShotVisible = true
+      this.$nextTick(() => {
+        this.$refs.taskManagSnapShot.init(row)
+      })
+    },
+    // 手动执行
+    startTask (id) {
+      starttask(id).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
     // 删除
     deleteHandle (id) {
       var ids = id
@@ -210,6 +266,24 @@ export default {
           type: 'warning'
         }
       ).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/honeycomb/honeycombtask/delete'),
+          method: 'post',
+          data: this.$http.adornData(ids, false)
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       })
     }
   }

@@ -107,41 +107,20 @@
         <el-form-item>
           <el-button @click="addDomain">新增输出数据源</el-button>
         </el-form-item>
+        <!-- <el-form-item label="SQL列" prop="sqlFields">
+          <el-input v-model="dataForm.sqlFields" placeholder="必须和SQL对应"></el-input>
+        </el-form-item> -->
         <el-form-item label="SQL" prop="sql">
           <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="testSQL">测试一下SQL</el-button>
         </el-form-item>
-        <!--<el-form-item label="转换配置" prop="transformerConfig">-->
-        <!--<el-input v-model="dataForm.transformerConfig" placeholder="转换配置"></el-input>-->
-        <!--</el-form-item>-->
-        <!-- <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input> -->
-        <el-form-item style="margin-top: -10px; margin-bottom:0px;">
-          <cron v-if="showCronBox" v-model="dataForm.cron"></cron>
-        </el-form-item>
         <el-form-item label="cron表达式" prop="cron">
           <el-input v-model="dataForm.cron" placeholder="cron表达式"></el-input>
-          <!-- <el-input v-model="dataForm.cron" auto-complete="off">
-            <el-button
-              slot="append"
-              v-if="!showCronBox"
-              icon="el-icon-arrow-up"
-              @click="showCronBox = true"
-              title="打开图形配置"
-            ></el-button>
-            <el-button
-              slot="append"
-              v-else
-              icon="el-icon-arrow-down"
-              @click="showCronBox = false"
-              title="关闭图形配置"
-            ></el-button>
-          </el-input> -->
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <!-- <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button> -->
         <el-button @click="visible = false">取消</el-button>
         <el-button type="primary"  v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
       </span>
@@ -188,9 +167,8 @@
 </template>
 
 <script>
-import cron from '@/components/cron'
 import { codemirror } from 'vue-codemirror'
-import { getDate, deepClone } from '@/utils'
+import { deepClone } from '@/utils'
 import 'codemirror/theme/ambiance.css'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
@@ -202,7 +180,6 @@ require('codemirror/addon/hint/sql-hint')
 export default {
   name: 'codeMirror',
   components: {
-    cron,
     codemirror
   },
   data () {
@@ -218,42 +195,30 @@ export default {
       showCronBox: false,
       visible: false,
       sqlVisible: false,
-      activeNames: 2,
       canUpdate: true, // 查看时不可编辑
       dataFormOrigin: {
         id: 0,
         name: '',
         inDatasource: '',
+        // sqlFields: '',
         sql: '',
         transformerConfig: '',
         outDatasource: '',
         cron: '',
-        dependTask: '',
-        userType: null,
-        operatorId: null,
-        userDesc: null,
-        increModel: 0,
-        allowRepeatTrigger: 0,
-        startTime: null,
-        endTime: null,
-        notifyFlag: 0,
-        taskSource: '',
-        targetSql: null,
         honeycombOutDatasourceEntitys: [
           {
             outTableName: '',
             outDatasource: 1,
+            enable: 1,
             taskId: 0
           }
         ]
       },
       dataForm: {},
-      rowData: { // 修改时数据内容
-          authOwner: '',
-          authOtherList: [],
-          authOthers: ''
-      },
       datasourceoptions: [],
+      tenantoptions: [],
+      computeTypeoptions: [],
+      idRuleoptions: [],
       dataRule: {
         name: [
           { required: true, message: '任务名称不能为空', trigger: 'blur', validator: validateNull }
@@ -388,122 +353,10 @@ export default {
     init (row, canUpdate) {
       this.redisListData = []
       this.dataForm = deepClone(this.dataFormOrigin)
-      // 数据源下拉框
-      this.$http({
-        url: this.$http.adornUrl(`/honeycomb/honeycombdatasourceconfig/select`),
-        method: 'get',
-        params: this.$http.adornParams()
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.datasourceoptions = data.honeycombDatasourceConfigEntities
-        }
-      })
-      this.rowData = {
-        authOwner: '',
-        authOtherList: [],
-        authOthers: ''
-      }
       this.dataForm.id = row ? row.id : 0
-      this.canUpdate = row ? canUpdate : true
-      this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
       this.visible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
-        if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(
-              `/honeycomb/honeycombtask/info/${this.dataForm.id}`
-            ),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm.notifyFlag = data.honeycombTask.notifyFlag
-              this.dataForm.taskSource = data.honeycombTask.taskSource
-              this.dataForm.targetSql = data.honeycombTask.targetSql
-              this.dataForm.userType = data.honeycombTask.userType
-              this.dataForm.operatorId = data.honeycombTask.operatorId
-              this.dataForm.userDesc = data.honeycombTask.userDesc
-              this.dataForm.increModel = data.honeycombTask.increModel
-              this.dataForm.allowRepeatTrigger = data.honeycombTask.allowRepeatTrigger
-              this.dataForm.startTime = data.honeycombTask.startTime
-              this.dataForm.endTime = data.honeycombTask.endTime
-              this.dataForm.name = data.honeycombTask.name
-              this.dataForm.inDatasource = data.honeycombTask.inDatasource
-              this.dataForm.sql = data.honeycombTask.sql
-              this.dataForm.transformerConfig =
-                data.honeycombTask.transformerConfig
-              this.dataForm.cron = data.honeycombTask.cron
-              this.dataForm.dependTask = data.honeycombTask.dependTask
-              this.dataForm.honeycombOutDatasourceEntitys =
-                data.honeycombTask.honeycombOutDatasourceEntitys
-              this.dataForm.honeycombOutDatasourceEntitys.forEach((val, i) => {
-                this.$set(this.redisListData, i, {
-                  name: '',
-                  key: '',
-                  value: '',
-                  label: '',
-                  score: '',
-                  time: '',
-                  type: '',
-                  unit: '1'
-                })
-                let id = val.outDatasource
-                let datasource = this.datasourceoptions.filter(
-                  item => item.id == id
-                )
-                if (datasource[0].datasourceType == 'redis' || datasource[0].datasourceType == 'singleRedis') {
-                  let arr = val.outTableName.split('#')
-                  let label = this.redisNames.filter(item => item.value === arr[0])[0].label
-                  this.$set(this.redisListData, i, {
-                    show: true,
-                    name: arr[0],
-                    key: arr[1],
-                    type: arr[2] || '',
-                    time: arr[3] || '',
-                    label: label,
-                    value: arr[4],
-                    score: arr[5] || '',
-                    unit: '1'
-                  })
-                } else {
-                  this.$set(this.redisListData, i, {
-                    show: false
-                  })
-                }
-              })
-            }
-          })
-        } else {
-          this.dataForm.honeycombOutDatasourceEntitys = []
-        }
-      })
-    },
-    /**
-     * 启动任务
-     */
-    startTask () {
-      return this.$http({
-        url: this.$http.adornUrl(
-          `/honeycomb/honeycombtask/starttask/${this.dataForm.id}`
-        ),
-        method: 'get',
-        params: this.$http.adornParams()
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.$message({
-            message: '操作成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
-              this.visible = false
-              this.$emit('closeUpdateBox')
-              this.$emit('refreshDataList')
-            }
-          })
-        } else {
-          this.$message.error(data.msg)
-        }
       })
     },
     // 表单提交
@@ -513,54 +366,6 @@ export default {
       }
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          this.showCronBox = false
-          this.$http({
-            url: this.$http.adornUrl(
-              `/honeycomb/honeycombtask/${
-                !this.dataForm.id ? 'save' : 'update'
-              }`
-            ),
-            method: 'post',
-            data: this.$http.adornData({
-              id: this.dataForm.id || undefined,
-              name: this.dataForm.name,
-              inDatasource: this.dataForm.inDatasource,
-              sql: this.dataForm.sql,
-              transformerConfig: this.dataForm.transformerConfig,
-              outDatasource: this.dataForm.outDatasource,
-              cron: this.dataForm.cron,
-              dependTask: this.dataForm.dependTask,
-              userType: this.dataForm.userType,
-              operatorId: this.dataForm.operatorId,
-              userDesc: this.dataForm.userDesc,
-              increModel: this.dataForm.increModel,
-              allowRepeatTrigger: this.dataForm.allowRepeatTrigger,
-              startTime: this.dataForm.startTime,
-              endTime: this.dataForm.endTime,
-              notifyFlag: this.dataForm.notifyFlag,
-              taskSource: this.dataForm.taskSource,
-              targetSql: this.dataForm.targetSql,
-              honeycombOutDatasourceEntitys: this.dataForm
-                .honeycombOutDatasourceEntitys,
-              authOwner: this.rowData.authOwner,
-              authOtherList: this.rowData.authOtherList,
-              authOthers: this.rowData.authOthers
-            })
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.visible = false
-                  this.$emit('refreshDataList')
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
         }
       })
     },
@@ -573,100 +378,12 @@ export default {
         if (valid) {
           this.returnData = ''
           this.returnStatus = ''
-          this.$http({
-            url: this.$http.adornUrl(
-              `/honeycomb/honeycombtaskpreview/preview/sql`
-            ),
-            method: 'post',
-            data: this.$http.adornData(this.dataSql)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              const time = getDate(data.resultBean.timestamp, 'year')
-              this.returnStatus =
-                time + ' ' + JSON.stringify({ status: data.resultBean.status })
-              this.returnData = JSON.stringify({
-                data: data.resultBean.data,
-                message: data.resultBean.message
-              })
-              if (data.resultBean.status === '2') {
-                this.instanceId = data.resultBean.traceId
-                this.returnData += '\n继续执行'
-                this.continueMaxcomputepreview()
-              } else {
-                clearInterval(window.clearnum)
-                this.instanceId = ''
-              }
-            } else {
-              this.returnData += JSON.stringify(data, null, 1)
-            }
-          })
-        }
-      })
-    },
-    continueMaxcomputepreview () {
-      this.$refs['dataSql'].validate(valid => {
-        if (valid) {
-          this.$http({
-            url: this.$http.adornUrl(
-              `/honeycomb/honeycombtaskpreview/preview/maxcompute`
-            ),
-            method: 'post',
-            data: this.$http.adornData({
-              instanceId: this.instanceId || undefined,
-              datasourceId: this.dataSql.datasourceId
-            })
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              const time = getDate(data.resultBean.timestamp, 'year')
-              this.returnStatus += `\n${time} ${JSON.stringify({
-                status: data.resultBean.status
-              })}`
-              this.returnData += JSON.stringify({
-                data: data.resultBean.data,
-                message: data.resultBean.message
-              })
-              if (data.resultBean.status === '2') {
-                this.returnData += '\n继续执行'
-                clearInterval(window.clearnum)
-                window.clearnum = setTimeout(() => {
-                  this.continueMaxcomputepreview()
-                }, 3000)
-              } else {
-                this.instanceId = ''
-                clearInterval(window.clearnum)
-              }
-            } else {
-              this.returnData += JSON.stringify(data)
-            }
-          })
         }
       })
     },
     stopMaxcomputepreview () {
       this.$refs['dataSql'].validate(valid => {
         if (valid) {
-          this.$http({
-            url: this.$http.adornUrl(
-              `/honeycomb/honeycombtaskpreview/preview/stopmaxcompute`
-            ),
-            method: 'post',
-            data: this.$http.adornData({
-              instanceId: this.instanceId || undefined,
-              datasourceId: this.dataSql.datasourceId
-            })
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              const time = getDate(data.resultBean.timestamp, 'year')
-              clearInterval(window.clearnum)
-              this.returnStatus += `\n${time} ${JSON.stringify({
-                status: data.resultBean.status
-              })}`
-              this.returnData += '\n停止执行'
-            } else {
-              this.$message.error(data.msg)
-              alert('操作失败')
-            }
-          })
         }
       })
     },
@@ -704,13 +421,6 @@ export default {
           })
           return false
         }
-        // if (this.redisListData[i].show && !this.redisListData[i].key) {
-        //   this.$message({
-        //     type: 'warning',
-        //     message: '请输入redis key'
-        //   })
-        //   return false
-        // }
       }
       return true
     }

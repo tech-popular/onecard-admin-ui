@@ -3,7 +3,7 @@
     :title="!dataForm.taskId ? '新增' : '配置'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="任务id" prop="taskId" v-show="false">
       <el-input v-model="dataForm.taskId" placeholder="任务id" v-show="false"></el-input>
     </el-form-item>
@@ -54,6 +54,7 @@
     </span>
   </el-dialog>
 </template>
+
 <script>
   export default {
     data () {
@@ -82,9 +83,34 @@
         }
       },
       init (id) {
+        // 下拉框
+        this.$http({
+          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/select`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.taskIdOptions = data.allTask
+          }
+        })
+        console.log('dddddd' + id)
+        this.dataForm.taskId = id
+        console.log('fffff' + this.dataForm.taskId)
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
+          if (this.dataForm.taskId) {
+            this.$http({
+              url: this.$http.adornUrl(`/honeycomb/honeycombtask/taskdependent/info/` + id),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm = data.honeycombTaskDependentEntities
+                console.log(this.dataForm)
+              }
+            })
+          }
         })
       },
       clearDataForm () {
@@ -99,6 +125,29 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/honeycomb/honeycombtask/taskdependent/save`),
+              method: 'post',
+              data: this.$http.adornData({
+                'taskId': this.dataForm.taskId,
+                'taskDependentEntities': this.dataForm.taskDependentEntities
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.clearDataForm()
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
           }
         })
       }
