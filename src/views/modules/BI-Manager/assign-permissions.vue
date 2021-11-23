@@ -1,12 +1,16 @@
 <template>
 <el-dialog title="当前用户组： A产品" :close-on-click-modal="false" :visible.sync="visible">
 			<el-tree
-			:data="data"
+			:data="dataTree"
 			show-checkbox
 			node-key="id"
-			:default-expanded-keys="[2, 3]"
-			:default-checked-keys="[5]"
-			:props="defaultProps">
+      :default-expand-all="true"
+			:props="defaultProps"
+      v-model="menuIds"
+      :default-checked-keys="defaultExpandedKeys"
+      @check-change="handleNodeClick"
+      @check="checkPermit"
+      >
     </el-tree>
   <span slot="footer" class="dialog-footer">
     <el-button @click="visible = false">取消</el-button>
@@ -16,61 +20,77 @@
 </template>
 
 <script>
+import { findAllRecursionList, saveRoleInfo, getRoleMenuList } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
     return {
       visible: false,
-     data: [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2'
-          }]
-        }],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        }
+      userGroupId: 0,
+      menuIds: [],
+      checkedDataKeys: [],
+      halfCheckedDataKeys: [],
+      defaultExpandedKeys: [],
+      dataTree: [],
+      defaultProps: {
+        children: 'children',
+        label: 'name'
+      }
     }
   },
   methods: {
-    init () {
+    init (id) {
+      this.defaultExpandedKeys = []
+      findAllRecursionList().then(({ data }) => {
+          if (data && data.code === 0) {
+            this.dataTree = data.data
+          }
+      })
+      let params = {
+        userGroupId: id
+      }
+      getRoleMenuList(params).then(({ data }) => {
+        if (data && data.code === 0 && data.data.length) {
+          data.data.forEach(element => {
+            this.defaultExpandedKeys.push(element.menuId)
+          })
+        }
+      })
+      this.userGroupId = id
       this.visible = true
+    },
+    handleNodeClick () {},
+    checkPermit (checkedNodes, checkedKeys, halfCheckedNodes, halfCheckedKeys) {
+      this.checkedDataKeys = checkedKeys.checkedKeys
+      this.halfCheckedDataKeys = checkedKeys.halfCheckedKeys
     },
     // 表单提交
     dataFormSubmit () {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
+      let menuIds = []
+      menuIds = this.checkedDataKeys.concat(this.halfCheckedDataKeys)
+      if (menuIds.length) {
+        let params = {
+          'menuIds': menuIds,
+          'userGroupId': this.userGroupId,
+          'checkedDataKeys': this.checkedDataKeys
         }
-      })
+        saveRoleInfo(params).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.$emit('refreshDataList')
+                this.visible = false
+              }
+            })
+          } else {
+            this.$message.error(data.msg || '数据异常')
+          }
+        })
+      } else {
+       this.$message.error('请选择菜单')
+     }
     }
   }
 }

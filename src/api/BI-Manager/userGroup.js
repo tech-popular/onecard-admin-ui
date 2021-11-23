@@ -7,5 +7,6 @@ export const lookDataInfo = id => httpGet(da + `bi/biUserGroup/info/${id}`) // �
 export const getSelectTenantDown = () => httpPost(da + 'tenantManage/selectTenantDown') // 租户列表
 export const getUsersList = tenantId => httpGet(da + `oa/getUsersFromTenantId/${tenantId}`) // 用户列表
 export const deleteUsersById = id => httpGet(da + `bi/biUserGroup/deleteById/${id}`) // 删除
-export const getRoleMenuList = userGroupId => httpGet(da + `bi/biSysUserGroupMenu/getRoleMenuList/${userGroupId}`) // 获取授权菜单id集合
+export const getRoleMenuList = userGroupId => httpGet(da + 'bi/biSysUserGroupMenu/getRoleMenuList', userGroupId) // 获取授权菜单id集合
 export const saveRoleInfo = params => httpPost(da + 'bi/biSysUserGroupMenu/saveRole', params) // 分配权限
+export const findAllRecursionList = () => httpGet(da + 'bi/biSysMenu/findAllRecursionList') // 递归菜单查询

@@ -100,7 +100,7 @@ export default {
           this.dataForm.enable = data.data.enable
           this.dataForm.tenantId = data.data.tenantId
           this.getUserSelectList()
-          this.dataForm.userIds = userIdsData.map(item =>{return +item })
+          this.dataForm.userIds = userIdsData.map(item => { return +item })
         }
       })
     },
@@ -127,7 +127,6 @@ export default {
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log('this.dataForm.userIds: ', this.dataForm);
           let params = {
             'name': this.dataForm.name,
             'tenantId': this.dataForm.tenantId,
