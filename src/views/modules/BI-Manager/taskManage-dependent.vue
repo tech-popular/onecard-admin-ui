@@ -84,11 +84,12 @@
       },
       init (id) {
         // 下拉框
-        let sysType = 1
         this.$http({
-          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/select` + sysType),
+          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/select`),
           method: 'get',
-          params: this.$http.adornParams()
+          params: this.$http.adornParams({
+            sysType: 1
+          })
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.taskIdOptions = data.allTask
