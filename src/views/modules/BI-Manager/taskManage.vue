@@ -6,28 +6,24 @@
           v-model="dataForm.id"
           placeholder="请输入任务ID"
           class="input-with-select"
+          clearable
           @keyup.enter.native="getDataList()"
         ></el-input>
       </el-form-item>
       <el-form-item label="任务名称: ">
-        <el-autocomplete
-          v-model="dataForm.key"
-          :fetch-suggestions="querySearchAsync"
+        <el-input
+          v-model="dataForm.name"
           placeholder="请输入任务名称"
-          @select="handleSelect"
           class="input-with-select"
+          clearable
           @keyup.enter.native="getDataList()"
-        ></el-autocomplete>
+        ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button type="primary" @click="getDataList()">查询</el-button>
+        <el-button type="default" @click="resetHandle()">重置</el-button>
+        <el-button type="success" @click="addOrUpdateHandle()">新增</el-button>
         <el-button
-          v-if="isAuth('honeycomb:honeycombtask:save')"
-          type="primary"
-          @click="addOrUpdateHandle()"
-        >新增</el-button>
-        <el-button
-          v-if="isAuth('honeycomb:honeycombtask:delete')"
           type="danger"
           @click="deleteHandle()"
           :disabled="dataListSelections.length <= 0"
@@ -126,7 +122,7 @@
 }
 </style>
 <script>
-import { taskManageList, selectTaskName, starttask } from '@/api/BI-Manager/taskManage'
+import { taskManageList, starttask } from '@/api/BI-Manager/taskManage'
 import AddOrUpdate from './taskManage-add-or-update'
 import TaskDependent from './taskManage-dependent'
 import taskManagSnapShot from './taskManag-snap-shot'
@@ -134,10 +130,9 @@ export default {
   data () {
     return {
       dataForm: {
-        key: '',
+        name: '',
         id: ''
       },
-      restaurants: [],
       dataList: [],
       pageIndex: 1,
       pageSize: 10,
@@ -157,18 +152,17 @@ export default {
   activated () {
     this.getDataList()
   },
-  mounted () {
-    this.loadAll()
-  },
+  mounted () {},
   methods: {
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true
       let params = {
-        page: this.pageIndex,
-        limit: this.pageSize,
-        key: this.dataForm.key,
-        id: this.dataForm.id
+        'sysType': 1,
+        'page': this.pageIndex.toString(),
+        'limit': this.pageSize.toString(),
+        'id': this.dataForm.id,
+        'name': this.dataForm.name
       }
       taskManageList(params).then(({ data }) => {
         if (data && data.code === 0) {
@@ -180,20 +174,6 @@ export default {
         }
         this.dataListLoading = false
       })
-    },
-    loadAll () {
-      selectTaskName(this.dataForm.key).then(({ data }) => {
-        if (data && data.code === 0) {
-            this.restaurants = data.searchData
-          }
-      })
-    },
-    querySearchAsync (queryString, cb) {
-      this.loadAll()
-      clearTimeout(this.timeout)
-      this.timeout = setTimeout(() => {
-        cb(this.restaurants)
-      }, 3000 * Math.random())
     },
     handleSelect (item) {
       this.dataForm.key = item.name
@@ -208,6 +188,11 @@ export default {
     // 当前页
     currentChangeHandle (val) {
       this.pageIndex = val
+      this.getDataList()
+    },
+    resetHandle () {
+      this.dataForm.id = ''
+      this.dataForm.name = ''
       this.getDataList()
     },
     // 多选

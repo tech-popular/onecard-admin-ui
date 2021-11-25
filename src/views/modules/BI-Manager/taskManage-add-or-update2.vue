@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      :title="!dataForm.id ? '新增' : '修改'"
+      :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"
       :close-on-click-modal="false"
       :visible.sync="visible"
     >
@@ -25,6 +25,16 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <!-- <el-form-item label="计算类型" prop="computeType">
+          <el-select v-model="dataForm.computeType" placeholder="请选择">
+            <el-option
+              v-for="item in computeTypeoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item> -->
         <el-form-item
           v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
           :label="'输出数据源' + index"
@@ -106,12 +116,18 @@
         <el-form-item>
           <el-button @click="addDomain">新增输出数据源</el-button>
         </el-form-item>
+        <!-- <el-form-item label="SQL列" prop="sqlFields">
+          <el-input v-model="dataForm.sqlFields" placeholder="必须和SQL对应"></el-input>
+        </el-form-item> -->
         <el-form-item label="SQL" prop="sql">
           <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="testSQL">测试一下SQL</el-button>
         </el-form-item>
+        <!-- <el-form-item label="周期" prop="period">
+          <el-input v-model="dataForm.period" placeholder="周期" type="number"></el-input>
+        </el-form-item> -->
         <!--<el-form-item label="转换配置" prop="transformerConfig">-->
         <!--<el-input v-model="dataForm.transformerConfig" placeholder="转换配置"></el-input>-->
         <!--</el-form-item>-->
@@ -138,11 +154,104 @@
             ></el-button>
           </el-input> -->
         </el-form-item>
+        <!-- <el-form-item label="数据权限" prop="tenantId">
+          <el-select v-model="dataForm.tenantId" placeholder="请选择,默认为所有人查看">
+            <el-option
+              v-for="item in tenantoptions"
+              :key="item.tenantId"
+              :label="item.name"
+              :value="item.tenantId"
+            ></el-option>
+          </el-select>
+        </el-form-item> -->
+        <!-- <el-form-item label="是否启用" prop="enable">
+          <el-radio-group v-model="dataForm.enable">
+            <el-radio :label="0">禁用</el-radio>
+            <el-radio :label="1">正常</el-radio>
+          </el-radio-group>
+        </el-form-item> -->
+        <!-- <el-collapse v-model="activeNames">
+          <el-collapse-item title="高级选项" name="1">
+            <el-form-item label="id规则" prop="idRule">
+              <el-select v-model="dataForm.idRule" placeholder="请选择">
+                <el-option
+                  v-for="item in idRuleoptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="增加task字段" prop="addFieldTask">
+              <el-select v-model="dataForm.addFieldTask" placeholder="请选择">
+                <el-option
+                  v-for="item in tureOrFalseoptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="增加timestamp字段" prop="addFieldTimestamp">
+              <el-select v-model="dataForm.addFieldTimestamp" placeholder="请选择">
+                <el-option
+                  v-for="item in tureOrFalseoptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="重写规则" prop="overwriteKey">
+              <el-input v-model="dataForm.overwriteKey" placeholder="overwriteKey"></el-input>
+            </el-form-item>
+            <el-form-item label="服务名称字段" prop="serviceNameFiled">
+              <el-input v-model="dataForm.serviceNameFiled" placeholder="serviceNameFiled"></el-input>
+            </el-form-item>
+            <el-form-item label="健康检查任务" prop="isHealthcheck">
+              <el-select v-model="dataForm.isHealthcheck" placeholder="请选择">
+                <el-option
+                  v-for="item in tureOrFalseoptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="是否为业务监控任务" prop="isBusinessDataCheck">
+              <el-select v-model="dataForm.isBusinessDataCheck" placeholder="请选择">
+                <el-option
+                  v-for="item in tureOrFalseoptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="是否是合并任务" prop="isMergeTask">
+              <el-select v-model="dataForm.isMergeTask" placeholder="请选择">
+                <el-option
+                  v-for="item in tureOrFalseoptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="版本号" prop="version">
+              <el-input v-model="dataForm.version" placeholder="版本号" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="标签" prop="tags">
+              <el-input v-model="dataForm.tags" placeholder="标签"></el-input>
+            </el-form-item>
+          </el-collapse-item>
+          <el-collapse-item name="2"></el-collapse-item>
+        </el-collapse> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <!-- <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button> -->
         <el-button @click="visible = false">取消</el-button>
-        <el-button type="primary"  @click="dataFormSubmit()">确定</el-button>
+        <el-button type="primary"   @click="dataFormSubmit()">确定</el-button>
       </span>
     </el-dialog>
     <!-- 测试 sql -->
@@ -218,22 +327,70 @@ export default {
       visible: false,
       sqlVisible: false,
       activeNames: 2,
+      canUpdate: true, // 查看时不可编辑
       dataFormOrigin: {
         id: 0,
         name: '',
         inDatasource: '',
+        computeType: '',
+        // sqlFields: '',
         sql: '',
+        period: 0,
+        transformerConfig: '',
+        outDatasource: '',
         cron: '',
+        version: 1,
+        dependTask: '',
+        tenantId: '',
+        tags: '',
+        enable: 1,
+        idRule: 'none',
+        addFieldTask: 'false',
+        addFieldTimestamp: 'false',
+        overwriteKey: '',
+        serviceNameFiled: '',
+        isHealthcheck: 'false',
+        isBusinessDataCheck: 'false',
+        isMergeTask: 'false',
+        userType: null,
+        operatorId: null,
+        userDesc: null,
+        increModel: 0,
+        allowRepeatTrigger: 0,
+        startTime: null,
+        endTime: null,
+        notifyFlag: 0,
+        taskSource: '',
+        targetSql: null,
         honeycombOutDatasourceEntitys: [
           {
             outTableName: '',
             outDatasource: 1,
+            enable: 1,
             taskId: 0
           }
         ]
       },
       dataForm: {},
+      rowData: { // 修改时数据内容
+          authOwner: '',
+          authOtherList: [],
+          authOthers: ''
+      },
       datasourceoptions: [],
+      tenantoptions: [],
+      computeTypeoptions: [],
+      idRuleoptions: [],
+      tureOrFalseoptions: [
+        {
+          value: true,
+          label: 'true'
+        },
+        {
+          value: false,
+          label: 'false'
+        }
+      ],
       dataRule: {
         name: [
           { required: true, message: '任务名称不能为空', trigger: 'blur', validator: validateNull }
@@ -241,7 +398,18 @@ export default {
         inDatasource: [
           { required: true, message: '输入数据源不能为空', trigger: 'change' }
         ],
+        computeType: [
+          {
+            required: true,
+            message: '计算类型:1 简单 2 复杂不能为空',
+            trigger: 'change'
+          }
+        ],
+        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
         cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
+        // sqlFields: [
+        //   { required: true, message: 'SQL列不能为空，且必须和SQL对应', trigger: 'blur', validator: validateNull }
+        // ]
       },
       dataSql: {
         datasourceId: '',
@@ -365,9 +533,19 @@ export default {
       let label = this.redisNames.filter(item => item.value === val)[0].label
       this.redisListData.splice(index, 1, { ...this.redisListData[index], label: label })
     },
-    init (row) {
+    init (row, canUpdate) {
       this.redisListData = []
       this.dataForm = deepClone(this.dataFormOrigin)
+      // 数据源权限tenant
+      this.$http({
+        url: this.$http.adornUrl(`/sys/systenant/getTenantInfoByUser`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.tenantoptions = data.sysTenantEntities
+        }
+      })
       // 数据源下拉框
       this.$http({
         url: this.$http.adornUrl(`/honeycomb/honeycombdatasourceconfig/select`),
@@ -378,7 +556,27 @@ export default {
           this.datasourceoptions = data.honeycombDatasourceConfigEntities
         }
       })
+      this.$http({
+        url: this.$http.adornUrl(`/sys/sysdictitem/selectalltaskpage`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.computeTypeoptions = data.taskDicts.task_compute_type
+          this.computeTypeoptions.map(item => {
+            item.label = item.label == 'simple' ? '简单类型' : '复杂类型'
+          })
+          this.idRuleoptions = data.taskDicts.task_id_rule
+        }
+      })
+      this.rowData = {
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
+      }
       this.dataForm.id = row ? row.id : 0
+      this.canUpdate = row ? canUpdate : true
+      this.rowData = this.dataForm.id ? deepClone(row) : this.rowData
       this.visible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
@@ -391,10 +589,42 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
+              this.dataForm.notifyFlag = data.honeycombTask.notifyFlag
+              this.dataForm.taskSource = data.honeycombTask.taskSource
+              this.dataForm.targetSql = data.honeycombTask.targetSql
+              this.dataForm.userType = data.honeycombTask.userType
+              this.dataForm.operatorId = data.honeycombTask.operatorId
+              this.dataForm.userDesc = data.honeycombTask.userDesc
+              this.dataForm.increModel = data.honeycombTask.increModel
+              this.dataForm.allowRepeatTrigger = data.honeycombTask.allowRepeatTrigger
+              this.dataForm.startTime = data.honeycombTask.startTime
+              this.dataForm.endTime = data.honeycombTask.endTime
               this.dataForm.name = data.honeycombTask.name
               this.dataForm.inDatasource = data.honeycombTask.inDatasource
+              this.dataForm.computeType =
+                data.honeycombTask.computeType == 'simple' ? '0' : '1'
               this.dataForm.sql = data.honeycombTask.sql
+              // this.dataForm.sqlFields = data.honeycombTask.sqlFields
+              this.dataForm.period = data.honeycombTask.period
+              this.dataForm.transformerConfig =
+                data.honeycombTask.transformerConfig
               this.dataForm.cron = data.honeycombTask.cron
+              this.dataForm.version = data.honeycombTask.version
+              this.dataForm.tenantId = data.honeycombTask.tenantId
+              this.dataForm.dependTask = data.honeycombTask.dependTask
+              this.dataForm.tags = data.honeycombTask.tags
+              this.dataForm.enable = data.honeycombTask.enable
+              this.dataForm.idRule = data.honeycombTask.idRule
+              this.dataForm.addFieldTask = data.honeycombTask.addFieldTask
+              this.dataForm.addFieldTimestamp =
+                data.honeycombTask.addFieldTimestamp
+              this.dataForm.overwriteKey = data.honeycombTask.overwriteKey
+              this.dataForm.serviceNameFiled =
+                data.honeycombTask.serviceNameFiled
+              this.dataForm.isHealthcheck = data.honeycombTask.isHealthcheck
+              this.dataForm.isBusinessDataCheck =
+                data.honeycombTask.isBusinessDataCheck
+              this.dataForm.isMergeTask = data.honeycombTask.isMergeTask
               this.dataForm.honeycombOutDatasourceEntitys =
                 data.honeycombTask.honeycombOutDatasourceEntitys
               this.dataForm.honeycombOutDatasourceEntitys.forEach((val, i) => {
@@ -486,11 +716,41 @@ export default {
               id: this.dataForm.id || undefined,
               name: this.dataForm.name,
               inDatasource: this.dataForm.inDatasource,
+              computeType: this.dataForm.computeType,
+              // sqlFields: this.dataForm.sqlFields,
               sql: this.dataForm.sql,
+              period: this.dataForm.period,
+              transformerConfig: this.dataForm.transformerConfig,
+              outDatasource: this.dataForm.outDatasource,
               cron: this.dataForm.cron,
-              period: 0,
+              version: this.dataForm.version,
+              tenantId: this.dataForm.tenantId,
+              tags: this.dataForm.tags,
+              enable: this.dataForm.enable,
+              dependTask: this.dataForm.dependTask,
+              idRule: this.dataForm.idRule,
+              addFieldTimestamp: this.dataForm.addFieldTimestamp,
+              addFieldTask: this.dataForm.addFieldTask,
+              overwriteKey: this.dataForm.overwriteKey,
+              serviceNameFiled: this.dataForm.serviceNameFiled,
+              isHealthcheck: this.dataForm.isHealthcheck,
+              isBusinessDataCheck: this.dataForm.isBusinessDataCheck,
+              isMergeTask: this.dataForm.isMergeTask,
+              userType: this.dataForm.userType,
+              operatorId: this.dataForm.operatorId,
+              userDesc: this.dataForm.userDesc,
+              increModel: this.dataForm.increModel,
+              allowRepeatTrigger: this.dataForm.allowRepeatTrigger,
+              startTime: this.dataForm.startTime,
+              endTime: this.dataForm.endTime,
+              notifyFlag: this.dataForm.notifyFlag,
+              taskSource: this.dataForm.taskSource,
+              targetSql: this.dataForm.targetSql,
               honeycombOutDatasourceEntitys: this.dataForm
-                .honeycombOutDatasourceEntitys
+                .honeycombOutDatasourceEntitys,
+              authOwner: this.rowData.authOwner,
+              authOtherList: this.rowData.authOtherList,
+              authOthers: this.rowData.authOthers
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {

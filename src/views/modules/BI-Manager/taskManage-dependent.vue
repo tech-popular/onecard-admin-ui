@@ -84,8 +84,9 @@
       },
       init (id) {
         // 下拉框
+        let sysType = 1
         this.$http({
-          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/select`),
+          url: this.$http.adornUrl(`/honeycomb/honeycombtask/all/select` + sysType),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({data}) => {

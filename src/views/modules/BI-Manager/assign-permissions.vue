@@ -51,7 +51,9 @@ export default {
       getRoleMenuList(params).then(({ data }) => {
         if (data && data.code === 0 && data.data.length) {
           data.data.forEach(element => {
-            this.defaultExpandedKeys.push(element.menuId)
+            if (element.checkeState) {
+              this.defaultExpandedKeys.push(element.menuId)
+            }
           })
         }
       })
@@ -69,9 +71,9 @@ export default {
       menuIds = this.checkedDataKeys.concat(this.halfCheckedDataKeys)
       if (menuIds.length) {
         let params = {
-          'menuIds': menuIds,
+          'menuIds': menuIds.join(','),
           'userGroupId': this.userGroupId,
-          'checkedDataKeys': this.checkedDataKeys
+          'checkedDataKeys': this.checkedDataKeys.join(',')
         }
         saveRoleInfo(params).then(({ data }) => {
           if (data && data.code === 0) {

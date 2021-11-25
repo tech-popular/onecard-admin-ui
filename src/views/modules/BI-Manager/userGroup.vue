@@ -1,13 +1,6 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
-      <!-- <el-form-item label="用户名称: ">
-        <el-input
-          v-model="dataForm.user"
-          class="input-with-select"
-          @keyup.enter.native="getDataList()"
-        ></el-input>
-      </el-form-item> -->
       <el-form-item label="用户组名称: ">
         <el-input
           v-model="dataForm.name"
@@ -99,7 +92,7 @@
 }
 </style>
 <script>
-import { getUserGroupList, deleteUsersById } from '@/api/BI-Manager/userGroup'
+import { getUserGroupList, deleteUsersById, getSelectTenantDown } from '@/api/BI-Manager/userGroup'
 import AddOrUpdate from './userGroup-add-or-update'
 import assignPermissions from './assign-permissions'
 export default {
@@ -115,6 +108,7 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
+      tenantIdList: [],
       addOrUpdateVisible: false,
       assignPermissionsVisible: false,
       taskDependentVisible: false
@@ -143,8 +137,9 @@ export default {
         }
         getUserGroupList(params).then(({ data }) => {
           if (data && data.code === 0) {
-            this.totalCount = data.data.totalCount
             this.dataList = data.data.list
+            this.getTenantDown()
+            this.totalCount = data.data.totalCount
             this.dataListLoading = false
           } else {
             this.dataList = []
@@ -152,6 +147,17 @@ export default {
             this.dataListLoading = false
           }
         })
+    },
+    getTenantDown() {
+      getSelectTenantDown().then(({ data }) => {
+        data.data.forEach(item => {
+          this.dataList.forEach(citem => {
+            if (item.id === citem.tenantId) {
+              citem.tenantId = item.name
+            }
+          })
+        })
+      })
     },
     // 每页数
     sizeChangeHandle (val) {
