@@ -39,7 +39,7 @@
                 :disabled="!!id"
               >指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
-                <el-form-item label="所属业务线" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
+                <el-form-item label="所属业务线" prop="channelId" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
                 <!-- multiple
                   :multiple-limit = "channelLimit" -->
                 <el-select
@@ -389,7 +389,7 @@ export default {
           { required: true, message: '请选择计算类型', trigger: 'change' }
         ],
         channelId: [
-          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
+          { required: true, message: '请选择用户所属业务线', trigger: 'change' }
         ],
         sql: [
           { required: true, message: '请输入SQL', trigger: 'change' }
