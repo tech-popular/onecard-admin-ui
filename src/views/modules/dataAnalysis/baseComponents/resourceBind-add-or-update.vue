@@ -4,7 +4,7 @@
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
-      <el-form-item label="所属渠道" prop="channelCode" :rules="{ required: true, message: '请选择所属渠道', trigger: 'blur' }">
+      <el-form-item label="所属业务线" prop="channelCode" :rules="{ required: true, message: '请选择所属业务线', trigger: 'blur' }">
 				<el-select
 					v-model="dataForm.channelCode"
 					@change="channelIdChange"

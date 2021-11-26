@@ -6,8 +6,8 @@
     width="600px"
     :close-on-click-modal="false">
     <el-form :model="dataForm" label-width="120px" ref="dataForm" :rules="dataRules">
-      <el-form-item prop="channelCode" label="用户所属渠道">
-        <el-select v-model="dataForm.channelCode" placeholder="请选择用户所属渠道" style="width: 400px" @change="channelCodeChange">
+      <el-form-item prop="channelCode" label="用户所属业务线">
+        <el-select v-model="dataForm.channelCode" placeholder="请选择用户所属业务线" style="width: 400px" @change="channelCodeChange">
           <el-option v-for="(item, index) in channelList" :key="index" :value="item.value" :label="item.text"></el-option>
         </el-select>
       </el-form-item>
@@ -44,7 +44,7 @@ export default {
       },
       dataRules: {
         channelCode: [
-          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
+          { required: true, message: '请选择用户所属业务线', trigger: 'change' }
         ],
         groupId: [
           { required: true, message: '请选择分群', trigger: 'change' }

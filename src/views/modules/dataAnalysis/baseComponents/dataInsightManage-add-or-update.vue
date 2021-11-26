@@ -39,7 +39,7 @@
                 :disabled="!!id"
               >指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
-                <el-form-item label="用户所属渠道" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
+                <el-form-item label="所属业务线" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
                 <!-- multiple
                   :multiple-limit = "channelLimit" -->
                 <el-select
@@ -71,7 +71,7 @@
             </div>
           </el-form-item>
           <el-form-item
-            label="用户所属渠道"
+            label="所属业务线"
             prop="channelId"
             v-if="baseForm.userType === 'excel'"
             class="user-channel"
@@ -117,7 +117,7 @@
             </div>
           </el-form-item>
            <el-form-item
-            label="用户所属渠道"
+            label="所属业务线"
             prop="channelId"
             v-if="baseForm.userType === 'sql'"
             label-width="110px;"
