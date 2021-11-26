@@ -67,7 +67,6 @@ export default {
       this.$nextTick(() => {
         // 上游任务
         this.$refs.taskSnapshotUpNewDepends[0].init()
-        this.$refs.taskSnapshotUpOldDepends[0].init()
       })
     },
     // 点击依赖快照
@@ -86,7 +85,6 @@ export default {
         this.$nextTick(() => {
           this.tabClickIndex = this.editableTabs.length - 1
           this.$refs.taskSnapshotUpNewDepends[this.tabClickIndex].init()
-          this.$refs.taskSnapshotUpOldDepends[this.tabClickIndex].init()
         })
         this.editableTabsValue = newTabName
       },
@@ -97,7 +95,6 @@ export default {
         this.editableTabs[this.tabClickIndex].content.activeName = 'first'
         this.$nextTick(() => {
           this.$refs.taskSnapshotUpNewDepends[this.tabClickIndex].init()
-          this.$refs.taskSnapshotUpOldDepends[this.tabClickIndex].init()
         })
       },
       // 删除任务
@@ -134,12 +131,10 @@ export default {
         if (tab.index === '0') {
           this.$nextTick(() => {
             this.$refs.taskSnapshotUpNewDepends[this.tabClickIndex].init()
-            this.$refs.taskSnapshotUpOldDepends[this.tabClickIndex].init()
           })
         } else {
           this.$nextTick(() => {
             this.$refs.taskSnapshotDownNewDepends[this.tabClickIndex].init()
-            this.$refs.taskSnapshotDownOldDepends[this.tabClickIndex].init()
           })
         }
       }

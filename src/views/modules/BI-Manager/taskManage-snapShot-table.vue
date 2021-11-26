@@ -50,20 +50,20 @@
 </template>
 <script>
 // import { taskSnapshotNewDepends } from '@/api/dispatch/taskManag'
-// import { deepClone } from '@/utils'
+import { deepClone } from '@/utils'
 export default {
   props: {
-    // dataApi: {
-    //   type: Function,
-    //   required: true
-    // },
-    // taskId: {
-    //   required: true
-    // },
-    // taskType: {
-    //   type: String,
-    //   required: true
-    // }
+    dataApi: {
+      type: Function,
+      required: true
+    },
+    taskId: {
+      required: true
+    },
+    taskType: {
+      type: String,
+      required: true
+    }
   },
   data () {
     return {
@@ -83,18 +83,18 @@ export default {
       this.getDataList()
     },
     getDataList () {
-      // let params = {
-      //   taskId: this.taskId,
-      //   type: this.taskType,
-      //   pageSize: this.pageSize,
-      //   pageNo: this.pageNo
-      // }
-      // this.dataApi(params).then(({ data }) => {
-      //   if (data && data.code === 0) {
-      //        this.tableList = deepClone(data.data.records)
-      //        this.totalPage = data.data.total
-      //   }
-      // })
+      let params = {
+        taskId: this.taskId,
+        type: this.taskType,
+        pageSize: this.pageSize,
+        pageNo: this.pageNo
+      }
+      this.dataApi(params).then(({ data }) => {
+        if (data && data.code === 0) {
+             this.tableList = deepClone(data.data.records)
+             this.totalPage = data.data.total
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (val) {
