@@ -164,7 +164,7 @@ export default {
         {
           name: '新BI系统',
           img: require('../../assets/img/newBI.png'),
-          url: 'http://zeppelin.9f.cn'
+          url: ' http://test.tech.9fbank.com/bi/#/?userId=' + sessionStorage.getItem('id')
         }
       ]
     }

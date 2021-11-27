@@ -70,8 +70,19 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // 适应新BI系统的登录后跳转
   console.log('from: ', from)
-  if (from.query.id) {
-    // window.location.href = 'https://www.baidu.com/'
+  if (from.query.userId) {
+    http({
+      url: http.adornUrl('/sys/user/info'),
+      method: 'get',
+      params: http.adornParams()
+    }).then(({data}) => {
+      if (data && data.code === 0) {
+        window.location.href = ' http://test.tech.9fbank.com/bi/#/?userId=' + data.user.id
+      } else {
+        console.log(`%c${e} 用户信息获取失败！！`, 'color:blue')
+        router.push({ name: 'login' })
+      }
+    })
   }
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
