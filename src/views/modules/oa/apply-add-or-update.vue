@@ -20,7 +20,7 @@
               <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList" style="margin-left:0">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 'newbi'">
+          <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 8 ">
             <el-select v-model="tenantForm.userGroupId" placeholder="请选择" style="width:100%">
               <el-option
                 v-for="item in userGroupList"
@@ -251,7 +251,8 @@ import {
   tenantInif,
   saveTenant,
   mcCompute,
-  tenantCrent
+  tenantCrent,
+  getUserGroupList
 } from '@/api/oa/apply'
 export default {
   data () {
@@ -402,6 +403,12 @@ export default {
         tenantInif().then(({ data }) => {
           this.tenantList = data.data
         })
+        let params = {
+          'userId': sessionStorage.getItem('id')
+        }
+        getUserGroupList(params).then(({ data }) => {
+          this.userGroupList = data.data
+        })
         var tenanName = []
         tenantCrent().then(({ data }) => {
           data.data.map(item => {
@@ -467,7 +474,11 @@ export default {
             applicantTel: this.dataForm.phone,
             applyReason: this.dataForm.reason,
             systemId: this.dataForm.system,
-            menuList: this.dataForm.systemmodel
+            menuList: this.dataForm.systemmodel,
+            userGroupId: this.dataForm.userGroupId
+          }
+          if (this.dataForm.system === 8) {
+            newData.systemName = '新BI系统'
           }
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {

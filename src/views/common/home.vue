@@ -177,11 +177,11 @@ export default {
     sidebarLayoutSkin: {
       get () { return this.$store.state.common.sidebarLayoutSkin },
       set (val) { this.$store.commit('common/updateSidebarLayoutSkin', val) }
-    },
-    userId: {
-      get () { return this.$store.state.user.id },
-      set (val) { this.$store.commit('user/updateId', val) }
-    },
+    }
+    // userId: {
+    //   get () { return this.$store.state.user.id },
+    //   set (val) { this.$store.commit('user/updateId', val) }
+    // }
     // userName: {
     //   get () { return this.$store.state.user.name },
     //   set (val) {

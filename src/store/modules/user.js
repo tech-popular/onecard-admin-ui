@@ -19,7 +19,6 @@ export default {
     },
     updateId (state, id) {
       state.id = id
-      console.log('state.id: ', state.id);
     }
   },
   actions: {
