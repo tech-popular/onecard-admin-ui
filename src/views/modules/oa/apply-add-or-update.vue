@@ -20,7 +20,7 @@
               <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList" style="margin-left:0">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
-          <!-- <el-form-item label="用户组" prop="userGroupId">
+          <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 'newbi'">
             <el-select v-model="tenantForm.userGroupId" placeholder="请选择" style="width:100%">
               <el-option
                 v-for="item in userGroupList"
@@ -29,7 +29,7 @@
                 :value="item.id"
               ></el-option>
             </el-select>
-          </el-form-item> -->
+          </el-form-item>
           <el-form-item label="申请系统模块" prop="systemmodel" v-if="isShow">
             <el-cascader
               style="width: 100%"

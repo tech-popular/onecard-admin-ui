@@ -164,7 +164,7 @@ export default {
         {
           name: '新BI系统',
           img: require('../../assets/img/newBI.png'),
-          url: ' http://test.tech.9fbank.com/bi/#/?userId=' + sessionStorage.getItem('id')
+          url: 'http://test.tech.9fbank.com/bi/#/'
         }
       ]
     }
@@ -177,11 +177,11 @@ export default {
     sidebarLayoutSkin: {
       get () { return this.$store.state.common.sidebarLayoutSkin },
       set (val) { this.$store.commit('common/updateSidebarLayoutSkin', val) }
-    }
-    // userId: {
-    //   get () { return this.$store.state.user.id },
-    //   set (val) { this.$store.commit('user/updateId', val) }
-    // },
+    },
+    userId: {
+      get () { return this.$store.state.user.id },
+      set (val) { this.$store.commit('user/updateId', val) }
+    },
     // userName: {
     //   get () { return this.$store.state.user.name },
     //   set (val) {
@@ -196,6 +196,7 @@ export default {
   },
   created () {
     // this.getUserInfo()
+    // console.log('this.$store.state.user: ', this.$store.state.user);
     sessionStorage.setItem('menuList', '[]')
     sessionStorage.setItem('permissions', '[]')
     this.$store.dispatch('user/getUserInfo').then((username) => {
@@ -266,7 +267,13 @@ export default {
             })
           })
         } else { // 外链系统，进行页面跳转
-          window.open(item.url, '_blank')
+          if (item.name === '新BI系统') {
+            item.url = item.url + '?userId=' + sessionStorage.getItem('id')
+            window.open(item.url, '_blank')
+            // window.location.href = item.url + '?userId=' + sessionStorage.getItem('id')
+          } else {
+            window.open(item.url, '_blank')
+          }
         }
       }
     },
