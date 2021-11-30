@@ -20,6 +20,16 @@
               <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList" style="margin-left:0">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
+          <!-- <el-form-item label="用户组" prop="userGroupId">
+            <el-select v-model="tenantForm.userGroupId" placeholder="请选择" style="width:100%">
+              <el-option
+                v-for="item in userGroupList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item> -->
           <el-form-item label="申请系统模块" prop="systemmodel" v-if="isShow">
             <el-cascader
               style="width: 100%"
@@ -265,7 +275,8 @@ export default {
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
-        reason: '' // 申请理由
+        reason: '', // 申请理由
+        userGroupId: '' // 用户组权限
       }, // 账号权限form
       dataRule: {
         name: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
@@ -277,10 +288,14 @@ export default {
         ],
         reason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
+        ],
+        userGroupId: [
+          { required: true, message: '用户组不能为空', trigger: 'blur' }
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
       tenantList: [],
+      userGroupList: [],
       // 租户申请开始
       tenantForm: {
         tenantIds: [], // 租户

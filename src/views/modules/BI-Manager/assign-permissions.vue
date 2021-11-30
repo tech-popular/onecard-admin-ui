@@ -1,5 +1,5 @@
 <template>
-<el-dialog title="当前用户组： A产品" :close-on-click-modal="false" :visible.sync="visible">
+<el-dialog title="分配权限" :close-on-click-modal="false" :visible.sync="visible">
 			<el-tree
 			:data="dataTree"
 			show-checkbox

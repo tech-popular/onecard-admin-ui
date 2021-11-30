@@ -87,6 +87,7 @@
       init (row) {
         this.getRecursionList()
         this.getTaskManageList()
+        this.menuParentList = []
         this.visible = true
         if (row) {
           this.dataForm.id = row.id
@@ -101,12 +102,12 @@
       getDataInfo (row) {
         lookDataInfo(row.id).then(({ data }) => {
           if (data && data.code === 0) {
-            let parentIdData = data.data.menuParentList.split(',')
-            let taskIdsData = data.data.taskIds.split(';')
+            let parentIdData = (data.data.menuParentList && data.data.menuParentList.split(',')) || []
+            let taskIdsData = (data.data.taskIds && data.data.taskIds.split(';')) || []
             this.dataForm.name = data.data.name
             this.dataForm.url = data.data.url
             this.dataForm.parentId = parentIdData.length ? parentIdData.map(item => { return +item }) : []
-            this.menuParentList = data.data.menuParentList.split(',')
+            this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
             this.dataForm.taskIds = taskIdsData.length ? taskIdsData.map(item => { return +item }) : []
             // this.getTaskManageList(data.data.taskIds.split(';'))
           }
