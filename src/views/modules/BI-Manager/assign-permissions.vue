@@ -2,13 +2,13 @@
 <el-dialog title="分配权限" :close-on-click-modal="false" :visible.sync="visible">
 			<el-tree
 			:data="dataTree"
+      ref="tree"
 			show-checkbox
 			node-key="id"
       :default-expand-all="true"
 			:props="defaultProps"
       v-model="menuIds"
       :default-checked-keys="defaultExpandedKeys"
-      @check-change="handleNodeClick"
       @check="checkPermit"
       >
     </el-tree>
@@ -40,6 +40,7 @@ export default {
   methods: {
     init (id) {
       this.defaultExpandedKeys = []
+      this.userGroupId = id
       findAllRecursionList().then(({ data }) => {
           if (data && data.code === 0) {
             this.dataTree = data.data
@@ -51,16 +52,15 @@ export default {
       getRoleMenuList(params).then(({ data }) => {
         if (data && data.code === 0 && data.data.length) {
           data.data.forEach(element => {
-            if (element.checkeState) {
+            if (element.checkeState === 1) {
               this.defaultExpandedKeys.push(element.menuId)
             }
+            this.$refs.tree.setCheckedKeys(this.defaultExpandedKeys)
           })
         }
       })
-      this.userGroupId = id
       this.visible = true
     },
-    handleNodeClick () {},
     checkPermit (checkedNodes, checkedKeys, halfCheckedNodes, halfCheckedKeys) {
       this.checkedDataKeys = checkedKeys.checkedKeys
       this.halfCheckedDataKeys = checkedKeys.halfCheckedKeys
