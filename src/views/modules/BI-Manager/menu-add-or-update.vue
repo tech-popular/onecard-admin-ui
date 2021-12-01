@@ -102,12 +102,20 @@
       getDataInfo (row) {
         lookDataInfo(row.id).then(({ data }) => {
           if (data && data.code === 0) {
-            let parentIdData = (data.data.menuParentList && data.data.menuParentList.split(',')) || []
+            let parentIdData = []
+            if (data.data.parentId == '0') {
+              this.dataForm.parentId = []
+              this.menuParentList = []
+            } else {
+              parentIdData = (data.data.menuParentList && data.data.menuParentList.split(',')) || []
+              // this.dataForm.parentId = parentIdData.length ? parentIdData.map(item => { return +item }) : []
+              // this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
+              this.dataForm.parentId = parentIdData.map(item => { return +item })
+              this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
+            }
             let taskIdsData = (data.data.taskIds && data.data.taskIds.split(';')) || []
             this.dataForm.name = data.data.name
             this.dataForm.url = data.data.url
-            this.dataForm.parentId = parentIdData.length ? parentIdData.map(item => { return +item }) : []
-            this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
             this.dataForm.taskIds = taskIdsData.length ? taskIdsData.map(item => { return +item }) : []
             // this.getTaskManageList(data.data.taskIds.split(';'))
           }
@@ -139,15 +147,9 @@
         return arr
       },
       getTaskManageList () {
-        let params = {
-          page: 1,
-          limit: 10,
-          key: '',
-          id: ''
-        }
-        taskManageList(params).then(({ data }) => {
+        taskManageList().then(({ data }) => {
           if (data && data.code === 0) {
-            this.calculateList = data.page.list
+            this.calculateList = data.data
           } else {
             this.calculateList = []
           }
@@ -166,7 +168,6 @@
               'parentId': this.dataForm.parentId.length ? this.menuParentList[this.menuParentList.length - 1].toString() : '0',
               'name': this.dataForm.name,
               'url': this.dataForm.url,
-              'grade': this.dataForm.parentId.length || 1,
               'taskIds': this.dataForm.taskIds.join(';'),
               'menuParentList': this.menuParentList.join(',')
             }

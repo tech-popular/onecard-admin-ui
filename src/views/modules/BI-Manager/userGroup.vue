@@ -78,7 +78,7 @@
       :current-page="pageIndex"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
-      :total="totalPage"
+      :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
@@ -105,7 +105,7 @@ export default {
       dataList: [],
       pageIndex: 1,
       pageSize: 10,
-      totalPage: 0,
+      totalCount: 0,
       dataListLoading: false,
       dataListSelections: [],
       tenantIdList: [],
