@@ -21,7 +21,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 8 ">
-            <el-select v-model="tenantForm.userGroupId" placeholder="请选择" style="width:100%">
+            <el-select v-model="dataForm.userGroupId" placeholder="请选择" style="width:100%">
               <el-option
                 v-for="item in userGroupList"
                 :key="item.id"
@@ -291,7 +291,7 @@ export default {
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
         ],
         userGroupId: [
-          { required: true, message: '用户组不能为空', trigger: 'blur' }
+          { required: true, message: '用户组不能为空', trigger: 'change' }
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
@@ -474,11 +474,11 @@ export default {
             applicantTel: this.dataForm.phone,
             applyReason: this.dataForm.reason,
             systemId: this.dataForm.system,
-            menuList: this.dataForm.systemmodel,
-            userGroupId: this.dataForm.userGroupId
+            menuList: this.dataForm.systemmodel
           }
           if (this.dataForm.system === 8) {
             newData.systemName = '新BI系统'
+            newData.userGroupId = this.dataForm.userGroupId
           }
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {

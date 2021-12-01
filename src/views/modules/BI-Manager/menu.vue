@@ -187,7 +187,7 @@
               })
             }
             this.$message({
-              type: 'success',
+              type: '操作成功',
               message: data.msg
             })
             this.getDataList()
