@@ -138,6 +138,12 @@
             ></el-button>
           </el-input> -->
         </el-form-item>
+        <el-form-item label="是否启用" prop="enable">
+          <el-radio-group v-model="dataForm.enable">
+            <el-radio :label="0">禁用</el-radio>
+            <el-radio :label="1">正常</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <!-- <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button> -->
@@ -224,10 +230,12 @@ export default {
         inDatasource: '',
         sql: '',
         cron: '',
+        enable: 1,
         honeycombOutDatasourceEntitys: [
           {
             outTableName: '',
             outDatasource: 1,
+            enable: 1,
             taskId: 0
           }
         ]
@@ -395,6 +403,7 @@ export default {
               this.dataForm.inDatasource = data.honeycombTask.inDatasource
               this.dataForm.sql = data.honeycombTask.sql
               this.dataForm.cron = data.honeycombTask.cron
+              this.dataForm.enable = data.honeycombTask.enable
               this.dataForm.honeycombOutDatasourceEntitys =
                 data.honeycombTask.honeycombOutDatasourceEntitys
               this.dataForm.honeycombOutDatasourceEntitys.forEach((val, i) => {
@@ -489,6 +498,7 @@ export default {
               sql: this.dataForm.sql,
               cron: this.dataForm.cron,
               period: 0,
+              enable: this.dataForm.enable,
               honeycombOutDatasourceEntitys: this.dataForm
                 .honeycombOutDatasourceEntitys
             })

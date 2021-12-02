@@ -61,8 +61,8 @@
         align="center"
         label="是否有效">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.flag === 1" size="small" type="danger">是</el-tag>
-          <el-tag v-else-if="scope.row.flag === 0" size="small" type="primary">否</el-tag>
+          <el-tag v-if="scope.row.flag === 1" size="small" type="danger">否</el-tag>
+          <el-tag v-else-if="scope.row.flag === 0" size="small" type="primary">是</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -91,9 +91,9 @@
         label="操作">
         <template slot-scope="scope">
           <el-button  type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
-          <el-button  type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <!-- <el-button v-if="scope.row.status === 0 && isAuth('sys:menu:updateStatus')" style="color:#67C23A;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">启用</el-button>
-          <el-button v-if="scope.row.status === 1 && isAuth('sys:menu:updateStatus')" style="color:#F56C6C;" type="text" size="small" @click="enableOrDisableHandle(scope.row.menuId,scope.row.status)">禁用</el-button> -->
+          <!-- <el-button  type="text" size="small" @click="deleteHandle(scope.row.id)"></el-button> -->
+          <el-button v-if="scope.row.flag === 1 " style="color:#67C23A;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">启用</el-button>
+          <el-button v-if="scope.row.flag === 0 " style="color:#F56C6C;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">禁用</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -111,7 +111,7 @@
 </template>
 
 <script>
-  import { getMenuList, updateBiInfo } from '@/api/BI-Manager/menu'
+  import { getMenuList, updateFlagInfo } from '@/api/BI-Manager/menu'
   import AddOrUpdate from './menu-add-or-update'
   export default {
     data () {
@@ -169,30 +169,25 @@
         })
       },
       // 删除
-      deleteHandle (id) {
+      changeFlagHandle (id, flag) {
         let params = {
             id: id,
-            flag: 1
+            flag: flag === 0 ? 1 : 0
         }
-        this.$confirm(`确定对[id=${id}]进行[删除]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          updateBiInfo(params).then(({ data }) => {
-            if (data.code !== 0) {
-              return this.$message({
-                type: 'error',
-                message: data.msg
-              })
-            }
-            this.$message({
-              type: '操作成功',
-              message: data.msg
+        updateFlagInfo(params).then(({ data }) => {
+          if (data.code !== 0) {
+            return this.$message({
+              type: 'error',
+              message: data.msg,
+              duration: 3000
             })
-            this.getDataList()
+          }
+          this.$message({
+            type: '操作成功',
+            message: data.msg
           })
-        }).catch(() => {})
+          this.getDataList()
+        })
       },
       resetHandle () { // 重置
         this.dataForm.name = ''

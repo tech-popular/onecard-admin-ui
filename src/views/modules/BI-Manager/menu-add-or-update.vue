@@ -190,7 +190,6 @@
               })
             } else {
               params.id = this.dataForm.id
-              params.flag = 0
               updateBiInfo(params).then(({data}) => {
                 if (data && data.code === 0) {
                   this.$message({
