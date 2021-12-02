@@ -122,7 +122,7 @@
 }
 </style>
 <script>
-import { taskManageList, starttask } from '@/api/BI-Manager/taskManage'
+import { taskManageList } from '@/api/BI-Manager/taskManage'
 import AddOrUpdate from './taskManage-add-or-update'
 import TaskDependent from './taskManage-dependent'
 import taskManagSnapShot from './taskManag-snap-shot'
@@ -220,7 +220,11 @@ export default {
     },
     // 手动执行
     startTask (id) {
-      starttask(id).then(({ data }) => {
+      return this.$http({
+        url: this.$http.adornUrl(`/honeycomb/honeycombtask/starttask/` + id),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
         if (data && data.code === 0) {
           this.$message({
             message: '操作成功',
