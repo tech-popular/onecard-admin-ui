@@ -2,8 +2,9 @@
   <div class="mod-config">
     <el-form :inline="true">
       <el-form-item>
-        <el-button type="primary"  @click="addOrUpdateHandle">新建提数申请</el-button>
-        <el-button type="primary" @click="searchHistory">我的历史提数</el-button>
+        <el-button type="primary"  @click="addOrUpdateSQLHandle">新建SQL申请</el-button>
+        <el-button type="primary"  @click="addOrUpdateSQLHandle">新建FTP申请</el-button>
+        <!-- <el-button type="primary" @click="searchHistory">我的历史提数</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
@@ -45,7 +46,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
-		<addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate"></addOrUpdate>
+		<addOrUpdateSql v-if="addOrUpdateVisible" ref="addOrUpdateSql"></addOrUpdateSql>
     <dataServiceHistory v-if="dataServiceHistoryVisible" ref="dataServiceHistory"></dataServiceHistory>
   </div>
 </template>
@@ -55,7 +56,7 @@
 }
 </style>
 <script>
-import addOrUpdate from './dataService-add-or-update'
+import addOrUpdateSql from './sql-add-or-update'
 import dataServiceHistory from './dataService-history'
 // import isInnerIPFn from '../../../utils/validate'
 export default {
@@ -71,7 +72,7 @@ export default {
       dataServiceHistoryVisible: false
     }
   },
-  components: { addOrUpdate, dataServiceHistory },
+  components: { addOrUpdateSql, dataServiceHistory },
   activated () {
     this.getDataList()
   },
@@ -94,10 +95,10 @@ export default {
       this.getDataList()
     },
     // 新增 / 修改
-    addOrUpdateHandle () {
+    addOrUpdateSQLHandle () {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init()
+        this.$refs.addOrUpdateSql.init()
       })
     },
     searchHistory () {
