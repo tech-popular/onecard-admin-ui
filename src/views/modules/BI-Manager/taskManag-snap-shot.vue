@@ -15,11 +15,11 @@
 	<el-tabs v-model="item.content.activeName"  @tab-click="tabhandleClick">
     <el-tab-pane label="上游任务" name="first">
 			<h3>任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotNewDepends" :taskId="taskId" taskType="up" @addTab = "addTab" ref="taskSnapshotUpNewDepends"></taskManageSnapShotTable>
+			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="up" @addTab = "addTab" ref="taskSnapshotUpNewDepends"></taskManageSnapShotTable>
 		</el-tab-pane>
     <el-tab-pane label="下游任务" name="second">
 			<h3>任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotNewDepends" :taskId="taskId" taskType="down" @addTab = "addTab" ref="taskSnapshotDownNewDepends"></taskManageSnapShotTable>
+			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="down" @addTab = "addTab" ref="taskSnapshotDownNewDepends"></taskManageSnapShotTable>
 		</el-tab-pane>
   </el-tabs>
   </el-tab-pane>
@@ -29,7 +29,7 @@
 
 <script>
 import taskManageSnapShotTable from './taskManage-snapShot-table.vue'
-import { taskSnapshotNewDepends } from '@/api/dispatch/taskManag'
+import { taskSnapshotDepends } from '@/api/BI-Manager/taskManage'
 export default {
   data () {
     return {
@@ -37,7 +37,7 @@ export default {
       taskId: '',
       editableTabsValue: '1',
       closable: false,
-      taskSnapshotNewDepends: taskSnapshotNewDepends,
+      taskSnapshotDepends: taskSnapshotDepends,
       editableTabs: [{
         title: '',
         name: '1',

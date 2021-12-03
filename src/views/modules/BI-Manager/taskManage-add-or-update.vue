@@ -499,6 +499,7 @@ export default {
               cron: this.dataForm.cron,
               period: 0,
               enable: this.dataForm.enable,
+              computeType: 'simple',
               honeycombOutDatasourceEntitys: this.dataForm
                 .honeycombOutDatasourceEntitys
             })
