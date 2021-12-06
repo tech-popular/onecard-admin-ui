@@ -2,7 +2,7 @@
   <el-dialog 
     :visible.sync="visible"
 		:fullscreen="true"
-	  title="依赖快照"
+	  title="依赖任务进度"
     :close-on-click-modal="false">
   <el-tabs v-model="editableTabsValue" type="border-card" @tab-click="tabClick" :closable ="closable" @tab-remove="removeTab">
   <el-tab-pane
@@ -15,11 +15,11 @@
 	<el-tabs v-model="item.content.activeName"  @tab-click="tabhandleClick">
     <el-tab-pane label="上游任务" name="first">
 			<h3>任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="up" @addTab = "addTab" ref="taskSnapshotUpNewDepends"></taskManageSnapShotTable>
+			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="up" @addTab="addTab" ref="taskSnapshotUpNewDepends"></taskManageSnapShotTable>
 		</el-tab-pane>
     <el-tab-pane label="下游任务" name="second">
 			<h3>任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="down" @addTab = "addTab" ref="taskSnapshotDownNewDepends"></taskManageSnapShotTable>
+			<taskManageSnapShotTable :dataApi ="taskSnapshotDepends" :taskId="taskId" taskType="down" @addTab="addTab" ref="taskSnapshotDownNewDepends"></taskManageSnapShotTable>
 		</el-tab-pane>
   </el-tabs>
   </el-tab-pane>
