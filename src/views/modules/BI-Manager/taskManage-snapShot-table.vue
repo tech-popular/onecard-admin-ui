@@ -86,12 +86,12 @@ export default {
         taskId: this.taskId,
         type: this.taskType,
         pageSize: this.pageSize,
-        pageNo: this.pageNo
+        page: this.pageNo
       }
       this.dataApi(params).then(({ data }) => {
         if (data && data.code === 0) {
-             this.tableList = deepClone(data.data.records)
-             this.totalPage = data.data.total
+             this.tableList = deepClone(data.data.list)
+             this.totalPage = data.data.totalCount
         }
       })
     },
