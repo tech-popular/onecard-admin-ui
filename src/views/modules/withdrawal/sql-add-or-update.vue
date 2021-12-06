@@ -11,22 +11,23 @@
     <div class="wrap">
       <el-form v-loading="loading" :model="baseForm" label-width="80px"  ref="baseForm" class="base-form" >
         <div class="base-pane">
-          <div  class="step-title">提数申请</div>
-					<div class="steps-horizontal">
+          <!-- <div  class="step-title">提数申请</div> -->
+					<!-- <div class="steps-horizontal">
 						<div class="horizontal-one">
-              <div class="el-icon-check success one-title" v-if="secendStepVisible"></div>
-							<div class="one-title" v-else>进行中</div>
+              <div class="el-icon-check success one-title"></div>
+							<div class="one-title">进行中</div>
 							<div style="padding-top:20px;">设置提数条件</div>
 						</div>
 						<div class="horizontal-line"></div>
 						<div><i class="el-icon-caret-right horizontal-icon"></i></div>
 						<div class="horizontal-one">
-              <div class="three-title" v-if="secendStepVisible">进行中</div>
-							<div class="two-title" v-else>未开始</div>
+              <div class="three-title">进行中</div>
+							<div class="two-title">未开始</div>
 							<div style="padding-top:20px;">数据下载设置</div>
 						</div>
- 					</div>
-           <div v-if="!secendStepVisible">
+ 					</div> -->
+          
+           <div>
             <el-form-item label="选择提数方式" prop="withdrawalMethod" label-width="120px" style="width:50%" >
                 <el-radio v-model="baseForm.withdrawalMethod"  @change="withdrawalTypeChange" label="0">自定义SQL</el-radio>
                 <el-radio v-model="baseForm.withdrawalMethod"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">FTP</el-radio>
@@ -109,7 +110,7 @@
               </el-col>
             </el-row>
            </div>
-           <div v-else style="margin-top: 30px">
+           <div style="margin-top: 30px">
              <el-form-item label="申请原因" prop="applyReason" style="width:50%">
                <el-input v-model="baseForm.applyReason"></el-input>
              </el-form-item>
@@ -122,9 +123,9 @@
       </el-form>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="cancelHandle" size="small" v-if="secendStepVisible">立即申请</el-button>
-      <el-button type="default" @click="cancelHandle" size="small" v-if="secendStepVisible">取消</el-button>
-			<el-button type="primary" @click="nextStep" size="small" v-else>下一步</el-button>
+      <el-button type="primary" @click="cancelHandle" size="small">立即申请</el-button>
+      <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
+			<!-- <el-button type="primary" @click="nextStep" size="small" v-else>下一步</el-button> -->
     </div>
   </el-drawer>
 </template>
@@ -146,7 +147,6 @@ require('codemirror/addon/hint/sql-hint.js')
         loading: false,
         visible: true,
         isInnerIP: false,
-        secendStepVisible: false,
         dataListLoading: false,
         baseForm: {
           id: '',
@@ -300,9 +300,6 @@ require('codemirror/addon/hint/sql-hint.js')
       },
       handleSelectionChange (val) { // 表格多选
         this.multipleSelection = val
-      },
-      nextStep () {
-        this.secendStepVisible = true
       },
       // 关闭抽屉弹窗
       drawerClose () {

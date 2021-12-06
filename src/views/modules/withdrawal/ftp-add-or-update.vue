@@ -11,76 +11,7 @@
     <div class="wrap">
       <el-form v-loading="loading" :model="baseForm" label-width="80px"  ref="baseForm" class="base-form" >
         <div class="base-pane">
-          <div  class="step-title">提数申请</div>
-					<div class="steps-horizontal">
-						<div class="horizontal-one">
-              <div class="el-icon-check success one-title" v-if="secendStepVisible"></div>
-							<div class="one-title" v-else>进行中</div>
-							<div style="padding-top:20px;">设置提数条件</div>
-						</div>
-						<div class="horizontal-line"></div>
-						<div><i class="el-icon-caret-right horizontal-icon"></i></div>
-						<div class="horizontal-one">
-              <div class="three-title" v-if="secendStepVisible">进行中</div>
-							<div class="two-title" v-else>未开始</div>
-							<div style="padding-top:20px;">数据下载设置</div>
-						</div>
- 					</div>
-           <div v-if="!secendStepVisible">
-            <el-form-item label="选择提数方式" prop="withdrawalMethod" label-width="120px" style="width:50%" >
-                <el-radio v-model="baseForm.withdrawalMethod"  @change="withdrawalTypeChange" label="0">自定义SQL</el-radio>
-                <el-radio v-model="baseForm.withdrawalMethod"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">FTP</el-radio>
-            </el-form-item>
-            <div style="display:flex" v-if="baseForm.withdrawalMethod === '0'">
-              <div>
-                <el-form-item prop="serviceId"  label="服务器">
-                  <el-select
-                  filterable
-                  v-model="baseForm.serviceId"
-                  placeholder="请选择"
-                  >
-                  <el-option
-                    v-for="item in serviceIdList"
-                    :key="item.value"
-                    :label="item.text"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-                </el-form-item>
-                <el-form-item prop="databaseId" label="数据库">
-                  <el-select
-                  filterable
-                  v-model="baseForm.databaseId"
-                  placeholder="请选择"
-                  >
-                  <el-option
-                    v-for="item in databaseIdList"
-                    :key="item.value"
-                    :label="item.text"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-                </el-form-item>
-              </div>
-              <el-form-item prop="serviceSql" label="SQL：" ref="serviceBeginSqlForm" style="width:70%">
-                <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative;">
-                  <codemirror
-                    ref="serviceBeginSql"
-                    v-model="baseForm.serviceSql"
-                    :options="cmOptions"
-                    @changes="cm => workItemChanges(cm, acquisitionTask.serviceSql, 'serviceBeginSqlForm', 'serviceBeginSql')"
-                    @keydown.native="e => workItemKeyDown(e, 'serviceBeginSql')"
-                    class="code"
-                    style="padding-bottom: 0px;"
-                  ></codemirror>
-                </div>
-                <div style="margin-top:10px;display:flex">
-                  <el-button type="primary">执行验证</el-button>
-                  <el-button type="text" v-if="isInnerIP">数据预览</el-button>
-                </div>
-            </el-form-item>
-            </div>
-            <el-row :gutter="24" v-if="baseForm.withdrawalMethod === '1'">
+            <el-row :gutter="24">
               <!-- <el-col :span="8" style="border: 2px solid #97999e"> -->
               <el-col :span="8">
                 <el-tree :data="data" :props="defaultProps" default-expand-all>
@@ -90,7 +21,7 @@
                   </span>
                 </el-tree>
               </el-col>
-              <el-col :span="16">
+              <el-col :span="16" style="text-aline；center;">
               <el-table
                   :data="dataList"
                   border
@@ -106,10 +37,18 @@
                   <el-table-column prop="ipAddress" header-align="center" align="center" label="文件格式"></el-table-column>
                   <el-table-column prop="inDatasourceName" header-align="center" align="center" label="修改时间"></el-table-column>
                 </el-table>
+                <div style="display:flex; justify-content: center;">
+                   <el-pagination
+                    background
+                    @current-change="currentChangeHandle"
+                    :current-page="pageIndex"
+                    :total="totalPage"
+                    layout="prev, pager, next"
+                  ></el-pagination>
+                </div>
               </el-col>
             </el-row>
-           </div>
-           <div v-else style="margin-top: 30px">
+           <div style="margin-top: 30px;margin-left:25%;">
              <el-form-item label="申请原因" prop="applyReason" style="width:50%">
                <el-input v-model="baseForm.applyReason"></el-input>
              </el-form-item>
@@ -122,9 +61,8 @@
       </el-form>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="cancelHandle" size="small" v-if="secendStepVisible">立即申请</el-button>
-      <el-button type="default" @click="cancelHandle" size="small" v-if="secendStepVisible">取消</el-button>
-			<el-button type="primary" @click="nextStep" size="small" v-else>下一步</el-button>
+      <el-button type="primary" @click="cancelHandle" size="small">立即申请</el-button>
+      <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-drawer>
 </template>
@@ -146,11 +84,9 @@ require('codemirror/addon/hint/sql-hint.js')
         loading: false,
         visible: true,
         isInnerIP: false,
-        secendStepVisible: false,
         dataListLoading: false,
         baseForm: {
           id: '',
-          withdrawalMethod: '0',
           serviceId: '',
           databaseId: '',
           serviceSql: '',
@@ -161,6 +97,8 @@ require('codemirror/addon/hint/sql-hint.js')
         databaseIdList: [],
         dataList: [],
         multipleSelection: [], // 多选数据
+        pageIndex: 1,
+        totalPage: 80,
         cmOptions: {
           theme: 'idea',
           mode: 'text/x-sparksql',
@@ -301,8 +239,10 @@ require('codemirror/addon/hint/sql-hint.js')
       handleSelectionChange (val) { // 表格多选
         this.multipleSelection = val
       },
-      nextStep () {
-        this.secendStepVisible = true
+        // 当前页
+      currentChangeHandle (val) {
+        this.pageIndex = val
+        // this.getDataList()
       },
       // 关闭抽屉弹窗
       drawerClose () {
