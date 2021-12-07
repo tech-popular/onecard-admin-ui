@@ -7,6 +7,8 @@
 			<el-form-item label="上级菜单："  prop="parentId" >
 				<el-cascader
           style="width: 100%"
+          clearable
+          ref="cascaderMenu"
           v-model="dataForm.parentId"
           :options="menuList"
           :props="menuListTreeProps"
@@ -14,13 +16,13 @@
         >
         </el-cascader>
 			</el-form-item>
-			<el-form-item label="菜单名称" prop="name">
+			<el-form-item label="菜单名称" prop="name" >
         <el-input v-model="dataForm.name" placeholder="菜单名称"></el-input>
       </el-form-item>
-			<el-form-item  label="菜单链接" prop="url">
+			<el-form-item  label="菜单链接" prop="url" v-if="menuNameVisible">
         <el-input v-model="dataForm.url" placeholder="菜单链接"></el-input>
       </el-form-item>
-			<el-form-item label="计算任务" prop="taskIds" >
+			<el-form-item label="计算任务" prop="taskIds" v-if="menuNameVisible">
 			  <el-select v-model="dataForm.taskIds" filterable  multiple placeholder="请选择计算任务" style="width: 100%">
 					<el-option
 						v-for="item in calculateList"
@@ -61,6 +63,7 @@
         menuList: [],
         menuParentList: [], // 保留选中的级联中完整内容
         calculateList: [],
+        menuNameVisible: false,
         menuListTreeProps: {
           checkStrictly: true,
           label: 'name',
@@ -158,7 +161,13 @@
       // 所属父级
       parentTreeChange (val) {
         this.menuParentList = val
-        console.log('this.menuParentList: ', this.menuParentList)
+        let arr = []
+        arr = this.$refs.cascaderMenu.getCheckedNodes()
+        if (arr[0].children.length) {
+          this.menuNameVisible = false
+        } else {
+          this.menuNameVisible = true
+        }
       },
       // 表单提交
       dataFormSubmit () {

@@ -2,13 +2,13 @@
   <div class="mod-menu">
     <el-form :inline="true" :model="dataForm">
       <el-form-item label="菜单名称: ">
-        <el-input v-model="dataForm.name"></el-input>
+        <el-input v-model="dataForm.name" @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
 			<el-form-item label="菜单链接: ">
-       <el-input v-model="dataForm.url"></el-input>
+       <el-input v-model="dataForm.url" @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
 			<el-form-item label="菜单等级: ">
-        <el-input v-model="dataForm.grade"></el-input>
+        <el-input v-model="dataForm.grade" @keyup.enter.native="getDataList()"></el-input>
         <!-- <el-select v-model="dataForm.grade"></el-select> -->
       </el-form-item>
       <el-form-item>
