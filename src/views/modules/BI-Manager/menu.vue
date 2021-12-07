@@ -168,7 +168,7 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 删除
+      // 启用/禁用
       changeFlagHandle (id, flag) {
         let params = {
             id: id,
@@ -183,8 +183,8 @@
             })
           }
           this.$message({
-            type: '操作成功',
-            message: data.msg
+            type: 'success',
+            message: '操作成功'
           })
           this.getDataList()
         })

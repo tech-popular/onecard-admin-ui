@@ -40,6 +40,8 @@ export default {
   methods: {
     init (id) {
       this.defaultExpandedKeys = []
+      this.checkedDataKeys = []
+      this.halfCheckedDataKeys = []
       this.userGroupId = id
       findAllRecursionList().then(({ data }) => {
           if (data && data.code === 0) {
@@ -54,6 +56,9 @@ export default {
           data.data.forEach(element => {
             if (element.checkeState === 1) {
               this.defaultExpandedKeys.push(element.menuId)
+              this.checkedDataKeys.push(element.menuId)
+            } else {
+              this.halfCheckedDataKeys.push(element.menuId)
             }
             this.$refs.tree.setCheckedKeys(this.defaultExpandedKeys)
           })
@@ -69,11 +74,18 @@ export default {
     dataFormSubmit () {
       let menuIds = []
       menuIds = this.checkedDataKeys.concat(this.halfCheckedDataKeys)
+      let checkData = this.$refs.tree.getCheckedNodes()
+      let arr = []
+      checkData.forEach(item => {
+        if (!item.children.length) {
+          arr.push(item.id)
+        }
+      })
       if (menuIds.length) {
         let params = {
           'menuIds': menuIds.join(','),
           'userGroupId': this.userGroupId,
-          'checkedDataKeys': this.checkedDataKeys.join(',')
+          'checkedDataKeys': arr.join(',')
         }
         saveRoleInfo(params).then(({ data }) => {
           if (data && data.code === 0) {

@@ -22,7 +22,7 @@
         label="本次完成时间">
       </el-table-column>
       <el-table-column
-        prop="exStatus"
+        prop="runStatus"
         header-align="center"
         align="center"
         label="任务状态">
@@ -33,7 +33,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="primary"  size="small" @click="addOrUpdateHandle(scope.row)">依赖快照</el-button>
+          <el-button type="primary"  size="small" @click="addOrUpdateHandle(scope.row)">依赖任务进度</el-button>
         </template>
       </el-table-column>
 			</el-table>

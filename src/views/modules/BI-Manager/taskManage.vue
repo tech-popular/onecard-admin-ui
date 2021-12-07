@@ -227,7 +227,7 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.$message({
-            message: '操作成功',
+            message: '执行成功',
             type: 'success',
             duration: 1500,
             onClose: () => {
@@ -262,7 +262,7 @@ export default {
         }).then(({ data }) => {
           if (data && data.code === 0) {
             this.$message({
-              message: '操作成功',
+              message: '删除成功',
               type: 'success',
               duration: 1500,
               onClose: () => {

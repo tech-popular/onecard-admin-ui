@@ -198,8 +198,8 @@ export default {
               })
             }
             this.$message({
-              type: '操作成功',
-              message: data.msg
+              type: 'success',
+              message: '删除成功'
             })
             this.getDataList()
           })
