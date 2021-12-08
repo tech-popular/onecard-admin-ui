@@ -228,7 +228,7 @@
               'name': this.dataForm.name,
               'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
               'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
-              'menuParentList': this.dataForm.type === 0 ? '' : this.menuParentList.join(',')
+              'menuParentList': this.menuParentList.join(',')
             }
               console.log('params: ', params)
             if (!this.dataForm.id) {
