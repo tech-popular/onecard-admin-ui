@@ -76,7 +76,7 @@ router.beforeEach((to, from, next) => {
       params: http.adornParams()
     }).then(({data}) => {
       if (data && data.code === 0) {
-        window.location.href = 'http://test.tech.9fbank.com/bi/#/?userId=' + data.user.id
+        window.location.href = 'http://tech.9fbank.com/bi/#/?userId=' + data.user.id
       } else {
         console.log('用户信息获取失败！！')
         router.push({ name: 'login' })

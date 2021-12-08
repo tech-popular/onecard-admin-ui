@@ -164,7 +164,7 @@ export default {
         {
           name: '新BI系统',
           img: require('../../assets/img/newBI.png'),
-          url: 'http://test.tech.9fbank.com/bi/#/'
+          url: 'http://tech.9fbank.com/bi/#/'
         }
       ]
     }
