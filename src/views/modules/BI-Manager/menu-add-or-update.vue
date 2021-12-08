@@ -218,18 +218,6 @@
       // 所属父级
       parentTreeChange (val) {
         this.menuParentList = val
-        // let arr = []
-        // arr = this.$refs.cascaderMenu.getCheckedNodes()
-        // if (this.dataForm.type === 0 && arr[0].level === 2) {
-        //   this.$message.error('不能新增三级目录')
-        //   // this.$refs.cascaderMenu.clearCheckedNodes
-        //   // 清空选中的节点
-        //   // this.$refs.cascaderMenu.$refs.panel.clearCheckedNodes()
-        //   // 设置为空可以让节点不高亮显示
-        //   // this.$refs.cascaderMenu.$refs.panel.activePath = []
-        //   this.dataForm.parentId = []
-        //   this.menuParentList = []
-        // }
       },
       // 表单提交
       dataFormSubmit () {
