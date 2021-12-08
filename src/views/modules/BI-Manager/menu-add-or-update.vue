@@ -238,9 +238,9 @@
             let params = {
               'parentId': this.dataForm.parentId.length ? this.menuParentList[this.menuParentList.length - 1].toString() : '0',
               'name': this.dataForm.name,
-              'url': this.dataForm.url,
-              'taskIds': this.dataForm.taskIds.join(';'),
-              'menuParentList': this.menuParentList.join(',')
+              'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
+              'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
+              'menuParentList': this.dataForm.type === 0 ? '' : this.menuParentList.join(',')
             }
               console.log('params: ', params)
             if (!this.dataForm.id) {
