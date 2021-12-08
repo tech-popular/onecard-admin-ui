@@ -20,6 +20,16 @@
               <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList" style="margin-left:0">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 8 ">
+            <el-select v-model="dataForm.userGroupId" placeholder="请选择" style="width:100%">
+              <el-option
+                v-for="item in userGroupList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item label="申请系统模块" prop="systemmodel" v-if="isShow">
             <el-cascader
               style="width: 100%"
@@ -241,7 +251,8 @@ import {
   tenantInif,
   saveTenant,
   mcCompute,
-  tenantCrent
+  tenantCrent,
+  getUserGroupList
 } from '@/api/oa/apply'
 export default {
   data () {
@@ -265,7 +276,8 @@ export default {
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
-        reason: '' // 申请理由
+        reason: '', // 申请理由
+        userGroupId: '' // 用户组权限
       }, // 账号权限form
       dataRule: {
         name: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
@@ -277,10 +289,14 @@ export default {
         ],
         reason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
+        ],
+        userGroupId: [
+          { required: true, message: '用户组不能为空', trigger: 'change' }
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
       tenantList: [],
+      userGroupList: [],
       // 租户申请开始
       tenantForm: {
         tenantIds: [], // 租户
@@ -387,6 +403,12 @@ export default {
         tenantInif().then(({ data }) => {
           this.tenantList = data.data
         })
+        let params = {
+          'userId': sessionStorage.getItem('id')
+        }
+        getUserGroupList(params).then(({ data }) => {
+          this.userGroupList = data.data
+        })
         var tenanName = []
         tenantCrent().then(({ data }) => {
           data.data.map(item => {
@@ -453,6 +475,10 @@ export default {
             applyReason: this.dataForm.reason,
             systemId: this.dataForm.system,
             menuList: this.dataForm.systemmodel
+          }
+          if (this.dataForm.system === 8) {
+            newData.systemName = '新BI系统'
+            newData.userGroupId = this.dataForm.userGroupId
           }
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {

@@ -13,6 +13,9 @@
             <el-radio :label="item.value" :key="item.value" v-for="(item) in detalList.systemList" disabled style="margin-left:0">{{item.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="用户组" v-if="detalList.userGroupName">
+          <span>{{detalList.userGroupName }}</span>
+        </el-form-item>
         <el-form-item label="申请模块">
           <el-table
             :data="detalList.modelList"
@@ -171,6 +174,7 @@ export default {
       })
       this.getTenantList()
     },
+
     getTenantList () {
       tenantInif().then(({ data }) => {
         this.tenantList = data.data
