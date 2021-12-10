@@ -164,7 +164,7 @@ export default {
         {
           name: '新BI系统',
           img: require('../../assets/img/newBI.png'),
-          url: 'http://tech.9fbank.com/bi/#/'
+          url: originHost + '/bi/#/'
         }
       ]
     }
@@ -270,7 +270,6 @@ export default {
           if (item.name === '新BI系统') {
             let url = item.url + '?userId=' + sessionStorage.getItem('id')
             window.open(url, '_blank')
-            // window.location.href = item.url + '?userId=' + sessionStorage.getItem('id')
           } else {
             window.open(item.url, '_blank')
           }
