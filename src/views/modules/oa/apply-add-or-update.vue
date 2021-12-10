@@ -476,8 +476,8 @@ export default {
             systemId: this.dataForm.system,
             menuList: this.dataForm.systemmodel
           }
+          newData.systemName = this.systemList.filter(item => item.value === this.dataForm.system)[0].label
           if (this.dataForm.system === 8) {
-            newData.systemName = '新BI系统'
             newData.userGroupId = this.dataForm.userGroupId
           }
           saveAccountAuthApply(newData).then(({ data }) => {
