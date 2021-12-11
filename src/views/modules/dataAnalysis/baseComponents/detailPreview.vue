@@ -70,7 +70,7 @@
 
 <script>
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-import { selectAllCata, overviewData } from '@/api/dataAnalysis/dataInsightManage'
+import { selectAllCata, overviewData, detailPreviewList } from '@/api/dataAnalysis/dataInsightManage'
 import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 export default {
   data () {
@@ -234,7 +234,7 @@ export default {
           }
         }
       })
-      this.getSelectColumns()
+      // this.getSelectColumns()
     },
     getSelectColumns () {
       this.columns = []
@@ -276,7 +276,6 @@ export default {
         this.lastCalTime = data.data.lastCalTime
         // this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : [5486, 5590]
         // this.selectedIndex = this.ruleForm.region
-        this.getTranferLogData()
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
         this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
         this.getSelectAllCata(channelCode, (indexList) => {
@@ -285,6 +284,7 @@ export default {
           this.selectedIndex = this.ruleForm.region
           this.outParamsIndexList = this.updateOutParamsList(indexList)
           this.getSelectCata(indexList, this.selectedIndex)
+          this.getDetailPreviewList()
           this.$nextTick(() => {
             this.loading = false
           })
@@ -300,28 +300,29 @@ export default {
         }
       })
     },
-    getTranferLogData () {
-      // transferLogList({
-      //   pageNum: this.pageNum,
-      //   pageSize: this.pageSize,
-      // 	 templateId: this.templateId,
-      // 	 indicators: this.ruleForm.region.join(',')
-      // }).then(({data}) => {
-      //   if (data.status !== '1') {
-      //     this.$message({
-      //       type: 'error',
-      //       message: data.message || '数据异常'
-      //     })
-      //     this.totalCount = 0
-      //     this.dataList = []
-      //   } else if (!data.data.list || !data.data.list.length) {
-      //     this.totalCount = 0
-      //     this.dataList = []
-      //   } else {
-      //     this.totalCount = data.data.total
-      //     this.dataList = data.data.list
-      //   }
-      // })
+    getDetailPreviewList () {
+      detailPreviewList({
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
+        templateId: this.templateId,
+        indicators: this.ruleForm.region.join(',')
+      }).then(({data}) => {
+        console.log('data: ', data)
+        if (data.status !== '1') {
+          this.$message({
+            type: 'error',
+            message: data.message || '数据异常'
+          })
+          this.totalCount = 0
+          this.dataList = []
+        } else if (!data.data.list || !data.data.list.length) {
+          this.totalCount = 0
+          this.dataList = []
+        } else {
+          this.totalCount = data.data.total
+          this.dataList = data.data.list
+        }
+      })
     },
     // 编辑
     editTable () {
@@ -344,12 +345,12 @@ export default {
     sizeChangeHandle (page) {
       this.pageSize = page
       this.pageNum = 1
-      this.getTranferLogData()
+      this.getDetailPreviewList()
     },
     // 当前页
     currentChangeHandle (page) {
       this.pageNum = page
-      this.getTranferLogData()
+      this.getDetailPreviewList()
     },
     // 弹窗状态
     handleClose () {
