@@ -2,8 +2,8 @@
   <div class="mod-config">
     <el-form :inline="true">
       <el-form-item>
-        <el-button type="primary"  @click="addOrUpdateSqlHandle">新建SQL申请</el-button>
-        <el-button type="primary"  @click="addOrUpdateFtpHandle">新建FTP申请</el-button>
+        <el-button type="primary"  @click="addOrUpdateHandle">新建申请</el-button>
+        <el-button type="primary"  @click="searchHistory">申请申请</el-button>
         <!-- <el-button type="primary" @click="searchHistory">我的历史提数</el-button> -->
       </el-form-item>
     </el-form>
@@ -46,7 +46,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
-		<addOrUpdateSql v-if="addOrUpdateSqlVisible" ref="addOrUpdateSql"></addOrUpdateSql>
+		<addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate"></addOrUpdate>
     <addOrUpdateFtp  v-if="addOrUpdateFtpVisible" ref="addOrUpdateftp"></addOrUpdateFtp>
     <dataServiceHistory v-if="dataServiceHistoryVisible" ref="dataServiceHistory"></dataServiceHistory>
   </div>
@@ -57,8 +57,8 @@
 }
 </style>
 <script>
-import addOrUpdateSql from './sql-add-or-update'
-import addOrUpdateFtp from './ftp-add-or-update'
+import addOrUpdate from './service-add-or-update'
+// import addOrUpdateFtp from './ftp-add-or-update'
 import dataServiceHistory from './dataService-history'
 // import isInnerIPFn from '../../../utils/validate'
 export default {
@@ -70,12 +70,12 @@ export default {
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
-      addOrUpdateSqlVisible: false,
+      addOrUpdateVisible: false,
       addOrUpdateFtpVisible: false,
       dataServiceHistoryVisible: false
     }
   },
-  components: { addOrUpdateSql, dataServiceHistory, addOrUpdateFtp },
+  components: { addOrUpdate, dataServiceHistory, addOrUpdateFtp },
   activated () {
     this.getDataList()
   },
@@ -98,10 +98,10 @@ export default {
       this.getDataList()
     },
     // 新增 / 修改
-    addOrUpdateSqlHandle () {
-      this.addOrUpdateSqlVisible = true
+    addOrUpdateHandle () {
+      this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdateSql.init()
+        this.$refs.addOrUpdate.init()
       })
     },
     addOrUpdateFtpHandle () {
