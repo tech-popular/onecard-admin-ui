@@ -3,8 +3,8 @@
     <el-form :inline="true">
       <el-form-item>
         <el-button type="primary"  @click="addOrUpdateHandle">新建申请</el-button>
-        <el-button type="primary"  @click="searchHistory">申请申请</el-button>
-        <!-- <el-button type="primary" @click="searchHistory">我的历史提数</el-button> -->
+        <!-- <el-button type="primary"  @click="searchHistory">申请申请</el-button> -->
+        <el-button type="primary" @click="searchHistory">我的历史提数</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -47,7 +47,7 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
 		<addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate"></addOrUpdate>
-    <addOrUpdateFtp  v-if="addOrUpdateFtpVisible" ref="addOrUpdateftp"></addOrUpdateFtp>
+    <!-- <addOrUpdateFtp  v-if="addOrUpdateFtpVisible" ref="addOrUpdateftp"></addOrUpdateFtp> -->
     <dataServiceHistory v-if="dataServiceHistoryVisible" ref="dataServiceHistory"></dataServiceHistory>
   </div>
 </template>
@@ -75,7 +75,7 @@ export default {
       dataServiceHistoryVisible: false
     }
   },
-  components: { addOrUpdate, dataServiceHistory, addOrUpdateFtp },
+  components: { addOrUpdate, dataServiceHistory },
   activated () {
     this.getDataList()
   },
