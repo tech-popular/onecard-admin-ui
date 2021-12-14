@@ -175,8 +175,8 @@
               v-model="baseForm.type"
               :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'sql'"
             >
-              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
+              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="分群描述">
