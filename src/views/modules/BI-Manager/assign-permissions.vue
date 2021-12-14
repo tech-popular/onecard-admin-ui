@@ -1,5 +1,13 @@
 <template>
-<el-dialog title="分配权限" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog title="分配权限" :close-on-click-modal="false" :visible.sync="visible">
+      <el-form :model="dataForm" ref="dataForm" label-width="100px" > 
+        <el-form-item label="类型" prop="type">
+          <el-radio-group v-model="dataForm.type">
+            <el-radio :label="0">PC端</el-radio>
+            <el-radio :label="1">移动端</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
 			<el-tree
 			:data="dataTree"
       ref="tree"
@@ -12,11 +20,11 @@
       @check="checkPermit"
       >
     </el-tree>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="visible = false">取消</el-button>
-    <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-  </span>
-</el-dialog>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+    </span>
+  </el-dialog>
 </template>
 
 <script>
@@ -25,6 +33,9 @@ export default {
   data () {
     return {
       visible: false,
+      dataForm: {
+        type: 0
+      },
       userGroupId: 0,
       menuIds: [],
       checkedDataKeys: [],
