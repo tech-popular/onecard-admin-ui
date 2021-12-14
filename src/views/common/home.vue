@@ -267,13 +267,14 @@ export default {
             })
           })
         } else { // 外链系统，进行页面跳转
-          if (item.name === '新BI系统') {
-            let url = item.url + '?userId=' + sessionStorage.getItem('id')
-            window.open(url, '_blank')
-            // window.location.href = item.url + '?userId=' + sessionStorage.getItem('id')
-          } else {
-            window.open(item.url, '_blank')
-          }
+          // if (item.name === '新BI系统') {
+          //   let url = item.url + '?userId=' + sessionStorage.getItem('id')
+          //   window.open(url, '_blank')
+          //   // window.location.href = item.url + '?userId=' + sessionStorage.getItem('id')
+          // } else {
+            // window.open(item.url, '_blank')
+          // }
+          window.open(item.url, '_blank')
         }
       }
     },
