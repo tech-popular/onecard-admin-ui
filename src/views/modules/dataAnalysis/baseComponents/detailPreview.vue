@@ -234,7 +234,7 @@ export default {
           }
         }
       })
-      // this.getSelectColumns()
+      this.getSelectColumns()
     },
     getSelectColumns () {
       this.columns = []
@@ -283,7 +283,7 @@ export default {
           this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : this.regionList
           this.selectedIndex = this.ruleForm.region
           this.outParamsIndexList = this.updateOutParamsList(indexList)
-          this.getSelectCata(indexList, this.selectedIndex)
+          // this.getSelectCata(indexList, this.selectedIndex)
           this.getDetailPreviewList()
           this.$nextTick(() => {
             this.loading = false
@@ -321,6 +321,7 @@ export default {
         } else {
           this.totalCount = data.data.total
           this.dataList = data.data.list
+          this.getSelectCata(this.indexList, this.selectedIndex)
         }
       })
     },
@@ -333,7 +334,7 @@ export default {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           this.isShow = true
-          this.getSelectColumns()
+          this.getDetailPreviewList()
         }
       })
     },
