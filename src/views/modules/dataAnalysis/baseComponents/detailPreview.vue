@@ -230,11 +230,17 @@ export default {
           this.getSelectCata(citem.children, selectedIndex)
         } else {
           if (selectedIndex.includes(citem.id)) {
-            this.selectColumnsData.push(citem)
+            let obj = {
+              label: citem.label,
+              prop: citem.englishName,
+              align: 'center'
+            }
+            this.columns.push(obj)
+            // this.selectColumnsData.push(citem)
           }
         }
       })
-      this.getSelectColumns()
+      // this.getSelectColumns()
     },
     getSelectColumns () {
       this.columns = []
@@ -315,12 +321,13 @@ export default {
           })
           this.totalCount = 0
           this.dataList = []
-        } else if (!data.data.list || !data.data.list.length) {
+        } else if (!data.data.tableDataList || !data.data.tableDataList.length) {
           this.totalCount = 0
           this.dataList = []
         } else {
-          this.totalCount = data.data.total
-          this.dataList = data.data.list
+          this.totalCount = data.data.tableDataList.length
+          this.dataList = data.data.tableDataList
+          this.columns = []
           this.getSelectCata(this.indexList, this.selectedIndex)
         }
       })
