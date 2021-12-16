@@ -1,10 +1,10 @@
 <template>
   <el-dialog :title="tag ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
-      <el-form-item label="指标名:" prop="englishName">
+      <el-form-item label="标签名称:" prop="englishName">
         <el-input v-model="dataForm.englishName" placeholder="" v-bind:readonly="readonly" />
       </el-form-item>
-      <el-form-item label="指标标题:" prop="chineseName">
+      <el-form-item label="标签标题:" prop="chineseName">
         <el-input v-model="dataForm.chineseName" placeholder="" v-bind:readonly="readonly" />
       </el-form-item>
       <el-form-item label="数据类型:" prop="fieldType">
@@ -12,7 +12,7 @@
           <el-option v-for="(item, index) in fieldTypeList" :value="item.childrenValue" :key="index" :label="item.childrenValue"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="渠道" prop="channelCode">
+      <el-form-item label="所属业务线" prop="channelCode">
         <el-select filterable v-model="dataForm.channelCode" style="width:100%" multiple>
           <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
         </el-select>
@@ -25,7 +25,7 @@
       <el-form-item label="数据格式:" prop="dataStandar">
         <el-input v-model="dataForm.dataStandar" placeholder="" v-bind:readonly="readonly" />
       </el-form-item>
-      <el-form-item label="指标类别:" prop="categoryId">
+      <el-form-item label="标签类别:" prop="categoryId">
         <Treeselect
               :options="categoryIdList"
               :disable-branch-nodes="true"
@@ -49,11 +49,11 @@
           <el-option v-for="(item, index) in sourceDatasource" :value="item.typeNum" :key="index" :label="item.typeValue"/>
         </el-select>
       </el-form-item> -->
-      <el-form-item label="指标状态:" prop="enable">
+      <el-form-item label="标签状态:" prop="enable">
         <el-radio v-model="dataForm.enable" label="true" v-bind:disabled="readonly" >有效</el-radio>
         <el-radio v-model="dataForm.enable" label="false" v-bind:disabled="readonly" >无效</el-radio>
       </el-form-item>
-      <el-form-item label="指标说明:" prop="remark">
+      <el-form-item label="标签说明:" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注" type="textarea" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}"  v-bind:readonly="readonly" />
         <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - dataForm.remark.length"></span>个字符</p>
       </el-form-item>

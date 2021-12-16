@@ -1,16 +1,16 @@
 <template>
   <div class="index-wrap">
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="指标ID">
+      <el-form-item label="标签ID">
         <el-input v-model="dataForm.id" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="指标名称">
+      <el-form-item label="标签名称">
         <el-input v-model="dataForm.englishName" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="指标标题">
+      <el-form-item label="标签标题">
         <el-input v-model="dataForm.chineseName" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="指标类别">
+      <el-form-item label="标签类别">
         <Treeselect
               :options="categoryIdList"
               :disable-branch-nodes="true"
@@ -25,7 +25,7 @@
               style="line-height:38px"
             />
       </el-form-item>
-      <el-form-item label="指标状态">
+      <el-form-item label="标签状态">
         <el-select v-model="dataForm.enable" placeholder="指标状态">
           <el-option label="全部" value=""></el-option>
           <el-option label="有效" value="true"></el-option>
@@ -39,8 +39,8 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" align="center" label="指标ID"></el-table-column>
-      <el-table-column prop="englishName" header-align="center" align="center" label="指标名">
+      <el-table-column prop="id" header-align="center" align="center" label="标签ID"></el-table-column>
+      <el-table-column prop="englishName" header-align="center" align="center" label="标签名称">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.englishName)" slot="content"></div>
@@ -48,7 +48,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="chineseName" header-align="center" align="center" label="指标标题">
+      <el-table-column prop="chineseName" header-align="center" align="center" label="标签标题">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.chineseName)" slot="content"></div>
@@ -57,8 +57,8 @@
         </template>
       </el-table-column>
       <el-table-column prop="fieldType" header-align="center" align="center" :formatter="fieldTypeFormat" label="数据类型"></el-table-column>
-      <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="指标类别"></el-table-column>
-      <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"></el-table-column>
+      <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="标签类别"></el-table-column>
+      <el-table-column prop="channelCode" header-align="center" align="center" label="所属业务线"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -68,7 +68,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="sourceTable" header-align="center" align="center" label="来源表"></el-table-column>
-      <el-table-column prop="remark" header-align="center" align="center" label="指标描述">
+      <el-table-column prop="remark" header-align="center" align="center" label="标签描述">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.remark)" slot="content"></div>
@@ -79,7 +79,7 @@
       <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
-      <el-table-column prop="enable" header-align="center" align="center" label="指标状态">
+      <el-table-column prop="enable" header-align="center" align="center" label="标签状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.enable === true" size="small" >有效</el-tag>
           <el-tag v-else size="small" type="danger">无效</el-tag>

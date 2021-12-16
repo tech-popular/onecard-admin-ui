@@ -25,7 +25,7 @@
             </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="渠道">
+      <el-form-item label="所属业务线">
         <el-select
 					v-model="dataForm.channelCode"
 					filterable
@@ -49,7 +49,7 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" width="80" header-align="center" align="center" label="id"/>
-      <el-table-column prop="channelCode" header-align="center" align="center" width="200" label="渠道"/>
+      <el-table-column prop="channelCode" header-align="center" align="center" width="200" label="所属业务线"/>
       <el-table-column prop="type" header-align="center" align="center" width="150" label="类型"/>
       <el-table-column prop="params" header-align="center" align="left" label="出参"/>
       <el-table-column prop="datasourceType" header-align="center" align="center" width="150" label="通道"/>

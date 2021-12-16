@@ -23,7 +23,7 @@
         width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="分群ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="分群名称">
+      <el-table-column prop="name" header-align="center" align="center" label="所属业务线">
         <!-- <template slot-scope="scope">
           <el-button type="text" size="small" @click="tableShowHandle(scope.row)">{{scope.row.name}}</el-button>
         </template> -->

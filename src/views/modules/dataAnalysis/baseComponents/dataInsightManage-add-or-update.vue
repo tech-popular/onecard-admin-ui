@@ -39,7 +39,7 @@
                 :disabled="!!id"
               >指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
-                <el-form-item label="用户所属渠道" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
+                <el-form-item label="所属业务线" prop="channelId" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
                 <!-- multiple
                   :multiple-limit = "channelLimit" -->
                 <el-select
@@ -71,7 +71,7 @@
             </div>
           </el-form-item>
           <el-form-item
-            label="用户所属渠道"
+            label="所属业务线"
             prop="channelId"
             v-if="baseForm.userType === 'excel'"
             class="user-channel"
@@ -117,7 +117,7 @@
             </div>
           </el-form-item>
            <el-form-item
-            label="用户所属渠道"
+            label="所属业务线"
             prop="channelId"
             v-if="baseForm.userType === 'sql'"
             label-width="110px;"
@@ -175,8 +175,8 @@
               v-model="baseForm.type"
               :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'sql'"
             >
-              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
+              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="分群描述">
@@ -389,7 +389,7 @@ export default {
           { required: true, message: '请选择计算类型', trigger: 'change' }
         ],
         channelId: [
-          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
+          { required: true, message: '请选择用户所属业务线', trigger: 'change' }
         ],
         sql: [
           { required: true, message: '请输入SQL', trigger: 'change' }

@@ -107,7 +107,7 @@
           <el-button
             type="text"
             size="small"
-            v-if="isAuth('honeycomb:honeycombtask:start') && isAdmin"
+            v-if="isAuth('honeycomb:honeycombtask:start') && (isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid)"
             @click="startTask(scope.row.id)"
           >启动任务</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOtherList.includes(userid) || scope.row.authOwner === userid" @click="taskDependent(scope.row.id)">任务编排</el-button>

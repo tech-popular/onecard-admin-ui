@@ -4,7 +4,7 @@
 			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
 				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
 			</el-form-item>
-      <el-form-item label="所属渠道" prop="channelCode" :rules="{ required: true, message: '请选择所属渠道', trigger: 'blur' }">
+      <el-form-item label="所属业务线" prop="channelCode" :rules="{ required: true, message: '请选择所属业务线', trigger: 'blur' }">
 				<el-select
 					v-model="dataForm.channelCode"
 					@change="channelIdChange"
@@ -77,19 +77,41 @@
             <span style="color:red" v-text="paramsNum"></span> 个参数
           </p>
       </el-form-item>
-       <el-form-item label="短信类型" v-if="dataForm.editType === '1' && dataForm.type === 'sms'"  prop="cusSmsType">
-        <el-select v-model="dataForm.cusSmsType"  filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="短信签名" v-if="dataForm.editType === '1' && dataForm.type === 'sms'"  prop="productNo">
-        <el-select v-model="dataForm.productNo" filterable  @change="changeproductNo"  placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in productNoList" :key="index" :value="item.code" :label="item.name"></el-option>
-        </el-select>
-      </el-form-item>
-        <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
-          <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="65" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
+      <div v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
+        <el-form-item label="短信类型"   prop="cusSmsType">
+          <el-select v-model="dataForm.cusSmsType"  filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
+              <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
+          </el-select>
         </el-form-item>
+        <el-form-item label="短信签名" v-if="dataForm.editType === '1' && dataForm.type === 'sms'"  prop="productNo">
+          <el-select v-model="dataForm.productNo" filterable  @change="changeproductNo"  placeholder="请选择" style="width: 400px;margin-right:15px;">
+              <el-option v-for="(item, index) in productNoList" :key="index" :value="item.code" :label="item.name"></el-option>
+          </el-select>
+        </el-form-item>
+          <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
+            <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="300" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
+          </el-form-item>
+          <el-form-item  prop="extraParams"  label="额外出参">
+				  <Treeselect
+						:options="outParamsList"
+						:disable-branch-nodes="true"
+						:show-count="true"
+						:multiple="true"
+						:load-options="loadOptions"
+						:searchable="true"
+						:clearable="true"
+						:disabled="viewVisible"
+            @open="openParamsSelect"
+						@input="changeOption"
+						@select="outParamsSelect"
+						@deselect="outParamsDeselect"
+						noChildrenText="暂无数据"
+						v-model="dataForm.extraParams"
+						placeholder="请选择"
+						class="base-pane-item"
+					/>
+			</el-form-item>
+      </div>
         <!-- ai -->
       <el-form-item prop="resourceId" v-if="dataForm.type === 'ai' " label="AI模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
         <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
@@ -127,7 +149,7 @@
         <!-- <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
         <el-input v-model="dataForm.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
         </el-form-item> -->
-        <el-form-item  prop="extraParams"  label="请求入参">
+        <el-form-item  prop="extraParams"  label="请求入参" :rules="{ required: true, message: '请选择名称', trigger: 'input' }">
 				  <Treeselect
 						:options="outParamsList"
 						:disable-branch-nodes="true"
@@ -200,7 +222,7 @@
 						class="base-pane-item"
 					/>
 			</el-form-item>
-      <el-form-item  prop="extraParams"  label="额外出参" v-if="extraParamsVisible">
+      <el-form-item  prop="extraParams"  label="额外出参" v-if="extraParamsVisible" :rules="{ required: true, message: '请选择名称', trigger: 'input' }">
 				  <Treeselect
 						:options="outParamsList"
 						:disable-branch-nodes="true"
@@ -437,9 +459,9 @@ export default {
         type: [
           { required: true, message: '请选择下发类型', trigger: 'blur' }
         ],
-        extraParams: [
-          { required: true, message: '请选择额外出参', trigger: 'input' }
-        ],
+        // extraParams: [
+        //   { required: true, message: '请选择额外出参', trigger: 'input' }
+        // ],
         editType: [
           { required: true, message: '请选择配置方式', trigger: 'blur' }
         ],
@@ -801,7 +823,11 @@ export default {
         })
         this.dataForm.extraParams = Array.from(new Set(out))
         this.outParamsList = this.updateOutParamsList(this.dataForm.extraParams, outList)
-        this.extraParamsVisible = true
+        if (this.dataForm.type === 'sms' && this.dataForm.editType === '0') {
+          this.extraParamsVisible = true
+        } else {
+          this.extraParamsVisible = false
+        }
       } else {
         this.dataForm.extraParams = []
         this.extraParamsVisible = false
@@ -1090,7 +1116,7 @@ export default {
           if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.fixedParams.length === 0) {
             return this.$message.error(`请联系管理员配置固定流程参数`)
           }
-          if ((this.dataForm.type === 'sms') && this.extraParams.length !== this.paramsNum) {
+          if ((this.dataForm.type === 'sms' && this.dataForm.editType === '0') && this.extraParams.length !== this.paramsNum) {
             return this.$message.error(`请选择${this.paramsNum}个参数`)
           }
           let smsContent = {
