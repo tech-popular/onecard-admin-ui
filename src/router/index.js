@@ -8,7 +8,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
-import { clearLoginInfo, getQueryString } from '@/utils'
+import { clearLoginInfo, getQueryString, getDate } from '@/utils'
 Vue.use(Router)
 // 开发环境不使用懒加载, 因为懒加载页面太多的话会造成webpack热更新太慢, 所以只有生产环境使用懒加载
 const _import = require('./import-' + process.env.NODE_ENV)
@@ -67,7 +67,50 @@ const router = new Router({
   routes: globalRoutes.concat(mainRoutes)
 })
 
+//   API   保存数据接口
+let startTime = Date.now()
+let currentTime
+let standingTime = 0
+let pageName = []
 router.beforeEach((to, from, next) => {
+  // 如果to存在，则说明路由发生了跳转
+  if (to.meta.menuId) {
+    // 清空界面名
+    pageName = []
+    // 离开界面
+    // 第一步：页面跳转后记录一下当前的时间 currentTime
+    currentTime = Date.now()
+    standingTime = parseInt((currentTime - startTime) / 1000)
+    from.matched.forEach(routeItem => {
+      pageName.push(routeItem.meta.title)
+    })
+    // ------------
+    // 第二步：在这里把 currentTime - startTime 的 差值 发送给后端
+    // ------------
+    if (pageName.length > 0) {
+      const params = {
+        // 界面
+        menuName: pageName[pageName.length - 1],
+        // 进入界面时间
+        visitTimeStart: getDate(startTime, 'year'),
+        // 离开时间
+        // gmtLeave: '',
+        visitTimeEnd: getDate(currentTime, 'year'),
+        menuId: to.meta.menuId,
+        // 停留时长
+        visitTime: standingTime
+      }
+      console.log('params: ', params)
+        // API.add(params).then(function(result) {
+        //     console.log(result)
+        // }).catch(function(result) {
+        //     // console.log(result)
+        // })
+    }
+    // 第三步：每次都要初始化一下 startTime
+    startTime = Date.now()
+    pageName = []
+   }
   // // 适应新BI系统的登录后跳转
   // if (from.query.from === 'newbi') {
   //   http({

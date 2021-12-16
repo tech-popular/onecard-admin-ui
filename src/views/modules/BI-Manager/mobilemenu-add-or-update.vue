@@ -223,7 +223,7 @@
               'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
               'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
               'menuParentList': this.menuParentList.join(','),
-              'type ': 0
+              'type ': 1
             }
             console.log('params: ', params)
             if (!this.dataForm.id) {

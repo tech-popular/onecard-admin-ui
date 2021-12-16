@@ -112,7 +112,7 @@
 
 <script>
   import { getMenuList, updateFlagInfo } from '@/api/BI-Manager/menu'
-  import AddOrUpdate from './menu-add-or-update'
+  import AddOrUpdate from './mobilemenu-add-or-update'
   export default {
     data () {
       return {
@@ -145,8 +145,8 @@
           'url': this.dataForm.url,
           'grade': this.dataForm.grade,
           'page': this.page,
-          'pageSize': this.pageSize,
-          'type ': 0
+					'pageSize': this.pageSize,
+					'type ': 1
         }
         getMenuList(params).then(({ data }) => {
           if (data && data.code === 0) {
