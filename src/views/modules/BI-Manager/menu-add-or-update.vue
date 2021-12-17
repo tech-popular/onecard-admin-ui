@@ -4,6 +4,11 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
+      <el-form-item label="菜单类型：" prop="type">
+        <el-radio-group v-model="dataForm.type" @change="radioTypeChange" :disabled="!!dataForm.id">
+          <el-radio v-for="(type, index) in dataForm.typeList" :label="index" :key="index">{{ type }}</el-radio>
+        </el-radio-group>
+      </el-form-item>
 			<el-form-item label="上级菜单："  prop="parentId" >
 				<el-cascader
           style="width: 100%"
@@ -55,6 +60,7 @@
         visible: false,
         dataForm: {
           id: 0,
+          type: 0,
           typeList: ['目录', '菜单'],
           parentId: [],
           name: '',
@@ -141,11 +147,16 @@
           this.dataForm.taskIds = []
         } else {
           this.menuList = this.filterMenuList(this.menuData)
+          this.dataForm.url = ''
+          this.dataForm.taskIds = []
         }
       },
       // 获取上级菜单
       getRecursionList () {
-        findAllRecursionList().then(({ data }) => {
+        let params = {
+          type: 0
+        }
+        findAllRecursionList(params).then(({ data }) => {
           if (data && data.code === 0) {
             this.menuData = data.data
             this.menuList = this.filterMenuGradeList(data.data)
@@ -223,9 +234,9 @@
               'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
               'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
               'menuParentList': this.menuParentList.join(','),
-              'type ': 0
+              'type': 0
             }
-            console.log('params: ', params)
+              console.log('params: ', params)
             if (!this.dataForm.id) {
               savaBiInfo(params).then(({data}) => {
                 if (data && data.code === 0) {

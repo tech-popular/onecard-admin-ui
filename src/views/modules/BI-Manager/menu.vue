@@ -146,7 +146,7 @@
           'grade': this.dataForm.grade,
           'page': this.page,
           'pageSize': this.pageSize,
-          'type ': 0
+          'type': 0
         }
         getMenuList(params).then(({ data }) => {
           if (data && data.code === 0) {

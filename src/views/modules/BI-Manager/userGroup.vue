@@ -51,12 +51,11 @@
           <el-tag v-else size="small" type="danger">否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="150" label="操作">
+      <el-table-column header-align="center" align="center"  label="操作">
         <template slot-scope="scope">
           <el-button
             type="text"
             size="small"
-            v-if="isAuth('honeycomb:honeycombtask:update')"
             @click="addOrUpdateHandle(scope.row)"
           >修改</el-button>
           <el-button
@@ -67,8 +66,13 @@
 					<el-button
             type="text"
             size="small"
-						@click="taskDependent(scope.row.id)"
-          >分配权限</el-button>
+						@click="taskDependent(scope.row.id, 0)"
+          >PC端权限</el-button>
+          <el-button
+            type="text"
+            size="small"
+						@click="taskDependent(scope.row.id, 1)"
+          >移动端权限</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -177,10 +181,10 @@ export default {
         this.$refs.addOrUpdate.init(row)
       })
     },
-    taskDependent (id) {
+    taskDependent (id, type) {
       this.assignPermissionsVisible = true
       this.$nextTick(() => {
-        this.$refs.assignPermissions.init(id)
+        this.$refs.assignPermissions.init(id, type)
       })
     },
     // 删除

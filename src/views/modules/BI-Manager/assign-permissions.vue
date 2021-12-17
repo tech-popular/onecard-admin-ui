@@ -1,13 +1,5 @@
 <template>
-  <el-dialog title="分配权限" :close-on-click-modal="false" :visible.sync="visible">
-      <el-form :model="dataForm" ref="dataForm" label-width="100px" > 
-        <el-form-item label="类型" prop="type">
-          <el-radio-group v-model="dataForm.type">
-            <el-radio :label="0">PC端</el-radio>
-            <el-radio :label="1">移动端</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
+  <el-dialog :title="type === 0 ? 'PC端权限分配' : '移动端权限分配'" :close-on-click-modal="false" :visible.sync="visible">
 			<el-tree
 			:data="dataTree"
       ref="tree"
@@ -33,9 +25,7 @@ export default {
   data () {
     return {
       visible: false,
-      dataForm: {
-        type: 0
-      },
+      type: 0,
       userGroupId: 0,
       menuIds: [],
       checkedDataKeys: [],
@@ -49,18 +39,30 @@ export default {
     }
   },
   methods: {
-    init (id) {
+    init (id, type) {
       this.defaultExpandedKeys = []
       this.checkedDataKeys = []
       this.halfCheckedDataKeys = []
       this.userGroupId = id
-      findAllRecursionList().then(({ data }) => {
-          if (data && data.code === 0) {
-            this.dataTree = data.data
-          }
-      })
+      this.type = type
+      this.getRecursionList()
+      this.getRoleMenuListData()
+      this.visible = true
+    },
+    getRecursionList () {
       let params = {
-        userGroupId: id
+        type: this.type
+      }
+      findAllRecursionList(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.dataTree = data.data
+        }
+      })
+    },
+    getRoleMenuListData () {
+      let params = {
+        userGroupId: this.userGroupId,
+        type: this.type
       }
       getRoleMenuList(params).then(({ data }) => {
         if (data && data.code === 0 && data.data.length) {
@@ -75,7 +77,10 @@ export default {
           })
         }
       })
-      this.visible = true
+    },
+    changeType () {
+      this.getRecursionList()
+      this.getRoleMenuListData()
     },
     checkPermit (checkedNodes, checkedKeys, halfCheckedNodes, halfCheckedKeys) {
       this.checkedDataKeys = checkedKeys.checkedKeys
@@ -96,7 +101,8 @@ export default {
         let params = {
           'menuIds': menuIds.join(','),
           'userGroupId': this.userGroupId,
-          'checkedDataKeys': arr.join(',')
+          'checkedDataKeys': arr.join(','),
+          'type': this.type
         }
         saveRoleInfo(params).then(({ data }) => {
           if (data && data.code === 0) {

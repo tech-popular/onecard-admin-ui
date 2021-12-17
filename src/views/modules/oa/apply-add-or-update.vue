@@ -11,7 +11,7 @@
       <!-- 账号 -->
       <el-tab-pane label="账号权限" name="账号权限">
         <el-divider>请填写以下申请</el-divider>
-        <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
+        <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="140px">
           <el-form-item label="标题" prop="name">
             <el-input v-model="dataForm.name" placeholder="标题" />
           </el-form-item>
@@ -20,13 +20,7 @@
               <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList" style="margin-left:0">{{item.label}}</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="设备类型" prop="type" v-if="dataForm.system === 8">
-          <el-radio-group v-model="dataForm.type">
-            <el-radio :label="0">PC端</el-radio>
-            <el-radio :label="1">移动端</el-radio>
-          </el-radio-group>
-        </el-form-item>
-          <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 8 ">
+          <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 8 || dataForm.system === 9">
             <el-select v-model="dataForm.userGroupId" placeholder="请选择" style="width:100%">
               <el-option
                 v-for="item in userGroupList"
@@ -283,8 +277,7 @@ export default {
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
         reason: '', // 申请理由
-        userGroupId: '', // 用户组权限
-        type: 0 // 申请PC端或者移动端
+        userGroupId: '' // 用户组权限
       }, // 账号权限form
       dataRule: {
         name: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
@@ -410,12 +403,6 @@ export default {
         tenantInif().then(({ data }) => {
           this.tenantList = data.data
         })
-        let params = {
-          'userId': sessionStorage.getItem('id')
-        }
-        getUserGroupList(params).then(({ data }) => {
-          this.userGroupList = data.data
-        })
         var tenanName = []
         tenantCrent().then(({ data }) => {
           data.data.map(item => {
@@ -484,8 +471,9 @@ export default {
             menuList: this.dataForm.systemmodel
           }
           newData.systemName = this.systemList.filter(item => item.value === this.dataForm.system)[0].label
-          if (this.dataForm.system === 8) {
+          if (this.dataForm.system === 8 || this.dataForm.system === 9) {
             newData.userGroupId = this.dataForm.userGroupId
+            newData.type = this.dataForm.system === 8 ? 0 : 1
           }
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {
@@ -547,6 +535,16 @@ export default {
         this.isShow = false
       } else {
         this.isShow = true
+      }
+      this.dataForm.userGroupId = ''
+      if (value === 8 || value === 9) {
+        let params = {
+          'userId': sessionStorage.getItem('id'),
+          'type': value === 8 ? 0 : 1
+        }
+        getUserGroupList(params).then(({ data }) => {
+          this.userGroupList = data.data
+        })
       }
       accoutAuthInitInfo().then(({ data }) => {
         var a = [{ value: value }]
