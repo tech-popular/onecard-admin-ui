@@ -74,7 +74,7 @@ let standingTime = 0
 let pageName = []
 router.beforeEach((to, from, next) => {
   // 如果to存在，则说明路由发生了跳转
-  if (to.meta.menuId) {
+  if (to.meta.menuId && from.name && from.name.split('-') && from.name.split('-')[0] === 'BI') {
     // 清空界面名
     pageName = []
     // 离开界面
@@ -98,14 +98,18 @@ router.beforeEach((to, from, next) => {
         visitTimeEnd: getDate(currentTime, 'year'),
         menuId: to.meta.menuId,
         // 停留时长
-        visitTime: standingTime
+        visitTime: standingTime,
+        // 访问类型
+        visitType: '1'
       }
+      http({
+        url: http.adornUrl('/bi/userVisitLog/saveUserVisitLog'),
+        method: 'post',
+        params: http.adornParams(params)
+      }).then(({data}) => {
+        console.log('data: ', data)
+      })
       console.log('params: ', params)
-        // API.add(params).then(function(result) {
-        //     console.log(result)
-        // }).catch(function(result) {
-        //     // console.log(result)
-        // })
     }
     // 第三步：每次都要初始化一下 startTime
     startTime = Date.now()
