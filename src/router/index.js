@@ -109,7 +109,6 @@ router.beforeEach((to, from, next) => {
       }).then(({data}) => {
         console.log('data: ', data)
       })
-      console.log('params: ', params)
     }
     // 第三步：每次都要初始化一下 startTime
     startTime = Date.now()
