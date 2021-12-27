@@ -1002,6 +1002,11 @@ export default {
           this.id = res.data.data
           this.saveCollision()
         }
+      }).catch((e) => {
+        this.$message({
+          type: 'error',
+          message: e.message || '保存失败'
+        })
       })
     },
     saveSql () {

@@ -8,18 +8,10 @@
       :close-on-press-escape="false"
       :before-close="handleClose">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
-        <el-form-item label="已选人群">
-          <el-select v-model="ruleForm.templateId"  filterable   placeholder="请选择">
-              <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="选择对比人群" style="margin-left: 30px;">
-           <el-select v-model="ruleForm.comTemplateId"  filterable   placeholder="请选择">
-              <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
-          </el-select>
-        </el-form-item>
+        <el-form-item label="分群用户数：">{{templateUserNum}}人，在<span class="channl">{{channelInfoNameList}}</span>渠道中占比{{userRateStr}}</el-form-item>
+        <el-form-item label="最近计算时间：" style="margin-left: 30px;">{{lastCalTime}}</el-form-item>
         <br/>
-        <el-form-item prop="region" label="已选标签">
+        <el-form-item prop="region" label="可视化筛选：">
           <Treeselect
             :options="outParamsIndexList"
             :disable-branch-nodes="true"
@@ -65,6 +57,26 @@
       <div class="no-echart-content" v-else>
         {{dataResultText}}
       </div>
+      <div class="custer-history">
+        <p>分群历史情况：</p>
+        <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
+          <el-table-column prop="lastCalTime" header-align="center" align="center" label="计算完成时间"></el-table-column>
+          <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
+          <el-table-column prop="type" header-align="center" align="center" label="计算类型">
+            <template slot-scope="scope">
+              <span>{{scope.row.type === 'static' ? '静态' : '动态'}}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+        @size-change="sizeChangeHandle"
+        @current-change="currentChangeHandle"
+        :current-page="pageNum"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="pageSize"
+        :total="totalCount"
+        layout="total, sizes, prev, pager, next, jumper"/>
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" type="primary">关闭</el-button>
       </span>
@@ -74,7 +86,7 @@
 <script>
 import echarts from 'echarts'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-import { selectAllCata, overviewData, chartInfo } from '@/api/dataAnalysis/dataInsightManage'
+import { selectAllCata, overviewData, transferLogList, chartInfo } from '@/api/dataAnalysis/dataInsightManage'
 import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import { pieJson, barJson } from '../dataAnalysisUtils/tableShowChartInit'
 export default {
@@ -98,17 +110,19 @@ export default {
       originRegion: [],
       regionList: [], // 可视化筛选数据的默认值
       ruleForm: {
-        region: [],
-        templateId: '',
-        comTemplateId: ''
+        region: []
       },
-      cusSmsTypeList: [],
       rules: {
         region: [
           { required: true, message: '请选择', trigger: 'change' }
         ]
       },
       isShow: true,
+      dataList: [],
+      pageNum: 1, // 当前页
+      pageSize: 10, // 默认每页10条
+      totalCount: 0,
+      dataListLoading: false,
       canUpdate: true // 可编辑
     }
   },
@@ -385,6 +399,28 @@ export default {
         })
       })
     },
+    getTranferLogData () {
+      transferLogList({
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
+        templateId: this.templateId
+      }).then(({data}) => {
+        if (data.status !== '1') {
+          this.$message({
+            type: 'error',
+            message: data.message || '数据异常'
+          })
+          this.totalCount = 0
+          this.dataList = []
+        } else if (!data.data.list || !data.data.list.length) {
+          this.totalCount = 0
+          this.dataList = []
+        } else {
+          this.totalCount = data.data.total
+          this.dataList = data.data.list
+        }
+      })
+    },
     // 编辑
     editTable () {
       this.isShow = false
@@ -401,6 +437,17 @@ export default {
     cancelTable () {
       this.ruleForm.region = this.originRegion
       this.isShow = true
+    },
+    // 每页数
+    sizeChangeHandle (page) {
+      this.pageSize = page
+      this.pageNum = 1
+      this.getTranferLogData()
+    },
+    // 当前页
+    currentChangeHandle (page) {
+      this.pageNum = page
+      this.getTranferLogData()
     },
     // 弹窗状态
     handleClose () {

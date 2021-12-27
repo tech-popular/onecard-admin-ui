@@ -23,7 +23,7 @@
         width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="分群ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="所属业务线">
+      <el-table-column prop="name" header-align="center" align="center" label="分群名称">
         <!-- <template slot-scope="scope">
           <el-button type="text" size="small" @click="tableShowHandle(scope.row)">{{scope.row.name}}</el-button>
         </template> -->
@@ -47,7 +47,7 @@
              {{(isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username) ? '编辑' : '查看'}}
           </el-button>
           <el-button type="text" size="small"  v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row)">删除</el-button>
-          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">分群概览</el-button>
+          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">特征分析</el-button>
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="detailPreviewHandle(scope.row)">明细预览</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>

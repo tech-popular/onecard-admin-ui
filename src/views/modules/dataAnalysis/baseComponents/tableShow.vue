@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-      :title="'【' + title + '】分群概览'"
+      :title="'【' + title + '人群特征分析'"
       :visible.sync="dialogVisible"
       width="1200px"
       v-loading="loading"
@@ -8,10 +8,14 @@
       :close-on-press-escape="false"
       :before-close="handleClose">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
-        <el-form-item label="分群用户数：">{{templateUserNum}}人，在<span class="channl">{{channelInfoNameList}}</span>渠道中占比{{userRateStr}}</el-form-item>
-        <el-form-item label="最近计算时间：" style="margin-left: 30px;">{{lastCalTime}}</el-form-item>
+        <el-form-item label="已选人群：">{{channelInfoNameList}}</el-form-item>
+        <el-form-item label="选择对比人群：" style="margin-left: 30px;">
+           <el-select v-model="ruleForm.comTemplateId"  filterable   placeholder="请选择">
+              <el-option v-for="(item, index) in custGroupDataList" :key="index" :value="item.code" :label="item.name"></el-option>
+          </el-select>
+        </el-form-item>
         <br/>
-        <el-form-item prop="region" label="可视化筛选：">
+        <el-form-item prop="region" label="已选标签">
           <Treeselect
             :options="outParamsIndexList"
             :disable-branch-nodes="true"
@@ -21,7 +25,6 @@
             noChildrenText="暂无数据"
             v-model="ruleForm.region"
             :clearable="false"
-            :disabled="isShow"
             search-nested
             placeholder="请选择"
             class="base-pane-item"
@@ -29,21 +32,15 @@
             @deselect="indexDeselect"
           />
         </el-form-item>
-        <el-form-item>
-          <el-tooltip placement="top">
-            <div slot="content">渠道多选时，图表显示指标所在渠道用户数据</div>
-            <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item>
-          <el-button @click="editTable" type="primary" size="small" v-if="isShow && canUpdate ">编辑</el-button>
-          <el-button @click="saveTable" type="primary" size="small" v-if="!isShow">保存</el-button>
-          <el-button @click="cancelTable" size="small" v-if="!isShow">取消</el-button>
+        <br/>
+        <el-form-item  style="margin-left: 50px;">
+          <el-button @click="saveTable" type="success">人群特征分析</el-button>
         </el-form-item>
       </el-form>
       <el-row :gutter="20" class="echart-content" v-if="chartLen > 0" v-loading="echartLoading">
         <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
           <el-card shadow="never" class="order-echarts-card" v-if="isShowData(item)">
+            <div v-if="item.indicatorsType === 'bar'" style="width: 100%; display:flex; justify-content: end;"><el-button type="text" @click="tagsGroupHandle(item)" size="small">编辑分组</el-button></div>
             <div :id="'echart-' + item.id" class="echart"></div>
           </el-card>
           <el-card shadow="never" class="order-echarts-card" v-if="!isShowData(item)">
@@ -57,38 +54,20 @@
       <div class="no-echart-content" v-else>
         {{dataResultText}}
       </div>
-      <div class="custer-history">
-        <p>分群历史情况：</p>
-        <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-          <el-table-column prop="lastCalTime" header-align="center" align="center" label="计算完成时间"></el-table-column>
-          <el-table-column prop="templateUserNum" header-align="center" align="center" label="分群用户数"></el-table-column>
-          <el-table-column prop="type" header-align="center" align="center" label="计算类型">
-            <template slot-scope="scope">
-              <span>{{scope.row.type === 'static' ? '静态' : '动态'}}</span>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-        @size-change="sizeChangeHandle"
-        @current-change="currentChangeHandle"
-        :current-page="pageNum"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="pageSize"
-        :total="totalCount"
-        layout="total, sizes, prev, pager, next, jumper"/>
-      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" type="primary">关闭</el-button>
       </span>
+      <tagsGrouped v-if="tagsGroupedVisible" ref="tagsGrouped"></tagsGrouped>
     </el-dialog>
 </template>
 
 <script>
 import echarts from 'echarts'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-import { selectAllCata, overviewData, transferLogList, chartInfo } from '@/api/dataAnalysis/dataInsightManage'
+import { selectAllCata, overviewData, chartInfo, custGroupList } from '@/api/dataAnalysis/dataInsightManage'
 import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import { pieJson, barJson } from '../dataAnalysisUtils/tableShowChartInit'
+import tagsGrouped from './tagsGrouped.vue'
 export default {
   data () {
     return {
@@ -98,35 +77,31 @@ export default {
       echartLoading: false,
       outParamsIndexList: [],
       selectedIndex: [], // 选中的指标，实时
+      selectedData: [], // 存储fieldType
       limitLen: 10, // 限制选中指标个数
-      templateUserNum: 1000,
       channelInfoNameList: '',
-      userRateStr: '3.4%',
-      lastCalTime: '2020-04-25',
       dataResultText: '暂无图表数据',
-      templateId: '',
       chartLen: 0,
       seriesData: [],
       originRegion: [],
       regionList: [], // 可视化筛选数据的默认值
       ruleForm: {
-        region: []
+        region: [],
+        templateId: '',
+        comTemplateId: '',
+        indexGroups: ''
       },
+      custGroupDataList: [],
+      tagsGroupedVisible: false,
       rules: {
         region: [
           { required: true, message: '请选择', trigger: 'change' }
         ]
       },
-      isShow: true,
-      dataList: [],
-      pageNum: 1, // 当前页
-      pageSize: 10, // 默认每页10条
-      totalCount: 0,
-      dataListLoading: false,
       canUpdate: true // 可编辑
     }
   },
-  components: { Treeselect },
+  components: { Treeselect, tagsGrouped },
   methods: {
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
@@ -154,6 +129,8 @@ export default {
             obj.id = item.id
             obj.englishName = item.englishName
             obj.label = item.chineseName
+            obj.fieldType = item.fieldType
+            obj.enumTypeNum = item.enumTypeNum
           } else {
             obj.id = item.id
             obj.label = item.name
@@ -177,6 +154,7 @@ export default {
     },
     indexSelect (node) { // 选中出参
       this.selectedIndex.push(node.id)
+      this.selectedData.push(node)
       if (this.selectedIndex.length >= this.limitLen) {
         let indexListArr = deepClone(this.indexList)
         this.outParamsIndexList = this.disabledOutParamsList(this.selectedIndex.length, indexListArr)
@@ -185,6 +163,7 @@ export default {
     indexDeselect (node) { // 删除出参
       let originLen = this.selectedIndex.length // 删除之前的数据长度
       this.selectedIndex = this.selectedIndex.filter(item => item !== node.id) // 删除数据
+      this.selectedData = this.selectedData.filter(item => item.id !== node.id) // 删除数据
       let newLen = this.selectedIndex.length // 删除后的数据长度
       if (originLen === this.limitLen && newLen === this.limitLen - 1) {
         let indexListArr = deepClone(this.indexList)
@@ -239,18 +218,41 @@ export default {
         return indexListArr
       }
     },
+        // 获取已选择的节点
+    getSelectCata (indexList, selectedIndex) {
+      let indexListArr = deepClone(indexList)
+      indexListArr.forEach((citem, cindex) => {
+        if (citem.children && citem.children.length) {
+          this.getSelectCata(citem.children, selectedIndex)
+        } else {
+          if (selectedIndex.includes(citem.id)) {
+            this.selectedData.push(citem)
+          }
+        }
+      })
+      // this.getSelectColumns()
+    },
     init (val, canUpdate) {
       this.loading = true
       this.regionList = []
       this.dialogVisible = true
-      this.isShow = true
       this.title = val.name
-      this.templateId = val.id
+      this.ruleForm.templateId = val.id
       this.canUpdate = canUpdate
       this.$nextTick(() => {
         this.$refs.ruleForm.clearValidate()
       })
       this.getOverviewData(val.id, val.channelId.split(','))
+      custGroupList().then(({data}) => {
+        if (data.status * 1 !== 1) {
+          this.loading = false
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+        this.custGroupDataList = data.data
+      })
     },
     getOverviewData (id, channelCode) {
       overviewData(id).then(({data}) => {
@@ -261,13 +263,9 @@ export default {
             message: data.message
           })
         }
-        this.templateUserNum = data.data.templateUserNum
-        this.userRateStr = data.data.userRateStr
-        this.lastCalTime = data.data.lastCalTime
         // this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : [5486, 5590]
         // this.selectedIndex = this.ruleForm.region
         // this.getChartInfo()
-        this.getTranferLogData()
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
         this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
         this.getSelectAllCata(channelCode, (indexList) => {
@@ -275,6 +273,7 @@ export default {
           this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : this.regionList
           this.selectedIndex = this.ruleForm.region
           this.outParamsIndexList = this.updateOutParamsList(indexList)
+          this.getSelectCata(indexList, this.selectedIndex)
           this.getChartInfo()
           this.$nextTick(() => {
             this.loading = false
@@ -304,8 +303,13 @@ export default {
       this.echartLoading = true
       this.dataResultText = '数据加载中...'
       chartInfo({
-        templateId: this.templateId,
-        indicators: this.ruleForm.region.join(',')
+        templateId: this.ruleForm.templateId,
+        indicators: this.ruleForm.region,
+        comTemplateId: this.ruleForm.comTemplateId,
+        // templateId: 985,
+        // indicators: [16694, 16211],
+        // comTemplateId: 986,
+        indexGroups: []
       }).then(({data}) => {
         if (data.status !== '1' || !data.data.data || !data.data.data.length) {
           this.$message({
@@ -327,11 +331,18 @@ export default {
               this.dataResultText = '暂无图表数据'
               return
             }
+            let optionSeriesData = []
+            item.valList.forEach(item => {
+             optionSeriesData.push({
+                name: item.name,
+                value: item.percentStr
+              })
+            })
             option = JSON.parse(JSON.stringify(pieJson))
             option.id = item.id
             option.title.text = item.indicatorsName
             option.series[0].name = item.indicatorsName
-            option.series[0].data = item.valList
+            option.series[0].data = optionSeriesData
             option.legend.data = []
             item.valList.forEach(item => {
               option.legend.data.push(item.name)
@@ -363,6 +374,7 @@ export default {
             }
           }
           if (item.indicatorsType === 'bar') {
+            console.log('item: ', item)
             if (!item.series || !item.series.length) {
               this.echartLoading = false
               this.dataResultText = '暂无图表数据'
@@ -370,7 +382,7 @@ export default {
             }
             option = JSON.parse(JSON.stringify(barJson))
             option.id = item.id
-            option.title.text = item.indicatorsName
+            option.title.text = item.indicatorsNameindicatorsName
             option.series[0].name = item.indicatorsName
             option.xAxis.data = item.xaxisData
             option.series[0].data = item.series
@@ -399,55 +411,20 @@ export default {
         })
       })
     },
-    getTranferLogData () {
-      transferLogList({
-        pageNum: this.pageNum,
-        pageSize: this.pageSize,
-        templateId: this.templateId
-      }).then(({data}) => {
-        if (data.status !== '1') {
-          this.$message({
-            type: 'error',
-            message: data.message || '数据异常'
-          })
-          this.totalCount = 0
-          this.dataList = []
-        } else if (!data.data.list || !data.data.list.length) {
-          this.totalCount = 0
-          this.dataList = []
-        } else {
-          this.totalCount = data.data.total
-          this.dataList = data.data.list
-        }
-      })
-    },
-    // 编辑
-    editTable () {
-      this.isShow = false
-      this.originRegion = this.ruleForm.region
-    },
+
     saveTable () {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           this.getChartInfo()
-          this.isShow = true
         }
       })
     },
-    cancelTable () {
-      this.ruleForm.region = this.originRegion
-      this.isShow = true
-    },
-    // 每页数
-    sizeChangeHandle (page) {
-      this.pageSize = page
-      this.pageNum = 1
-      this.getTranferLogData()
-    },
-    // 当前页
-    currentChangeHandle (page) {
-      this.pageNum = page
-      this.getTranferLogData()
+    tagsGroupHandle (val) {
+      let selectedFieldType = this.selectedData.filter(item => item.id === val.id)[0].fieldType
+      this.tagsGroupedVisible = true
+      this.$nextTick(() => {
+        this.$refs.tagsGrouped.init(val, selectedFieldType)
+      })
     },
     // 弹窗状态
     handleClose () {
@@ -457,9 +434,6 @@ export default {
 }
 </script>
 <style scoped>
-.channl{
-  color: #2093f7;
-}
 .echart {
   height: 400px;
 }
@@ -469,9 +443,6 @@ export default {
 .order-echarts-col {
   margin-bottom: 20px;
 }
-.echart-content {
-  border-bottom: 1px dashed #d8d8d8;
-}
 .no-echart-content {
   width: 100%;
   padding: 30px 0;
@@ -479,7 +450,7 @@ export default {
   border-bottom: 1px dashed #d8d8d8;
 }
 .base-pane-item {
-  width: 700px;
+  width: 900px;
   line-height: 38px;
 }
 .vue-treeselect {
