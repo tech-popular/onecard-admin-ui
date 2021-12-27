@@ -757,6 +757,23 @@ export default {
       }
     },
     handleChange (file, fileList) {
+      let that = this
+      let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
+      let size = file.size / 1024 / 1024
+      if (fileName != 'xls' && fileName != 'xlsx') {
+        that.$message({
+          type: 'error',
+          message: '文件类型不是.xls文件!'
+        })
+        return false
+      }
+      if (size > 10) {
+        that.$message({
+          type: 'error',
+          message: '文件大小不能超过10M!'
+        })
+        return false
+      }
       // 上传文件变化时
       if (fileList.length > 0) {
         this.fileData.fileList = [fileList[fileList.length - 1]] // 这一步，是展示最后一次选择的文件
@@ -764,13 +781,22 @@ export default {
       }
     },
     beforeUpload (file) {
+      // 由于auto-upload被设置为false，beforeUpload时间没有被触发，需要交验的内容在on-change时间完成
       // 上传文件之前的事件
       let that = this
       let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
+      let size = file.size/1024/1024
       if (fileName != 'xls' && fileName != 'xlsx') {
         that.$message({
           type: 'error',
           message: '文件类型不是.xls文件!'
+        })
+        return false
+      }
+      if (size > 2) {
+        that.$message({
+          type: 'error',
+          message: '文件大小不能超过10M!'
         })
         return false
       }
