@@ -10,6 +10,7 @@
     <el-tabs type="border-card" @tab-click="tabClick" v-model="actoveTab">
       <!-- 账号 -->
       <el-tab-pane label="账号权限" name="账号权限">
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>审批流在收到钉钉审批通过后，默认10分钟之后处理完成，请重新登陆系统</p>
         <el-divider>请填写以下申请</el-divider>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="140px">
           <el-form-item label="标题" prop="name">
@@ -57,6 +58,7 @@
       <!-- 租户 -->
       <el-tab-pane label="租户申请" name="租户申请">
         <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#e6a23c"></i>如选项中未包含期望申请的租户，请邮件&lt;<span style="color:#2093f7">datareq@9fbank.com.cn</span>&gt;进行新增申请</p>
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>审批流在收到钉钉审批通过后，默认10分钟之后处理完成，请重新登陆系统</p>
         <el-form :model="tenantForm" :rules="tenantRule" ref="tenantForm" label-width="100px">
           <el-form-item label="选择租户" prop="tenantIds">
             <el-select v-model="tenantForm.tenantIds" multiple placeholder="请选择" style="width:100%">
@@ -79,6 +81,7 @@
       </el-tab-pane>
       <!-- 库表 -->
       <el-tab-pane label="库表授权" name="库表授权">
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>审批流在收到钉钉审批通过后，默认10分钟之后处理完成，请重新登陆系统</p>
         <el-form
           :model="severDataForm"
           :rules="severDataRule"
