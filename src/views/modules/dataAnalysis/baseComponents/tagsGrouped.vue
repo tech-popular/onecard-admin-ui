@@ -4,10 +4,11 @@
     :modal-append-to-body='false'
     :append-to-body="true"
     :visible.sync="visible"
-    width="1000px;"
+    width="30%"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :rules="dataRules" :inline="true">
-      <div
+     <div v-if="selectedFieldType !== 'enums'">
+        <div
         style="display: flex;"
         v-for="(outdata, index) in dataForm.digitalRange"
         :key="outdata.key"
@@ -18,17 +19,17 @@
         <!-- 数字区间 -->
         <div class="pane-rules-inline" v-if="selectedFieldType === 'number'">
           <span class="parentheses">( &nbsp;</span>
-          <el-form-item prop="smallerValue"  :ref="'paramss' + outdata.key" :rules="{ required: true, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, outdata, index), trigger: 'blur' }" >
+          <el-form-item prop="smallerValue">
             <el-input v-model="outdata.smallerValue" class="itemIput-small" @input="outdata.smallerValue = keyupNumberInput(outdata.smallerValue)" @blur="outdata.smallerValue = pramasNumBlur(outdata, outdata.smallerValue, index)"></el-input>
           </el-form-item>
           &nbsp;,&nbsp;
-          <el-form-item prop="largerValue" :ref="'paramsl' + outdata.key" :rules="{ required: true, validator: (rule, value, callback) => judgeNumberTwoInput(rule, value, callback, outdata, index), trigger: 'blur' }">
+          <el-form-item prop="largerValue">
             <el-input v-model="outdata.largerValue" class="itemIput-small" @input="outdata.largerValue = keyupNumberInput(outdata.largerValue)" @blur="outdata.largerValue = pramasNumBlur(outdata, outdata.largerValue,index)" ></el-input>
           </el-form-item>
           <span class="parentheses">&nbsp;)</span>
         </div>
         <!-- 时间区间 -->
-        <el-form-item prop="dataRange" :ref="'datetime' + outdata.key" v-if="selectedFieldType === 'date'" :rules="{required: true, message: '请选择', trigger: 'change'}">
+        <el-form-item prop="dataRange" v-if="selectedFieldType === 'date'">
            <el-date-picker
               v-model="outdata.dataRange"
               type="datetimerange"
@@ -36,23 +37,26 @@
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
+              format="yyyy-MM-dd HH:mm:ss"
+              value-format="yyyy-MM-dd HH:mm:ss"
               align="right">
          </el-date-picker>
         </el-form-item>
           <el-form-item class="btn-group">
-              <i class="el-icon-circle-plus cursor-pointer" @click="addDomain" v-if="index === dataForm.digitalRange.length-1"></i>
+              <i class="el-icon-circle-plus cursor-pointer" @click="addDomain(outdata, index)" v-if="index === dataForm.digitalRange.length-1"></i>
           </el-form-item>
-          <el-form-item style="float: right">
+          <el-form-item style="float: right" v-if="closeIconVisible">
             <i class="el-icon-close cursor-pointer" @click="removeDomain(outdata, index)"></i>
           </el-form-item>
       </div>
+     </div>
          <!-- <el-form-item>
           <el-button @click="addDomain">新增区间</el-button>
         </el-form-item> -->
         <!-- 枚举值 -->
-        <el-form-item prop="selectVal"  v-if="selectedFieldType === 'enums'" :rules="{required: true, message: '请选择', trigger: 'change'}">
+        <el-form-item prop="selectVal"  v-if="selectedFieldType === 'enums'">
           <el-select v-model="dataForm.selectVal" multiple class="itemIput">
-              <el-option v-for="(fitem, findex) in item.selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
+              <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
         </el-form-item>
     </el-form>
@@ -63,13 +67,15 @@
   </el-dialog>
 </template>
 <script>
+import { dataEnumType } from '@/api/dataAnalysis/dataInsightManage'
 export default {
   data () {
     return {
       visible: false,
+      closeIconVisible: false,
       selectedFieldType: 'number',
       dataForm: {
-        id: '',
+        id: 0,
         selectVal: '',
         digitalRange: [
           {
@@ -111,15 +117,33 @@ export default {
         }]
       },
       dataRules: {
-        name: [
-          { required: true, pattern: /^([a-zA-z_]{1})([\w]*)$/g, message: '只可输入字母、数字、下划线，且不能以数字开头', trigger: 'blur' }
+        selectVal: [
+          { required: true, message: '请选择', trigger: 'biur' }
         ]
+        // dataRange: [
+        //   { required: true,  message: '请选择时间区间', trigger: 'biur' }
+        // ],
+        // smallerValue: [
+        //   { required: true,  message: '请输入', trigger: 'biur' }
+        // ],
+        // largerValue: [
+        //   { required: true,  message: '请输入', trigger: 'biur' }
+        // ],
       }
     }
   },
   methods: {
     init (val, selectedFieldType) {
       this.selectedFieldType = selectedFieldType
+      this.dataForm.id = val.id
+      this.selectEnumsList = []
+      if (selectedFieldType === 'enums') {
+        dataEnumType(val.enumTypeNum).then(({ data }) => {
+          if (data.status === '1') {
+            this.selectEnumsList = data.data
+          }
+        })
+      }
       this.visible = true
     },
     keyupNumberInput (val) { // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
@@ -136,29 +160,38 @@ export default {
       console.log(999444, val)
       return val
     },
-    judgeNumberTwoInput (rule, value, callback, outdata, index) { // 数值介于判断
-      if (value === '') {
-        callback(new Error('请输入'))
-      } else if (index === 0 && outdata.smallerValue && outdata.largerValue * 1 > outdata.smallerValue * 1) {
-        callback(new Error('起始数值应小于终止数值'))
-      } else if (index !== 0 && outdata.largerValue && outdata.largerValue * 1 > outdata.smallerValue * 1) {
-        callback(new Error('起始数值应小于终止数值'))
-      } else {
-        callback()
-      }
-    },
+    // judgeNumberTwoInput (rule, value, callback, outdata, index) { // 数值介于判断
+    // console.log('value: ', value)
+    // console.log('rule: ', rule)
+    //   if (value === '') {
+    //     callback(new Error('请输入'))
+    //   } else if (index === 0 && outdata.smallerValue && outdata.largerValue * 1 < outdata.smallerValue * 1) {
+    //     callback(new Error('起始数值应小于终止数值'))
+    //   } else if (index !== 0 && outdata.largerValue && outdata.largerValue * 1 < outdata.smallerValue * 1) {
+    //     callback(new Error('起始数值应小于终止数值'))
+    //   } else {
+    //     callback()
+    //   }
+    // },
     pramasNumBlur (outdata, val, index) { // 数值 介于的判断
-      if (index > 0 && outdata.smallerValue && outdata.smallerValue < this.dataForm.digitalRange[index - 1].largerValue) {
+      if (index > 0 && outdata.smallerValue && outdata.smallerValue * 1 < this.dataForm.digitalRange[index - 1].largerValue * 1) {
         this.$message({
           type: 'error',
-          message: '输入值需大于上一区间'
+          message: '此区间起始数值应大于上一区间终止数值'
         })
         return ''
       }
-      if (outdata.smallerValue * 1 < outdata.largerValue * 1) {
-        this.$refs['paramss' + outdata.key][0].clearValidate()
-        this.$refs['paramsl' + outdata.key][0].clearValidate()
+      if (outdata.smallerValue && outdata.largerValue && outdata.smallerValue * 1 > outdata.largerValue * 1) {
+        this.$message({
+          type: 'error',
+          message: '起始数值应小于终止数值'
+        })
+        return ''
       }
+      // if (outdata.smallerValue * 1 < outdata.largerValue * 1) {
+      //   this.$refs['paramss' + outdata.key][0].clearValidate()
+      //   this.$refs['paramsl' + outdata.key][0].clearValidate()
+      // }
       return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
     },
      blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
@@ -176,47 +209,92 @@ export default {
       val = val.replace(/^-0+([0-9])/, '-$1') // -009.9 -00099999 -> -9.9  -999999
       return val
     },
-    addDomain () {
+    addDomain (outdata, index) {
+      if (this.selectedFieldType === 'number') {
+        if (outdata.smallerValue === '' || outdata.largerValue === '') {
+          this.$message({
+            type: 'error',
+            message: '请先完成已有区间的设置'
+          })
+          return
+        }
+      } else if (this.selectedFieldType === 'date') {
+        if (!outdata.dataRange) {
+          this.$message({
+            type: 'error',
+            message: '请先完成已有区间的设置'
+          })
+          return
+        }
+      }
       this.dataForm.digitalRange.push({
         smallerValue: '',
         largerValue: '',
+        dataRange: '',
         key: Date.now()
       })
+      if (this.dataForm.digitalRange.length > 1) {
+        this.closeIconVisible = true
+      }
     },
     removeDomain (item, i) {
+      if (this.dataForm.digitalRange.length === 1) {
+        this.closeIconVisible = false
+      }
       var index = this.dataForm.digitalRange.indexOf(item)
       this.dataForm.digitalRange.splice(index, 1)
     },
     saveHandle () {
-      if (this.selectedFieldType === 'enums') {
-        this.$refs.dataForm.validate((valid) => {
-          if (valid) {}
-        })
-      } else {
-        let flag = true
-        let ruleSet = this.$refs
-        let ruleArr = []
-        for (let key in ruleSet) {
-          if (key !== 'dataForm') {
-            ruleSet[key][0].validate(valid => {
-              console.log('valid: ', valid);
-
+      let indexGroups = []
+      if (this.selectedFieldType === 'number') {
+        this.dataForm.digitalRange.forEach(item => {
+          if (item.smallerValue === '' || item.largerValue === '') {
+            return this.$message({
+              type: 'error',
+              message: '请先完成所有区间的设置'
             })
-            ruleArr.push(ruleSet[key][0])
+          } else {
+            let arr = `${item.smallerValue},${item.largerValue}`
+            indexGroups.push(arr)
           }
-        }
-        // ruleArr.forEach(item => {
-        //   console.log('item: ', item)
-        //     console.log('item.validate: ', item.validate);
-        //   item.validator(valid => {
-        //     console.log('valid: ', valid)
-        //     if (!valid) {
-        //       flag = false
-        //       console.log('flag: ', flag)
-        //     }
-        //   })
-        // })
+        })
+        console.log('indexGroups: ', indexGroups)
+        this.$emit('refreshDataList', indexGroups, this.dataForm.id)
+        this.visible = false
+        this.$refs['dataForm'].resetFields()
+      } else if (this.selectedFieldType === 'date') {
+        this.dataForm.digitalRange.forEach(item => {
+          if (!item.dataRange) {
+            return this.$message({
+              type: 'error',
+              message: '请先完成所有区间的设置'
+            })
+          } else {
+            indexGroups.push(item.dataRange)
+          }
+        })
+        this.$emit('refreshDataList', indexGroups, this.dataForm.id)
+        this.visible = false
+        this.$refs['dataForm'].resetFields()
       }
+      // if (this.selectedFieldType === 'enums' || this.selectedFieldType === 'date') {
+        this.$refs.dataForm.validate((valid) => {
+          if (valid) {
+
+          }
+        })
+      // } else {
+      //   let ruleSet = this.$refs
+      //   let ruleArr = []
+      //   for (let key in ruleSet) {
+      //     if (key !== 'dataForm') {
+      //       // this.$refs[key][0].clearValidate()
+      //       this.$refs[key][0].validate(valid => {
+      //         console.log('valid: ', valid)
+      //       })
+      //     }
+      //   }
+      // }
     },
     cancelHandle () {
       this.visible = false

@@ -10,8 +10,8 @@
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
         <el-form-item label="已选人群：">{{channelInfoNameList}}</el-form-item>
         <el-form-item label="选择对比人群：" style="margin-left: 30px;">
-           <el-select v-model="ruleForm.comTemplateId"  filterable   placeholder="请选择">
-              <el-option v-for="(item, index) in custGroupDataList" :key="index" :value="item.code" :label="item.name"></el-option>
+           <el-select v-model="ruleForm.comTemplateId"  filterable  clearable  placeholder="请选择">
+              <el-option v-for="(item, index) in custGroupDataList" :key="index" :value="item.id" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
         <br/>
@@ -57,7 +57,7 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" type="primary">关闭</el-button>
       </span>
-      <tagsGrouped v-if="tagsGroupedVisible" ref="tagsGrouped"></tagsGrouped>
+      <tagsGrouped v-if="tagsGroupedVisible" ref="tagsGrouped" @refreshDataList="getChartInfo"></tagsGrouped>
     </el-dialog>
 </template>
 
@@ -85,11 +85,12 @@ export default {
       seriesData: [],
       originRegion: [],
       regionList: [], // 可视化筛选数据的默认值
+      indexGroups: [], // 默认分组
+      indexId: null, // 选中分组ID
       ruleForm: {
         region: [],
         templateId: '',
-        comTemplateId: '',
-        indexGroups: ''
+        comTemplateId: ''
       },
       custGroupDataList: [],
       tagsGroupedVisible: false,
@@ -239,6 +240,9 @@ export default {
       this.title = val.name
       this.ruleForm.templateId = val.id
       this.canUpdate = canUpdate
+      this.indexGroups = []
+      this.ruleForm.comTemplateId = ''
+      this.indexId = null
       this.$nextTick(() => {
         this.$refs.ruleForm.clearValidate()
       })
@@ -274,7 +278,7 @@ export default {
           this.selectedIndex = this.ruleForm.region
           this.outParamsIndexList = this.updateOutParamsList(indexList)
           this.getSelectCata(indexList, this.selectedIndex)
-          this.getChartInfo()
+          this.getChartInfo(this.indexGroups, this.indexId)
           this.$nextTick(() => {
             this.loading = false
           })
@@ -297,7 +301,8 @@ export default {
         return false
       }
     },
-    getChartInfo () {
+    getChartInfo (indexGroups, indexId) {
+      console.log('indexGroups: ', indexGroups)
       this.seriesData = []
       this.chartLen = 0
       this.echartLoading = true
@@ -306,10 +311,11 @@ export default {
         templateId: this.ruleForm.templateId,
         indicators: this.ruleForm.region,
         comTemplateId: this.ruleForm.comTemplateId,
+        indexId: indexId,
         // templateId: 985,
         // indicators: [16694, 16211],
         // comTemplateId: 986,
-        indexGroups: []
+        indexGroups: indexGroups
       }).then(({data}) => {
         if (data.status !== '1' || !data.data.data || !data.data.data.length) {
           this.$message({
@@ -415,7 +421,7 @@ export default {
     saveTable () {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
-          this.getChartInfo()
+          this.getChartInfo(this.indexGroups, this.indexId)
         }
       })
     },

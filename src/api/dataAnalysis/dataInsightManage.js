@@ -27,6 +27,7 @@ export const transferLogList = params => httpGet(da + `data/transferLog/listOnPa
 // export const chartInfo = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
 export const chartInfo = params => httpPost(da + `data/group/featureAnalysis`, params)
 export const custGroupList = () => httpGet(da + `data/group/custGroupList`) // 人群下拉列表
+export const dataEnumType = enumTypeNum => httpGet(da + `dataEnumType/selectByTypeNum/${enumTypeNum}`) // 枚举值列表
 
 export const selectEventAllCata = params => httpGetSeries(da + 'data/event/getEventDropDownList', params) // 加载事件类型接口
 export const selectEventIndexAllCata = params => httpGet(da + 'data/event/index/getEventIndexByElementId', params) // 加载事件属性类型接口
