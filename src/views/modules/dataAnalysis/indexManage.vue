@@ -35,7 +35,8 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button type="success" v-if="isAdmin" @click="manualSync()">手动同步</el-button>
+        <el-button  type="success" @click="resetHandle()">新建指标</el-button>
+        <!-- <el-button type="success" v-if="isAdmin" @click="manualSync()">手动同步</el-button> -->
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -85,10 +86,17 @@
           <el-tag v-else size="small" type="danger">无效</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="100" label="操作">
+      <el-table-column prop="status" header-align="center" align="center" label="是否设置默认分组">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === true" size="small" >是</el-tag>
+          <el-tag v-else size="small" type="danger">否</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button> -->
-          <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+          <el-button type="text" size="small" @click="changeTagsHandle(scope.row)">默认分组标签</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -102,6 +110,7 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <IndexTags v-if="indexTagsVisible" ref="indexTags"></IndexTags>
   </div>
 </template>
 
@@ -109,6 +118,7 @@
   import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex } from '@/api/dataAnalysis/indexManage'
   import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
+  import IndexTags from './baseComponents/index-tags'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
@@ -127,6 +137,7 @@
         totalCount: 0,
         dataListLoading: false,
         addOrUpdateVisible: false,
+        indexTagsVisible: false,
         isAdmin: sessionStorage.getItem('username') === 'admin',
         fieldTypeList: [ // 数据类型
           // {
@@ -152,7 +163,8 @@
     },
     components: {
       AddOrUpdate,
-      Treeselect
+      Treeselect,
+      IndexTags
     },
     mounted () {
       this.getCategoryIdList()
@@ -231,6 +243,13 @@
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(row, tag)
           // this.$refs.addOrUpdate.getCategoryIdList(row)
+        })
+      },
+      //  设置默认分组
+      changeTagsHandle (row) {
+        this.indexTagsVisible = true
+        this.$nextTick(() => {
+          this.$refs.indexTags.init(row)
         })
       },
       /** 查询 */

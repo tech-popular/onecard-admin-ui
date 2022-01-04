@@ -120,30 +120,21 @@ export default {
         selectVal: [
           { required: true, message: '请选择', trigger: 'biur' }
         ]
-        // dataRange: [
-        //   { required: true,  message: '请选择时间区间', trigger: 'biur' }
-        // ],
-        // smallerValue: [
-        //   { required: true,  message: '请输入', trigger: 'biur' }
-        // ],
-        // largerValue: [
-        //   { required: true,  message: '请输入', trigger: 'biur' }
-        // ],
       }
     }
   },
   methods: {
-    init (val, selectedFieldType) {
-      this.selectedFieldType = selectedFieldType
+    init (val) {
+      // this.selectedFieldType = selectedFieldType
       this.dataForm.id = val.id
       this.selectEnumsList = []
-      if (selectedFieldType === 'enums') {
-        dataEnumType(val.enumTypeNum).then(({ data }) => {
-          if (data.status === '1') {
-            this.selectEnumsList = data.data
-          }
-        })
-      }
+      // if (selectedFieldType === 'enums') {
+        // dataEnumType(val.enumTypeNum).then(({ data }) => {
+        //   if (data.status === '1') {
+        //     this.selectEnumsList = data.data
+        //   }
+        // })
+      // }
       this.visible = true
     },
     keyupNumberInput (val) { // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
@@ -160,19 +151,6 @@ export default {
       console.log(999444, val)
       return val
     },
-    // judgeNumberTwoInput (rule, value, callback, outdata, index) { // 数值介于判断
-    // console.log('value: ', value)
-    // console.log('rule: ', rule)
-    //   if (value === '') {
-    //     callback(new Error('请输入'))
-    //   } else if (index === 0 && outdata.smallerValue && outdata.largerValue * 1 < outdata.smallerValue * 1) {
-    //     callback(new Error('起始数值应小于终止数值'))
-    //   } else if (index !== 0 && outdata.largerValue && outdata.largerValue * 1 < outdata.smallerValue * 1) {
-    //     callback(new Error('起始数值应小于终止数值'))
-    //   } else {
-    //     callback()
-    //   }
-    // },
     pramasNumBlur (outdata, val, index) { // 数值 介于的判断
       if (index > 0 && outdata.smallerValue && outdata.smallerValue * 1 < this.dataForm.digitalRange[index - 1].largerValue * 1) {
         this.$message({
@@ -210,13 +188,6 @@ export default {
       return val
     },
     addDomain (outdata, index) {
-      if (this.dataForm.digitalRange.length === 20) {
-        this.$message({
-          type: 'error',
-          message: '最多设置20个区间'
-        })
-        return
-      }
       if (this.selectedFieldType === 'number') {
         if (outdata.smallerValue === '' || outdata.largerValue === '') {
           this.$message({
