@@ -823,11 +823,14 @@ export default {
         })
         this.dataForm.extraParams = Array.from(new Set(out))
         this.outParamsList = this.updateOutParamsList(this.dataForm.extraParams, outList)
-        if (this.dataForm.type === 'sms' && this.dataForm.editType === '0') {
+        if (this.dataForm.type === 'kafka' || (this.dataForm.type === 'sms' && this.dataForm.editType === '0')) {
           this.extraParamsVisible = true
         } else {
           this.extraParamsVisible = false
         }
+        // if () {
+        //   this.extraParamsVisible = true
+        // }
       } else {
         this.dataForm.extraParams = []
         this.extraParamsVisible = false
