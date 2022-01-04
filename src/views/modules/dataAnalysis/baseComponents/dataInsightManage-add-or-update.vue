@@ -785,7 +785,7 @@ export default {
       // 上传文件之前的事件
       let that = this
       let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
-      let size = file.size/1024/1024
+      let size = file.size / 1024 / 1024
       if (fileName != 'xls' && fileName != 'xlsx') {
         that.$message({
           type: 'error',
