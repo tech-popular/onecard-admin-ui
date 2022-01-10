@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-      :title="'【' + title + '明细预览'"
+      :title="title + '明细预览'"
       :visible.sync="dialogVisible"
       width="1200px"
       v-loading="loading"
@@ -104,7 +104,13 @@ export default {
       dataListLoading: false,
       canUpdate: true, // 可编辑
       selectColumnsData: [],
-      columns: []
+      columns: [
+         {
+          label: '用户ID',
+          prop: 'id',
+          align: 'center'
+        }
+      ]
     }
   },
   components: { Treeselect },

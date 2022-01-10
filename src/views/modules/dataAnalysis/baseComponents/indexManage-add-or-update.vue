@@ -85,7 +85,7 @@
               >
               </el-cascader>
             </el-form-item>
-             <el-form-item  prop="processType" label="加工类型：">
+             <el-form-item  prop="processType" label="加工类型：" v-if="baseForm.indexType === '1'">
             <el-radio  v-model="baseForm.processType" label="1">实时更新</el-radio>
             <el-radio  v-model="baseForm.processType" label="2" >T+1</el-radio>
           </el-form-item>
