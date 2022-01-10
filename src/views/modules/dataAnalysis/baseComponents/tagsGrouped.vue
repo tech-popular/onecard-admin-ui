@@ -325,7 +325,6 @@ export default {
 }
 .parentheses {
   font-size: 32px;
-  
 }
 .itemIput-small {
   width: 100px;

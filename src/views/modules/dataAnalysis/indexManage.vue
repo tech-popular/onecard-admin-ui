@@ -35,7 +35,7 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button  type="success" @click="resetHandle()">新建指标</el-button>
+        <el-button  type="success" @click="addOrUpdateHandle()">新建指标</el-button>
         <!-- <el-button type="success" v-if="isAdmin" @click="manualSync()">手动同步</el-button> -->
       </el-form-item>
     </el-form>
@@ -94,9 +94,9 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" label="操作">
         <template slot-scope="scope">
-          <!-- <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button> -->
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
-          <el-button type="text" size="small" @click="changeTagsHandle(scope.row)">默认分组标签</el-button>
+          <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button>
+          <el-button type="text" @click="deleteHandle(scope.row)">删除</el-button>
+          <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -110,15 +110,13 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
-    <IndexTags v-if="indexTagsVisible" ref="indexTags"></IndexTags>
   </div>
 </template>
 
 <script>
-  import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex } from '@/api/dataAnalysis/indexManage'
+  import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex, deleteDataInfo } from '@/api/dataAnalysis/indexManage'
   import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
-  import IndexTags from './baseComponents/index-tags'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
@@ -163,8 +161,7 @@
     },
     components: {
       AddOrUpdate,
-      Treeselect,
-      IndexTags
+      Treeselect
     },
     mounted () {
       this.getCategoryIdList()
@@ -238,18 +235,11 @@
       },
 
       // 新增 / 修改
-      addOrUpdateHandle (row, tag) {
+      addOrUpdateHandle (row) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(row, tag)
+          this.$refs.addOrUpdate.init(row)
           // this.$refs.addOrUpdate.getCategoryIdList(row)
-        })
-      },
-      //  设置默认分组
-      changeTagsHandle (row) {
-        this.indexTagsVisible = true
-        this.$nextTick(() => {
-          this.$refs.indexTags.init(row)
         })
       },
       /** 查询 */
@@ -274,7 +264,31 @@
         this.dataListLoading = true
         syncDataIndex().then(({data}) => {
           if (data && data.status === '1') {
-            this.getDataList()
+            this.$message({
+              message: '同步成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+                }
+            })
+          } else {
+            this.dataListLoading = false
+          }
+        })
+      },
+      deleteHandle (row) {
+        this.dataListLoading = true
+        deleteDataInfo(row.id).then(({data}) => {
+          if (data && data.status === '1') {
+            this.$message({
+              message: '删除成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+                }
+            })
           } else {
             this.dataListLoading = false
           }

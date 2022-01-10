@@ -1,348 +1,615 @@
 <template>
-  <el-dialog :title="tag ? '查看' : dataForm.id ? '修改' : '新增'" :modal-append-to-body='false' :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
-      <el-form-item label="标签名称:" prop="englishName">
-        <el-input v-model="dataForm.englishName" placeholder="" v-bind:readonly="readonly" />
-      </el-form-item>
-      <el-form-item label="标签标题:" prop="chineseName">
-        <el-input v-model="dataForm.chineseName" placeholder="" v-bind:readonly="readonly" />
-      </el-form-item>
-      <el-form-item label="数据类型:" prop="fieldType">
-        <el-select filterable v-model="dataForm.fieldType" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
-          <el-option v-for="(item, index) in fieldTypeList" :value="item.childrenValue" :key="index" :label="item.childrenValue"/>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="所属业务线" prop="channelCode">
-        <el-select filterable v-model="dataForm.channelCode" style="width:100%" multiple>
-          <el-option v-for="(item, index) in channelList" :key="index" :label="item.text" :value="item.value"></el-option>
-        </el-select>
-      </el-form-item>
-       <el-form-item label="枚举类型:" prop="enumTypeNum" :required="enumeration" v-show="enumeration">
-        <el-select filterable v-model="dataForm.enumTypeNum" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
-          <el-option v-for="(item, index) in enumTypeNumList" :value="item.typeNum" :key="index" :label="item.typeValue"/>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="数据格式:" prop="dataStandar">
-        <el-input v-model="dataForm.dataStandar" placeholder="" v-bind:readonly="readonly" />
-      </el-form-item>
-      <el-form-item label="标签类别:" prop="categoryId">
-        <Treeselect
-              :options="categoryIdList"
-              :disable-branch-nodes="true"
-              :show-count="true"
-              :multiple="false"
-              :load-options="loadOptions"
-              :searchable="true"
-              :clearable="true"
-              :disabled="readonly"
-              @input="changeOption"
-              noChildrenText="暂无数据"
-              v-model="dataForm.categoryId"
-              placeholder="请选择"
-            />
-      </el-form-item>
-      <el-form-item label="来源表:" prop="sourceTable">
-        <el-input v-model="dataForm.sourceTable" placeholder="" v-bind:readonly="readonly" />
-      </el-form-item>
-      <!-- <el-form-item label="指标数据源:" prop="sourceDatasource">
-        <el-select filterable v-model="dataForm.sourceDatasource" placeholder="请选择" style="width:60%" v-bind:disabled="readonly" >
-          <el-option v-for="(item, index) in sourceDatasource" :value="item.typeNum" :key="index" :label="item.typeValue"/>
-        </el-select>
-      </el-form-item> -->
-      <el-form-item label="标签状态:" prop="enable">
-        <el-radio v-model="dataForm.enable" label="true" v-bind:disabled="readonly" >有效</el-radio>
-        <el-radio v-model="dataForm.enable" label="false" v-bind:disabled="readonly" >无效</el-radio>
-      </el-form-item>
-      <el-form-item label="标签说明:" prop="remark">
-        <el-input v-model="dataForm.remark" placeholder="备注" type="textarea" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}"  v-bind:readonly="readonly" />
-        <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - dataForm.remark.length"></span>个字符</p>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="foot">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()" v-show="!readonly">确定</el-button>
+  <el-drawer
+    :append-to-body="false"
+    :visible.sync="visible"
+    :show-close="false"
+    :wrapperClosable="false"
+    size="1350px"
+    class="index-manage-drawer"
+  >
+    <div slot="title" class="drawer-title">
+      {{drawerTitle}}
+      <i class="el-icon-close drawer-close" @click="drawerClose"></i>
     </div>
-  </el-dialog>
+    <div class="wrap" v-loading="loading">
+      <div class="base-pane">
+        <el-form
+          label-width="180px"
+          :model="baseForm"
+          ref="baseForm"
+          :rules="baseRule"
+          class="base-form"
+        >
+          <el-form-item label="英文名称" prop="englishName">
+            <el-input
+              v-model.trim="baseForm.englishName"
+              placeholder="英文名称"
+              clearable
+              class="base-pane-item"
+            />
+          </el-form-item>
+          <el-form-item label="标签名称" prop="chineseName">
+            <el-input
+              v-model.trim="baseForm.chineseName"
+              placeholder="标签名称"
+              clearable
+              class="base-pane-item"
+            />
+          </el-form-item>
+          <el-form-item label="所属业务线" prop="channelCode" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
+              <el-select
+                v-model="baseForm.channelCode"
+                @change="channelIdChange"
+                filterable
+                style="width: 400px"
+              >
+                <template v-for="(item, index) in channelList">
+                  <el-option
+                    :key="index"
+                    :label="item.text"
+                    :value="item.value"
+                    :disabled="item.disabled"
+                  ></el-option>
+                </template>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="标签口径" prop="processCaliber">
+              <el-input
+                v-model.trim="baseForm.processCaliber"
+                placeholder="标签口径"
+                clearable
+                class="base-pane-item"
+              />
+            </el-form-item>
+            <el-form-item  prop="indexType" label="类型">
+              <el-radio  v-model="baseForm.indexType" label="1">用户标签</el-radio>
+              <el-radio  v-model="baseForm.indexType" label="4">衍生标签</el-radio>
+          </el-form-item>
+            <el-form-item label="计算公式" prop="formula">
+              <el-input
+                v-model.trim="baseForm.formula"
+                placeholder="计算公式"
+                clearable
+                class="base-pane-item"
+              />
+            </el-form-item>
+           <el-form-item label="选择所属分类" prop="categoryId">
+              <el-cascader
+                clearable
+                ref="cascaderMenu"
+                v-model="baseForm.categoryId"
+                :options="indexList"
+                :props="indexListTreeProps"
+                @change="indexTreeChange"
+                class="base-pane-item"
+              >
+              </el-cascader>
+            </el-form-item>
+             <el-form-item  prop="processType" label="加工类型：">
+            <el-radio  v-model="baseForm.processType" label="1">实时更新</el-radio>
+            <el-radio  v-model="baseForm.processType" label="2" >T+1</el-radio>
+          </el-form-item>
+           <el-form-item  prop="fieldType" label="数据类型：">
+            <el-radio  v-model="baseForm.fieldType" label="number">数值</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="date">日期</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="enums">枚举</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="string">字符串</el-radio>
+          </el-form-item>
+          <el-form-item  prop="isSensitive" label="是否包含敏感信息：">
+            <el-radio  v-model="baseForm.isSensitive" label="1">是</el-radio>
+            <el-radio  v-model="baseForm.isSensitive" label="0">否</el-radio>
+          </el-form-item>
+          <el-form-item label="敏感信息显示规则：" prop="showRules">
+              <el-input
+                v-model.trim="baseForm.showRules"
+                clearable
+                class="base-pane-item"
+              />
+            </el-form-item>
+           <el-form-item  prop="enable" label="是否启动：" >
+            <el-radio  v-model="baseForm.enable" :label='true'>是</el-radio>
+            <el-radio  v-model="baseForm.enable" :label='false' >否</el-radio>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+    <div class="footer">
+      <el-button
+        type="primary"
+        @click="saveHandle"
+        size="small"
+        :disabled="loading" 
+      >保存</el-button>
+      <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
+    </div>
+  </el-drawer>
 </template>
 <script>
-  import { addIndexManage, updateIndexManage, indexManageTypeList, indexManageMinCataList, indexManageTypeNumList } from '@/api/dataAnalysis/indexManage'
-  import { channelsList } from '@/api/dataAnalysis/dataInsightManage'
-  import { deepClone, findVueSelectItemIndex, nameToLabel, findOption } from '../dataAnalysisUtils/utils'
-  import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-  export default {
-    data () {
-      // 验证枚举类型的函数
-      let validateName = (rule, value, callback) => {
-        // 当枚举类型为空值且为必填时，抛出错误，反之通过校验
-        if (this.dataForm.enumTypeNum === '' && this.isHaveTo) {
-          callback(new Error('请输入枚举类型'))
-        } else {
-          callback()
-        }
-      }
-
-      let checkSpace = (rule, value, callback) => {
-        const spaceReg = /^\S*$/
-        setTimeout(() => {
-          if (spaceReg.test(value)) {
-            callback()
-          } else {
-            callback(new Error('不输入含空格'))
-          }
-        }, 100)
-      }
-
-      return {
-        visible: false,
-        dataForm: {
-          id: '',
-          englishName: '',
-          chineseName: '', // 指标标题
-          fieldType: '', // 数据类型
-          categoryId: null, // 指标类别
-          enumTypeNum: '', // 枚举类型
-          dataStandar: '', // 数据格式
-          sourceTable: '', // 来源表
-          // sourceDatasource: '', // 指标数据源
-          enable: 'true', // 指标状态
-          remark: '', // 描述
-          channelCode: []
-        },
-        tag: '', // 说明是否是“查看”
-        readonly: false, // 不可编辑
-        enumeration: false, // 枚举类型是否显示
-        fieldTypeList: [ // 数据类型
+import { selectAllCata, channelsList, addIndexManage, updateIndexManage, infoIndexManage } from '@/api/dataAnalysis/indexManage'
+import InputTag from '../components/InputTag'
+import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+export default {
+  data () {
+    return {
+      loading: false,
+      id: 0,
+      drawerTitle: '',
+      visible: false,
+      baseForm: {
+        englishName: '',
+        chineseName: '',
+        channelCode: '',
+        processCaliber: '',
+        indexType: '1',
+        formula: '',
+        categoryId: [],
+        processType: '',
+        fieldType: '',
+        isSensitive: '',
+        showRules: '',
+        enable: ''
+      },
+      indexListTreeProps: {
+        checkStrictly: true,
+        label: 'label',
+        value: 'id',
+        children: 'children'
+      },
+      indexParentList: [],
+      baseRule: { // 基本信息校验规则
+        englishName: [
+          { required: true, message: '请输入分群名称', trigger: 'blur' }
         ],
-        categoryIdList: [ // 指标类别
+        chineseName: [
+          { required: true, message: '请输入分群名称', trigger: 'blur' }
         ],
-        // sourceDatasource: [ // 指标数据源
-        //   {
-        //     typeNum: 'adb_user_label_res_da',
-        //     typeValue: 'adb_user_label_res_da'
-        //   }
-        // ],
-        enumTypeNumList: [// 枚举类型
+        indexType: [
+          { required: true, message: '请选择分群类型', trigger: 'change' }
         ],
-        channelList: [],
-        dataRule: {
-          englishName: [
-            { required: true, message: '请输入指标名', trigger: 'blur' },
-            {
-              validator: checkSpace,
-              trigger: 'blur'
-            }
-          ],
-          chineseName: [
-            { required: true, message: '请输入指标标题', trigger: 'blur' },
-            {
-              validator: checkSpace,
-              trigger: 'blur'
-            }
-          ],
-          fieldType: [
-            { required: true, message: '请选择指标类型', trigger: 'change' }
-          ],
-          categoryId: [
-            { required: true, message: '请选择指标类别', trigger: 'input' }
-          ],
-          enumTypeNum: [
-            { validator: validateName }
-          ],
-          sourceTable: [
-            { required: true, message: '请输入来源表', trigger: 'blur' }
-          ],
-          // sourceDatasource: [
-          //   { required: true, message: '请选择指标数据源', trigger: 'change' }
-          // ],
-          enable: [
-            { required: true, message: '请选择指标状态', trigger: 'change' }
-          ],
-          channelCode: [
-            { required: true, message: '请选择所属渠道', trigger: 'change' }
-          ]
-        }
-      }
-    },
-
-    mounted () {
-      // this.getCategoryIdList()
-      this.getFieldTypeList()
-      this.getEnumTypeNumList()
+        channelCode: [
+          { required: true, message: '请选择用户所属业务线', trigger: 'change' }
+        ]
+      },
+      channelList: [],
+      indexList: []
+    }
+  },
+  components: {
+    Treeselect,
+    InputTag
+  },
+  methods: {
+    init (row) {
+      this.id = row ? row.id : 0
+      // this.loading = true
       this.getChannelsList()
-    },
-
-    computed: {
-      isHaveTo: function () {
-        return this.dataForm.enumTypeNum === `enums`
+      this.visible = true
+      this.$nextTick(() => { // 默认将基本信息的错误提示消除
+        this.$refs.baseForm.clearValidate()
+      })
+      if (!this.id) {
+        this.loading = false
+        this.drawerTitle = '新建标签'
+      } else {
+        this.id = row.id
+        this.drawerTitle = '编辑标签'
+        this.getDataInfo(row.id)
       }
     },
-
-    watch: {
-      'dataForm.fieldType': {
-        handler (newVal, oldVal) {
-          if (newVal == 'enums') {
-            this.enumeration = true
-          } else {
-            this.enumeration = false
-          }
-        },
-        deep: true,
-        immediate: true
+    async loadOptions ({ action, parentNode, callback }) {
+      if (action === LOAD_CHILDREN_OPTIONS) {
+        callback()
       }
     },
-
-    components: {Treeselect},
-
-    methods: {
-      // 树加载
-      async loadOptions ({ action, parentNode, callback }) {
-        if (action === LOAD_CHILDREN_OPTIONS) {
-          callback()
+    getDataInfo (id) {
+      // 查看及编辑时请求数据
+      infoIndexManage(id).then(({ data }) => {
+        if (data && data.status === '1') {
+          this.id = data.data.id
+          this.baseForm.englishName = data.data.englishName
+          this.baseForm.chineseName = data.data.chineseName
+          this.baseForm.channelCode = data.data.channelCode
+          this.baseForm.processCaliber = data.data.processCaliber
+          this.baseForm.indexType = data.data.indexType
+          this.baseForm.categoryId = data.data.catagoryIdSelect
+          this.baseForm.processType = data.data.processType
+          this.baseForm.fieldType = data.data.fieldType
+          this.baseForm.isSensitive = data.data.isSensitive
+          this.baseForm.showRules = data.data.showRules
+          this.baseForm.enable = data.data.enable
+          this.indexParentList = data.data.catagoryIdSelect
+          this.getSelectAllCata()
         }
-      },
-
-      // 获取指标类别
-      getCategoryIdList (row) {
-        indexManageMinCataList().then(({data}) => {
-          if (data && data.status === '1') {
-            this.categoryIdList = nameToLabel(data.data)
-            if (row) {
-              let categoryIdList = this.categoryIdList
-              let optionIndex = findVueSelectItemIndex(categoryIdList, row.categoryId).split(',')
-              this.categoryIdList = findOption(categoryIdList, optionIndex)
-            }
-          }
-        })
-      },
-
-      // 获取数据类型
-      getFieldTypeList () {
-        let params = 6
-        indexManageTypeList(params).then(({data}) => {
-          if (data && data.status === '1') {
-            this.fieldTypeList = data.data
-          }
-        })
-      },
-
-      // 获取枚举类型
-      getEnumTypeNumList () {
-        indexManageTypeNumList().then(({data}) => {
-          if (data && data.status === '1') {
-            this.enumTypeNumList = data.data
-          }
-        })
-      },
-
-      // 指标类别选择
-      changeOption () {
-        this.$refs.dataForm.validateField('categoryId')
-      },
-
-      getChannelsList () {
-        channelsList().then(res => {
-          if (res.data.status * 1 !== 1) {
-            this.channelList = []
-            return
-          }
-          this.channelList = res.data.data
-        })
-      },
-
-      init (row, tag) {
-        this.dataForm.id = row ? row.id : ''
-        this.tag = tag || ''
-        this.visible = true
-        this.categoryIdList = []
-        this.getCategoryIdList(row)
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (row) {
-            this.dataForm = deepClone(row)
-            this.dataForm.channelCode = this.dataForm.channelCode.split(',').filter(item => item !== '')
-            if (row.remark === null) {
-              this.dataForm.remark = ''
-            }
-          }
-          this.dataForm.enable = this.dataForm.enable.toString()
-          if (tag == 'view') {
-            this.readonly = true
+      })
+    },
+    getSelectAllCata (fn) { // 获取所有指标
+      selectAllCata({
+        channelCode: this.baseForm.channelCode,
+        flag: this.id ? '-1' : '1'
+      }).then(({data}) => {
+        if (data.status !== '1') {
+          this.indexList = []
+        } else {
+          let indexList = this.filterAllCata(data.data)
+          this.indexList = this.filterIndexList(indexList)
+          console.log(' this.indexList: ', this.indexList)
+        }
+        if (fn) {
+          fn(this.indexList)
+        }
+      })
+    },
+        filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
+      let arr = []
+      if (!!tree && tree.length !== 0) {
+        tree.forEach((item, index) => {
+          let obj = {}
+          if (item.fieldType) {
+            obj.id = item.englishName + '-' + item.id
+            obj.englishName = item.englishName
+            obj.label = item.chineseName
+            obj.fieldType = item.fieldType
+            obj.enumTypeNum = item.enumTypeNum
+            obj.sourceTable = item.sourceTable
+            obj.dataStandar = item.dataStandar
+            obj.fieldId = item.id
+            obj.channelCode = item.channelCode
+            obj.enable = item.enable
           } else {
-            this.readonly = false
+            obj.id = item.id
+            obj.label = item.name
           }
-        })
-      },
-
-      dataFormSubmit (form) {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.dataForm = {
-              ...this.dataForm,
-              id: this.dataForm.id ? Number(this.dataForm.id) : ''
-            }
-            if (this.dataForm.enable == 'true') {
-              this.dataForm.enable = true
+          if (this.filterAllCata(item.dataCata).length) { // 指标层 ，无children
+            obj.children = this.filterAllCata(item.dataCata) // 指标集合
+            arr.push(obj)
+          } else if (this.filterAllCata(item.dataIndex).length) {
+            obj.children = this.filterAllCata(item.dataIndex) // 指标集合
+            arr.push(obj)
+          } else { // 指标父级层
+            if (!item.fieldType) {
+              obj.children = null
             } else {
-              this.dataForm.enable = false
-            }
-            this.dataForm.channelCode = this.dataForm.channelCode.join(',')
-            if (!this.dataForm.id) {
-              addIndexManage(this.dataForm).then(({data}) => {
-                if (data && data.status === '1') {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.readonly = false
-                      this.enumeration = false
-                      this.$emit('refreshDataList')
-                      this.$refs['dataForm'].resetFields()
-                    }
-                  })
-                } else {
-                  this.$message.error(data.message || '数据异常')
-                }
-              })
-            } else {
-              updateIndexManage(this.dataForm.id, this.dataForm).then(({data}) => {
-                if (data && data.status === '1') {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.readonly = false
-                      this.enumeration = false
-                      this.$emit('refreshDataList')
-                      this.$refs['dataForm'].resetFields()
-                    }
-                  })
-                } else {
-                  this.$message.error(data.message)
-                }
-              })
+              arr.push(obj) // 每个指标都放在集合中
             }
           }
         })
       }
-
+      return arr
+    },
+    filterIndexList (data) {
+      let arr = []
+      if (!!data && data.length !== 0) {
+        data.forEach((item, index) => {
+          if (!item.fieldType) {
+            let obj = {}
+            obj.id = item.id
+            obj.label = item.label
+            if (item.children.length) {
+              let children = []
+              children = this.filterIndexList(item.children)
+              if (children.length) {
+                obj.children = children
+              }
+              arr.push(obj)
+            } else {
+              arr.push(obj)
+            }
+          }
+        })
+      }
+      return arr
+    },
+    getChannelsList () {
+      channelsList().then(res => {
+        if (res.data.status * 1 !== 1) {
+          this.channelList = []
+          return
+        }
+        this.channelList = res.data.data.map(item => {
+          if (item.value === '0000') {
+            item.disabled = true
+          } else {
+            item.disabled = false
+          }
+          return item
+        })
+      })
+    },
+     channelIdChange () {
+      // 用户渠道改变时，重新过滤指标数据
+      if (this.baseForm.channelCode.length === 0) {
+        this.channelList.forEach(item => {
+          if (item.value === '0000') {
+            item.disabled = true
+          } else {
+            item.disabled = false
+          }
+        })
+      }
+      this.getSelectAllCata()
+    },
+    indexTreeChange (val) {
+       this.indexParentList = val
+    },
+    saveHandle () {
+       this.$refs['baseForm'].validate((valid) => {
+        if (valid) {
+          let params = {
+            'englishName': this.baseForm.englishName,
+            'chineseName': this.baseForm.chineseName,
+            'channelCode': this.baseForm.channelCode,
+            'processCaliber': this.baseForm.processCaliber,
+            'indexType': this.baseForm.indexType,
+            'formula': this.baseForm.formula,
+            'categoryId': this.baseForm.categoryId.length ? this.indexParentList[this.indexParentList.length - 1].toString() : '',
+            'processType': this.baseForm.processType,
+            'fieldType': this.baseForm.fieldType,
+            'isSensitive': this.baseForm.isSensitive,
+            'showRules': this.baseForm.showRules,
+            'enable': this.baseForm.enable,
+            'catagoryIdSelect': this.indexParentList
+          }
+          if (!this.id) {
+            addIndexManage(params).then(({ data }) => {
+              console.log('data: ', data)
+              if (data && data.status === '1') {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                    this.$refs['baseForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.message || '数据异常')
+              }
+            })
+          } else {
+            params.id = this.id
+            updateIndexManage(params).then(({ data }) => {
+              console.log('data: ', data)
+              if (data && data.status === '1') {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                    this.$refs['baseForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.message || '数据异常')
+              }
+            })
+          }
+        }
+      })
+    },
+    drawerClose () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
+    },
+    cancelHandle () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
     }
   }
+}
 </script>
-<style scoped>
-  .data-description-tips {
-    color: #999;
-    margin-top: 0
-  }
-  .data-description-tips span {
-    color: red
-  }
-  .vue-treeselect {
-    height: 38px;
-    line-height: 38px;
-  }
+<style>
+.index-manage-drawer .wrap {
+  padding: 0 20px 20px;
+  margin-top: -12px;
+  width: 100%;
+  overflow-y: auto;
+  position: absolute;
+  top: 75px;
+  bottom: 55px;
+}
+.index-manage-drawer .drawer-title {
+  padding: 15px;
+  background: #333;
+  color: #fff;
+  font-size: 15px;
+  margin: -20px -20px 0 -20px;
+  position: relative;
+}
+.index-manage-drawer .drawer-close {
+  position: absolute;
+  right: 20px;
+}
+.index-manage-drawer .item-inline {
+  display: inline-block;
+}
+.index-manage-drawer .item-code {
+  margin-left: -70px;
+}
+.index-manage-drawer .item-code-name {
+  width: 300px;
+}
+.index-manage-drawer .item-button {
+  margin-left: -60px;
+}
+.index-manage-drawer .copy-code {
+  margin-left: 15px;
+}
+.index-manage-drawer .footer {
+  position: absolute;
+  bottom: 0;
+  background: #fff;
+  padding: 10px 22px 10px 10px;
+  width: 100%;
+  height: 55px;
+  text-align: right;
+  box-shadow: 0 -2px 9px 0 rgba(153, 169, 191, 0.17);
+  z-index: 500;
+}
+.index-manage-drawer .cursor-pointer {
+  cursor: pointer;
+}
+.index-manage-drawer .base-pane-item {
+  width: 60%;
+}
+.index-manage-drawer .vue-treeselect {
+  line-height: 24px;
+}
+.index-manage-drawer .data-description-tips {
+  color: #999;
+  margin-top: 0;
+}
+.index-manage-drawer .data-description-tips span {
+  color: red;
+}
+.index-manage-drawer .type-radio-group {
+  margin-top: 12px;
+}
+.index-manage-drawer .type-radio-two {
+  margin-top: 10px;
+}
+.index-manage-drawer .type-radio-three {
+  margin-top: 10px;
+}
+.index-manage-drawer .upload-excel {
+  display: inline-block;
+  margin-left: 20px;
+}
+.index-manage-drawer .btn-upload {
+  display: inline-block;
+  font-size: 14px;
+  padding-left: 15px;
+}
+.index-manage-drawer .upload-name {
+  font-size: 14px;
+  padding-left: 15px;
+}
+.index-manage-drawer .btn-upload button {
+  margin-left: 10px;
+}
+.index-manage-drawer .btn-download {
+  margin-left: 10px;
+}
+.index-manage-drawer .btn-download a {
+  color: #fff;
+}
+.index-manage-drawer .el-list-enter-active,
+.index-manage-drawer .el-list-leave-active {
+  transition: none;
+}
+.index-manage-drawer .el-list-enter,
+.index-manage-drawer .el-list-leave-active {
+  opacity: 0;
+}
+.index-manage-drawer .pane-rules {
+  position: relative;
+  display: flex;
+}
+/* .pane-rules-data {
+
+} */
+.pane-rules-relation {
+  left: 0;
+  top: -8px;
+  bottom: 0;
+  position: relative;
+  margin-right: 8px;
+  margin-bottom: 20px;
+}
+.pane-rules-relation:before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  overflow: hidden;
+  background: #d0e2f5;
+}
+.pane-rules-relation span {
+  position: relative;
+  display: block;
+  top: 50%;
+  left: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-50%);
+  border-radius: 3px;
+  background: #d0e2f5;
+  color: #409eff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 25px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+.index-manage-drawer .pane-rules-title, .index-manage-drawer .pane-reject {
+  border-top: 1px dashed #ccc;
+}
+.index-manage-drawer .user-channel {
+  margin-left: 110px;
+}
+.index-manage-drawer .indicator-channel {
+  display: inline-block;
+  margin-left: 20px;
+}
+.index-manage-drawer .pane-reject {
+  margin-top: 20px;
+}
+.index-manage-drawer .reject-pane-item {
+  width: 50%;
+}
+.index-manage-drawer .reject-pane-item1 {
+  width:80%
+}
+.inputTag {
+  display: inline-block;
+  border-radius: 4px;
+  width: 340px;
+  line-height: 22px;
+  border: 1px solid #dcdfe6
+}
+.work-type-pane-source {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: 70px;
+}
+.type-radio-item-indexType {
+  margin-bottom: 0 !important;
+}
+.type-radio-item-indexType-active {
+  margin-bottom: 22px !important;
+}
+ .index-manage-drawer .content-range {
+   width: 80px;
+   height: 28px;
+   border: solid 1px #dcdfe6;
+   text-align: center;
+   font-size: 14px;
+   line-height: 28px;
+   margin-right: 10px;
+   margin-left: 50px;
+ }
+ .index-manage-drawer .pane-rules-inline {
+  margin-left: 20px;
+  display: flex;
+  line-height: 36px;
+}
+.index-manage-drawer .parentheses {
+  font-size: 28px;
+}
+.itemIput-small {
+  width: 100px;
+}
+.index-manage-drawer .btn-group i {
+  margin-left:20px;
+}
 </style>

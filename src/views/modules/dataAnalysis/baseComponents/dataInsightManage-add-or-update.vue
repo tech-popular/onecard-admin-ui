@@ -487,7 +487,7 @@ export default {
           this.rowData.authOtherList = row.authOtherList
           this.rowData.authOthers = row.authOthers
         }
-        this.drawerTitle = tag === canUpdate ? '编辑' : '查看'
+        this.drawerTitle = tag === canUpdate ? '查看' : '编辑'
         // this.drawerTitle = tag === 'view' ? '查看' : '编辑'
         this.getDataInfo(row.id)
       }
