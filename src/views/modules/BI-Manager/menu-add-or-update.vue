@@ -21,8 +21,18 @@
         >
         </el-cascader>
 			</el-form-item>
-			<el-form-item label="菜单名称" prop="name" >
+			<el-form-item label="菜单名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="菜单名称"></el-input>
+      </el-form-item>
+      <el-form-item label="菜单属性" prop="menuType" v-if="dataForm.type === 1">
+        <el-select v-model="dataForm.menuType" placeholder="请选择菜单属性" style="width: 100%">
+					<el-option
+						v-for="item in menuLists"
+						:key="item.id"
+						:label="item.name"
+						:value="item.id">
+					</el-option>
+				</el-select>
       </el-form-item>
 			<el-form-item  label="菜单链接" prop="url" v-if="dataForm.type === 1">
         <el-input v-model="dataForm.url" placeholder="菜单链接"></el-input>
@@ -89,8 +99,21 @@
           ],
           taskIds: [
             { required: true, message: '计算任务不能为空', trigger: 'blur' }
+          ],
+          menuType: [
+            { required: true, message: '菜单属性不能为空', trigger: 'blur' }
           ]
-        }
+        },
+        menuLists: [{
+          id: '0',
+          name: 'superset列表'
+        }, {
+          id: '1',
+          name: 'table简单报表'
+        }, {
+          id: '2',
+          name: 'tableau图表'
+        }]
       }
     },
     methods: {
@@ -123,6 +146,7 @@
               this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
             }
             this.dataForm.name = data.data.name
+            this.dataForm.menuType = data.data.menuType + '';
             if (data.data.url) {
               this.dataForm.type = 1
               this.menuList = this.filterMenuList(this.menuData)
@@ -234,7 +258,8 @@
               'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
               'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
               'menuParentList': this.menuParentList.join(','),
-              'type': 0
+              'type': 0,
+              'menuType': this.dataForm.menuType
             }
               console.log('params: ', params)
             if (!this.dataForm.id) {
