@@ -295,7 +295,7 @@ export default {
           this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : this.regionList
           this.selectedIndex = this.ruleForm.region
           this.outParamsIndexList = this.updateOutParamsList(indexList)
-          // this.getSelectCata(indexList, this.selectedIndex)
+          this.getSelectCata(indexList, this.selectedIndex)
           this.getDetailPreviewList()
           this.$nextTick(() => {
             this.loading = false
@@ -333,8 +333,6 @@ export default {
         } else {
           this.totalCount = data.data.tableDataList.length
           this.dataList = data.data.tableDataList
-          this.columns = []
-          this.getSelectCata(this.indexList, this.selectedIndex)
         }
       })
     },
@@ -347,6 +345,14 @@ export default {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           this.isShow = true
+          this.columns = [
+            {
+              label: '用户ID',
+              prop: 'id',
+              align: 'center'
+            }
+          ]
+          this.getSelectCata(this.indexList, this.selectedIndex)
           this.getDetailPreviewList()
         }
       })
