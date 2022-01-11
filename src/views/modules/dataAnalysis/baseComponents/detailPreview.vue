@@ -269,6 +269,13 @@ export default {
       this.title = val.name
       this.templateId = val.id
       this.canUpdate = canUpdate
+      this.columns = [
+        {
+          label: '用户ID',
+          prop: 'id',
+          align: 'center'
+        }
+      ]
       this.$nextTick(() => {
         this.$refs.ruleForm.clearValidate()
       })
