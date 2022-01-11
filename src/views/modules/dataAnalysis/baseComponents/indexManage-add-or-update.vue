@@ -65,7 +65,7 @@
               <el-radio  v-model="baseForm.indexType" label="1">用户标签</el-radio>
               <el-radio  v-model="baseForm.indexType" label="4">衍生标签</el-radio>
           </el-form-item>
-            <el-form-item label="计算公式" prop="formula">
+            <el-form-item label="计算公式" prop="formula"  v-if="baseForm.indexType === '4'">
               <el-input
                 v-model.trim="baseForm.formula"
                 placeholder="计算公式"
@@ -206,6 +206,7 @@ export default {
       infoIndexManage(id).then(({ data }) => {
         if (data && data.status === '1') {
           this.id = data.data.id
+          this.baseForm.formula = data.data.formula
           this.baseForm.englishName = data.data.englishName
           this.baseForm.chineseName = data.data.chineseName
           this.baseForm.channelCode = data.data.channelCode
