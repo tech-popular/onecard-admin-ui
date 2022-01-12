@@ -146,7 +146,7 @@
               this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
             }
             this.dataForm.name = data.data.name
-            this.dataForm.menuType = data.data.menuType + '';
+            this.dataForm.menuType = data.data.menuType + ''
             if (data.data.url) {
               this.dataForm.type = 1
               this.menuList = this.filterMenuList(this.menuData)

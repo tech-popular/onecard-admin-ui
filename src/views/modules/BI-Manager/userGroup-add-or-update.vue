@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { savaUserGroupInfo, updateUserGroupInfo, lookDataInfo, getSelectTenantDown, getUsersList } from '@/api/BI-Manager/userGroup'
+import { savaUserGroupInfo, updateUserGroupInfo, lookDataInfo, getUsersList } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
     return {
@@ -155,20 +155,20 @@ export default {
     // },
     getUserSelectList (query) {
       if (query !== '') {
-        this.loading = true;
+        this.loading = true
         let params = {
           name: query
-        };
+        }
         getUsersList(params).then(({ data }) => {
           if (data && data.code === 0) {
             this.userIdList = data.dataList
           } else {
             this.userIdList = []
           }
-          this.loading = false;
+          this.loading = false
         }).finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
       }
     },
     // 表单提交

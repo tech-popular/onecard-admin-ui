@@ -111,7 +111,7 @@
 }
 </style>
 <script>
-import { getUserGroupList, deleteUsersById, getSelectTenantDown } from '@/api/BI-Manager/userGroup'
+import { getUserGroupList, deleteUsersById } from '@/api/BI-Manager/userGroup'
 import AddOrUpdate from './userGroup-add-or-update'
 import assignPermissions from './assign-permissions'
 export default {

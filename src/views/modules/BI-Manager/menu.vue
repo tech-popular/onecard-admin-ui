@@ -223,7 +223,7 @@
       // 格式化菜单属性显示
       formatMenuType(row, column, cellValue, index) {
         const menuLists = ['superset列表', 'table简单报表', 'tableau图表']
-        return menuLists[cellValue];
+        return menuLists[cellValue]
       }
     }
   }
