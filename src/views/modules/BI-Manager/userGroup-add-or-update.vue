@@ -66,6 +66,9 @@ export default {
       dataForm: {
         id: 0,
         name: '',
+        department: '',
+        creater: '',
+        remark: '',
         enable: 1,
         // tenantId: '',
         userIds: []
@@ -158,7 +161,7 @@ export default {
         };
         getUsersList(params).then(({ data }) => {
           if (data && data.code === 0) {
-            this.userIdList = data.data
+            this.userIdList = data.dataList
           } else {
             this.userIdList = []
           }
