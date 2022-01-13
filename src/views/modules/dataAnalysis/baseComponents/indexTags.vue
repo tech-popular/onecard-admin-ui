@@ -67,7 +67,7 @@
   </el-dialog>
 </template>
 <script>
-import { dataEnumType } from '@/api/dataAnalysis/dataInsightManage'
+import { getDimension } from '@/api/dataAnalysis/indexManage'
 export default {
   data () {
     return {
@@ -133,11 +133,16 @@ export default {
     }
   },
   methods: {
-    init (val, selectedFieldType) {
-      this.selectedFieldType = selectedFieldType
+    init (val) {
+			console.log('val: ', val);
+      this.selectedFieldType = val.fieldType
       this.dataForm.id = val.id
-      this.selectEnumsList = []
-      if (selectedFieldType === 'enums') {
+			this.selectEnumsList = []
+			getDimension(val.id).then(({ data }) => {
+				console.log('data: ', data);
+
+			})
+      if (val.fieldType === 'enums') {
         dataEnumType(val.enumTypeNum).then(({ data }) => {
           if (data.status === '1') {
             this.selectEnumsList = data.data

@@ -103,7 +103,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row)">编辑</el-button>
           <el-button type="text" size="small"  @click="deleteHandle(scope.row)">删除</el-button>
-          <!-- <el-button type="text" size="small"  @click="deleteHandle(scope.row)">删除</el-button> -->
+          <el-button type="text" size="small"  @click="tagChange(scope.row)">默认标签分组 </el-button>
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button> -->
         </template>
       </el-table-column>
@@ -118,6 +118,7 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <indexTags ref="indexTags" v-if="indexTagsVisible" @refreshDataList="getDataList"></indexTags>
   </div>
 </template>
 
@@ -125,6 +126,7 @@
   import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex, deleteDataInfo } from '@/api/dataAnalysis/indexManage'
   import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
+  import indexTags from './baseComponents/indexTags'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
@@ -169,7 +171,8 @@
     },
     components: {
       AddOrUpdate,
-      Treeselect
+      Treeselect,
+      indexTags
     },
     mounted () {
       this.getCategoryIdList()
@@ -312,6 +315,13 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
+      },
+      // 默认标签分组
+      tagChange (row) {
+        this.indexTagsVisible = true
+        this.$nextTick(() => {
+          this.$refs.indexTags.init(row)
+        })
       }
     }
   }
