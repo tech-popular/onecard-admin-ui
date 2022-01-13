@@ -35,7 +35,7 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button  type="success" @click="addOrUpdateHandle()">新建指标</el-button>
+        <!-- <el-button  type="success" @click="addOrUpdateHandle()">新建指标</el-button> -->
         <!-- <el-button type="success" v-if="isAdmin" @click="manualSync()">手动同步</el-button> -->
       </el-form-item>
     </el-form>
@@ -93,18 +93,18 @@
           <el-tag v-else size="small" type="danger">无效</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="是否设置默认分组">
+      <!-- <el-table-column prop="status" header-align="center" align="center" label="是否设置默认分组">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === true" size="small" >是</el-tag>
           <el-tag v-else size="small" type="danger">否</el-tag>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column header-align="center" align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row)">编辑</el-button>
+          <!-- <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row)">编辑</el-button>
           <el-button type="text" size="small"  @click="deleteHandle(scope.row)">删除</el-button>
-          <el-button type="text" size="small"  @click="tagChange(scope.row)">默认标签分组 </el-button>
-          <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button> -->
+          <el-button type="text" size="small"  @click="tagChange(scope.row)">默认标签分组 </el-button> -->
+          <el-button type="text"  @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -125,7 +125,8 @@
 <script>
   import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex, deleteDataInfo } from '@/api/dataAnalysis/indexManage'
   import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
-  import AddOrUpdate from './baseComponents/indexManage-add-or-update'
+  // import AddOrUpdate from './baseComponents/indexManage-add-or-update'
+  import AddOrUpdate from './baseComponents/indexManage-add-or-update1'
   import indexTags from './baseComponents/indexTags'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -246,10 +247,10 @@
       },
 
       // 新增 / 修改
-      addOrUpdateHandle (row) {
+      addOrUpdateHandle (row, tag) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(row)
+          this.$refs.addOrUpdate.init(row, tag)
           // this.$refs.addOrUpdate.getCategoryIdList(row)
         })
       },

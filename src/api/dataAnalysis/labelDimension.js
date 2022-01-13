@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpGetSeries, httpDelete } from '@/api'
+import { httpGet } from '@/api'
 // let da = '/dataAnalysis/'
 let da = '/'
 // 指标管理模块

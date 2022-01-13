@@ -149,8 +149,8 @@ export default {
   },
   methods: {
     getSelectAllGroupTypeNum () {
-      selectAllGroupTypeNum().then(({ data }) =>{
-        console.log('data: ', data);
+      selectAllGroupTypeNum().then(({ data }) => {
+        console.log('data: ', data)
         if (data && data.status === '1') {
           this.treeData[0].children.push(data.data)
         }
