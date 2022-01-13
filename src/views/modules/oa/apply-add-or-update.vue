@@ -71,12 +71,13 @@
       </el-tab-pane>
       <!-- 库表 -->
       <el-tab-pane label="库表授权" name="库表授权">
-        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>审批流在收到钉钉审批通过后，默认10分钟之后处理完成，请重新登陆系统</p>
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>数据表权限申请，请通过邮件datareq@9fbank.com.cn申请，谢谢！</p>
         <el-form
           :model="severDataForm"
           :rules="severDataRule"
           ref="severDataForm"
           label-width="160px"
+          disabled
         >
           <el-form-item label="标题" prop="title">
             <el-input v-model="severDataForm.title" placeholder="标题" />
@@ -85,7 +86,7 @@
             <!-- <p>选择要授权的库/表/字段</p> -->
             <el-row :gutter="24">
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
-                <el-form :inline="true" :model="staffTemp" size="mini">
+                <el-form :inline="true" :model="staffTemp" size="mini" disabled>
                   <el-row :gutter="24" style="padding:5px;">
                     <el-alert
                       title="切换库后已选库表将会清空"
