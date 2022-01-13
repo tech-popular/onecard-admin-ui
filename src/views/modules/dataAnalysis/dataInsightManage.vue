@@ -48,6 +48,7 @@
           </el-button>
           <el-button type="text" size="small"  v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row)">删除</el-button>
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">分群概览</el-button>
+          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="detailPreviewHandle(scope.row)">明细预览</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
@@ -62,6 +63,7 @@
       layout="total, sizes, prev, pager, next, jumper" />
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
     <tableShow v-if="tableShowVisible" ref="tableShow"/>
+    <detailPreview v-if="detailPreviewVisible" ref="detailPreview"/>
      <!-- 授权 -->
     <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
@@ -73,6 +75,7 @@
   import TableShow from './baseComponents/tableShow'
   import { updateGroupAuth, updateGroupAuths } from '@/api/commom/assignPermission'
   import AssignPermission from '../../components/permission/assign-permission'
+  import detailPreview from './baseComponents/detailPreview'
   export default {
     data () {
       return {
@@ -87,6 +90,7 @@
         dataListLoading: false,
         addOrUpdateVisible: false,
         tableShowVisible: false,
+        detailPreviewVisible: false,
         dataListSelections: [],
         submitDataApi: updateGroupAuth,
         submitDataApis: updateGroupAuths,
@@ -99,7 +103,8 @@
     components: {
       AddOrUpdate,
       TableShow,
-      AssignPermission
+      AssignPermission,
+      detailPreview
     },
     mounted () {
       this.getDataList()
@@ -133,6 +138,17 @@
             canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
           }
           this.$refs.tableShow.init(value, canUpdate)
+        })
+      },
+      // 明细预览
+      detailPreviewHandle (value) {
+        this.detailPreviewVisible = true
+        this.$nextTick(() => {
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
+          }
+          this.$refs.detailPreview.init(value, canUpdate)
         })
       },
       // 新增 / 修改
