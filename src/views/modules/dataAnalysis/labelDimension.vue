@@ -8,7 +8,7 @@
     </el-input>
 		<el-tree
 			class="filter-tree"
-			:data="data"
+			:data="treeData"
 			:props="defaultProps"
 			default-expand-all
 			:filter-node-method="filterNode"
@@ -17,6 +17,7 @@
         <span>{{ node.label }}</span>
         <span>
 					 <el-button
+            v-if="node.id === 0"
             type="text"
             size="mini"
             @click="() => append()">
@@ -90,26 +91,17 @@
 </div>
 </template>
 <script>
+import { selectAllGroupTypeNum } from '@/api/dataAnalysis/labelDimension'
 export default {
   data () {
     return {
       filterText: '',
       addorupdate: false,
       modifyaddorupdate: false,
-      data: [{
-        id: 1,
-        label: '一级 1',
-        children: [{
-          id: 4,
-          label: '二级 1-1',
-          children: [{
-            id: 9,
-            label: '三级 1-1-1'
-          }, {
-            id: 10,
-            label: '三级 1-1-2'
-          }]
-        }]
+      treeData: [{
+        id: 0,
+        label: '标签维度',
+        children: []
       }],
       defaultProps: {
         children: 'children',
@@ -152,8 +144,18 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
-
+  mounted () {
+    this.getSelectAllGroupTypeNum()
+  },
   methods: {
+    getSelectAllGroupTypeNum () {
+      selectAllGroupTypeNum().then(({ data }) =>{
+        console.log('data: ', data);
+        if (data && data.status === '1') {
+          this.treeData[0].children.push(data.data)
+        }
+      })
+    },
     filterNode(value, data) {
       if (!value) return true
       return data.label.indexOf(value) !== -1

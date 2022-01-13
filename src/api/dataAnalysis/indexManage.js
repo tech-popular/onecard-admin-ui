@@ -14,5 +14,5 @@ export const indexManageTypeNumList = () => httpGet(da + 'dataEnumType/selectAll
 export const syncDataIndex = () => httpPost(da + 'sync/v3/dataIndex', {}) // 同步数语指标
 export const selectAllCata = params => httpGetSeries(da + 'dataCatalog/selectAllCataNew', params) // 加载目录树接口
 export const channelsList = () => httpGet(da + 'common/select/channels')
-export const getDimension = (id) => httpGet(da + `dataIndexManager/getDimension/${id}`) // 分组查看
-export const setDimension = (id) => httpGet(da + `dataIndexManager/setDimension/${id}`) // 分组查看
+export const getDimension = (params) => httpGet(da + 'dataIndexManager/getDimension', params) // 分组查看
+export const setDimension = (params) => httpPost(da + 'dataIndexManager/setDimension', params) // 设置分组

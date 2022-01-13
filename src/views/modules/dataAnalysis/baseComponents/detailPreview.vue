@@ -53,14 +53,14 @@
         </el-table> -->
 				 <!-- <tab :list="dataList" :columns="columns"/> -->
 				 <tab :list="dataList" :columns="columns" :operates="{}" :fixed="{}"/>
-        <el-pagination
+        <!-- <el-pagination
         @size-change="sizeChangeHandle"
         @current-change="currentChangeHandle"
         :current-page="pageNum"
         :page-sizes="[10, 20, 50, 100]"
         :page-size="pageSize"
         :total="totalCount"
-        layout="total, sizes, prev, pager, next, jumper"/>
+        layout="total, sizes, prev, pager, next, jumper"/> -->
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" type="primary">关闭</el-button>
@@ -121,7 +121,7 @@ export default {
       }
     },
     getSelectAllCata (channelCode, fn) { // 获取所有指标
-      selectAllCata({ channelCode: channelCode, flag: '1'}).then(({data}) => {
+      selectAllCata({channelCode: channelCode, flag: '1'}).then(({data}) => {
         // selectAllCata({ channelCode: channelCode, flag: '1', type: ['number', 'enums'] }).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
@@ -370,16 +370,16 @@ export default {
       this.isShow = true
     },
     // 每页数
-    sizeChangeHandle (page) {
-      this.pageSize = page
-      this.pageNum = 1
-      this.getDetailPreviewList()
-    },
-    // 当前页
-    currentChangeHandle (page) {
-      this.pageNum = page
-      this.getDetailPreviewList()
-    },
+    // sizeChangeHandle (page) {
+    //   this.pageSize = page
+    //   this.pageNum = 1
+    //   this.getDetailPreviewList()
+    // },
+    // // 当前页
+    // currentChangeHandle (page) {
+    //   this.pageNum = page
+    //   this.getDetailPreviewList()
+    // },
     // 弹窗状态
     handleClose () {
       this.dialogVisible = false

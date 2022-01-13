@@ -59,6 +59,9 @@
               <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
         </el-form-item>
+        <el-form-item prop="classLabel"  v-if="selectedFieldType === 'string'">
+          <el-radio v-model="dataForm.classLabel" label="1">是否类标签</el-radio>
+        </el-form-item>
     </el-form>
     <div slot="footer">
       <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
@@ -67,7 +70,7 @@
   </el-dialog>
 </template>
 <script>
-import { getDimension } from '@/api/dataAnalysis/indexManage'
+import { getDimension, setDimension } from '@/api/dataAnalysis/indexManage'
 export default {
   data () {
     return {
@@ -77,14 +80,8 @@ export default {
       dataForm: {
         id: 0,
         selectVal: '',
-        digitalRange: [
-          {
-            smallerValue: '',
-            largerValue: '',
-            dataRange: '',
-            key: Date.now()
-          }
-        ]
+        classLabel: '0',
+        digitalRange: []
       },
       selectEnumsList: [],
       pickerOptions: {
@@ -134,21 +131,52 @@ export default {
   },
   methods: {
     init (val) {
-			console.log('val: ', val);
       this.selectedFieldType = val.fieldType
       this.dataForm.id = val.id
-			this.selectEnumsList = []
-			getDimension(val.id).then(({ data }) => {
-				console.log('data: ', data);
-
-			})
-      if (val.fieldType === 'enums') {
-        dataEnumType(val.enumTypeNum).then(({ data }) => {
-          if (data.status === '1') {
-            this.selectEnumsList = data.data
-          }
-        })
+      this.selectEnumsList = []
+      let params = {
+        indexId: val.id
       }
+      getDimension(params).then(({ data }) => {
+        console.log('data: ', data)
+        if (data && data.status === '1' && data.data.length) {
+          if (val.fieldType === 'number') {
+            data.data.forEach((item, index) => {
+              this.dataForm.digitalRange.push({
+                smallerValue: item.split(',')[0],
+                largerValue: item.split(',')[1],
+                key: Date.now()
+              })
+            })
+          } else if (val.fieldType === 'string') {
+            this.dataForm.classLabel = data.data[0]
+          }
+        } else {
+          if (val.fieldType === 'number') {
+            this.dataForm.digitalRange.push({
+              smallerValue: '',
+              largerValue: '',
+              key: Date.now()
+            })
+          } else if (val.fieldType === 'date') {
+            this.dataForm.digitalRange.push({
+              dataRange: '',
+              key: Date.now()
+            })
+          } else if (val.fieldType === 'enums') {
+            this.dataForm.selectVal = ''
+          } else {
+            this.dataForm.classLabel = '0'
+          }
+        }
+      })
+      // if (val.fieldType === 'enums') {
+      //   dataEnumType(val.enumTypeNum).then(({ data }) => {
+      //     if (data.status === '1') {
+      //       this.selectEnumsList = data.data
+      //     }
+      //   })
+      // }
       this.visible = true
     },
     keyupNumberInput (val) { // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
@@ -258,6 +286,9 @@ export default {
     },
     saveHandle () {
       let indexGroups = []
+      let params = {
+        'indexId': this.dataForm.id
+      }
       if (this.selectedFieldType === 'number') {
         this.dataForm.digitalRange.forEach(item => {
           if (item.smallerValue === '' || item.largerValue === '') {
@@ -270,10 +301,7 @@ export default {
             indexGroups.push(arr)
           }
         })
-        console.log('indexGroups: ', indexGroups)
-        this.$emit('refreshDataList', indexGroups, this.dataForm.id)
-        this.visible = false
-        this.$refs['dataForm'].resetFields()
+        params.dimensions = indexGroups
       } else if (this.selectedFieldType === 'date') {
         this.dataForm.digitalRange.forEach(item => {
           if (!item.dataRange) {
@@ -285,28 +313,32 @@ export default {
             indexGroups.push(item.dataRange)
           }
         })
-        this.$emit('refreshDataList', indexGroups, this.dataForm.id)
-        this.visible = false
-        this.$refs['dataForm'].resetFields()
+        params.dimensions = indexGroups
+      } else if (this.selectedFieldType === 'string') {
+        params.dimensions = [this.dataForm.classLabel]
+      } else {
+        params.dimensions = this.dataForm.selectVal
       }
-      // if (this.selectedFieldType === 'enums' || this.selectedFieldType === 'date') {
-        this.$refs.dataForm.validate((valid) => {
-          if (valid) {
-
-          }
-        })
-      // } else {
-      //   let ruleSet = this.$refs
-      //   let ruleArr = []
-      //   for (let key in ruleSet) {
-      //     if (key !== 'dataForm') {
-      //       // this.$refs[key][0].clearValidate()
-      //       this.$refs[key][0].validate(valid => {
-      //         console.log('valid: ', valid)
-      //       })
-      //     }
-      //   }
-      // }
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          setDimension(params).then(({ data }) => {
+            if (data && data.status === '1') {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                    this.$refs['baseForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.message || '数据异常')
+              }
+          })
+        }
+      })
     },
     cancelHandle () {
       this.visible = false
