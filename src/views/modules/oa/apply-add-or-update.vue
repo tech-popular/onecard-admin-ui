@@ -72,21 +72,20 @@
       <!-- 库表 -->
       <el-tab-pane label="库表授权" name="库表授权">
         <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>数据表权限申请，请通过邮件datareq@9fbank.com.cn申请，谢谢！</p>
-        <el-form
+        <!-- <el-form
           :model="severDataForm"
           :rules="severDataRule"
           ref="severDataForm"
           label-width="160px"
-          disabled
         >
           <el-form-item label="标题" prop="title">
             <el-input v-model="severDataForm.title" placeholder="标题" />
           </el-form-item>
-          <el-form-item label="选择要授权的库/表/字段">
+          <el-form-item label="选择要授权的库/表/字段"> -->
             <!-- <p>选择要授权的库/表/字段</p> -->
-            <el-row :gutter="24">
+            <!-- <el-row :gutter="24">
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
-                <el-form :inline="true" :model="staffTemp" size="mini" disabled>
+                <el-form :inline="true" :model="staffTemp" size="mini">
                   <el-row :gutter="24" style="padding:5px;">
                     <el-alert
                       title="切换库后已选库表将会清空"
@@ -110,8 +109,8 @@
                           />
                         </el-select>
                       </el-form-item>
-                    </el-col>
-                    <el-col :span="10" style="padding:0;">
+                    </el-col> -->
+                    <!-- <el-col :span="10" style="padding:0;">
                       <el-form-item style="margin: 0;">
                         <el-input v-model="staffTemp.name" placeholder="请输入名称"></el-input>
                       </el-form-item>
@@ -122,8 +121,8 @@
                       </el-form-item>
                     </el-col>
                   </el-row>
-                </el-form>
-                <el-table
+                </el-form> -->
+                <!-- <el-table
                   ref="staffTable"
                   v-loading="listLoading"
                   :data="staffList"
@@ -144,9 +143,9 @@
                       <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
-                </el-table>
+                </el-table> -->
                 <!-- 分页 -->
-                <el-pagination
+                <!-- <el-pagination
                   @size-change="sizeChangeHandle"
                   @current-change="currentChangeHandle"
                   :current-page="staffTemp.pageNum"
@@ -156,8 +155,8 @@
                   :small="true"
                   layout="total, prev, pager, next"
                 />
-              </el-col>
-              <el-col :span="2" style="text-align:center;padding-top:10%">
+              </el-col> -->
+              <!-- <el-col :span="2" style="text-align:center;padding-top:10%">
                 <el-button @click="addStaff" type="primary" size="mini" style="padding: 5px;">
                   添加
                   <i class="el-icon-arrow-right"></i>
@@ -196,8 +195,8 @@
                 </el-table>
               </el-col>
             </el-row>
-          </el-form-item>
-          <el-form-item label="申请权限" prop="applyAuthTypeList">
+          </el-form-item> -->
+          <!-- <el-form-item label="申请权限" prop="applyAuthTypeList">
             <el-checkbox-group v-model="severDataForm.applyAuthTypeList">
               <el-checkbox
                 v-for="(item, index) in severApplyAuthList"
@@ -208,14 +207,14 @@
           </el-form-item>
           <el-form-item label="maxcomputer账号" prop="account">
             <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
-          </el-form-item>
+          </el-form-item> -->
           <!-- <el-form-item label="AccessKeyId" prop="accessKeyId">
             <el-input v-model="severDataForm.accessKeyId" placeholder="AccessKeyId" />
           </el-form-item>
           <el-form-item label="AccessKeySecert" prop="accessKeySecert">
             <el-input v-model="severDataForm.accessKeySecert" placeholder="AccessKeySecert" />
           </el-form-item> -->
-          <el-form-item label="默认所属部门">
+          <!-- <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">
               {{item}}
               <br />
@@ -224,10 +223,10 @@
           <el-form-item label="申请理由" prop="applyReason">
             <el-input type="textarea" v-model="severDataForm.applyReason" placeholder="申请理由"></el-input>
           </el-form-item>
-        </el-form>
+        </el-form> -->
         <div class="foot">
           <el-button @click="cancel()">取消</el-button>
-          <el-button type="primary" @click="severDataFormSubmit()" :loading="buttonloading">确定</el-button>
+          <el-button type="primary" @click="cancel()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -371,7 +370,7 @@ export default {
       this.tenantForm.authApplyReason = ''
       this.visible = true
       this.$nextTick(() => {
-        this.$refs['severDataForm'].resetFields()
+        // this.$refs['severDataForm'].resetFields()
         this.getStaffList()
         accoutAuthInitInfo().then(({ data }) => {
           this.systemList = data.data.systemList
@@ -660,11 +659,11 @@ export default {
       this.staffTemp.pageNum = 1
       this.staffTemp.name = ''
       this.selectedStaffList = []
-      this.$refs.staffTable.clearSelection()
+      // this.$refs.staffTable.clearSelection()
       this.actoveTab = '账号权限'
       this.$refs['dataForm'].resetFields()
       this.$refs['tenantForm'].resetFields()
-      this.$refs['severDataForm'].resetFields()
+      // this.$refs['severDataForm'].resetFields()
     },
     // 当前页
     currentChangeHandle (val) {
