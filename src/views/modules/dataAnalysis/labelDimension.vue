@@ -14,22 +14,24 @@
 			:filter-node-method="filterNode"
 			ref="tree">
 	    <span class="custom-tree-node" slot-scope="{ node, data }">
-        <span>{{ node.label }}</span>
+        <span>{{ data.typeValue }}</span>
         <span>
 					 <el-button
-            v-if="node.id === 0"
+            v-if="node.level === 1"
             type="text"
             size="mini"
             @click="() => append()">
             添加维度
           </el-button>
           <el-button
+            v-if="node.level !== 1"
             type="text"
             size="mini"
             @click="() => append(data)">
             修改
           </el-button>
           <el-button
+            v-if="node.level !== 1"
             type="text"
             size="mini"
             @click="() => remove(node, data)">
@@ -100,12 +102,12 @@ export default {
       modifyaddorupdate: false,
       treeData: [{
         id: 0,
-        label: '标签维度',
+        typeValue: '标签维度',
         children: []
       }],
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'typeValue'
       },
       dataList: [
         {
@@ -150,9 +152,8 @@ export default {
   methods: {
     getSelectAllGroupTypeNum () {
       selectAllGroupTypeNum().then(({ data }) => {
-        console.log('data: ', data)
         if (data && data.status === '1') {
-          this.treeData[0].children.push(data.data)
+          this.treeData[0].children = data.data
         }
       })
     },
@@ -167,6 +168,9 @@ export default {
     },
 
     remove(node, data) {
+      console.log('data: ', data);
+      console.log('node: ', node);
+      console.log('this.documentClientHeight: ', this.documentClientHeight);
       const parent = node.parent
       const children = parent.data.children || parent.data
       const index = children.findIndex(d => d.id === data.id)
@@ -209,16 +213,15 @@ export default {
 		display: flex;
   }
   .dimension-tree {
-	  width: 320px;
+	  width: 620px;
 	  position: relative;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    height: 100%;
-    min-height: 300px;
-    overflow: hidden;
+    height: 350px;
+     overflow-y: scroll;
 	  border: 1px solid #e6e6e6;
   }
 	.code-select {
