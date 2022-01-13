@@ -110,7 +110,7 @@ export default {
       }
     },
     getSelectAllCata (channelCode, fn) { // 获取所有指标
-      selectAllCata({ channelCode: channelCode, flag: '1'}).then(({data}) => {
+      selectAllCata({channelCode: channelCode, flag: '1'}).then(({data}) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {

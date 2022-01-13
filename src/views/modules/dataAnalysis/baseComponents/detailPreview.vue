@@ -107,7 +107,7 @@ export default {
       columns: [
          {
           label: '用户ID',
-          prop: 'id',
+          prop: 'customer_id',
           align: 'center'
         }
       ]
@@ -273,7 +273,7 @@ export default {
       this.columns = [
         {
           label: '用户ID',
-          prop: 'id',
+          prop: 'customer_id',
           align: 'center'
         }
       ]
@@ -356,7 +356,7 @@ export default {
           this.columns = [
             {
               label: '用户ID',
-              prop: 'id',
+              prop: 'customer_id',
               align: 'center'
             }
           ]
