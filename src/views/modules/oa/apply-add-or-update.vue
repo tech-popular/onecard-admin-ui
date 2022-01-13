@@ -239,6 +239,13 @@
           <el-button type="primary" @click="severDataFormSubmit()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
+      <el-tab-pane label="订阅申请" name="订阅申请">
+        <apply-subscription 
+          :system-list="systemListSubscription" 
+          :systemmodel-list="systemmodelListAll"
+          @cancel="cancel"
+          @submitSuccess="submitSuccess"></apply-subscription>
+      </el-tab-pane>
     </el-tabs>
   </el-dialog>
 </template>
@@ -257,6 +264,8 @@ import {
   tenantCrent,
   getUserGroupList
 } from '@/api/oa/apply'
+import applySubscription from './applySubscription.vue'
+
 export default {
   data () {
     return {
@@ -266,6 +275,7 @@ export default {
       // 账号权限开始
       systemList: [], // 申请系统数据载体
       systemmodelList: [], // 申请系统模块数据载体
+      systemmodelListAll: [],
       props: {
         multiple: true
       }, // 可多选申请系统
@@ -378,7 +388,16 @@ export default {
       ]
     }
   },
-  components: {},
+  components: {
+    applySubscription
+  },
+  computed: {
+    systemListSubscription: function() {
+      return this.systemList.filter(item => {
+        return item.value === 8 || item.value === 9
+      })
+    }
+  },
   methods: {
     init (id, value) {
       this.dataForm.id = id || ''
@@ -391,6 +410,7 @@ export default {
         accoutAuthInitInfo().then(({ data }) => {
           this.systemList = data.data.systemList
           this.systemmodelList = data.data.systemList
+          this.systemmodelListAll = data.data.systemList
           this.defaultApproverList = data.data.defaultApproverList
           this.departmentList = data.data.departmentList
           this.dataForm.userName = data.data.applicantName
@@ -486,7 +506,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['dataForm'].resetFields()
                   this.buttonloading = false
                   this.isShow = false
@@ -517,7 +537,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['dataForm'].resetFields()
                   this.buttonloading = false
                   this.isShow = false
@@ -583,7 +603,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['severDataForm'].resetFields()
                   this.staffTemp.pageNum = 1
                   this.staffTemp.name = ''
@@ -703,6 +723,9 @@ export default {
     },
     getRowKey (row) {
       return row.id
+    },
+    submitSuccess() {
+      this.$emit('refreshDataList')
     }
   }
 }

@@ -32,6 +32,7 @@ export default {
             commit('updateId', data.user.id)
             sessionStorage.setItem('id', data.user.id) // 存储用户id
             sessionStorage.setItem('username', data.user.username) // 存储用户id
+            sessionStorage.setItem('userInfo', JSON.stringify(data.user))
             resolve(data.user.username)
           } else {
             console.log(data.msg)

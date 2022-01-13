@@ -35,3 +35,5 @@ export const tenantCrent = (params) => httpPost(da + 'tenantManage/selectTenantI
 export const tenantShow = (params) => httpPost(da + 'tenantManage/selectTenantIdsFromUser', params)
 // 租户保存
 export const saveTenant = (params) => httpPost(da + 'oa/saveTenantAuthApply', params)
+// 订阅申请
+export const applyScription = params => httpPost(da + 'oa/saveAccountAuthApply', params)
