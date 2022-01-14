@@ -54,8 +54,8 @@
           <el-button @click="addDomain">新增区间</el-button>
         </el-form-item> -->
         <!-- 枚举值 -->
-        <el-form-item prop="selectVal"  v-if="selectedFieldType === 'enums'">
-          <el-select v-model="dataForm.selectVal" multiple class="itemIput">
+        <el-form-item prop="selectVal" label="枚举" label-width="50px"  v-if="selectedFieldType === 'enums'">
+          <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
               <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
         </el-form-item>
@@ -79,7 +79,7 @@ export default {
       selectedFieldType: 'number',
       dataForm: {
         id: 0,
-        selectVal: '',
+        selectVal: [],
         classLabel: '0',
         digitalRange: []
       },
@@ -135,7 +135,7 @@ export default {
       this.selectEnumsList = []
       this.dataForm = {
         id: val.id,
-        selectVal: '',
+        selectVal: [],
         classLabel: '0',
         digitalRange: []
       }
@@ -161,25 +161,22 @@ export default {
               })
             })
           }
+        } else {
+          if (val.fieldType === 'number') {
+            this.dataForm.digitalRange.push({
+              smallerValue: '',
+              largerValue: ''
+            })
+          } else if (val.fieldType === 'date') {
+            this.dataForm.digitalRange.push({
+              dataRange: []
+            })
+          } else if (val.fieldType === 'enums') {
+            this.dataForm.selectVal = []
+          } else {
+            this.dataForm.classLabel = '0'
+          }
         }
-        // else {
-        //   if (val.fieldType === 'number') {
-        //     this.dataForm.digitalRange.push({
-        //       smallerValue: '',
-        //       largerValue: '',
-        //       key: Date.now()
-        //     })
-        //   } else if (val.fieldType === 'date') {
-        //     this.dataForm.digitalRange.push({
-        //       dataRange: [],
-        //       key: Date.now()
-        //     })
-        //   } else if (val.fieldType === 'enums') {
-        //     this.dataForm.selectVal = ''
-        //   } else {
-        //     this.dataForm.classLabel = '0'
-        //   }
-        // }
       })
       if (val.fieldType === 'enums') {
         let params = {

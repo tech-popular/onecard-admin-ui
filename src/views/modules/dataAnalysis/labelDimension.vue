@@ -11,6 +11,7 @@
 			:data="treeData"
 			:props="defaultProps"
 			default-expand-all
+      :expand-on-click-node="false"
 			:filter-node-method="filterNode"
       @check="handleCheck"
       @node-click="treeNodeClick"
@@ -162,7 +163,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.label.indexOf(value) !== -1
+      return data.typeValue.indexOf(value) !== -1
     },
     append(data) {
       this.addorupdate = true

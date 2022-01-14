@@ -54,7 +54,7 @@
           <el-button @click="addDomain">新增区间</el-button>
         </el-form-item> -->
         <!-- 枚举值 -->
-        <el-form-item prop="selectVal"  v-if="selectedFieldType === 'enums'">
+        <el-form-item prop="selectVal" label="枚举" label-width="50px" v-if="selectedFieldType === 'enums'">
           <el-select v-model="dataForm.selectVal" multiple class="itemIput">
               <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
@@ -76,7 +76,7 @@ export default {
       selectedFieldType: 'number',
       dataForm: {
         id: 0,
-        selectVal: '',
+        selectVal: [],
         digitalRange: [
           {
             smallerValue: '',
@@ -293,31 +293,24 @@ export default {
               message: '请先完成所有区间的设置'
             })
           } else {
-            indexGroups.push(item.dataRange)
+            let arr = `${item.dataRange[0]},${item.dataRange[1]}`
+            indexGroups.push(arr)
           }
         })
         this.$emit('refreshDataList', indexGroups, this.dataForm.id)
         this.visible = false
         this.$refs['dataForm'].resetFields()
       }
-      // if (this.selectedFieldType === 'enums' || this.selectedFieldType === 'date') {
+      if (this.selectedFieldType === 'enums') {
         this.$refs.dataForm.validate((valid) => {
           if (valid) {
-
+            indexGroups = this.dataForm.selectVal
+            this.$emit('refreshDataList', indexGroups, this.dataForm.id)
+            this.visible = false
+            this.$refs['dataForm'].resetFields()
           }
         })
-      // } else {
-      //   let ruleSet = this.$refs
-      //   let ruleArr = []
-      //   for (let key in ruleSet) {
-      //     if (key !== 'dataForm') {
-      //       // this.$refs[key][0].clearValidate()
-      //       this.$refs[key][0].validate(valid => {
-      //         console.log('valid: ', valid)
-      //       })
-      //     }
-      //   }
-      // }
+      }
     },
     cancelHandle () {
       this.visible = false

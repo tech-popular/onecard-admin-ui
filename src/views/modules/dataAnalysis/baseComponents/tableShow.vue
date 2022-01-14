@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-      :title="'【' + title + '人群特征分析'"
+      :title=" title + '人群特征分析'"
       :visible.sync="dialogVisible"
       width="1200px"
       v-loading="loading"
