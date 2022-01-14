@@ -143,7 +143,6 @@ export default {
         indexId: val.id
       }
       getDimension(params).then(({ data }) => {
-        console.log('data: ', data)
         if (data && data.status === '1' && data.data.length) {
           if (val.fieldType === 'number') {
             data.data.forEach((item, index) => {
@@ -254,6 +253,10 @@ export default {
           })
           return
         }
+        this.dataForm.digitalRange.push({
+          smallerValue: '',
+          largerValue: '',
+        })
       } else if (this.selectedFieldType === 'date') {
         if (!outdata.dataRange) {
           this.$message({
@@ -262,29 +265,27 @@ export default {
           })
           return
         }
-      }
-      let startTimeArr = []
-      let endTimeArr = []
-      this.dataForm.digitalRange.forEach(item => {
-        startTimeArr.push(item.dataRange[0])
-        endTimeArr.push(item.dataRange[1])
-      })
-      let begin = startTimeArr.sort()
-      let over = endTimeArr.sort()
-      for (var k = 1; k < begin.length; k++) {
-        if (begin[k] <= over[k - 1]) {
-          this.$message({
-          type: 'error',
-          message: '时间区间存在重叠，请重新设置'
+        let startTimeArr = []
+        let endTimeArr = []
+        this.dataForm.digitalRange.forEach(item => {
+          startTimeArr.push(item.dataRange[0])
+          endTimeArr.push(item.dataRange[1])
         })
-          return
+        let begin = startTimeArr.sort()
+        let over = endTimeArr.sort()
+        for (var k = 1; k < begin.length; k++) {
+          if (begin[k] <= over[k - 1]) {
+            this.$message({
+            type: 'error',
+            message: '时间区间存在重叠，请重新设置'
+          })
+            return
+          }
         }
+        this.dataForm.digitalRange.push({
+          dataRange: []
+        })
       }
-      this.dataForm.digitalRange.push({
-        smallerValue: '',
-        largerValue: '',
-        dataRange: []
-      })
       if (this.dataForm.digitalRange.length > 1) {
         this.closeIconVisible = true
       }

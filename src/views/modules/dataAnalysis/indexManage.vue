@@ -95,7 +95,7 @@
       </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="是否设置默认分组">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === true" size="small" >是</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" >是</el-tag>
           <el-tag v-else size="small" type="danger">否</el-tag>
         </template>
       </el-table-column>
