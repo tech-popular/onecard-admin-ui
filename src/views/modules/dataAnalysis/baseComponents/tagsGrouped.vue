@@ -234,6 +234,23 @@ export default {
           return
         }
       }
+      let startTimeArr = []
+      let endTimeArr = []
+      this.dataForm.digitalRange.forEach(item => {
+        startTimeArr.push(item.dataRange[0])
+        endTimeArr.push(item.dataRange[1])
+      })
+      let begin = startTimeArr.sort()
+      let over = endTimeArr.sort()
+      for (var k = 1; k < begin.length; k++) {
+        if (begin[k] <= over[k - 1]) {
+          this.$message({
+          type: 'error',
+          message: '时间区间存在重叠，请重新设置'
+        })
+          return
+        }
+      }
       this.dataForm.digitalRange.push({
         smallerValue: '',
         largerValue: '',
@@ -265,7 +282,6 @@ export default {
             indexGroups.push(arr)
           }
         })
-        console.log('indexGroups: ', indexGroups)
         this.$emit('refreshDataList', indexGroups, this.dataForm.id)
         this.visible = false
         this.$refs['dataForm'].resetFields()

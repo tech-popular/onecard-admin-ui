@@ -47,8 +47,8 @@
              {{(isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username) ? '编辑' : '查看'}}
           </el-button>
           <el-button type="text" size="small"  v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row)">删除</el-button>
-          <!-- <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">特征分析</el-button> -->
-          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">分群概览</el-button>
+          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">特征分析</el-button>
+          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="table1ShowHandle(scope.row)">分群概览</el-button>
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="detailPreviewHandle(scope.row)">明细预览</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
@@ -64,6 +64,7 @@
       layout="total, sizes, prev, pager, next, jumper" />
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
     <tableShow v-if="tableShowVisible" ref="tableShow"/>
+    <TableShow1  v-if="tableShow1Visible" ref="tableShow1"></TableShow1>
     <detailPreview v-if="detailPreviewVisible" ref="detailPreview"/>
      <!-- 授权 -->
     <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
@@ -73,8 +74,8 @@
 <script>
   import { dataInsightManageList, deleteDataInfo } from '@/api/dataAnalysis/dataInsightManage'
   import AddOrUpdate from './baseComponents/dataInsightManage-add-or-update'
-  // import TableShow from './baseComponents/tableShow'
-  import TableShow from './baseComponents/tableShow1'
+  import TableShow from './baseComponents/tableShow'
+  import TableShow1 from './baseComponents/tableShow1'
   import detailPreview from './baseComponents/detailPreview'
   import { updateGroupAuth, updateGroupAuths } from '@/api/commom/assignPermission'
   import AssignPermission from '../../components/permission/assign-permission'
@@ -93,6 +94,7 @@
         addOrUpdateVisible: false,
         tableShowVisible: false,
         detailPreviewVisible: false,
+        tableShow1Visible: false,
         dataListSelections: [],
         submitDataApi: updateGroupAuth,
         submitDataApis: updateGroupAuths,
@@ -106,7 +108,8 @@
       AddOrUpdate,
       TableShow,
       AssignPermission,
-      detailPreview
+      detailPreview,
+      TableShow1
     },
     mounted () {
       this.getDataList()
@@ -151,6 +154,16 @@
             canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
           }
           this.$refs.tableShow.init(value, canUpdate)
+        })
+      },
+      table1ShowHandle (value) {
+        this.tableShow1Visible = true
+        this.$nextTick(() => {
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
+          }
+          this.$refs.tableShow1.init(value, canUpdate)
         })
       },
       // 新增 / 修改

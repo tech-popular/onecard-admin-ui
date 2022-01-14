@@ -86,7 +86,7 @@
 <script>
 import echarts from 'echarts'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-import { selectAllCata, overviewData, transferLogList, chartInfo } from '@/api/dataAnalysis/dataInsightManage'
+import { selectAllCata, overviewData, transferLogList, chartInfo1 } from '@/api/dataAnalysis/dataInsightManage'
 import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import { pieJson, barJson } from '../dataAnalysisUtils/tableShowChartInit'
 export default {
@@ -303,7 +303,7 @@ export default {
       this.chartLen = 0
       this.echartLoading = true
       this.dataResultText = '数据加载中...'
-      chartInfo({
+      chartInfo1({
         templateId: this.templateId,
         indicators: this.ruleForm.region.join(',')
       }).then(({data}) => {

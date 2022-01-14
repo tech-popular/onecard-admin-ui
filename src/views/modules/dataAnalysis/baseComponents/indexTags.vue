@@ -11,7 +11,7 @@
         <div
         style="display: flex;"
         v-for="(outdata, index) in dataForm.digitalRange"
-        :key="outdata.key"
+        :key="index"
       >
         <div class="content-range">
                区间{{index+1}}
@@ -70,7 +70,7 @@
   </el-dialog>
 </template>
 <script>
-import { getDimension, setDimension } from '@/api/dataAnalysis/indexManage'
+import { getDimension, setDimension, getchildrenList } from '@/api/dataAnalysis/indexManage'
 export default {
   data () {
     return {
@@ -132,8 +132,13 @@ export default {
   methods: {
     init (val) {
       this.selectedFieldType = val.fieldType
-      this.dataForm.id = val.id
       this.selectEnumsList = []
+      this.dataForm = {
+        id: val.id,
+        selectVal: '',
+        classLabel: '0',
+        digitalRange: []
+      }
       let params = {
         indexId: val.id
       }
@@ -144,39 +149,50 @@ export default {
             data.data.forEach((item, index) => {
               this.dataForm.digitalRange.push({
                 smallerValue: item.split(',')[0],
-                largerValue: item.split(',')[1],
-                key: Date.now()
+                largerValue: item.split(',')[1]
               })
             })
           } else if (val.fieldType === 'string') {
             this.dataForm.classLabel = data.data[0]
-          }
-        } else {
-          if (val.fieldType === 'number') {
-            this.dataForm.digitalRange.push({
-              smallerValue: '',
-              largerValue: '',
-              key: Date.now()
-            })
           } else if (val.fieldType === 'date') {
-            this.dataForm.digitalRange.push({
-              dataRange: '',
-              key: Date.now()
+            data.data.forEach((item, index) => {
+              this.dataForm.digitalRange.push({
+                dataRange: [item.split(',')[0], item.split(',')[1]]
+              })
             })
-          } else if (val.fieldType === 'enums') {
-            this.dataForm.selectVal = ''
-          } else {
-            this.dataForm.classLabel = '0'
           }
         }
+        // else {
+        //   if (val.fieldType === 'number') {
+        //     this.dataForm.digitalRange.push({
+        //       smallerValue: '',
+        //       largerValue: '',
+        //       key: Date.now()
+        //     })
+        //   } else if (val.fieldType === 'date') {
+        //     this.dataForm.digitalRange.push({
+        //       dataRange: [],
+        //       key: Date.now()
+        //     })
+        //   } else if (val.fieldType === 'enums') {
+        //     this.dataForm.selectVal = ''
+        //   } else {
+        //     this.dataForm.classLabel = '0'
+        //   }
+        // }
       })
-      // if (val.fieldType === 'enums') {
-      //   dataEnumType(val.enumTypeNum).then(({ data }) => {
-      //     if (data.status === '1') {
-      //       this.selectEnumsList = data.data
-      //     }
-      //   })
-      // }
+      if (val.fieldType === 'enums') {
+        let params = {
+        typeNum: val.typeNum
+      }
+      getchildrenList(params).then(({ data }) => {
+        if (data && data.status === '1' && data.data.length) {
+          this.selectEnumsList = data.data
+        } else {
+          this.selectEnumsList = []
+        }
+      })
+      }
       this.visible = true
     },
     keyupNumberInput (val) { // 输入内容 要求 只能输入 整数 小数 最多一位小数点 开头和结尾都不能有小数点
@@ -193,19 +209,6 @@ export default {
       console.log(999444, val)
       return val
     },
-    // judgeNumberTwoInput (rule, value, callback, outdata, index) { // 数值介于判断
-    // console.log('value: ', value)
-    // console.log('rule: ', rule)
-    //   if (value === '') {
-    //     callback(new Error('请输入'))
-    //   } else if (index === 0 && outdata.smallerValue && outdata.largerValue * 1 < outdata.smallerValue * 1) {
-    //     callback(new Error('起始数值应小于终止数值'))
-    //   } else if (index !== 0 && outdata.largerValue && outdata.largerValue * 1 < outdata.smallerValue * 1) {
-    //     callback(new Error('起始数值应小于终止数值'))
-    //   } else {
-    //     callback()
-    //   }
-    // },
     pramasNumBlur (outdata, val, index) { // 数值 介于的判断
       if (index > 0 && outdata.smallerValue && outdata.smallerValue * 1 < this.dataForm.digitalRange[index - 1].largerValue * 1) {
         this.$message({
@@ -221,10 +224,6 @@ export default {
         })
         return ''
       }
-      // if (outdata.smallerValue * 1 < outdata.largerValue * 1) {
-      //   this.$refs['paramss' + outdata.key][0].clearValidate()
-      //   this.$refs['paramsl' + outdata.key][0].clearValidate()
-      // }
       return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
     },
      blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
@@ -267,11 +266,27 @@ export default {
           return
         }
       }
+      let startTimeArr = []
+      let endTimeArr = []
+      this.dataForm.digitalRange.forEach(item => {
+        startTimeArr.push(item.dataRange[0])
+        endTimeArr.push(item.dataRange[1])
+      })
+      let begin = startTimeArr.sort()
+      let over = endTimeArr.sort()
+      for (var k = 1; k < begin.length; k++) {
+        if (begin[k] <= over[k - 1]) {
+          this.$message({
+          type: 'error',
+          message: '时间区间存在重叠，请重新设置'
+        })
+          return
+        }
+      }
       this.dataForm.digitalRange.push({
         smallerValue: '',
         largerValue: '',
-        dataRange: '',
-        key: Date.now()
+        dataRange: []
       })
       if (this.dataForm.digitalRange.length > 1) {
         this.closeIconVisible = true
@@ -310,7 +325,8 @@ export default {
               message: '请先完成所有区间的设置'
             })
           } else {
-            indexGroups.push(item.dataRange)
+            let arr = `${item.dataRange[0]},${item.dataRange[1]}`
+            indexGroups.push(arr)
           }
         })
         params.dimensions = indexGroups
@@ -330,7 +346,7 @@ export default {
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
-                    this.$refs['baseForm'].resetFields()
+                    this.$refs['dataForm'].resetFields()
                   }
                 })
               } else {

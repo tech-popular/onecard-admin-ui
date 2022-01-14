@@ -24,7 +24,7 @@ export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManage
 
 export const overviewData = id => httpGet(da + `data/group/overview/${id}`)
 export const transferLogList = params => httpGet(da + `data/transferLog/listOnPage`, params)
-// export const chartInfo = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
+export const chartInfo1 = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
 export const chartInfo = params => httpPost(da + `data/group/featureAnalysis`, params)
 export const custGroupList = () => httpGet(da + `data/group/custGroupList`) // 人群下拉列表
 export const dataEnumType = enumTypeNum => httpGet(da + `dataEnumType/selectByTypeNum/${enumTypeNum}`) // 枚举值列表
