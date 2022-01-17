@@ -89,7 +89,7 @@ export default {
         notifyType: [],
         title: '',
         applyReason: '',
-        receiveTime: []
+        receiveTime: ['10:00', '18:00']
       },
       subscriptionRules: {
         system: [{ required: true, message: '请选择申请系统', trigger: 'change' }],
@@ -151,21 +151,18 @@ export default {
           this.buttonloading = true
 
           const { userGroupId, systemmodel, title, applyReason, system } = this.subscriptionForm
-          const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
           const selectedSystem = this.systemList.filter(item => item.value == system)
           let params = {
             userGroupId,
             menuList: systemmodel,
-            title,
+            content: title,
             applyReason,
             type: 3, // 订阅申请
             notifyType: this.subscriptionForm.notifyType.join(','),
-            receiveTime: this.subscriptionForm.receiveTime.join(','),
+            receiveTimeStart: this.subscriptionForm.receiveTime[0] + ':00',
+            receiveTimeEnd: this.subscriptionForm.receiveTime[1] + ':00',
             systemName: selectedSystem[0].label,
-            systemId: selectedSystem[0].value,
-            applicantEmail: userInfo.email || userInfo.orgEmail,
-            applicantName: userInfo.name,
-            applicantTel: userInfo.mobile
+            systemId: selectedSystem[0].value
           }
           console.log('params: ', params)
           applyScription(params).then(({ data }) => {
