@@ -255,7 +255,7 @@ export default {
         }
         this.dataForm.digitalRange.push({
           smallerValue: '',
-          largerValue: '',
+          largerValue: ''
         })
       } else if (this.selectedFieldType === 'date') {
         if (!outdata.dataRange) {
