@@ -74,7 +74,8 @@
 <script>
 import {
   applyScription,
-  getUserGroupList
+  getUserGroupList,
+  getSystemModulesById
 } from '@/api/oa/apply'
 
 export default {
@@ -101,6 +102,7 @@ export default {
         notifyType: [{ required: true, message: '请选择通知方式', trigger: 'change' }]
       },
       userGroupList: [],
+      systemmodelListFilter: [],
       props: {
         multiple: true
       },
@@ -111,16 +113,11 @@ export default {
       buttonloading: false
     }
   },
-  computed: {
-    systemmodelListFilter: function() {
-      const a = [{ value: this.subscriptionForm.system }]
-      return [...this.systemmodelList].filter(x => [...a].some(y => y.value === x.value))
-    }
-  },
   methods: {
     // 系统选择
     changeSystem(value) {
       this.isShow = true
+      this.systemmodelListFilter = []
 
       if (value === 8 || value === 9) {
         let params = {
@@ -131,6 +128,12 @@ export default {
           this.userGroupList = data.data
         })
       }
+
+      getSystemModulesById({
+        systemId: value
+      }).then(({ data }) => {
+        this.systemmodelListFilter = data.data[0].children
+      })
     },
     cancel() {
       this.subscriptionForm = {

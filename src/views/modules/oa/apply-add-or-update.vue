@@ -242,7 +242,7 @@
       <el-tab-pane label="订阅申请" name="订阅申请">
         <apply-subscription 
           :system-list="systemListSubscription" 
-          :systemmodel-list="systemmodelListAll"
+          :systemmodel-list="systemmodelList"
           @cancel="cancel"
           @submitSuccess="submitSuccess"></apply-subscription>
       </el-tab-pane>
@@ -262,7 +262,8 @@ import {
   saveTenant,
   mcCompute,
   tenantCrent,
-  getUserGroupList
+  getUserGroupList,
+  getSystemModulesById
 } from '@/api/oa/apply'
 import applySubscription from './applySubscription.vue'
 
@@ -275,7 +276,6 @@ export default {
       // 账号权限开始
       systemList: [], // 申请系统数据载体
       systemmodelList: [], // 申请系统模块数据载体
-      systemmodelListAll: [],
       props: {
         multiple: true
       }, // 可多选申请系统
@@ -410,7 +410,6 @@ export default {
         accoutAuthInitInfo().then(({ data }) => {
           this.systemList = data.data.systemList
           this.systemmodelList = data.data.systemList
-          this.systemmodelListAll = data.data.systemList
           this.defaultApproverList = data.data.defaultApproverList
           this.departmentList = data.data.departmentList
           this.dataForm.userName = data.data.applicantName
@@ -569,11 +568,10 @@ export default {
           this.userGroupList = data.data
         })
       }
-      accoutAuthInitInfo().then(({ data }) => {
-        var a = [{ value: value }]
-        var b = data.data.systemList
-        var arr = [...b].filter(x => [...a].some(y => y.value === x.value))
-        this.systemmodelList = arr
+      getSystemModulesById({
+        systemId: value
+      }).then(({ data }) => {
+        this.systemmodelList = data.data[0].children
       })
     },
     severDataFormSubmit (form) {

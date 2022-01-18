@@ -37,3 +37,5 @@ export const tenantShow = (params) => httpPost(da + 'tenantManage/selectTenantId
 export const saveTenant = (params) => httpPost(da + 'oa/saveTenantAuthApply', params)
 // 订阅申请
 export const applyScription = params => httpPost(da + 'oa/saveAccountAuthApply', params)
+// 系统模块
+export const getSystemModulesById = params => httpGet(da + 'oa/getMenuListBySystemId', params)
