@@ -99,7 +99,7 @@
             <el-radio  v-model="baseForm.isSensitive" label="1">是</el-radio>
             <el-radio  v-model="baseForm.isSensitive" label="0">否</el-radio>
           </el-form-item>
-          <el-form-item label="敏感信息显示规则：" prop="showRules">
+          <el-form-item label="敏感信息显示规则：" prop="showRules" v-if="baseForm.isSensitive === '1'">
               <el-input
                 v-model.trim="baseForm.showRules"
                 clearable
@@ -168,6 +168,24 @@ export default {
         ],
         channelCode: [
           { required: true, message: '请选择用户所属业务线', trigger: 'change' }
+        ],
+        categoryId: [
+          { required: true, message: '请选择所属分类', trigger: 'change' }
+        ],
+        processType: [
+          { required: true, message: '请选择加工类型', trigger: 'change' }
+        ],
+        fieldType: [
+          { required: true, message: '请选择数据类型', trigger: 'change' }
+        ],
+        isSensitive: [
+          { required: true, message: '请选择是否包含敏感信息', trigger: 'change' }
+        ],
+        showRules: [
+          { required: true, message: '请输入敏感信息显示规则', trigger: 'blur' }
+        ],
+        enable: [
+          { required: true, message: '请选择是否启动', trigger: 'change' }
         ]
       },
       channelList: [],

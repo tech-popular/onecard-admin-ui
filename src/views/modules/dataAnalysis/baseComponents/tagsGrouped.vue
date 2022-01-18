@@ -50,9 +50,9 @@
           </el-form-item>
       </div>
      </div>
-         <!-- <el-form-item>
-          <el-button @click="addDomain">新增区间</el-button>
-        </el-form-item> -->
+         <el-form-item>
+          <el-button v-if="dataForm.digitalRange.length === 0" @click="addDomain">新增区间</el-button>
+        </el-form-item>
         <!-- 枚举值 -->
         <el-form-item prop="selectVal" label="枚举" label-width="50px" v-if="selectedFieldType === 'enums'">
           <el-select v-model="dataForm.selectVal" multiple class="itemIput">
@@ -218,7 +218,7 @@ export default {
         return
       }
       if (this.selectedFieldType === 'number') {
-        if (outdata.smallerValue === '' || outdata.largerValue === '') {
+        if (this.dataForm.digitalRange.length > 0 && (outdata.smallerValue === '' || outdata.largerValue === '')) {
           this.$message({
             type: 'error',
             message: '请先完成已有区间的设置'
@@ -226,7 +226,7 @@ export default {
           return
         }
       } else if (this.selectedFieldType === 'date') {
-        if (!outdata.dataRange) {
+        if (this.dataForm.digitalRange.length > 0 && !outdata.dataRange) {
           this.$message({
             type: 'error',
             message: '请先完成已有区间的设置'
@@ -270,6 +270,14 @@ export default {
     },
     saveHandle () {
       let indexGroups = []
+      if (this.selectedFieldType === 'number' || this.selectedFieldType === 'date') {
+        if (this.dataForm.digitalRange.length === 0) {
+          return this.$message({
+            type: 'error',
+            message: '请先完成区间的设置'
+          })
+        }
+      }
       if (this.selectedFieldType === 'number') {
         this.dataForm.digitalRange.forEach(item => {
           if (item.smallerValue === '' || item.largerValue === '') {

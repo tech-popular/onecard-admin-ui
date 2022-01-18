@@ -50,18 +50,21 @@
           </el-form-item>
       </div>
      </div>
-         <!-- <el-form-item>
+     <div  v-if="(selectedFieldType === 'date' || selectedFieldType === 'number') && dataForm.digitalRange.length === 0">
+        <el-form-item>
           <el-button @click="addDomain">新增区间</el-button>
-        </el-form-item> -->
+        </el-form-item>
+     </div>
         <!-- 枚举值 -->
         <el-form-item prop="selectVal" label="枚举" label-width="50px"  v-if="selectedFieldType === 'enums'">
           <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
               <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
         </el-form-item>
-        <el-form-item prop="classLabel"  v-if="selectedFieldType === 'string'">
-          <el-radio v-model="dataForm.classLabel" label="1">是否类标签</el-radio>
-        </el-form-item>
+         <el-form-item  prop="isSetGroup" label="是否启用：" >
+            <el-radio  v-model="dataForm.isSetGroup" :label='1'>是</el-radio>
+            <el-radio  v-model="dataForm.isSetGroup" :label='0' >否</el-radio>
+          </el-form-item>
     </el-form>
     <div slot="footer">
       <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
@@ -75,12 +78,12 @@ export default {
   data () {
     return {
       visible: false,
-      closeIconVisible: false,
+      closeIconVisible: true,
       selectedFieldType: 'number',
       dataForm: {
         id: 0,
+        isSetGroup: '',
         selectVal: [],
-        classLabel: '0',
         digitalRange: []
       },
       selectEnumsList: [],
@@ -116,10 +119,10 @@ export default {
       dataRules: {
         selectVal: [
           { required: true, message: '请选择', trigger: 'biur' }
+        ],
+        isSetGroup: [
+          { required: true, message: '请选择是否启用', trigger: 'biur' }
         ]
-        // dataRange: [
-        //   { required: true,  message: '请选择时间区间', trigger: 'biur' }
-        // ],
         // smallerValue: [
         //   { required: true,  message: '请输入', trigger: 'biur' }
         // ],
@@ -136,46 +139,47 @@ export default {
       this.dataForm = {
         id: val.id,
         selectVal: [],
-        classLabel: '0',
+        isSetGroup: '',
         digitalRange: []
       }
       let params = {
         indexId: val.id
       }
       getDimension(params).then(({ data }) => {
-        if (data && data.status === '1' && data.data.length) {
+        console.log('data: ', data);
+        if (data && data.status === '1' && data.data) {
+          this.dataForm.isSetGroup = data.data.isSetGroup === '0' ? 0 : 1
           if (val.fieldType === 'number') {
-            data.data.forEach((item, index) => {
+            data.data.dimensions.forEach((item, index) => {
               this.dataForm.digitalRange.push({
                 smallerValue: item.split(',')[0],
                 largerValue: item.split(',')[1]
               })
             })
-          } else if (val.fieldType === 'string') {
-            this.dataForm.classLabel = data.data[0]
           } else if (val.fieldType === 'date') {
-            data.data.forEach((item, index) => {
+            data.data.dimensions.forEach((item, index) => {
               this.dataForm.digitalRange.push({
                 dataRange: [item.split(',')[0], item.split(',')[1]]
               })
             })
           }
-        } else {
-          if (val.fieldType === 'number') {
-            this.dataForm.digitalRange.push({
-              smallerValue: '',
-              largerValue: ''
-            })
-          } else if (val.fieldType === 'date') {
-            this.dataForm.digitalRange.push({
-              dataRange: []
-            })
-          } else if (val.fieldType === 'enums') {
-            this.dataForm.selectVal = []
-          } else {
-            this.dataForm.classLabel = '0'
-          }
-        }
+        } 
+        // else {
+        //   if (val.fieldType === 'number') {
+        //     this.dataForm.digitalRange.push({
+        //       smallerValue: '',
+        //       largerValue: ''
+        //     })
+        //   } else if (val.fieldType === 'date') {
+        //     this.dataForm.digitalRange.push({
+        //       dataRange: []
+        //     })
+        //   } else if (val.fieldType === 'enums') {
+        //     this.dataForm.selectVal = []
+        //   } else {
+        //     this.dataForm.classLabel = '0'
+        //   }
+        // }
       })
       if (val.fieldType === 'enums') {
         let params = {
@@ -246,7 +250,7 @@ export default {
         return
       }
       if (this.selectedFieldType === 'number') {
-        if (outdata.smallerValue === '' || outdata.largerValue === '') {
+        if (this.dataForm.digitalRange.length > 0 && (outdata.smallerValue === '' || outdata.largerValue === '')) {
           this.$message({
             type: 'error',
             message: '请先完成已有区间的设置'
@@ -258,7 +262,7 @@ export default {
           largerValue: ''
         })
       } else if (this.selectedFieldType === 'date') {
-        if (!outdata.dataRange) {
+        if (this.dataForm.digitalRange.length > 0 && !outdata.dataRange) {
           this.$message({
             type: 'error',
             message: '请先完成已有区间的设置'
@@ -286,12 +290,12 @@ export default {
           dataRange: []
         })
       }
-      if (this.dataForm.digitalRange.length > 1) {
+      if (this.dataForm.digitalRange.length > 0) {
         this.closeIconVisible = true
       }
     },
     removeDomain (item, i) {
-      if (this.dataForm.digitalRange.length === 1) {
+      if (this.dataForm.digitalRange.length === 0) {
         this.closeIconVisible = false
       }
       var index = this.dataForm.digitalRange.indexOf(item)
@@ -300,7 +304,16 @@ export default {
     saveHandle () {
       let indexGroups = []
       let params = {
-        'indexId': this.dataForm.id
+        'indexId': this.dataForm.id,
+        'isSetGroup': this.dataForm.isSetGroup.toString()
+      }
+      if (this.selectedFieldType === 'number' || this.selectedFieldType === 'date') {
+        if (this.dataForm.digitalRange.length === 0) {
+          return this.$message({
+            type: 'error',
+            message: '请先完成区间的设置'
+          })
+        }
       }
       if (this.selectedFieldType === 'number') {
         this.dataForm.digitalRange.forEach(item => {
@@ -328,8 +341,6 @@ export default {
           }
         })
         params.dimensions = indexGroups
-      } else if (this.selectedFieldType === 'string') {
-        params.dimensions = [this.dataForm.classLabel]
       } else {
         params.dimensions = this.dataForm.selectVal
       }
