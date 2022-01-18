@@ -50,21 +50,21 @@
           </el-form-item>
       </div>
      </div>
-     <div  v-if="(selectedFieldType === 'date' || selectedFieldType === 'number') && dataForm.digitalRange.length === 0">
-        <el-form-item>
+        <el-form-item  v-if="(selectedFieldType === 'date' || selectedFieldType === 'number') && dataForm.digitalRange.length === 0">
           <el-button @click="addDomain">新增区间</el-button>
         </el-form-item>
-     </div>
         <!-- 枚举值 -->
         <el-form-item prop="selectVal" label="枚举" label-width="50px"  v-if="selectedFieldType === 'enums'">
           <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
               <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
         </el-form-item>
+        <div >
          <el-form-item  prop="isSetGroup" label="是否启用：" >
             <el-radio  v-model="dataForm.isSetGroup" :label='1'>是</el-radio>
             <el-radio  v-model="dataForm.isSetGroup" :label='0' >否</el-radio>
           </el-form-item>
+          </div>
     </el-form>
     <div slot="footer">
       <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
@@ -146,7 +146,6 @@ export default {
         indexId: val.id
       }
       getDimension(params).then(({ data }) => {
-        console.log('data: ', data);
         if (data && data.status === '1' && data.data) {
           this.dataForm.isSetGroup = data.data.isSetGroup === '0' ? 0 : 1
           if (val.fieldType === 'number') {
@@ -165,7 +164,7 @@ export default {
           } else {
             this.dataForm.selectVal = data.data.dimensions
           }
-        } 
+        }
         // else {
         //   if (val.fieldType === 'number') {
         //     this.dataForm.digitalRange.push({
@@ -185,7 +184,7 @@ export default {
       })
       if (val.fieldType === 'enums') {
         let params = {
-        typeNum: val.typeNum
+        typeNum: val.enumTypeNum
       }
       getchildrenList(params).then(({ data }) => {
         if (data && data.status === '1' && data.data.length) {

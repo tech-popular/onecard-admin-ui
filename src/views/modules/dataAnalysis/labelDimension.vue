@@ -8,11 +8,14 @@
     </el-input>
 		<el-tree
 			class="filter-tree"
+      node-key="id"
 			:data="treeData"
 			:props="defaultProps"
 			default-expand-all
+      :current-node-key="currentLivingId"
       :expand-on-click-node="false"
 			:filter-node-method="filterNode"
+      highlight-current
       @check="handleCheck"
       @node-click="treeNodeClick"
 			ref="tree">
@@ -114,6 +117,7 @@ export default {
       },
       selecttreeData: {},
       dataList: [],
+      currentLivingId: '', // 默认选中的节点
       dataForm: {
         childrenNum: '',
         childrenValue: '',
@@ -153,20 +157,29 @@ export default {
     this.getSelectAllGroupTypeNum()
   },
   methods: {
-    getSelectAllGroupTypeNum () {
+    getSelectAllGroupTypeNum (val) {
       selectAllGroupTypeNum().then(({ data }) => {
         if (data && data.status === '1') {
           this.treeData[0].children = data.data
-          this.treeNodeClick(data.data[0])
+          if (val === 'add') {
+            this.treeNodeClick(this.selecttreeData)
+            this.currentLivingId = this.selecttreeData.id
+          } else {
+            this.treeNodeClick(data.data[0])
+             this.currentLivingId = data.data[0].id
+          }
+          this.$nextTick(() => {
+            this.$refs.tree.setCurrentKey(this.currentLivingId)
+          })
         }
       })
     },
-    filterNode(value, data) {
+    filterNode(value, data, node) {
       if (!value) return true
+      data.typeValue = data.typeValue.toString()
       return data.typeValue.indexOf(value) !== -1
     },
     append(data) {
-      console.log('data: ', data);
       this.addorupdate = true
       this.baseForm.typeNum = data ? data.typeNum : ''
       this.baseForm.name = data ? data.typeValue : ''
@@ -230,7 +243,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.modifyaddorupdate = false
-                  this.getSelectAllGroupTypeNum()
+                  this.getSelectAllGroupTypeNum('add')
                   this.$refs['dataForm'].resetFields()
                 }
               })
@@ -248,7 +261,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.modifyaddorupdate = false
-                  this.getSelectAllGroupTypeNum()
+                  this.getSelectAllGroupTypeNum('add')
                   this.$refs['dataForm'].resetFields()
                 }
               })
