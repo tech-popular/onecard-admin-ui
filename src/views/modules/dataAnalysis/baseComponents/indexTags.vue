@@ -162,6 +162,8 @@ export default {
                 dataRange: [item.split(',')[0], item.split(',')[1]]
               })
             })
+          } else {
+            this.dataForm.selectVal = data.data.dimensions
           }
         } 
         // else {

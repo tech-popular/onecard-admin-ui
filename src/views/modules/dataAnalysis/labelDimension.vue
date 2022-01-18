@@ -166,9 +166,10 @@ export default {
       return data.typeValue.indexOf(value) !== -1
     },
     append(data) {
+      console.log('data: ', data);
       this.addorupdate = true
       this.baseForm.typeNum = data ? data.typeNum : ''
-      this.baseForm.name = data ? data.name : ''
+      this.baseForm.name = data ? data.typeValue : ''
     },
 
     remove(node, data) {
@@ -220,7 +221,7 @@ export default {
           typeValue: this.dataForm.typeValue,
           typeNum: this.dataForm.typeNum
         }
-        if (!this.baseForm.id) {
+        if (!this.dataForm.id) {
           addChildren(params).then(({ data }) => {
             if (data && data.status === '1') {
               this.$message({
@@ -228,9 +229,9 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.addorupdate = false
+                  this.modifyaddorupdate = false
                   this.getSelectAllGroupTypeNum()
-                  this.$refs['baseForm'].resetFields()
+                  this.$refs['dataForm'].resetFields()
                 }
               })
             } else {
@@ -238,7 +239,7 @@ export default {
             }
           })
         } else {
-          params.typeNum = this.baseForm.typeNum
+          params.typeNum = this.dataForm.typeNum
           updateChildren(params).then(({ data }) => {
             if (data && data.status === '1') {
               this.$message({
@@ -246,9 +247,9 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.addorupdate = false
+                  this.modifyaddorupdate = false
                   this.getSelectAllGroupTypeNum()
-                  this.$refs['baseForm'].resetFields()
+                  this.$refs['dataForm'].resetFields()
                 }
               })
             } else {
