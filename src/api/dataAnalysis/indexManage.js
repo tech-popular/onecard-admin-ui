@@ -16,5 +16,4 @@ export const selectAllCata = params => httpGetSeries(da + 'dataCatalog/selectAll
 export const channelsList = () => httpGet(da + 'common/select/channels')
 export const getDimension = (params) => httpGet(da + 'dataIndexManager/getDimension', params) // 分组查看
 export const setDimension = (params) => httpPost(da + 'dataIndexManager/setDimension', params) // 设置分组
-// export const getchildrenList = (typeNum) => httpGet(da + `dataEnumType/childrenList/${typeNum}`) // 默认分组枚举值列表
 export const getchildrenList = (typeNum) => httpGet(da + 'dataEnumType/childrenList', typeNum) // 默认分组枚举值列表

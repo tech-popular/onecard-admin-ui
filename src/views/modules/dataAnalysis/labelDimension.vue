@@ -176,8 +176,7 @@ export default {
     },
     filterNode(value, data, node) {
       if (!value) return true
-      data.typeValue = data.typeValue.toString()
-      return data.typeValue.indexOf(value) !== -1
+      return data.typeValue && data.typeValue.indexOf(value) !== -1
     },
     append(data) {
       this.addorupdate = true
