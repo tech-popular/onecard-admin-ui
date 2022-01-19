@@ -20,13 +20,13 @@
               :disabled="from === 'api' || !canUpdate"
           />
           </el-form-item>
-          <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+          <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}" v-if="item.fieldType !== 'group'">
             <el-select v-model="item.func" class="itemOperateIput" @change="data => selectOperateChange(data, item)" @visible-change="data => selectOperateVisible(data, item)">
               <el-option v-for="(fitem, findex) in item.selectOperateList" :value="fitem.code" :key="findex" :label="fitem.title"/>
             </el-select>
           </el-form-item>
           <!--条件内容区-->
-          <div v-if="isEmpty(item)" class="pane-rules-inline">
+          <div v-if="isEmpty(item) && item.fieldType !== 'group'" class="pane-rules-inline">
             <!--string-->
             <div v-if="(item.fieldType === 'string' || item.fieldType === '') && !item.enumTypeNum" class="pane-rules-inline">
               <!--string型等于或不等于可以输入多个-->

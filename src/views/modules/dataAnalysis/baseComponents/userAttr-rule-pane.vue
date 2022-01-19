@@ -96,11 +96,38 @@ export default {
           this.indexList = []
         } else {
           this.indexList = this.filterAllCata(data.data)
+          this.getCustGroup()
         }
         if (fn) {
           fn(this.indexList)
         }
       })
+    },
+    getCustGroup () {
+      let data = {
+        "id": 1,
+        "name": "用户分群",
+        "custGroupTemplateBases": [
+          {
+            "id": 1291,
+            "channelId": "N1001",
+            "name": "t0119-004",            
+            "type": "dynamic"
+          }
+        ]
+      }
+      let custGroupList = {}
+      custGroupList.id = data.id
+      custGroupList.label = data.name
+      custGroupList.children = []
+      data.custGroupTemplateBases.forEach(item =>{
+        custGroupList.children.push({
+          id:item.id,
+          label: item.name,
+          fieldType: 'group'
+        })
+      })
+      this.indexList.push(custGroupList)
     },
     channelIdChangeUpdate (channelId) {
       this.channelId = channelId
@@ -403,45 +430,47 @@ export default {
       this.updateRulesArr(data, citem, { params: newArr })
     },
     fieldCodeChange (data, citem, obj) { // rxs更新数据
-      this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
-        let params = {
-          selectOperateList: selectOperateList,
-          func: selectOperateList[0].code,
-          subFunc: '',
-          dateDimension: '',
-          strTips: [],
-          params: [{ value: '', title: '' }]
-        }
-        if (params.func === 'relative_time') {
-          params.subFunc = 'relative_before'
-          params.dateDimension = 'DAYS'
-        }
-        if (params.func === 'relative_time_in') {
-          params.dateDimension = 'DAYS'
-        }
-        Object.keys(obj).forEach(oitem => {
-          params[oitem] = obj[oitem]
-        })
-        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-        }
-        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-          let res = data
-          dataIndexManagerCandidate({ // 字符串提示输入示例
-            sourceTable: obj.sourceTable,
-            fieldName: obj.englishName,
-            count: 10
-          }).then(({data}) => {
-            if (data.status * 1 === 1 && data.data.length) {
-              params.strTips = data.data
-            }
-            this.updateRulesArr(res, citem, params)
+      if (obj.fieldType !== 'group') {
+        this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
+          let params = {
+            selectOperateList: selectOperateList,
+            func: selectOperateList[0].code,
+            subFunc: '',
+            dateDimension: '',
+            strTips: [],
+            params: [{ value: '', title: '' }]
+          }
+          if (params.func === 'relative_time') {
+            params.subFunc = 'relative_before'
+            params.dateDimension = 'DAYS'
+          }
+          if (params.func === 'relative_time_in') {
+            params.dateDimension = 'DAYS'
+          }
+          Object.keys(obj).forEach(oitem => {
+            params[oitem] = obj[oitem]
           })
-        } else {
-          this.updateRulesArr(data, citem, params)
-        }
-      })
+          if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
+            params.params = [{ value: [], title: '' }]
+          }
+          if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
+            params.params = [{ value: [], title: '' }]
+            let res = data
+            dataIndexManagerCandidate({ // 字符串提示输入示例
+              sourceTable: obj.sourceTable,
+              fieldName: obj.englishName,
+              count: 10
+            }).then(({data}) => {
+              if (data.status * 1 === 1 && data.data.length) {
+                params.strTips = data.data
+              }
+              this.updateRulesArr(res, citem, params)
+            })
+          } else {
+            this.updateRulesArr(data, citem, params)
+          }
+        })
+      }
     },
     addChildreRules (data, citem) { // 添加子集
       let indexPath = findRuleIndex(data.rules, citem) + ''
