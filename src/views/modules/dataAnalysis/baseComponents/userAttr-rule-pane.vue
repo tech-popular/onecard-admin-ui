@@ -124,7 +124,8 @@ export default {
         custGroupList.children.push({
           id:item.id,
           label: item.name,
-          fieldType: 'group'
+          fieldType: 'group',
+          enable: true
         })
       })
       this.indexList.push(custGroupList)
@@ -470,6 +471,8 @@ export default {
             this.updateRulesArr(data, citem, params)
           }
         })
+      } else {
+        this.updateRulesArr(data, citem, obj)
       }
     },
     addChildreRules (data, citem) { // 添加子集
@@ -552,23 +555,26 @@ export default {
       return ruleArr
     },
     updateRulesConfig (arr) { // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
+    console.log('arr: ', arr);
       this.isSelectedUneffectIndex = []
       arr.rules.forEach(item => {
         if (!item.rules) {
-          item.selectOperateList = item.selectOperateList.filter(sitem => sitem.code === item.func)
-          let selectEnumsArr = []
-          item.selectEnumsList.forEach(sitem => {
-            item.params.forEach(pitem => {
-              if (sitem.childrenNum === pitem.value) {
-                selectEnumsArr.push(sitem)
-              }
+          if (item.fieldType !== 'group') {
+            item.selectOperateList = item.selectOperateList.filter(sitem => sitem.code === item.func)
+            let selectEnumsArr = []
+            item.selectEnumsList.forEach(sitem => {
+              item.params.forEach(pitem => {
+                if (sitem.childrenNum === pitem.value) {
+                  selectEnumsArr.push(sitem)
+                }
+              })
             })
-          })
-          item.selectEnumsList = selectEnumsArr
-          item.indexList = []
-          if (item.label && !item.enable) {
-            this.isSelectedUneffectIndex.push(item.label)
+            item.selectEnumsList = selectEnumsArr
           }
+            item.indexList = []
+            if (item.label && !item.enable) {
+              this.isSelectedUneffectIndex.push(item.label)
+            }
         } else {
           if (item.rules) {
             this.updateRulesConfig(item)
