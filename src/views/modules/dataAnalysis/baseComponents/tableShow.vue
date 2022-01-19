@@ -389,9 +389,13 @@ export default {
             option = JSON.parse(JSON.stringify(barJson))
             option.id = item.id
             option.title.text = item.indicatorsNameindicatorsName
-            option.series[0].name = item.indicatorsName
             option.xAxis.data = item.xaxisData
-            option.series[0].data = item.series
+            if (this.ruleForm.comTemplateId) {
+              option.series = item.series
+            } else {
+              option.series[0].name = item.indicatorsName
+              option.series[0].data = item.series
+            }
             option.yAxis.axisLabel.formatter = value => {
               if (value >= 10000) {
                 value = (value / 10000) + 'w'
