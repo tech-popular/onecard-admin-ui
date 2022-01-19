@@ -143,7 +143,7 @@ export default {
         notifyType: [],
         title: '',
         applyReason: '',
-        receiveTime: []
+        receiveTime: ['10:00', '18:00']
       }
       this.$refs['subscriptionForm'].resetFields()
       this.$emit('cancel')
