@@ -67,7 +67,7 @@
   </el-dialog>
 </template>
 <script>
-import { dataEnumType } from '@/api/dataAnalysis/dataInsightManage'
+import { getchildrenList } from '@/api/dataAnalysis/dataInsightManage'
 export default {
   data () {
     return {
@@ -133,12 +133,15 @@ export default {
     }
   },
   methods: {
-    init (val, selectedFieldType) {
-      this.selectedFieldType = selectedFieldType
+    init (val, selected) {
+      this.selectedFieldType = selected.fieldType
       this.dataForm.id = val.id
       this.selectEnumsList = []
-      if (selectedFieldType === 'enums') {
-        dataEnumType(val.enumTypeNum).then(({ data }) => {
+      if (this.selectedFieldType === 'enums') {
+        let params = {
+          typeNum: selected.enumTypeNum
+        }
+        getchildrenList(params).then(({ data }) => {
           if (data.status === '1') {
             this.selectEnumsList = data.data
           }

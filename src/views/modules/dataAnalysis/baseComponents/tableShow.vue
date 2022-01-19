@@ -388,7 +388,7 @@ export default {
             }
             option = JSON.parse(JSON.stringify(barJson))
             option.id = item.id
-            option.title.text = item.indicatorsNameindicatorsName
+            option.title.text = item.indicatorsName
             option.xAxis.data = item.xaxisData
             if (this.ruleForm.comTemplateId) {
               option.series = item.series
@@ -430,10 +430,10 @@ export default {
       })
     },
     tagsGroupHandle (val) {
-      let selectedFieldType = this.selectedData.filter(item => item.id === val.id)[0].fieldType
+      let selected = this.selectedData.filter(item => item.id === val.id)[0]
       this.tagsGroupedVisible = true
       this.$nextTick(() => {
-        this.$refs.tagsGrouped.init(val, selectedFieldType)
+        this.$refs.tagsGrouped.init(val, selected)
       })
     },
     // 弹窗状态
