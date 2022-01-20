@@ -1,6 +1,6 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm">
+    <el-form :inline="true" :model="dataForm" size="small">
       <el-form-item label="用户组名称: ">
         <el-input
           v-model="dataForm.name"
@@ -20,10 +20,10 @@
     <el-table
       :data="dataList"
       border
+      fit
       v-loading="dataListLoading"
-      style="width: 100%;"
     >
-      <el-table-column prop="id" header-align="center" align="center" label="Id"></el-table-column>
+      <el-table-column prop="id" header-align="center" align="center" label="ID" width="80"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="用户组名称">
         <template slot-scope="scope">
           <el-tooltip effect="dark" placement="top">
@@ -33,25 +33,40 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="tenantId"
+        prop="department"
         header-align="center"
         align="center"
         show-overflow-tooltip
-        label="所属租户"
+        label="归属部门"
+      ></el-table-column>
+      <el-table-column
+        prop="creater"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="申请人"
+      ></el-table-column>
+      <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="说明"
       ></el-table-column>
       <el-table-column
         prop="memberNum"
         header-align="center"
         align="center"
-        label="成员人数">
+        label="成员人数"
+        width="80">
       </el-table-column>
-      <el-table-column prop="enable" header-align="center" align="center" label="是否失效">
+      <el-table-column prop="enable" header-align="center" align="center" label="是否失效" width="80">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.enable === 1" size="small">是</el-tag>
           <el-tag v-else size="small" type="danger">否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center"  label="操作">
+      <el-table-column header-align="center" align="center"  label="操作" width="260">
         <template slot-scope="scope">
           <el-button
             type="text"
@@ -96,7 +111,7 @@
 }
 </style>
 <script>
-import { getUserGroupList, deleteUsersById, getSelectTenantDown } from '@/api/BI-Manager/userGroup'
+import { getUserGroupList, deleteUsersById } from '@/api/BI-Manager/userGroup'
 import AddOrUpdate from './userGroup-add-or-update'
 import assignPermissions from './assign-permissions'
 export default {
@@ -112,7 +127,7 @@ export default {
       totalCount: 0,
       dataListLoading: false,
       dataListSelections: [],
-      tenantIdList: [],
+      // tenantIdList: [],
       addOrUpdateVisible: false,
       assignPermissionsVisible: false,
       taskDependentVisible: false
@@ -142,7 +157,7 @@ export default {
         getUserGroupList(params).then(({ data }) => {
           if (data && data.code === 0) {
             this.dataList = data.data.list
-            this.getTenantDown()
+            // this.getTenantDown()
             this.totalCount = data.data.totalCount
             this.dataListLoading = false
           } else {
@@ -152,17 +167,17 @@ export default {
           }
         })
     },
-    getTenantDown() {
-      getSelectTenantDown().then(({ data }) => {
-        data.data.forEach(item => {
-          this.dataList.forEach(citem => {
-            if (item.id === citem.tenantId) {
-              citem.tenantId = item.name
-            }
-          })
-        })
-      })
-    },
+    // getTenantDown() {
+    //   getSelectTenantDown().then(({ data }) => {
+    //     data.data.forEach(item => {
+    //       this.dataList.forEach(citem => {
+    //         if (item.id === citem.tenantId) {
+    //           citem.tenantId = item.name
+    //         }
+    //       })
+    //     })
+    //   })
+    // },
     // 每页数
     sizeChangeHandle (val) {
       this.pageSize = val

@@ -37,6 +37,14 @@
         label="菜单名称">
       </el-table-column>
       <el-table-column
+        prop="menuType"
+        header-align="center"
+				align="center"
+        width="150"
+        :formatter="formatMenuType"
+        label="菜单属性">
+      </el-table-column>
+      <el-table-column
         prop="grade"
         header-align="center"
         align="center"
@@ -211,6 +219,11 @@
       currentChangeHandle (page) {
         this.page = page
         this.getDataList()
+      },
+      // 格式化菜单属性显示
+      formatMenuType(row, column, cellValue, index) {
+        const menuLists = ['superset列表', 'table简单报表', 'tableau图表']
+        return menuLists[cellValue]
       }
     }
   }

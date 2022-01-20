@@ -1,10 +1,19 @@
 <template>
 <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
+  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px" size="small">
     <el-form-item label="用户组名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
     </el-form-item>
-		<el-form-item label="用户组所属租户" prop="tenantId">
+    <el-form-item label="用户组归属部门" prop="department">
+      <el-input v-model="dataForm.department" placeholder="用户组归属部门"></el-input>
+    </el-form-item>
+    <el-form-item label="用户组申请人" prop="creater">
+      <el-input v-model="dataForm.creater" placeholder="用户组申请人"></el-input>
+    </el-form-item>
+    <el-form-item label="用户组说明" prop="remark">
+      <el-input v-model="dataForm.remark" placeholder="用户组说明"></el-input>
+    </el-form-item>
+		<!-- <el-form-item label="用户组所属租户" prop="tenantId">
       <el-select v-model="dataForm.tenantId"  placeholder="请选择" style="width:100%" filterable @change="getUserSelectList">
         <el-option
           v-for="item in tenantIdList"
@@ -14,9 +23,17 @@
           >
         </el-option>
       </el-select>
-    </el-form-item>
+    </el-form-item> -->
      <el-form-item label="用户组成员" prop="userIds">
-      <el-select v-model="dataForm.userIds" multiple placeholder="请选择" style="width:100%" filterable>
+      <el-select 
+        v-model="dataForm.userIds" 
+        multiple 
+        placeholder="请输入关键字" 
+        style="width:100%" 
+        remote
+        :remote-method="getUserSelectList"
+        :loading="loading"
+        filterable>
         <el-option
           v-for="item in userIdList"
           :key="item.id"
@@ -40,19 +57,23 @@
 </template>
 
 <script>
-import { savaUserGroupInfo, updateUserGroupInfo, lookDataInfo, getSelectTenantDown, getUsersList } from '@/api/BI-Manager/userGroup'
+import { savaUserGroupInfo, updateUserGroupInfo, lookDataInfo, getUsersList } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
     return {
+      loading: false,
       visible: false,
       dataForm: {
         id: 0,
         name: '',
+        department: '',
+        creater: '',
+        remark: '',
         enable: 1,
-        tenantId: '',
+        // tenantId: '',
         userIds: []
       },
-      tenantIdList: [],
+      // tenantIdList: [],
       userIdList: [],
       dataRule: {
         name: [{
@@ -60,16 +81,31 @@ export default {
           message: '用户组名称不能为空',
           trigger: 'blur'
         }],
+        department: [{
+          required: true,
+          message: '用户组归属部门不能为空',
+          trigger: 'blur'
+        }],
+        creater: [{
+          required: true,
+          message: '用户组申请人不能为空',
+          trigger: 'blur'
+        }],
+        remark: [{
+          required: true,
+          message: '用户组说明不能为空',
+          trigger: 'blur'
+        }],
         userIds: [{
           required: true,
           message: '请选择用户组成员',
           trigger: 'blur'
         }],
-        tenantId: [{
-          required: true,
-          message: '请选择用户组所属租户',
-          trigger: 'blur'
-        }],
+        // tenantId: [{
+        //   required: true,
+        //   message: '请选择用户组所属租户',
+        //   trigger: 'blur'
+        // }],
         enable: [{
           required: true,
           message: '是否失效不能为空',
@@ -80,7 +116,7 @@ export default {
   },
   methods: {
     init (row) {
-      this.SelectTenantDown()
+      // this.SelectTenantDown()
       this.visible = true
       if (row) {
         this.getDataInfo(row.id)
@@ -98,30 +134,42 @@ export default {
           this.dataForm.id = data.data.id
           this.dataForm.name = data.data.name
           this.dataForm.enable = data.data.enable
-          this.dataForm.tenantId = data.data.tenantId
+          this.dataForm.department = data.data.department
+          this.dataForm.creater = data.data.creater
+          this.dataForm.remark = data.data.remark
+          // this.dataForm.tenantId = data.data.tenantId
           this.getUserSelectList()
           this.dataForm.userIds = userIdsData.map(item => { return +item })
         }
       })
     },
     // 获取租户list
-    SelectTenantDown () {
-      getSelectTenantDown().then(({ data }) => {
-        if (data && data.code === 0) {
-          this.tenantIdList = data.data
-        } else {
-          this.tenantIdList = []
+    // SelectTenantDown () {
+    //   getSelectTenantDown().then(({ data }) => {
+    //     if (data && data.code === 0) {
+    //       this.tenantIdList = data.data
+    //     } else {
+    //       this.tenantIdList = []
+    //     }
+    //   })
+    // },
+    getUserSelectList (query) {
+      if (query !== '') {
+        this.loading = true
+        let params = {
+          name: query
         }
-      })
-    },
-    getUserSelectList () {
-      getUsersList(this.dataForm.tenantId).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.userIdList = data.data
-        } else {
-          this.userIdList = []
-        }
-      })
+        getUsersList(params).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.userIdList = data.dataList
+          } else {
+            this.userIdList = []
+          }
+          this.loading = false
+        }).finally(() => {
+          this.loading = false
+        })
+      }
     },
     // 表单提交
     dataFormSubmit () {
@@ -129,7 +177,10 @@ export default {
         if (valid) {
           let params = {
             'name': this.dataForm.name,
-            'tenantId': this.dataForm.tenantId,
+            'department': this.dataForm.department,
+            'creater': this.dataForm.creater,
+            'remark': this.dataForm.remark,
+            // 'tenantId': this.dataForm.tenantId,
             'enable': this.dataForm.enable,
             'userIds': this.dataForm.userIds.join(',')
             }

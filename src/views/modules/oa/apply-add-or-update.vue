@@ -239,6 +239,13 @@
           <el-button type="primary" @click="cancel()" :loading="buttonloading">确定</el-button>
         </div>
       </el-tab-pane>
+      <el-tab-pane label="订阅申请" name="订阅申请">
+        <apply-subscription 
+          :system-list="systemListSubscription" 
+          :systemmodel-list="systemmodelList"
+          @cancel="cancel"
+          @submitSuccess="submitSuccess"></apply-subscription>
+      </el-tab-pane>
     </el-tabs>
   </el-dialog>
 </template>
@@ -255,8 +262,11 @@ import {
   saveTenant,
   mcCompute,
   tenantCrent,
-  getUserGroupList
+  getUserGroupList,
+  getSystemModulesById
 } from '@/api/oa/apply'
+import applySubscription from './applySubscription.vue'
+
 export default {
   data () {
     return {
@@ -378,7 +388,16 @@ export default {
       ]
     }
   },
-  components: {},
+  components: {
+    applySubscription
+  },
+  computed: {
+    systemListSubscription: function() {
+      return this.systemList.filter(item => {
+        return item.value === 8 || item.value === 9
+      })
+    }
+  },
   methods: {
     init (id, value) {
       this.dataForm.id = id || ''
@@ -486,7 +505,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['dataForm'].resetFields()
                   this.buttonloading = false
                   this.isShow = false
@@ -517,7 +536,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['dataForm'].resetFields()
                   this.buttonloading = false
                   this.isShow = false
@@ -549,11 +568,10 @@ export default {
           this.userGroupList = data.data
         })
       }
-      accoutAuthInitInfo().then(({ data }) => {
-        var a = [{ value: value }]
-        var b = data.data.systemList
-        var arr = [...b].filter(x => [...a].some(y => y.value === x.value))
-        this.systemmodelList = arr
+      getSystemModulesById({
+        systemId: value
+      }).then(({ data }) => {
+        this.systemmodelList = data.data[0].children
       })
     },
     severDataFormSubmit (form) {
@@ -583,7 +601,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['severDataForm'].resetFields()
                   this.staffTemp.pageNum = 1
                   this.staffTemp.name = ''
@@ -703,6 +721,9 @@ export default {
     },
     getRowKey (row) {
       return row.id
+    },
+    submitSuccess() {
+      this.$emit('refreshDataList')
     }
   }
 }
