@@ -51,7 +51,7 @@
       </div>
      </div>
          <el-form-item>
-          <el-button v-if="dataForm.digitalRange.length === 0" @click="addDomain">新增区间</el-button>
+          <el-button v-if="dataForm.digitalRange.length === 0 && selectedFieldType !== 'enums'" @click="addDomain">新增区间</el-button>
         </el-form-item>
         <!-- 枚举值 -->
         <el-form-item prop="selectVal" label="枚举" label-width="50px" v-if="selectedFieldType === 'enums'">
