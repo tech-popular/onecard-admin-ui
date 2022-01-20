@@ -40,7 +40,7 @@
       <el-row :gutter="20" class="echart-content" v-if="chartLen > 0" v-loading="echartLoading">
         <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
           <el-card shadow="never" class="order-echarts-card" v-if="isShowData(item)">
-            <div v-if="item.indicatorsType === 'bar'" style="width: 100%; display:flex; justify-content: end;"><el-button type="text" @click="tagsGroupHandle(item)" size="small">编辑分组</el-button></div>
+            <div v-if="item.indicatorsType === 'bar' && item.fieldType !== 'string'" style="width: 100%; display:flex; justify-content: end;"><el-button type="text" @click="tagsGroupHandle(item)" size="small">编辑分组</el-button></div>
             <div :id="'echart-' + item.id" class="echart"></div>
           </el-card>
           <el-card shadow="never" class="order-echarts-card" v-if="!isShowData(item)">
@@ -380,7 +380,6 @@ export default {
             }
           }
           if (item.indicatorsType === 'bar') {
-            console.log('item: ', item)
             if (!item.series || !item.series.length) {
               this.echartLoading = false
               this.dataResultText = '暂无图表数据'
@@ -390,6 +389,7 @@ export default {
             option.id = item.id
             option.title.text = item.indicatorsName
             option.xAxis.data = item.xaxisData
+            item.fieldType = this.selectedData.filter(citem => citem.id === item.id)[0].fieldType
             if (this.ruleForm.comTemplateId) {
               option.series = item.series
             } else {

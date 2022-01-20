@@ -135,8 +135,13 @@ export default {
   methods: {
     init (val, selected) {
       this.selectedFieldType = selected.fieldType
-      this.dataForm.id = val.id
+      // this.dataForm.id = val.id
       this.selectEnumsList = []
+       this.dataForm = {
+        id: val.id,
+        selectVal: [],
+        digitalRange: []
+      }
       if (this.selectedFieldType === 'enums') {
         let params = {
           typeNum: selected.enumTypeNum
