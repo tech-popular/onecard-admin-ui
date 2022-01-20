@@ -72,7 +72,7 @@ export default {
   data () {
     return {
       visible: false,
-      closeIconVisible: false,
+      closeIconVisible: true,
       selectedFieldType: 'number',
       dataForm: {
         id: 0,
@@ -265,12 +265,12 @@ export default {
         dataRange: '',
         key: Date.now()
       })
-      if (this.dataForm.digitalRange.length > 1) {
+      if (this.dataForm.digitalRange.length > 0) {
         this.closeIconVisible = true
       }
     },
     removeDomain (item, i) {
-      if (this.dataForm.digitalRange.length === 1) {
+      if (this.dataForm.digitalRange.length === 0) {
         this.closeIconVisible = false
       }
       var index = this.dataForm.digitalRange.indexOf(item)
