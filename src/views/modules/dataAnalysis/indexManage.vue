@@ -35,7 +35,8 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
-        <el-button type="success" v-if="isAdmin" @click="manualSync()">手动同步</el-button>
+        <el-button  type="success" @click="addOrUpdateHandle()">新建指标</el-button>
+        <!-- <el-button type="success" v-if="isAdmin" @click="manualSync()">手动同步</el-button> -->
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -67,7 +68,14 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="sourceTable" header-align="center" align="center" label="来源表"></el-table-column>
+      <el-table-column prop="sourceTable" header-align="center" align="center" label="来源表">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.sourceTable)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.sourceTable}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="remark" header-align="center" align="center" label="标签描述">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -85,10 +93,18 @@
           <el-tag v-else size="small" type="danger">无效</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="100" label="操作">
+      <el-table-column prop="status" header-align="center" align="center" label="是否设置默认分组">
         <template slot-scope="scope">
-          <!-- <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button> -->
-          <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+          <el-tag v-if="scope.row.isSetGroup == '1'" size="small" >是</el-tag>
+          <el-tag v-else size="small" type="danger">否</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" label="操作">
+        <template slot-scope="scope">
+          <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row)">编辑</el-button>
+          <el-button type="text" size="small"  @click="deleteHandle(scope.row)">删除</el-button>
+          <el-button type="text" size="small" v-if="scope.row.fieldType !== 'string'"  @click="tagChange(scope.row)">默认标签分组 </el-button>
+          <!-- <el-button type="text"  @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -102,13 +118,16 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <indexTags ref="indexTags" v-if="indexTagsVisible" @refreshDataList="getDataList"></indexTags>
   </div>
 </template>
 
 <script>
-  import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex } from '@/api/dataAnalysis/indexManage'
+  import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex, deleteDataInfo } from '@/api/dataAnalysis/indexManage'
   import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
+  // import AddOrUpdate from './baseComponents/indexManage-add-or-update1'
+  import indexTags from './baseComponents/indexTags'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
@@ -127,6 +146,7 @@
         totalCount: 0,
         dataListLoading: false,
         addOrUpdateVisible: false,
+        indexTagsVisible: false,
         isAdmin: sessionStorage.getItem('username') === 'admin',
         fieldTypeList: [ // 数据类型
           // {
@@ -152,7 +172,8 @@
     },
     components: {
       AddOrUpdate,
-      Treeselect
+      Treeselect,
+      indexTags
     },
     mounted () {
       this.getCategoryIdList()
@@ -255,7 +276,31 @@
         this.dataListLoading = true
         syncDataIndex().then(({data}) => {
           if (data && data.status === '1') {
-            this.getDataList()
+            this.$message({
+              message: '同步成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+                }
+            })
+          } else {
+            this.dataListLoading = false
+          }
+        })
+      },
+      deleteHandle (row) {
+        this.dataListLoading = true
+        deleteDataInfo(row.id).then(({data}) => {
+          if (data && data.status === '1') {
+            this.$message({
+              message: '删除成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+                }
+            })
           } else {
             this.dataListLoading = false
           }
@@ -271,6 +316,13 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
+      },
+      // 默认标签分组
+      tagChange (row) {
+        this.indexTagsVisible = true
+        this.$nextTick(() => {
+          this.$refs.indexTags.init(row)
+        })
       }
     }
   }

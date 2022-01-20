@@ -23,7 +23,7 @@
         width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="分群ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="所属业务线">
+      <el-table-column prop="name" header-align="center" align="center" label="分群名称">
         <!-- <template slot-scope="scope">
           <el-button type="text" size="small" @click="tableShowHandle(scope.row)">{{scope.row.name}}</el-button>
         </template> -->
@@ -47,7 +47,8 @@
              {{(isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username) ? '编辑' : '查看'}}
           </el-button>
           <el-button type="text" size="small"  v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row)">删除</el-button>
-          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">分群概览</el-button>
+          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">特征分析</el-button>
+          <!-- <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="table1ShowHandle(scope.row)">分群概览</el-button> -->
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="detailPreviewHandle(scope.row)">明细预览</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
@@ -63,6 +64,7 @@
       layout="total, sizes, prev, pager, next, jumper" />
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
     <tableShow v-if="tableShowVisible" ref="tableShow"/>
+    <TableShow1  v-if="tableShow1Visible" ref="tableShow1"></TableShow1>
     <detailPreview v-if="detailPreviewVisible" ref="detailPreview"/>
      <!-- 授权 -->
     <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis= "submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
@@ -73,6 +75,7 @@
   import { dataInsightManageList, deleteDataInfo } from '@/api/dataAnalysis/dataInsightManage'
   import AddOrUpdate from './baseComponents/dataInsightManage-add-or-update'
   import TableShow from './baseComponents/tableShow'
+  import TableShow1 from './baseComponents/tableShow1'
   import { updateGroupAuth, updateGroupAuths } from '@/api/commom/assignPermission'
   import AssignPermission from '../../components/permission/assign-permission'
   import detailPreview from './baseComponents/detailPreview'
@@ -91,6 +94,7 @@
         addOrUpdateVisible: false,
         tableShowVisible: false,
         detailPreviewVisible: false,
+        tableShow1Visible: false,
         dataListSelections: [],
         submitDataApi: updateGroupAuth,
         submitDataApis: updateGroupAuths,
@@ -104,7 +108,8 @@
       AddOrUpdate,
       TableShow,
       AssignPermission,
-      detailPreview
+      detailPreview,
+      TableShow1
     },
     mounted () {
       this.getDataList()
@@ -129,6 +134,17 @@
           this.totalCount = data.data.total
         })
       },
+      // 明细预览
+      detailPreviewHandle (value) {
+        this.detailPreviewVisible = true
+        this.$nextTick(() => {
+          let canUpdate = true
+          if (!this.isAdmin) {
+            canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
+          }
+          this.$refs.detailPreview.init(value, canUpdate)
+        })
+      },
       // 分群概览
       tableShowHandle (value) {
         this.tableShowVisible = true
@@ -140,15 +156,14 @@
           this.$refs.tableShow.init(value, canUpdate)
         })
       },
-      // 明细预览
-      detailPreviewHandle (value) {
-        this.detailPreviewVisible = true
+      table1ShowHandle (value) {
+        this.tableShow1Visible = true
         this.$nextTick(() => {
           let canUpdate = true
           if (!this.isAdmin) {
             canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
           }
-          this.$refs.detailPreview.init(value, canUpdate)
+          this.$refs.tableShow1.init(value, canUpdate)
         })
       },
       // 新增 / 修改
