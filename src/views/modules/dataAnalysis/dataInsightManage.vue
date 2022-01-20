@@ -48,7 +48,7 @@
           </el-button>
           <el-button type="text" size="small"  v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username" @click="deleteHandle(scope.row)">删除</el-button>
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">特征分析</el-button>
-          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="table1ShowHandle(scope.row)">分群概览</el-button>
+          <!-- <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="table1ShowHandle(scope.row)">分群概览</el-button> -->
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="detailPreviewHandle(scope.row)">明细预览</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
