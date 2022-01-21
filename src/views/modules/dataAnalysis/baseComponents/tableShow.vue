@@ -259,7 +259,8 @@ export default {
       })
     },
     getOverviewData (id, channelCode) {
-      overviewData(id).then(({data}) => {
+      let type = '2' // 明细预览传1，特征分析传2
+      overviewData(id, type).then(({data}) => {
         if (data.status * 1 !== 1) {
           this.loading = false
           return this.$message({

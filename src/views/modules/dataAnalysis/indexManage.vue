@@ -57,7 +57,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="fieldType" header-align="center" align="center" :formatter="fieldTypeFormat" label="数据类型"></el-table-column>
+      <el-table-column prop="fieldType" header-align="center" align="center" label="数据类型"></el-table-column>
       <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="标签类别"></el-table-column>
       <el-table-column prop="channelCode" header-align="center" align="center" label="所属业务线"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式">

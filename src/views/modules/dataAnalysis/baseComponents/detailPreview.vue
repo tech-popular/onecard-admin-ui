@@ -283,7 +283,8 @@ export default {
       this.getOverviewData(val.id, val.channelId.split(','))
     },
     getOverviewData (id, channelCode) {
-      overviewData(id).then(({data}) => {
+      let type = '1' // 明细预览传1，特征分析传2
+      overviewData(id, type).then(({data}) => {
         if (data.status * 1 !== 1) {
           this.loading = false
           return this.$message({
