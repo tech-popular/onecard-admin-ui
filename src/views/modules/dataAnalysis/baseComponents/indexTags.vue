@@ -7,7 +7,7 @@
     width="50%"
     :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :rules="dataRules" :inline="true">
-     <div v-if="selectedFieldType !== 'enums'">
+     <div v-if="selectedFieldType !== '枚举'">
         <div
         style="display: flex;"
         v-for="(outdata, index) in dataForm.digitalRange"
@@ -17,7 +17,7 @@
                区间{{index+1}}
         </div>
         <!-- 数字区间 -->
-        <div class="pane-rules-inline" v-if="selectedFieldType === 'number'">
+        <div class="pane-rules-inline" v-if="selectedFieldType === '数值'">
           <span class="parentheses">( &nbsp;</span>
           <el-form-item prop="smallerValue">
             <el-input v-model="outdata.smallerValue" class="itemIput-small" @input="outdata.smallerValue = keyupNumberInput(outdata.smallerValue)" @blur="outdata.smallerValue = pramasNumBlur(outdata, outdata.smallerValue, index)"></el-input>
@@ -29,7 +29,7 @@
           <span class="parentheses">&nbsp;)</span>
         </div>
         <!-- 时间区间 -->
-        <el-form-item prop="dataRange" v-if="selectedFieldType === 'date'">
+        <el-form-item prop="dataRange" v-if="selectedFieldType === '时间'">
            <el-date-picker
               v-model="outdata.dataRange"
               type="datetimerange"
@@ -50,11 +50,11 @@
           </el-form-item>
       </div>
      </div>
-        <el-form-item  v-if="(selectedFieldType === 'date' || selectedFieldType === 'number') && dataForm.digitalRange.length === 0">
+        <el-form-item  v-if="(selectedFieldType === '时间' || selectedFieldType === '数值') && dataForm.digitalRange.length === 0">
           <el-button @click="addDomain">新增区间</el-button>
         </el-form-item>
         <!-- 枚举值 -->
-        <el-form-item prop="selectVal" label="枚举" label-width="50px"  v-if="selectedFieldType === 'enums'">
+        <el-form-item prop="selectVal" label="枚举" label-width="50px"  v-if="selectedFieldType === '枚举'">
           <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
               <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
             </el-select>
@@ -79,7 +79,7 @@ export default {
     return {
       visible: false,
       closeIconVisible: true,
-      selectedFieldType: 'number',
+      selectedFieldType: '数值',
       dataForm: {
         id: 0,
         isSetGroup: '',
@@ -148,14 +148,14 @@ export default {
       getDimension(params).then(({ data }) => {
         if (data && data.status === '1' && data.data) {
           this.dataForm.isSetGroup = data.data.isSetGroup === '0' ? 0 : 1
-          if (val.fieldType === 'number') {
+          if (val.fieldType === '数值') {
             data.data.dimensions.forEach((item, index) => {
               this.dataForm.digitalRange.push({
                 smallerValue: item.split(',')[0],
                 largerValue: item.split(',')[1]
               })
             })
-          } else if (val.fieldType === 'date') {
+          } else if (val.fieldType === '时间') {
             data.data.dimensions.forEach((item, index) => {
               this.dataForm.digitalRange.push({
                 dataRange: [item.split(',')[0], item.split(',')[1]]
@@ -166,23 +166,23 @@ export default {
           }
         }
         // else {
-        //   if (val.fieldType === 'number') {
+        //   if (val.fieldType === '数值') {
         //     this.dataForm.digitalRange.push({
         //       smallerValue: '',
         //       largerValue: ''
         //     })
-        //   } else if (val.fieldType === 'date') {
+        //   } else if (val.fieldType === '时间') {
         //     this.dataForm.digitalRange.push({
         //       dataRange: []
         //     })
-        //   } else if (val.fieldType === 'enums') {
+        //   } else if (val.fieldType === '枚举') {
         //     this.dataForm.selectVal = []
         //   } else {
         //     this.dataForm.classLabel = '0'
         //   }
         // }
       })
-      if (val.fieldType === 'enums') {
+      if (val.fieldType === '枚举') {
         let params = {
         typeNum: val.enumTypeNum
       }
@@ -250,7 +250,7 @@ export default {
         })
         return
       }
-      if (this.selectedFieldType === 'number') {
+      if (this.selectedFieldType === '数值') {
         if (this.dataForm.digitalRange.length > 0 && (outdata.smallerValue === '' || outdata.largerValue === '')) {
           this.$message({
             type: 'error',
@@ -262,7 +262,7 @@ export default {
           smallerValue: '',
           largerValue: ''
         })
-      } else if (this.selectedFieldType === 'date') {
+      } else if (this.selectedFieldType === '时间') {
         if (this.dataForm.digitalRange.length > 0 && !outdata.dataRange) {
           this.$message({
             type: 'error',
@@ -308,7 +308,7 @@ export default {
         'indexId': this.dataForm.id,
         'isSetGroup': this.dataForm.isSetGroup.toString()
       }
-      if (this.selectedFieldType === 'number' || this.selectedFieldType === 'date') {
+      if (this.selectedFieldType === '数值' || this.selectedFieldType === '时间') {
         if (this.dataForm.digitalRange.length === 0) {
           return this.$message({
             type: 'error',
@@ -316,7 +316,7 @@ export default {
           })
         }
       }
-      if (this.selectedFieldType === 'number') {
+      if (this.selectedFieldType === '数值') {
         this.dataForm.digitalRange.forEach(item => {
           if (item.smallerValue === '' || item.largerValue === '') {
             return this.$message({
@@ -329,7 +329,7 @@ export default {
           }
         })
         params.dimensions = indexGroups
-      } else if (this.selectedFieldType === 'date') {
+      } else if (this.selectedFieldType === '时间') {
         this.dataForm.digitalRange.forEach(item => {
           if (!item.dataRange) {
             return this.$message({
