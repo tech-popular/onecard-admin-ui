@@ -103,7 +103,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row)">编辑</el-button>
           <el-button type="text" size="small"  @click="deleteHandle(scope.row)">删除</el-button>
-          <el-button type="text" size="small" v-if="scope.row.fieldType !== 'string'"  @click="tagChange(scope.row)">默认标签分组 </el-button>
+          <el-button type="text" size="small" v-if="scope.row.fieldType !== '字符串'"  @click="tagChange(scope.row)">默认标签分组 </el-button>
           <!-- <el-button type="text"  @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button> -->
         </template>
       </el-table-column>
