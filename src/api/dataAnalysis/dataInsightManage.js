@@ -22,7 +22,7 @@ export const custerAvailable = code => httpGet(da + `data/group/select/available
 export const templateDownload = http.adornUrl(da + 'data/group/template/download?token=' + Vue.cookie.get('token'))
 export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManager/value/candidate', params)
 
-export const overviewData = id => httpGet(da + `data/group/overview/${id}`)
+export const overviewData = (id, type) => httpGet(da + `data/group/overview/${id}/${type}`)
 export const transferLogList = params => httpGet(da + `data/transferLog/listOnPage`, params)
 export const chartInfo1 = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
 export const chartInfo = params => httpPost(da + `data/group/featureAnalysis`, params)
