@@ -89,11 +89,11 @@
             <el-radio  v-model="baseForm.processType" label="1">实时更新</el-radio>
             <el-radio  v-model="baseForm.processType" label="2" >T+1</el-radio>
           </el-form-item>
-           <el-form-item  prop="fieldType" label="数据类型：">
-            <el-radio  v-model="baseForm.fieldType" label="number">数值</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="date">日期</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="enums">枚举</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="string">字符串</el-radio>
+           <el-form-item  prop="fieldType" label="数据类型：" >
+            <el-radio  v-model="baseForm.fieldType" label="number" :disabled="!!id">数值</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="date" :disabled="!!id">日期</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="enums" :disabled="!!id">枚举</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="string" :disabled="!!id">字符串</el-radio>
           </el-form-item>
           <el-form-item  prop="isSensitive" label="是否包含敏感信息：">
             <el-radio  v-model="baseForm.isSensitive" label="1">是</el-radio>
@@ -186,6 +186,9 @@ export default {
         ],
         enable: [
           { required: true, message: '请选择是否启动', trigger: 'change' }
+        ],
+        formula: [
+          { required: true, message: '请输入计算公式', trigger: 'blur' }
         ]
       },
       channelList: [],
@@ -224,6 +227,11 @@ export default {
       infoIndexManage(id).then(({ data }) => {
         if (data && data.status === '1') {
           this.id = data.data.id
+          if (data.data.enumTypeNum && data.data.enumTypeNum !== '') {
+            this.baseForm.fieldType = 'enums'
+          } else {
+            this.baseForm.fieldType = data.data.fieldType
+          }
           this.baseForm.formula = data.data.formula
           this.baseForm.englishName = data.data.englishName
           this.baseForm.chineseName = data.data.chineseName
@@ -232,7 +240,6 @@ export default {
           this.baseForm.indexType = data.data.indexType
           this.baseForm.categoryId = data.data.catagoryIdSelect
           this.baseForm.processType = data.data.processType
-          this.baseForm.fieldType = data.data.fieldType
           this.baseForm.isSensitive = data.data.isSensitive
           this.baseForm.showRules = data.data.showRules
           this.baseForm.enable = data.data.enable
