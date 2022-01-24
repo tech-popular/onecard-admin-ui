@@ -186,6 +186,9 @@ export default {
         ],
         enable: [
           { required: true, message: '请选择是否启动', trigger: 'change' }
+        ],
+        formula: [
+          { required: true, message: '请输入计算公式', trigger: 'blur' }
         ]
       },
       channelList: [],
