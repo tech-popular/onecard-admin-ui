@@ -930,7 +930,6 @@ export default {
           this.$refs.userAttrRule.uneffectIndexValidate()
           // this.$refs.userActionRule.uneffectIndexValidate() // 用户行为暂时隐藏
           if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
-          console.log('this.$refs.userAttrRule.isSelectedUneffectIndex: ', this.$refs.userAttrRule.isSelectedUneffectIndex);
             return false
           }
           if (this.baseForm.userType === 'excel') { // excel方式

@@ -105,14 +105,14 @@ export default {
     },
     getCustGroup () {
       let data = {
-        "id": 1,
-        "name": "用户分群",
-        "custGroupTemplateBases": [
+        'id': 1,
+        'name': '用户分群',
+        'custGroupTemplateBases': [
           {
-            "id": 1291,
-            "channelId": "N1001",
-            "name": "t0119-004",            
-            "type": "dynamic"
+            'id': 1291,
+            'channelId': 'N1001',
+            'name': 't0119-004',   
+            'type': 'dynamic'
           }
         ]
       }
@@ -120,9 +120,9 @@ export default {
       custGroupList.id = data.id
       custGroupList.label = data.name
       custGroupList.children = []
-      data.custGroupTemplateBases.forEach(item =>{
+      data.custGroupTemplateBases.forEach(item => {
         custGroupList.children.push({
-          id:item.id,
+          id: item.id,
           label: item.name,
           fieldType: 'group',
           enable: true
@@ -555,7 +555,6 @@ export default {
       return ruleArr
     },
     updateRulesConfig (arr) { // 提交数据时，删除配置数据中多余的内容selectOperateList,selectEnumsList
-    console.log('arr: ', arr);
       this.isSelectedUneffectIndex = []
       arr.rules.forEach(item => {
         if (!item.rules) {
