@@ -224,6 +224,11 @@ export default {
       infoIndexManage(id).then(({ data }) => {
         if (data && data.status === '1') {
           this.id = data.data.id
+          if (data.data.enumTypeNum && data.data.enumTypeNum !== '') {
+            this.baseForm.fieldType = 'enums'
+          } else {
+            this.baseForm.fieldType = data.data.fieldType
+          }
           this.baseForm.formula = data.data.formula
           this.baseForm.englishName = data.data.englishName
           this.baseForm.chineseName = data.data.chineseName
@@ -232,7 +237,6 @@ export default {
           this.baseForm.indexType = data.data.indexType
           this.baseForm.categoryId = data.data.catagoryIdSelect
           this.baseForm.processType = data.data.processType
-          this.baseForm.fieldType = data.data.fieldType
           this.baseForm.isSensitive = data.data.isSensitive
           this.baseForm.showRules = data.data.showRules
           this.baseForm.enable = data.data.enable
