@@ -89,11 +89,11 @@
             <el-radio  v-model="baseForm.processType" label="1">实时更新</el-radio>
             <el-radio  v-model="baseForm.processType" label="2" >T+1</el-radio>
           </el-form-item>
-           <el-form-item  prop="fieldType" label="数据类型：">
-            <el-radio  v-model="baseForm.fieldType" label="number">数值</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="date">日期</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="enums">枚举</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="string">字符串</el-radio>
+           <el-form-item  prop="fieldType" label="数据类型：" >
+            <el-radio  v-model="baseForm.fieldType" label="number" :disabled="!!id">数值</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="date" :disabled="!!id">日期</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="enums" :disabled="!!id">枚举</el-radio>
+            <el-radio  v-model="baseForm.fieldType" label="string" :disabled="!!id">字符串</el-radio>
           </el-form-item>
           <el-form-item  prop="isSensitive" label="是否包含敏感信息：">
             <el-radio  v-model="baseForm.isSensitive" label="1">是</el-radio>
