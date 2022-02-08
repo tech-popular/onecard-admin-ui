@@ -4,37 +4,18 @@
     :visible.sync="visible"
     :show-close="false"
     :wrapperClosable="false"
-    size="1200px"
+    size="1300px"
     class="data-transfer-manage-drawer"
   >
-  <div slot="title" class="drawer-title">新建<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+  <div slot="title" class="drawer-title">SQL提数<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <el-form v-loading="loading" :model="baseForm" label-width="80px"  ref="baseForm" class="base-form" >
         <div class="base-pane">
-          <!-- <div  class="step-title">提数申请</div> -->
-					<!-- <div class="steps-horizontal">
-						<div class="horizontal-one">
-              <div class="el-icon-check success one-title"></div>
-							<div class="one-title">进行中</div>
-							<div style="padding-top:20px;">设置提数条件</div>
-						</div>
-						<div class="horizontal-line"></div>
-						<div><i class="el-icon-caret-right horizontal-icon"></i></div>
-						<div class="horizontal-one">
-              <div class="three-title">进行中</div>
-							<div class="two-title">未开始</div>
-							<div style="padding-top:20px;">数据下载设置</div>
-						</div>
- 					</div> -->
-          
-           <div>
-            <el-form-item label="选择提数方式" prop="withdrawalMethod" label-width="120px" style="width:50%" >
-                <el-radio v-model="baseForm.withdrawalMethod"  @change="withdrawalTypeChange" label="0">自定义SQL</el-radio>
-                <el-radio v-model="baseForm.withdrawalMethod"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">FTP</el-radio>
-            </el-form-item>
-            <div style="display:flex" v-if="baseForm.withdrawalMethod === '0'">
+          <el-tabs type="border-card">
+            <el-tab-pane label="自助查询">
+            <div style="display:flex">
               <div>
-                <el-form-item prop="serviceId"  label="服务器">
+                <el-form-item prop="serviceId" label="服务器：">
                   <el-select
                   filterable
                   v-model="baseForm.serviceId"
@@ -48,7 +29,7 @@
                   </el-option>
                 </el-select>
                 </el-form-item>
-                <el-form-item prop="databaseId" label="数据库">
+                <el-form-item prop="databaseId" label="数据库：">
                   <el-select
                   filterable
                   v-model="baseForm.databaseId"
@@ -63,74 +44,68 @@
                 </el-select>
                 </el-form-item>
               </div>
-              <el-form-item prop="serviceSql" label="SQL：" ref="serviceBeginSqlForm" style="width:70%">
-                <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative;">
-                  <codemirror
-                    ref="serviceBeginSql"
-                    v-model="baseForm.serviceSql"
-                    :options="cmOptions"
-                    @changes="cm => workItemChanges(cm, acquisitionTask.serviceSql, 'serviceBeginSqlForm', 'serviceBeginSql')"
-                    @keydown.native="e => workItemKeyDown(e, 'serviceBeginSql')"
-                    class="code"
-                    style="padding-bottom: 0px;"
-                  ></codemirror>
-                </div>
-                <div style="margin-top:10px;display:flex">
+              <div style="width:70%">
+                <el-form-item prop="serviceSql" label="SQL：" ref="serviceBeginSqlForm" >
+                  <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative;">
+                    <codemirror
+                      ref="serviceBeginSql"
+                      v-model="baseForm.serviceSql"
+                      :options="cmOptions"
+                      @changes="cm => workItemChanges(cm, acquisitionTask.serviceSql, 'serviceBeginSqlForm', 'serviceBeginSql')"
+                      @keydown.native="e => workItemKeyDown(e, 'serviceBeginSql')"
+                      class="code"
+                      style="padding-bottom: 0px;"
+                    ></codemirror>
+                  </div>
+                </el-form-item>
+                <el-form-item style="margin-top:10px;">
                   <el-button type="primary">执行验证</el-button>
-                  <el-button type="text" v-if="isInnerIP">数据预览</el-button>
-                </div>
-            </el-form-item>
+                </el-form-item>
+                <el-form-item>
+                  <span>执行完成，执行时间3S   预览查询结果（随机展示10条数据）</span>
+                </el-form-item>
+                  <el-form-item label="申请原因" prop="applyReason">
+                    <el-input v-model="baseForm.applyReason"></el-input>
+                  </el-form-item>
+                  <el-form-item label="提数类型" prop="withdrawalType">
+                    <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="0">一次性</el-radio>
+                    <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">周期性</el-radio>
+                  </el-form-item>
+                  <el-form-item label="提数周期" prop="applyReason">
+                    <el-input v-model="baseForm.applyReason"></el-input>
+                  </el-form-item>
+                  <el-form-item label="接受天设置" prop="applyReason" label-width="90px">
+                    <el-input v-model="baseForm.applyReason"></el-input>
+                  </el-form-item>
+                  <el-form-item label="允许接收时间段" label-width="120px">
+                    <el-time-picker
+                      is-range
+                      v-model="baseForm.applyReason"
+                      range-separator="至"
+                      start-placeholder="开始时间"
+                      end-placeholder="结束时间"
+                      placeholder="选择时间范围">
+                      </el-time-picker>
+                  </el-form-item>
+                    <el-form-item prop="withdrawalType">
+                    <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="0">本人申请</el-radio>
+                    <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">用户组申请</el-radio>
+                  </el-form-item>
+              </div>
             </div>
-            <el-row :gutter="24" v-if="baseForm.withdrawalMethod === '1'">
-              <!-- <el-col :span="8" style="border: 2px solid #97999e"> -->
-              <el-col :span="8">
-                <el-tree :data="data" :props="defaultProps" default-expand-all>
-                  <span slot-scope="{ node, data }">
-                    <i :class="data.icon" style="color:blue"></i>
-                    <span style="padding-left: 4px;">{{node.label}}</span>
-                  </span>
-                </el-tree>
-              </el-col>
-              <el-col :span="16">
-              <el-table
-                  :data="dataList"
-                  border
-                  v-loading="dataListLoading"
-                  height="300"
-                  @selection-change="handleSelectionChange">
-                  <el-table-column
-                    type="selection"
-                    width="55">
-                  </el-table-column>
-                  <el-table-column prop="id" header-align="center" align="center" label="序号"></el-table-column>
-                  <el-table-column prop="name" header-align="center" align="center" label="文件名称"></el-table-column>
-                  <el-table-column prop="ipAddress" header-align="center" align="center" label="文件格式"></el-table-column>
-                  <el-table-column prop="inDatasourceName" header-align="center" align="center" label="修改时间"></el-table-column>
-                </el-table>
-              </el-col>
-            </el-row>
-           </div>
-           <div style="margin-top: 30px">
-             <el-form-item label="申请原因" prop="applyReason" style="width:50%">
-               <el-input v-model="baseForm.applyReason"></el-input>
-             </el-form-item>
-             <el-form-item label="提数类型" prop="withdrawalType"  style="width:50%" >
-                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="0">一次性</el-radio>
-                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">周期性</el-radio>
-            </el-form-item>
-           </div>
+            </el-tab-pane>
+          </el-tabs>
         </div>
       </el-form>
     </div>
     <div class="footer">
       <el-button type="primary" @click="cancelHandle" size="small">立即申请</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
-			<!-- <el-button type="primary" @click="nextStep" size="small" v-else>下一步</el-button> -->
     </div>
   </el-drawer>
 </template>
 <script>
-import {isInnerIPFn} from '@/utils/validate'
+// import {isInnerIPFn} from '@/utils/validate'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/idea.css'
@@ -262,8 +237,8 @@ require('codemirror/addon/hint/sql-hint.js')
       }
     },
     mounted () {
-      this.isInnerIP = isInnerIPFn()
-      console.log('1112', isInnerIPFn())
+      // this.isInnerIP = isInnerIPFn()
+      // console.log('1112', isInnerIPFn())
     },
     components: {codemirror},
     methods: {
@@ -410,13 +385,6 @@ require('codemirror/addon/hint/sql-hint.js')
       box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
       z-index: 500;
     }
-    & .data-description-tips {
-      color: #999;
-      margin-top: 0;
-      & span {
-        color: red
-      }
-    }
     & .vue-treeselect {
       min-height: 38px;
       line-height: 24px;
@@ -436,13 +404,13 @@ require('codemirror/addon/hint/sql-hint.js')
     & .base-select{
       width: 40%;
     }
-    & .base-form{
-      & .pane-rules{
-        & .el-form-item__content{
-          margin-left: 0px !important;
-        }
-      }
-    }
+    // & .base-form{
+    //   & .pane-rules{
+    //     & .el-form-item__content{
+    //       margin-left: 0px !important;
+    //     }
+    //   }
+    // }
     & .radio-item {
       margin-right: 15px;
     }

@@ -2,9 +2,9 @@
   <div class="mod-config">
     <el-form :inline="true">
       <el-form-item>
-        <el-button type="primary"  @click="addOrUpdateHandle">新建申请</el-button>
+        <el-button type="primary"  @click="addOrUpdateSqlHandle">SQL提数申请</el-button>
         <!-- <el-button type="primary"  @click="searchHistory">申请申请</el-button> -->
-        <el-button type="primary" @click="searchHistory">我的历史提数</el-button>
+        <el-button type="primary" @click="addOrUpdateFtpHandle">FTP提数申请</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -46,9 +46,9 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
-		<addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate"></addOrUpdate>
-    <!-- <addOrUpdateFtp  v-if="addOrUpdateFtpVisible" ref="addOrUpdateftp"></addOrUpdateFtp> -->
-    <dataServiceHistory v-if="dataServiceHistoryVisible" ref="dataServiceHistory"></dataServiceHistory>
+		<addOrUpdateSql v-if="addOrUpdateSqlVisible" ref="addOrUpdateSql"></addOrUpdateSql>
+    <addOrUpdateFtp  v-if="addOrUpdateFtpVisible" ref="addOrUpdateftp"></addOrUpdateFtp>
+    <!-- <dataServiceHistory v-if="dataServiceHistoryVisible" ref="dataServiceHistory"></dataServiceHistory> -->
   </div>
 </template>
 <style>
@@ -57,10 +57,10 @@
 }
 </style>
 <script>
-import addOrUpdate from './service-add-or-update'
-// import addOrUpdateFtp from './ftp-add-or-update'
-import dataServiceHistory from './dataService-history'
-// import isInnerIPFn from '../../../utils/validate'
+// import addOrUpdate from './service-add-or-update'
+import addOrUpdateSql from './sql-add-or-update'
+import addOrUpdateFtp from './ftp-add-or-update'
+// import dataServiceHistory from './dataService-history'
 export default {
   data () {
     return {
@@ -70,12 +70,12 @@ export default {
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
-      addOrUpdateVisible: false,
+      addOrUpdateSqlVisible: false,
       addOrUpdateFtpVisible: false,
       dataServiceHistoryVisible: false
     }
   },
-  components: { addOrUpdate, dataServiceHistory },
+  components: { addOrUpdateSql, addOrUpdateFtp },
   activated () {
     this.getDataList()
   },
@@ -98,10 +98,10 @@ export default {
       this.getDataList()
     },
     // 新增 / 修改
-    addOrUpdateHandle () {
-      this.addOrUpdateVisible = true
+    addOrUpdateSqlHandle () {
+      this.addOrUpdateSqlVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init()
+        this.$refs.addOrUpdateSql.init()
       })
     },
     addOrUpdateFtpHandle () {
