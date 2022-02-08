@@ -8,7 +8,22 @@
       <el-input v-model="dataForm.department" placeholder="用户组归属部门"></el-input>
     </el-form-item>
     <el-form-item label="用户组申请人" prop="creater">
-      <el-input v-model="dataForm.creater" placeholder="用户组申请人"></el-input>
+      <!-- <el-input v-model="dataForm.creater" placeholder="用户组申请人"></el-input> -->
+      <el-select 
+        v-model="dataForm.creater" 
+        placeholder="请输入关键字" 
+        style="width:100%" 
+        remote
+        :remote-method="getUserSelectList"
+        :loading="loading"
+        filterable>
+        <el-option
+          v-for="item in userIdList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.name">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="用户组说明" prop="remark">
       <el-input v-model="dataForm.remark" placeholder="用户组说明"></el-input>
@@ -169,6 +184,8 @@ export default {
         }).finally(() => {
           this.loading = false
         })
+      } else {
+        this.userIdList = []
       }
     },
     // 表单提交
