@@ -34,3 +34,4 @@ export const collisionSave = (params, collisionPackId) => httpPost(da + `data/co
 export const collisionUpdate = (params, collisionPackId, groupId) => httpPut(da + `data/collision/config/group?groupId=${groupId}&collisionPackId=${collisionPackId}`, params, false)
 export const importSqlInfo = params => httpPost(da + 'data/group/sql/import', params) // 保存SQL
 export const databaseInitInfo = () => httpGet(da + 'oa/databaseInitInfo') // 库表管理初始化
+export const selectDataGroupInfos = params => httpGet(da + 'dataCatalog/selectDataGroupInfos', params) // 分群包

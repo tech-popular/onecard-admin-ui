@@ -17,7 +17,7 @@
 </template>
 <script>
 import dataRulesSet from './data-rules-set'
-import { selectOperate, selectAllCata, enumTypeList, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, dataIndexManagerCandidate, selectDataGroupInfos } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -96,39 +96,38 @@ export default {
           this.indexList = []
         } else {
           this.indexList = this.filterAllCata(data.data)
-          this.getCustGroup()
+          this.getGroupInfos()
         }
         if (fn) {
           fn(this.indexList)
         }
       })
     },
-    getCustGroup () {
-      let data = {
-        'id': 1,
-        'name': '用户分群',
-        'custGroupTemplateBases': [
-          {
-            'id': 1291,
-            'channelId': 'N1001',
-            'name': 't0119-004',   
-            'type': 'dynamic'
+    getGroupInfos () {
+      selectDataGroupInfos({
+        channelCode: this.channelId
+      }).then(({data}) => {
+        let custGroupList = {}
+        if (data.status !== '1') {
+          custGroupList = []
+        } else {
+          console.log('data:111 ', data);
+          custGroupList.id = data.data[0].id
+          custGroupList.label = data.data[0].name
+          custGroupList.children = []
+          if (data.data[0].custGroupTemplateBases && data.data[0].custGroupTemplateBases.length) {
+            data.data[0].custGroupTemplateBases.forEach(item => {
+              custGroupList.children.push({
+                id: item.id,
+                label: item.name,
+                fieldType: 'group',
+                enable: true
+              })
+            })
           }
-        ]
-      }
-      let custGroupList = {}
-      custGroupList.id = data.id
-      custGroupList.label = data.name
-      custGroupList.children = []
-      data.custGroupTemplateBases.forEach(item => {
-        custGroupList.children.push({
-          id: item.id,
-          label: item.name,
-          fieldType: 'group',
-          enable: true
-        })
+          this.indexList.push(custGroupList)
+        }
       })
-      this.indexList.push(custGroupList)
     },
     channelIdChangeUpdate (channelId) {
       this.channelId = channelId
