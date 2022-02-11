@@ -308,20 +308,23 @@
         })
       },
       deleteHandle (row) {
-        this.dataListLoading = true
-        deleteDataInfo(row.id).then(({data}) => {
-          if (data && data.status === '1') {
-            this.$message({
-              message: '删除成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-                }
-            })
-          } else {
-            this.dataListLoading = false
-          }
+         this.$confirm(`确认删除标签名称为【${row.chineseName}】的数据?`, '提示', {
+          confirmButtonText: '删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteDataInfo(row.id).then(({data}) => {
+            if (data && data.status === '1') {
+              this.$message({
+                message: '删除成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                  }
+              })
+            }
+          })
         })
       },
       // 每页数
