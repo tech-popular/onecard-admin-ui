@@ -124,7 +124,7 @@
 
 <script>
   import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex, deleteDataInfo } from '@/api/dataAnalysis/indexManage'
-  import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
+  import { echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
   // import AddOrUpdate from './baseComponents/indexManage-add-or-update1'
   import indexTags from './baseComponents/indexTags'
@@ -204,7 +204,7 @@
       getCategoryIdList () {
         indexManageMinCataList().then(({data}) => {
           if (data && data.status === '1') {
-            this.categoryIdList = nameToLabel(data.data)
+            this.categoryIdList = this.nameToLabel(data.data)
           }
         })
       },
@@ -218,7 +218,25 @@
           }
         })
       },
-
+      nameToLabel(arr) {
+        arr = arr.slice()
+        let results
+        function toParse (arr) {
+          arr.forEach(function (item, index) {
+          item['id'] = item.id
+          item['label'] = item.name
+          if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+            item['children'] = item.children
+            toParse(item['children'])
+          } else {
+            delete item['children']
+          }
+        })
+        return arr
+        }
+        results = toParse(arr)
+        return results
+      },
       // 获取数据列表
       getDataList () {
         this.$refs['dataForm'].validate((valid) => {
