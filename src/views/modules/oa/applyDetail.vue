@@ -150,7 +150,7 @@ export default {
             message: data.message
           })
         }
-        if (this.quanxian === '账号权限') {
+        if (this.quanxian === '账号权限' || this.quanxian === '订阅申请') {
           this.detalList = data.data
           let a = [{selected: true}]
           let b = this.detalList.systemList
