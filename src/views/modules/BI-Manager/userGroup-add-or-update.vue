@@ -155,6 +155,7 @@ export default {
           // this.dataForm.tenantId = data.data.tenantId
           this.getUserSelectList()
           this.dataForm.userIds = userIdsData.map(item => { return +item })
+          this.userIdList = data.data.nameList
         }
       })
     },
