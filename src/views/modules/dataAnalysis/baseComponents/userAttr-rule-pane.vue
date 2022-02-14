@@ -114,10 +114,10 @@ export default {
         } else {
           this.custGroupList.id = data.data[0].id
           this.custGroupList.label = data.data[0].name
-          this.custGroupList.children = []
+          let childData = []
           if (data.data[0].custGroupTemplateBases && data.data[0].custGroupTemplateBases.length) {
             data.data[0].custGroupTemplateBases.forEach(item => {
-              this.custGroupList.children.push({
+              childData.push({
                 id: item.id,
                 label: item.name,
                 fieldType: 'group',
@@ -125,6 +125,7 @@ export default {
               })
             })
           }
+          this.custGroupList.children = childData
           this.indexList.push(this.custGroupList)
         }
       })
@@ -219,13 +220,11 @@ export default {
       this.updateConditionId(this.ruleConfig)
     },
     updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
-    console.log('indexList: ', JSON.parse(JSON.stringify(indexList)));
       arr.rules.forEach(item => {
         if (!item.rules) {
           if (item.fieldType !== 'group') {
-            let indexListArr = deepClone(indexList)
-            this.custGroupList.isDefaultExpanded = true
-            indexListArr.push(this.custGroupList)
+            // let indexListArr = deepClone(indexList)
+            let indexListArr = indexList
             let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
             let indexPathArr = indexPath.split(',')
             let a = indexListArr
@@ -239,7 +238,7 @@ export default {
                 }
               })
               // 加了分群包后无法自动展开
-              item.indexList = indexList// 给每一行规则都加上一个指标列表，同时展示选中项
+              item.indexList = indexListArr// 给每一行规则都加上一个指标列表，同时展示选中项
               if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
                 item.subFunc = item.func
                 item.func = 'relative_time'
@@ -266,10 +265,7 @@ export default {
               }
             }
           } else {
-             let indexListArr = deepClone(indexList)
-            this.custGroupList.isDefaultExpanded = true
-            indexListArr.push(this.custGroupList)
-            item.indexList = indexListArr
+            item.indexList = indexList
           }
         } else {
           this.updateInitRulesConfig(item, indexList)
