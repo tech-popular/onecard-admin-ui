@@ -50,6 +50,7 @@ export default {
       indexList: [],
       isSelectedUneffectIndex: [],
       lastSubmitRuleConfig: {},
+      custGroupList: {},
       subTimeSelects: [
         {
           code: 'DAYS', title: '天'
@@ -104,20 +105,19 @@ export default {
       })
     },
     getGroupInfos () {
+      this.custGroupList = {}
       selectDataGroupInfos({
         channelCode: this.channelId
       }).then(({data}) => {
-        let custGroupList = {}
         if (data.status !== '1') {
-          custGroupList = []
+          this.custGroupList = {}
         } else {
-          console.log('data:111 ', data);
-          custGroupList.id = data.data[0].id
-          custGroupList.label = data.data[0].name
-          custGroupList.children = []
+          this.custGroupList.id = data.data[0].id
+          this.custGroupList.label = data.data[0].name
+          this.custGroupList.children = []
           if (data.data[0].custGroupTemplateBases && data.data[0].custGroupTemplateBases.length) {
             data.data[0].custGroupTemplateBases.forEach(item => {
-              custGroupList.children.push({
+              this.custGroupList.children.push({
                 id: item.id,
                 label: item.name,
                 fieldType: 'group',
@@ -125,7 +125,7 @@ export default {
               })
             })
           }
-          this.indexList.push(custGroupList)
+          this.indexList.push(this.custGroupList)
         }
       })
     },
@@ -219,46 +219,57 @@ export default {
       this.updateConditionId(this.ruleConfig)
     },
     updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
+    console.log('indexList: ', JSON.parse(JSON.stringify(indexList)));
       arr.rules.forEach(item => {
         if (!item.rules) {
-          let indexListArr = deepClone(indexList)
-          let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
-          let indexPathArr = indexPath.split(',')
-          let a = indexListArr
-          if (indexPath) {
-            indexPathArr.forEach((fitem, findex) => {
-              if (findex < indexPathArr.length - 1) {
-                a[fitem].isDefaultExpanded = true
-                a = a[fitem].children
-              } else {
-                item.enable = a[fitem].enable
-              }
-            })
-            item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
-            if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
-              item.subFunc = item.func
-              item.func = 'relative_time'
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
-              }
-              this.getSelectOperateList(item.fieldType, (selectOperateList) => {
-                item.selectOperateList = selectOperateList
-                item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+          if (item.fieldType !== 'group') {
+            let indexListArr = deepClone(indexList)
+            this.custGroupList.isDefaultExpanded = true
+            indexListArr.push(this.custGroupList)
+            let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
+            let indexPathArr = indexPath.split(',')
+            let a = indexListArr
+            if (indexPath) {
+              indexPathArr.forEach((fitem, findex) => {
+                if (findex < indexPathArr.length - 1) {
+                  a[fitem].isDefaultExpanded = true
+                  a = a[fitem].children
+                } else {
+                  item.enable = a[fitem].enable
+                }
               })
-            }
-            if (item.func === 'relative_time_in' || item.func === 'relative_time') {
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
+              // 加了分群包后无法自动展开
+              item.indexList = indexList// 给每一行规则都加上一个指标列表，同时展示选中项
+              if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
+                item.subFunc = item.func
+                item.func = 'relative_time'
+                item.subTimeSelects = this.subTimeSelects
+                if (!item.dateDimension) {
+                  item.dateDimension = 'DAYS'
+                }
+                this.getSelectOperateList(item.fieldType, (selectOperateList) => {
+                  item.selectOperateList = selectOperateList
+                  item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+                })
+              }
+              if (item.func === 'relative_time_in' || item.func === 'relative_time') {
+                item.subTimeSelects = this.subTimeSelects
+                if (!item.dateDimension) {
+                  item.dateDimension = 'DAYS'
+                }
+              }
+              // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+              if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
+                if (!item.params[0].selectVal) {
+                  item.params[0].selectVal = [ item.params[0].value ]
+                }
               }
             }
-            // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
-            if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
-              if (!item.params[0].selectVal) {
-                item.params[0].selectVal = [ item.params[0].value ]
-              }
-            }
+          } else {
+             let indexListArr = deepClone(indexList)
+            this.custGroupList.isDefaultExpanded = true
+            indexListArr.push(this.custGroupList)
+            item.indexList = indexListArr
           }
         } else {
           this.updateInitRulesConfig(item, indexList)
@@ -282,6 +293,7 @@ export default {
         'selectEnumsList': [], // 内容下拉选
         'subFunc': '',
         'dateDimension': '',
+        'groupId': null,
         'strTips': [],
         'params': [{
           value: '',
