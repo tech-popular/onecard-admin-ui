@@ -164,16 +164,16 @@
       },
       //   菜单类型修改
       radioTypeChange (val) {
-        this.dataForm.type = val
-        if (val === 0) {
-          this.menuList = this.filterMenuGradeList(this.menuData)
-          this.dataForm.url = ''
-          this.dataForm.taskIds = []
-        } else {
+        // this.dataForm.type = val
+        // if (val === 0) {
+        //   this.menuList = this.filterMenuGradeList(this.menuData)
+        //   this.dataForm.url = ''
+        //   this.dataForm.taskIds = []
+        // } else {
           this.menuList = this.filterMenuList(this.menuData)
           this.dataForm.url = ''
           this.dataForm.taskIds = []
-        }
+        // }
       },
       // 获取上级菜单
       getRecursionList () {
@@ -183,7 +183,8 @@
         findAllRecursionList(params).then(({ data }) => {
           if (data && data.code === 0) {
             this.menuData = data.data
-            this.menuList = this.filterMenuGradeList(data.data)
+            // this.menuList = this.filterMenuGradeList(data.data)
+            this.menuList = this.filterMenuList(data.data)
           }
         })
       },

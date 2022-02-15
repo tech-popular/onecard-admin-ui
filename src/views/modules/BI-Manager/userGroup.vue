@@ -60,9 +60,9 @@
         label="成员人数"
         width="80">
       </el-table-column>
-      <el-table-column prop="enable" header-align="center" align="center" label="是否失效" width="80">
+      <el-table-column prop="flag" header-align="center" align="center" label="是否失效" width="80">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small">是</el-tag>
+          <el-tag v-if="scope.row.flag === 1" size="small">是</el-tag>
           <el-tag v-else size="small" type="danger">否</el-tag>
         </template>
       </el-table-column>

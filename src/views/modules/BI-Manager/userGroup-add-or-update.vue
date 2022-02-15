@@ -8,7 +8,22 @@
       <el-input v-model="dataForm.department" placeholder="用户组归属部门"></el-input>
     </el-form-item>
     <el-form-item label="用户组申请人" prop="creater">
-      <el-input v-model="dataForm.creater" placeholder="用户组申请人"></el-input>
+      <!-- <el-input v-model="dataForm.creater" placeholder="用户组申请人"></el-input> -->
+      <el-select 
+        v-model="dataForm.creater" 
+        placeholder="请输入关键字" 
+        style="width:100%" 
+        remote
+        :remote-method="getUserSelectList"
+        :loading="loading"
+        filterable>
+        <el-option
+          v-for="item in userIdList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.name">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="用户组说明" prop="remark">
       <el-input v-model="dataForm.remark" placeholder="用户组说明"></el-input>
@@ -42,8 +57,8 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="是否失效" prop="enable">
-      <el-radio-group v-model="dataForm.enable">
+    <el-form-item label="是否失效" prop="flag">
+      <el-radio-group v-model="dataForm.flag">
         <el-radio :label="0">否</el-radio>
         <el-radio :label="1">是</el-radio>
       </el-radio-group>
@@ -69,7 +84,7 @@ export default {
         department: '',
         creater: '',
         remark: '',
-        enable: 1,
+        flag: 1,
         // tenantId: '',
         userIds: []
       },
@@ -106,7 +121,7 @@ export default {
         //   message: '请选择用户组所属租户',
         //   trigger: 'blur'
         // }],
-        enable: [{
+        flag: [{
           required: true,
           message: '是否失效不能为空',
           trigger: 'blur'
@@ -133,13 +148,14 @@ export default {
           let userIdsData = data.data.userIds.split(',')
           this.dataForm.id = data.data.id
           this.dataForm.name = data.data.name
-          this.dataForm.enable = data.data.enable
+          this.dataForm.flag = data.data.flag
           this.dataForm.department = data.data.department
           this.dataForm.creater = data.data.creater
           this.dataForm.remark = data.data.remark
           // this.dataForm.tenantId = data.data.tenantId
           this.getUserSelectList()
           this.dataForm.userIds = userIdsData.map(item => { return +item })
+          this.userIdList = data.data.nameList
         }
       })
     },
@@ -169,6 +185,8 @@ export default {
         }).finally(() => {
           this.loading = false
         })
+      } else {
+        this.userIdList = []
       }
     },
     // 表单提交
@@ -181,7 +199,7 @@ export default {
             'creater': this.dataForm.creater,
             'remark': this.dataForm.remark,
             // 'tenantId': this.dataForm.tenantId,
-            'enable': this.dataForm.enable,
+            'flag': this.dataForm.flag,
             'userIds': this.dataForm.userIds.join(',')
             }
             console.log('params: ', params)
@@ -203,7 +221,6 @@ export default {
               })
             } else {
               params.id = this.dataForm.id
-              params.flag = 0
               updateUserGroupInfo(params).then(({data}) => {
                 if (data && data.code === 0) {
                   this.$message({
