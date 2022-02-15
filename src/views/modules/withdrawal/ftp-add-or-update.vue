@@ -48,13 +48,16 @@
                 </div>
               </el-col>
             </el-row>
-           <div style="margin-top: 30px;margin-left:25%;">
+           <div style="margin-top: 30px;margin-left:33%;">
              <el-form-item label="申请原因" prop="applyReason" style="width:50%">
                <el-input v-model="baseForm.applyReason"></el-input>
              </el-form-item>
-             <el-form-item label="提数类型" prop="withdrawalType"  style="width:50%" >
-                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="0">一次性</el-radio>
-                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">周期性</el-radio>
+             <el-form-item label="数据接收人" style="width:50%" label-width="100px">
+               <el-select v-model="baseForm.applyReason"></el-select>
+             </el-form-item>
+             <el-form-item label="接收方式" prop="withdrawalType"  style="width:50%" >
+                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="0">钉钉消息</el-radio>
+                <el-radio v-model="baseForm.withdrawalType"  @change="withdrawalTypeChange" label="1"  style="margin-left:5px;">邮件</el-radio>
             </el-form-item>
            </div>
         </div>

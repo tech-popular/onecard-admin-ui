@@ -107,7 +107,7 @@ export default {
     addOrUpdateFtpHandle () {
       this.addOrUpdateFtpVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdateFtp.init()
+        this.$refs.addOrUpdateftp.init()
       })
     },
     searchHistory () {
