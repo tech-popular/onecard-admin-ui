@@ -117,12 +117,14 @@ export default {
           let childData = []
           if (data.data[0].custGroupTemplateBases && data.data[0].custGroupTemplateBases.length) {
             data.data[0].custGroupTemplateBases.forEach(item => {
-              childData.push({
-                id: item.id,
-                label: item.name,
-                fieldType: 'group',
-                enable: true
-              })
+              if (this.id !== item.id) {
+                childData.push({
+                  id: item.id,
+                  label: item.name,
+                  fieldType: 'group',
+                  enable: true
+                })
+              }
             })
           }
           this.custGroupList.children = childData
