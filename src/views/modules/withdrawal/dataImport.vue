@@ -2,14 +2,14 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="上传人: ">
-        <el-input v-model="dataForm.roleName" placeholder="角色名称" clearable></el-input>
+        <el-input v-model="dataForm.userName" placeholder="角色名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="上传时间: ">
-        <el-input v-model="dataForm.roleName" placeholder="角色名称" clearable></el-input>
+        <el-input v-model="dataForm.createTime" placeholder="角色名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getDataList()">上传数据</el-button>
-        <el-button @click="resetHandle">下载模板</el-button>
+        <!-- <el-button @click="resetHandle">下载模板</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
@@ -44,6 +44,10 @@
 export default {
   data () {
     return {
+      dataForm: {
+        userName: '',
+        createTime: ''
+      },
       restaurants: [],
       dataList: [],
       pageIndex: 1,
