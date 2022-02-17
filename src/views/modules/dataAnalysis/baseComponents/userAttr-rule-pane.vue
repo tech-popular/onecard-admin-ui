@@ -17,7 +17,7 @@
 </template>
 <script>
 import dataRulesSet from './data-rules-set'
-import { selectOperate, selectAllCata, enumTypeList, dataIndexManagerCandidate } from '@/api/dataAnalysis/dataInsightManage'
+import { selectOperate, selectAllCata, enumTypeList, dataIndexManagerCandidate, selectDataGroupInfos } from '@/api/dataAnalysis/dataInsightManage'
 import { findRuleIndex, getAbc, findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -50,6 +50,7 @@ export default {
       indexList: [],
       isSelectedUneffectIndex: [],
       lastSubmitRuleConfig: {},
+      custGroupList: {},
       subTimeSelects: [
         {
           code: 'DAYS', title: '天'
@@ -96,9 +97,38 @@ export default {
           this.indexList = []
         } else {
           this.indexList = this.filterAllCata(data.data)
+          this.getGroupInfos()
         }
         if (fn) {
           fn(this.indexList)
+        }
+      })
+    },
+    getGroupInfos () {
+      this.custGroupList = {}
+      selectDataGroupInfos({
+        channelCode: this.channelId
+      }).then(({data}) => {
+        if (data.status !== '1') {
+          this.custGroupList = {}
+        } else {
+          this.custGroupList.id = data.data[0].id
+          this.custGroupList.label = data.data[0].name
+          let childData = []
+          if (data.data[0].custGroupTemplateBases && data.data[0].custGroupTemplateBases.length) {
+            data.data[0].custGroupTemplateBases.forEach(item => {
+              if (this.id !== item.id) {
+                childData.push({
+                  id: item.id,
+                  label: item.name,
+                  fieldType: 'group',
+                  enable: true
+                })
+              }
+            })
+          }
+          this.custGroupList.children = childData
+          this.indexList.push(this.custGroupList)
         }
       })
     },
@@ -194,44 +224,50 @@ export default {
     updateInitRulesConfig (arr, indexList) {  // 获取指标默认展开列表
       arr.rules.forEach(item => {
         if (!item.rules) {
-          let indexListArr = deepClone(indexList)
-          let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
-          let indexPathArr = indexPath.split(',')
-          let a = indexListArr
-          if (indexPath) {
-            indexPathArr.forEach((fitem, findex) => {
-              if (findex < indexPathArr.length - 1) {
-                a[fitem].isDefaultExpanded = true
-                a = a[fitem].children
-              } else {
-                item.enable = a[fitem].enable
-              }
-            })
-            item.indexList = indexListArr // 给每一行规则都加上一个指标列表，同时展示选中项
-            if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
-              item.subFunc = item.func
-              item.func = 'relative_time'
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
-              }
-              this.getSelectOperateList(item.fieldType, (selectOperateList) => {
-                item.selectOperateList = selectOperateList
-                item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+          if (item.fieldType !== 'group') {
+            // let indexListArr = deepClone(indexList)
+            let indexListArr = indexList
+            let indexPath = findVueSelectItemIndex(indexListArr, item.fieldCode) + ''
+            let indexPathArr = indexPath.split(',')
+            let a = indexListArr
+            if (indexPath) {
+              indexPathArr.forEach((fitem, findex) => {
+                if (findex < indexPathArr.length - 1) {
+                  a[fitem].isDefaultExpanded = true
+                  a = a[fitem].children
+                } else {
+                  item.enable = a[fitem].enable
+                }
               })
-            }
-            if (item.func === 'relative_time_in' || item.func === 'relative_time') {
-              item.subTimeSelects = this.subTimeSelects
-              if (!item.dateDimension) {
-                item.dateDimension = 'DAYS'
+              // 加了分群包后无法自动展开
+              item.indexList = indexListArr// 给每一行规则都加上一个指标列表，同时展示选中项
+              if (item.func === 'relative_within' || item.func === 'relative_before') { // 兼容老数据
+                item.subFunc = item.func
+                item.func = 'relative_time'
+                item.subTimeSelects = this.subTimeSelects
+                if (!item.dateDimension) {
+                  item.dateDimension = 'DAYS'
+                }
+                this.getSelectOperateList(item.fieldType, (selectOperateList) => {
+                  item.selectOperateList = selectOperateList
+                  item.subSelects = item.selectOperateList.filter(sitem => sitem.code === item.func)[0].subSelects
+                })
+              }
+              if (item.func === 'relative_time_in' || item.func === 'relative_time') {
+                item.subTimeSelects = this.subTimeSelects
+                if (!item.dateDimension) {
+                  item.dateDimension = 'DAYS'
+                }
+              }
+              // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
+              if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
+                if (!item.params[0].selectVal) {
+                  item.params[0].selectVal = [ item.params[0].value ]
+                }
               }
             }
-            // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
-            if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
-              if (!item.params[0].selectVal) {
-                item.params[0].selectVal = [ item.params[0].value ]
-              }
-            }
+          } else {
+            item.indexList = indexList
           }
         } else {
           this.updateInitRulesConfig(item, indexList)
@@ -255,6 +291,7 @@ export default {
         'selectEnumsList': [], // 内容下拉选
         'subFunc': '',
         'dateDimension': '',
+        'groupId': null,
         'strTips': [],
         'params': [{
           value: '',
@@ -403,45 +440,49 @@ export default {
       this.updateRulesArr(data, citem, { params: newArr })
     },
     fieldCodeChange (data, citem, obj) { // rxs更新数据
-      this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
-        let params = {
-          selectOperateList: selectOperateList,
-          func: selectOperateList[0].code,
-          subFunc: '',
-          dateDimension: '',
-          strTips: [],
-          params: [{ value: '', title: '' }]
-        }
-        if (params.func === 'relative_time') {
-          params.subFunc = 'relative_before'
-          params.dateDimension = 'DAYS'
-        }
-        if (params.func === 'relative_time_in') {
-          params.dateDimension = 'DAYS'
-        }
-        Object.keys(obj).forEach(oitem => {
-          params[oitem] = obj[oitem]
-        })
-        if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-        }
-        if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
-          params.params = [{ value: [], title: '' }]
-          let res = data
-          dataIndexManagerCandidate({ // 字符串提示输入示例
-            sourceTable: obj.sourceTable,
-            fieldName: obj.englishName,
-            count: 10
-          }).then(({data}) => {
-            if (data.status * 1 === 1 && data.data.length) {
-              params.strTips = data.data
-            }
-            this.updateRulesArr(res, citem, params)
+      if (obj.fieldType !== 'group') {
+        this.getSelectOperateList(obj.fieldType, (selectOperateList) => {
+          let params = {
+            selectOperateList: selectOperateList,
+            func: selectOperateList[0].code,
+            subFunc: '',
+            dateDimension: '',
+            strTips: [],
+            params: [{ value: '', title: '' }]
+          }
+          if (params.func === 'relative_time') {
+            params.subFunc = 'relative_before'
+            params.dateDimension = 'DAYS'
+          }
+          if (params.func === 'relative_time_in') {
+            params.dateDimension = 'DAYS'
+          }
+          Object.keys(obj).forEach(oitem => {
+            params[oitem] = obj[oitem]
           })
-        } else {
-          this.updateRulesArr(data, citem, params)
-        }
-      })
+          if (obj.fieldType === 'number' && (params.func === 'eq' || params.func === 'neq')) {
+            params.params = [{ value: [], title: '' }]
+          }
+          if (obj.fieldType === 'string' && (params.func === 'eq' || params.func === 'neq')) {
+            params.params = [{ value: [], title: '' }]
+            let res = data
+            dataIndexManagerCandidate({ // 字符串提示输入示例
+              sourceTable: obj.sourceTable,
+              fieldName: obj.englishName,
+              count: 10
+            }).then(({data}) => {
+              if (data.status * 1 === 1 && data.data.length) {
+                params.strTips = data.data
+              }
+              this.updateRulesArr(res, citem, params)
+            })
+          } else {
+            this.updateRulesArr(data, citem, params)
+          }
+        })
+      } else {
+        this.updateRulesArr(data, citem, obj)
+      }
     },
     addChildreRules (data, citem) { // 添加子集
       let indexPath = findRuleIndex(data.rules, citem) + ''
@@ -526,20 +567,22 @@ export default {
       this.isSelectedUneffectIndex = []
       arr.rules.forEach(item => {
         if (!item.rules) {
-          item.selectOperateList = item.selectOperateList.filter(sitem => sitem.code === item.func)
-          let selectEnumsArr = []
-          item.selectEnumsList.forEach(sitem => {
-            item.params.forEach(pitem => {
-              if (sitem.childrenNum === pitem.value) {
-                selectEnumsArr.push(sitem)
-              }
+          if (item.fieldType !== 'group') {
+            item.selectOperateList = item.selectOperateList.filter(sitem => sitem.code === item.func)
+            let selectEnumsArr = []
+            item.selectEnumsList.forEach(sitem => {
+              item.params.forEach(pitem => {
+                if (sitem.childrenNum === pitem.value) {
+                  selectEnumsArr.push(sitem)
+                }
+              })
             })
-          })
-          item.selectEnumsList = selectEnumsArr
-          item.indexList = []
-          if (item.label && !item.enable) {
-            this.isSelectedUneffectIndex.push(item.label)
+            item.selectEnumsList = selectEnumsArr
           }
+            item.indexList = []
+            if (item.label && !item.enable) {
+              this.isSelectedUneffectIndex.push(item.label)
+            }
         } else {
           if (item.rules) {
             this.updateRulesConfig(item)
