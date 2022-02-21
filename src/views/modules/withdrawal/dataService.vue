@@ -30,12 +30,6 @@
 			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="失效原因"></el-table-column>
 			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="距离失效日期"></el-table-column>
       <el-table-column prop="inDatasourceName" header-align="center" align="center" label="接收人"></el-table-column>
-      <!-- <el-table-column prop="enable" header-align="center" align="center" label="是否启用">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small">正常</el-tag>
-          <el-tag v-else size="small" type="danger">禁用</el-tag>
-        </template>
-      </el-table-column> -->
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
