@@ -135,7 +135,7 @@ export default {
       biExcelUpload(form).then(({ data }) => {
         if (data.code === 0) {
           this.$message({
-            message: '操作成功',
+            message: '上传成功',
             type: 'success',
             duration: 1500,
             onClose: () => {
