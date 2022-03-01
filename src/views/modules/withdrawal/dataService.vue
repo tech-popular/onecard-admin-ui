@@ -2,17 +2,10 @@
   <div class="mod-config">
     <el-form :inline="true">
       <el-form-item>
-        <el-button type="primary"  @click="addOrUpdateSqlHandle">SQL提数申请</el-button>
-        <!-- <el-button type="primary"  @click="searchHistory">申请申请</el-button> -->
-        <el-button type="primary" @click="addOrUpdateFtpHandle">FTP提数申请</el-button>
+        <el-button type="primary" @click="addOrUpdateSqlHandle">SQL提数申请</el-button>
       </el-form-item>
     </el-form>
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      style="width: 100%;"
-    >
+    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="序号"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="申请原因">
         <template slot-scope="scope">
@@ -25,10 +18,10 @@
       <el-table-column prop="ipAddress" header-align="center" align="center" label="申请时间"></el-table-column>
       <el-table-column prop="cron" header-align="center" align="center" show-overflow-tooltip label="提数类型"></el-table-column>
       <el-table-column prop="sql" header-align="center" align="center" label="接收时间"></el-table-column>
-			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="申请状态"></el-table-column>
-			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="是否失效"></el-table-column>
-			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="失效原因"></el-table-column>
-			<el-table-column prop="inDatasourceName" header-align="center" align="center" label="距离失效日期"></el-table-column>
+      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="申请状态"></el-table-column>
+      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="是否失效"></el-table-column>
+      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="失效原因"></el-table-column>
+      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="距离失效日期"></el-table-column>
       <el-table-column prop="inDatasourceName" header-align="center" align="center" label="接收人"></el-table-column>
     </el-table>
     <el-pagination
@@ -40,9 +33,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
-		<addOrUpdateSql v-if="addOrUpdateSqlVisible" ref="addOrUpdateSql"></addOrUpdateSql>
-    <addOrUpdateFtp  v-if="addOrUpdateFtpVisible" ref="addOrUpdateftp"></addOrUpdateFtp>
-    <!-- <dataServiceHistory v-if="dataServiceHistoryVisible" ref="dataServiceHistory"></dataServiceHistory> -->
+    <addOrUpdateSql v-if="addOrUpdateSqlVisible" ref="addOrUpdateSql"></addOrUpdateSql>
   </div>
 </template>
 <style>
@@ -51,10 +42,7 @@
 }
 </style>
 <script>
-// import addOrUpdate from './service-add-or-update'
 import addOrUpdateSql from './sql-add-or-update'
-import addOrUpdateFtp from './ftp-add-or-update'
-// import dataServiceHistory from './dataService-history'
 export default {
   data () {
     return {
@@ -64,12 +52,10 @@ export default {
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
-      addOrUpdateSqlVisible: false,
-      addOrUpdateFtpVisible: false,
-      dataServiceHistoryVisible: false
+      addOrUpdateSqlVisible: false
     }
   },
-  components: { addOrUpdateSql, addOrUpdateFtp },
+  components: { addOrUpdateSql },
   activated () {
     this.getDataList()
   },
@@ -96,18 +82,6 @@ export default {
       this.addOrUpdateSqlVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdateSql.init()
-      })
-    },
-    addOrUpdateFtpHandle () {
-      this.addOrUpdateFtpVisible = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdateftp.init()
-      })
-    },
-    searchHistory () {
-      this.dataServiceHistoryVisible = true
-      this.$nextTick(() => {
-        this.$refs.dataServiceHistory.init()
       })
     }
   }
