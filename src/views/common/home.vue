@@ -275,10 +275,9 @@ export default {
           })
         } else { // 外链系统，进行页面跳转
           if (item.name === '新BI系统') {
-            console.log('8888', this.$cookie.get('token'))
-            let url = item.url + '?token=' + this.$cookie.get('token') + '&userId=' + sessionStorage.getItem('id')
-            window.open(url, '_blank')
-            // window.location.href = item.url + '?token=' + this.$cookie.get('token') + '?userId=' + sessionStorage.getItem('id')
+            // let url = item.url + '?token=' + this.$cookie.get('token') + '&userId=' + sessionStorage.getItem('id')
+            // window.open(url, '_blank')
+            window.location.href = item.url + '?token=' + this.$cookie.get('token') + '&userId=' + sessionStorage.getItem('id')
           } else {
             window.open(item.url, '_blank')
           }
