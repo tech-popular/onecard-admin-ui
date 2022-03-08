@@ -170,9 +170,9 @@ export default {
         {
           name: '新BI系统',
           img: require('../../assets/img/newBI.png'),
-          // url: originHost + '/bi/#/'
+          url: originHost + '/bi/#/'
           // url: 'http://tech.9fbank.com/bi/#/'
-          url: 'http://10.3.0.50:3088/#/'
+          // url: 'http://10.3.0.50:3088/#/'
         }
       ]
     }
@@ -276,8 +276,8 @@ export default {
           })
         } else { // 外链系统，进行页面跳转
           if (item.name === '新BI系统') {
-            let url = item.url + '?token=' + this.$cookie.get('token') + '&userId=' + sessionStorage.getItem('id')
-            window.open(url, '_blank')
+            // let url = item.url + '?token=' + this.$cookie.get('token') + '&userId=' + sessionStorage.getItem('id')
+            window.open(item.url, '_blank')
             // window.location.href = item.url + '?token=' + this.$cookie.get('token') + 'userId=' + sessionStorage.getItem('id')
           } else {
             window.open(item.url, '_blank')
