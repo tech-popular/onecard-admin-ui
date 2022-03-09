@@ -643,10 +643,10 @@
         ],
         timeIntervalList: [],
         dispatchCycleList: [
-          {value: 'MINUTE', label: '分钟'},
+          // {value: 'MINUTE', label: '分钟'},
           {value: 'HOUR', label: '小时'},
           {value: 'DAY', label: '日'},
-          {value: 'WEEK', label: '周'},
+          // {value: 'WEEK', label: '周'},
           {value: 'MONTH', label: '月'}
         ],
         dayOfWeeksList: [
