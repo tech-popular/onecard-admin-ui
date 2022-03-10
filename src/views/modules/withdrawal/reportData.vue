@@ -28,7 +28,7 @@ export default {
   data () {
     return {
       dataList: [],
-      dataListLoading: false,
+      dataListLoading: false
     }
   },
   activated () {

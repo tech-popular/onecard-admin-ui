@@ -1150,7 +1150,6 @@
             postData.taskScheduleConfig.jobValue = data.dayOfWeeks.join(',')
           } else if (data.runCycle == 'MONTH') {
             postData.taskScheduleConfig.jobValue = data.dayOfMonths.join(',')
-            console.log('data.dayOfMonths: ', data.dayOfMonths);
           } else if (data.runCycle == 'MINUTE' || data.runCycle == 'HOUR') {
             let startTime = new Date(typeof this.baseForm.startTime === 'object' ? this.baseForm.startTime : parseInt(this.baseForm.startTime))
             let startHour = startTime.getHours() < 10 ? '0' + startTime.getHours() : startTime.getHours().toString()
