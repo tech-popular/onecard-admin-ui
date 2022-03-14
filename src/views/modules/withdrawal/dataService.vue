@@ -6,23 +6,28 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" align="center" label="序号"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="申请原因">
+      <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
+      <el-table-column prop="approveReason" header-align="center" align="center" label="申请原因">
         <template slot-scope="scope">
           <el-tooltip effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.name)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.name}}</div>
+            <div v-html="toBreak(scope.row.approveReason)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.approveReason}}</div>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="ipAddress" header-align="center" align="center" label="申请时间"></el-table-column>
-      <el-table-column prop="cron" header-align="center" align="center" show-overflow-tooltip label="提数类型"></el-table-column>
-      <el-table-column prop="sql" header-align="center" align="center" label="接收时间"></el-table-column>
-      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="申请状态"></el-table-column>
-      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="是否失效"></el-table-column>
-      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="失效原因"></el-table-column>
-      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="距离失效日期"></el-table-column>
-      <el-table-column prop="inDatasourceName" header-align="center" align="center" label="接收人"></el-table-column>
+      <el-table-column prop="createTime" header-align="center" align="center" label="申请时间"></el-table-column>
+      <el-table-column prop="createUser" header-align="center" align="center" label="申请人"></el-table-column>
+      <el-table-column prop="exportType" header-align="center" align="center" show-overflow-tooltip label="提数类型"></el-table-column>
+      <el-table-column prop="expiryTime" header-align="center" align="center" label="过期时间"></el-table-column>
+      <el-table-column prop="enable" header-align="center" align="center" label="是否失效">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.enable === 1" size="small">是</el-tag>
+          <el-tag v-else size="small" type="danger">否</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="period" header-align="center" align="center" label="周期"></el-table-column>
+      <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天数"></el-table-column>
+      <el-table-column prop="remainDay" header-align="center" align="center" label="距离失效日期"></el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -42,6 +47,7 @@
 }
 </style>
 <script>
+import { exportDataList } from '@/api/biExport/dataService'
 import addOrUpdateSql from './sql-add-or-update'
 export default {
   data () {
@@ -64,7 +70,22 @@ export default {
   methods: {
     // 获取数据列表
     getDataList () {
-      // this.dataListLoading = true
+      this.dataListLoading = true
+      let params = {
+        pageNum: this.pageIndex,
+        pageSize: this.pageSize
+      }
+      exportDataList(params).then(({ data }) => {
+        console.log('res: ', data)
+        if (data.code === 0 && data.data) {
+          this.dataList = data.data.list
+          this.totalPage = data.data.totalCount
+          this.dataListLoading = false
+        } else {
+          this.dataList = []
+          this.dataListLoading = false
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (val) {
