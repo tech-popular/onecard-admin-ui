@@ -47,16 +47,16 @@
                   <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
                     <el-input v-model="baseForm.addingDatabase.accessKey" type="password"></el-input>
                   </el-form-item>
-                  <el-button style="float: right; margin-right: 10px;" type="success" plain>保存</el-button>
+                  <el-button style="float: right; margin-right: 10px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
                 </div>
                 <div style="width:70%">
-                  <el-form-item prop="serviceSql" label="SQL：" ref="serviceBeginSqlForm">
+                  <el-form-item prop="sql" label="SQL：" ref="serviceBeginSqlForm">
                     <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative;">
                       <codemirror
                         ref="serviceBeginSql"
-                        v-model="baseForm.serviceSql"
+                        v-model="baseForm.sql"
                         :options="cmOptions"
-                        @changes="cm => workItemChanges(cm, acquisitionTask.serviceSql, 'serviceBeginSqlForm', 'serviceBeginSql')"
+                        @changes="cm => workItemChanges(cm, acquisitionTask.sql, 'serviceBeginSqlForm', 'serviceBeginSql')"
                         @keydown.native="e => workItemKeyDown(e, 'serviceBeginSql')"
                         class="code"
                         style="padding-bottom: 0px;"
@@ -69,26 +69,33 @@
                   <el-form-item>
                     <span>执行完成，执行时间3S 预览查询结果（随机展示10条数据）</span>
                   </el-form-item>
-                  <el-form-item label="申请原因" prop="applyReason">
-                    <el-input v-model="baseForm.applyReason"></el-input>
-                  </el-form-item>
-                  <el-form-item label="提数类型" prop="withdrawalType">
-                    <el-radio v-model="baseForm.withdrawalType" @change="withdrawalTypeChange" label="0">一次性</el-radio>
-                    <el-radio v-model="baseForm.withdrawalType" @change="withdrawalTypeChange" label="1" style="margin-left:5px;">周期性</el-radio>
-                  </el-form-item>
-                  <el-form-item label="提数周期" prop="applyReason">
-                    <el-input v-model="baseForm.applyReason"></el-input>
-                  </el-form-item>
-                  <el-form-item label="接受天设置" prop="applyReason" label-width="90px">
-                    <el-input v-model="baseForm.applyReason"></el-input>
-                  </el-form-item>
-                  <el-form-item label="允许接收时间段" label-width="120px">
-                    <el-time-picker is-range v-model="baseForm.applyReason" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
-                  </el-form-item>
-                  <el-form-item prop="withdrawalType">
-                    <el-radio v-model="baseForm.withdrawalType" @change="withdrawalTypeChange" label="0">本人申请</el-radio>
-                    <el-radio v-model="baseForm.withdrawalType" @change="withdrawalTypeChange" label="1" style="margin-left:5px;">用户组申请</el-radio>
-                  </el-form-item>
+                  <div style="margin-left:50px;">
+                    <el-form-item label="申请原因" prop="approveReason">
+                      <el-input v-model="baseForm.approveReason"></el-input>
+                    </el-form-item>
+                    <el-form-item label="提数类型" prop="exportType">
+                      <el-radio v-model="baseForm.exportType" label="once">一次性</el-radio>
+                      <el-radio v-model="baseForm.exportType" label="period" style="margin-left:5px;">周期性</el-radio>
+                    </el-form-item>
+                    <el-form-item label="提数周期" prop="period" v-if="baseForm.exportType === 'period'">
+                      <el-select v-model="baseForm.period" placeholder="请选择" style="width:220px;" @change="disTimeTurnOff (baseForm.period)">
+                        <el-option v-for="item in sqlCycleList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'" label-width="90px">
+                      <el-select v-model="baseForm.receiveDays" multiple collapse-tags placeholder="请选择">
+                        <el-option v-for="item in receiveDaysList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px" style="width:400px;">
+                      <el-time-picker is-range v-model="baseForm.receiveTime" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
+                    </el-form-item>
+                    <el-form-item prop="receiver" label="接收人">
+                      <el-select filterable v-model="baseForm.receiver" placeholder="请选择">
+                        <el-option v-for="item in databaseIdList" :key="item.id" :label="item.databaseName" :value="item.id"></el-option>
+                      </el-select>
+                    </el-form-item>
+                  </div>
                 </div>
               </div>
             </el-tab-pane>
@@ -103,7 +110,7 @@
   </el-drawer>
 </template>
 <script>
-import { datasourceDataList, databaseDataList, sqlPreview } from '@/api/biExport/dataService'
+import { datasourceDataList, databaseDataList, sqlPreview, checkDatasource, saveDatasource } from '@/api/biExport/dataService'
 // import {isInnerIPFn} from '@/utils/validate'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -124,12 +131,18 @@ export default {
       dataListLoading: false,
       baseForm: {
         id: '',
-        withdrawalMethod: '0',
-        datasourceId: '',
-        dataBaseId: '',
-        serviceSql: '',
-        applyReason: '',
-        withdrawalType: '0',
+        dataSourceId: '', // 数据源id
+        dataBaseId: '', // 数据库id
+        sql: '', // sql
+        applyReason: '', // 申请原因
+        period: '', // 提数周期
+        receiveDays: '', // 接收天设置
+        receiveTime: ['08:00:00', '23:59:59'],
+        // receiveStartTime: '', // 允许接收时间开始时间
+        // receiveEndTime: '', // 允许接收时间接收时间
+        exportType: 'once', // 提数类型
+        receiveType: '0', // 接收类型
+        receiver: [], // 接收人
         addingDatabase: {
           'type': 'mysql',
           'url': '',
@@ -142,8 +155,25 @@ export default {
       },
       datasourceList: [],
       databaseIdList: [],
+      receiveDaysList: [], // 接收天设置list
       dataList: [],
       multipleSelection: [], // 多选数据
+      sqlCycleList: [
+        { value: 'HOUR', label: '小时' },
+        { value: 'DAY', label: '天' },
+        { value: 'WEEK', label: '周' },
+        { value: 'MONTH', label: '月' }
+      ],
+      dayOfWeeksList: [
+        { value: 'MON', label: '周一' },
+        { value: 'TUE', label: '周二' },
+        { value: 'WED', label: '周三' },
+        { value: 'THU', label: '周四' },
+        { value: 'FRI', label: '周五' },
+        { value: 'SAT', label: '周六' },
+        { value: 'SUN', label: '周日' }
+      ],
+      dayOfMonthsList: [],
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
@@ -209,19 +239,59 @@ export default {
         }
       })
     },
+    // 保存数据源管理
+    handleSaveDatasource () {
+      let params = {
+        type: this.baseForm.addingDatabase.type,
+        database: this.baseForm.addingDatabase.database
+      }
+      if (this.baseForm.addingDatabase.type === 'mysql') {
+        params.url = this.baseForm.addingDatabase.url
+        params.user = this.baseForm.addingDatabase.user
+        params.passwd = this.baseForm.addingDatabase.passwd
+        checkDatasource(params).then(({ data }) => {
+          console.log('data:111', data);
+        })
+      } else {
+        params.accessId = this.baseForm.addingDatabase.accessId
+        params.accessKey = this.baseForm.addingDatabase.accessKey
+        saveDatasource(params).then(({ data }) => {
+          console.log('data: 222', data);
+        })
+      }
+
+    },
     // sql执行预览
     dataSqlSubmit () {
       let params = {
         'dataBaseId': this.baseForm.dataBaseId,
-        'sql': this.baseForm.serviceSql
+        'sql': this.baseForm.sql
       }
       sqlPreview(params).then(({ data }) => {
         console.log('sql执行预览: ', data)
       })
     },
-    // 提数方式改变
-    withdrawalTypeChange () {
-
+    //  提数 时间间隔 数据切换
+    disTimeTurnOff (disType) {
+      let tempArry = []
+      if (disType === 'DAY') {
+        tempArry.push({ value: '每天', label: '每天' })
+      } else if (disType === 'HOUR') {
+        for (let i = 1, j = 24; i < j; i++) {
+          tempArry.push({ value: i, label: '每隔' + i + '小时' })
+        }
+      } else if (disType === 'MONTH') {
+        for (let i = 1, j = 32; i < j; i++) {
+          tempArry.push({ value: i, label: '每月' + i + '号' })
+        }
+        // tempArry.push({ value: '-1', label: '每月最后一天' })
+      }
+      this.baseForm.receiveDays = ''
+      if (disType === 'WEEK') {
+        this.receiveDaysList = this.dayOfWeeksList
+      } else {
+        this.receiveDaysList = tempArry
+      }
     },
     workItemChanges (cm, sql, refForm, selfRef) { // 内容更新时，不为空时将报错信息去除
       if (sql !== '') {
