@@ -5,7 +5,7 @@
       <i class="el-icon-close drawer-close" @click="drawerClose"></i>
     </div>
     <div class="wrap">
-      <el-form v-loading="loading" :model="baseForm" label-width="80px" ref="baseForm" class="base-form">
+      <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-width="80px" ref="baseForm" class="base-form">
         <div class="base-pane">
           <el-tabs type="border-card">
             <el-tab-pane label="自助查询">
@@ -67,33 +67,50 @@
                     <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
                   <el-form-item>
-                    <span>执行完成，执行时间3S 预览查询结果（随机展示10条数据）</span>
+                    <span>
+                      执行完成，执行时间3S
+                      <el-button type="text" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
+                    </span>
                   </el-form-item>
                   <div style="margin-left:50px;">
-                    <el-form-item label="申请原因" prop="approveReason">
-                      <el-input v-model="baseForm.approveReason"></el-input>
+                    <el-form-item label="申请原因" prop="applyReason">
+                      <el-input v-model="baseForm.applyReason" type="textarea"></el-input>
                     </el-form-item>
                     <el-form-item label="提数类型" prop="exportType">
                       <el-radio v-model="baseForm.exportType" label="once">一次性</el-radio>
                       <el-radio v-model="baseForm.exportType" label="period" style="margin-left:5px;">周期性</el-radio>
                     </el-form-item>
                     <el-form-item label="提数周期" prop="period" v-if="baseForm.exportType === 'period'">
-                      <el-select v-model="baseForm.period" placeholder="请选择" style="width:220px;" @change="disTimeTurnOff (baseForm.period)">
+                      <el-select v-model="baseForm.period" placeholder="请选择" class="reject-pane-item" @change="disTimeTurnOff (baseForm.period)">
                         <el-option v-for="item in sqlCycleList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'" label-width="90px">
-                      <el-select v-model="baseForm.receiveDays" multiple collapse-tags placeholder="请选择">
+                    <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'" label-width="100px">
+                      <el-select v-model="baseForm.receiveDays" class="reject-pane-item" multiple collapse-tags placeholder="请选择">
                         <el-option v-for="item in receiveDaysList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px" style="width:400px;">
-                      <el-time-picker is-range v-model="baseForm.receiveTime" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
+                    <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px">
+                      <el-time-picker
+                        is-range
+                        :clearable="false"
+                        format="HH:mm"
+                        v-model="baseForm.receiveTime"
+                        range-separator="至"
+                        style="width:400px;"
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                        placeholder="选择时间范围"
+                      ></el-time-picker>
                     </el-form-item>
-                    <el-form-item prop="receiver" label="接收人">
-                      <el-select filterable v-model="baseForm.receiver" placeholder="请选择">
-                        <el-option v-for="item in databaseIdList" :key="item.id" :label="item.databaseName" :value="item.id"></el-option>
+                    <el-form-item prop="receiver" label="数据接收人" label-width="100px">
+                      <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
+                        <el-option v-for="item in userList" :value="item.id" :key="item.id" :label="item.name || item.username "></el-option>
                       </el-select>
+                    </el-form-item>
+                    <el-form-item label="提数方式" prop="receiveType">
+                      <el-radio v-model="baseForm.receiveType" label="0">钉钉</el-radio>
+                      <el-radio v-model="baseForm.receiveType" label="1" style="margin-left:5px;">邮件</el-radio>
                     </el-form-item>
                   </div>
                 </div>
@@ -104,13 +121,13 @@
       </el-form>
     </div>
     <div class="footer">
-      <el-button type="primary" @click="cancelHandle" size="small">立即申请</el-button>
+      <el-button type="primary" @click="severDataFormSubmit" size="small">立即申请</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
   </el-drawer>
 </template>
 <script>
-import { datasourceDataList, databaseDataList, sqlPreview, checkDatasource, saveDatasource } from '@/api/biExport/dataService'
+import { datasourceDataList, databaseDataList, sqlPreview, checkDatasource, saveDatasource, getUsersList, saveDatabySql } from '@/api/biExport/dataService'
 // import {isInnerIPFn} from '@/utils/validate'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -137,7 +154,7 @@ export default {
         applyReason: '', // 申请原因
         period: '', // 提数周期
         receiveDays: '', // 接收天设置
-        receiveTime: ['08:00:00', '23:59:59'],
+        receiveTime: ['08:00', '23:59'],
         // receiveStartTime: '', // 允许接收时间开始时间
         // receiveEndTime: '', // 允许接收时间接收时间
         exportType: 'once', // 提数类型
@@ -156,7 +173,7 @@ export default {
       datasourceList: [],
       databaseIdList: [],
       receiveDaysList: [], // 接收天设置list
-      dataList: [],
+      userList: [],
       multipleSelection: [], // 多选数据
       sqlCycleList: [
         { value: 'HOUR', label: '小时' },
@@ -205,19 +222,56 @@ export default {
           showToken: true
         },
         styleSelectedText: true
+      },
+      baseRule: {
+        dataSourceId: [
+          { required: true, message: '请选择服务器', trigger: 'change' }
+        ],
+        dataBaseId: [
+          { required: true, message: '请选择数据库', trigger: 'change' }
+        ],
+        applyReason: [
+          { required: true, message: '请输入申请原因', trigger: 'blur' }
+        ],
+        receiveDays: [
+          { required: true, message: '请选择接收天设置', trigger: 'change' }
+        ],
+        exportType: [
+          { required: true, message: '请选择提数类型', trigger: 'change' }
+        ],
+        receiveType: [
+          { type: 'date', required: true, message: '请选择接收类型', trigger: 'change' }
+        ],
+        receiver: [
+          { type: 'array', required: true, message: '请选择接收人', trigger: 'change' }
+        ],
+        period: [
+          { required: true, message: '请选择提数周期', trigger: 'change' }
+        ]
       }
     }
-  },
-  mounted () {
-    // this.isInnerIP = isInnerIPFn()
-    // console.log('1112', isInnerIPFn())
   },
   components: { codemirror },
   methods: {
     // 打开抽屉弹窗
     init () {
       this.getSourceDataList()
+      this.getUsersList()
       this.visible = true
+      this.$nextTick(() => {
+        this.$refs['baseForm'].resetFields()
+      })
+    },
+    // 获取用户同一租户下的列表
+    getUsersList () {
+      let tenantId = sessionStorage.getItem('tenantId')
+      getUsersList(tenantId).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.userList = data.data
+        } else {
+          this.userList = []
+        }
+      })
     },
     // 获取服务器列表
     getSourceDataList () {
@@ -242,24 +296,68 @@ export default {
     // 保存数据源管理
     handleSaveDatasource () {
       let params = {
-        type: this.baseForm.addingDatabase.type,
-        database: this.baseForm.addingDatabase.database
+        'type': this.baseForm.addingDatabase.type,
+        'database': this.baseForm.addingDatabase.database
       }
       if (this.baseForm.addingDatabase.type === 'mysql') {
         params.url = this.baseForm.addingDatabase.url
         params.user = this.baseForm.addingDatabase.user
         params.passwd = this.baseForm.addingDatabase.passwd
         checkDatasource(params).then(({ data }) => {
-          console.log('data:111', data);
+          console.log('data:111', data)
+          if (data && data.code === 0) {
+            if (!data.data) {
+              this.handleSaveDatasourceData(params)
+            } else if (data.data.user === params.user && data.data.passwd === params.passwd) {
+              this.$confirm('当前登录用户，数据源已存在', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '修改',
+                type: 'warning'
+              }).then(() => {
+                this.handleSaveDatasourceData(params)
+              })
+            } else if (data.data.user === params.user && data.data.passwd !== params.passwd) {
+              this.$confirm('当前登录用户，数据源下用户名相同，是否覆盖密码', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                this.handleSaveDatasourceData(params)
+              })
+            } else if (data.data.user !== params.user && data.data.passwd !== params.passwd) {
+              this.$confirm('当前登录用户，数据源已存在 是否覆盖用户名和密码', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                this.handleSaveDatasourceData(params)
+              })
+            }
+          }
         })
       } else {
         params.accessId = this.baseForm.addingDatabase.accessId
         params.accessKey = this.baseForm.addingDatabase.accessKey
-        saveDatasource(params).then(({ data }) => {
-          console.log('data: 222', data);
-        })
+        this.handleSaveDatasourceData(params)
       }
-
+    },
+    // 保存数据源管理
+    handleSaveDatasourceData (params) {
+      saveDatasource(params).then(({ data }) => {
+        console.log('data: save', data)
+        if (data && data.code === 0) {
+          this.$message({
+            message: '保存成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getSourceDataList()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
     },
     // sql执行预览
     dataSqlSubmit () {
@@ -270,6 +368,10 @@ export default {
       sqlPreview(params).then(({ data }) => {
         console.log('sql执行预览: ', data)
       })
+    },
+    previewSqlData () {
+
+      window.open(routeUrl.href, '_blank')
     },
     //  提数 时间间隔 数据切换
     disTimeTurnOff (disType) {
@@ -316,8 +418,40 @@ export default {
         this.$refs[ref].codemirror.showHint({ completeSingle: false })
       }
     },
-    handleSelectionChange (val) { // 表格多选
-      this.multipleSelection = val
+    severDataFormSubmit () { // 表格多选
+      this.$refs['baseForm'].validate(valid => {
+        if (valid) {
+          let params = {
+            'dataSourceId': this.baseForm.dataSourceId,
+            'dataBaseId': this.baseForm.dataBaseId,
+            'sql': this.baseForm.sql,
+            'approveReason': this.baseForm.approveReason,
+            'exportType': this.baseForm.exportType,
+            'period': this.baseForm.period,
+            'receiveDays': this.baseForm.receiveDays,
+            'receiveStartTime': this.baseForm.receiveTime[0],
+            'receiveEndTime': this.baseForm.receiveTime[1],
+            'receiver': this.baseForm.receiver.join(','),
+            'receiveType': this.baseForm.receiveType
+          }
+          saveDatabySql(params).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '保存成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.$emit('refreshDataList')
+                  this.$refs['baseForm'].resetFields()
+                  this.visible = false
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }
+      })
     },
     // 关闭抽屉弹窗
     drawerClose () {
@@ -404,6 +538,9 @@ export default {
         text-align: center;
       }
     }
+  }
+  .reject-pane-item {
+    width: 50%;
   }
   & .drawer-title {
     padding: 15px;

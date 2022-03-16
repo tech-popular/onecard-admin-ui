@@ -28,6 +28,13 @@
       <el-table-column prop="period" header-align="center" align="center" label="周期"></el-table-column>
       <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天数"></el-table-column>
       <el-table-column prop="remainDay" header-align="center" align="center" label="距离失效日期"></el-table-column>
+      <el-table-column header-align="center" align="center" width="150" label="操作">
+        <template slot-scope="scope">
+          <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
+          <el-button type="text" v-if="scope.row.enable === 1" @click="disableHandle(scope.row)">申请失效</el-button>
+          <el-button type="text" v-else @click="renewalHandle(scope.row)">申请续期</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -38,7 +45,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
-    <addOrUpdateSql v-if="addOrUpdateSqlVisible" ref="addOrUpdateSql"></addOrUpdateSql>
+    <addOrUpdateSql v-if="addOrUpdateSqlVisible" ref="addOrUpdateSql" @refreshDataList="getDataList"></addOrUpdateSql>
   </div>
 </template>
 <style>
@@ -47,7 +54,7 @@
 }
 </style>
 <script>
-import { exportDataList } from '@/api/biExport/dataService'
+import { exportDataList, approveRenewal, approveDisable } from '@/api/biExport/dataService'
 import addOrUpdateSql from './sql-add-or-update'
 export default {
   data () {
@@ -103,6 +110,46 @@ export default {
       this.addOrUpdateSqlVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdateSql.init()
+      })
+    },
+    renewalHandle (row) {
+      let params = {
+        'id': row.id,
+        'month': 3
+      }
+      approveRenewal(params).then(({ data }) => {
+        console.log('申请延期 ', data)
+        if (data && data.code === 0) {
+          this.$message({
+            message: '延期成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
+        }
+      })
+    },
+    // 申请失效
+    disableHandle (row) {
+      this.$confirm('确认要将此申请设为失效？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        approveDisable(row.id).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '申请失效成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          }
+        })
       })
     }
   }

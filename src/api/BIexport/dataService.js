@@ -7,3 +7,7 @@ export const databaseDataList = (datasourceId) => httpGet(da + `export/data/data
 export const sqlPreview = params => httpPost(da + 'export/data/sql/preview', params) // sql执行预览
 export const checkDatasource = params => httpPost(da + 'export/data/checkDatasource', params) // 数据源预览
 export const saveDatasource = params => httpPost(da + 'export/data/saveDatasource', params) // 数据源保存
+export const getUsersList = id => httpGet(da + `oa/getUsersFromTenantId/${id}`) // 租户下的用户信息
+export const saveDatabySql = params => httpPost(da + 'export/data/bySql', params) // 数据源保存
+export const approveRenewal = params => httpGet(da + 'export/data/approveRenewal', params) // 申请延长期限
+export const approveDisable = id => httpGet(da + `export/data/disable/${id}`) // 申请失效
