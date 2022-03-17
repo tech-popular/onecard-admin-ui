@@ -21,8 +21,8 @@
       <el-table-column prop="expiryTime" header-align="center" align="center" label="过期时间"></el-table-column>
       <el-table-column prop="enable" header-align="center" align="center" label="是否失效">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small">是</el-tag>
-          <el-tag v-else size="small" type="danger">否</el-tag>
+          <el-tag v-if="scope.row.enable === 1" size="small">否</el-tag>
+          <el-tag v-else size="small" type="danger">是</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="period" header-align="center" align="center" label="周期"></el-table-column>

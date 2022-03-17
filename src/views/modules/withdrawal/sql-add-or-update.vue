@@ -76,8 +76,8 @@
                     </span>
                   </el-form-item>
                   <div style="margin-left:50px;">
-                    <el-form-item label="申请原因" prop="applyReason">
-                      <el-input v-model="baseForm.applyReason" type="textarea"></el-input>
+                    <el-form-item label="申请原因" prop="approveReason">
+                      <el-input v-model="baseForm.approveReason" type="textarea"></el-input>
                     </el-form-item>
                     <el-form-item label="提数类型" prop="exportType">
                       <el-radio v-model="baseForm.exportType" label="once">一次性</el-radio>
@@ -154,7 +154,7 @@ export default {
         dataSourceId: '', // 数据源id
         dataBaseId: '', // 数据库id
         sql: '', // sql
-        applyReason: '', // 申请原因
+        approveReason: '', // 申请原因
         period: '', // 提数周期
         receiveDays: '', // 接收天设置
         receiveTime: ['08:00', '23:59'],
@@ -236,7 +236,7 @@ export default {
         dataBaseId: [
           { required: true, message: '请选择数据库', trigger: 'change' }
         ],
-        applyReason: [
+        approveReason: [
           { required: true, message: '请输入申请原因', trigger: 'blur' }
         ],
         receiveDays: [
