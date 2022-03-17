@@ -129,7 +129,7 @@
   </el-drawer>
 </template>
 <script>
-import { datasourceDataList, databaseDataList, sqlPreview, checkDatasource, saveDatasource, getUsersList, saveDatabySql } from '@/api/biExport/dataService'
+import { datasourceDataList, databaseDataList, sqlPreview, checkDatasource, saveDatasource, getUsersList, saveDatabySql } from '@/api/biExport/dataImport'
 // import {isInnerIPFn} from '@/utils/validate'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
