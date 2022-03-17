@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-config">
+  <div class="mod-config" v-loading="dataListLoading">
     <tab :list="dataList" :columns="columns" :operates="{}" :fixed="{}" />
   </div>
 </template>
@@ -25,7 +25,14 @@ export default {
       this.columns = []
       this.dataListLoading = true
       let reportData = this.$store.state.withdrawal.sqlPreviewDataList
-      this.columns = Object.keys(this.dataList[0])
+      let columnsData = Object.keys(reportData[0])
+      columnsData.forEach(item => {
+        this.columns.push({
+          label: item,
+          prop: item,
+          align: 'center'
+        })
+      })
       this.dataList = reportData
       this.dataListLoading = false
     }

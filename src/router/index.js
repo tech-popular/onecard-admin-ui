@@ -20,7 +20,8 @@ const globalRoutes = [
   { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
   { path: '/resetPassword', component: _import('common/resetPass'), name: 'resetPass', meta: { title: '重置密码' } },
   { path: '', redirect: '/login' },
-  { path: '/withdrawal-reportData', component: _import('modules/withdrawal/reportData'), name: 'withdrawal-reportData', meta: { title: '数据预览' } }
+  { path: '/withdrawal-reportData', component: _import('modules/withdrawal/reportData'), name: 'withdrawal-reportData', meta: { title: '数据预览' } },
+  { path: '/withdrawal-dingPreview', component: _import('modules/withdrawal/dingPreview'), name: 'withdrawal-dingPreview', meta: { title: '钉钉数据预览' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -108,14 +109,14 @@ router.beforeEach((to, from, next) => {
         url: http.adornUrl('/bi/userVisitLog/saveUserVisitLog'),
         method: 'post',
         params: http.adornParams(params)
-      }).then(({data}) => {
+      }).then(({ data }) => {
         console.log('data: ', data)
       })
     }
     // 第三步：每次都要初始化一下 startTime
     startTime = Date.now()
     pageName = []
-   }
+  }
   // // 适应新BI系统的登录后跳转
   // if (from.query.from === 'newbi') {
   //   http({

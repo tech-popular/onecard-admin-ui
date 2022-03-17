@@ -72,7 +72,7 @@
                   <el-form-item>
                     <span>
                       执行完成
-                      <el-button type="text" :disabled="!sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
+                      <el-button type="text" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
                     </span>
                   </el-form-item>
                   <div style="margin-left:50px;">
@@ -94,16 +94,7 @@
                       </el-select>
                     </el-form-item>
                     <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px">
-                      <el-time-picker
-                        is-range
-                        v-model="baseForm.receiveTime"
-                        :picker-options="pickerOptions"
-                        value-format="HH:mm"
-                        range-separator="-"
-                        start-placeholder="开始时间"
-                        end-placeholder="结束时间"
-                        placeholder="选择时间范围"
-                      ></el-time-picker>
+                      <el-time-picker is-range v-model="baseForm.receiveTime" value-format="HH:mm" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
                     </el-form-item>
                     <el-form-item prop="receiver" label="数据接收人" label-width="100px">
                       <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
@@ -194,9 +185,6 @@ export default {
         { value: 'SUN', label: '周日' }
       ],
       dayOfMonthsList: [],
-      pickerOptions: {
-        format: 'HH:mm'
-      },
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
@@ -395,6 +383,7 @@ export default {
     previewSqlData () {
       let originHost = location.origin
       let url = originHost + '/#/withdrawal-reportData'
+      // let url = originHost + '/#/withdrawal-dingPreview?id=1'
       window.open(url, '_blank')
     },
     //  提数 时间间隔 数据切换
