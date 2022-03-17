@@ -5,44 +5,26 @@
         <el-input v-model="dataForm.creator" placeholder="角色名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="上传时间: ">
-        <el-date-picker
-            v-model="dataForm.createTime"
-            type="datetimerange"
-            range-separator="至"
-            format="yyyy-MM-dd HH:mm:ss"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间">
-        </el-date-picker>
+        <el-date-picker v-model="dataForm.createTime" type="datetimerange" range-separator="至" format="yyyy-MM-dd HH:mm:ss" start-placeholder="开始时间" end-placeholder="结束时间"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
         <el-button @click="resetHandle">重置</el-button>
-        <el-upload
-          class="upload-excel"
-          ref="upload"
-          action="aaa"
-          accept=".xlsx, .xls"
-          :on-change="handleChange"
-          :show-file-list="false"
-          :auto-upload="false"
-        >
+        <el-upload class="upload-excel" ref="upload" action="aaa" accept=".xlsx, .xls" :on-change="handleChange" :show-file-list="false" :auto-upload="false">
           <el-button type="primary">点击上传</el-button>
         </el-upload>
-        <el-button type="primary" class="btn-download" icon="el-icon-download"><a :href="templateUrl">下载模板</a></el-button>
+        <el-button type="primary" class="btn-download" icon="el-icon-download">
+          <a :href="templateUrl">下载模板</a>
+        </el-button>
       </el-form-item>
     </el-form>
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      style="width: 100%;"
-    >
+    <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="序号"></el-table-column>
       <el-table-column prop="project" header-align="center" align="center" label="项目"></el-table-column>
       <el-table-column prop="tableName" header-align="center" align="center" show-overflow-tooltip label="表名"></el-table-column>
       <el-table-column prop="dataCount" header-align="center" align="center" label="导入数据条数"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
-			<el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
+      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -82,14 +64,11 @@ export default {
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
-       biExcelUrl: (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? 'http://unify-manager-test.sk.9f.cn/canary-admin' : window.SITE_CONFIG.baseUrl) + '/bi/excel/upload',
       templateUrl: biExcelDownload
     }
   },
   activated () {
     this.getDataList()
-  },
-  mounted () {
   },
   methods: {
     // 获取数据列表

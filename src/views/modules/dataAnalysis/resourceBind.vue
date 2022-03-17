@@ -14,7 +14,7 @@
       <el-form-item label="名称">
         <el-input v-model="dataForm.resourceName" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="渠道">
+      <el-form-item label="所属业务线">
         <el-select
 					v-model="dataForm.channelCode"
 					filterable
@@ -48,7 +48,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="center"  width="150" label="类型"></el-table-column>
-      <el-table-column prop="channelCode" header-align="center" align="center" width="150" label="渠道"></el-table-column>
+      <el-table-column prop="channelCode" header-align="center" align="center" width="150" label="所属业务线"></el-table-column>
       <!-- <el-table-column prop="bindingIndex" header-align="center" align="center" label="出参">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">

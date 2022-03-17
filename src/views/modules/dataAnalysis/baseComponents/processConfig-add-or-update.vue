@@ -1,7 +1,7 @@
 <template>
 	<el-dialog  :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
 		<el-form v-loading="dataLoading" label-width="100px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
-      <el-form-item label="所属渠道" prop="channelCode" :rules="{ required: true, message: '请选择所属渠道', trigger: 'blur' }">
+      <el-form-item label="所属业务线" prop="channelCode" :rules="{ required: true, message: '请选择所属渠道', trigger: 'blur' }">
 				<el-select
 					v-model="dataForm.channelCode"
 					@change="channelIdChange"
@@ -24,6 +24,7 @@
           <el-option label="电销" value="tel"></el-option>
           <el-option label="AI" value="ai"></el-option>
 					<el-option label="push" value="push"></el-option>
+          <el-option label="红包/卡券" value="card"></el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item  prop="params"  label="出参">

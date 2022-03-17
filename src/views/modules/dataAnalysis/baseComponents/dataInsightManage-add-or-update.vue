@@ -39,7 +39,7 @@
                 :disabled="!!id"
               >指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
-                <el-form-item label="用户所属渠道" prop="channelId" :rules="{ required: true, message: '请选择用户所属渠道', trigger: 'blur' }">
+                <el-form-item label="所属业务线" prop="channelId" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
                 <!-- multiple
                   :multiple-limit = "channelLimit" -->
                 <el-select
@@ -71,7 +71,7 @@
             </div>
           </el-form-item>
           <el-form-item
-            label="用户所属渠道"
+            label="所属业务线"
             prop="channelId"
             v-if="baseForm.userType === 'excel'"
             class="user-channel"
@@ -117,7 +117,7 @@
             </div>
           </el-form-item>
            <el-form-item
-            label="用户所属渠道"
+            label="所属业务线"
             prop="channelId"
             v-if="baseForm.userType === 'sql'"
             label-width="110px;"
@@ -175,8 +175,8 @@
               v-model="baseForm.type"
               :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'sql'"
             >
-              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
+              <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="分群描述">
@@ -389,7 +389,7 @@ export default {
           { required: true, message: '请选择计算类型', trigger: 'change' }
         ],
         channelId: [
-          { required: true, message: '请选择用户所属渠道', trigger: 'change' }
+          { required: true, message: '请选择用户所属业务线', trigger: 'change' }
         ],
         sql: [
           { required: true, message: '请输入SQL', trigger: 'change' }
@@ -487,7 +487,7 @@ export default {
           this.rowData.authOtherList = row.authOtherList
           this.rowData.authOthers = row.authOthers
         }
-        this.drawerTitle = tag === canUpdate ? '编辑' : '查看'
+        this.drawerTitle = tag === canUpdate ? '查看' : '编辑'
         // this.drawerTitle = tag === 'view' ? '查看' : '编辑'
         this.getDataInfo(row.id)
       }
@@ -757,6 +757,23 @@ export default {
       }
     },
     handleChange (file, fileList) {
+      let that = this
+      let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
+      let size = file.size / 1024 / 1024
+      if (fileName != 'xls' && fileName != 'xlsx') {
+        that.$message({
+          type: 'error',
+          message: '文件类型不是.xls文件!'
+        })
+        return false
+      }
+      if (size > 10) {
+        that.$message({
+          type: 'error',
+          message: '文件大小不能超过10M!'
+        })
+        return false
+      }
       // 上传文件变化时
       if (fileList.length > 0) {
         this.fileData.fileList = [fileList[fileList.length - 1]] // 这一步，是展示最后一次选择的文件
@@ -764,13 +781,22 @@ export default {
       }
     },
     beforeUpload (file) {
+      // 由于auto-upload被设置为false，beforeUpload时间没有被触发，需要交验的内容在on-change时间完成
       // 上传文件之前的事件
       let that = this
       let fileName = file.name.substring(file.name.lastIndexOf('.') + 1) // 文件类型
+      let size = file.size / 1024 / 1024
       if (fileName != 'xls' && fileName != 'xlsx') {
         that.$message({
           type: 'error',
           message: '文件类型不是.xls文件!'
+        })
+        return false
+      }
+      if (size > 2) {
+        that.$message({
+          type: 'error',
+          message: '文件大小不能超过10M!'
         })
         return false
       }
@@ -1002,6 +1028,11 @@ export default {
           this.id = res.data.data
           this.saveCollision()
         }
+      }).catch((e) => {
+        this.$message({
+          type: 'error',
+          message: e.message || '保存失败'
+        })
       })
     },
     saveSql () {

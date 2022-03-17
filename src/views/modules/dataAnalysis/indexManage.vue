@@ -1,16 +1,16 @@
 <template>
   <div class="index-wrap">
     <el-form :inline="true" :model="dataForm" ref="dataForm">
-      <el-form-item label="指标ID">
+      <el-form-item label="标签ID">
         <el-input v-model="dataForm.id" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="指标名称">
+      <el-form-item label="标签名称">
         <el-input v-model="dataForm.englishName" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="指标标题">
+      <el-form-item label="标签标题">
         <el-input v-model="dataForm.chineseName" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="指标类别">
+      <el-form-item label="标签类别">
         <Treeselect
               :options="categoryIdList"
               :disable-branch-nodes="true"
@@ -25,7 +25,7 @@
               style="line-height:38px"
             />
       </el-form-item>
-      <el-form-item label="指标状态">
+      <el-form-item label="标签状态">
         <el-select v-model="dataForm.enable" placeholder="指标状态">
           <el-option label="全部" value=""></el-option>
           <el-option label="有效" value="true"></el-option>
@@ -35,12 +35,13 @@
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
+        <el-button  type="success" @click="addOrUpdateHandle()">新建指标</el-button>
         <el-button type="success" v-if="isAdmin" @click="manualSync()">手动同步</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" align="center" label="指标ID"></el-table-column>
-      <el-table-column prop="englishName" header-align="center" align="center" label="指标名">
+      <el-table-column prop="id" header-align="center" align="center" label="标签ID"></el-table-column>
+      <el-table-column prop="englishName" header-align="center" align="center" label="标签名称">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.englishName)" slot="content"></div>
@@ -48,7 +49,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="chineseName" header-align="center" align="center" label="指标标题">
+      <el-table-column prop="chineseName" header-align="center" align="center" label="标签标题">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.chineseName)" slot="content"></div>
@@ -56,9 +57,9 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="fieldType" header-align="center" align="center" :formatter="fieldTypeFormat" label="数据类型"></el-table-column>
-      <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="指标类别"></el-table-column>
-      <el-table-column prop="channelCode" header-align="center" align="center" label="渠道"></el-table-column>
+      <el-table-column prop="fieldType" header-align="center" align="center" label="数据类型"></el-table-column>
+      <el-table-column prop="categoryId" header-align="center" align="center" :formatter="categoryIdFormat" label="标签类别"></el-table-column>
+      <el-table-column prop="channelCode" header-align="center" align="center" label="所属业务线"></el-table-column>
       <el-table-column prop="dataStandar" header-align="center" align="center" label="数据格式">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -67,8 +68,15 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="sourceTable" header-align="center" align="center" label="来源表"></el-table-column>
-      <el-table-column prop="remark" header-align="center" align="center" label="指标描述">
+      <el-table-column prop="sourceTable" header-align="center" align="center" label="来源表">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.sourceTable)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.sourceTable}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="remark" header-align="center" align="center" label="标签描述">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.remark)" slot="content"></div>
@@ -79,16 +87,24 @@
       <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
-      <el-table-column prop="enable" header-align="center" align="center" label="指标状态">
+      <el-table-column prop="enable" header-align="center" align="center" label="标签状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.enable === true" size="small" >有效</el-tag>
           <el-tag v-else size="small" type="danger">无效</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" width="100" label="操作">
+      <el-table-column prop="status" header-align="center" align="center" label="是否设置默认分组">
         <template slot-scope="scope">
-          <!-- <el-button type="text" @click="addOrUpdateHandle(scope.row)">编辑</el-button> -->
-          <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
+          <el-tag v-if="scope.row.isSetGroup == '1'" size="small" >是</el-tag>
+          <el-tag v-else size="small" type="danger">否</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" label="操作">
+        <template slot-scope="scope">
+          <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row)">编辑</el-button>
+          <el-button type="text" size="small"  @click="deleteHandle(scope.row)">删除</el-button>
+          <el-button type="text" size="small" v-if="scope.row.fieldType !== '字符串'"  @click="tagChange(scope.row)">默认标签分组 </el-button>
+          <!-- <el-button type="text"  @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -102,13 +118,16 @@
       layout="total, sizes, prev, pager, next, jumper"/>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"/>
+    <indexTags ref="indexTags" v-if="indexTagsVisible" @refreshDataList="getDataList"></indexTags>
   </div>
 </template>
 
 <script>
-  import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex } from '@/api/dataAnalysis/indexManage'
-  import { nameToLabel, echoDisplay } from './dataAnalysisUtils/utils'
+  import { indexManageList, indexManageTypeList, indexManageMinCataList, syncDataIndex, deleteDataInfo } from '@/api/dataAnalysis/indexManage'
+  import { echoDisplay } from './dataAnalysisUtils/utils'
   import AddOrUpdate from './baseComponents/indexManage-add-or-update'
+  // import AddOrUpdate from './baseComponents/indexManage-add-or-update1'
+  import indexTags from './baseComponents/indexTags'
   import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   export default {
@@ -127,6 +146,7 @@
         totalCount: 0,
         dataListLoading: false,
         addOrUpdateVisible: false,
+        indexTagsVisible: false,
         isAdmin: sessionStorage.getItem('username') === 'admin',
         fieldTypeList: [ // 数据类型
           // {
@@ -152,7 +172,8 @@
     },
     components: {
       AddOrUpdate,
-      Treeselect
+      Treeselect,
+      indexTags
     },
     mounted () {
       this.getCategoryIdList()
@@ -183,7 +204,7 @@
       getCategoryIdList () {
         indexManageMinCataList().then(({data}) => {
           if (data && data.status === '1') {
-            this.categoryIdList = nameToLabel(data.data)
+            this.categoryIdList = this.nameToLabel(data.data)
           }
         })
       },
@@ -197,7 +218,25 @@
           }
         })
       },
-
+      nameToLabel(arr) {
+        arr = arr.slice()
+        let results
+        function toParse (arr) {
+          arr.forEach(function (item, index) {
+          item['id'] = item.id
+          item['label'] = item.name
+          if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+            item['children'] = item.children
+            toParse(item['children'])
+          } else {
+            delete item['children']
+          }
+        })
+        return arr
+        }
+        results = toParse(arr)
+        return results
+      },
       // 获取数据列表
       getDataList () {
         this.$refs['dataForm'].validate((valid) => {
@@ -255,10 +294,37 @@
         this.dataListLoading = true
         syncDataIndex().then(({data}) => {
           if (data && data.status === '1') {
-            this.getDataList()
+            this.$message({
+              message: '同步成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+                }
+            })
           } else {
             this.dataListLoading = false
           }
+        })
+      },
+      deleteHandle (row) {
+         this.$confirm(`确认删除标签名称为【${row.chineseName}】的数据?`, '提示', {
+          confirmButtonText: '删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteDataInfo(row.id).then(({data}) => {
+            if (data && data.status === '1') {
+              this.$message({
+                message: '删除成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                  }
+              })
+            }
+          })
         })
       },
       // 每页数
@@ -271,6 +337,13 @@
       currentChangeHandle (page) {
         this.pageNum = page
         this.getDataList()
+      },
+      // 默认标签分组
+      tagChange (row) {
+        this.indexTagsVisible = true
+        this.$nextTick(() => {
+          this.$refs.indexTags.init(row)
+        })
       }
     }
   }

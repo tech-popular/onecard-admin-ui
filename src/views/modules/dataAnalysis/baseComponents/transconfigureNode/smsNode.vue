@@ -27,24 +27,45 @@
       <el-form-item prop="smsTemplate" v-if="dataForm.editType === '0'" label="模板详情">
         <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" >
 				</el-input>
-					<p style="margin:0">
+					<p style="margin:0" v-if="dataForm.resourceCode">
               需要选择
             <span style="color:red" v-text="paramsNum"></span> 个参数
           </p>
       </el-form-item>
-      <el-form-item label="短信类型" v-if="dataForm.editType === '1'"  prop="cusSmsType">
-        <el-select v-model="dataForm.cusSmsType" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="短信签名" v-if="dataForm.editType === '1'"  prop="productNo">
-        <el-select v-model="dataForm.productNo" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in productNoList" :key="index" :value="item.code" :label="item.name"></el-option>
-        </el-select>
-      </el-form-item>
-        <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1'">
-          <el-input type="textarea"  class="base-pane-item" v-model="dataForm.smsContent" maxlength="65" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
+      <div v-if="dataForm.editType === '1'">
+        <el-form-item label="短信类型"   prop="cusSmsType">
+          <el-select v-model="dataForm.cusSmsType" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
+              <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
+          </el-select>
         </el-form-item>
+        <el-form-item label="短信签名" v-if="dataForm.editType === '1'"  prop="productNo">
+          <el-select v-model="dataForm.productNo" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
+              <el-option v-for="(item, index) in productNoList" :key="index" :value="item.code" :label="item.name"></el-option>
+          </el-select>
+        </el-form-item>
+          <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1'">
+            <el-input type="textarea"  class="base-pane-item" v-model="dataForm.smsContent" maxlength="300" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
+          </el-form-item>
+          <el-form-item  prop="extraParams"  label="额外出参">
+            <Treeselect
+              :options="outParamsList"
+              :disable-branch-nodes="true"
+              :show-count="true"
+              :multiple="true"
+              :load-options="loadOptions"
+              :searchable="true"
+              :clearable="true"
+              :disabled="!canUpdate"
+              @input="changeOption"
+              @select="outParamsSelect"
+              @deselect="outParamsDeselect"
+              noChildrenText="暂无数据"
+              v-model="dataForm.extraParams"
+              placeholder="请选择"
+              class="base-pane-item"
+            />
+        </el-form-item>
+      </div>
       <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
 				  <Treeselect
 						:options="outParamsList"
@@ -60,7 +81,7 @@
 						class="base-pane-item"
 					/>
 			</el-form-item>
-      <el-form-item  prop="extraParams"  label="额外出参" v-if="extraParamsVisible">
+      <el-form-item  prop="extraParams"  label="额外出参" v-if="extraParamsVisible" :rules="{ required: true, message: '请选择名称', trigger: 'input' }">
 				  <Treeselect
 						:options="outParamsList"
 						:disable-branch-nodes="true"
@@ -96,7 +117,7 @@ export default {
   data () {
     return {
       visible: false,
-      extraParamsVisible: true,
+      extraParamsVisible: false,
       fixedParamsvisible: false,
       canUpdate: true,
       dataLoading: false,
@@ -131,9 +152,9 @@ export default {
         cusSmsType: [
           { required: true, message: '请选择短信类型', trigger: 'blur' }
         ],
-        extraParams: [
-          { required: true, message: '请选择额外出参', trigger: 'input' }
-        ],
+        // extraParams: [
+        //   { required: true, message: '请选择额外出参', trigger: 'input' }
+        // ],
         productNo: [
           { required: true, message: '请选择短信签名', trigger: 'blur' }
         ],
@@ -152,7 +173,6 @@ export default {
       }
     },
     init (channelCode, id, canUpdate) {
-      this.extraParamsVisible = true
       this.fixedParamsvisible = false
       this.canUpdate = canUpdate
       this.getAllSmsChannels()
@@ -184,6 +204,7 @@ export default {
         this.getLookData(id)
       } else {
         this.getOutParamsList()
+        this.extraParamsVisible = true
       }
     },
     // 短信签名
@@ -257,6 +278,8 @@ export default {
             this.dataForm.resourceCode = ''
             this.dataForm.smsTemplate = ''
             this.target = ''
+            // this.dataForm.fixedParams = []
+            // this.fixedParams = []
           }
         }
       })
@@ -328,6 +351,11 @@ export default {
            this.extraParams.push(item.split('@')[1])
         })
         this.dataForm.extraParams = Array.from(new Set(out))
+        if (this.dataForm.editType === '0') {
+          this.extraParamsVisible = true
+        } else {
+          this.extraParamsVisible = false
+        }
       }
       if (fixedParams) {
         let out = []
@@ -392,6 +420,8 @@ export default {
         this.extraParams = []
       } else {
         this.extraParamsVisible = true
+        this.dataForm.extraParams = []
+        this.extraParams = []
       }
       // this.dataForm.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].smsDesc
       this.dataForm.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].id
@@ -438,7 +468,7 @@ export default {
           if (this.fixedParams.length === 0) {
             return this.$message.error(`请联系管理员配置固定流程参数`)
           }
-          if (this.dataForm.type === 'sms' && this.extraParams.length !== this.paramsNum) {
+          if (this.dataForm.editType === '0' && this.extraParams.length !== this.paramsNum) {
             return this.$message.error(`请选择${this.paramsNum}个参数`)
           }
           let congiger = {
@@ -450,6 +480,7 @@ export default {
             id: this.dataForm.id,
             type: this.dataForm.type,
             resourceName: this.dataForm.editType === '0' ? '标准短信_' + this.dataForm.resourceName : '自定义短信_' + this.dataForm.resourceName,
+            channelId: this.dataForm.channelId,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,
             resourceId: this.dataForm.editType === '0' ? this.dataForm.resourceId.toString() : null,

@@ -6,14 +6,14 @@
 			</el-form-item>
       <el-form-item prop="telTemplateValue" label="电销模板" :rules="{ required: true, message: '请选择模板', trigger: 'input' }">
           <el-autocomplete
-          class="inline-input"
-          style="width: 400px;"
-          v-model="dataForm.telTemplateValue"
-          :fetch-suggestions="querySearch"
-          placeholder="请输入内容"
-          @select="handleSelect"
-          @blur="blurInputTle"
-    ></el-autocomplete>
+            class="inline-input"
+            style="width: 400px;"
+            v-model="dataForm.telTemplateValue"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入内容"
+            @select="handleSelect"
+            @blur="blurInputTle"
+          ></el-autocomplete>
         </el-form-item>
       <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
 				  <Treeselect

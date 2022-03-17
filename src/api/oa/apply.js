@@ -4,6 +4,9 @@ let da = '/'
 export const accoutAuthInitInfo = (params) => httpGet(da + 'oa/accoutAuthInitInfo', params)
 // 账号保存
 export const saveAccountAuthApply = (params) => httpPost(da + 'oa/saveAccountAuthApply', params)
+// 账号用户组列表
+// export const getUserGroupList = (userId) => httpGet(da + `bi/biUserGroup/getUserGroupListByUserId/${userId}`)
+export const getUserGroupList = (params) => httpGet(da + 'bi/biUserGroup/getUserGroupListByUserId', params)
 // 库表管理初始化
 export const databaseInitInfo = (params) => httpGet(da + 'oa/databaseInitInfo', params)
 // 模糊查询数据库表字段
@@ -32,3 +35,7 @@ export const tenantCrent = (params) => httpPost(da + 'tenantManage/selectTenantI
 export const tenantShow = (params) => httpPost(da + 'tenantManage/selectTenantIdsFromUser', params)
 // 租户保存
 export const saveTenant = (params) => httpPost(da + 'oa/saveTenantAuthApply', params)
+// 订阅申请
+export const applyScription = params => httpPost(da + 'oa/saveAccountAuthApply', params)
+// 系统模块
+export const getSystemModulesById = params => httpGet(da + 'oa/getMenuListBySystemId', params)

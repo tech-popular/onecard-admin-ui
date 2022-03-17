@@ -25,7 +25,7 @@
             </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="渠道">
+      <el-form-item label="所属业务线">
         <el-select
 					v-model="dataForm.channelCode"
 					filterable
@@ -49,7 +49,7 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" width="80" header-align="center" align="center" label="id"/>
-      <el-table-column prop="channelCode" header-align="center" align="center" width="200" label="渠道"/>
+      <el-table-column prop="channelCode" header-align="center" align="center" width="200" label="所属业务线"/>
       <el-table-column prop="type" header-align="center" align="center" width="150" label="类型"/>
       <el-table-column prop="params" header-align="center" align="left" label="出参"/>
       <el-table-column prop="datasourceType" header-align="center" align="center" width="150" label="通道"/>
@@ -74,7 +74,7 @@
       :current-page="pageNum"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
-      :total="totalPage"
+      :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper"/>
     </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
@@ -99,7 +99,7 @@
         channelList: [],
         pageNum: 1, // 当前页
         pageSize: 10, // 默认每页10条
-        totalPage: 0,
+        totalCount: 0,
         dataForm: {
           channelCode: '',
           type: ''
@@ -149,10 +149,13 @@
                 }
               })
               item.params = item.params.split(',').join('\n')
-              item.target = this.datasourceList.filter(citem => citem.id === item.datasourceId)[0].name
+              if (this.datasourceList.length) {
+                item.target = this.datasourceList.filter(citem => citem.id === item.datasourceId)[0].name
+                console.log('this.datasourceList: ', this.datasourceList)
+              }
             })
             this.dataList = data.data.list
-            this.totalCount = data.data.total
+            this.totalCount = data.data.totalCount
           }
             this.dataListLoading = false
           })

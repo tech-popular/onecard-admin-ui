@@ -2,19 +2,23 @@ import { getUserInfo } from '@/api/sys/user'
 export default {
   namespaced: true,
   state: {
-    id: 0,
+    userId: 0,
     name: '',
-    datetime: ''
+    datetime: '',
+    id: 0
   },
   mutations: {
-    updateId (state, id) {
-      state.id = id
+    updateUserId (state, userId) {
+      state.userId = userId
     },
     updateName (state, name) {
       state.name = name
     },
     createTime (state, datetime) {
       state.datetime = datetime
+    },
+    updateId (state, id) {
+      state.id = id
     }
   },
   actions: {
@@ -22,14 +26,13 @@ export default {
       return new Promise((resolve, reject) => {
         getUserInfo().then(({data}) => {
           if (data && data.code === 0) {
-            // this.userId = data.user.userId
-            // this.userName = data.user.username
-            // this.createTime = data.user.createTime
-            commit('updateId', data.user.userId)
+            commit('updateUserId', data.user.userId)
             commit('updateName', data.user.username)
             commit('createTime', data.user.createTime)
+            commit('updateId', data.user.id)
             sessionStorage.setItem('id', data.user.id) // 存储用户id
             sessionStorage.setItem('username', data.user.username) // 存储用户id
+            sessionStorage.setItem('userInfo', JSON.stringify(data.user))
             resolve(data.user.username)
           } else {
             console.log(data.msg)

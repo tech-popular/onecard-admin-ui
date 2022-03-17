@@ -364,6 +364,40 @@
               </div>
             </el-col>
           </el-row>
+          <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
+             <el-col style="width: 8.33333%;">
+              <el-form-item  prop="transferType">
+                <el-checkbox label="card" name="transferType" v-model="baseForm.transferType" 
+                @change="checked=>changeDistribution(checked, 'card')"
+                style="margin-left: 8px;">红包/卡券</el-checkbox>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10" style="display:flex;">
+              <el-form-item prop="cardId">
+                <el-select
+                  v-model= "baseForm.cardId"
+                  clearable
+                  filterable
+                  @change="cardSelectChange"
+                  style="margin-right:10px; width:270px;"
+                  placeholder="请选择">
+                  <el-option
+                    v-for="item in cardIdList"
+                    :key="item.id"
+                    :label="item.resourceName"
+                    :value="item.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+               <div>
+                <el-tooltip placement="top" v-if="baseForm.cardId">
+                  <div slot="content">{{baseForm.cardIdParams}}</div>
+                  <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
+                </el-tooltip>
+                <div v-if="this.baseForm.transferType.indexOf('card') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('card')">{{canUpdate? '配置' : '查看' }}</div>
+              </div>
+            </el-col>
+          </el-row>
           <!-- <el-row :gutter="20" v-if="baseForm.transferCategory === '0'">
             <el-col style="width: 8.33333%;">
               <el-form-item class="label-remove-margin" prop="transferType">
@@ -440,7 +474,7 @@
         size="small"
         v-if="!!baseForm.id && baseForm.decisionType === '0'"
       >复制创建新任务</el-button>
-      <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '1'"  @click="decisionCanvas" size="small">决策画布</el-button>
+      <el-button type="primary" v-if="baseForm.decisionType === '1'"  @click="decisionCanvas" size="small">决策画布</el-button>
       <el-button type="primary" v-if="canUpdate && baseForm.decisionType === '0'"  @click="saveHandle" size="small">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
@@ -450,6 +484,7 @@
     <telNode v-if="telNodeVisible" ref="telNode" @updateList="changeDistribution"></telNode>
     <aiNode v-if="aiNodeVisible" ref="aiNode" @updateList="changeDistribution"></aiNode>
     <pushNode v-if="pushNodeVisible" ref="pushNode" @updateList="changeDistribution"></pushNode>
+    <cardVoucherNode v-if="cardVoucherVisible" ref="cardVoucherNode" @updateList="changeDistribution"></cardVoucherNode>
   </el-drawer>
 </template>
 <script>
@@ -460,7 +495,8 @@
   // dataTransferManageMysql,
   infoDataTransferManage,
   // defaultOutParams,
-  selectResourceBindingList
+  selectResourceBindingList,
+  validTransferName
   // getSmsAllMessage
   } from '@/api/dataAnalysis/dataTransferManage'
   import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
@@ -472,6 +508,7 @@
   import telNode from './transconfigureNode/telNode'
   import aiNode from './transconfigureNode/aiNode'
   import pushNode from './transconfigureNode/pushNode'
+  import cardVoucherNode from './transconfigureNode/cardVoucherNode'
   export default {
     data () {
       // 验证枚举类型的函数
@@ -505,6 +542,13 @@
       }
        let validatePushId = (rule, value, callback) => {
         if (this.baseForm.transferType.indexOf('push') > -1 && this.baseForm.pushId === '') {
+          callback(new Error('请选择'))
+        } else {
+          callback()
+        }
+      }
+      let validatecardVoucherId = (rule, value, callback) => {
+        if (this.baseForm.transferType.indexOf('card') > -1 && this.baseForm.cardId === '') {
           callback(new Error('请选择'))
         } else {
           callback()
@@ -585,6 +629,8 @@
           aiParams: '',
           pushId: '',
           pushParams: '',
+          cardId: '',
+          cardIdParams: '',
           triggerMode: '0', // 下发类型，默认0主动型 1被动
           decisionType: '0'
         },
@@ -597,10 +643,10 @@
         ],
         timeIntervalList: [],
         dispatchCycleList: [
-          {value: 'MINUTE', label: '分钟'},
+          // {value: 'MINUTE', label: '分钟'},
           {value: 'HOUR', label: '小时'},
           {value: 'DAY', label: '日'},
-          {value: 'WEEK', label: '周'},
+          // {value: 'WEEK', label: '周'},
           {value: 'MONTH', label: '月'}
         ],
         dayOfWeeksList: [
@@ -621,6 +667,7 @@
         telIdList: [],
         aiIdList: [],
         pushIdList: [],
+        cardIdList: [],
         intelligentDistributionParams: [],
         transferLogVisible: false,
         transferLogList: [],
@@ -629,6 +676,7 @@
         telNodeVisible: false,
         aiNodeVisible: false,
         pushNodeVisible: false,
+        cardVoucherVisible: false,
         baseRule: {
           decisionType: [
             { required: true, message: '请选择决策方式', trigger: 'change' }
@@ -688,6 +736,9 @@
           ],
           pushId: [
             {validator: validatePushId}
+          ],
+          cardId: [
+            {validator: validatecardVoucherId}
           ]
           //  kafkaServer: [
           //  { required: true, message: '请选择数据源', trigger: 'change' }
@@ -720,7 +771,7 @@
 
     },
 
-    components: { Treeselect, transferLog, kafkaNode, smsNode, telNode, aiNode, pushNode },
+    components: { Treeselect, transferLog, kafkaNode, smsNode, telNode, aiNode, pushNode, cardVoucherNode },
 
     methods: {
       // 树加载
@@ -826,6 +877,9 @@
             }
           } else {
             this.outParamsList = []
+          }
+          if (this.baseForm.decisionType === '1') {
+            this.loading = false
           }
         })
       },
@@ -1086,42 +1140,9 @@
         if (data.pushId != '' && data.transferType.includes('push')) {
           postData.sourceBindingIds.push(data.pushId)
         }
-        // if (data.transferCategory === '0') {
-            // let tempServer = {
-            //   type: 'kafka',
-            //   id: data.kafkaServer,
-            //   topic: data.topic
-            // }
-          // postData.datasourceParams.push(tempServer)
-            // }
-            // if (data.mysqlServer != '' && data.transferType.includes('mysql')) {
-            //   let tempServer = {
-            //     type: 'mysql',
-            //     id: data.mysqlServer
-            //   }
-            //   postData.datasourceParams.push(tempServer)
-            // }
-            // if (data.sqlServer != '' && data.transferType.includes('sqlServer')) {
-            //   let tempServer = {
-            //     type: 'sqlServer',
-            //     id: data.sqlServer
-            //   }
-            //   postData.datasourceParams.push(tempServer)
-            // }
-        // else {
-        //   let smsMessage = this.intelligentDistributionParams.filter(item => item.type === 'sms')
-        //   this.intelligentDistributionParams.forEach(item => {
-        //     if (item.type === 'sms') {
-        //        postData.datasourceParams.push(item)
-        //     } else if (item.type === 'tel') {
-        //       postData.datasourceParams.push({type: 'tel', id: smsMessage.length ? smsMessage[0].id + 1 : 200})
-        //     } else if (item.type === 'ai') {
-        //       postData.datasourceParams.push({type: 'ai', id: smsMessage.length ? smsMessage[0].id + 2 : 300})
-        //     }
-        //   })
-        //   // postData.transferType = 'kafka'
-        // }
-        // postData.transferType = 'kafka'
+        if (data.cardId != '' && data.transferType.includes('card')) {
+          postData.sourceBindingIds.push(data.cardId)
+        }
         postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
@@ -1195,9 +1216,10 @@
             this.baseForm.transferName = disData.transferName
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
-            this.baseForm.transferType = disData.transferType.split(',')
             if (disData.decisionType === '1') {
               this.$store.commit('canvasFlow/setEditData', disData)
+            } else {
+              this.baseForm.transferType = (disData.transferType || '').split(',')
             }
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
@@ -1216,22 +1238,6 @@
               this.isStatic = false
             }
             this.baseForm.increModel = disData.increModel == -1 ? 0 : disData.increModel
-            // disData.sourceBindingIds.forEach((item, index) => {
-            //   if (item == 'kafka') {
-            //     // this.baseForm.kafkaServer = item.id
-            //     // this.baseForm.topic = item.topic
-            //   } else if (item.type == 'mysql') {
-            //     this.baseForm.mysqlServer = item.id
-            //   } else if (item.type == 'sqlServer') {
-            //     this.baseForm.sqlServer = item.id
-            //     this.isR3DefaultOut = true
-            //   } else if (disData.transferCategory == '1') {
-            //     this.baseForm.intelligentDistribution.push(item.type)
-            //     if (item.type === 'sms') {
-            //       this.setSmsTemplteVisible = true
-            //     }
-            //   }
-            // })
             let tempTime = disData.taskScheduleConfig
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONCE_ONLY':
@@ -1327,6 +1333,14 @@
                   this.pushSelectChange()
                 }
               })
+            } else if (type === 'card') {
+              this.cardIdList = data.data
+              data.data.filter(item => {
+                if (sourceBindingIds.indexOf(item.id) > -1) {
+                  this.baseForm.cardId = item.id
+                  this.cardSelectChange()
+                }
+              })
             }
           }
           this.$nextTick(() => {
@@ -1372,6 +1386,8 @@
         this.baseForm.aiParams = ''
         this.baseForm.pushId = ''
         this.baseForm.pushParams = ''
+        this.baseForm.cardId = ''
+        this.baseForm.cardIdParams = ''
         this.baseForm.templateId = ''
         this.rowData.authOwner = ''
         this.rowData.authOtherList = []
@@ -1486,14 +1502,21 @@
               return item.value === this.baseForm.templateId
               })
             }
+            params.canUpdate = this.canUpdate
             this.$store.commit('canvasFlow/setGroupNodeName', obj.text)
-            this.$store.commit('canvasFlow/setRowData', this.rowData)
+            // this.$store.commit('canvasFlow/setRowData', this.rowData)
             this.$store.commit('canvasFlow/setSaveDate', params)
             this.$store.commit('canvasFlow/setChannelCode', this.channelCode)
-            if (this.baseForm.id) {
-              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.baseForm.id, time: new Date().getTime() } })
+            if (!this.baseForm.id) {
+              validTransferName(this.baseForm.transferName).then(({data}) => {
+                if (data && data.status === '1') {
+                  this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { time: new Date().getTime() } })
+                } else {
+                  this.$message.error(data.message)
+                }
+              })
             } else {
-              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { time: new Date().getTime() } })
+              this.$router.replace({ path: 'dataAnalysis-canvasFlow', query: { id: this.baseForm.id, time: new Date().getTime() } })
             }
           }
         })
@@ -1506,16 +1529,35 @@
               channelCode: this.channelCode
             }
             selectResourceBindingList(params).then(({data}) => {
-              if (val === 'kafka') {
-                this.kafkaServerList = data.data
-              } else if (val === 'sms') {
-                this.smsIdList = data.data
-              } else if (val === 'tel') {
-                this.telIdList = data.data
-              } else if (val === 'ai') {
-                this.aiIdList = data.data
-              } else if (val === 'push') {
-                this.pushIdList = data.data
+              if (data && data.status === '1') {
+                if (val === 'kafka') {
+                  this.kafkaServerList = data.data
+                } else if (val === 'sms') {
+                  this.smsIdList = data.data
+                } else if (val === 'tel') {
+                  this.telIdList = data.data
+                } else if (val === 'ai') {
+                  this.aiIdList = data.data
+                } else if (val === 'push') {
+                  this.pushIdList = data.data
+                } else if (val === 'card') {
+                  this.cardIdList = data.data
+                }
+              } else {
+                this.$message.error(data.message)
+                 if (val === 'kafka') {
+                  this.kafkaServerList = []
+                } else if (val === 'sms') {
+                  this.smsIdList = []
+                } else if (val === 'tel') {
+                  this.telIdList = []
+                } else if (val === 'ai') {
+                  this.aiIdList = []
+                } else if (val === 'push') {
+                  this.pushIdList = []
+                } else if (val === 'card') {
+                  this.cardIdList = []
+                }
               }
             })
           } else {
@@ -1540,6 +1582,10 @@
               this.baseForm.pushId = ''
               this.baseForm.pushParams = ''
               this.pushIdList = []
+            } else if (val === 'card') {
+              this.baseForm.cardId = ''
+              this.baseForm.cardIdParams = ''
+              this.cardIdList = []
             }
           }
         } else {
@@ -1551,7 +1597,10 @@
       kafkaSelectChange (value) {
         if (this.baseForm.kafkaServer) {
           let arr = this.kafkaServerList.filter(item => item.id === this.baseForm.kafkaServer)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.kafkaParams = arr1.join(',')
@@ -1578,7 +1627,10 @@
       smsSelectChange () {
         if (this.baseForm.smsId) {
           let arr = this.smsIdList.filter(item => item.id === this.baseForm.smsId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.smsParams = arr1.join(',')
@@ -1605,7 +1657,10 @@
       telSelectChange () {
         if (this.baseForm.telId) {
           let arr = this.telIdList.filter(item => item.id === this.baseForm.telId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.telParams = arr1.join(',')
@@ -1631,7 +1686,10 @@
       aiSelectChange () {
         if (this.baseForm.aiId) {
           let arr = this.aiIdList.filter(item => item.id === this.baseForm.aiId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.aiParams = arr1.join(',')
@@ -1657,12 +1715,31 @@
       pushSelectChange () {
         if (this.baseForm.pushId) {
           let arr = this.pushIdList.filter(item => item.id === this.baseForm.pushId)
-          let paramsData = arr[0].extraParams + arr[0].fixedParams
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
           if (paramsData) {
             let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
             this.baseForm.pushParams = arr1.join(',')
           } else {
             this.baseForm.pushParams = ''
+          }
+        }
+      },
+      // 红包卡券
+      cardSelectChange () {
+         if (this.baseForm.cardId) {
+          let arr = this.cardIdList.filter(item => item.id === this.baseForm.cardId)
+          let paramsData = arr[0].extraParams
+          if (arr[0].fixedParams) {
+            paramsData = arr[0].extraParams + ',' + arr[0].fixedParams
+          }
+          if (paramsData) {
+            let arr1 = this.getOutParamsEditList(paramsData.split(','), this.outParamsList, [])
+            this.baseForm.cardIdParams = arr1.join(',')
+          } else {
+            this.baseForm.cardIdParams = ''
           }
         }
       },
@@ -1694,13 +1771,15 @@
             this.$nextTick(() => {
               this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId, this.canUpdate)
             })
+          } else if (val === 'card') {
+            this.cardVoucherVisible = true
+            this.$nextTick(() => {
+              this.$refs.cardVoucherNode.init(this.channelCode, this.baseForm.cardId, this.canUpdate)
+            })
           }
         } else {
           this.$message.error('请选择分群名称')
         }
-      },
-      getintelligentDistribution () {
-
       },
       // 关闭
       cancelHandle () {

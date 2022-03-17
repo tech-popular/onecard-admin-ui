@@ -20,13 +20,13 @@
               :disabled="from === 'api' || !canUpdate"
           />
           </el-form-item>
-          <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+          <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}" v-if="item.fieldType !== 'group'">
             <el-select v-model="item.func" class="itemOperateIput" @change="data => selectOperateChange(data, item)" @visible-change="data => selectOperateVisible(data, item)">
               <el-option v-for="(fitem, findex) in item.selectOperateList" :value="fitem.code" :key="findex" :label="fitem.title"/>
             </el-select>
           </el-form-item>
           <!--条件内容区-->
-          <div v-if="isEmpty(item)" class="pane-rules-inline">
+          <div v-if="isEmpty(item) && item.fieldType !== 'group'" class="pane-rules-inline">
             <!--string-->
             <div v-if="(item.fieldType === 'string' || item.fieldType === '') && !item.enumTypeNum" class="pane-rules-inline">
               <!--string型等于或不等于可以输入多个-->
@@ -316,7 +316,11 @@ export default {
       this.parent.switchSymbol(ruleCode, this.parent.ruleConfig)
     },
     fieldCodeChange (node, ruleItem) { // 指标改变时，对应的操作符也更新
-      this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { label: node.label, englishName: node.englishName, fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId, format: node.dataStandar, enable: node.enable })
+      if (node.fieldType === 'group') {
+        this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { label: node.label, englishName: node.englishName, fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId, format: node.dataStandar, enable: node.enable, groupId: node.id })
+      } else {
+         this.parent.fieldCodeChange(this.parent.ruleConfig, ruleItem, { label: node.label, englishName: node.englishName, fieldType: node.fieldType, enumTypeNum: node.enumTypeNum, sourceTable: node.sourceTable, fieldId: node.fieldId, format: node.dataStandar, enable: node.enable })
+      }
     },
     selectOperateChange (val, ruleItem) { // 操作符改变时，数据清空，重新输入
       this.parent.updateOperateChange(this.parent.ruleConfig, ruleItem)

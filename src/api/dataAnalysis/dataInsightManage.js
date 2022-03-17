@@ -22,9 +22,13 @@ export const custerAvailable = code => httpGet(da + `data/group/select/available
 export const templateDownload = http.adornUrl(da + 'data/group/template/download?token=' + Vue.cookie.get('token'))
 export const dataIndexManagerCandidate = params => httpGet(da + 'dataIndexManager/value/candidate', params)
 
-export const overviewData = id => httpGet(da + `data/group/overview/${id}`)
+export const overviewData = (id, type) => httpGet(da + `data/group/overview/${id}/${type}`)
 export const transferLogList = params => httpGet(da + `data/transferLog/listOnPage`, params)
-export const chartInfo = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
+export const chartInfo1 = params => httpGet(da + `data/group/chartInfo`, params, 1000 * 60)
+export const chartInfo = params => httpPost(da + `data/group/featureAnalysis`, params)
+export const custGroupList = () => httpGet(da + `data/group/custGroupList`) // 人群下拉列表
+// export const dataEnumType = enumTypeNum => httpGet(da + `dataEnumType/selectByTypeNum/${enumTypeNum}`) // 枚举值列表
+export const getchildrenList = (params) => httpGet(da + 'dataEnumType/childrenList', params) // 默认分组枚举值列表
 
 export const selectEventAllCata = params => httpGetSeries(da + 'data/event/getEventDropDownList', params) // 加载事件类型接口
 export const selectEventIndexAllCata = params => httpGet(da + 'data/event/index/getEventIndexByElementId', params) // 加载事件属性类型接口
@@ -34,3 +38,5 @@ export const collisionSave = (params, collisionPackId) => httpPost(da + `data/co
 export const collisionUpdate = (params, collisionPackId, groupId) => httpPut(da + `data/collision/config/group?groupId=${groupId}&collisionPackId=${collisionPackId}`, params, false)
 export const importSqlInfo = params => httpPost(da + 'data/group/sql/import', params) // 保存SQL
 export const databaseInitInfo = () => httpGet(da + 'oa/databaseInitInfo') // 库表管理初始化
+export const detailPreviewList = params => httpGet(da + `data/group/formList`, params)
+export const selectDataGroupInfos = params => httpGet(da + 'dataCatalog/selectDataGroupInfos', params) // 分群包

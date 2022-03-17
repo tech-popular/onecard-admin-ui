@@ -5,30 +5,30 @@ export const palette = [
   //   nodeName: '入参',
   //   key: '1'
   // },
-  // {
-  //   key: '2',
-  //   category: 'MULTI_BRANCH',
-  //   path: 'flowNode.png',
-  //   nodeName: '分流节点'
-  // },
-  // {
-  //   key: '3',
-  //   category: 'GROUP_CHOICE',
-  //   nodeName: '分群节点'
-  // },
+  {
+    key: '2',
+    category: 'MULTI_BRANCH',
+    path: 'flowNode.png',
+    nodeName: '分流节点'
+  },
+  {
+    key: '3',
+    category: 'HTTP_QUERY',
+    nodeName: '过滤节点'
+  },
   // {
   //   key: '4',
-  //   category: 'FILTER_CHOICE',
-  //   nodeName: '过滤节点'
+  //   category: 'FORK_JOIN',
+  //   nodeName: '合并任务'
   // },
   {
     key: '5',
     category: 'OUT_PARAM',
     nodeName: '运营\n方式'
+  },
+  {
+    key: '6',
+    category: 'END_NODE',
+    nodeName: '结束'
   }
-  // {
-  //   key: '6',
-  //   category: 'OUT_KAFKA',
-  //   nodeName: '下发\nkafka'
-  // }
 ]

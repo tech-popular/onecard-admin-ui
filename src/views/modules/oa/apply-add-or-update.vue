@@ -10,8 +10,9 @@
     <el-tabs type="border-card" @tab-click="tabClick" v-model="actoveTab">
       <!-- 账号 -->
       <el-tab-pane label="账号权限" name="账号权限">
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>审批流在收到钉钉审批通过后，默认10分钟之后处理完成，请重新登陆系统</p>
         <el-divider>请填写以下申请</el-divider>
-        <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="160px">
+        <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="140px">
           <el-form-item label="标题" prop="name">
             <el-input v-model="dataForm.name" placeholder="标题" />
           </el-form-item>
@@ -19,6 +20,16 @@
             <el-radio-group v-model="dataForm.system" @change="testFunction">
               <el-radio :label="item.value" :key="item.value" v-for="(item) in systemList" style="margin-left:0">{{item.label}}</el-radio>
             </el-radio-group>
+          </el-form-item>
+          <el-form-item label="用户组" prop="userGroupId" v-if="dataForm.system === 8 || dataForm.system === 9">
+            <el-select v-model="dataForm.userGroupId" placeholder="请选择" style="width:100%">
+              <el-option
+                v-for="item in userGroupList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="申请系统模块" prop="systemmodel" v-if="isShow">
             <el-cascader
@@ -47,6 +58,7 @@
       <!-- 租户 -->
       <el-tab-pane label="租户申请" name="租户申请">
         <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#e6a23c"></i>如选项中未包含期望申请的租户，请邮件&lt;<span style="color:#2093f7">datareq@9fbank.com.cn</span>&gt;进行新增申请</p>
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>审批流在收到钉钉审批通过后，默认10分钟之后处理完成，请重新登陆系统</p>
         <el-form :model="tenantForm" :rules="tenantRule" ref="tenantForm" label-width="100px">
           <el-form-item label="选择租户" prop="tenantIds">
             <el-select v-model="tenantForm.tenantIds" multiple placeholder="请选择" style="width:100%">
@@ -69,7 +81,8 @@
       </el-tab-pane>
       <!-- 库表 -->
       <el-tab-pane label="库表授权" name="库表授权">
-        <el-form
+        <p style="margin-left: 20px;"><i class="el-icon-warning" style="margin-right:5px;color:#F56C6C"></i>数据表权限申请，请通过邮件datareq@9fbank.com.cn申请，谢谢！</p>
+        <!-- <el-form
           :model="severDataForm"
           :rules="severDataRule"
           ref="severDataForm"
@@ -78,9 +91,9 @@
           <el-form-item label="标题" prop="title">
             <el-input v-model="severDataForm.title" placeholder="标题" />
           </el-form-item>
-          <el-form-item label="选择要授权的库/表/字段">
+          <el-form-item label="选择要授权的库/表/字段"> -->
             <!-- <p>选择要授权的库/表/字段</p> -->
-            <el-row :gutter="24">
+            <!-- <el-row :gutter="24">
               <el-col :span="10" style="border: 1px solid #DCDFE6; overflow: hidden;">
                 <el-form :inline="true" :model="staffTemp" size="mini">
                   <el-row :gutter="24" style="padding:5px;">
@@ -106,8 +119,8 @@
                           />
                         </el-select>
                       </el-form-item>
-                    </el-col>
-                    <el-col :span="10" style="padding:0;">
+                    </el-col> -->
+                    <!-- <el-col :span="10" style="padding:0;">
                       <el-form-item style="margin: 0;">
                         <el-input v-model="staffTemp.name" placeholder="请输入名称"></el-input>
                       </el-form-item>
@@ -118,8 +131,8 @@
                       </el-form-item>
                     </el-col>
                   </el-row>
-                </el-form>
-                <el-table
+                </el-form> -->
+                <!-- <el-table
                   ref="staffTable"
                   v-loading="listLoading"
                   :data="staffList"
@@ -140,9 +153,9 @@
                       <span>{{ row.name }}</span>
                     </template>
                   </el-table-column>
-                </el-table>
+                </el-table> -->
                 <!-- 分页 -->
-                <el-pagination
+                <!-- <el-pagination
                   @size-change="sizeChangeHandle"
                   @current-change="currentChangeHandle"
                   :current-page="staffTemp.pageNum"
@@ -152,8 +165,8 @@
                   :small="true"
                   layout="total, prev, pager, next"
                 />
-              </el-col>
-              <el-col :span="2" style="text-align:center;padding-top:10%">
+              </el-col> -->
+              <!-- <el-col :span="2" style="text-align:center;padding-top:10%">
                 <el-button @click="addStaff" type="primary" size="mini" style="padding: 5px;">
                   添加
                   <i class="el-icon-arrow-right"></i>
@@ -192,8 +205,8 @@
                 </el-table>
               </el-col>
             </el-row>
-          </el-form-item>
-          <el-form-item label="申请权限" prop="applyAuthTypeList">
+          </el-form-item> -->
+          <!-- <el-form-item label="申请权限" prop="applyAuthTypeList">
             <el-checkbox-group v-model="severDataForm.applyAuthTypeList">
               <el-checkbox
                 v-for="(item, index) in severApplyAuthList"
@@ -204,14 +217,14 @@
           </el-form-item>
           <el-form-item label="maxcomputer账号" prop="account">
             <el-input v-model="severDataForm.account" placeholder="maxcomputer账号" />
-          </el-form-item>
+          </el-form-item> -->
           <!-- <el-form-item label="AccessKeyId" prop="accessKeyId">
             <el-input v-model="severDataForm.accessKeyId" placeholder="AccessKeyId" />
           </el-form-item>
           <el-form-item label="AccessKeySecert" prop="accessKeySecert">
             <el-input v-model="severDataForm.accessKeySecert" placeholder="AccessKeySecert" />
           </el-form-item> -->
-          <el-form-item label="默认所属部门">
+          <!-- <el-form-item label="默认所属部门">
             <span v-for="(item, index) in departmentList" :key="index">
               {{item}}
               <br />
@@ -220,11 +233,18 @@
           <el-form-item label="申请理由" prop="applyReason">
             <el-input type="textarea" v-model="severDataForm.applyReason" placeholder="申请理由"></el-input>
           </el-form-item>
-        </el-form>
+        </el-form> -->
         <div class="foot">
           <el-button @click="cancel()">取消</el-button>
-          <el-button type="primary" @click="severDataFormSubmit()" :loading="buttonloading">确定</el-button>
+          <el-button type="primary" @click="cancel()" :loading="buttonloading">确定</el-button>
         </div>
+      </el-tab-pane>
+      <el-tab-pane label="订阅申请" name="订阅申请">
+        <apply-subscription 
+          :system-list="systemListSubscription" 
+          :systemmodel-list="systemmodelList"
+          @cancel="cancel"
+          @submitSuccess="submitSuccess"></apply-subscription>
       </el-tab-pane>
     </el-tabs>
   </el-dialog>
@@ -241,8 +261,12 @@ import {
   tenantInif,
   saveTenant,
   mcCompute,
-  tenantCrent
+  tenantCrent,
+  getUserGroupList,
+  getSystemModulesById
 } from '@/api/oa/apply'
+import applySubscription from './applySubscription.vue'
+
 export default {
   data () {
     return {
@@ -265,7 +289,8 @@ export default {
         userName: '', // 申请人姓名
         phone: '', // 申请人手机号
         email: '', // 申请人邮箱
-        reason: '' // 申请理由
+        reason: '', // 申请理由
+        userGroupId: '' // 用户组权限
       }, // 账号权限form
       dataRule: {
         name: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
@@ -277,10 +302,14 @@ export default {
         ],
         reason: [
           { required: true, message: '申请理由不能为空', trigger: 'blur' }
+        ],
+        userGroupId: [
+          { required: true, message: '用户组不能为空', trigger: 'change' }
         ]
       }, // 账号权限form 表单校验
       // 账号权限结束
       tenantList: [],
+      userGroupList: [],
       // 租户申请开始
       tenantForm: {
         tenantIds: [], // 租户
@@ -359,7 +388,16 @@ export default {
       ]
     }
   },
-  components: {},
+  components: {
+    applySubscription
+  },
+  computed: {
+    systemListSubscription: function() {
+      return this.systemList.filter(item => {
+        return item.value === 8 || item.value === 9
+      })
+    }
+  },
   methods: {
     init (id, value) {
       this.dataForm.id = id || ''
@@ -367,7 +405,7 @@ export default {
       this.tenantForm.authApplyReason = ''
       this.visible = true
       this.$nextTick(() => {
-        this.$refs['severDataForm'].resetFields()
+        // this.$refs['severDataForm'].resetFields()
         this.getStaffList()
         accoutAuthInitInfo().then(({ data }) => {
           this.systemList = data.data.systemList
@@ -454,6 +492,11 @@ export default {
             systemId: this.dataForm.system,
             menuList: this.dataForm.systemmodel
           }
+          newData.systemName = this.systemList.filter(item => item.value === this.dataForm.system)[0].label
+          if (this.dataForm.system === 8 || this.dataForm.system === 9) {
+            newData.userGroupId = this.dataForm.userGroupId
+            newData.type = this.dataForm.system === 8 ? 0 : 1
+          }
           saveAccountAuthApply(newData).then(({ data }) => {
             if (data && data.status === '1') {
               this.$message({
@@ -462,7 +505,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['dataForm'].resetFields()
                   this.buttonloading = false
                   this.isShow = false
@@ -493,7 +536,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['dataForm'].resetFields()
                   this.buttonloading = false
                   this.isShow = false
@@ -515,11 +558,20 @@ export default {
       } else {
         this.isShow = true
       }
-      accoutAuthInitInfo().then(({ data }) => {
-        var a = [{ value: value }]
-        var b = data.data.systemList
-        var arr = [...b].filter(x => [...a].some(y => y.value === x.value))
-        this.systemmodelList = arr
+      this.dataForm.userGroupId = ''
+      if (value === 8 || value === 9) {
+        let params = {
+          'userId': sessionStorage.getItem('id'),
+          'type': value === 8 ? 0 : 1
+        }
+        getUserGroupList(params).then(({ data }) => {
+          this.userGroupList = data.data
+        })
+      }
+      getSystemModulesById({
+        systemId: value
+      }).then(({ data }) => {
+        this.systemmodelList = data.data[0].children
       })
     },
     severDataFormSubmit (form) {
@@ -549,7 +601,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false
-                  this.$emit('refreshDataList')
+                  this.submitSuccess()
                   this.$refs['severDataForm'].resetFields()
                   this.staffTemp.pageNum = 1
                   this.staffTemp.name = ''
@@ -656,11 +708,11 @@ export default {
       this.staffTemp.pageNum = 1
       this.staffTemp.name = ''
       this.selectedStaffList = []
-      this.$refs.staffTable.clearSelection()
+      // this.$refs.staffTable.clearSelection()
       this.actoveTab = '账号权限'
       this.$refs['dataForm'].resetFields()
       this.$refs['tenantForm'].resetFields()
-      this.$refs['severDataForm'].resetFields()
+      // this.$refs['severDataForm'].resetFields()
     },
     // 当前页
     currentChangeHandle (val) {
@@ -669,6 +721,9 @@ export default {
     },
     getRowKey (row) {
       return row.id
+    },
+    submitSuccess() {
+      this.$emit('refreshDataList')
     }
   }
 }

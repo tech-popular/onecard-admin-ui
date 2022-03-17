@@ -8,7 +8,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
-import { clearLoginInfo, getQueryString } from '@/utils'
+import { clearLoginInfo, getQueryString, getDate } from '@/utils'
 Vue.use(Router)
 // 开发环境不使用懒加载, 因为懒加载页面太多的话会造成webpack热更新太慢, 所以只有生产环境使用懒加载
 const _import = require('./import-' + process.env.NODE_ENV)
@@ -69,7 +69,68 @@ const router = new Router({
   routes: globalRoutes.concat(mainRoutes)
 })
 
+//   API   保存数据接口
+let startTime = Date.now()
+let currentTime
+let standingTime = 0
+let pageName = []
 router.beforeEach((to, from, next) => {
+  // 如果to存在，则说明路由发生了跳转
+  if (to.meta.menuId && from.name && from.name.split('-') && from.name.split('-')[0] === 'BI') {
+    // 清空界面名
+    pageName = []
+    // 离开界面
+    // 第一步：页面跳转后记录一下当前的时间 currentTime
+    currentTime = Date.now()
+    standingTime = parseInt((currentTime - startTime) / 1000)
+    from.matched.forEach(routeItem => {
+      pageName.push(routeItem.meta.title)
+    })
+    // ------------
+    // 第二步：在这里把 currentTime - startTime 的 差值 发送给后端
+    // ------------
+    if (pageName.length > 0) {
+      const params = {
+        // 界面
+        menuName: pageName[pageName.length - 1],
+        // 进入界面时间
+        visitTimeStart: getDate(startTime, 'year'),
+        // 离开时间
+        // gmtLeave: '',
+        visitTimeEnd: getDate(currentTime, 'year'),
+        menuId: to.meta.menuId,
+        // 停留时长
+        visitTime: standingTime,
+        // 访问类型
+        visitType: '1'
+      }
+      http({
+        url: http.adornUrl('/bi/userVisitLog/saveUserVisitLog'),
+        method: 'post',
+        params: http.adornParams(params)
+      }).then(({data}) => {
+        console.log('data: ', data)
+      })
+    }
+    // 第三步：每次都要初始化一下 startTime
+    startTime = Date.now()
+    pageName = []
+   }
+  // // 适应新BI系统的登录后跳转
+  // if (from.query.from === 'newbi') {
+  //   http({
+  //     url: http.adornUrl('/sys/user/info'),
+  //     method: 'get',
+  //     params: http.adornParams()
+  //   }).then(({data}) => {
+  //     if (data && data.code === 0) {
+  //       window.location.href = 'http://test.tech.9fbank.com/bi/#/?userId=' + data.user.id
+  //     } else {
+  //       console.log('用户信息获取失败！！')
+  //       router.push({ name: 'login' })
+  //     }
+  //   })
+  // }
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
