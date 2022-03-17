@@ -7,6 +7,7 @@ import reportChart from './modules/report-chart'
 import workFlow from './modules/workFlow'
 import canvasFlow from './modules/canvasFlow'
 import dataTransferManage from './modules/dataTransferManage'
+import withdrawal from './modules/withdrawal'
 
 Vue.use(Vuex)
 
@@ -17,7 +18,8 @@ export default new Vuex.Store({
     reportChart,
     workFlow,
     canvasFlow,
-    dataTransferManage
+    dataTransferManage,
+    withdrawal
   },
   mutations: {
     // 重置vuex本地储存状态

@@ -19,7 +19,8 @@ const globalRoutes = [
   { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } },
   { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
   { path: '/resetPassword', component: _import('common/resetPass'), name: 'resetPass', meta: { title: '重置密码' } },
-  { path: '', redirect: '/login' }
+  { path: '', redirect: '/login' },
+  { path: '/withdrawal-reportData', component: _import('modules/withdrawal/reportData'), name: 'withdrawal-reportData', meta: { title: '数据预览' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -49,6 +50,7 @@ const mainRoutes = {
     { path: '/phoenix-spectaculars0', component: _import('modules/phoenix/spectaculars0'), name: 'phoenix-spectaculars0', meta: { title: '彩虹评级', isTab: true } },
     { path: '/dataAnalysis-workFlow', component: _import('modules/dataAnalysis/workFlow'), name: 'dataAnalysis-workFlow', meta: { title: '决策配置', isTab: false } },
     { path: '/dataAnalysis-canvasFlow', component: _import('modules/dataAnalysis/canvasFlow'), name: 'dataAnalysis-canvasFlow', meta: { title: '决策画布', isTab: false } }
+    // { path: '/withdrawal-reportData', component: _import('modules/withdrawal/reportData'), name: 'withdrawal-reportData', meta: { title: '数据预览', isTab: false } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
@@ -106,7 +108,7 @@ function specialHttpMenu (to, from, next) {
     url: http.adornUrl('/sys/menu/selectDownNoButtonMenu/402'),
     method: 'get',
     params: http.adornParams()
-  }).then(({data}) => {
+  }).then(({ data }) => {
     if (data && data.code === 0) {
       if (!data.menuList.length) {
         sessionStorage.setItem('menuList', '[]')
@@ -181,7 +183,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
       } else {
         try {
           route['component'] = _import(`modules/${menuList[i].url}`) || null
-        } catch (e) {}
+        } catch (e) { }
       }
       routes.push(route)
     }

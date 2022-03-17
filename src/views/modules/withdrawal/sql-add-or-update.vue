@@ -11,8 +11,8 @@
             <el-tab-pane label="自助查询">
               <div style="display:flex">
                 <div>
-                  <el-form-item prop="datasourceId" label="服务器：">
-                    <el-select filterable v-model="baseForm.datasourceId" placeholder="请选择" @change="selectdatabaseDataList">
+                  <el-form-item prop="dataSourceId" label="服务器：">
+                    <el-select filterable v-model="baseForm.dataSourceId" placeholder="请选择" @change="selectdatabaseDataList">
                       <el-option v-for="item in datasourceList" :key="item.id" :label="item.datasourceName" :value="item.id"></el-option>
                     </el-select>
                   </el-form-item>
@@ -21,33 +21,36 @@
                       <el-option v-for="item in databaseIdList" :key="item.id" :label="item.databaseName" :value="item.id"></el-option>
                     </el-select>
                   </el-form-item>
-                  <el-divider content-position="center">新增数据源信息</el-divider>
-                  <el-form-item label="类型" prop="type">
-                    <el-radio v-model="baseForm.addingDatabase.type" label="mysql">mysql</el-radio>
-                    <el-radio v-model="baseForm.addingDatabase.type" label="maxcomputer" style="margin-left:5px;">maxcomputer</el-radio>
-                  </el-form-item>
-                  <el-form-item label="实例地址" prop="url" v-if="baseForm.addingDatabase.type === 'mysql'">
-                    <el-input v-model="baseForm.addingDatabase.url"></el-input>
-                  </el-form-item>
-                  <el-form-item label="数据库" prop="database" v-if="baseForm.addingDatabase.type === 'mysql'">
-                    <el-input v-model="baseForm.addingDatabase.database"></el-input>
-                  </el-form-item>
-                  <el-form-item label="用户名" prop="user" v-if="baseForm.addingDatabase.type === 'mysql'">
-                    <el-input v-model="baseForm.addingDatabase.user"></el-input>
-                  </el-form-item>
-                  <el-form-item label="密码" prop="passwd" v-if="baseForm.addingDatabase.type === 'mysql'">
-                    <el-input v-model="baseForm.addingDatabase.passwd" type="password"></el-input>
-                  </el-form-item>
-                  <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
-                    <el-input v-model="baseForm.addingDatabase.database"></el-input>
-                  </el-form-item>
-                  <el-form-item label="用户名" prop="accessId" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
-                    <el-input v-model="baseForm.addingDatabase.accessId"></el-input>
-                  </el-form-item>
-                  <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
-                    <el-input v-model="baseForm.addingDatabase.accessKey" type="password"></el-input>
-                  </el-form-item>
-                  <el-button style="float: right; margin-right: 10px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
+                  <el-collapse v-model="activeNames">
+                    <el-collapse-item title="新增数据源信息" name="1">
+                      <el-form-item label="类型" prop="type">
+                        <el-radio v-model="baseForm.addingDatabase.type" label="mysql">mysql</el-radio>
+                        <el-radio v-model="baseForm.addingDatabase.type" label="maxcomputer" style="margin-left:5px;">maxcomputer</el-radio>
+                      </el-form-item>
+                      <el-form-item label="实例地址" prop="url" v-if="baseForm.addingDatabase.type === 'mysql'">
+                        <el-input v-model="baseForm.addingDatabase.url"></el-input>
+                      </el-form-item>
+                      <el-form-item label="数据库" prop="database" v-if="baseForm.addingDatabase.type === 'mysql'">
+                        <el-input v-model="baseForm.addingDatabase.database"></el-input>
+                      </el-form-item>
+                      <el-form-item label="用户名" prop="userName" v-if="baseForm.addingDatabase.type === 'mysql'">
+                        <el-input v-model="baseForm.addingDatabase.userName"></el-input>
+                      </el-form-item>
+                      <el-form-item label="密码" prop="password" v-if="baseForm.addingDatabase.type === 'mysql'">
+                        <el-input v-model="baseForm.addingDatabase.password"></el-input>
+                      </el-form-item>
+                      <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
+                        <el-input v-model="baseForm.addingDatabase.database"></el-input>
+                      </el-form-item>
+                      <el-form-item label="用户名" prop="accessId" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
+                        <el-input v-model="baseForm.addingDatabase.accessId"></el-input>
+                      </el-form-item>
+                      <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
+                        <el-input v-model="baseForm.addingDatabase.accessKey"></el-input>
+                      </el-form-item>
+                      <el-button style="float: right; margin-right: 10px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
+                    </el-collapse-item>
+                  </el-collapse>
                 </div>
                 <div style="width:70%">
                   <el-form-item prop="sql" label="SQL：" ref="serviceBeginSqlForm">
@@ -56,7 +59,7 @@
                         ref="serviceBeginSql"
                         v-model="baseForm.sql"
                         :options="cmOptions"
-                        @changes="cm => workItemChanges(cm, acquisitionTask.sql, 'serviceBeginSqlForm', 'serviceBeginSql')"
+                        @changes="cm => workItemChanges(cm, baseForm.sql, 'serviceBeginSqlForm', 'serviceBeginSql')"
                         @keydown.native="e => workItemKeyDown(e, 'serviceBeginSql')"
                         class="code"
                         style="padding-bottom: 0px;"
@@ -68,8 +71,8 @@
                   </el-form-item>
                   <el-form-item>
                     <span>
-                      执行完成，执行时间3S
-                      <el-button type="text" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
+                      执行完成
+                      <el-button type="text" :disabled="!sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
                     </span>
                   </el-form-item>
                   <div style="margin-left:50px;">
@@ -86,22 +89,12 @@
                       </el-select>
                     </el-form-item>
                     <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'" label-width="100px">
-                      <el-select v-model="baseForm.receiveDays" class="reject-pane-item" multiple collapse-tags placeholder="请选择">
+                      <el-select v-model="baseForm.receiveDays" class="reject-pane-item" placeholder="请选择">
                         <el-option v-for="item in receiveDaysList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                       </el-select>
                     </el-form-item>
                     <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px">
-                      <el-time-picker
-                        is-range
-                        :clearable="false"
-                        format="HH:mm"
-                        v-model="baseForm.receiveTime"
-                        range-separator="至"
-                        style="width:400px;"
-                        start-placeholder="开始时间"
-                        end-placeholder="结束时间"
-                        placeholder="选择时间范围"
-                      ></el-time-picker>
+                      <el-time-picker is-range v-model="baseForm.receiveTime" value-format="HH:mm" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
                     </el-form-item>
                     <el-form-item prop="receiver" label="数据接收人" label-width="100px">
                       <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
@@ -146,6 +139,7 @@ export default {
       visible: true,
       isInnerIP: false,
       dataListLoading: false,
+      activeNames: 1,
       baseForm: {
         id: '',
         dataSourceId: '', // 数据源id
@@ -155,7 +149,6 @@ export default {
         period: '', // 提数周期
         receiveDays: '', // 接收天设置
         receiveTime: ['08:00', '23:59'],
-        // receiveStartTime: '', // 允许接收时间开始时间
         // receiveEndTime: '', // 允许接收时间接收时间
         exportType: 'once', // 提数类型
         receiveType: '0', // 接收类型
@@ -164,8 +157,8 @@ export default {
           'type': 'mysql',
           'url': '',
           'database': '',
-          'user': '',
-          'passwd': '',
+          'userName': '',
+          'password': '',
           'accessId': '',
           'accessKey': ''
         }
@@ -173,6 +166,7 @@ export default {
       datasourceList: [],
       databaseIdList: [],
       receiveDaysList: [], // 接收天设置list
+      sqlPreviewDataList: [], // sql预览数据
       userList: [],
       multipleSelection: [], // 多选数据
       sqlCycleList: [
@@ -240,7 +234,7 @@ export default {
           { required: true, message: '请选择提数类型', trigger: 'change' }
         ],
         receiveType: [
-          { type: 'date', required: true, message: '请选择接收类型', trigger: 'change' }
+          { required: true, message: '请选择接收类型', trigger: 'change' }
         ],
         receiver: [
           { type: 'array', required: true, message: '请选择接收人', trigger: 'change' }
@@ -260,6 +254,7 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         this.$refs['baseForm'].resetFields()
+        this.sqlPreviewDataList = []
       })
     },
     // 获取用户同一租户下的列表
@@ -285,7 +280,7 @@ export default {
     },
     // 获取数据库列表
     selectdatabaseDataList () {
-      databaseDataList(this.baseForm.datasourceId).then(({ data }) => {
+      databaseDataList(this.baseForm.dataSourceId).then(({ data }) => {
         if (data.code === 0 && data.data) {
           this.databaseIdList = data.data
         } else {
@@ -301,8 +296,8 @@ export default {
       }
       if (this.baseForm.addingDatabase.type === 'mysql') {
         params.url = this.baseForm.addingDatabase.url
-        params.user = this.baseForm.addingDatabase.user
-        params.passwd = this.baseForm.addingDatabase.passwd
+        params.user = this.baseForm.addingDatabase.userName
+        params.passwd = this.baseForm.addingDatabase.password
         checkDatasource(params).then(({ data }) => {
           console.log('data:111', data)
           if (data && data.code === 0) {
@@ -361,23 +356,40 @@ export default {
     },
     // sql执行预览
     dataSqlSubmit () {
+      this.loading = true
       let params = {
         'dataBaseId': this.baseForm.dataBaseId,
         'sql': this.baseForm.sql
       }
       sqlPreview(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '执行成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.sqlPreviewDataList = data.data
+              this.$store.commit('withdrawal/setPreviewList', this.sqlPreviewDataList)
+              this.loading = false
+            }
+          })
+        } else {
+          this.loading = false
+          this.$message.error(data.msg)
+        }
         console.log('sql执行预览: ', data)
       })
     },
     previewSqlData () {
-
-      window.open(routeUrl.href, '_blank')
+      let originHost = location.origin
+      let url = originHost + '/#/withdrawal-reportData'
+      window.open(url, '_blank')
     },
     //  提数 时间间隔 数据切换
     disTimeTurnOff (disType) {
       let tempArry = []
       if (disType === 'DAY') {
-        tempArry.push({ value: '每天', label: '每天' })
+        tempArry.push({ value: '1', label: '每天' })
       } else if (disType === 'HOUR') {
         for (let i = 1, j = 24; i < j; i++) {
           tempArry.push({ value: i, label: '每隔' + i + '小时' })
@@ -428,11 +440,11 @@ export default {
             'approveReason': this.baseForm.approveReason,
             'exportType': this.baseForm.exportType,
             'period': this.baseForm.period,
-            'receiveDays': this.baseForm.receiveDays,
-            'receiveStartTime': this.baseForm.receiveTime[0],
-            'receiveEndTime': this.baseForm.receiveTime[1],
+            'receiveDays': this.baseForm.period === 'DAY' ? '' : this.baseForm.receiveDays,
+            'receiveStartTime': this.baseForm.receiveTime[0] + ':00',
+            'receiveEndTime': this.baseForm.receiveTime[1] + ':00',
             'receiver': this.baseForm.receiver.join(','),
-            'receiveType': this.baseForm.receiveType
+            'receiveType': Number(this.baseForm.receiveType)
           }
           saveDatabySql(params).then(({ data }) => {
             if (data && data.code === 0) {
