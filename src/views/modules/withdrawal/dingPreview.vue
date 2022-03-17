@@ -1,6 +1,11 @@
 <template>
   <div class="mod-config" v-loading="dataListLoading">
-    <tab :list="dataList" :columns="columns" :operates="{}" :fixed="{}" />
+    <div class="dingding-preview-title">查询结果</div>
+    <el-table :data="dataList" border style="width: 100%" :header-cell-style="{background:'#cceaf9'}">
+      <template v-for="(item,index) in columns">
+        <el-table-column :prop="item.prop" :key="index" :label="item.label" :align="item.align"></el-table-column>
+      </template>
+    </el-table>
   </div>
 </template>
 <style>
@@ -53,3 +58,12 @@ export default {
   }
 }
 </script>
+<style scoped>
+.dingding-preview-title {
+  padding: 14px;
+  background: #c3c3c3;
+  font-size: 14px;
+  margin: 20px 0px;
+  position: relative;
+}
+</style>

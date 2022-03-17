@@ -38,7 +38,9 @@ Vue.config.productionTip = false
 if (process.env.NODE_ENV !== 'production') {
   require('@/mock')
 }
-
+// import Vconsole from 'vconsole'
+// const vConsole = new Vconsole()
+// Vue.use(vConsole)
 // 挂载全局
 Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth // 权限方法

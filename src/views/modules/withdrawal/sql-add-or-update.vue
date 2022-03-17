@@ -69,10 +69,10 @@
                   <el-form-item style="margin-top:10px;">
                     <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
-                  <el-form-item>
+                  <el-form-item v-if="previewing">
                     <span>
-                      执行完成
-                      <el-button type="text" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
+                      {{previewText ? '正在执行中' : '执行完成' }}
+                      <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
                     </span>
                   </el-form-item>
                   <div style="margin-left:50px;">
@@ -94,7 +94,16 @@
                       </el-select>
                     </el-form-item>
                     <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px">
-                      <el-time-picker is-range v-model="baseForm.receiveTime" value-format="HH:mm" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
+                      <el-time-picker
+                        is-range
+                        v-model="baseForm.receiveTime"
+                        format="HH:mm"
+                        value-format="HH:mm"
+                        range-separator="-"
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                        placeholder="选择时间范围"
+                      ></el-time-picker>
                     </el-form-item>
                     <el-form-item prop="receiver" label="数据接收人" label-width="100px">
                       <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
@@ -139,6 +148,8 @@ export default {
       visible: true,
       isInnerIP: false,
       dataListLoading: false,
+      previewText: false,
+      previewing: false,
       activeNames: 1,
       baseForm: {
         id: '',
@@ -251,6 +262,8 @@ export default {
     init () {
       this.getSourceDataList()
       this.getUsersList()
+      this.previewing = false
+      this.previewText = false
       this.visible = true
       this.$nextTick(() => {
         this.$refs['baseForm'].resetFields()
@@ -282,8 +295,10 @@ export default {
     selectdatabaseDataList () {
       databaseDataList(this.baseForm.dataSourceId).then(({ data }) => {
         if (data.code === 0 && data.data) {
+          this.baseForm.dataBaseId = ''
           this.databaseIdList = data.data
         } else {
+          this.baseForm.dataBaseId = ''
           this.databaseIdList = []
         }
       })
@@ -356,7 +371,8 @@ export default {
     },
     // sql执行预览
     dataSqlSubmit () {
-      this.loading = true
+      this.previewText = true
+      this.previewing = true
       let params = {
         'dataBaseId': this.baseForm.dataBaseId,
         'sql': this.baseForm.sql
@@ -369,15 +385,16 @@ export default {
             duration: 1500,
             onClose: () => {
               this.sqlPreviewDataList = data.data
-              this.$store.commit('withdrawal/setPreviewList', this.sqlPreviewDataList)
-              this.loading = false
+              sessionStorage.setItem('sqlPreviewDataList', JSON.stringify(data.data || '[]'))
+              // this.$store.commit('withdrawal/setPreviewList', this.sqlPreviewDataList)
+              this.previewText = false
             }
           })
         } else {
-          this.loading = false
+          sessionStorage.setItem('sqlPreviewDataList', [])
           this.$message.error(data.msg)
+          this.previewText = false
         }
-        console.log('sql执行预览: ', data)
       })
     },
     previewSqlData () {
