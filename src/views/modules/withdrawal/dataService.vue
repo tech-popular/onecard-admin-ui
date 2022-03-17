@@ -54,7 +54,7 @@
 }
 </style>
 <script>
-import { exportDataList, approveRenewal, approveDisable } from '@/api/biExport/dataImport'
+import { exportDataList, approveRenewal, approveDisable } from '@/api/withdrawal/datareport'
 import addOrUpdateSql from './sql-add-or-update'
 export default {
   data () {

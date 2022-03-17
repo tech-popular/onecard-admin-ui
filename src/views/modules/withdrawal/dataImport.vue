@@ -51,7 +51,7 @@
 }
 </style>
 <script>
-import { biExcelList, biExcelUpload, biExcelDownload } from '@/api/biExport/dataImport'
+import { biExcelList, biExcelUpload, biExcelDownload } from '@/api/withdrawal/datareport'
 export default {
   data () {
     return {
