@@ -107,7 +107,7 @@
                     </el-form-item>
                     <el-form-item prop="receiver" label="数据接收人" label-width="100px">
                       <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
-                        <el-option v-for="item in userList" :value="item.id" :key="item.id" :label="item.name || item.username "></el-option>
+                        <el-option v-for="item in userList" :value="item.userid" :key="item.id" :label="item.name || item.username "></el-option>
                       </el-select>
                     </el-form-item>
                     <el-form-item label="提数方式" prop="receiveType">
@@ -459,9 +459,9 @@ export default {
             'exportType': this.baseForm.exportType,
             'period': this.baseForm.period,
             'receiveDays': this.baseForm.period === 'DAY' ? '' : this.baseForm.receiveDays,
-            'receiveStartTime': this.baseForm.receiveTime[0] + ':00',
-            'receiveEndTime': this.baseForm.receiveTime[1] + ':00',
-            'receiver': this.baseForm.receiver.join(','),
+            'receiveStartTime': this.baseForm.receiveTime[0],
+            'receiveEndTime': this.baseForm.receiveTime[1],
+            'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
             'receiveType': Number(this.baseForm.receiveType)
           }
           saveDatabySql(params).then(({ data }) => {
