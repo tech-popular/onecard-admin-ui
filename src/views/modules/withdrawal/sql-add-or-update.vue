@@ -398,10 +398,12 @@ export default {
       })
     },
     previewSqlData () {
-      let originHost = location.origin
-      let url = originHost + '/#/withdrawal-reportData'
-      // let url = originHost + '/#/withdrawal-dingPreview?id=1'
-      window.open(url, '_blank')
+      // let originHost = location.origin
+      // let url = originHost + '/#/withdrawal-reportData'
+      // // let url = originHost + '/#/withdrawal-dingPreview?id=1'
+      // window.open(url, '_blank')
+      let routeUrl = this.$router.resolve({ path: '/withdrawal-reportData' })
+      window.open(routeUrl.href, '_blank')
     },
     //  提数 时间间隔 数据切换
     disTimeTurnOff (disType) {

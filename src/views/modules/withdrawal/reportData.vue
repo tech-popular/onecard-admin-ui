@@ -1,7 +1,6 @@
 <template>
   <div class="mod-config" v-loading="dataListLoading">
     <div class="preview-title">查询结果</div>
-    <!-- <tab :list="dataList" :columns="columns" :operates="{}" :fixed="{}" /> -->
     <el-table :data="dataList" border style="width: 100%" :header-cell-style="{background:'#cceaf9'}">
       <template v-for="(item,index) in columns">
         <el-table-column :prop="item.prop" :key="index" :label="item.label" :align="item.align"></el-table-column>
