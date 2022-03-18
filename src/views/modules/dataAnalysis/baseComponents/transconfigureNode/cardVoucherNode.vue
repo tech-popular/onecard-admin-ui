@@ -134,7 +134,7 @@ export default {
       if (id) {
         this.getLookData(id)
       } else {
-        this.getcardVoucherData()
+        // this.getcardVoucherData()
         this.getOutParamsList()
       }
     },
