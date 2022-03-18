@@ -1,66 +1,46 @@
 <template>
-	<el-dialog  width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form  v-loading="dataLoading" label-width="160px" :model="dataForm"  :rules="baseRule" ref="dataForm" :disabled="viewVisible">
-			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
-				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
-			</el-form-item>
+  <el-dialog width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+    <el-form v-loading="dataLoading" label-width="160px" :model="dataForm" :rules="baseRule" ref="dataForm" :disabled="viewVisible">
+      <el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
+        <el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
+      </el-form-item>
       <el-form-item label="所属业务线" prop="channelCode" :rules="{ required: true, message: '请选择所属业务线', trigger: 'blur' }">
-				<el-select
-					v-model="dataForm.channelCode"
-					@change="channelIdChange"
-					filterable
-					style="width: 400px"
-				>
-					<template v-for="(item, index) in channelList">
-						<el-option
-							:key="index"
-							:label="item.text"
-							:value="item.value"
-							:disabled="item.disabled"
-						></el-option>
-					</template>
-				</el-select>
-				</el-form-item>
-			<el-form-item label="类型" prop="type"> 
-				<el-select v-model="dataForm.type" @change="changeType" style="width: 400px">
-          <el-option
-              v-for="item in typeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-				</el-select>
-			</el-form-item>
+        <el-select v-model="dataForm.channelCode" @change="channelIdChange" filterable style="width: 400px">
+          <template v-for="(item, index) in channelList">
+            <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
+          </template>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="类型" prop="type">
+        <el-select v-model="dataForm.type" @change="changeType" style="width: 400px">
+          <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
       <!-- kafka -->
       <div style="display:flex">
         <el-form-item v-if="dataForm.editType === '0' && dataForm.type === 'kafka'" label="topic" prop="resourceId" :rules="{ required: true, message: '请选择topic', trigger: 'blur' }">
           <el-select v-model="dataForm.resourceId" @change="kafkaServerChange" style="margin-right:15px;width: 400px;">
-            <el-option
-              v-for="item in kafkaServerList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
+            <el-option v-for="item in kafkaServerList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-          <el-tooltip placement="top" v-if="dataForm.editType === '0' && dataForm.type === 'kafka' && dataForm.resourceId">
+        <el-tooltip placement="top" v-if="dataForm.editType === '0' && dataForm.type === 'kafka' && dataForm.resourceId">
           <div slot="content">{{target}}</div>
           <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
         </el-tooltip>
       </div>
       <!-- 短信 -->
       <el-form-item label="配置方式" v-if="dataForm.type === 'sms'" prop="editType">
-        <el-radio v-model="dataForm.editType" @change="changeEditType"  label="0">标准模板</el-radio>
-        <el-radio v-model="dataForm.editType" @change="changeEditType"  label="1">自定义模板</el-radio>
+        <el-radio v-model="dataForm.editType" @change="changeEditType" label="0">标准模板</el-radio>
+        <el-radio v-model="dataForm.editType" @change="changeEditType" label="1">自定义模板</el-radio>
       </el-form-item>
-			 <el-form-item  prop="channelId" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="短信渠道" :rules="{ required: true, message: '请选择短信渠道', trigger: 'blur' }">
-        <el-select v-model="dataForm.channelId" filterable  @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 400px">
+      <el-form-item prop="channelId" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="短信渠道" :rules="{ required: true, message: '请选择短信渠道', trigger: 'blur' }">
+        <el-select v-model="dataForm.channelId" filterable @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 400px">
           <el-option v-for="(item, index) in issueChannelList" :key="index" :value="item" :label="item"></el-option>
         </el-select>
       </el-form-item>
       <div style="display:flex">
         <el-form-item prop="resourceCode" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="短信模板" :rules="{ required: true, message: '请选择短信模板', trigger: 'blur' }">
-          <el-select v-model="dataForm.resourceCode" filterable  @change="getSmsTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
+          <el-select v-model="dataForm.resourceCode" filterable @change="getSmsTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
             <el-option v-for="(item, index) in issueTemplateList" :key="index" :value="item.tempCode" :label="item.smsDesc"></el-option>
           </el-select>
         </el-form-item>
@@ -70,51 +50,50 @@
         </el-tooltip>
       </div>
       <el-form-item prop="smsTemplate" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="模板详情">
-        <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true" >
-				</el-input>
-					<p style="margin:0" v-if="dataForm.resourceCode">
-              需要选择
-            <span style="color:red" v-text="paramsNum"></span> 个参数
-          </p>
+        <el-input type="textarea" autosize v-model="dataForm.smsTemplate" :disabled="true"></el-input>
+        <p style="margin:0" v-if="dataForm.resourceCode">
+          需要选择
+          <span style="color:red" v-text="paramsNum"></span> 个参数
+        </p>
       </el-form-item>
       <div v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
-        <el-form-item label="短信类型"   prop="cusSmsType">
-          <el-select v-model="dataForm.cusSmsType"  filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-              <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
+        <el-form-item label="短信类型" prop="cusSmsType">
+          <el-select v-model="dataForm.cusSmsType" filterable placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in cusSmsTypeList" :key="index" :value="item.code" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="短信签名" v-if="dataForm.editType === '1' && dataForm.type === 'sms'"  prop="productNo">
-          <el-select v-model="dataForm.productNo" filterable  @change="changeproductNo"  placeholder="请选择" style="width: 400px;margin-right:15px;">
-              <el-option v-for="(item, index) in productNoList" :key="index" :value="item.code" :label="item.name"></el-option>
+        <el-form-item label="短信签名" v-if="dataForm.editType === '1' && dataForm.type === 'sms'" prop="productNo">
+          <el-select v-model="dataForm.productNo" filterable @change="changeproductNo" placeholder="请选择" style="width: 400px;margin-right:15px;">
+            <el-option v-for="(item, index) in productNoList" :key="index" :value="item.code" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
-          <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
-            <el-input type="textarea"  class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="300" :autosize="{ minRows: 3, maxRows: 5}"  show-word-limit />
-          </el-form-item>
-          <el-form-item  prop="extraParams"  label="额外出参">
-				  <Treeselect
-						:options="outParamsList"
-						:disable-branch-nodes="true"
-						:show-count="true"
-						:multiple="true"
-						:load-options="loadOptions"
-						:searchable="true"
-						:clearable="true"
-						:disabled="viewVisible"
+        <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
+          <el-input type="textarea" class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="300" :autosize="{ minRows: 3, maxRows: 5}" show-word-limit />
+        </el-form-item>
+        <el-form-item prop="extraParams" label="额外出参">
+          <Treeselect
+            :options="outParamsList"
+            :disable-branch-nodes="true"
+            :show-count="true"
+            :multiple="true"
+            :load-options="loadOptions"
+            :searchable="true"
+            :clearable="true"
+            :disabled="viewVisible"
             @open="openParamsSelect"
-						@input="changeOption"
-						@select="outParamsSelect"
-						@deselect="outParamsDeselect"
-						noChildrenText="暂无数据"
-						v-model="dataForm.extraParams"
-						placeholder="请选择"
-						class="base-pane-item"
-					/>
-			</el-form-item>
+            @input="changeOption"
+            @select="outParamsSelect"
+            @deselect="outParamsDeselect"
+            noChildrenText="暂无数据"
+            v-model="dataForm.extraParams"
+            placeholder="请选择"
+            class="base-pane-item"
+          />
+        </el-form-item>
       </div>
-        <!-- ai -->
+      <!-- ai -->
       <el-form-item prop="resourceId" v-if="dataForm.type === 'ai' " label="AI模板" :rules="{ required: true, message: '请选择模板', trigger: 'blur' }">
-        <el-select v-model="dataForm.resourceId" filterable  @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
+        <el-select v-model="dataForm.resourceId" filterable @change="changeTelTemplate" placeholder="请选择模板" style="width: 400px;margin-right:15px;">
           <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
@@ -128,49 +107,49 @@
           placeholder="请输入内容"
           @select="handleSelect"
           @blur="blurInputTle"
-          ></el-autocomplete>
-        </el-form-item>
+        ></el-autocomplete>
+      </el-form-item>
       <!-- 红包卡券 -->
-      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType" >
-        <el-select v-model="dataForm.cardType" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardTypeList" :key="index" :label="item.label" :value="item.value"></el-option>
+      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType">
+        <el-select v-model="dataForm.cardType" filterable @change="cardTypeChange" placeholder="请选择" style="width: 400px;margin-right:15px;">
+          <el-option v-for="(item, index) in cardTypeList" :key="index" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'card'" prop="resourceCode" :rules="{ required: true, message: '请选择名称', trigger: 'blur' }">
-        <el-select v-model="dataForm.resourceCode" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardNameList" :key="index" :value="item.rsId" :label="item.rsName"></el-option>
+        <el-select v-model="dataForm.resourceCode" filterable placeholder="请选择" style="width: 400px;margin-right:15px;">
+          <el-option v-for="(item, index) in cardNameList" :key="index" :value="item.rsId" :label="item.rsName"></el-option>
         </el-select>
       </el-form-item>
       <!-- HTTP -->
       <div v-if="dataForm.type === 'http'">
         <el-form-item label="URL" prop="url" :rules="baseRule.url">
-          <el-input v-model="dataForm.url" placeholder="请输入URL"/>
+          <el-input v-model="dataForm.url" placeholder="请输入URL" />
         </el-form-item>
         <!-- <el-form-item label="请求参数的fieldId数组" prop="requestFields" :rules="baseRule.requestFields">
         <el-input v-model="dataForm.requestFields" placeholder="param1,param2(多个参数逗号隔开)"/>
-        </el-form-item> -->
-        <el-form-item  prop="extraParams"  label="请求入参" :rules="{ required: true, message: '请选择名称', trigger: 'input' }">
-				  <Treeselect
-						:options="outParamsList"
-						:disable-branch-nodes="true"
-						:show-count="true"
-						:multiple="true"
-						:load-options="loadOptions"
-						:searchable="true"
-						:clearable="true"
-						:disabled="viewVisible"
+        </el-form-item>-->
+        <el-form-item prop="extraParams" label="请求入参" :rules="{ required: true, message: '请选择名称', trigger: 'input' }">
+          <Treeselect
+            :options="outParamsList"
+            :disable-branch-nodes="true"
+            :show-count="true"
+            :multiple="true"
+            :load-options="loadOptions"
+            :searchable="true"
+            :clearable="true"
+            :disabled="viewVisible"
             @open="openParamsSelect"
-						@input="changeOption"
-						@select="outParamsSelect"
-						@deselect="outParamsDeselect"
-						noChildrenText="暂无数据"
-						v-model="dataForm.extraParams"
-						placeholder="请选择"
-						class="base-pane-item"
-					/>
-			</el-form-item>
+            @input="changeOption"
+            @select="outParamsSelect"
+            @deselect="outParamsDeselect"
+            noChildrenText="暂无数据"
+            v-model="dataForm.extraParams"
+            placeholder="请选择"
+            class="base-pane-item"
+          />
+        </el-form-item>
         <el-form-item label="请求head入参" prop="requestHeadFields">
-        <el-input v-model="dataForm.requestHeadFields" placeholder="请输入请求head入参"/>
+          <el-input v-model="dataForm.requestHeadFields" placeholder="请输入请求head入参" />
         </el-form-item>
         <el-form-item label="入参生成方式">
           <el-radio-group v-model="dataForm.requestParamTemplateStatus">
@@ -179,26 +158,21 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item prop="templateContent" label="模板内容" v-if="dataForm.requestParamTemplateStatus == '1'" :rules="baseRule.templateContent">
-          <el-input type="textarea"  class="base-pane-item" v-model="dataForm.templateContent"  :autosize="{ minRows: 2}" />
+          <el-input type="textarea" class="base-pane-item" v-model="dataForm.templateContent" :autosize="{ minRows: 2}" />
         </el-form-item>
         <el-form-item label="响应参数的fieldId数组" prop="responseFields" :rules="baseRule.responseFields">
-        <el-input v-model="dataForm.responseFields" placeholder="result1,result2(多个结果逗号隔开)"/>
+          <el-input v-model="dataForm.responseFields" placeholder="result1,result2(多个结果逗号隔开)" />
         </el-form-item>
-        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="baseRule.responseType"> 
+        <el-form-item label="响应参数的数据类型" prop="responseType" :rules="baseRule.responseType">
           <el-select v-model="dataForm.responseType" placeholder="请选择响应参数的数据类型">
-            <el-option
-              v-for="item in httpResponseTypeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+            <el-option v-for="item in httpResponseTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
-         </el-form-item>
+        </el-form-item>
         <el-form-item label="判断表达式" prop="expression" :rules="baseRule.expression">
-          <el-input v-model="dataForm.expression" placeholder="请输入缓存生成的key需要的字段"/>
+          <el-input v-model="dataForm.expression" placeholder="请输入缓存生成的key需要的字段" />
         </el-form-item>
         <el-form-item label="switch判断项集合" prop="switchTemplate" :rules="baseRule.switchTemplate">
-          <el-input v-model="dataForm.switchTemplate" placeholder="请输入缓存生成的key需要的字段"/>
+          <el-input v-model="dataForm.switchTemplate" placeholder="请输入缓存生成的key需要的字段" />
         </el-form-item>
       </div>
       <!-- push -->
@@ -206,48 +180,48 @@
         <el-checkbox v-model="dataForm.flag" label="pushFlag" @change="checked=>changeDistribution(checked, 'pushFlag')">push</el-checkbox>
         <el-checkbox v-model="dataForm.flag " label="msgFlag" @change="checked=>changeDistribution(checked, 'msgFlag')">个人消息</el-checkbox>
       </el-form-item>
-    <!-- 参数 -->
-      <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
-				  <Treeselect
-						:options="outParamsList"
-						:disable-branch-nodes="true"
-						:show-count="true"
-						:multiple="true"
-						:load-options="loadOptions"
-						:searchable="true"
-						:clearable="true"
-						disabled
-            placeholder=""
-						v-model="dataForm.fixedParams"
-						class="base-pane-item"
-					/>
-			</el-form-item>
-      <el-form-item  prop="extraParams"  label="额外出参" v-if="extraParamsVisible" :rules="{ required: true, message: '请选择名称', trigger: 'input' }">
-				  <Treeselect
-						:options="outParamsList"
-						:disable-branch-nodes="true"
-						:show-count="true"
-						:multiple="true"
-						:load-options="loadOptions"
-						:searchable="true"
-						:clearable="true"
-						:disabled="viewVisible"
-            @open="openParamsSelect"
-						@input="changeOption"
-						@select="outParamsSelect"
-						@deselect="outParamsDeselect"
-						noChildrenText="暂无数据"
-						v-model="dataForm.extraParams"
-						placeholder="请选择"
-						class="base-pane-item"
-					/>
-			</el-form-item>
+      <!-- 参数 -->
+      <el-form-item prop="fixedParams" label="固定出参" v-if="fixedParamsvisible">
+        <Treeselect
+          :options="outParamsList"
+          :disable-branch-nodes="true"
+          :show-count="true"
+          :multiple="true"
+          :load-options="loadOptions"
+          :searchable="true"
+          :clearable="true"
+          disabled
+          placeholder
+          v-model="dataForm.fixedParams"
+          class="base-pane-item"
+        />
+      </el-form-item>
+      <el-form-item prop="extraParams" label="额外出参" v-if="extraParamsVisible" :rules="{ required: true, message: '请选择名称', trigger: 'input' }">
+        <Treeselect
+          :options="outParamsList"
+          :disable-branch-nodes="true"
+          :show-count="true"
+          :multiple="true"
+          :load-options="loadOptions"
+          :searchable="true"
+          :clearable="true"
+          :disabled="viewVisible"
+          @open="openParamsSelect"
+          @input="changeOption"
+          @select="outParamsSelect"
+          @deselect="outParamsDeselect"
+          noChildrenText="暂无数据"
+          v-model="dataForm.extraParams"
+          placeholder="请选择"
+          class="base-pane-item"
+        />
+      </el-form-item>
       <div v-if="dataForm.type === 'push' && dataForm.flag.includes('pushFlag')">
         <el-divider content-position="center">push</el-divider>
         <el-form-item label="Push类型：" prop="pushType" :rules="{ required: true, message: '请选择Push类型', trigger: 'blur' }">
           <el-select v-model="dataForm.pushType">
             <el-option value="PUM" label="服务通知"></el-option>
-            <el-option value='SYS' label="系统公告"></el-option>
+            <el-option value="SYS" label="系统公告"></el-option>
             <el-option value="ACTIVITY" label="精选活动"></el-option>
             <el-option value="BONUS" label="专属福利"></el-option>
           </el-select>
@@ -257,13 +231,13 @@
           <el-radio label="external" v-model="dataForm.pageType">外部H5</el-radio>
         </el-form-item>
         <el-form-item label="查看详情跳转链接：" prop="linkUrl" v-if="dataForm.pushType === 'ACTIVITY' || dataForm.pushType === 'BONUS'" :rules="{ required: true, message: '请输入查看详情跳转链接', trigger: 'blur' }">
-          <el-input v-model="dataForm.linkUrl" ></el-input>
+          <el-input v-model="dataForm.linkUrl"></el-input>
         </el-form-item>
         <el-form-item label="Push标题：" prop="pushTitle" :rules="{ required: true, message: '请输入Push标题', trigger: 'blur' }">
           <el-input v-model="dataForm.pushTitle" placeholder="请输入Push标题"></el-input>
         </el-form-item>
         <el-form-item label="内容：" prop="pushContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
-          <el-input type="textarea"  v-model="dataForm.pushContent" :autosize="{ minRows: 3}"  show-word-limit />
+          <el-input type="textarea" v-model="dataForm.pushContent" :autosize="{ minRows: 3}" show-word-limit />
         </el-form-item>
       </div>
       <div v-if="dataForm.type === 'push' && dataForm.flag.includes('msgFlag')">
@@ -275,22 +249,22 @@
           <el-radio label="external" v-model="dataForm.pageType">外部H5</el-radio>
         </el-form-item>
         <el-form-item label="App跳转链接：" prop="msgUrl" :rules="{ required: true, message: '请输入App跳转链接', trigger: 'blur' }">
-          <el-input v-model="dataForm.msgUrl" ></el-input>
+          <el-input v-model="dataForm.msgUrl"></el-input>
         </el-form-item>
         <el-form-item label="标题：" prop="msgTitle" :rules="{ required: true, message: '请输入标题', trigger: 'blur' }">
           <el-input v-model="dataForm.msgTitle" placeholder="请输入标题"></el-input>
         </el-form-item>
-      <el-form-item label="内容：" prop="msgContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
-            <el-input type="textarea"  v-model="dataForm.msgContent" :autosize="{ minRows: 3}"  show-word-limit />
-      </el-form-item>
-      <!--  -->
+        <el-form-item label="内容：" prop="msgContent" :rules="{ required: true, message: '请输入内容', trigger: 'blur' }">
+          <el-input type="textarea" v-model="dataForm.msgContent" :autosize="{ minRows: 3}" show-word-limit />
+        </el-form-item>
+        <!--  -->
       </div>
-		</el-form>
-		<div slot="footer" class="foot">
+    </el-form>
+    <div slot="footer" class="foot">
       <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
-	</el-dialog>
+  </el-dialog>
 </template>
 <script>
 import { dataTransferManageOutParams, dataTransferManageKafka, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
@@ -430,28 +404,34 @@ export default {
       }, {
         value: 2,
         label: '借款红包'
-      }, {
-        value: 3,
-        label: '免息红包'
-      }, {
-        value: 4,
-        label: '提额红包'
-      }, {
-        value: 5,
-        label: '商城满减红包'
-      }, {
-        value: 6,
-        label: '接口红包'
-      }, {
-        value: 7,
-        label: '积分（无资源）'
-      }, {
-        value: 8,
-        label: '接口资源提额红包 '
-      }, {
-        value: 9,
-        label: '降息红包'
-      }, {
+      },
+      //  {
+      //   value: 3,
+      //   label: '免息红包'
+      // }, {
+      //   value: 4,
+      //   label: '提额红包'
+      // }, {
+      //   value: 5,
+      //   label: '商城满减红包'
+      // }, {
+      //   value: 6,
+      //   label: '接口红包'
+      // }, {
+      //   value: 7,
+      //   label: '积分（无资源）'
+      // }, {
+      //   value: 8,
+      //   label: '接口资源提额红包 '
+      // }, {
+      //   value: 9,
+      //   label: '降息红包'
+      // },
+      {
+        value: 11,
+        label: '免息劵'
+      },
+      {
         value: 12,
         label: '减息券'
       }],
@@ -503,7 +483,7 @@ export default {
   },
   components: { Treeselect },
   methods: {
-     // 树加载
+    // 树加载
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
         callback()
@@ -546,7 +526,7 @@ export default {
         msgTitle: '',
         msgUrl: '',
         msgContent: '',
-         // HTTP参数
+        // HTTP参数
         url: '',  // url
         // requestFields: '',
         requestHeadFields: '',
@@ -639,7 +619,7 @@ export default {
             }
             if (res.data.data.bindingConfig.type === 'tel' || res.data.data.bindingConfig.type === 'ai') {
               this.extraParamsVisible = false
-              getResourceInfoFromType(res.data.data.bindingConfig.type).then(({data}) => {
+              getResourceInfoFromType(res.data.data.bindingConfig.type).then(({ data }) => {
                 if (data && data.status === '1') {
                   data.data && data.data.forEach(item => {
                     item.value = item.name
@@ -658,7 +638,8 @@ export default {
             }
             if (res.data.data.bindingConfig.type === 'card') {
               this.extraParamsVisible = false
-              this.getcardVoucherData('edit')
+              this.dataForm.cardType = Number(res.data.data.bindingConfig.content)
+              this.getcardVoucherData(this.dataForm.cardType)
             }
           }
           this.getOutParamsList(row, res.data.data.extraParams)
@@ -681,12 +662,12 @@ export default {
         })
       })
     },
-      // kafka 数据源
+    // kafka 数据源
     getKafkaServerList (resourceId) {
       let params = {
         type: 'kafka'
       }
-      dataTransferManageKafka(params).then(({data}) => {
+      dataTransferManageKafka(params).then(({ data }) => {
         if (data && data.status === '1') {
           this.kafkaServerList = data.data
           if (resourceId) {
@@ -701,9 +682,9 @@ export default {
       this.dataForm.resourceCode = arr[0].code
       this.target = arr[0].target
     },
-     // 短信签名
+    // 短信签名
     getSmsSignInfo () {
-      getSmsSignInfo().then(({data}) => {
+      getSmsSignInfo().then(({ data }) => {
         if (data && data.status === '1') {
           this.productNoList = data.data
         } else {
@@ -713,7 +694,7 @@ export default {
     },
     // 短信类型
     getSmsStyleInfo () {
-      getSmsStyleInfo().then(({data}) => {
+      getSmsStyleInfo().then(({ data }) => {
         if (data && data.status === '1') {
           this.cusSmsTypeList = data.data
         } else {
@@ -722,15 +703,15 @@ export default {
       })
     },
     // 短信渠道
-    getAllSmsChannels() {
-      getAllSmsChannels().then(({data}) => {
+    getAllSmsChannels () {
+      getAllSmsChannels().then(({ data }) => {
         if (data.status === '1') {
           this.issueChannelList = data.data
         }
       })
     },
     getDate (value, isChange) {
-      getSmsCodeInfo(value).then(({data}) => {
+      getSmsCodeInfo(value).then(({ data }) => {
         if (data.status === '1') {
           this.issueTemplateList = data.data
           if (isChange) {
@@ -743,7 +724,7 @@ export default {
     },
     // 获取分群出参 指标列表
     getOutParamsList (row, extraParams) {
-      dataTransferManageOutParams({ channelCode: this.dataForm.channelCode, flag: this.dataForm.id ? '-1' : '1' }).then(({data}) => {
+      dataTransferManageOutParams({ channelCode: this.dataForm.channelCode, flag: this.dataForm.id ? '-1' : '1' }).then(({ data }) => {
         if (data && data.status === '1') {
           this.outParamsList = this.filterAllCata(data.data)
           if (row) {
@@ -819,7 +800,7 @@ export default {
         let fixedData = extraParams.split(',')
         fixedData.forEach(item => {
           out.push(item.split('@')[0] + '-' + item.split('@')[1])
-           this.extraParams.push(item.split('@')[1])
+          this.extraParams.push(item.split('@')[1])
         })
         this.dataForm.extraParams = Array.from(new Set(out))
         this.outParamsList = this.updateOutParamsList(this.dataForm.extraParams, outList)
@@ -900,7 +881,7 @@ export default {
         msgTitle: '',
         msgUrl: '',
         msgContent: '',
-         // HTTP参数
+        // HTTP参数
         url: '',  // url
         // requestFields: '',
         requestHeadFields: '',
@@ -924,7 +905,7 @@ export default {
         this.getKafkaServerList()
       }
       if (value === 'tel' || value === 'ai') {
-        getResourceInfoFromType(value).then(({data}) => {
+        getResourceInfoFromType(value).then(({ data }) => {
           if (data && data.status === '1') {
             this.telOrAiList = data.data
           } else {
@@ -933,10 +914,10 @@ export default {
         })
       }
       if (value === 'card') {
-        this.getcardVoucherData()
+        // this.getcardVoucherData()
       }
     },
-     // 编辑类型改变
+    // 编辑类型改变
     changeEditType () {
       if (this.dataForm.type === 'sms') {
         if (this.dataForm.editType === '0') {
@@ -977,8 +958,8 @@ export default {
         this.$set(this.dataForm, this.dataForm.smsContent, '')
       }
     },
-     // 电销
-    querySearch(queryString, cb) {
+    // 电销
+    querySearch (queryString, cb) {
       let telOrAiList = this.telOrAiList
       telOrAiList.length && telOrAiList.forEach(item => {
         item.value = item.name
@@ -987,17 +968,17 @@ export default {
       // 调用 callback 返回建议列表的数据
       cb(results)
     },
-    createFilter(queryString) {
+    createFilter (queryString) {
       return (telOrAiList) => {
         return (telOrAiList.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
       }
     },
-    handleSelect(item) {
+    handleSelect (item) {
       this.dataForm.telTemplateValue = item.value
       this.dataForm.resourceCode = item.code
       this.dataForm.resourceId = item.id
     },
-    blurInputTle(e) {
+    blurInputTle (e) {
       if (e.target.value) {
         this.dataForm.telTemplateValue = e.target.value
         this.dataForm.resourceCode = e.target.value
@@ -1020,7 +1001,7 @@ export default {
       }
     },
     // 固定参数
-    getFixedParams() {
+    getFixedParams () {
       if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.dataForm.channelCode && this.dataForm.type) {
         let out = []
         this.fixedParams = []
@@ -1028,7 +1009,7 @@ export default {
           channelCode: this.dataForm.channelCode,
           type: this.dataForm.type
         }
-        getFixedParams(params).then(({data}) => {
+        getFixedParams(params).then(({ data }) => {
           if (data && data.status === '1') {
             if (data.data) {
               let fixedData = data.data.split(',')
@@ -1065,26 +1046,27 @@ export default {
       // this.dataForm.resourceName = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].smsDesc
       this.dataForm.resourceId = this.issueTemplateList.filter(item => item.tempCode === this.dataForm.resourceCode)[0].id
     },
-     // AI模板
+    // AI模板
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
     //  红包卡券
-    getcardVoucherData (edit) {
-      getCardInfo().then(({data}) => {
+    getcardVoucherData (code) {
+      getCardInfo(code).then(({ data }) => {
         if (data && data.status === '1') {
-          this.cardDataList = data.data
-          if (edit === 'edit') {
-            this.dataForm.cardType = data.data.filter(item => item.rsId === this.dataForm.resourceCode)[0].rsType
-            this.cardTypeChange('edit')
-          }
+          this.cardNameList = data.data
+          // if (edit === 'edit') {
+          //   this.dataForm.cardType = data.data.filter(item => item.rsId === this.dataForm.resourceCode)[0].rsType
+          //   this.cardTypeChange('edit')
+          // }
         } else {
-          this.cardDataList = []
+          this.cardNameList = []
         }
       })
     },
     cardTypeChange (edit) {
       this.cardNameList = []
+      this.getcardVoucherData(this.dataForm.cardType)
       if (edit !== 'edit') {
         this.dataForm.resourceCode = ''
       }
@@ -1139,8 +1121,8 @@ export default {
             switchTemplate: this.dataForm.switchTemplate
           }
           let pushExtraKeys = {
-              pageType: this.dataForm.pageType,
-              linkUrl: this.dataForm.linkUrl
+            pageType: this.dataForm.pageType,
+            linkUrl: this.dataForm.linkUrl
           }
           let pushContent = {
             pushFlag: this.dataForm.flag.includes('pushFlag') ? 'Y' : 'N',
@@ -1180,45 +1162,48 @@ export default {
             params.content = JSON.stringify(httpContent)
             // params.resourceId = null
           }
-          if (!this.dataForm.id) {
-              addDataInfo(params).then(({data}) => {
-                if (data && data.status === '1') {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.$emit('refreshDataList')
-                      this.$refs['dataForm'].resetFields()
-                    }
-                  })
-                } else {
-                  this.$message.error(data.message || '数据异常')
-                }
-              })
-            } else {
-              params.createTime = this.createTime
-              params.createUser = this.createUser
-              editDataInfo(params).then(({data}) => {
-                if (data && data.status === '1') {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.$emit('refreshDataList')
-                      this.$refs['dataForm'].resetFields()
-                    }
-                  })
-                } else {
-                  this.$message.error(data.message)
-                }
-              })
-            }
+          if (this.dataForm.type === 'card') {
+            params.conten = this.dataForm.cardType.toString()
           }
-        })
+          if (!this.dataForm.id) {
+            addDataInfo(params).then(({ data }) => {
+              if (data && data.status === '1') {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                    this.$refs['dataForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.message || '数据异常')
+              }
+            })
+          } else {
+            params.createTime = this.createTime
+            params.createUser = this.createUser
+            editDataInfo(params).then(({ data }) => {
+              if (data && data.status === '1') {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                    this.$refs['dataForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.message)
+              }
+            })
+          }
+        }
+      })
     }
   }
 }
