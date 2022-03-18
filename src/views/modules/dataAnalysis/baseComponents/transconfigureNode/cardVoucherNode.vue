@@ -1,41 +1,41 @@
 <template>
-	<el-dialog title="配置" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-		<el-form v-loading="dataLoading" label-width="120px" :model="dataForm" :disabled="!canUpdate"  ref="dataForm">
-			<el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
-				<el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
-			</el-form-item>
+  <el-dialog title="配置" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+    <el-form v-loading="dataLoading" label-width="120px" :model="dataForm" :disabled="!canUpdate" ref="dataForm">
+      <el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
+        <el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
+      </el-form-item>
       <!-- 红包卡券 -->
-      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType" >
-        <el-select v-model="dataForm.cardType" filterable  @change="cardTypeChange"  placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardTypeList" :key="index" :label="item.label" :value="item.value"></el-option>
+      <el-form-item v-if="dataForm.type === 'card'" label="红包/卡券类型" prop="cardType">
+        <el-select v-model="dataForm.cardType" filterable @change="cardTypeChange" placeholder="请选择" style="width: 400px;margin-right:15px;">
+          <el-option v-for="(item, index) in cardTypeList" :key="index" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="红包/卡券名称" v-if="dataForm.type === 'card'" prop="resourceCode" :rules="{ required: true, message: '请选择名称', trigger: 'blur' }">
-        <el-select v-model="dataForm.resourceCode" filterable   placeholder="请选择" style="width: 400px;margin-right:15px;">
-            <el-option v-for="(item, index) in cardNameList" :key="index" :value="item.rsId" :label="item.rsName"></el-option>
+        <el-select v-model="dataForm.resourceCode" filterable placeholder="请选择" style="width: 400px;margin-right:15px;">
+          <el-option v-for="(item, index) in cardNameList" :key="index" :value="item.rsId" :label="item.rsName"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
-				  <Treeselect
-						:options="outParamsList"
-						:disable-branch-nodes="true"
-						:show-count="true"
-						:multiple="true"
-						:load-options="loadOptions"
-						:searchable="true"
-						:clearable="true"
-						disabled
-            placeholder=""
-						v-model="dataForm.fixedParams"
-						class="base-pane-item"
-					/>
-			</el-form-item>
-		</el-form>
-		<div slot="footer" class="foot">
-      <el-button type="primary" v-if="canUpdate" @click="submitData" >提交</el-button>
+      <el-form-item prop="fixedParams" label="固定出参" v-if="fixedParamsvisible">
+        <Treeselect
+          :options="outParamsList"
+          :disable-branch-nodes="true"
+          :show-count="true"
+          :multiple="true"
+          :load-options="loadOptions"
+          :searchable="true"
+          :clearable="true"
+          disabled
+          placeholder
+          v-model="dataForm.fixedParams"
+          class="base-pane-item"
+        />
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="foot">
+      <el-button type="primary" v-if="canUpdate" @click="submitData">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
-	</el-dialog>
+  </el-dialog>
 </template>
 <script>
 import { dataTransferManageOutParams } from '@/api/dataAnalysis/dataTransferManage'
@@ -71,28 +71,34 @@ export default {
       }, {
         value: 2,
         label: '借款红包'
-      }, {
-        value: 3,
-        label: '免息红包'
-      }, {
-        value: 4,
-        label: '提额红包'
-      }, {
-        value: 5,
-        label: '商城满减红包'
-      }, {
-        value: 6,
-        label: '接口红包'
-      }, {
-        value: 7,
-        label: '积分（无资源）'
-      }, {
-        value: 8,
-        label: '接口资源提额红包 '
-      }, {
-        value: 9,
-        label: '降息红包'
-      }, {
+      },
+      //  {
+      //   value: 3,
+      //   label: '免息红包'
+      // }, {
+      //   value: 4,
+      //   label: '提额红包'
+      // }, {
+      //   value: 5,
+      //   label: '商城满减红包'
+      // }, {
+      //   value: 6,
+      //   label: '接口红包'
+      // }, {
+      //   value: 7,
+      //   label: '积分（无资源）'
+      // }, {
+      //   value: 8,
+      //   label: '接口资源提额红包 '
+      // }, {
+      //   value: 9,
+      //   label: '降息红包'
+      // },
+      {
+        value: 11,
+        label: '免息劵'
+      },
+      {
         value: 12,
         label: '减息券'
       }]
@@ -100,7 +106,7 @@ export default {
   },
   components: { Treeselect },
   methods: {
-     // 树加载
+    // 树加载
     async loadOptions ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
         callback()
@@ -141,39 +147,38 @@ export default {
           this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
           this.dataForm.resourceCode = res.data.data.bindingConfig.resourceCode
           this.dataForm.type = res.data.data.bindingConfig.type
+          this.dataForm.cardType = Number(res.data.data.bindingConfig.content)
           this.dataForm.resourceId = null
-          this.getcardVoucherData('edit')
+          this.getcardVoucherData(this.dataForm.cardType)
           this.getOutParamsList(res.data.data.fixedParams)
         }
       })
     },
-     getcardVoucherData (edit) {
-      getCardInfo().then(({data}) => {
+    getcardVoucherData (code) {
+      getCardInfo(code).then(({ data }) => {
         if (data && data.status === '1') {
-          this.cardDataList = data.data
-          if (edit === 'edit') {
-            this.dataForm.cardType = data.data.filter(item => item.rsId === this.dataForm.resourceCode)[0].rsType
-            this.cardTypeChange('edit')
-          }
+          this.cardNameList = data.data
         } else {
-          this.cardDataList = []
+          this.$message.error(data.message)
+          this.cardNameList = []
         }
       })
     },
     cardTypeChange (edit) {
       this.cardNameList = []
+      this.getcardVoucherData(this.dataForm.cardType)
       if (edit !== 'edit') {
         this.dataForm.resourceCode = ''
       }
-      this.cardDataList.forEach(item => {
-        if (item.rsType === this.dataForm.cardType) {
-          this.cardNameList.push(item)
-        }
-      })
+      // this.cardDataList.forEach(item => {
+      //   if (item.rsType === this.dataForm.cardType) {
+      //     this.cardNameList.push(item)
+      //   }
+      // })
     },
     // 获取分群出参 指标列表
     getOutParamsList (fixedParams) {
-      dataTransferManageOutParams({ channelCode: this.dataForm.channelCode, flag: this.dataForm.id ? '-1' : '1' }).then(({data}) => {
+      dataTransferManageOutParams({ channelCode: this.dataForm.channelCode, flag: this.dataForm.id ? '-1' : '1' }).then(({ data }) => {
         if (data && data.status === '1') {
           if (fixedParams) {
             this.getOutParamsEditList(fixedParams, this.filterAllCata(data.data))
@@ -236,7 +241,7 @@ export default {
         let fixedData = fixedParams.split(',')
         fixedData.forEach(item => {
           out.push(item.split('@')[0] + '-' + item.split('@')[1])
-           this.fixedParams.push(item.split('@')[1])
+          this.fixedParams.push(item.split('@')[1])
         })
         this.dataForm.fixedParams = Array.from(new Set(out))
         this.fixedParamsvisible = true
@@ -260,14 +265,14 @@ export default {
       return indexListArr
     },
     // 固定参数
-    getFixedParams() {
+    getFixedParams () {
       let out = []
       this.fixedParams = []
       let params = {
         channelCode: this.dataForm.channelCode,
         type: this.dataForm.type
       }
-      getFixedParams(params).then(({data}) => {
+      getFixedParams(params).then(({ data }) => {
         if (data && data.status === '1') {
           if (data.data) {
             let fixedData = data.data.split(',')
@@ -286,7 +291,7 @@ export default {
         }
       })
     },
-     // 电销或AI模板
+    // 电销或AI模板
     changeTelTemplate () {
       this.dataForm.resourceCode = this.telOrAiList.filter(item => item.id === this.dataForm.resourceId)[0].code
     },
@@ -304,45 +309,46 @@ export default {
             channelCode: this.dataForm.channelCode,
             resourceId: null,
             fixedParams: this.fixedParams.join(','),
-            extraParams: ''
+            extraParams: '',
+            content: this.dataForm.cardType.toString()
           }
           if (!this.dataForm.id) {
-              addDataInfo(params).then(({data}) => {
-                if (data && data.status === '1') {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.$emit('updateList', true, 'card')
-                      this.$refs['dataForm'].resetFields()
-                    }
-                  })
-                } else {
-                  this.$message.error(data.message || '数据异常')
-                }
-              })
-            } else {
-              editDataInfo(params).then(({data}) => {
-                if (data && data.status === '1') {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.$emit('updateList', true, 'card')
-                      this.$refs['dataForm'].resetFields()
-                    }
-                  })
-                } else {
-                  this.$message.error(data.message)
-                }
-              })
-            }
+            addDataInfo(params).then(({ data }) => {
+              if (data && data.status === '1') {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('updateList', true, 'card')
+                    this.$refs['dataForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.message || '数据异常')
+              }
+            })
+          } else {
+            editDataInfo(params).then(({ data }) => {
+              if (data && data.status === '1') {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('updateList', true, 'card')
+                    this.$refs['dataForm'].resetFields()
+                  }
+                })
+              } else {
+                this.$message.error(data.message)
+              }
+            })
           }
-        })
+        }
+      })
     }
   }
 }
