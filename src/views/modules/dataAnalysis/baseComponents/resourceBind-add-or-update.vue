@@ -426,7 +426,7 @@ export default {
       // }, {
       //   value: 9,
       //   label: '降息红包'
-      // }, 
+      // },
       {
         value: 11,
         label: '免息劵'
