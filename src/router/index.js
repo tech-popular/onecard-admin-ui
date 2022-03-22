@@ -21,7 +21,8 @@ const globalRoutes = [
   { path: '/resetPassword', component: _import('common/resetPass'), name: 'resetPass', meta: { title: '重置密码' } },
   { path: '', redirect: '/login' },
   { path: '/withdrawal-reportData', component: _import('modules/withdrawal/reportData'), name: 'withdrawal-reportData', meta: { title: '数据预览' } },
-  { path: '/withdrawal-dingPreview', component: _import('modules/withdrawal/dingPreview'), name: 'withdrawal-dingPreview', meta: { title: '钉钉数据预览' } }
+  { path: '/withdrawal-dingPreview', component: _import('modules/withdrawal/dingPreview'), name: 'withdrawal-dingPreview', meta: { title: '钉钉数据预览' } },
+  { path: '/withdrawal-dingDownLoad', component: _import('modules/withdrawal/dingDownLoad'), name: 'withdrawal-dingDownLoad', meta: { title: '钉钉数据下载' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
