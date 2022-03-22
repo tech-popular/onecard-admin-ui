@@ -107,6 +107,10 @@ export default {
     },
     // 新增 / 修改
     addOrUpdateSqlHandle () {
+      // let routeUrl = this.$router.resolve({        path: '/withdrawal-dingDownLoad', query: {
+      //     fileName: 'dingning_20220322154406300'
+      //   }      })
+      // window.open(routeUrl.href, '_blank')
       this.addOrUpdateSqlVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdateSql.init()
