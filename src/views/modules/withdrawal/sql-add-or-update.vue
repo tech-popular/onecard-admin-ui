@@ -48,7 +48,7 @@
                       <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
                         <el-input v-model="baseForm.addingDatabase.accessKey"></el-input>
                       </el-form-item>
-                      <el-button style="float: right; margin-right: 10px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
+                      <el-button style="float: right; margin-right: 10px; margin-bottom: 20px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
                     </el-collapse-item>
                   </el-collapse>
                 </div>
@@ -267,6 +267,15 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         this.$refs['baseForm'].resetFields()
+        this.baseForm.addingDatabase = {
+          'type': 'mysql',
+          'url': '',
+          'database': '',
+          'userName': '',
+          'password': '',
+          'accessId': '',
+          'accessKey': ''
+        }
         this.sqlPreviewDataList = []
       })
     },
