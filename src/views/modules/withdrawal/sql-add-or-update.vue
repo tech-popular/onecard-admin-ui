@@ -181,7 +181,7 @@ export default {
       userList: [],
       multipleSelection: [], // 多选数据
       sqlCycleList: [
-        { value: 'HOUR', label: '小时' },
+        { value: 'HOURS', label: '小时' },
         { value: 'DAY', label: '天' },
         { value: 'WEEK', label: '周' },
         { value: 'MONTH', label: '月' }
