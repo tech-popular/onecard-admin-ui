@@ -181,10 +181,10 @@ export default {
       userList: [],
       multipleSelection: [], // 多选数据
       sqlCycleList: [
-        { value: 'HOURS', label: '小时' },
-        { value: 'DAY', label: '天' },
-        { value: 'WEEK', label: '周' },
-        { value: 'MONTH', label: '月' }
+        { value: 'hours', label: '小时' },
+        { value: 'day', label: '天' },
+        { value: 'week', label: '周' },
+        { value: 'month', label: '月' }
       ],
       dayOfWeeksList: [
         { value: 'MON', label: '周一' },
@@ -417,20 +417,20 @@ export default {
     //  提数 时间间隔 数据切换
     disTimeTurnOff (disType) {
       let tempArry = []
-      if (disType === 'DAY') {
+      if (disType === 'day') {
         tempArry.push({ value: '1', label: '每天' })
-      } else if (disType === 'HOURS') {
+      } else if (disType === 'hours') {
         for (let i = 1, j = 24; i < j; i++) {
           tempArry.push({ value: i, label: '每隔' + i + '小时' })
         }
-      } else if (disType === 'MONTH') {
+      } else if (disType === 'month') {
         for (let i = 1, j = 32; i < j; i++) {
           tempArry.push({ value: i, label: '每月' + i + '号' })
         }
         // tempArry.push({ value: '-1', label: '每月最后一天' })
       }
       this.baseForm.receiveDays = ''
-      if (disType === 'WEEK') {
+      if (disType === 'week') {
         this.receiveDaysList = this.dayOfWeeksList
       } else {
         this.receiveDaysList = tempArry
@@ -469,7 +469,7 @@ export default {
             'approveReason': this.baseForm.approveReason,
             'exportType': this.baseForm.exportType,
             'period': this.baseForm.period,
-            'receiveDays': this.baseForm.period === 'DAY' ? '' : this.baseForm.receiveDays,
+            'receiveDays': this.baseForm.period === 'day' ? '' : this.baseForm.receiveDays,
             'receiveStartTime': this.baseForm.receiveTime[0],
             'receiveEndTime': this.baseForm.receiveTime[1],
             'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
