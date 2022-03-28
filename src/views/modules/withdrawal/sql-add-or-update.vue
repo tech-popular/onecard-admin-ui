@@ -419,7 +419,7 @@ export default {
       let tempArry = []
       if (disType === 'DAY') {
         tempArry.push({ value: '1', label: '每天' })
-      } else if (disType === 'HOUR') {
+      } else if (disType === 'HOURS') {
         for (let i = 1, j = 24; i < j; i++) {
           tempArry.push({ value: i, label: '每隔' + i + '小时' })
         }
