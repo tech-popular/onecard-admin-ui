@@ -40,3 +40,4 @@ export const importSqlInfo = params => httpPost(da + 'data/group/sql/import', pa
 export const databaseInitInfo = () => httpGet(da + 'oa/databaseInitInfo') // 库表管理初始化
 export const detailPreviewList = params => httpGet(da + `data/group/formList`, params)
 export const selectDataGroupInfos = params => httpGet(da + 'dataCatalog/selectDataGroupInfos', params) // 分群包
+export const updateUserNum = id => httpGet(da + `data/group/updateUserNum/${id}`) // 刷新
