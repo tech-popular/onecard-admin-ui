@@ -67,6 +67,7 @@
           <el-button
             type="text"
             @click="lowerHandle(scope.row)"
+            :disabled="scope.row.buttonIsdisabled"
             v-if="scope.row.enable === true && (isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username)"
           >立即下发</el-button>
           <el-button
@@ -192,7 +193,13 @@ export default {
         lowerDataTransferManage(row.id).then(({ data }) => {
           if (data && data.status === '1') {
             this.loading = false
+            this.$nextTick(() => {
+              row.buttonIsdisabled = true
+            })
             this.$message.success(data.message)
+            setTimeout(function () {
+              row.buttonIsdisabled = false
+            }, 10000)
           } else {
             this.loading = false
             this.$message.error(data.message ? data.message : data.msg)
@@ -220,6 +227,9 @@ export default {
                 this.dataList = []
                 this.totalCount = 0
               } else {
+                data.data.list.forEach(element => {
+                  element.buttonIsdisabled = false
+                })
                 this.dataList = data.data.list
                 this.totalCount = data.data.total
               }
