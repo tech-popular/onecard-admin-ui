@@ -51,6 +51,7 @@
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">特征分析</el-button>
           <!-- <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="table1ShowHandle(scope.row)">分群概览</el-button> -->
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="detailPreviewHandle(scope.row)">明细预览</el-button>
+          <el-button type="text" size="small" @click="detailRefreshHandle(scope.row)">刷新</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
@@ -74,7 +75,7 @@
 </template>
 
 <script>
-import { dataInsightManageList, deleteDataInfo } from '@/api/dataAnalysis/dataInsightManage'
+import { dataInsightManageList, deleteDataInfo, updateUserNum } from '@/api/dataAnalysis/dataInsightManage'
 import AddOrUpdate from './baseComponents/dataInsightManage-add-or-update'
 import TableShow from './baseComponents/tableShow'
 import TableShow1 from './baseComponents/tableShow1'
@@ -262,6 +263,29 @@ export default {
       })
       this.$nextTick(() => {
         this.$refs.assignPermission.init(ids, true)
+      })
+    },
+    detailRefreshHandle (row) {
+      this.$confirm(`确认刷新名称为【${row.name}】的数据?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        updateUserNum(row.id).then(({ data }) => {
+          if (data.status !== '1') {
+            return this.$message({
+              type: 'error',
+              message: data.message
+            })
+          }
+          this.$message({
+            type: 'success',
+            message: data.message
+          })
+          this.getDataList()
+        })
+      }).catch(() => {
+        // console.log('quxiao')
       })
     }
   }
