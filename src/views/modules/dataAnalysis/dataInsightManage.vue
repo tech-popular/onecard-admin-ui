@@ -266,7 +266,7 @@ export default {
       })
     },
     detailRefreshHandle (row) {
-      this.$confirm(`确认刷新名称为【${row.name}】的数据?`, '提示', {
+      this.$confirm(`确认刷新名称为【${row.name}】的分群用户数吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
