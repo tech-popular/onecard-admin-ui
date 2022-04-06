@@ -151,6 +151,7 @@ export default {
       previewText: false,
       previewing: false,
       activeNames: 1,
+      sqlSubmitSuccess: false,
       baseForm: {
         id: '',
         dataSourceId: '', // 数据源id
@@ -265,6 +266,7 @@ export default {
       this.previewing = false
       this.previewText = false
       this.visible = true
+      this.sqlSubmitSuccess = false
       this.$nextTick(() => {
         this.$refs['baseForm'].resetFields()
         this.baseForm.addingDatabase = {
@@ -397,12 +399,14 @@ export default {
               sessionStorage.setItem('sqlPreviewDataList', JSON.stringify(data.data || '[]'))
               // this.$store.commit('withdrawal/setPreviewList', this.sqlPreviewDataList)
               this.previewText = false
+              this.sqlSubmitSuccess = true
             }
           })
         } else {
           sessionStorage.setItem('sqlPreviewDataList', [])
           this.$message.error(data.msg)
           this.previewText = false
+          this.sqlSubmitSuccess = false
         }
       })
     },
@@ -462,6 +466,13 @@ export default {
     severDataFormSubmit () { // 表格多选
       this.$refs['baseForm'].validate(valid => {
         if (valid) {
+          if (!this.sqlSubmitSuccess) {
+            return this.$message({
+              message: '请在SQL执行成功后保存提数申请',
+              type: 'error',
+              center: true
+            })
+          }
           let params = {
             'dataSourceId': this.baseForm.dataSourceId,
             'dataBaseId': this.baseForm.dataBaseId,
