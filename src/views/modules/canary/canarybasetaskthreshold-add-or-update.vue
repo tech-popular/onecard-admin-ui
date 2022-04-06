@@ -121,7 +121,7 @@
             <div class="grid-content bg-purple">
               <el-select v-model="outdata.email" placeholder="请选择">
                 <el-option label="报警邮件" value="onecard-warn@9fgroup.com">报警邮件</el-option>
-                <el-option label="数据服务" value="data_service@9fbank.cc">数据服务</el-option>
+                <el-option label="数据服务" value="datamanage@9fbank.com.cn">数据服务</el-option>
               </el-select>
             </div>
           </el-col>
