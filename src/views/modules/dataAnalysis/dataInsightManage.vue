@@ -7,6 +7,26 @@
       <el-form-item label="分群名称">
         <el-input v-model="dataForm.name" placeholder="分群名称" clearable />
       </el-form-item>
+      <el-form-item label="时间类型">
+        <el-select v-model="dataForm.timeType" clearable>
+          <el-option value="lastCalTime" label="最近下发时间"></el-option>
+          <el-option value="createTime" label="创建时间"></el-option>
+          <el-option value="updateTime" label="最后修改时间"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="dataForm.timeType">
+        <el-date-picker
+          v-model="dataForm.dateTimeRange"
+          type="datetimerange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          format="yyyy-MM-dd HH:mm:ss"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          align="right"
+          clearable
+        ></el-date-picker>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
@@ -87,7 +107,9 @@ export default {
     return {
       dataForm: {
         id: '',
-        name: ''
+        name: '',
+        timeType: '',
+        dateTimeRange: ''
       },
       dataList: [],
       pageNum: 1, // 当前页
@@ -126,6 +148,7 @@ export default {
         'pageNum': this.pageNum,
         'pageSize': this.pageSize
       }
+      params.dateTimeRange.length > 0 ? params.dateTimeRange = params.dateTimeRange.join(',') : params.dateTimeRange = params.dateTimeRange
       dataInsightManageList(params).then(({ data }) => {
         this.dataListLoading = false
         if (data.status !== '1' || !data.data || !data.data.list.length) {
@@ -214,7 +237,9 @@ export default {
       this.pageNum = 1
       this.dataForm = {
         name: '',
-        id: ''
+        id: '',
+        timeType: '',
+        dateTimeRange: ''
       }
       this.getDataList()
     },
