@@ -14,6 +14,26 @@
           <el-option label="无效" value="0"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="时间类型">
+        <el-select v-model="dataForm.timeType" clearable>
+          <el-option value="lastCalTime" label="最近下发时间"></el-option>
+          <el-option value="createTime" label="创建时间"></el-option>
+          <el-option value="updateTime" label="最后修改时间"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="dataForm.timeType">
+        <el-date-picker
+          v-model="dataForm.dateTimeRange"
+          type="datetimerange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          format="yyyy-MM-dd HH:mm:ss"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          align="right"
+          clearable
+        ></el-date-picker>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
@@ -110,7 +130,9 @@ export default {
       dataForm: {
         id: '',
         transferName: '',
-        enable: ''
+        enable: '',
+        timeType: '',
+        dateTimeRange: ''
       },
       loading: false,
       dataList: [],
@@ -221,6 +243,7 @@ export default {
             'pageNum': this.pageNum,
             'pageSize': this.pageSize
           }
+          params.dateTimeRange.length > 0 ? params.dateTimeRange = params.dateTimeRange.join(',') : params.dateTimeRange = params.dateTimeRange
           dataTransferManageList(params).then(({ data }) => {
             if (data && data.status === '1') {
               if (data.data == null) {
@@ -265,7 +288,9 @@ export default {
       this.dataForm = {
         id: '',
         transferName: '',
-        enable: ''
+        enable: '',
+        timeType: '',
+        dateTimeRange: ''
       }
       // this.getDataList()
     },
