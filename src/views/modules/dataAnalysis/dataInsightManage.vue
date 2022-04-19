@@ -9,7 +9,7 @@
       </el-form-item>
       <el-form-item label="时间类型">
         <el-select v-model="dataForm.timeType" clearable>
-          <el-option value="lastCalTime" label="最近下发时间"></el-option>
+          <el-option value="lastCalTime" label="最近计算时间"></el-option>
           <el-option value="createTime" label="创建时间"></el-option>
           <el-option value="updateTime" label="最后修改时间"></el-option>
         </el-select>
