@@ -283,8 +283,7 @@ export default {
     },
     // 获取用户同一租户下的列表
     getUsersList () {
-      let tenantId = sessionStorage.getItem('tenantId')
-      getUsersList(tenantId).then(({ data }) => {
+      getUsersList().then(({ data }) => {
         if (data && data.code === 0) {
           this.userList = data.data
         } else {
