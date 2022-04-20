@@ -124,9 +124,11 @@ export default {
       indexParentList: [],
       modifyaddorupdate: false,
       enumList: [],
+      dataFormId: 0,
       dataForm: {
         childrenNum: '',
-        childrenValue: ''
+        childrenValue: '',
+        id: 0
       },
       dataRule: {
         childrenNum: [
@@ -182,6 +184,7 @@ export default {
   methods: {
     init (row) {
       this.id = row ? row.id : 0
+      this.dataFormId = 0
       // this.loading = true
       this.getChannelsList()
       this.visible = true
@@ -340,6 +343,15 @@ export default {
     saveHandle () {
       this.$refs['baseForm'].validate((valid) => {
         if (valid) {
+          let enumDataList = []
+          if (this.baseForm.fieldType === 'enums') {
+            this.enumList.forEach(item => {
+              enumDataList.push({
+                'childrenNum': item.childrenNum,
+                'childrenValue': item.childrenValue
+              })
+            })
+          }
           let params = {
             'englishName': this.baseForm.englishName,
             'chineseName': this.baseForm.chineseName,
@@ -353,7 +365,8 @@ export default {
             'isSensitive': this.baseForm.isSensitive,
             'showRules': this.baseForm.showRules,
             'enable': this.baseForm.enable,
-            'catagoryIdSelect': this.indexParentList
+            'catagoryIdSelect': this.indexParentList,
+            'enumList': enumDataList
           }
           if (!this.id) {
             addIndexManage(params).then(({ data }) => {
@@ -399,17 +412,30 @@ export default {
     // 添加维度
     changeHandle (scope) {
       this.modifyaddorupdate = true
+      this.dataForm.id = scope ? this.enumList[scope.$index].id : ''
       this.dataForm.childrenNum = scope ? this.enumList[scope.$index].childrenNum : ''
       this.dataForm.childrenValue = scope ? this.enumList[scope.$index].childrenValue : ''
     },
     deleteHandle (scope) {
-      console.log('scope: ', scope);
       let index = scope.$index
       this.enumList.splice(index, 1)
     },
     modifySubmit () {
       this.$refs['dataForm'].validate(valid => {
-        this.enumList.push(this.dataForm)
+        let params = {
+          id: this.dataForm.id,
+          childrenNum: this.dataForm.childrenNum,
+          childrenValue: this.dataForm.childrenValue
+        }
+        if (this.dataForm.id) {
+          this.enumList = this.enumList.map(t => {
+            return t.id === params.id ? params : t
+          })
+        } else {
+          this.dataFormId = this.dataFormId + 1
+          params.id = this.dataFormId
+          this.enumList.push(params)
+        }
         this.modifyaddorupdate = false
       })
     },
