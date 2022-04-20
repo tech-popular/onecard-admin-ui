@@ -1,6 +1,6 @@
 <template>
   <el-dialog width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form v-loading="dataLoading" label-width="160px" :model="dataForm" :rules="baseRule" ref="dataForm" :disabled="viewVisible">
+    <el-form label-width="160px" :model="dataForm" :rules="baseRule" ref="dataForm">
       <el-form-item label="分类名称" prop="name" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
         <el-input v-model="dataForm.name" placeholder="请输入名称" style="width: 400px"></el-input>
       </el-form-item>
@@ -25,7 +25,7 @@
       </el-form-item>-->
     </el-form>
     <div slot="footer" class="foot">
-      <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
+      <el-button type="primary" @click="submitData">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
   </el-dialog>
@@ -61,27 +61,15 @@ export default {
       }
     },
     init (row, tag) {
-      this.fixedParamsvisible = false
-      this.extraParamsVisible = false
-      this.getChannelsList()
-      this.outParamsList = []
       this.tag = row ? tag : ''
-      if (this.tag === 'view') {
-        this.viewVisible = true
-      } else {
-        this.viewVisible = false
-      }
       this.dataForm = {
         id: '',
-        channelCode: '',
-        type: '',
         resourceId: '',
         name: ''
       }
 
       this.visible = true
       if (row) {
-        this.dataLoading = true
         this.getLookData(row)
       }
     },

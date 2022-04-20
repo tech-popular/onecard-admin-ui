@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import AddOrUpdate from './baseComponents/resourceBind-add-or-update'
+import AddOrUpdate from './baseComponents/tagsManage-add-or-update'
 export default {
   data () {
     return {
