@@ -147,7 +147,7 @@ export default {
       this.pageNum = 1
       this.dataForm = {
         type: '',
-        resourceName: '',
+        resourceName: ''
       }
     },
     // 每页数
