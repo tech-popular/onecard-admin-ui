@@ -25,14 +25,15 @@
           <el-tag v-else size="small" type="danger">是</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="approveStatus" header-align="center" align="center" label="审批流状态"></el-table-column>
       <el-table-column prop="period" header-align="center" align="center" label="周期"></el-table-column>
       <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天数"></el-table-column>
       <el-table-column prop="remainDay" header-align="center" align="center" label="距离失效日期"></el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
-          <el-button type="text" v-if="scope.row.enable === 1 && scope.row.exportType !== '一次性'" @click="disableHandle(scope.row)">申请失效</el-button>
-          <el-button type="text" v-if="scope.row.enable === 0 && scope.row.exportType !== '一次性'" @click="renewalHandle(scope.row)">申请续期</el-button>
+          <el-button type="text" v-if="scope.row.enable === 1 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
+          <el-button type="text" v-if="scope.row.enable === 0 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'" @click="renewalHandle(scope.row)">申请续期</el-button>
         </template>
       </el-table-column>
     </el-table>
