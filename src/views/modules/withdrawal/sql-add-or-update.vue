@@ -28,10 +28,10 @@
                         <el-radio v-model="baseForm.addingDatabase.type" @change="radioTypeChange" label="maxComputer" style="margin-left:5px;">maxComputer</el-radio>
                       </el-form-item>
                       <el-form-item label="实例地址" prop="url" v-if="baseForm.addingDatabase.type === 'mysql'">
-                        <el-input v-model="baseForm.addingDatabase.url" placeholder="jdbc:mysql://172.20.134.9:3317/"></el-input>
+                        <el-input v-model="baseForm.addingDatabase.url" placeholder="jdbc:mysql://ip:3306/"></el-input>
                       </el-form-item>
                       <el-form-item label="数据库" prop="database" v-if="baseForm.addingDatabase.type === 'mysql'">
-                        <el-input v-model="baseForm.addingDatabase.database" placeholder="cmdb"></el-input>
+                        <el-input v-model="baseForm.addingDatabase.database" placeholder="database"></el-input>
                       </el-form-item>
                       <el-form-item label="用户名" prop="userName" v-if="baseForm.addingDatabase.type === 'mysql'">
                         <el-input v-model="baseForm.addingDatabase.userName" placeholder="user"></el-input>
@@ -42,11 +42,11 @@
                       <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxComputer'">
                         <el-input v-model="baseForm.addingDatabase.database" placeholder="bd_src"></el-input>
                       </el-form-item>
-                      <el-form-item label="用户名" prop="accessId" v-if="baseForm.addingDatabase.type === 'maxComputer'">
-                        <el-input v-model="baseForm.addingDatabase.accessId" placeholder="access-id"></el-input>
+                      <el-form-item label="用户名" prop="userName" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                        <el-input v-model="baseForm.addingDatabase.userName" placeholder="access-id"></el-input>
                       </el-form-item>
-                      <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxComputer'">
-                        <el-input v-model="baseForm.addingDatabase.accessKey" placeholder="access-key"></el-input>
+                      <el-form-item label="密码" prop="password" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                        <el-input v-model="baseForm.addingDatabase.password" placeholder="access-key"></el-input>
                       </el-form-item>
                       <el-button style="float: right; margin-right: 10px; margin-bottom: 20px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
                     </el-collapse-item>
@@ -170,9 +170,7 @@ export default {
           'url': '',
           'database': '',
           'userName': '',
-          'password': '',
-          'accessId': '',
-          'accessKey': ''
+          'password': ''
         }
       },
       datasourceList: [],
@@ -274,9 +272,7 @@ export default {
           'url': '',
           'database': '',
           'userName': '',
-          'password': '',
-          'accessId': '',
-          'accessKey': ''
+          'password': ''
         }
         this.sqlPreviewDataList = []
       })
@@ -319,19 +315,17 @@ export default {
       this.baseForm.addingDatabase.url = ''
       this.baseForm.addingDatabase.userName = ''
       this.baseForm.addingDatabase.password = ''
-      this.baseForm.addingDatabase.accessId = ''
-      this.baseForm.addingDatabase.accessKey = ''
     },
     // 保存数据源管理
     handleSaveDatasource () {
       let params = {
         'type': this.baseForm.addingDatabase.type,
-        'database': this.baseForm.addingDatabase.database
+        'database': this.baseForm.addingDatabase.database,
+        'user': this.baseForm.addingDatabase.userName,
+        'passwd': this.baseForm.addingDatabase.password
       }
       if (this.baseForm.addingDatabase.type === 'mysql') {
         params.url = this.baseForm.addingDatabase.url
-        params.user = this.baseForm.addingDatabase.userName
-        params.passwd = this.baseForm.addingDatabase.password
         checkDatasource(params).then(({ data }) => {
           if (data && data.code === 0) {
             if (!data.data) {
@@ -364,8 +358,6 @@ export default {
           }
         })
       } else {
-        params.accessId = this.baseForm.addingDatabase.accessId
-        params.accessKey = this.baseForm.addingDatabase.accessKey
         this.handleSaveDatasourceData(params)
       }
     },
@@ -384,9 +376,7 @@ export default {
                 'url': '',
                 'database': '',
                 'userName': '',
-                'password': '',
-                'accessId': '',
-                'accessKey': ''
+                'password': ''
               }
               this.getSourceDataList()
             }
