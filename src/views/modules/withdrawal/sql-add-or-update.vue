@@ -12,41 +12,41 @@
               <div style="display:flex">
                 <div>
                   <el-form-item prop="dataSourceId" label="服务器：">
-                    <el-select filterable v-model="baseForm.dataSourceId" placeholder="请选择" @change="selectdatabaseDataList">
+                    <el-select filterable v-model="baseForm.dataSourceId" placeholder="请选择" clearable @change="selectdatabaseDataList">
                       <el-option v-for="item in datasourceList" :key="item.id" :label="item.datasourceName" :value="item.id"></el-option>
                     </el-select>
                   </el-form-item>
                   <el-form-item prop="dataBaseId" label="数据库：">
-                    <el-select filterable v-model="baseForm.dataBaseId" placeholder="请选择">
+                    <el-select filterable v-model="baseForm.dataBaseId" clearable placeholder="请选择">
                       <el-option v-for="item in databaseIdList" :key="item.id" :label="item.databaseName" :value="item.id"></el-option>
                     </el-select>
                   </el-form-item>
                   <el-collapse v-model="activeNames">
                     <el-collapse-item title="新增数据源信息" name="1">
                       <el-form-item label="类型" prop="type">
-                        <el-radio v-model="baseForm.addingDatabase.type" label="mysql">mysql</el-radio>
-                        <el-radio v-model="baseForm.addingDatabase.type" label="maxcomputer" style="margin-left:5px;">maxcomputer</el-radio>
+                        <el-radio v-model="baseForm.addingDatabase.type" @change="radioTypeChange" label="mysql">mysql</el-radio>
+                        <el-radio v-model="baseForm.addingDatabase.type" @change="radioTypeChange" label="maxComputer" style="margin-left:5px;">maxComputer</el-radio>
                       </el-form-item>
                       <el-form-item label="实例地址" prop="url" v-if="baseForm.addingDatabase.type === 'mysql'">
-                        <el-input v-model="baseForm.addingDatabase.url"></el-input>
+                        <el-input v-model="baseForm.addingDatabase.url" placeholder="jdbc:mysql://172.20.134.9:3317/"></el-input>
                       </el-form-item>
                       <el-form-item label="数据库" prop="database" v-if="baseForm.addingDatabase.type === 'mysql'">
-                        <el-input v-model="baseForm.addingDatabase.database"></el-input>
+                        <el-input v-model="baseForm.addingDatabase.database" placeholder="cmdb"></el-input>
                       </el-form-item>
                       <el-form-item label="用户名" prop="userName" v-if="baseForm.addingDatabase.type === 'mysql'">
-                        <el-input v-model="baseForm.addingDatabase.userName"></el-input>
+                        <el-input v-model="baseForm.addingDatabase.userName" placeholder="user"></el-input>
                       </el-form-item>
                       <el-form-item label="密码" prop="password" v-if="baseForm.addingDatabase.type === 'mysql'">
-                        <el-input v-model="baseForm.addingDatabase.password"></el-input>
+                        <el-input v-model="baseForm.addingDatabase.password" placeholder="password"></el-input>
                       </el-form-item>
-                      <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
-                        <el-input v-model="baseForm.addingDatabase.database"></el-input>
+                      <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                        <el-input v-model="baseForm.addingDatabase.database" placeholder="bd_src"></el-input>
                       </el-form-item>
-                      <el-form-item label="用户名" prop="accessId" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
-                        <el-input v-model="baseForm.addingDatabase.accessId"></el-input>
+                      <el-form-item label="用户名" prop="accessId" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                        <el-input v-model="baseForm.addingDatabase.accessId" placeholder="access-id"></el-input>
                       </el-form-item>
-                      <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
-                        <el-input v-model="baseForm.addingDatabase.accessKey"></el-input>
+                      <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                        <el-input v-model="baseForm.addingDatabase.accessKey" placeholder="access-key"></el-input>
                       </el-form-item>
                       <el-button style="float: right; margin-right: 10px; margin-bottom: 20px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
                     </el-collapse-item>
@@ -313,6 +313,15 @@ export default {
         }
       })
     },
+    // 数据源类型切换
+    radioTypeChange () {
+      this.baseForm.addingDatabase.database = ''
+      this.baseForm.addingDatabase.url = ''
+      this.baseForm.addingDatabase.userName = ''
+      this.baseForm.addingDatabase.password = ''
+      this.baseForm.addingDatabase.accessId = ''
+      this.baseForm.addingDatabase.accessKey = ''
+    },
     // 保存数据源管理
     handleSaveDatasource () {
       let params = {
@@ -324,7 +333,6 @@ export default {
         params.user = this.baseForm.addingDatabase.userName
         params.passwd = this.baseForm.addingDatabase.password
         checkDatasource(params).then(({ data }) => {
-          console.log('data:111', data)
           if (data && data.code === 0) {
             if (!data.data) {
               this.handleSaveDatasourceData(params)
@@ -371,6 +379,15 @@ export default {
             type: 'success',
             duration: 1500,
             onClose: () => {
+              this.baseForm.addingDatabase = {
+                'type': 'mysql',
+                'url': '',
+                'database': '',
+                'userName': '',
+                'password': '',
+                'accessId': '',
+                'accessKey': ''
+              }
               this.getSourceDataList()
             }
           })
