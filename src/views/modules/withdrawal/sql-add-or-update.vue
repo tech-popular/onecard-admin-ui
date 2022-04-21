@@ -396,7 +396,6 @@ export default {
             onClose: () => {
               this.sqlPreviewDataList = data.data
               sessionStorage.setItem('sqlPreviewDataList', JSON.stringify(data.data || '[]'))
-              // this.$store.commit('withdrawal/setPreviewList', this.sqlPreviewDataList)
               this.previewText = false
               this.sqlSubmitSuccess = true
             }
@@ -410,10 +409,6 @@ export default {
       })
     },
     previewSqlData () {
-      // let originHost = location.origin
-      // let url = originHost + '/#/withdrawal-reportData'
-      // // let url = originHost + '/#/withdrawal-dingPreview?id=1'
-      // window.open(url, '_blank')
       let routeUrl = this.$router.resolve({ path: '/withdrawal-reportData' })
       window.open(routeUrl.href, '_blank')
     },
