@@ -1,7 +1,7 @@
 /**
  * 开发环境
  */
-;(function () {
+; (function () {
   window.SITE_CONFIG = {}
   // api接口请求地址
   // window.SITE_CONFIG['baseUrl'] = '//10.3.0.30:8000/canary-admin' // 开发环境
