@@ -25,7 +25,7 @@
                     <el-collapse-item title="新增数据源信息" name="1">
                       <el-form-item label="类型" prop="type">
                         <el-radio v-model="baseForm.addingDatabase.type" label="mysql">mysql</el-radio>
-                        <el-radio v-model="baseForm.addingDatabase.type" label="maxcomputer" style="margin-left:5px;">maxcomputer</el-radio>
+                        <el-radio v-model="baseForm.addingDatabase.type" label="maxComputer" style="margin-left:5px;">maxComputer</el-radio>
                       </el-form-item>
                       <el-form-item label="实例地址" prop="url" v-if="baseForm.addingDatabase.type === 'mysql'">
                         <el-input v-model="baseForm.addingDatabase.url"></el-input>
@@ -39,13 +39,13 @@
                       <el-form-item label="密码" prop="password" v-if="baseForm.addingDatabase.type === 'mysql'">
                         <el-input v-model="baseForm.addingDatabase.password"></el-input>
                       </el-form-item>
-                      <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
+                      <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxComputer'">
                         <el-input v-model="baseForm.addingDatabase.database"></el-input>
                       </el-form-item>
-                      <el-form-item label="用户名" prop="accessId" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
+                      <el-form-item label="用户名" prop="accessId" v-if="baseForm.addingDatabase.type === 'maxComputer'">
                         <el-input v-model="baseForm.addingDatabase.accessId"></el-input>
                       </el-form-item>
-                      <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxcomputer'">
+                      <el-form-item label="密码" prop="accessKey" v-if="baseForm.addingDatabase.type === 'maxComputer'">
                         <el-input v-model="baseForm.addingDatabase.accessKey"></el-input>
                       </el-form-item>
                       <el-button style="float: right; margin-right: 10px; margin-bottom: 20px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
