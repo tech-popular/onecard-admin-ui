@@ -1,36 +1,142 @@
 <template>
-  <el-dialog 
-    title="标签分组"
-    :modal-append-to-body='false'
-    :append-to-body="true"
-    :visible.sync="visible"
-    width="50%"
-    :close-on-click-modal="false">
+  <el-dialog title="标签分组" :modal-append-to-body="false" :append-to-body="true" :visible.sync="visible" width="50%" :close-on-click-modal="false">
     <el-form :model="dataForm" ref="dataForm" :rules="dataRules" :inline="true">
-     <div v-if="selectedFieldType !== '枚举'">
-        <div
-        style="display: flex;"
-        v-for="(outdata, index) in dataForm.digitalRange"
-        :key="index"
-      >
-        <div class="content-range">
-               区间{{index+1}}
-        </div>
-        <!-- 数字区间 -->
-        <div class="pane-rules-inline" v-if="selectedFieldType === '数值'">
-          <span class="parentheses">( &nbsp;</span>
-          <el-form-item prop="smallerValue">
-            <el-input v-model="outdata.smallerValue" class="itemIput-small" @input="outdata.smallerValue = keyupNumberInput(outdata.smallerValue)" @blur="outdata.smallerValue = pramasNumBlur(outdata, outdata.smallerValue, index)"></el-input>
+      <div v-if="selectedFieldType !== '枚举'">
+        <div style="display: flex;" v-for="(outdata, index) in dataForm.digitalRange" :key="index">
+          <div class="content-range">区间{{index+1}}</div>
+          <el-form-item prop="func" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+            <el-select v-model="outdata.func" class="itemOperateIput">
+              <el-option style="width:200px" v-for="(fitem, findex) in fileList" :value="fitem.value" :key="findex" :label="fitem.lable" />
+            </el-select>
           </el-form-item>
-          &nbsp;,&nbsp;
-          <el-form-item prop="largerValue">
-            <el-input v-model="outdata.largerValue" class="itemIput-small" @input="outdata.largerValue = keyupNumberInput(outdata.largerValue)" @blur="outdata.largerValue = pramasNumBlur(outdata, outdata.largerValue,index)" ></el-input>
-          </el-form-item>
-          <span class="parentheses">&nbsp;)</span>
-        </div>
-        <!-- 时间区间 -->
-        <el-form-item prop="dataRange" v-if="selectedFieldType === '时间'">
-           <el-date-picker
+          <!-- 数字区间 -->
+          <div class="pane-rules-inline" v-if="selectedFieldType === '数值'">
+            <el-form-item>
+              <el-select v-model="outdata.startRangeType" class="itemIput-small">
+                <el-option value="open" label="("></el-option>
+                <el-option value="close" label="["></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item prop="smallerValue">
+              <el-input
+                v-model="outdata.smallerValue"
+                class="itemIput-small"
+                @input="outdata.smallerValue = keyupNumberInput(outdata.smallerValue)"
+                @blur="outdata.smallerValue = pramasNumBlur(outdata, outdata.smallerValue, index)"
+              ></el-input>
+            </el-form-item>&nbsp;-&nbsp;
+            <el-form-item prop="largerValue">
+              <el-input
+                v-model="outdata.largerValue"
+                class="itemIput-small"
+                @input="outdata.largerValue = keyupNumberInput(outdata.largerValue)"
+                @blur="outdata.largerValue = pramasNumBlur(outdata, outdata.largerValue,index)"
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-select v-model="outdata.endRangeType" class="itemIput-small">
+                <el-option value="open" label=")"></el-option>
+                <el-option value="close" label="]"></el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+            <!--条件内容区-->
+          <div class="pane-rules-inline" v-if="selectedFieldType === '时间'">
+            <!--相对当前时间点-->
+            <div v-if="item.func === 'relative_time'" class="pane-rules-inline">
+              在&nbsp;过去&nbsp;
+              <el-form-item
+                prop="params[0].value"
+                :ref="'paramst' + index"
+                :rules="{required: isRequired, message: '请输入', trigger: 'blur'}"
+              >
+                <el-input
+                  style="width: 150px;"
+                  v-model="outdata.params[0].value"
+                  :maxlength="10"
+                  @input="outdata.params[0].value = keyupDateNumberInput(outdata.params[0].value)"
+                  @blur="outdata.params[0].value = blurNumberInput(outdata.params[0].value)"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="dateDimension" :ref="'paramsi' + index" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+                <el-select
+                  v-model="outdata.dateDimension"
+                  class="subSelect1"
+                  @change="data => updateDateDimension(data, item)"
+                >
+                  <el-option
+                    v-for="(fitem, findex) in item.subTimeSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item prop="subFunc" :ref="'paramsm' + item.ruleCode" :rules="{required: isRequired, message: '请输入', trigger: 'blur'}">
+                <el-select v-model="item.subFunc" class="subSelect" style="width:90px">
+                  <el-option
+                    v-for="(fitem, findex) in subSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>
+            </div>
+            <!--相对当前时间点区间-->
+            <div v-if="item.func === 'relative_time_in'" class="pane-rules-inline">
+              在&nbsp;过去&nbsp;
+              <el-form-item prop = "params[0].value" :ref="'paramse' + item.ruleCode" :rules="{ required: isRequired, validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
+                <el-input
+                  style="width:90px;"
+                  v-model="item.params[0].value"
+                  :maxlength="10"
+                  @input="item.params[0].value = keyupDateNumberInput(item.params[0].value)"
+                  @blur="item.params[0].value = pramasDateBlur(item, item.params[0].value)"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="dateDimension" :ref="'paramso' + item.ruleCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+                <el-select
+                  v-model="item.dateDimension"
+                  class="subSelect1"
+                  @change="data => updateDateDimension(data, item)"
+                >
+                  <el-option
+                    v-for="(fitem, findex) in item.subTimeSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>到&nbsp;过去&nbsp;
+              <el-form-item prop = "params[1].value" :ref="'paramsn' + item.ruleCode" :rules="{ required: isRequired,  validator: (rule, value, callback) => judgeDateTwoInput(rule, value, callback, item.params), trigger: 'blur'}">
+                <el-input
+                  style="width:90px;"
+                  v-model="item.params[1].value"
+                  :maxlength="10"
+                  @input="item.params[1].value = keyupDateNumberInput(item.params[1].value)"
+                  @blur="item.params[1].value = pramasDateBlur(item, item.params[1].value)"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="dateDimension" :ref="'paramsp' + item.ruleCode" :rules="{required: isRequired, message: '请选择', trigger: 'change'}">
+                <el-select
+                  v-model="item.dateDimension"
+                  class="subSelect1"
+                  @change="data => updateDateDimension(data, item)"
+                >
+                  <el-option
+                    v-for="(fitem, findex) in item.subTimeSelects"
+                    :value="fitem.code"
+                    :key="findex"
+                    :label="fitem.title"
+                  />
+                </el-select>
+              </el-form-item>之内
+            </div>
+          </div>
+          <!-- 时间区间
+          <el-form-item prop="dataRange" v-if="selectedFieldType === '时间'">
+            <el-date-picker
               v-model="outdata.dataRange"
               type="datetimerange"
               :picker-options="pickerOptions"
@@ -39,32 +145,32 @@
               end-placeholder="结束日期"
               format="yyyy-MM-dd HH:mm:ss"
               value-format="yyyy-MM-dd HH:mm:ss"
-              align="right">
-         </el-date-picker>
-        </el-form-item>
+              align="right"
+            ></el-date-picker>
+          </el-form-item> -->
           <el-form-item class="btn-group">
-              <i class="el-icon-circle-plus cursor-pointer" @click="addDomain(outdata, index)" v-if="index === dataForm.digitalRange.length-1"></i>
+            <i class="el-icon-circle-plus cursor-pointer" @click="addDomain(outdata, index)" v-if="index === dataForm.digitalRange.length-1"></i>
           </el-form-item>
           <el-form-item style="float: right" v-if="closeIconVisible">
             <i class="el-icon-close cursor-pointer" @click="removeDomain(outdata, index)"></i>
           </el-form-item>
+        </div>
       </div>
-     </div>
-        <el-form-item  v-if="(selectedFieldType === '时间' || selectedFieldType === '数值') && dataForm.digitalRange.length === 0">
-          <el-button @click="addDomain">新增区间</el-button>
+      <el-form-item v-if="(selectedFieldType === '时间' || selectedFieldType === '数值') && dataForm.digitalRange.length === 0">
+        <el-button @click="addDomain">新增区间</el-button>
+      </el-form-item>
+      <!-- 枚举值 -->
+      <el-form-item prop="selectVal" label="枚举" label-width="50px" v-if="selectedFieldType === '枚举'">
+        <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
+          <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue" />
+        </el-select>
+      </el-form-item>
+      <div>
+        <el-form-item prop="isSetGroup" label="是否启用：">
+          <el-radio v-model="dataForm.isSetGroup" :label="1">是</el-radio>
+          <el-radio v-model="dataForm.isSetGroup" :label="0">否</el-radio>
         </el-form-item>
-        <!-- 枚举值 -->
-        <el-form-item prop="selectVal" label="枚举" label-width="50px"  v-if="selectedFieldType === '枚举'">
-          <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
-              <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue"/>
-            </el-select>
-        </el-form-item>
-        <div >
-         <el-form-item  prop="isSetGroup" label="是否启用：" >
-            <el-radio  v-model="dataForm.isSetGroup" :label='1'>是</el-radio>
-            <el-radio  v-model="dataForm.isSetGroup" :label='0' >否</el-radio>
-          </el-form-item>
-          </div>
+      </div>
     </el-form>
     <div slot="footer">
       <el-button type="primary" @click="saveHandle" size="small">确定</el-button>
@@ -86,11 +192,12 @@ export default {
         selectVal: [],
         digitalRange: []
       },
+      fileList: [],
       selectEnumsList: [],
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
-          onClick(picker) {
+          onClick (picker) {
             const end = new Date()
             const start = new Date()
             start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
@@ -99,7 +206,7 @@ export default {
         },
         {
           text: '最近一个月',
-          onClick(picker) {
+          onClick (picker) {
             const end = new Date()
             const start = new Date()
             start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
@@ -108,7 +215,7 @@ export default {
         },
         {
           text: '最近三个月',
-          onClick(picker) {
+          onClick (picker) {
             const end = new Date()
             const start = new Date()
             start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
@@ -184,15 +291,15 @@ export default {
       })
       if (val.fieldType === '枚举') {
         let params = {
-        typeNum: val.enumTypeNum
-      }
-      getchildrenList(params).then(({ data }) => {
-        if (data && data.status === '1' && data.data.length) {
-          this.selectEnumsList = data.data
-        } else {
-          this.selectEnumsList = []
+          typeNum: val.enumTypeNum
         }
-      })
+        getchildrenList(params).then(({ data }) => {
+          if (data && data.status === '1' && data.data.length) {
+            this.selectEnumsList = data.data
+          } else {
+            this.selectEnumsList = []
+          }
+        })
       }
       this.visible = true
     },
@@ -227,7 +334,7 @@ export default {
       }
       return this.blurNumberInput(val) // 返回一下处理过的值 用于赋值
     },
-     blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
+    blurNumberInput (val) { // 失去焦点时判断输入内容是否符合要求
       val = val + '' // 数据转为字符串
       if (val[val.length - 1] === '.') { // 最后一位为小数点时，则删除小数点
         val = val.substring(0, val.length - 1)
@@ -281,9 +388,9 @@ export default {
         for (var k = 1; k < begin.length; k++) {
           if (begin[k] <= over[k - 1]) {
             this.$message({
-            type: 'error',
-            message: '时间区间存在重叠，请重新设置'
-          })
+              type: 'error',
+              message: '时间区间存在重叠，请重新设置'
+            })
             return
           }
         }
@@ -349,19 +456,19 @@ export default {
         if (valid) {
           setDimension(params).then(({ data }) => {
             if (data && data.status === '1') {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                    this.$refs['dataForm'].resetFields()
-                  }
-                })
-              } else {
-                this.$message.error(data.message || '数据异常')
-              }
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false
+                  this.$emit('refreshDataList')
+                  this.$refs['dataForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.message || '数据异常')
+            }
           })
         }
       })
@@ -373,15 +480,15 @@ export default {
 }
 </script>
 <style scoped>
- .content-range {
-   width: 100px;
-   height: 36px;
-   border: solid 1px #dcdfe6;
-   text-align: center;
-   line-height: 36px;
-   margin-right: 10px;
- }
- .pane-rules-inline {
+.content-range {
+  width: 100px;
+  height: 36px;
+  border: solid 1px #dcdfe6;
+  text-align: center;
+  line-height: 36px;
+  margin-right: 10px;
+}
+.pane-rules-inline {
   margin-left: 20px;
   display: inline-block;
   line-height: 36px;
@@ -393,6 +500,9 @@ export default {
   width: 100px;
 }
 .btn-group i {
-  margin-left:20px;
+  margin-left: 20px;
+}
+.itemOperateIput {
+  width: 180px;
 }
 </style>
