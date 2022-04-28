@@ -166,7 +166,7 @@
         <el-button @click="addDomain">新增区间</el-button>
       </el-form-item>
       <el-form-item prop="selectVal" label="枚举" label-width="50px" v-if="selectedFieldType === '枚举'">
-        <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
+        <el-select v-model="dataForm.selectVal" multiple clearable>
           <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue" />
         </el-select>
       </el-form-item>
@@ -320,7 +320,7 @@ export default {
               })
             })
           } else {
-            this.dataForm.selectVal = data.data.dimensions
+            this.dataForm.selectVal = data.data.indexGroupConfigs.length ? data.data.indexGroupConfigs[0].dimension.split(',') : []
           }
         }
       })
@@ -543,7 +543,12 @@ export default {
       }
     },
     saveHandle () {
-      let ruleArr = [...this.$refs['baseForm'], ...this.$refs['dataForm']]
+      let ruleArr = []
+      if (this.selectedFieldType === '枚举') {
+        ruleArr = [...this.$refs['dataForm']]
+      } else {
+        ruleArr = [...this.$refs['baseForm'], ...this.$refs['dataForm']]
+      }
       let flag = true
       ruleArr.forEach(item => {
         item.validate(valid => {
@@ -588,7 +593,12 @@ export default {
         })
         params.indexGroupConfigs = indexGroups
       } else {
-        params.dimension = this.dataForm.selectVal
+        params.indexGroupConfigs = [
+          {
+            'func': 'eq',
+            'dimension': this.dataForm.selectVal.join(',')
+          }
+        ]
       }
       // this.$refs['dataForm'].validate((valid) => {
       if (flag) {
