@@ -185,6 +185,7 @@ export default {
     init (row) {
       this.id = row ? row.id : 0
       this.dataFormId = 0
+      this.enumList = []
       // this.loading = true
       this.getChannelsList()
       this.visible = true
@@ -212,6 +213,14 @@ export default {
           this.id = data.data.id
           if (data.data.enumTypeNum && data.data.enumTypeNum !== '') {
             this.baseForm.fieldType = 'enums'
+            data.data.enumList.forEach((item, index) => {
+              this.enumList.push({
+                id: index,
+                childrenNum: item.childrenNum,
+                childrenValue: item.childrenValue
+              })
+            })
+            this.dataFormId = data.data.enumList.length
           } else {
             this.baseForm.fieldType = data.data.fieldType
           }
