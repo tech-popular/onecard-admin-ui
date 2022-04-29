@@ -279,6 +279,8 @@ export default {
             this.selectEnumsList = data.data
           }
         })
+      } else {
+        this.getOperatorsList(this.selectedFieldType)
       }
       this.visible = true
     },
@@ -454,17 +456,14 @@ export default {
       }
     },
     removeDomain (item, i) {
+      if (this.baseForm.numberDigitalRange.length === 0 && this.baseForm.dateDigitalRange.length === 0) {
+        this.closeIconVisible = false
+      }
       if (this.selectedFieldType === 'number') {
-        if (this.baseForm.numberDigitalRange.length === 0) {
-          this.closeIconVisible = false
-        }
         var index = this.baseForm.numberDigitalRange.indexOf(item)
         this.baseForm.numberDigitalRange.splice(index, 1)
       }
       if (this.selectedFieldType === 'date') {
-        if (this.baseForm.numberDigitalRange.length === 0) {
-          this.closeIconVisible = false
-        }
         let index = this.baseForm.dateDigitalRange.indexOf(item)
         this.baseForm.dateDigitalRange.splice(index, 1)
       }
@@ -526,10 +525,10 @@ export default {
         this.visible = false
         this.$refs['dataForm'].resetFields()
       }
+    },
+    cancelHandle () {
+      this.visible = false
     }
-  },
-  cancelHandle () {
-    this.visible = false
   }
 }
 </script>

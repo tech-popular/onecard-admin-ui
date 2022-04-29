@@ -527,17 +527,17 @@ export default {
       }
     },
     removeDomain (item, i) {
+      if (this.baseForm.numberDigitalRange.length === 0 && this.baseForm.dateDigitalRange.length === 0) {
+        this.closeIconVisible = false
+      }
       if (this.selectedFieldType === '数值') {
-        if (this.baseForm.numberDigitalRange.length === 0) {
-          this.closeIconVisible = false
-        }
         var index = this.baseForm.numberDigitalRange.indexOf(item)
         this.baseForm.numberDigitalRange.splice(index, 1)
       }
       if (this.selectedFieldType === '时间') {
-        if (this.baseForm.numberDigitalRange.length === 0) {
-          this.closeIconVisible = false
-        }
+        // if (this.baseForm.numberDigitalRange.length === 0) {
+        //   this.closeIconVisible = false
+        // }
         let index = this.baseForm.dateDigitalRange.indexOf(item)
         this.baseForm.dateDigitalRange.splice(index, 1)
       }

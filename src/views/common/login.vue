@@ -24,13 +24,7 @@
             <h3 class="login-title">玖富数据中台</h3>
             <p class="login-title-single">JIAGOUZONGHEFUWUPINGTAI</p>
           </div>
-          <el-form
-            :model="dataForm"
-            :rules="dataRule"
-            ref="dataForm"
-            @keyup.enter.native="dataFormSubmit('dataForm')"
-            status-icon
-          >
+          <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit('dataForm')" status-icon>
             <el-form-item prop="username">
               <el-input v-model="dataForm.username" placeholder="用户名"></el-input>
             </el-form-item>
@@ -46,19 +40,14 @@
                   <img :src="captchaPath" @click="getCaptcha()" alt />
                 </el-col>
               </el-row>
-            </el-form-item> -->
+            </el-form-item>-->
             <p class="forgetPass">请使用上网账号登陆使用</p>
             <el-form-item>
-              <el-button
-                class="login-btn-submit"
-                type="primary"
-                @click="dataFormSubmit('dataForm')"
-                :loading="loadingVlaue"
-              >登录</el-button>
+              <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')" :loading="loadingVlaue">登录</el-button>
             </el-form-item>
             <!-- <el-form-item>
               <p class="loginMethod" @click="changeType">手机验证码登录</p>
-            </el-form-item> -->
+            </el-form-item>-->
           </el-form>
         </div>
         <!-- 手机验证码登录 -->
@@ -125,7 +114,7 @@
               <p class="loginMethod" @click="changeType">账号密码登录</p>
             </el-form-item>
           </el-form>
-        </div> -->
+        </div>-->
       </div>
     </div>
   </div>
@@ -412,7 +401,7 @@ export default {
     z-index: 0;
     width: 100%;
     height: 100%;
-    content: "";
+    content: '';
     background-image: url(~@/assets/img/login_bg.jpg);
     background-size: cover;
   }
