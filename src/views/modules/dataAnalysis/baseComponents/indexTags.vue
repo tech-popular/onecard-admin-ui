@@ -520,7 +520,6 @@ export default {
           endRangeType: '',
           rangeRelative: ''
         })
-
         if (this.baseForm.dateDigitalRange.length > 0) {
           this.closeIconVisible = true
         }
