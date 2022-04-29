@@ -6,8 +6,6 @@
           <h2 class="brand-info__text">玖富数据中台</h2>
           <p class="brand-info__intro">提供平台的全方位的报警监控。</p>
         </div>-->
-        <!-- <el-tabs tab-position="bottom" class="login-tabs"> -->
-        <!-- <el-tab-pane label="账号密码登陆"> -->
         <!-- 账号密码登录 -->
         <div class="login-main" v-show="type">
           <div class="login-tri-top">
@@ -26,7 +24,13 @@
             <h3 class="login-title">玖富数据中台</h3>
             <p class="login-title-single">JIAGOUZONGHEFUWUPINGTAI</p>
           </div>
-          <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit('dataForm')" status-icon>
+          <el-form
+            :model="dataForm"
+            :rules="dataRule"
+            ref="dataForm"
+            @keyup.enter.native="dataFormSubmit('dataForm')"
+            status-icon
+          >
             <el-form-item prop="username">
               <el-input v-model="dataForm.username" placeholder="用户名"></el-input>
             </el-form-item>
@@ -42,26 +46,23 @@
                   <img :src="captchaPath" @click="getCaptcha()" alt />
                 </el-col>
               </el-row>
-            </el-form-item>-->
+            </el-form-item> -->
             <p class="forgetPass">请使用上网账号登陆使用</p>
             <el-form-item>
-              <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')" :loading="loadingVlaue">登录</el-button>
+              <el-button
+                class="login-btn-submit"
+                type="primary"
+                @click="dataFormSubmit('dataForm')"
+                :loading="loadingVlaue"
+              >登录</el-button>
             </el-form-item>
-            <el-form-item>
-              <p class="loginMethod" @click="changeType">扫码登陆</p>
-            </el-form-item>
-             <!-- <el-form-item>
+            <!-- <el-form-item>
               <p class="loginMethod" @click="changeType">手机验证码登录</p>
-            </el-form-item>-->
-          </el-form>
+            </el-form-item> -->
           </el-form>
         </div>
-        <!-- </el-tab-pane>
-          <el-tab-pane label="扫码登陆">扫码登陆</el-tab-pane>
-        </el-tabs>-->
-
         <!-- 手机验证码登录 -->
-        <div class="login-main" v-show="!type">
+        <!-- <div class="login-main" v-show="!type">
           <div class="login-tri-top">
             <img :src="imgTop" alt />
           </div>
@@ -124,7 +125,7 @@
               <p class="loginMethod" @click="changeType">账号密码登录</p>
             </el-form-item>
           </el-form>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -411,7 +412,7 @@ export default {
     z-index: 0;
     width: 100%;
     height: 100%;
-    content: '';
+    content: "";
     background-image: url(~@/assets/img/login_bg.jpg);
     background-size: cover;
   }
@@ -446,30 +447,6 @@ export default {
     font-size: 16px;
     line-height: 1.58;
     opacity: 0.6;
-  }
-  .login-tabs {
-    width: 470px;
-    // height: 300px;
-    position: absolute;
-    top: 50%;
-    margin-top: 0px;
-    left: 50%;
-    margin-left: -235px;
-    .el-tabs__content {
-      padding: 0px;
-    }
-    .el-tabs__header {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    .el-tabs__nav {
-      width: 100%;
-    }
-    .el-tabs__item {
-      width: 50%;
-      text-align: center;
-    }
   }
   .login-main {
     position: absolute;
