@@ -80,46 +80,10 @@
           </div>
           <el-form
             :model="dataElseForm"
-            :rules="elseRule"
             ref="dataElseForm"
-            @keyup.enter.native="dataFormSubmit()"
             status-icon
           >
-            <el-form-item prop="mobile">
-              <el-input v-model="dataElseForm.mobile" placeholder="手机号"></el-input>
-            </el-form-item>
-            <el-form-item prop="captcha">
-              <el-row :gutter="20">
-                <el-col :span="14">
-                  <el-input v-model="dataElseForm.captcha" placeholder="验证码" @blur="checkCaptcha"></el-input>
-                </el-col>
-                <el-col :span="10" class="login-captcha">
-                  <img :src="phoneCaptchaPath" @click="getPhoneCaptcha()" alt />
-                </el-col>
-              </el-row>
-            </el-form-item>
-            <el-form-item prop="verifyCode">
-              <el-row :gutter="20">
-                <el-col :span="14">
-                  <el-input v-model="dataElseForm.verifyCode" placeholder="短信验证码"></el-input>
-                </el-col>
-                <el-col :span="10" class="login-captcha">
-                  <el-button
-                    class="code"
-                    type="primary"
-                    @click="getCode()"
-                    :disabled="timer ? true : false"
-                  >{{timer ? time + 's' : '获取验证码'}}</el-button>
-                </el-col>
-              </el-row>
-            </el-form-item>
-            <el-form-item>
-              <el-button
-                class="login-btn-submit"
-                type="primary"
-                @click="dataFormSubmit('dataElseForm')"
-              >登录</el-button>
-            </el-form-item>
+           <div id="login_container"></div>
             <el-form-item>
               <p class="loginMethod" @click="changeType">账号密码登录</p>
             </el-form-item>
@@ -129,9 +93,10 @@
     </div>
   </div>
 </template>
-
+<script src="http://g.alicdn.com/dingding/dinglogin/0.0.5/ddLogin.js"></script>
 <script>
 import { getUUID } from '@/utils'
+
 import {
   loginIn,
   sendCode,
@@ -209,6 +174,14 @@ export default {
         uuid: ''
         // captcha: ''
       },
+      // 钉钉扫码登录
+      dingCodeConfig: {
+        id: 'login_container', // 匹配到设置的html的id
+        goto: 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=dingx2dp7goiirz78ncj&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=http://test.tech.9fbank.com/canary/#/login',
+        style: 'border:none;background-color:#FFFFFF;',
+        width: '400',
+        height: '400'
+      }, // 生成二维码样式的配置
       dataRule: {
         // email: [
         //   { required: true, trigger: 'blur', validator: validateEmail }
@@ -297,6 +270,11 @@ export default {
     // 切换 登录方式
     changeType () {
       this.type = !this.type
+      if (!this.type) {
+    //     this.initDingJs()
+    //     this.addDingListener()
+    // this.initDingLogin()
+      }
     },
     // 忘记密码
     async forgetToPass () {
