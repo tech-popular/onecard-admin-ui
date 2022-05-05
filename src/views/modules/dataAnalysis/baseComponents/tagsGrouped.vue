@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="标签分组" :modal-append-to-body="false" :append-to-body="true" :visible.sync="visible" width="50%" :close-on-click-modal="false">
+  <el-dialog title="标签分组" :modal-append-to-body="false" :append-to-body="true" :visible.sync="visible" width="70%" :close-on-click-modal="false">
     <div v-if="selectedFieldType === 'number'" v-for="(outdata, index) in baseForm.numberDigitalRange" :key="index">
       <el-form :model="outdata" ref="baseForm" :inline="true">
         <div style="display:flex">
@@ -193,6 +193,7 @@ export default {
     return {
       visible: false,
       closeIconVisible: true,
+      isRequired: true,
       selectedFieldType: 'number',
       dataForm: {
         id: 0,
@@ -469,7 +470,7 @@ export default {
       }
     },
     saveHandle () {
-      let indexGroupConfigs = {}
+      let indexGroupConfigs = []
       let ruleArr = []
       if (this.selectedFieldType === '枚举') {
         ruleArr = [...this.$refs['dataForm']]

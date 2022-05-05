@@ -303,7 +303,9 @@ export default {
         englishName: '',
         chineseName: '',
         categoryId: null,
-        enable: ''
+        enable: '',
+        fieldType: '',
+        isSetGroup: ''
       }
       // this.getDataList()
     },
