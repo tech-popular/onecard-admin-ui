@@ -175,13 +175,16 @@ export default {
         // captcha: ''
       },
       // 钉钉扫码登录
+      redirect: undefined,
+      appid: 'dingx2dp7goiirz78ncj',
+      redirectUrl: 'https://tech.9f.cn/canary/#/login',
+      apiUrl: 'https://tech.9f.cn/canary-admin/sys/login',
       dingCodeConfig: {
-        id: 'login_container', // 匹配到设置的html的id
-        goto: 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=dingx2dp7goiirz78ncj&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=http://test.tech.9fbank.com/canary/#/login',
+        id: 'login_container',
         style: 'border:none;background-color:#FFFFFF;',
-        width: '400',
-        height: '400'
-      }, // 生成二维码样式的配置
+        width: '365',
+        height: '320'
+      },
       dataRule: {
         // email: [
         //   { required: true, trigger: 'blur', validator: validateEmail }
@@ -216,9 +219,32 @@ export default {
       imgLeft: require('../../assets/img/left.png')
     }
   },
+   watch: {
+    $route: {
+      handler: function(route) {
+        this.redirect = route.query && route.query.redirect
+      },
+      immediate: true
+    }
+  },
+  computed: {
+    getRedirectUrl() {
+      return encodeURIComponent(this.redirectUrl)
+    },
+    getAuthUrl() {
+      return `https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=${this.appid}&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=${this.getRedirectUrl}`
+    },
+    getGoto() {
+      return encodeURIComponent(this.getAuthUrl)
+    },
+    getDingCodeConfig() {
+      return { ...this.dingCodeConfig, goto: this.getGoto }
+    }
+  },
   created () {
     // const url = location.href.split('#')[0]
     this.getCaptcha()
+    this.initDingJs()
     sessionStorage.clear()
     // this.getPhoneCaptcha()
     // this.url = url + '#/resetPassword'\
@@ -271,9 +297,9 @@ export default {
     changeType () {
       this.type = !this.type
       if (!this.type) {
-    //     this.initDingJs()
-    //     this.addDingListener()
-    // this.initDingLogin()
+        this.initDingJs()
+        this.addDingListener()
+        this.initDingLogin()
       }
     },
     // 忘记密码
@@ -368,6 +394,71 @@ export default {
         })
       })
       return res
+    },
+    // 钉钉扫码登陆
+    initDingJs() {
+      !function(window, document) {
+        function d(a) {
+          let e
+          let c = document.createElement('iframe')
+          let d = 'https://login.dingtalk.com/login/qrcode.htm?goto=' + a.goto
+            d += a.style ? '&style=' + encodeURIComponent(a.style) : ''
+            d += a.href ? '&href=' + a.href : ''
+            c.src = d
+            c.frameBorder = '0'
+            c.allowTransparency = 'true'
+            c.scrolling = 'no'
+            c.width = a.width ? a.width + 'px' : '365px'
+            c.height = a.height ? a.height + 'px' : '400px'
+            e = document.getElementById(a.id)
+            e.innerHTML = ''
+            e.appendChild(c)
+        }
+        window.DDLogin = d
+      }(window, document)
+    },
+    addDingListener() {
+      let self = this
+      let handleLoginTmpCode = function(loginTmpCode) {
+        window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
+      }
+      let handleMessage = function(event) {
+        if (event.origin == 'https://login.dingtalk.com') {
+          handleLoginTmpCode(event.data)
+        }
+      }
+      if (typeof window.addEventListener != 'undefined') {
+        window.addEventListener('message', handleMessage, false)
+      } else if (typeof window.attachEvent != 'undefined') {
+        window.attachEvent('onmessage', handleMessage)
+      }
+    },
+    initDingLogin() {
+      window.DDLogin(this.getDingCodeConfig)
+    },
+    getUser() {
+      let getQueryString = function(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
+        var r = window.location.search.substr(1).match(reg)
+        if (r != null) {
+          return unescape(r[2])
+        }
+        return null
+      }
+      let code = getQueryString('code')
+      if (code !== null) {
+        // axios
+        //   .get(`${this.apiUrl}?code=${code}`).then(response => {
+
+        //   // setToken(response.data.token)
+        //   // this.$router.push({ path: this.redirect || '/' }).catch(() => {
+        //   // })
+        //   // commit('SET_TOKEN', response.data.token)
+        // })
+        //   .catch(error => {
+        //     console.log(error)
+        //   })
+      }
     }
   }
 }
