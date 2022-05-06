@@ -31,7 +31,8 @@
             <el-input v-model.trim="baseForm.formula" placeholder="计算公式" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="选择所属分类" prop="categoryId">
-            <el-cascader clearable ref="cascaderMenu" v-model="baseForm.categoryId" :options="indexList" :props="indexListTreeProps" @change="indexTreeChange" class="base-pane-item"></el-cascader>
+            <!-- <el-cascader clearable ref="cascaderMenu" v-model="baseForm.categoryId" :options="indexList" :props="indexListTreeProps" @change="indexTreeChange" class="base-pane-item"></el-cascader> -->
+            <el-cascader style="width: 100%" clearable ref="cascaderMenu" v-model="baseForm.categoryId" :options="alldataCataLogList" :props="dataCataLogTreeProps" @change="indexTreeChange"></el-cascader>
           </el-form-item>
           <el-form-item prop="processType" label="加工类型：" v-if="baseForm.indexType === '1'">
             <el-radio v-model="baseForm.processType" label="1">实时更新</el-radio>
@@ -91,7 +92,7 @@
   </el-drawer>
 </template>
 <script>
-import { selectAllCata, channelsList, addIndexManage, updateIndexManage, infoIndexManage } from '@/api/dataAnalysis/indexManage'
+import { selectAllCata, channelsList, addIndexManage, updateIndexManage, infoIndexManage, getDataCataLog } from '@/api/dataAnalysis/indexManage'
 import InputTag from '../components/InputTag'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 export default {
@@ -121,6 +122,13 @@ export default {
         value: 'id',
         children: 'children'
       },
+      dataCataLogTreeProps: {
+        checkStrictly: true,
+        label: 'name',
+        value: 'id',
+        children: 'dataCata'
+      },
+      alldataCataLogList: [],
       indexParentList: [],
       modifyaddorupdate: false,
       enumList: [],
@@ -236,7 +244,14 @@ export default {
           this.baseForm.showRules = data.data.showRules
           this.baseForm.enable = data.data.enable
           this.indexParentList = data.data.catagoryIdSelect
-          this.getSelectAllCata()
+          // this.getSelectAllCata()
+          getDataCataLog().then(({ data }) => {
+            if (data.status === '1') {
+              this.alldataCataLogList = data.data
+            } else {
+              this.alldataCataLogList = []
+            }
+          })
         }
       })
     },
@@ -344,7 +359,14 @@ export default {
           }
         })
       }
-      this.getSelectAllCata()
+      // this.getSelectAllCata()
+      getDataCataLog().then(({ data }) => {
+        if (data.status === '1') {
+          this.alldataCataLogList = data.data
+        } else {
+          this.alldataCataLogList = []
+        }
+      })
     },
     indexTreeChange (val) {
       this.indexParentList = val

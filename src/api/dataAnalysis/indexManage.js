@@ -18,3 +18,4 @@ export const getDimension = (params) => httpGet(da + 'dataIndexManager/getDimens
 export const setDimension = (params) => httpPost(da + 'dataIndexManager/setDimension', params) // 设置分组
 export const getchildrenList = (typeNum) => httpGet(da + 'dataEnumType/childrenList', typeNum) // 默认分组枚举值列表
 export const getOperators = (type) => httpGet(da + 'dataIndexManager/operators', type) // 默认分组枚举值列表
+export const getDataCataLog = () => httpGet(da + 'dataCatalog/AlldataCataLog') // 分级目录

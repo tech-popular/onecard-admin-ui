@@ -78,7 +78,7 @@ export default {
         }
       })
     },
-    // 获取分群出参 指标列表
+    // 获取分级目录
     getDataCataLogList () {
       getDataCataLog().then(({ data }) => {
         if (data.status === '1') {
