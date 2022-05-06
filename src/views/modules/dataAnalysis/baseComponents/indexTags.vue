@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="标签分组" :modal-append-to-body="false" :append-to-body="true" :visible.sync="visible" width="50%" :close-on-click-modal="false">
+  <el-dialog title="标签分组" :modal-append-to-body="false" :append-to-body="true" :visible.sync="visible" width="70%" :close-on-click-modal="false">
     <div v-if="selectedFieldType === '数值'" v-for="(outdata, index) in baseForm.numberDigitalRange" :key="index">
       <el-form :model="outdata" ref="baseForm" :inline="true">
         <div style="display:flex">
