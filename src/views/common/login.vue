@@ -93,10 +93,8 @@
     </div>
   </div>
 </template>
-<script src="http://g.alicdn.com/dingding/dinglogin/0.0.5/ddLogin.js"></script>
 <script>
 import { getUUID } from '@/utils'
-
 import {
   loginIn,
   sendCode,
@@ -175,10 +173,10 @@ export default {
         // captcha: ''
       },
       // 钉钉扫码登录
-      redirect: undefined,
+      redirect: 'http://test.tech.9fbank.com/canary/#/home',
       appid: 'dingx2dp7goiirz78ncj',
-      redirectUrl: 'https://tech.9f.cn/canary/#/login',
-      apiUrl: 'https://tech.9f.cn/canary-admin/sys/login',
+      redirectUrl: 'http://test.tech.9fbank.com/canary/#/login',
+      apiUrl: 'http://192.168.161.219:8000/canary-admin/sys/dingTalkLogin',
       dingCodeConfig: {
         id: 'login_container',
         style: 'border:none;background-color:#FFFFFF;',
@@ -229,6 +227,7 @@ export default {
   },
   computed: {
     getRedirectUrl() {
+      // return this.redirectUrl
       return encodeURIComponent(this.redirectUrl)
     },
     getAuthUrl() {
@@ -297,9 +296,9 @@ export default {
     changeType () {
       this.type = !this.type
       if (!this.type) {
-        this.initDingJs()
         this.addDingListener()
         this.initDingLogin()
+        // this.getUser()
       }
     },
     // 忘记密码
@@ -420,10 +419,21 @@ export default {
     addDingListener() {
       let self = this
       let handleLoginTmpCode = function(loginTmpCode) {
-        window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
+        console.log('loginTmpCode: ', loginTmpCode)
+        // window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
+        self.$http({
+          url: self.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${loginTmpCode}`),
+          method: 'get',
+          params: self.$http.adornParams()
+        }).then(({data}) => {
+          console.log('data: ', data)
+          self.$cookie.set('token', data.token)
+          this.$router.replace({ name: 'home' })
+        })
       }
       let handleMessage = function(event) {
         if (event.origin == 'https://login.dingtalk.com') {
+          console.log('event: ', event)
           handleLoginTmpCode(event.data)
         }
       }
@@ -436,7 +446,7 @@ export default {
     initDingLogin() {
       window.DDLogin(this.getDingCodeConfig)
     },
-    getUser() {
+    getUser(loginTmpCode) {
       let getQueryString = function(name) {
         var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
         var r = window.location.search.substr(1).match(reg)
@@ -447,9 +457,20 @@ export default {
       }
       let code = getQueryString('code')
       if (code !== null) {
+        this.$http({
+          url: this.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${loginTmpCode}`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          console.log('data: ', data)
+          this.$cookie.set('token', data.token)
+              // this.$router.replace({ name: 'home' })
+        })
         // axios
-        //   .get(`${this.apiUrl}?code=${code}`).then(response => {
-
+        //   .get(`${this.apiUrl}?tmpAuthCode=${code}`).then(response => {
+        //     console.log('response: ', response);
+        //       this.$cookie.set('token', data.token)
+        //       this.$router.replace({ name: 'home' })
         //   // setToken(response.data.token)
         //   // this.$router.push({ path: this.redirect || '/' }).catch(() => {
         //   // })
