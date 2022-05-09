@@ -428,7 +428,7 @@ export default {
         }).then(({data}) => {
           console.log('data: ', data)
           self.$cookie.set('token', data.token)
-          this.$router.replace({ name: 'home' })
+          // this.$router.replace({ name: 'home' })
         })
       }
       let handleMessage = function(event) {
