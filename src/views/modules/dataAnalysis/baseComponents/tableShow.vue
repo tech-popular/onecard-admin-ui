@@ -309,7 +309,7 @@ export default {
         // templateId: 985,
         // indicators: [16694, 16211],
         // comTemplateId: 986,
-        indexGroups: indexGroups
+        indexGroupConfigs: indexGroups
       }).then(({ data }) => {
         if (data.status !== '1' || !data.data.data || !data.data.data.length) {
           this.$message({

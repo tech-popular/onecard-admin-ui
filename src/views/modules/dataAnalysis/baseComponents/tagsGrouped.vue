@@ -165,7 +165,7 @@
       <el-form-item v-if="(baseForm.numberDigitalRange.length === 0 && selectedFieldType === 'number' ) ||  (baseForm.dateDigitalRange.length === 0 && selectedFieldType === 'date')">
         <el-button @click="addDomain">新增区间</el-button>
       </el-form-item>
-      <el-form-item prop="selectVal" label="枚举" label-width="50px" v-if="selectedFieldType === '枚举'">
+      <el-form-item prop="selectVal" label="枚举" label-width="50px" v-if="enumsVisible">
         <el-select v-model="dataForm.selectVal" multiple clearable class="itemIput">
           <el-option v-for="(fitem, findex) in selectEnumsList" :value="fitem.childrenNum" :key="findex" :label="fitem.childrenValue" />
         </el-select>
@@ -194,6 +194,7 @@ export default {
       visible: false,
       closeIconVisible: true,
       isRequired: true,
+      enumsVisible: false,
       selectedFieldType: 'number',
       dataForm: {
         id: 0,
@@ -263,6 +264,7 @@ export default {
     init (val, selected) {
       this.selectedFieldType = selected.fieldType
       // this.dataForm.id = val.id
+      this.enumsVisible = selected.enumTypeNum ? true : false
       this.selectEnumsList = []
       this.dataForm = {
         id: val.id,
@@ -271,7 +273,7 @@ export default {
       }
       this.baseForm.numberDigitalRange = []
       this.baseForm.dateDigitalRange = []
-      if (this.selectedFieldType === 'enums') {
+      if (this.enumsVisible) {
         let params = {
           typeNum: selected.enumTypeNum
         }
@@ -472,7 +474,7 @@ export default {
     saveHandle () {
       let indexGroupConfigs = []
       let ruleArr = []
-      if (this.selectedFieldType === '枚举') {
+      if (this.enumsVisible) {
         ruleArr = [...this.$refs['dataForm']]
       } else {
         ruleArr = [...this.$refs['baseForm'], ...this.$refs['dataForm']]
@@ -513,7 +515,7 @@ export default {
           }
           indexGroupConfigs.push(arr)
         })
-      } else if (this.selectedFieldType === 'enums') {
+      } else if (this.enumsVisible) {
         this.dataForm.selectVal.forEach(item => {
           let arr = {
             'func': 'eq',
