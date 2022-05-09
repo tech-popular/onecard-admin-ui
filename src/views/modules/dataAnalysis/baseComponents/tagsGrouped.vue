@@ -514,12 +514,13 @@ export default {
           indexGroupConfigs.push(arr)
         })
       } else if (this.selectedFieldType === 'enums') {
-        indexGroupConfigs = [
-          {
+        this.dataForm.selectVal.forEach(item => {
+          let arr = {
             'func': 'eq',
-            'dimension': this.dataForm.selectVal.join(',')
+            'dimension': item
           }
-        ]
+          indexGroupConfigs.push(arr)
+        })
       }
       if (flag) {
         this.$emit('refreshDataList', indexGroupConfigs, this.dataForm.id)

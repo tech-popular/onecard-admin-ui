@@ -320,7 +320,10 @@ export default {
               })
             })
           } else {
-            this.dataForm.selectVal = data.data.indexGroupConfigs.length ? data.data.indexGroupConfigs[0].dimension.split(',') : []
+            data.data.indexGroupConfigs.forEach((item, index) => {
+              this.dataForm.selectVal.push(item.dimension)
+            })
+            // this.dataForm.selectVal = data.data.indexGroupConfigs.length ? data.data.indexGroupConfigs[0].dimension.split(',') : []
           }
         }
       })
@@ -592,12 +595,14 @@ export default {
         })
         params.indexGroupConfigs = indexGroups
       } else {
-        params.indexGroupConfigs = [
-          {
+        this.dataForm.selectVal.forEach(item => {
+          let arr = {
             'func': 'eq',
-            'dimension': this.dataForm.selectVal.join(',')
+            'dimension': item
           }
-        ]
+          indexGroups.push(arr)
+        })
+        params.indexGroupConfigs = indexGroups
       }
       // this.$refs['dataForm'].validate((valid) => {
       if (flag) {
