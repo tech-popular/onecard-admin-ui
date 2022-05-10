@@ -176,7 +176,7 @@ export default {
       redirect: 'http://test.tech.9fbank.com/canary/#/home',
       appid: 'dingx2dp7goiirz78ncj',
       // redirectUrl: 'http://test.tech.9fbank.com/canary/#/login',
-      redirectUrl: 'http://192.168.161.219:8000/canary-admin/sys/dingTalkLogin',
+      redirectUrl: 'http://localhost:8001/#/login',
       apiUrl: 'http://192.168.161.219:8000/canary-admin/sys/dingTalkLogin',
       dingCodeConfig: {
         id: 'login_container',
@@ -418,19 +418,23 @@ export default {
       }(window, document)
     },
     addDingListener() {
-      let self = this
+      // let self = this
       let handleLoginTmpCode = function(loginTmpCode) {
         console.log('loginTmpCode: ', loginTmpCode)
-        // window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
-        self.$http({
-          url: self.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${loginTmpCode}`),
-          method: 'get',
-          params: self.$http.adornParams()
-        }).then(({data}) => {
-          console.log('data: ', data)
-          self.$cookie.set('token', data.token)
-          // this.$router.replace({ name: 'home' })
-        })
+        // window.location.href =
+        //             "https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=appid&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=REDIRECT_URI&loginTmpCode=" +
+        //             loginTmpCode
+        window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
+        self.getUser()
+        // self.$http({
+        //   url: self.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${loginTmpCode}`),
+        //   method: 'get',
+        //   params: self.$http.adornParams()
+        // }).then(({data}) => {
+        //   console.log('data: ', data)
+        //   self.$cookie.set('token', data.token)
+        //   // this.$router.replace({ name: 'home' })
+        // })
       }
       let handleMessage = function(event) {
         if (event.origin == 'https://login.dingtalk.com') {
@@ -447,7 +451,7 @@ export default {
     initDingLogin() {
       window.DDLogin(this.getDingCodeConfig)
     },
-    getUser(loginTmpCode) {
+    getUser() {
       let getQueryString = function(name) {
         var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
         var r = window.location.search.substr(1).match(reg)
@@ -459,7 +463,7 @@ export default {
       let code = getQueryString('code')
       if (code !== null) {
         this.$http({
-          url: this.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${loginTmpCode}`),
+          url: this.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${code}`),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({data}) => {
