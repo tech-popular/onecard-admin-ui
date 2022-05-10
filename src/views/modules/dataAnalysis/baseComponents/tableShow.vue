@@ -1,64 +1,57 @@
 <template>
-  <el-dialog
-      :title=" title + '人群特征分析'"
-      :visible.sync="dialogVisible"
-      width="1200px"
-      v-loading="loading"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :before-close="handleClose">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
-        <el-form-item label="已选人群：">{{channelInfoNameList}}</el-form-item>
-        <el-form-item label="选择对比人群：" style="margin-left: 30px;">
-           <el-select v-model="ruleForm.comTemplateId"  filterable  clearable  placeholder="请选择">
-              <el-option v-for="(item, index) in custGroupDataList" :key="index" :value="item.id" :label="item.name"></el-option>
-          </el-select>
-        </el-form-item>
-        <br/>
-        <el-form-item prop="region" label="已选标签">
-          <Treeselect
-            :options="outParamsIndexList"
-            :disable-branch-nodes="true"
-            :show-count="true"
-            :multiple="true"
-            :load-options="loadOptions"
-            noChildrenText="暂无数据"
-            v-model="ruleForm.region"
-            :clearable="false"
-            search-nested
-            placeholder="请选择"
-            class="base-pane-item"
-            @select="indexSelect"
-            @deselect="indexDeselect"
-          />
-        </el-form-item>
-        <br/>
-        <el-form-item  style="margin-left: 50px;">
-          <el-button @click="saveTable" type="success">人群特征分析</el-button>
-        </el-form-item>
-      </el-form>
-      <el-row :gutter="20" class="echart-content" v-if="chartLen > 0" v-loading="echartLoading">
-        <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
-          <el-card shadow="never" class="order-echarts-card" v-if="isShowData(item)">
-            <div v-if="item.indicatorsType === 'bar' && item.fieldType !== 'string'" style="width: 100%; display:flex; justify-content: end;"><el-button type="text" @click="tagsGroupHandle(item)" size="small">编辑分组</el-button></div>
-            <div :id="'echart-' + item.id" class="echart"></div>
-          </el-card>
-          <el-card shadow="never" class="order-echarts-card" v-if="!isShowData(item)">
-            <div class="echart">
-              <h3>{{item.indicatorsName}}</h3>
-              <p style="padding-top: 130px;text-align:center">暂无数据</p>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-      <div class="no-echart-content" v-else>
-        {{dataResultText}}
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" type="primary">关闭</el-button>
-      </span>
-      <tagsGrouped v-if="tagsGroupedVisible" ref="tagsGrouped" @refreshDataList="getChartInfo"></tagsGrouped>
-    </el-dialog>
+  <el-dialog :title=" title + '人群特征分析'" :visible.sync="dialogVisible" width="1200px" v-loading="loading" :close-on-click-modal="false" :close-on-press-escape="false" :before-close="handleClose">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
+      <el-form-item label="已选人群：">{{channelInfoNameList}}</el-form-item>
+      <el-form-item label="选择对比人群：" style="margin-left: 30px;">
+        <el-select v-model="ruleForm.comTemplateId" filterable clearable placeholder="请选择">
+          <el-option v-for="(item, index) in custGroupDataList" :key="index" :value="item.id" :label="item.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <br />
+      <el-form-item prop="region" label="已选标签">
+        <Treeselect
+          :options="outParamsIndexList"
+          :disable-branch-nodes="true"
+          :show-count="true"
+          :multiple="true"
+          :load-options="loadOptions"
+          noChildrenText="暂无数据"
+          v-model="ruleForm.region"
+          :clearable="false"
+          search-nested
+          placeholder="请选择"
+          class="base-pane-item"
+          @select="indexSelect"
+          @deselect="indexDeselect"
+        />
+      </el-form-item>
+      <br />
+      <el-form-item style="margin-left: 50px;">
+        <el-button @click="saveTable" type="success">人群特征分析</el-button>
+      </el-form-item>
+    </el-form>
+    <el-row :gutter="20" class="echart-content" v-if="chartLen > 0" v-loading="echartLoading">
+      <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
+        <el-card shadow="never" class="order-echarts-card" v-if="isShowData(item)">
+          <div v-if="item.indicatorsType === 'bar' && ((item.fieldType !== 'string' && item.fieldType !== '') || !item.enumTypeNum)" style="width: 100%; display:flex; justify-content: end;">
+            <el-button type="text" @click="tagsGroupHandle(item)" size="small">编辑分组</el-button>
+          </div>
+          <div :id="'echart-' + item.id" class="echart"></div>
+        </el-card>
+        <el-card shadow="never" class="order-echarts-card" v-if="!isShowData(item)">
+          <div class="echart">
+            <h3>{{item.indicatorsName}}</h3>
+            <p style="padding-top: 130px;text-align:center">暂无数据</p>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+    <div class="no-echart-content" v-else>{{dataResultText}}</div>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible = false" type="primary">关闭</el-button>
+    </span>
+    <tagsGrouped v-if="tagsGroupedVisible" ref="tagsGrouped" @refreshDataList="getChartInfo"></tagsGrouped>
+  </el-dialog>
 </template>
 
 <script>
@@ -110,7 +103,7 @@ export default {
       }
     },
     getSelectAllCata (channelCode, fn) { // 获取所有指标
-      selectAllCata({channelCode: channelCode, flag: '1', isSetGroup: '1'}).then(({data}) => {
+      selectAllCata({ channelCode: channelCode, flag: '1', isSetGroup: '1' }).then(({ data }) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
@@ -219,7 +212,7 @@ export default {
         return indexListArr
       }
     },
-        // 获取已选择的节点
+    // 获取已选择的节点
     getSelectCata (indexList, selectedIndex) {
       let indexListArr = deepClone(indexList)
       indexListArr.forEach((citem, cindex) => {
@@ -247,7 +240,7 @@ export default {
         this.$refs.ruleForm.clearValidate()
       })
       this.getOverviewData(val.id, val.channelId.split(','))
-      custGroupList().then(({data}) => {
+      custGroupList().then(({ data }) => {
         if (data.status * 1 !== 1) {
           this.loading = false
           return this.$message({
@@ -260,7 +253,7 @@ export default {
     },
     getOverviewData (id, channelCode) {
       let type = '2' // 明细预览传1，特征分析传2
-      overviewData(id, type).then(({data}) => {
+      overviewData(id, type).then(({ data }) => {
         if (data.status * 1 !== 1) {
           this.loading = false
           return this.$message({
@@ -291,7 +284,7 @@ export default {
         if (!item.children && this.regionList.length < 4) {
           this.regionList.push(item.id)
         } else {
-        this.getRegionList(item.children)
+          this.getRegionList(item.children)
         }
       })
     },
@@ -316,8 +309,8 @@ export default {
         // templateId: 985,
         // indicators: [16694, 16211],
         // comTemplateId: 986,
-        indexGroups: indexGroups
-      }).then(({data}) => {
+        indexGroupConfigs: indexGroups
+      }).then(({ data }) => {
         if (data.status !== '1' || !data.data.data || !data.data.data.length) {
           this.$message({
             type: 'error',
@@ -340,7 +333,7 @@ export default {
             }
             let optionSeriesData = []
             item.valList.forEach(item => {
-             optionSeriesData.push({
+              optionSeriesData.push({
                 name: item.name,
                 value: item.percentStr
               })

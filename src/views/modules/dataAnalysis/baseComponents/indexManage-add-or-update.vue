@@ -1,131 +1,98 @@
 <template>
-  <el-drawer
-    :append-to-body="false"
-    :visible.sync="visible"
-    :show-close="false"
-    :wrapperClosable="false"
-    size="1350px"
-    class="index-manage-drawer"
-  >
+  <el-drawer :append-to-body="false" :visible.sync="visible" :show-close="false" :wrapperClosable="false" size="1350px" class="index-manage-drawer">
     <div slot="title" class="drawer-title">
       {{drawerTitle}}
       <i class="el-icon-close drawer-close" @click="drawerClose"></i>
     </div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
-        <el-form
-          label-width="180px"
-          :model="baseForm"
-          ref="baseForm"
-          :rules="baseRule"
-          class="base-form"
-        >
+        <el-form label-width="180px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
           <el-form-item label="英文名称" prop="englishName">
-            <el-input
-              v-model.trim="baseForm.englishName"
-              placeholder="英文名称"
-              clearable
-              class="base-pane-item"
-            />
+            <el-input v-model.trim="baseForm.englishName" placeholder="英文名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="标签名称" prop="chineseName">
-            <el-input
-              v-model.trim="baseForm.chineseName"
-              placeholder="标签名称"
-              clearable
-              class="base-pane-item"
-            />
+            <el-input v-model.trim="baseForm.chineseName" placeholder="标签名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="所属业务线" prop="channelCode" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
-              <el-select
-                v-model="baseForm.channelCode"
-                @change="channelIdChange"
-                filterable
-                style="width: 400px"
-              >
-                <template v-for="(item, index) in channelList">
-                  <el-option
-                    :key="index"
-                    :label="item.text"
-                    :value="item.value"
-                    :disabled="item.disabled"
-                  ></el-option>
-                </template>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="标签口径" prop="processCaliber">
-              <el-input
-                v-model.trim="baseForm.processCaliber"
-                placeholder="标签口径"
-                clearable
-                class="base-pane-item"
-              />
-            </el-form-item>
-            <el-form-item  prop="indexType" label="类型">
-              <el-radio  v-model="baseForm.indexType" label="1">用户标签</el-radio>
-              <el-radio  v-model="baseForm.indexType" label="4">衍生标签</el-radio>
+            <el-select v-model="baseForm.channelCode" @change="channelIdChange" filterable style="width: 400px">
+              <template v-for="(item, index) in channelList">
+                <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
+              </template>
+            </el-select>
           </el-form-item>
-            <el-form-item label="计算公式" prop="formula"  v-if="baseForm.indexType === '4'">
-              <el-input
-                v-model.trim="baseForm.formula"
-                placeholder="计算公式"
-                clearable
-                class="base-pane-item"
-              />
-            </el-form-item>
-           <el-form-item label="选择所属分类" prop="categoryId">
-              <el-cascader
-                clearable
-                ref="cascaderMenu"
-                v-model="baseForm.categoryId"
-                :options="indexList"
-                :props="indexListTreeProps"
-                @change="indexTreeChange"
-                class="base-pane-item"
-              >
-              </el-cascader>
-            </el-form-item>
-             <el-form-item  prop="processType" label="加工类型：" v-if="baseForm.indexType === '1'">
-            <el-radio  v-model="baseForm.processType" label="1">实时更新</el-radio>
-            <el-radio  v-model="baseForm.processType" label="2" >T+1</el-radio>
+          <el-form-item label="标签口径" prop="processCaliber">
+            <el-input v-model.trim="baseForm.processCaliber" placeholder="标签口径" clearable class="base-pane-item" />
           </el-form-item>
-           <el-form-item  prop="fieldType" label="数据类型：" >
-            <el-radio  v-model="baseForm.fieldType" label="number" :disabled="!!id">数值</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="date" :disabled="!!id">日期</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="enums" :disabled="!!id">枚举</el-radio>
-            <el-radio  v-model="baseForm.fieldType" label="string" :disabled="!!id">字符串</el-radio>
+          <el-form-item prop="indexType" label="类型">
+            <el-radio v-model="baseForm.indexType" label="1">用户标签</el-radio>
+            <el-radio v-model="baseForm.indexType" label="4">衍生标签</el-radio>
           </el-form-item>
-          <el-form-item  prop="isSensitive" label="是否包含敏感信息：">
-            <el-radio  v-model="baseForm.isSensitive" label="1">是</el-radio>
-            <el-radio  v-model="baseForm.isSensitive" label="0">否</el-radio>
+          <el-form-item label="计算公式" prop="formula" v-if="baseForm.indexType === '4'">
+            <el-input v-model.trim="baseForm.formula" placeholder="计算公式" clearable class="base-pane-item" />
+          </el-form-item>
+          <el-form-item label="选择所属分类" prop="categoryId">
+            <!-- <el-cascader clearable ref="cascaderMenu" v-model="baseForm.categoryId" :options="indexList" :props="indexListTreeProps" @change="indexTreeChange" class="base-pane-item"></el-cascader> -->
+            <el-cascader style="width: 100%" clearable ref="cascaderMenu" v-model="baseForm.categoryId" :options="alldataCataLogList" :props="dataCataLogTreeProps" @change="indexTreeChange"></el-cascader>
+          </el-form-item>
+          <el-form-item prop="processType" label="加工类型：" v-if="baseForm.indexType === '1'">
+            <el-radio v-model="baseForm.processType" label="1">实时更新</el-radio>
+            <el-radio v-model="baseForm.processType" label="2">T+1</el-radio>
+          </el-form-item>
+          <el-form-item prop="fieldType" label="数据类型：">
+            <el-radio v-model="baseForm.fieldType" label="number" :disabled="!!id">数值</el-radio>
+            <el-radio v-model="baseForm.fieldType" label="date" :disabled="!!id">日期</el-radio>
+            <el-radio v-model="baseForm.fieldType" label="enums" :disabled="!!id">枚举</el-radio>
+            <el-radio v-model="baseForm.fieldType" label="string" :disabled="!!id">字符串</el-radio>
+          </el-form-item>
+          <el-form-item label-width="100px" v-if="baseForm.fieldType === 'enums'">
+            <el-button @click="changeHandle()">添加值</el-button>
+          </el-form-item>
+          <el-table :data="enumList" border v-if="baseForm.fieldType === 'enums'" style="width: 50%; margin-left:100px; margin-bottom:20px;">
+            <el-table-column prop="childrenNum" header-align="center" align="center" label="维度code"></el-table-column>
+            <el-table-column prop="childrenValue" header-align="center" align="center" label="修饰值"></el-table-column>
+            <el-table-column header-align="center" align="center" label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="changeHandle(scope)">修改名称</el-button>
+                <el-button type="text" size="small" @click="deleteHandle(scope)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-form-item prop="isSensitive" label="是否包含敏感信息：">
+            <el-radio v-model="baseForm.isSensitive" label="1">是</el-radio>
+            <el-radio v-model="baseForm.isSensitive" label="0">否</el-radio>
           </el-form-item>
           <el-form-item label="敏感信息显示规则：" prop="showRules" v-if="baseForm.isSensitive === '1'">
-              <el-input
-                v-model.trim="baseForm.showRules"
-                clearable
-                class="base-pane-item"
-              />
-            </el-form-item>
-           <el-form-item  prop="enable" label="是否启动：" >
-            <el-radio  v-model="baseForm.enable" :label='true'>是</el-radio>
-            <el-radio  v-model="baseForm.enable" :label='false' >否</el-radio>
+            <el-input v-model.trim="baseForm.showRules" clearable class="base-pane-item" />
+          </el-form-item>
+          <el-form-item prop="enable" label="是否启动：">
+            <el-radio v-model="baseForm.enable" :label="true">是</el-radio>
+            <el-radio v-model="baseForm.enable" :label="false">否</el-radio>
           </el-form-item>
         </el-form>
       </div>
     </div>
     <div class="footer">
-      <el-button
-        type="primary"
-        @click="saveHandle"
-        size="small"
-        :disabled="loading" 
-      >保存</el-button>
+      <el-button type="primary" @click="saveHandle" size="small" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
+    <el-dialog :visible.sync="modifyaddorupdate" width="600px" append-to-body>
+      <el-form :model="dataForm" ref="dataForm" :rules="dataRule" label-width="100px">
+        <el-form-item label="维度code" prop="childrenNum">
+          <el-input v-model="dataForm.childrenNum" placeholder="请输入编码" type="text"></el-input>
+        </el-form-item>
+        <el-form-item prop="childrenValue" label="修饰值">
+          <el-input v-model="dataForm.childrenValue" placeholder="请输入" type="text"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="foot">
+        <el-button type="primary" @click="modifySubmit()">确认</el-button>
+        <el-button type="primary" @click="modifyCancel()">取消</el-button>
+      </div>
+    </el-dialog>
   </el-drawer>
 </template>
 <script>
-import { selectAllCata, channelsList, addIndexManage, updateIndexManage, infoIndexManage } from '@/api/dataAnalysis/indexManage'
+import { selectAllCata, channelsList, addIndexManage, updateIndexManage, infoIndexManage, getDataCataLog } from '@/api/dataAnalysis/indexManage'
 import InputTag from '../components/InputTag'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 export default {
@@ -155,7 +122,30 @@ export default {
         value: 'id',
         children: 'children'
       },
+      dataCataLogTreeProps: {
+        checkStrictly: true,
+        label: 'name',
+        value: 'id',
+        children: 'dataCata'
+      },
+      alldataCataLogList: [],
       indexParentList: [],
+      modifyaddorupdate: false,
+      enumList: [],
+      dataFormId: 0,
+      dataForm: {
+        childrenNum: '',
+        childrenValue: '',
+        id: 0
+      },
+      dataRule: {
+        childrenNum: [
+          { required: true, message: '维度code不能为空', trigger: 'blur' }
+        ],
+        childrenValue: [
+          { required: true, message: '修饰值不能为空', trigger: 'blur' }
+        ]
+      },
       baseRule: { // 基本信息校验规则
         englishName: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
@@ -202,6 +192,8 @@ export default {
   methods: {
     init (row) {
       this.id = row ? row.id : 0
+      this.dataFormId = 0
+      this.enumList = []
       // this.loading = true
       this.getChannelsList()
       this.visible = true
@@ -229,6 +221,14 @@ export default {
           this.id = data.data.id
           if (data.data.enumTypeNum && data.data.enumTypeNum !== '') {
             this.baseForm.fieldType = 'enums'
+            data.data.enumList.forEach((item, index) => {
+              this.enumList.push({
+                id: index,
+                childrenNum: item.childrenNum,
+                childrenValue: item.childrenValue
+              })
+            })
+            this.dataFormId = data.data.enumList.length
           } else {
             this.baseForm.fieldType = data.data.fieldType
           }
@@ -244,7 +244,14 @@ export default {
           this.baseForm.showRules = data.data.showRules
           this.baseForm.enable = data.data.enable
           this.indexParentList = data.data.catagoryIdSelect
-          this.getSelectAllCata()
+          // this.getSelectAllCata()
+          getDataCataLog().then(({ data }) => {
+            if (data.status === '1') {
+              this.alldataCataLogList = data.data
+            } else {
+              this.alldataCataLogList = []
+            }
+          })
         }
       })
     },
@@ -252,7 +259,7 @@ export default {
       selectAllCata({
         channelCode: this.baseForm.channelCode,
         flag: this.id ? '-1' : '1'
-      }).then(({data}) => {
+      }).then(({ data }) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
@@ -265,7 +272,7 @@ export default {
         }
       })
     },
-        filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
+    filterAllCata (tree) { // 清洗数据，按selectVue的格式重新组织指标数据
       let arr = []
       if (!!tree && tree.length !== 0) {
         tree.forEach((item, index) => {
@@ -341,7 +348,7 @@ export default {
         })
       })
     },
-     channelIdChange () {
+    channelIdChange () {
       // 用户渠道改变时，重新过滤指标数据
       if (this.baseForm.channelCode.length === 0) {
         this.channelList.forEach(item => {
@@ -352,14 +359,30 @@ export default {
           }
         })
       }
-      this.getSelectAllCata()
+      // this.getSelectAllCata()
+      getDataCataLog().then(({ data }) => {
+        if (data.status === '1') {
+          this.alldataCataLogList = data.data
+        } else {
+          this.alldataCataLogList = []
+        }
+      })
     },
     indexTreeChange (val) {
-       this.indexParentList = val
+      this.indexParentList = val
     },
     saveHandle () {
-       this.$refs['baseForm'].validate((valid) => {
+      this.$refs['baseForm'].validate((valid) => {
         if (valid) {
+          let enumDataList = []
+          if (this.baseForm.fieldType === 'enums') {
+            this.enumList.forEach(item => {
+              enumDataList.push({
+                'childrenNum': item.childrenNum,
+                'childrenValue': item.childrenValue
+              })
+            })
+          }
           let params = {
             'englishName': this.baseForm.englishName,
             'chineseName': this.baseForm.chineseName,
@@ -373,7 +396,8 @@ export default {
             'isSensitive': this.baseForm.isSensitive,
             'showRules': this.baseForm.showRules,
             'enable': this.baseForm.enable,
-            'catagoryIdSelect': this.indexParentList
+            'catagoryIdSelect': this.indexParentList,
+            'enumList': enumDataList
           }
           if (!this.id) {
             addIndexManage(params).then(({ data }) => {
@@ -414,6 +438,43 @@ export default {
             })
           }
         }
+      })
+    },
+    // 添加维度
+    changeHandle (scope) {
+      this.modifyaddorupdate = true
+      this.dataForm.id = scope ? this.enumList[scope.$index].id : ''
+      this.dataForm.childrenNum = scope ? this.enumList[scope.$index].childrenNum : ''
+      this.dataForm.childrenValue = scope ? this.enumList[scope.$index].childrenValue : ''
+    },
+    deleteHandle (scope) {
+      let index = scope.$index
+      this.enumList.splice(index, 1)
+    },
+    modifySubmit () {
+      this.$refs['dataForm'].validate(valid => {
+        let params = {
+          id: this.dataForm.id,
+          childrenNum: this.dataForm.childrenNum,
+          childrenValue: this.dataForm.childrenValue
+        }
+        if (this.dataForm.id) {
+          this.enumList = this.enumList.map(t => {
+            return t.id === params.id ? params : t
+          })
+        } else {
+          this.dataFormId = this.dataFormId + 1
+          params.id = this.dataFormId
+          this.enumList.push(params)
+        }
+        this.modifyaddorupdate = false
+      })
+    },
+    modifyCancel () {
+      this.modifyaddorupdate = false
+      this.$nextTick(() => {
+        this.enumList = this.enumList
+        this.$refs['dataForm'].resetFields()
       })
     },
     drawerClose () {
@@ -546,7 +607,7 @@ export default {
   margin-bottom: 20px;
 }
 .pane-rules-relation:before {
-  content: " ";
+  content: ' ';
   position: absolute;
   top: 0;
   left: 50%;
@@ -574,7 +635,8 @@ export default {
   cursor: pointer;
   user-select: none;
 }
-.index-manage-drawer .pane-rules-title, .index-manage-drawer .pane-reject {
+.index-manage-drawer .pane-rules-title,
+.index-manage-drawer .pane-reject {
   border-top: 1px dashed #ccc;
 }
 .index-manage-drawer .user-channel {
@@ -591,14 +653,14 @@ export default {
   width: 50%;
 }
 .index-manage-drawer .reject-pane-item1 {
-  width:80%
+  width: 80%;
 }
 .inputTag {
   display: inline-block;
   border-radius: 4px;
   width: 340px;
   line-height: 22px;
-  border: 1px solid #dcdfe6
+  border: 1px solid #dcdfe6;
 }
 .work-type-pane-source {
   display: flex;
@@ -614,17 +676,17 @@ export default {
 .type-radio-item-indexType-active {
   margin-bottom: 22px !important;
 }
- .index-manage-drawer .content-range {
-   width: 80px;
-   height: 28px;
-   border: solid 1px #dcdfe6;
-   text-align: center;
-   font-size: 14px;
-   line-height: 28px;
-   margin-right: 10px;
-   margin-left: 50px;
- }
- .index-manage-drawer .pane-rules-inline {
+.index-manage-drawer .content-range {
+  width: 80px;
+  height: 28px;
+  border: solid 1px #dcdfe6;
+  text-align: center;
+  font-size: 14px;
+  line-height: 28px;
+  margin-right: 10px;
+  margin-left: 50px;
+}
+.index-manage-drawer .pane-rules-inline {
   margin-left: 20px;
   display: flex;
   line-height: 36px;
@@ -636,6 +698,6 @@ export default {
   width: 100px;
 }
 .index-manage-drawer .btn-group i {
-  margin-left:20px;
+  margin-left: 20px;
 }
 </style>

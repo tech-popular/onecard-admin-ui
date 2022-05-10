@@ -47,13 +47,9 @@
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')" :loading="loadingVlaue">登录</el-button>
             </el-form-item>
-            <el-form-item>
-              <p class="loginMethod" @click="changeType">扫码登陆</p>
-            </el-form-item>
              <!-- <el-form-item>
               <p class="loginMethod" @click="changeType">手机验证码登录</p>
             </el-form-item>-->
-          </el-form>
           </el-form>
         </div>
         <!-- </el-tab-pane>
@@ -88,7 +84,7 @@
               <p class="loginMethod" @click="changeType">账号密码登录</p>
             </el-form-item>
           </el-form>
-        </div>
+        </div>-->
       </div>
     </div>
   </div>
