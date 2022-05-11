@@ -175,8 +175,8 @@ export default {
       // 钉钉扫码登录
       redirect: 'http://test.tech.9fbank.com/canary/#/home',
       appid: 'dingx2dp7goiirz78ncj',
-      // redirectUrl: 'http://test.tech.9fbank.com/canary/#/login',
-      redirectUrl: 'http://localhost:8001/#/login',
+      redirectUrl: 'http://test.tech.9fbank.com/canary/#/login',
+      // redirectUrl: 'http://localhost:8001/#/login',
       apiUrl: 'http://192.168.161.219:8000/canary-admin/sys/dingTalkLogin',
       dingCodeConfig: {
         id: 'login_container',
@@ -228,7 +228,6 @@ export default {
   },
   computed: {
     getRedirectUrl() {
-      // return this.redirectUrl
       return encodeURIComponent(this.redirectUrl)
     },
     getAuthUrl() {
@@ -253,6 +252,9 @@ export default {
     //   message: '请使用上网账号登陆使用',
     //   duration: 30 * 1000
     // })
+  },
+  mounted() {
+    this.getUser()
   },
   methods: {
     // 提交表单
@@ -421,24 +423,10 @@ export default {
       // let self = this
       let handleLoginTmpCode = function(loginTmpCode) {
         console.log('loginTmpCode: ', loginTmpCode)
-        // window.location.href =
-        //             "https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=appid&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=REDIRECT_URI&loginTmpCode=" +
-        //             loginTmpCode
         window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
-        self.getUser()
-        // self.$http({
-        //   url: self.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${loginTmpCode}`),
-        //   method: 'get',
-        //   params: self.$http.adornParams()
-        // }).then(({data}) => {
-        //   console.log('data: ', data)
-        //   self.$cookie.set('token', data.token)
-        //   // this.$router.replace({ name: 'home' })
-        // })
       }
       let handleMessage = function(event) {
         if (event.origin == 'https://login.dingtalk.com') {
-          console.log('event: ', event)
           handleLoginTmpCode(event.data)
         }
       }
