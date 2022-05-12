@@ -171,8 +171,9 @@ export default {
       // 钉钉扫码登录
       redirect: 'http://test.tech.9fbank.com/canary/#/home',
       appid: 'dingx2dp7goiirz78ncj',
+      redirectUrl: 'https://tech.9f.cn/canary/#/login',
       // redirectUrl: 'http://test.tech.9fbank.com/canary/#/login',
-      redirectUrl: 'http://localhost:8001/#/login',
+      // redirectUrl: 'http://localhost:8001/#/login',
       apiUrl: 'http://192.168.161.219:8000/canary-admin/sys/dingTalkLogin',
       dingCodeConfig: {
         id: 'login_container',
@@ -224,7 +225,6 @@ export default {
   },
   computed: {
     getRedirectUrl() {
-      // return this.redirectUrl
       return encodeURIComponent(this.redirectUrl)
     },
     getAuthUrl() {
@@ -242,6 +242,7 @@ export default {
     this.getCaptcha()
     this.initDingJs()
     sessionStorage.clear()
+    this.getUser()
     // this.getPhoneCaptcha()
     // this.url = url + '#/resetPassword'\
     // this.$message({
@@ -249,6 +250,9 @@ export default {
     //   message: '请使用上网账号登陆使用',
     //   duration: 30 * 1000
     // })
+  },
+  mounted() {
+    this.getUser()
   },
   methods: {
     // 提交表单
@@ -414,27 +418,14 @@ export default {
       }(window, document)
     },
     addDingListener() {
-      // let self = this
+      let self = this
       let handleLoginTmpCode = function(loginTmpCode) {
         console.log('loginTmpCode: ', loginTmpCode)
-        // window.location.href =
-        //             "https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=appid&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=REDIRECT_URI&loginTmpCode=" +
-        //             loginTmpCode
         window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
         self.getUser()
-        // self.$http({
-        //   url: self.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${loginTmpCode}`),
-        //   method: 'get',
-        //   params: self.$http.adornParams()
-        // }).then(({data}) => {
-        //   console.log('data: ', data)
-        //   self.$cookie.set('token', data.token)
-        //   // this.$router.replace({ name: 'home' })
-        // })
       }
       let handleMessage = function(event) {
         if (event.origin == 'https://login.dingtalk.com') {
-          console.log('event: ', event)
           handleLoginTmpCode(event.data)
         }
       }
@@ -449,8 +440,9 @@ export default {
     },
     getUser() {
       let getQueryString = function(name) {
-        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
-        var r = window.location.search.substr(1).match(reg)
+        let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
+        let params = window.location.search.substr(1) || window.location.href.split('?')[1]
+        let r = params && params.match(reg)
         if (r != null) {
           return unescape(r[2])
         }
@@ -465,21 +457,15 @@ export default {
         }).then(({data}) => {
           console.log('data: ', data)
           this.$cookie.set('token', data.token)
-              // this.$router.replace({ name: 'home' })
+          //我调用api后，就不需要这些参数了，就删除了了url后携带的参数，直接跳转首页
+          let url = window.location.href //获取当前页面的url
+          if (url.indexOf("?") != -1) {
+            //判断是否存在参数
+            url = url.replace(/(\?|#)[^'"]*/, "") //去除参数
+            window.history.pushState({}, 0, url)
+          }
+          this.$router.replace({ name: 'home' })
         })
-        // axios
-        //   .get(`${this.apiUrl}?tmpAuthCode=${code}`).then(response => {
-        //     console.log('response: ', response);
-        //       this.$cookie.set('token', data.token)
-        //       this.$router.replace({ name: 'home' })
-        //   // setToken(response.data.token)
-        //   // this.$router.push({ path: this.redirect || '/' }).catch(() => {
-        //   // })
-        //   // commit('SET_TOKEN', response.data.token)
-        // })
-        //   .catch(error => {
-        //     console.log(error)
-        //   })
       }
     }
   }
