@@ -47,9 +47,9 @@
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit('dataForm')" :loading="loadingVlaue">登录</el-button>
             </el-form-item>
-             <!-- <el-form-item>
-              <p class="loginMethod" @click="changeType">手机验证码登录</p>
-            </el-form-item>-->
+            <el-form-item>
+              <p class="loginMethod" @click="changeType">钉钉扫码登陆</p>
+            </el-form-item>
           </el-form>
         </div>
         <!-- </el-tab-pane>
@@ -74,12 +74,8 @@
             <h3 class="login-title">玖富数据中台</h3>
             <p class="login-title-single">JIAGOUZONGHEFUWUPINGTAI</p>
           </div>
-          <el-form
-            :model="dataElseForm"
-            ref="dataElseForm"
-            status-icon
-          >
-           <div id="login_container"></div>
+          <el-form :model="dataElseForm" ref="dataElseForm" status-icon>
+            <div id="login_container"></div>
             <el-form-item>
               <p class="loginMethod" @click="changeType">账号密码登录</p>
             </el-form-item>
@@ -215,25 +211,25 @@ export default {
       imgLeft: require('../../assets/img/left.png')
     }
   },
-   watch: {
+  watch: {
     $route: {
-      handler: function(route) {
+      handler: function (route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
     }
   },
   computed: {
-    getRedirectUrl() {
+    getRedirectUrl () {
       return encodeURIComponent(this.redirectUrl)
     },
-    getAuthUrl() {
+    getAuthUrl () {
       return `https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=${this.appid}&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=${this.getRedirectUrl}`
     },
-    getGoto() {
+    getGoto () {
       return encodeURIComponent(this.getAuthUrl)
     },
-    getDingCodeConfig() {
+    getDingCodeConfig () {
       return { ...this.dingCodeConfig, goto: this.getGoto }
     }
   },
@@ -251,7 +247,7 @@ export default {
     //   duration: 30 * 1000
     // })
   },
-  mounted() {
+  mounted () {
     this.getUser()
   },
   methods: {
@@ -396,35 +392,35 @@ export default {
       return res
     },
     // 钉钉扫码登陆
-    initDingJs() {
-      !function(window, document) {
-        function d(a) {
+    initDingJs () {
+      !function (window, document) {
+        function d (a) {
           let e
           let c = document.createElement('iframe')
           let d = 'https://login.dingtalk.com/login/qrcode.htm?goto=' + a.goto
-            d += a.style ? '&style=' + encodeURIComponent(a.style) : ''
-            d += a.href ? '&href=' + a.href : ''
-            c.src = d
-            c.frameBorder = '0'
-            c.allowTransparency = 'true'
-            c.scrolling = 'no'
-            c.width = a.width ? a.width + 'px' : '365px'
-            c.height = a.height ? a.height + 'px' : '400px'
-            e = document.getElementById(a.id)
-            e.innerHTML = ''
-            e.appendChild(c)
+          d += a.style ? '&style=' + encodeURIComponent(a.style) : ''
+          d += a.href ? '&href=' + a.href : ''
+          c.src = d
+          c.frameBorder = '0'
+          c.allowTransparency = 'true'
+          c.scrolling = 'no'
+          c.width = a.width ? a.width + 'px' : '365px'
+          c.height = a.height ? a.height + 'px' : '400px'
+          e = document.getElementById(a.id)
+          e.innerHTML = ''
+          e.appendChild(c)
         }
         window.DDLogin = d
       }(window, document)
     },
-    addDingListener() {
+    addDingListener () {
       let self = this
-      let handleLoginTmpCode = function(loginTmpCode) {
+      let handleLoginTmpCode = function (loginTmpCode) {
         console.log('loginTmpCode: ', loginTmpCode)
         window.location.href = self.getAuthUrl + `&loginTmpCode=${loginTmpCode}`
         self.getUser()
       }
-      let handleMessage = function(event) {
+      let handleMessage = function (event) {
         if (event.origin == 'https://login.dingtalk.com') {
           handleLoginTmpCode(event.data)
         }
@@ -435,11 +431,11 @@ export default {
         window.attachEvent('onmessage', handleMessage)
       }
     },
-    initDingLogin() {
+    initDingLogin () {
       window.DDLogin(this.getDingCodeConfig)
     },
-    getUser() {
-      let getQueryString = function(name) {
+    getUser () {
+      let getQueryString = function (name) {
         let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
         let params = window.location.search.substr(1) || window.location.href.split('?')[1]
         let r = params && params.match(reg)
@@ -454,14 +450,14 @@ export default {
           url: this.$http.adornUrl(`/sys/dingTalkLogin?tmpAuthCode=${code}`),
           method: 'get',
           params: this.$http.adornParams()
-        }).then(({data}) => {
+        }).then(({ data }) => {
           console.log('data: ', data)
           this.$cookie.set('token', data.token)
-          //我调用api后，就不需要这些参数了，就删除了了url后携带的参数，直接跳转首页
-          let url = window.location.href //获取当前页面的url
-          if (url.indexOf("?") != -1) {
-            //判断是否存在参数
-            url = url.replace(/(\?|#)[^'"]*/, "") //去除参数
+          // 我调用api后，就不需要这些参数了，就删除了了url后携带的参数，直接跳转首页
+          let url = window.location.href // 获取当前页面的url
+          if (url.indexOf('?') != -1) {
+            // 判断是否存在参数
+            url = url.replace(/(\?|#)[^'"]*/, '') // 去除参数
             window.history.pushState({}, 0, url)
           }
           this.$router.replace({ name: 'home' })
