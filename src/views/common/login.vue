@@ -175,9 +175,9 @@ export default {
       // 钉钉扫码登录
       redirect: 'http://test.tech.9fbank.com/canary/#/home',
       appid: 'dingx2dp7goiirz78ncj',
-      // redirectUrl: 'https://tech.9f.cn/canary/#/login',
+      redirectUrl: 'https://tech.9f.cn/canary/#/login',
       // redirectUrl: 'http://test.tech.9fbank.com/canary/#/login',
-      redirectUrl: 'http://localhost:8001/#/login',
+      // redirectUrl: 'http://localhost:8001/#/login',
       apiUrl: 'http://192.168.161.219:8000/canary-admin/sys/dingTalkLogin',
       dingCodeConfig: {
         id: 'login_container',
