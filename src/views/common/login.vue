@@ -175,9 +175,9 @@ export default {
       // 钉钉扫码登录
       redirect: 'http://test.tech.9fbank.com/canary/#/home',
       appid: 'dingx2dp7goiirz78ncj',
-      redirectUrl: 'https://tech.9f.cn/canary/#/login',
+      // redirectUrl: 'https://tech.9f.cn/canary/#/login',
       // redirectUrl: 'http://test.tech.9fbank.com/canary/#/login',
-      // redirectUrl: 'http://localhost:8001/#/login',
+      redirectUrl: 'http://localhost:8001/#/login',
       apiUrl: 'http://192.168.161.219:8000/canary-admin/sys/dingTalkLogin',
       dingCodeConfig: {
         id: 'login_container',
@@ -246,7 +246,7 @@ export default {
     this.getCaptcha()
     this.initDingJs()
     sessionStorage.clear()
-    this.getUser()
+    // this.getUser()
     // this.getPhoneCaptcha()
     // this.url = url + '#/resetPassword'\
     // this.$message({
@@ -461,13 +461,13 @@ export default {
         }).then(({data}) => {
           console.log('data: ', data)
           this.$cookie.set('token', data.token)
-          //我调用api后，就不需要这些参数了，就删除了了url后携带的参数，直接跳转首页
-          let url = window.location.href //获取当前页面的url
-          if (url.indexOf("?") != -1) {
-            //判断是否存在参数
-            url = url.replace(/(\?|#)[^'"]*/, "") //去除参数
-            window.history.pushState({}, 0, url)
-          }
+          // 我调用api后，就不需要这些参数了，就删除了了url后携带的参数，直接跳转首页
+          // let url = window.location.href // 获取当前页面的url
+          // if (url.indexOf('?') != -1) {
+          //   // 判断是否存在参数
+          //   url = url.replace(/(\?|#)[^'"]*/, "") //去除参数
+          //   window.history.pushState({}, 0, url)
+          // }
           this.$router.replace({ name: 'home' })
         })
       }
