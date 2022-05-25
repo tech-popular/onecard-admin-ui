@@ -254,7 +254,8 @@
           { id: 'kafka', value: 'kafka' },
           { id: 'ftp', value: 'ftp' },
           { id: 'canary', value: 'canary' },
-          { id: 'es', value: 'es' }
+          { id: 'es', value: 'es' },
+          { id: 'ignite', value: 'ignite' }
         ]
       }
     },
