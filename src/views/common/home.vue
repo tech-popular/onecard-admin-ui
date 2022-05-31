@@ -152,11 +152,11 @@ export default {
           img: require('../../assets/img/fenghuang.jpg'),
           url: originHost + '/phoenix/#/home'
         },
-        {
-          name: '数语系统',
-          img: require('../../assets/img/shuyu.png'),
-          url: 'http://datablau.9f.cn/dam/login.jsp '
-        },
+        // {
+        //   name: '数语系统',
+        //   img: require('../../assets/img/shuyu.png'),
+        //   url: 'http://datablau.9f.cn/dam/login.jsp '
+        // },
         {
           name: '神策系统',
           img: require('../../assets/img/shence.jpg'),
