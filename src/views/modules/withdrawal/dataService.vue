@@ -1,8 +1,19 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true">
+    <el-form :inline="true" :model="dataForm">
+      <el-form-item label="申请原因: ">
+        <el-input v-model="dataForm.approveReason" clearable placeholder="请输入申请原因" class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
+      <el-form-item label="类型: ">
+        <el-select v-model="dataForm.type" clearable>
+          <el-option label="sql提数" value="0"></el-option>
+          <el-option label="ftp提数" value="1"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
+        <el-button type="primary" @click="getDataList()">查询</el-button>
         <el-button type="primary" @click="addOrUpdateSqlHandle">SQL提数申请</el-button>
+        <el-button type="primary" @click="addOrUpdateFtpHandle">FTP提数申请</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -15,6 +26,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
+      <el-table-column prop="typeDesc" header-align="center" align="center" label="类型"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="申请时间"></el-table-column>
       <el-table-column prop="createUser" header-align="center" align="center" label="申请人"></el-table-column>
       <el-table-column prop="exportType" header-align="center" align="center" show-overflow-tooltip label="提数类型"></el-table-column>
@@ -38,8 +50,18 @@
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
-          <el-button type="text" v-if="scope.row.enable === 1 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
-          <el-button type="text" v-if="scope.row.enable === 0 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'" @click="renewalHandle(scope.row)">申请续期</el-button>
+          <el-button
+            type="text"
+            v-if="scope.row.typeDesc === 'sql提数' && scope.row.enable === 1 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'"
+            @click="disableHandle(scope.row)"
+          >申请失效</el-button>
+          <el-button
+            type="text"
+            v-if="scope.row.typeDesc === 'sql提数' && scope.row.enable === 0 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'"
+            @click="renewalHandle(scope.row)"
+          >申请续期</el-button>
+          <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 1 && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
+          <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 0  && scope.row.approveStatus === 'agree'" @click="renewalHandle(scope.row)">申请续期</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -53,6 +75,7 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
     <addOrUpdateSql v-if="addOrUpdateSqlVisible" ref="addOrUpdateSql" @refreshDataList="getDataList"></addOrUpdateSql>
+    <addOrUpdateFtp v-if="addOrUpdateFtpVisible" ref="addOrUpdateFtp" @refreshDataList="getDataList"></addOrUpdateFtp>
   </div>
 </template>
 <style>
@@ -63,6 +86,7 @@
 <script>
 import { exportDataList, approveRenewal, approveDisable } from '@/api/withdrawal/datareport'
 import addOrUpdateSql from './sql-add-or-update'
+import addOrUpdateFtp from './ftp-add-or-update'
 export default {
   data () {
     return {
@@ -72,10 +96,15 @@ export default {
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
-      addOrUpdateSqlVisible: false
+      addOrUpdateSqlVisible: false,
+      addOrUpdateFtpVisible: false,
+      dataForm: {
+        approveReason: '',
+        type: ''
+      }
     }
   },
-  components: { addOrUpdateSql },
+  components: { addOrUpdateSql, addOrUpdateFtp },
   activated () {
     this.getDataList()
   },
@@ -86,6 +115,8 @@ export default {
     getDataList () {
       this.dataListLoading = true
       let params = {
+        approveReason: this.dataForm.approveReason,
+        type: this.dataForm.type ? Number(this.dataForm.type) : '',
         pageNum: this.pageIndex,
         pageSize: this.pageSize
       }
@@ -121,6 +152,12 @@ export default {
       this.addOrUpdateSqlVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdateSql.init()
+      })
+    },
+    addOrUpdateFtpHandle () {
+      this.addOrUpdateFtpVisible = true
+      this.$nextTick(() => {
+        this.$refs.addOrUpdateFtp.init()
       })
     },
     renewalHandle (row) {
