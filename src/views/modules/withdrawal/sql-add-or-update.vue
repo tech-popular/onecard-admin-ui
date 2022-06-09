@@ -70,7 +70,7 @@
                     <el-button type="primary" :disabled="dataSqlSubmiting" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
                   <el-form-item v-if="previewing">
-                    <span v-if="dataSqlSubmiting">{{previewText}} 执行时间{{dataSqlSubmitTime}}</span>
+                    <span v-if="dataSqlSubmiting">{{previewText}}, 执行时间{{dataSqlSubmitTime}}</span>
                     <span v-else>{{previewText}},执行时间{{dataSqlSubmitTime}}</span>
                     <span>
                       <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>
@@ -269,7 +269,6 @@ export default {
       this.previewing = false
       this.previewText = ''
       this.dataSqlSubmiting = false
-      this.dataSqlSubmitTime = 0
       this.visible = true
       this.sqlSubmitSuccess = false
       this.$nextTick(() => {
@@ -398,36 +397,42 @@ export default {
       this.previewText = '执行中'
       this.previewing = true
       this.dataSqlSubmiting = true
+      this.dataSqlSubmitTime = 0
       let params = {
         'dataBaseId': this.baseForm.dataBaseId,
         'sql': this.baseForm.sql
       }
-      let startTime = Date.now()
-      sqlPreview(params).then(({ data }) => {
-        let endTime = Date.now()
-        this.dataSqlSubmitTime = parseInt((endTime - startTime) / 1000)
-        if (this.dataSqlSubmitTime > 60) {
-          this.previewText = '执行超时,请联系管理员'
-          return
+      // this.$nextTick(() => {
+      console.log(' this.dataSqlSubmitTime: 111', this.dataSqlSubmitTime);
+      let that = this
+      that.timer = setInterval(function () {
+        if (that.dataSqlSubmitTime >= 180) {
+          that.previewText = '执行超时,请联系管理员'
+          clearInterval(this.timer)
         }
-
-        if (data && data.code === 0) {
+        that.dataSqlSubmitTime = that.dataSqlSubmitTime + 1
+      }, 1000)
+      sqlPreview(params).then(({ data }) => {
+        clearInterval(this.timer)
+        if (data && data.code === 0 && this.dataSqlSubmitTime < 180) {
           this.$message({
-            message: '执行成功',
+            message: '查询成功',
             type: 'success',
             duration: 1500,
             onClose: () => {
               this.sqlPreviewDataList = data.data
               sessionStorage.setItem('sqlPreviewDataList', JSON.stringify(data.data || '[]'))
-              this.previewText = '执行成功'
+              this.previewText = '查询成功'
               this.sqlSubmitSuccess = true
               this.dataSqlSubmiting = false
             }
           })
         } else {
           sessionStorage.setItem('sqlPreviewDataList', [])
-          this.$message.error(data.msg)
-          this.previewText = '执行失败：' + data.msg
+          if (this.dataSqlSubmitTime < 180) {
+            this.$message.error(data.msg)
+            this.previewText = '执行失败：' + data.msg
+          }
           this.sqlSubmitSuccess = false
           this.dataSqlSubmiting = false
         }
