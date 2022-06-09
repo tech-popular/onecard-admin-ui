@@ -44,7 +44,7 @@
                 :total="totalPage"
                 layout="total, sizes, prev, pager, next, jumper"
               ></el-pagination>
-              <span>已勾选：</span>
+              <span style="color:#2093f7">已勾选：</span>
               <div style="margin-left:50px">
                 <span v-for="(item,index) in multipleSelection" :key="index">
                   {{item.fileName}}
@@ -139,7 +139,7 @@ export default {
         if (data && data.code === 0) {
           this.dataTree[0].children = data.data.dataList
           this.treeNodeClick(data.data.dataList[0])
-          this.currentLivingId = data.data.dataList[0].id
+          this.currentLivingId = data.data.dataList[0].fileName
           this.$nextTick(() => {
             this.$refs.tree.setCurrentKey(this.currentLivingId)
           })
