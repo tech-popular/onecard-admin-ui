@@ -67,12 +67,14 @@
                     </div>
                   </el-form-item>
                   <el-form-item style="margin-top:10px;">
-                    <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
+                    <el-button type="primary" :disabled="dataSqlSubmiting" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
                   <el-form-item v-if="previewing">
+                    <span :style="{color:previewTextColor}">{{previewText}},执行时间&nbsp;&nbsp;{{dataSqlSubmitTime}}s</span>
+                    <!-- <span v-else>{{previewText}}, 执行时间&nbsp;&nbsp;{{dataSqlSubmitTime}}s</span> -->
                     <span>
-                      {{previewText ? '正在执行中' : '执行完成' }}
-                      <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
+                      <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>
+                      <span v-if="sqlPreviewDataList.length">（随机展示10条数据）</span>
                     </span>
                   </el-form-item>
                   <div style="margin-left:50px;">
@@ -148,10 +150,14 @@ export default {
       visible: true,
       isInnerIP: false,
       dataListLoading: false,
-      previewText: false,
+      previewText: '',
+      previewTextColor: '#303133',
       previewing: false,
       activeNames: 1,
       sqlSubmitSuccess: false,
+      dataSqlSubmiting: false,
+      dataSqlSubmitTime: 0,
+      timer: null,
       baseForm: {
         id: '',
         dataSourceId: '', // 数据源id
@@ -262,7 +268,8 @@ export default {
       this.getSourceDataList()
       this.getUsersList()
       this.previewing = false
-      this.previewText = false
+      this.previewText = ''
+      this.dataSqlSubmiting = false
       this.visible = true
       this.sqlSubmitSuccess = false
       this.$nextTick(() => {
@@ -388,30 +395,50 @@ export default {
     },
     // sql执行预览
     dataSqlSubmit () {
-      this.previewText = true
+      this.previewText = '执行中'
       this.previewing = true
+      this.dataSqlSubmiting = true
+      this.previewTextColor = '#303133'
+      this.dataSqlSubmitTime = 0
       let params = {
         'dataBaseId': this.baseForm.dataBaseId,
         'sql': this.baseForm.sql
       }
+      let that = this
+      that.timer = setInterval(function () {
+        if (that.dataSqlSubmitTime >= 180) {
+          that.previewText = '执行超时,请联系管理员'
+          that.sqlSubmitSuccess = false
+          that.dataSqlSubmiting = false
+          that.previewTextColor = 'red'
+          clearInterval(that.timer)
+        }
+        that.dataSqlSubmitTime = that.dataSqlSubmitTime + 1
+      }, 1000)
       sqlPreview(params).then(({ data }) => {
-        if (data && data.code === 0) {
+        clearInterval(this.timer)
+        if (data && data.code === 0 && this.dataSqlSubmitTime < 180) {
           this.$message({
-            message: '执行成功',
+            message: '查询成功',
             type: 'success',
             duration: 1500,
             onClose: () => {
               this.sqlPreviewDataList = data.data
               sessionStorage.setItem('sqlPreviewDataList', JSON.stringify(data.data || '[]'))
-              this.previewText = false
+              this.previewText = '查询成功'
               this.sqlSubmitSuccess = true
+              this.dataSqlSubmiting = false
             }
           })
         } else {
           sessionStorage.setItem('sqlPreviewDataList', [])
-          this.$message.error(data.msg)
-          this.previewText = false
+          if (this.dataSqlSubmitTime < 180) {
+            this.previewTextColor = 'red'
+            this.$message.error(data.msg)
+            this.previewText = '执行失败：' + data.msg
+          }
           this.sqlSubmitSuccess = false
+          this.dataSqlSubmiting = false
         }
       })
     },
