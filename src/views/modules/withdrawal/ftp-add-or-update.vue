@@ -223,7 +223,7 @@ export default {
             'ftpFileName': ftpFileName.join(','),
             'approveReason': this.baseForm.approveReason,
             'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
-            // 'receiveType': Number(this.baseForm.receiveType)
+            'receiveType': Number(this.baseForm.receiveType)
           }
           saveDataFtp(params).then(({ data }) => {
             if (data && data.code === 0) {
