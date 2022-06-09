@@ -70,8 +70,8 @@
                     <el-button type="primary" :disabled="dataSqlSubmiting" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
                   <el-form-item v-if="previewing">
-                    <span v-if="dataSqlSubmiting">{{previewText}}, 执行时间{{dataSqlSubmitTime}}</span>
-                    <span v-else>{{previewText}},执行时间{{dataSqlSubmitTime}}</span>
+                    <span :style="{color:previewTextColor}">{{previewText}},执行时间&nbsp;&nbsp;{{dataSqlSubmitTime}}s</span>
+                    <!-- <span v-else>{{previewText}}, 执行时间&nbsp;&nbsp;{{dataSqlSubmitTime}}s</span> -->
                     <span>
                       <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>
                       <span v-if="sqlPreviewDataList.length">（随机展示10条数据）</span>
@@ -151,6 +151,7 @@ export default {
       isInnerIP: false,
       dataListLoading: false,
       previewText: '',
+      previewTextColor: '#303133',
       previewing: false,
       activeNames: 1,
       sqlSubmitSuccess: false,
@@ -397,18 +398,20 @@ export default {
       this.previewText = '执行中'
       this.previewing = true
       this.dataSqlSubmiting = true
+      this.previewTextColor = '#303133'
       this.dataSqlSubmitTime = 0
       let params = {
         'dataBaseId': this.baseForm.dataBaseId,
         'sql': this.baseForm.sql
       }
-      // this.$nextTick(() => {
-      console.log(' this.dataSqlSubmitTime: 111', this.dataSqlSubmitTime);
       let that = this
       that.timer = setInterval(function () {
         if (that.dataSqlSubmitTime >= 180) {
           that.previewText = '执行超时,请联系管理员'
-          clearInterval(this.timer)
+          that.sqlSubmitSuccess = false
+          that.dataSqlSubmiting = false
+          that.previewTextColor = 'red'
+          clearInterval(that.timer)
         }
         that.dataSqlSubmitTime = that.dataSqlSubmitTime + 1
       }, 1000)
@@ -430,6 +433,7 @@ export default {
         } else {
           sessionStorage.setItem('sqlPreviewDataList', [])
           if (this.dataSqlSubmitTime < 180) {
+            this.previewTextColor = 'red'
             this.$message.error(data.msg)
             this.previewText = '执行失败：' + data.msg
           }
