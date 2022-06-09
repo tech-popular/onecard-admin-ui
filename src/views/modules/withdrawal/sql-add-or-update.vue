@@ -67,12 +67,14 @@
                     </div>
                   </el-form-item>
                   <el-form-item style="margin-top:10px;">
-                    <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
+                    <el-button type="primary" :disabled="dataSqlSubmiting" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
                   <el-form-item v-if="previewing">
+                    <span v-if="dataSqlSubmiting">{{previewText}} 执行时间{{dataSqlSubmitTime}}</span>
+                    <span v-else>{{previewText}},执行时间{{dataSqlSubmitTime}}</span>
                     <span>
-                      {{previewText ? '正在执行中' : '执行完成' }}
-                      <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
+                      <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>
+                      <span v-if="sqlPreviewDataList.length">（随机展示10条数据）</span>
                     </span>
                   </el-form-item>
                   <div style="margin-left:50px;">
@@ -148,10 +150,13 @@ export default {
       visible: true,
       isInnerIP: false,
       dataListLoading: false,
-      previewText: false,
+      previewText: '',
       previewing: false,
       activeNames: 1,
       sqlSubmitSuccess: false,
+      dataSqlSubmiting: false,
+      dataSqlSubmitTime: 0,
+      timer: null,
       baseForm: {
         id: '',
         dataSourceId: '', // 数据源id
@@ -262,7 +267,9 @@ export default {
       this.getSourceDataList()
       this.getUsersList()
       this.previewing = false
-      this.previewText = false
+      this.previewText = ''
+      this.dataSqlSubmiting = false
+      this.dataSqlSubmitTime = 0
       this.visible = true
       this.sqlSubmitSuccess = false
       this.$nextTick(() => {
@@ -388,13 +395,22 @@ export default {
     },
     // sql执行预览
     dataSqlSubmit () {
-      this.previewText = true
+      this.previewText = '执行中'
       this.previewing = true
+      this.dataSqlSubmiting = true
       let params = {
         'dataBaseId': this.baseForm.dataBaseId,
         'sql': this.baseForm.sql
       }
+      let startTime = Date.now()
       sqlPreview(params).then(({ data }) => {
+        let endTime = Date.now()
+        this.dataSqlSubmitTime = parseInt((endTime - startTime) / 1000)
+        if (this.dataSqlSubmitTime > 60) {
+          this.previewText = '执行超时,请联系管理员'
+          return
+        }
+
         if (data && data.code === 0) {
           this.$message({
             message: '执行成功',
@@ -403,15 +419,17 @@ export default {
             onClose: () => {
               this.sqlPreviewDataList = data.data
               sessionStorage.setItem('sqlPreviewDataList', JSON.stringify(data.data || '[]'))
-              this.previewText = false
+              this.previewText = '执行成功'
               this.sqlSubmitSuccess = true
+              this.dataSqlSubmiting = false
             }
           })
         } else {
           sessionStorage.setItem('sqlPreviewDataList', [])
           this.$message.error(data.msg)
-          this.previewText = false
+          this.previewText = '执行失败：' + data.msg
           this.sqlSubmitSuccess = false
+          this.dataSqlSubmiting = false
         }
       })
     },
