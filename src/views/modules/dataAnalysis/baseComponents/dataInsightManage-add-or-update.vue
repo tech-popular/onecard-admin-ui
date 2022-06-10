@@ -299,11 +299,13 @@
       ref="dataPreviewInfo"
       :vestPackCode="rejectForm.vestPackCode"
     ></data-preview-info>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList = 'taskDependenciesList'></taskDependencies>
   </el-drawer>
 </template>
 <script>
 import userAttrRulePane from './userAttr-rule-pane'
 import userActionRulePane from './userAction-rule-pane'
+import taskDependencies from './task-dependencies'
 // import userBehaviorRulePane from './userBehavior-rule-pane'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
@@ -378,6 +380,8 @@ export default {
         collisionPackId: ''
       },
       collisionPackText: '',
+      taskDependenciesList: [],
+      taskDependenciesVisible: false,
       baseRule: { // 基本信息校验规则
         name: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
@@ -452,7 +456,8 @@ export default {
     Treeselect,
     dataPreviewInfo,
     InputTag,
-    codemirror
+    codemirror,
+    taskDependencies
   },
   methods: {
     init (row, tag, canUpdate) {
@@ -874,6 +879,13 @@ export default {
       })
     },
     saveHandle (type) {
+      if (type === 'save') {
+            this.taskDependenciesVisible = true
+            this.$nextTick(() => {
+              this.$refs.taskDependencies.init()
+            })
+          }
+          return
       if (this.baseForm.userType === 'excel' && !this.excelFile) {
           this.$message({
             type: 'error',
@@ -932,6 +944,7 @@ export default {
           if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
             return false
           }
+      
           if (this.baseForm.userType === 'excel') { // excel方式
             this.excelSaveData()
           } else if (this.baseForm.userType === 'sql') {
