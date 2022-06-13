@@ -41,3 +41,4 @@ export const databaseInitInfo = () => httpGet(da + 'oa/databaseInitInfo') // 库
 export const detailPreviewList = params => httpGet(da + `data/group/formList`, params)
 export const selectDataGroupInfos = params => httpGet(da + 'dataCatalog/selectDataGroupInfos', params) // 分群包
 export const updateUserNum = id => httpGet(da + `data/group/updateUserNum/${id}`) // 刷新
+export const selectTransferTask = id => httpGet(da + `data/group/selectTransferTaskByTemplateId/${id}`) // 流转下发依赖任务

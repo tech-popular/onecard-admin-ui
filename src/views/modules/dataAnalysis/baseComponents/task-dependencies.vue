@@ -2,17 +2,19 @@
   <el-dialog title="流转依赖任务" :modal-append-to-body="false" :append-to-body="true" :visible.sync="visible" width="50%" :close-on-click-modal="false">
     <el-table :data="dataList" height="600px;" border v-loading="dataListLoading" style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" label="任务ID"></el-table-column>
-      <el-table-column prop="englishName" header-align="center" align="center" label="任务名称">
+      <el-table-column prop="transferName" header-align="center" align="center" label="任务名称">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.englishName)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.englishName}}</div>
+            <div v-html="toBreak(scope.row.transferName)" slot="content"></div>
+            <div class="text-to-long-cut">{{scope.row.transferName}}</div>
           </el-tooltip>
         </template>
       </el-table-column>
+      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
+      <el-table-column prop="updateTime" header-align="center" align="center" label="更新时间"></el-table-column>
       <el-table-column prop="enable" header-align="center" align="center" label="任务状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === true" size="small">已完成</el-tag>
+          <el-tag v-if="scope.row.comUpdate === true" size="small">已完成</el-tag>
           <el-tag v-else size="small" type="danger">未完成</el-tag>
         </template>
       </el-table-column>
@@ -24,6 +26,7 @@
   </el-dialog>
 </template>
 <script>
+import { updateDataTransferManage, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
 export default {
   props: {
     // 父组件传来的值需定义一下
@@ -43,7 +46,19 @@ export default {
       this.visible = true
     },
     saveHandle () {
-
+      this.dataList.forEach(item => {
+        infoDataTransferManage(item.id).then(({ data }) => {
+          console.log('data:222 ', data);
+          if (data.status === '1' && data.data) {
+            updateDataTransferManage(data.data).then(({ res }) => {
+              console.log('res3333: ', res);
+              if (res.status === '1') {
+                item.comUpdate = true
+              }
+            })
+          }
+        })
+      })
     },
     cancelHandle () {
       this.visible = false
