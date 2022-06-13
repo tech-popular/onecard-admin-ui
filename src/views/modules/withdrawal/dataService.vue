@@ -123,6 +123,12 @@ export default {
       exportDataList(params).then(({ data }) => {
         console.log('res: ', data)
         if (data.code === 0 && data.data) {
+          data.data.list.forEach(element => {
+            if (element.typeDesc === 'ftp提数') {
+              element.remainDay = ''
+              element.receiveDays = ''
+            }
+          })
           this.dataList = data.data.list
           this.totalPage = data.data.totalCount
           this.dataListLoading = false

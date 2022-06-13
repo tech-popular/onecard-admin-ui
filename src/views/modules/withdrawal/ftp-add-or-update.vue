@@ -166,7 +166,7 @@ export default {
     },
     filterNode (value, data, node) {
       if (!value) return true
-      return data.typeValue && data.typeValue.indexOf(value) !== -1
+      return data.fileName && data.fileName.indexOf(value) !== -1
     },
     getFtpTableList () {
       this.dataListLoading = true
@@ -421,6 +421,9 @@ export default {
     justify-content: center;
     width: 100%;
     padding: 6px;
+  }
+  .el-tree__empty-block {
+    width: 290px;
   }
 }
 </style>
