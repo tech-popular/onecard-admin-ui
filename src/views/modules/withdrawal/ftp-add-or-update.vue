@@ -181,6 +181,7 @@ export default {
           this.totalPage = data.data.totalPage
           this.dataListLoading = false
         } else {
+          this.$message.error(data.msg)
           this.dataList = []
           this.dataListLoading = false
         }
@@ -189,7 +190,7 @@ export default {
     // 多选
     handleSelectionChange (val) {
       this.multipleSelection = val
-      console.log('this.multipleSelection: ', this.multipleSelection);
+      console.log('this.multipleSelection: ', this.multipleSelection)
     },
     // 每页数
     sizeChangeHandle (val) {

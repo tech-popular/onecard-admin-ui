@@ -1,23 +1,24 @@
 <template>
   <div class="mod-config" v-loading="dataListLoading">
     <div class="dingding-preview-title">查询结果</div>
-    <el-table :data="dataList" border style="width: 100%" :header-cell-style="{background:'#cceaf9'}">
-      <template v-for="(item,index) in columns">
-        <el-table-column :prop="item.prop" :key="index" :label="item.label" :align="item.align"></el-table-column>
-      </template>
-    </el-table>
+    <div v-for="(item,index) in tableList" :key="index" style="margin-bottom:30px;">
+      <h3 style="margin-left: 30px;">文件名称：{{item.fileName}}</h3>
+      <el-table :data="item.dataList" border style="width: 100%;" :header-cell-style="{background:'#cceaf9'}">
+        <template v-for="(citem,cindex) in item.columns">
+          <el-table-column :prop="citem.prop" :key="cindex" :label="citem.label" :align="citem.align"></el-table-column>
+        </template>
+      </el-table>
+    </div>
   </div>
 </template>
-<style>
-</style>
 <script>
 // import { dingDingPreview } from '@/api/withdrawal/datareport'
 export default {
   data () {
     return {
-      dataList: [],
+      tableList: [],
+      // dataList: [],
       dataListLoading: false,
-      columns: []
     }
   },
   activated () {
@@ -29,9 +30,9 @@ export default {
   methods: {
     // 获取数据列表
     getDataList () {
-      this.columns = []
       this.dataListLoading = true
       let id = this.$route.query.id
+      this.tableList = []
       this.$http({
         url: this.$http.adornUrl(`/export/data/ftp/preview/${id}`),
         method: 'get',
@@ -39,18 +40,36 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           let reportData = data.data
-          let columnsData = Object.keys(reportData[0])
-          columnsData.forEach(item => {
-            this.columns.push({
-              label: item,
-              prop: item,
-              align: 'center'
+          reportData.forEach(item => {
+            let columnData = {
+              fileName: '',
+              dataList: [],
+              columns: []
+            }
+            item.forEach((citem, cindex) => {
+              if (cindex === 0) {
+                columnData.fileName = citem.fileName
+              } else if (cindex === 1) {
+                let columnsData = Object.keys(citem)
+                let columns = []
+                columnsData.forEach(eitem => {
+                  columns.push({
+                    label: eitem,
+                    prop: eitem,
+                    align: 'center'
+                  })
+                })
+                columnData.columns = columns
+              } else {
+                columnData.dataList.push(citem)
+              }
             })
+            this.tableList.push(columnData)
           })
-          this.dataList = reportData
           this.dataListLoading = false
         } else {
-          this.dataList = []
+          this.$message.error(data.msg)
+          this.tableList = []
           this.dataListLoading = false
         }
       })
@@ -59,6 +78,10 @@ export default {
 }
 </script>
 <style scoped>
+.mod-config {
+  margin-left: 10px;
+  margin-right: 10px;
+}
 .dingding-preview-title {
   padding: 14px;
   background: #c3c3c3;
