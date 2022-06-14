@@ -841,9 +841,15 @@ export default {
                   this.$nextTick(() => {
                     this.$refs.taskDependencies.init()
                   })
+                } else {
+                  this.savueData(type)
                 }
               } else {
                 this.taskDependenciesList = []
+                return this.$message({
+                  type: 'error',
+                  message: data.message || '数据异常'
+                })
               }
             })
           } else {

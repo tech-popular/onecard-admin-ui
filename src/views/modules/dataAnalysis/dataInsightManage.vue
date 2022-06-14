@@ -214,7 +214,7 @@ export default {
             })
           }
           if (data.data.dataTransfers.length || data.data.templateIds) {
-            const h = this.$createElement;
+            const h = this.$createElement
             this.$msgbox({
               title: '提示',
               message: h('p', null, [
@@ -224,7 +224,7 @@ export default {
               ]),
               // this.$mess(`请先对[id=${taskIds.join(',')}]的流转任务进行删除操作?`, '提示', {
               confirmButtonText: '确定',
-              cancelButtonText: '取消',
+              cancelButtonText: '取消'
               // type: 'warning'
             }).then(() => { })
           } else {
