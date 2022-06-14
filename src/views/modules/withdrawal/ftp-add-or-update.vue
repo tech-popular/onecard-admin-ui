@@ -6,17 +6,18 @@
     </div>
     <div class="wrap">
       <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-width="80px" ref="baseForm" class="base-form">
+        <h3>目录</h3>
         <div class="base-pane">
           <div style="display:flex">
             <div style="width:30%">
-              <h3>目录</h3>
               <div class="dimension-tree">
                 <el-input class="code-select" placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
-                <el-tree
+                <!-- <el-tree
                   class="filter-tree"
                   node-key="id"
-                  :data="dataTree"
                   :props="defaultProps"
+                  :load="loadNode"
+                  lazy
                   default-expand-all
                   :current-node-key="currentLivingId"
                   :expand-on-click-node="false"
@@ -24,7 +25,8 @@
                   highlight-current
                   @node-click="treeNodeClick"
                   ref="tree"
-                ></el-tree>
+                ></el-tree>-->
+                <el-tree class="filter-tree" node-key="id" :props="defaultProps" :load="loadNode" lazy :filter-node-method="filterNode" @node-click="treeNodeClick" ref="tree"></el-tree>
               </div>
             </div>
             <div style="width:70%">
@@ -134,20 +136,41 @@ export default {
     init () {
       this.getUsersList()
       this.visible = true
-      getFtpMenuLis().then(({ data }) => {
-        console.log('data: ', data)
-        if (data && data.code === 0) {
-          this.dataTree[0].children = data.data.dataList
-          this.treeNodeClick(data.data.dataList[0])
-          this.currentLivingId = data.data.dataList[0].fileName
-          this.$nextTick(() => {
-            this.$refs.tree.setCurrentKey(this.currentLivingId)
-          })
-        }
-      })
       this.$nextTick(() => {
         this.$refs['baseForm'].resetFields()
       })
+    },
+    loadNode (node, resolve) {
+      console.log('resolve:111 ', resolve);
+      console.log('111: ', 111);
+      console.log('node: ', node);
+      if (node.level === 0) {
+        this.getTreeData('', resolve)
+        // return resolve([{ name: 'region' }]);
+      } else {
+        this.getTreeData(node, resolve)
+      }
+    },
+    // },
+    getTreeData (node, resolve) {
+      let params = {
+        path: node.data ? node.data.path : ''
+      }
+      getFtpMenuLis(params).then(({ data }) => {
+        console.log('data: ', data)
+        if (data && data.code === 0) {
+          // this.dataTree[0].children = data.data
+          return resolve(data.data)
+          // this.treeNodeClick(data.data[0])
+          // this.currentLivingId = data.data[0].fileName
+          // this.$nextTick(() => {
+          //   this.$refs.tree.setCurrentKey(this.currentLivingId)
+          // })
+        } else {
+          return resolve([])
+        }
+      })
+
     },
     // 获取用户同一租户下的列表
     getUsersList () {
@@ -161,6 +184,7 @@ export default {
     },
     // 选择文件
     treeNodeClick (data, node) {
+      console.log('data: 2222', data);
       this.selecttreeData = data
       this.getFtpTableList()
     },

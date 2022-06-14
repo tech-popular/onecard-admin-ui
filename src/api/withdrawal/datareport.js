@@ -18,6 +18,6 @@ export const saveDatabySql = params => httpPost(da + 'export/data/bySql', params
 export const approveRenewal = params => httpGet(da + 'export/data/approveRenewal', params) // 申请延长期限
 export const approveDisable = id => httpGet(da + `export/data/disable/${id}`) // 申请失效
 // ftp
-export const getFtpMenuLis = () => httpGet(da + 'export/data/getFtpMenuList')
+export const getFtpMenuLis = params => httpGet(da + 'export/data/getFtpMenuList', params)
 export const getFtpDataList = params => httpGet(da + 'export/data/getFtpDataList', params)
 export const saveDataFtp = params => httpPost(da + 'export/data/byFtp', params)
