@@ -193,7 +193,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
-    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList"></taskDependencies>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @savueData = 'savueData'></taskDependencies>
   </el-drawer>
 </template>
 <script>
@@ -836,7 +836,6 @@ export default {
             selectTransferTask(this.id).then(({ data }) => {
               if (data.status === '1' && data.data) {
                 this.taskDependenciesList = data.data.dataTransfers
-                console.log('data.data.dataTransfers: ', data.data.dataTransfers);
                 if (this.taskDependenciesList.length) {
                   this.taskDependenciesVisible = true
                   this.$nextTick(() => {
@@ -848,16 +847,19 @@ export default {
               }
             })
           } else {
-            if (this.baseForm.userType === 'excel') { // excel方式
+           this.savueData(type)
+          }
+        }
+      })
+    },
+    savueData(type) {
+       if (this.baseForm.userType === 'excel') { // excel方式
               this.excelSaveData()
             } else if (this.baseForm.userType === 'sql') {
               this.saveSql()
             } else {
               this.indexSaveData(type)
             }
-          }
-        }
-      })
     },
     indexSaveData (type) {
       let code = 0
