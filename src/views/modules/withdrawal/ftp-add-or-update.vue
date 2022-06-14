@@ -12,21 +12,20 @@
             <div style="width:30%">
               <div class="dimension-tree">
                 <el-input class="code-select" placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
-                <!-- <el-tree
+                <el-tree
                   class="filter-tree"
                   node-key="id"
                   :props="defaultProps"
                   :load="loadNode"
                   lazy
-                  default-expand-all
-                  :current-node-key="currentLivingId"
                   :expand-on-click-node="false"
+                  :current-node-key="currentLivingId"
                   :filter-node-method="filterNode"
                   highlight-current
                   @node-click="treeNodeClick"
                   ref="tree"
-                ></el-tree>-->
-                <el-tree class="filter-tree" node-key="id" :props="defaultProps" :load="loadNode" lazy :filter-node-method="filterNode" @node-click="treeNodeClick" ref="tree"></el-tree>
+                ></el-tree>
+                <!-- <el-tree class="filter-tree" node-key="id" :props="defaultProps" :load="loadNode" lazy :filter-node-method="filterNode" @node-click="treeNodeClick" ref="tree"></el-tree> -->
               </div>
             </div>
             <div style="width:70%">
@@ -141,9 +140,6 @@ export default {
       })
     },
     loadNode (node, resolve) {
-      console.log('resolve:111 ', resolve);
-      console.log('111: ', 111);
-      console.log('node: ', node);
       if (node.level === 0) {
         this.getTreeData('', resolve)
         // return resolve([{ name: 'region' }]);
@@ -159,18 +155,11 @@ export default {
       getFtpMenuLis(params).then(({ data }) => {
         console.log('data: ', data)
         if (data && data.code === 0) {
-          // this.dataTree[0].children = data.data
-          return resolve(data.data)
-          // this.treeNodeClick(data.data[0])
-          // this.currentLivingId = data.data[0].fileName
-          // this.$nextTick(() => {
-          //   this.$refs.tree.setCurrentKey(this.currentLivingId)
-          // })
+          return resolve(data.menuList)
         } else {
           return resolve([])
         }
       })
-
     },
     // 获取用户同一租户下的列表
     getUsersList () {
@@ -184,7 +173,6 @@ export default {
     },
     // 选择文件
     treeNodeClick (data, node) {
-      console.log('data: 2222', data);
       this.selecttreeData = data
       this.getFtpTableList()
     },
@@ -448,6 +436,9 @@ export default {
   }
   .el-tree__empty-block {
     width: 290px;
+  }
+  .filter-tree {
+    width: 100%;
   }
 }
 </style>
