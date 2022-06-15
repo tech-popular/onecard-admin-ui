@@ -13,6 +13,7 @@
               <div class="dimension-tree">
                 <!-- <el-input class="code-select" placeholder="输入关键字进行过滤" v-model="filterText"></el-input> -->
                 <el-tree
+                  v-if="treeVisible"
                   class="filter-tree"
                   node-key="id"
                   :props="defaultProps"
@@ -85,6 +86,7 @@ export default {
       loading: false,
       visible: true,
       isInnerIP: false,
+      treeVisible: false,
       dataTree: [
         {
           id: 0,
@@ -130,24 +132,27 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
+  mounted () {
+    this.treeVisible = false
+  },
   methods: {
     // 打开抽屉弹窗
     init () {
       this.getUsersList()
+      this.dataList = []
       this.visible = true
       this.$nextTick(() => {
+        this.treeVisible = true
         this.$refs['baseForm'].resetFields()
       })
     },
     loadNode (node, resolve) {
       if (node.level === 0) {
         this.getTreeData('', resolve)
-        // return resolve([{ name: 'region' }]);
       } else {
         this.getTreeData(node, resolve)
       }
     },
-    // },
     getTreeData (node, resolve) {
       let params = {
         path: node.data ? node.data.path : ''
@@ -248,6 +253,7 @@ export default {
                   this.$emit('refreshDataList')
                   this.$refs['baseForm'].resetFields()
                   this.visible = false
+                  this.treeVisible = false
                 }
               })
             } else {
@@ -260,11 +266,13 @@ export default {
     // 关闭抽屉弹窗
     drawerClose () {
       this.visible = false
+      this.treeVisible = false
       this.$parent.addOrUpdateVisible = false
     },
     // 关闭
     cancelHandle () {
       this.visible = false
+      this.treeVisible = false
       this.$parent.addOrUpdateVisible = false
     }
   }
