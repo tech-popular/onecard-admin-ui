@@ -193,7 +193,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
-    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @savueData = 'savueData'></taskDependencies>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @savueData = 'savueData'></taskDependencies>
   </el-drawer>
 </template>
 <script>
@@ -745,7 +745,7 @@ export default {
       //   console.log('cancel')
       // })
     },
-    saveCollision () {
+    saveCollision (callback) {
       let url = collisionSave
       let params = this.collisionData
       params.forEach(item => {
@@ -766,11 +766,22 @@ export default {
           return this.$message.error(data.message || data.msg || '提交失败')
         }
         this.$message.success(data.message)
-        this.visible = false
-        this.$parent.addOrUpdateVisible = false
-        this.$nextTick(() => {
-          this.$parent.getDataList()
-        })
+        if (callback) {
+          callback(data)
+        } else {
+          this.visible = false
+          this.$parent.addOrUpdateVisible = false
+          this.$nextTick(() => {
+            this.$parent.getDataList()
+          })
+        }
+      })
+    },
+    updateClosed () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
+      this.$nextTick(() => {
+        this.$parent.getDataList()
       })
     },
     saveHandle (type) {
@@ -842,7 +853,7 @@ export default {
                     this.$refs.taskDependencies.init()
                   })
                 } else {
-                  this.savueData(type)
+                  this.savueData(type, true)
                 }
               } else {
                 this.taskDependenciesList = []
@@ -853,21 +864,21 @@ export default {
               }
             })
           } else {
-           this.savueData(type)
+           this.savueData(type, true)
           }
         }
       })
     },
-    savueData(type) {
-       if (this.baseForm.userType === 'excel') { // excel方式
-              this.excelSaveData()
-            } else if (this.baseForm.userType === 'sql') {
-              this.saveSql()
-            } else {
-              this.indexSaveData(type)
-            }
+    savueData(type, callback) {
+      if (this.baseForm.userType === 'excel') { // excel方式
+        this.excelSaveData(callback)
+      } else if (this.baseForm.userType === 'sql') {
+        this.saveSql(callback)
+      } else {
+        this.indexSaveData(type, callback)
+      }
     },
-    indexSaveData (type) {
+    indexSaveData (type, callback) {
       let code = 0
       if (this.rejectForm.rejectGroupPackageIds.length) {
         code = 1
@@ -914,11 +925,11 @@ export default {
           })
         } else {
           this.id = data.data
-          this.saveCollision()
+          this.saveCollision(callback)
         }
       })
     },
-    excelSaveData () {
+    excelSaveData (callback) {
       let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
       data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
       data.append('name', this.baseForm.name)
@@ -951,7 +962,7 @@ export default {
           this.loading = false
         } else {
           this.id = res.data.data
-          this.saveCollision()
+          this.saveCollision(callback)
         }
       }).catch((e) => {
         this.$message({
@@ -960,7 +971,7 @@ export default {
         })
       })
     },
-    saveSql () {
+    saveSql (callback) {
       let code = 0
       if (this.rejectForm.rejectGroupPackageIds.length) {
         code = 1
@@ -1000,7 +1011,7 @@ export default {
           this.loading = false
         } else {
           this.id = res.data.data
-          this.saveCollision()
+          this.saveCollision(callback)
         }
       })
     },
