@@ -11,7 +11,7 @@
           <div style="display:flex">
             <div style="width:30%">
               <div class="dimension-tree">
-                <el-input class="code-select" placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+                <!-- <el-input class="code-select" placeholder="输入关键字进行过滤" v-model="filterText"></el-input> -->
                 <el-tree
                   class="filter-tree"
                   node-key="id"
@@ -190,7 +190,7 @@ export default {
       getFtpDataList(params).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataList = data.data.dataList
-          this.totalPage = data.data.totalPage
+          this.totalPage = data.data.totalCount
           this.dataListLoading = false
         } else {
           this.$message.error(data.msg)

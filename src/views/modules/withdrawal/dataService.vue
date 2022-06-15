@@ -11,7 +11,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="getDataList()">查询</el-button>
+        <el-button type="primary" @click="searchData()">查询</el-button>
         <el-button type="primary" @click="addOrUpdateSqlHandle">SQL提数申请</el-button>
         <el-button type="primary" @click="addOrUpdateFtpHandle">FTP提数申请</el-button>
       </el-form-item>
@@ -60,8 +60,8 @@
             v-if="scope.row.typeDesc === 'sql提数' && scope.row.enable === 0 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'"
             @click="renewalHandle(scope.row)"
           >申请续期</el-button>
-          <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 1 && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
-          <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 0  && scope.row.approveStatus === 'agree'" @click="renewalHandle(scope.row)">申请续期</el-button>
+          <!-- <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 1 && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
+          <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 0  && scope.row.approveStatus === 'agree'" @click="renewalHandle(scope.row)">申请续期</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -147,6 +147,10 @@ export default {
     // 当前页
     currentChangeHandle (val) {
       this.pageIndex = val
+      this.getDataList()
+    },
+    searchData () {
+      this.pageIndex = 1
       this.getDataList()
     },
     // 新增 / 修改
