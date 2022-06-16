@@ -843,7 +843,7 @@ export default {
           if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
             return false
           }
-          if (this.id) {
+          if (this.id && type === 'save') {
             selectTransferTask(this.id).then(({ data }) => {
               if (data.status === '1' && data.data) {
                 this.taskDependenciesList = data.data.dataTransfers
