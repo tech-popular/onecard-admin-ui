@@ -218,7 +218,7 @@ export default {
             this.$msgbox({
               title: '提示',
               message: h('p', null, [
-                h('p', null, '删除操作将对以下任务产生影响'),
+                h('p', { style: 'color: red' }, '以下任务正在使用，无法删除!'),
                 h('p', null, `分群任务ID：${data.data.templateIds.length ? data.data.templateIds.join(',') : '无'}`),
                 h('p', null, `流转任务ID：${taskIds.length ? taskIds.join(',') : '无'}`)
               ]),
