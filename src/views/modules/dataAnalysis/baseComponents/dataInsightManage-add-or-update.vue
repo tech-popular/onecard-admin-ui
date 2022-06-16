@@ -853,7 +853,7 @@ export default {
                     this.$refs.taskDependencies.init()
                   })
                 } else {
-                  this.savueData(type, true)
+                  this.savueData(type)
                 }
               } else {
                 this.taskDependenciesList = []
@@ -864,7 +864,7 @@ export default {
               }
             })
           } else {
-           this.savueData(type, true)
+           this.savueData(type)
           }
         }
       })

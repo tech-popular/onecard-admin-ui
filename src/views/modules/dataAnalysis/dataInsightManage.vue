@@ -219,8 +219,8 @@ export default {
               title: '提示',
               message: h('p', null, [
                 h('p', null, '删除操作将对以下任务产生影响'),
-                h('p', null, `分群任务：${data.data.templateIds.length ? data.data.templateIds.join(',') : '无'}`),
-                h('p', null, `流转任务：${taskIds.length ? taskIds.join(',') : '无'}`)
+                h('p', null, `分群任务ID：${data.data.templateIds.length ? data.data.templateIds.join(',') : '无'}`),
+                h('p', null, `流转任务ID：${taskIds.length ? taskIds.join(',') : '无'}`)
               ]),
               // this.$mess(`请先对[id=${taskIds.join(',')}]的流转任务进行删除操作?`, '提示', {
               confirmButtonText: '确定',
