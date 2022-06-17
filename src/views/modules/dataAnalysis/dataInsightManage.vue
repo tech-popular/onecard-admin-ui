@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import { dataInsightManageList, deleteDataInfo, updateUserNum } from '@/api/dataAnalysis/dataInsightManage'
+import { dataInsightManageList, deleteDataInfo, updateUserNum, selectTransferTask } from '@/api/dataAnalysis/dataInsightManage'
 import AddOrUpdate from './baseComponents/dataInsightManage-add-or-update'
 import TableShow from './baseComponents/tableShow'
 import TableShow1 from './baseComponents/tableShow1'
@@ -205,28 +205,58 @@ export default {
     },
     // 删除
     deleteHandle (row) {
-      this.$confirm(`确认删除分群名称为【${row.name}】的数据?`, '提示', {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleteDataInfo(row.id).then(({ data }) => {
-          if (data.status !== '1') {
-            return this.$message({
-              type: 'error',
-              message: data.message
+      let taskIds = []
+      selectTransferTask(row.id).then(({ data }) => {
+        if (data.status === '1' && data.data) {
+          if (data.data.dataTransfers.length) {
+            data.data.dataTransfers.forEach(element => {
+              taskIds.push(element.id)
             })
           }
-          this.$message({
-            type: 'success',
+          if (data.data.dataTransfers.length || data.data.templateIds.length) {
+            const h = this.$createElement
+            this.$msgbox({
+              title: '提示',
+              message: h('p', null, [
+                h('p', { style: 'color: red' }, '以下任务正在使用，无法删除!'),
+                h('p', null, `分群任务ID：${data.data.templateIds.length ? data.data.templateIds.join(',') : '无'}`),
+                h('p', null, `流转任务ID：${taskIds.length ? taskIds.join(',') : '无'}`)
+              ]),
+              // this.$mess(`请先对[id=${taskIds.join(',')}]的流转任务进行删除操作?`, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消'
+              // type: 'warning'
+            }).then(() => { })
+          } else {
+            this.$confirm(`确认删除分群名称为【${row.name}】的数据?`, '提示', {
+              confirmButtonText: '删除',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              deleteDataInfo(row.id).then(({ data }) => {
+                if (data.status !== '1') {
+                  return this.$message({
+                    type: 'error',
+                    message: data.message
+                  })
+                }
+                this.$message({
+                  type: 'success',
+                  message: data.message
+                })
+                this.getDataList()
+              })
+            })
+          }
+        } else {
+          return this.$message({
+            type: 'error',
             message: data.message
           })
-          this.getDataList()
-        })
-      }).catch(() => {
-        // console.log('quxiao')
+        }
       })
     },
+
     /** 查询 */
     searchHandle () {
       this.pageNum = 1

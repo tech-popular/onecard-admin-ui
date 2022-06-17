@@ -1,12 +1,5 @@
 <template>
-  <el-drawer
-    :append-to-body="false"
-    :visible.sync="visible"
-    :show-close="false"
-    :wrapperClosable="false"
-    size="1350px"
-    class="insight-manage-drawer"
-  >
+  <el-drawer :append-to-body="false" :visible.sync="visible" :show-close="false" :wrapperClosable="false" size="1350px" class="insight-manage-drawer">
     <div slot="title" class="drawer-title">
       {{drawerTitle}}
       <i class="el-icon-close drawer-close" @click="drawerClose"></i>
@@ -14,68 +7,30 @@
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3 ref="baseTitle">基本信息</h3>
-        <el-form
-          label-width="120px"
-          :model="baseForm"
-          ref="baseForm"
-          :rules="baseRule"
-          class="base-form"
-          :disabled="!canUpdate"
-        >
+        <el-form label-width="120px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form" :disabled="!canUpdate">
           <el-form-item label="分群名称" prop="name">
-            <el-input
-              v-model.trim="baseForm.name"
-              placeholder="分群名称"
-              clearable
-              class="base-pane-item"
-            />
+            <el-input v-model.trim="baseForm.name" placeholder="分群名称" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item label="分群类型" prop="userType" :class="baseForm.userType === 'excel' ? 'type-radio-item-userType-active' : 'type-radio-item-userType'">
             <div class="type-radio-item type-radio-one">
-              <el-radio
-                label="indicator"
-                v-model="baseForm.userType"
-                @change="radioTypeChange"
-                :disabled="!!id"
-              >指标筛选</el-radio>
+              <el-radio label="indicator" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">指标筛选</el-radio>
               <div v-if="baseForm.userType === 'indicator'" class="indicator-channel">
                 <el-form-item label="所属业务线" prop="channelId" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
-                <!-- multiple
-                  :multiple-limit = "channelLimit" -->
-                <el-select
-                  v-model="baseForm.channelId"
-                  @change="channelIdChange"
-                  filterable
-                  :disabled="!!id"
-                  style="width: 400px"
-                >
-                  <template v-for="(item, index) in channelList">
-                    <el-option
-                      :key="index"
-                      :label="item.text"
-                      :value="item.value"
-                      :disabled="item.disabled"
-                    ></el-option>
-                  </template>
-                </el-select>
+                  <!-- multiple
+                  :multiple-limit = "channelLimit"-->
+                  <el-select v-model="baseForm.channelId" @change="channelIdChange" filterable :disabled="!!id" style="width: 400px">
+                    <template v-for="(item, index) in channelList">
+                      <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
+                    </template>
+                  </el-select>
                 </el-form-item>
               </div>
             </div>
             <div class="type-radio-item type-radio-two">
-              <el-radio
-                label="excel"
-                v-model="baseForm.userType"
-                @change="radioTypeChange"
-                :disabled="!!id"
-              >excel文件导入</el-radio>
+              <el-radio label="excel" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">excel文件导入</el-radio>
             </div>
           </el-form-item>
-          <el-form-item
-            label="所属业务线"
-            prop="channelId"
-            v-if="baseForm.userType === 'excel'"
-            class="user-channel"
-          >
+          <el-form-item label="所属业务线" prop="channelId" v-if="baseForm.userType === 'excel'" class="user-channel">
             <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px" @change="channelIdChange" filterable>
               <template v-for="(item, index) in channelList">
                 <el-option :key="index" :label="item.text" :value="item.value"></el-option>
@@ -96,56 +51,32 @@
             >
               <el-button slot="trigger" size="small" type="default" icon="el-icon-document">选择文件</el-button>
             </el-upload>
-            <el-button
-              v-if="baseForm.userType === 'excel'"
-              class="btn-download"
-              size="small"
-              type="primary"
-              icon="el-icon-download"
-            >
+            <el-button v-if="baseForm.userType === 'excel'" class="btn-download" size="small" type="primary" icon="el-icon-download">
               <a :href="templateUrl">下载模板</a>
             </el-button>
           </el-form-item>
           <el-form-item>
             <div class="type-radio-item type-radio-three">
-              <el-radio
-                label="sql"
-                v-model="baseForm.userType"
-                @change="radioTypeChange"
-                :disabled="!!id"
-              >SQL</el-radio>
+              <el-radio label="sql" v-model="baseForm.userType" @change="radioTypeChange" :disabled="!!id">SQL</el-radio>
             </div>
           </el-form-item>
-           <el-form-item
-            label="所属业务线"
-            prop="channelId"
-            v-if="baseForm.userType === 'sql'"
-            label-width="110px;"
-            class="user-channel"
-          >
+          <el-form-item label="所属业务线" prop="channelId" v-if="baseForm.userType === 'sql'" label-width="110px;" class="user-channel">
             <el-select v-model="baseForm.channelId" :disabled="!!id" style="width: 300px" @change="channelIdChange" filterable>
               <template v-for="(item, index) in channelList">
                 <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
               </template>
             </el-select>
           </el-form-item>
-          <div  v-if="baseForm.userType === 'sql'" class="work-type-pane-source">
+          <div v-if="baseForm.userType === 'sql'" class="work-type-pane-source">
             <el-form-item prop="datasourceType" label="数据来源">
               <el-select v-model="baseForm.datasourceType" style="width:300px;">
-                <el-option label="maxComputer" value="maxComputer">
-                </el-option>
+                <el-option label="maxComputer" value="maxComputer"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="tableSpace" label="表空间">
-            <el-select v-model="baseForm.tableSpace" style="width:300px;">
-              <el-option 
-                v-for="(item,index) in tableSpaceList"
-                :key="index"
-                :label="item.value"
-                :value="item.value"
-                >
-              </el-option>
-            </el-select>
+              <el-select v-model="baseForm.tableSpace" style="width:300px;">
+                <el-option v-for="(item,index) in tableSpaceList" :key="index" :label="item.value" :value="item.value"></el-option>
+              </el-select>
             </el-form-item>
           </div>
           <el-form-item class="user-channel" v-if="baseForm.userType === 'sql'" prop="sql" label="SQL：" label-width="70px" ref="workBeginSqlForm">
@@ -160,52 +91,41 @@
                 style="padding-bottom: 0px"
               ></codemirror>
             </div>
-            <p class="data-description-tips">
-             默认选中sql语句中输出的第一个字段作为映射字段
-            </p>
+            <p class="data-description-tips">默认选中sql语句中输出的第一个字段作为映射字段</p>
           </el-form-item>
           <el-form-item v-if="baseForm.userType === 'sql'" prop="outParam" label="输出数据" style="margin-left:80px;">
-            <el-radio  v-model="baseForm.outParam" label="uuid">uuid</el-radio>
-            <el-radio  v-model="baseForm.outParam" label="user_id" >user_id</el-radio>
-            <el-radio  v-model="baseForm.outParam" label="cert_id">cert_id</el-radio>
-            <el-radio  v-model="baseForm.outParam" label="mobile">mobile</el-radio>
+            <el-radio v-model="baseForm.outParam" label="uuid">uuid</el-radio>
+            <el-radio v-model="baseForm.outParam" label="user_id">user_id</el-radio>
+            <el-radio v-model="baseForm.outParam" label="cert_id">cert_id</el-radio>
+            <el-radio v-model="baseForm.outParam" label="mobile">mobile</el-radio>
           </el-form-item>
           <el-form-item label="计算类型" prop="type">
-            <el-radio-group
-              v-model="baseForm.type"
-              :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'sql'"
-            >
+            <el-radio-group v-model="baseForm.type" :disabled="!!id || baseForm.userType === 'excel'|| baseForm.userType === 'sql'">
               <el-radio label="dynamic">动态（根据每次下发或调用的时间计算）</el-radio>
               <el-radio label="static">静态（根据创建/修改分群的时间计算）</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="分群描述">
-            <el-input
-              type="textarea"
-              class="base-pane-item"
-              v-model="baseForm.desc"
-              placeholder="最多输入100个字符"
-              maxlength="100"
-              :autosize="{ minRows: 3, maxRows: 5}"
-            />
+            <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
             <p class="data-description-tips">
               最多输入100个字符，您还可以输入
               <span v-text="100 - baseForm.desc.length"></span>个字符
             </p>
           </el-form-item>
         </el-form>
-
       </div>
-      <div class="pane-rules-title"> <h3>满足如下条件的用户</h3> </div>
+      <div class="pane-rules-title">
+        <h3>满足如下条件的用户</h3>
+      </div>
       <div class="pane-rules">
-          <div class="pane-rules-relation" v-if="showActionRule && showAtterRule">
-             <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
-          </div>
-           <div style="flex: 1">
-               <user-attr-rule-pane ref="userAttrRule" :id="id" :canUpdate="canUpdate" @renderEnd="renderEnd" @isShowAttrRule="isShowAttrRule"></user-attr-rule-pane>
-               <!-- 暂时隐藏用户行为 -->
-               <!-- <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowActionRule="isShowActionRule"></user-action-rule-pane> -->
-           </div>
+        <div class="pane-rules-relation" v-if="showActionRule && showAtterRule">
+          <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
+        </div>
+        <div style="flex: 1">
+          <user-attr-rule-pane ref="userAttrRule" :id="id" :canUpdate="canUpdate" @renderEnd="renderEnd" @isShowAttrRule="isShowAttrRule"></user-attr-rule-pane>
+          <!-- 暂时隐藏用户行为 -->
+          <!-- <user-action-rule-pane ref="userActionRule" :id="id" @renderEnd="renderEnd" @isShowActionRule="isShowActionRule"></user-action-rule-pane> -->
+        </div>
       </div>
       <div class="pane-reject">
         <h3>剔除用户名单</h3>
@@ -213,22 +133,12 @@
           <el-form label-width="80px" :model="rejectForm" :rules="baseRule" ref="rejectForm" :disabled="!canUpdate">
             <el-form-item label="分群包">
               <el-select v-model="rejectForm.rejectGroupPackageIds" filterable multiple placeholder="请选择分群包" class="reject-pane-item">
-                <el-option
-                  v-for="item in custerNameList"
-                  :key="item.value"
-                  :label="item.text"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in custerNameList" :key="item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="风控包">
               <el-select v-model="rejectForm.vestPackCode" filterable multiple placeholder="请选择风控包" class="reject-pane-item">
-                <el-option
-                  v-for="item in vestPackList"
-                  :key="item.value"
-                  :label="item.text"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in vestPackList" :key="item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
               <el-tooltip placement="top">
                 <div slot="content">因风控包需调用第三方接口，当判断指定用户是否在此分群时，不进行风控包过滤</div>
@@ -237,26 +147,30 @@
             </el-form-item>
             <el-form-item label="撞库包">
               <el-select v-model="rejectForm.collisionPackId" filterable clearable @clear="collisionPackIdClear" @change="collisionPackIdChange" placeholder="请选择撞库包" class="reject-pane-item">
-                <el-option
-                  v-for="item in collisionList"
-                  :key="item.value"
-                  :label="item.text"
-                  :value="item.value">
-                </el-option>
+                <el-option v-for="item in collisionList" :key="item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <div style="display:flex;width:100%" v-if="collisionData.length">
               <div style="width:160px;text-align:right;padding-right:10px;">{{collisionPackText}}</div>
               <el-card class="box-card" shadow="never" style="width:560px">
-                <el-form-item :label="item.paramTitle" :prop="item.paramName" v-for="(item, index) in collisionData" :key="index" :rules="{ required: true, message: item.allowMulti && !item.isEnum ? `请输入${item.paramTitle}，可用回车输入多条` : '请选择' + item.paramTitle, trigger: 'change' }">
-                  <input-tag v-model="rejectForm[item.paramName]" v-if="item.allowMulti && !item.isEnum" :tag-tips=[] :add-tag-on-blur="true" :allow-duplicates="true" class="inputTag reject-pane-item1" :placeholder="`请输入${item.paramTitle}，可用回车输入多条`"></input-tag>
-                  <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle"  class="reject-pane-item1">
-                    <el-option
-                      v-for="citem in item.options"
-                      :key="citem.value"
-                      :label="citem.text"
-                      :value="citem.value">
-                    </el-option>
+                <el-form-item
+                  :label="item.paramTitle"
+                  :prop="item.paramName"
+                  v-for="(item, index) in collisionData"
+                  :key="index"
+                  :rules="{ required: true, message: item.allowMulti && !item.isEnum ? `请输入${item.paramTitle}，可用回车输入多条` : '请选择' + item.paramTitle, trigger: 'change' }"
+                >
+                  <input-tag
+                    v-model="rejectForm[item.paramName]"
+                    v-if="item.allowMulti && !item.isEnum"
+                    :tag-tips="[]"
+                    :add-tag-on-blur="true"
+                    :allow-duplicates="true"
+                    class="inputTag reject-pane-item1"
+                    :placeholder="`请输入${item.paramTitle}，可用回车输入多条`"
+                  ></input-tag>
+                  <el-select v-model="rejectForm[item.paramName]" v-if="item.isEnum" :multiple="item.allowMulti" filterable :placeholder="'请选择' + item.paramTitle" class="reject-pane-item1">
+                    <el-option v-for="citem in item.options" :key="citem.value" :label="citem.text" :value="citem.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-card>
@@ -266,44 +180,26 @@
       </div>
     </div>
     <div class="footer">
-      <el-button
-        type="success"
-        @click="saveHandle('preview')"
-        size="small"
-        v-if="baseForm.userType !== 'excel' && baseForm.userType !== 'sql'"
-      >数据预览</el-button>
-      <el-button
-        type="primary"
-        @click="copyHandle('save')"
-        size="small"
-        v-if="!!id && baseForm.userType !== 'excel'"
-      >复制创建新分群</el-button>
+      <el-button type="success" @click="saveHandle('preview')" size="small" v-if="baseForm.userType !== 'excel' && baseForm.userType !== 'sql'">数据预览</el-button>
+      <el-button type="primary" @click="copyHandle('save')" size="small" v-if="!!id && baseForm.userType !== 'excel'">复制创建新分群</el-button>
       <!-- <el-button
         type="primary"
         @click="saveHandle('save')"
         size="small"
         v-if="tag !== 'view'"
         :disabled="loading"
-      >保存</el-button> -->
-      <el-button
-        type="primary"
-        @click="saveHandle('save')"
-        size="small"
-        v-if="canUpdate"
-        :disabled="loading"
-      >保存</el-button>
+      >保存</el-button>-->
+      <el-button type="primary" @click="saveHandle('save')" size="small" v-if="canUpdate" :disabled="loading">保存</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
-    <data-preview-info
-      v-if="isPreviewShow"
-      ref="dataPreviewInfo"
-      :vestPackCode="rejectForm.vestPackCode"
-    ></data-preview-info>
+    <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @savueData = 'savueData'></taskDependencies>
   </el-drawer>
 </template>
 <script>
 import userAttrRulePane from './userAttr-rule-pane'
 import userActionRulePane from './userAction-rule-pane'
+import taskDependencies from './task-dependencies'
 // import userBehaviorRulePane from './userBehavior-rule-pane'
 import dataPreviewInfo from './data-preview-info'
 import { getQueryString } from '@/utils'
@@ -322,7 +218,8 @@ import {
   collisionSave,
   collisionUpdate,
   databaseInitInfo,
-  importSqlInfo
+  importSqlInfo,
+  selectTransferTask
 } from '@/api/dataAnalysis/dataInsightManage'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -378,6 +275,8 @@ export default {
         collisionPackId: ''
       },
       collisionPackText: '',
+      taskDependenciesList: [],
+      taskDependenciesVisible: false,
       baseRule: { // 基本信息校验规则
         name: [
           { required: true, message: '请输入分群名称', trigger: 'blur' }
@@ -406,7 +305,7 @@ export default {
       },
       channelList: [],
       tableSpaceList: [],
-       cmOptions: {
+      cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
         lineWrapping: true,
@@ -452,7 +351,8 @@ export default {
     Treeselect,
     dataPreviewInfo,
     InputTag,
-    codemirror
+    codemirror,
+    taskDependencies
   },
   methods: {
     init (row, tag, canUpdate) {
@@ -584,7 +484,7 @@ export default {
       this.loading = false
     },
     getSqlImport () {
-      databaseInitInfo().then(({data}) => {
+      databaseInitInfo().then(({ data }) => {
         if (data.status !== '1') {
           this.tableSpaceList = []
           return this.$message({
@@ -595,7 +495,7 @@ export default {
         this.tableSpaceList = data.data.touchActionList
       })
     },
-     workItemChanges (cm, sql, refForm, selfRef) { // 内容更新时，不为空时将报错信息去除
+    workItemChanges (cm, sql, refForm, selfRef) { // 内容更新时，不为空时将报错信息去除
       if (sql !== '') {
         this.$refs[refForm].clearValidate()
       }
@@ -714,7 +614,7 @@ export default {
       })
     },
     getCollisionList () {
-      collisionList().then(({data}) => {
+      collisionList().then(({ data }) => {
         this.collisionList = data.data || []
         if (this.id) {
           this.getCollisionParams()
@@ -731,7 +631,7 @@ export default {
       }
     },
     getCollisionParams () {
-      collisionParams(this.rejectForm.collisionPackId, this.id).then(({data}) => {
+      collisionParams(this.rejectForm.collisionPackId, this.id).then(({ data }) => {
         if (data && data.status * 1 === 1) {
           if (!data.data.length) return
           this.collisionData = data.data
@@ -834,18 +734,18 @@ export default {
       }).catch(() => {
         console.log('cancel')
       })
-        // .then(() => {
-        //   // 确认创建分群时的操作
-        //   this.drawerTitle = '新建'
-        //   this.baseForm.name = '复制' + this.baseForm.name
-        //   this.id = 0
-        //   this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
-        // })
-        // .catch(() => {
-        //   console.log('cancel')
-        // })
+      // .then(() => {
+      //   // 确认创建分群时的操作
+      //   this.drawerTitle = '新建'
+      //   this.baseForm.name = '复制' + this.baseForm.name
+      //   this.id = 0
+      //   this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
+      // })
+      // .catch(() => {
+      //   console.log('cancel')
+      // })
     },
-    saveCollision () {
+    saveCollision (callback) {
       let url = collisionSave
       let params = this.collisionData
       params.forEach(item => {
@@ -860,26 +760,37 @@ export default {
       if (this.id) {
         url = collisionUpdate
       }
-      url(params, this.rejectForm.collisionPackId, this.id).then(({data}) => {
+      url(params, this.rejectForm.collisionPackId, this.id).then(({ data }) => {
         this.loading = false
         if ((data && data.status * 1 !== 1) || (data.code && data.code === 500)) {
           return this.$message.error(data.message || data.msg || '提交失败')
         }
         this.$message.success(data.message)
-        this.visible = false
-        this.$parent.addOrUpdateVisible = false
-        this.$nextTick(() => {
-          this.$parent.getDataList()
-        })
+        if (callback) {
+          callback(data)
+        } else {
+          this.visible = false
+          this.$parent.addOrUpdateVisible = false
+          this.$nextTick(() => {
+            this.$parent.getDataList()
+          })
+        }
+      })
+    },
+    updateClosed () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
+      this.$nextTick(() => {
+        this.$parent.getDataList()
       })
     },
     saveHandle (type) {
       if (this.baseForm.userType === 'excel' && !this.excelFile) {
-          this.$message({
-            type: 'error',
-            message: '请选择要上传的文件'
-          })
-          return
+        this.$message({
+          type: 'error',
+          message: '请选择要上传的文件'
+        })
+        return
       }
       // 用户属性 用户行为 数据校验
       this.$refs.userAttrRule.isRequired = true
@@ -915,7 +826,7 @@ export default {
         //   })
         // })
         if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel' && this.baseForm.userType !== 'sql') {
-        // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
+          // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
           return this.$message({
             message: '请配置用户规则信息',
             type: 'error',
@@ -932,17 +843,42 @@ export default {
           if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
             return false
           }
-          if (this.baseForm.userType === 'excel') { // excel方式
-            this.excelSaveData()
-          } else if (this.baseForm.userType === 'sql') {
-            this.saveSql()
+          if (this.id && type === 'save') {
+            selectTransferTask(this.id).then(({ data }) => {
+              if (data.status === '1' && data.data) {
+                this.taskDependenciesList = data.data.dataTransfers
+                if (this.taskDependenciesList.length) {
+                  this.taskDependenciesVisible = true
+                  this.$nextTick(() => {
+                    this.$refs.taskDependencies.init()
+                  })
+                } else {
+                  this.savueData(type)
+                }
+              } else {
+                this.taskDependenciesList = []
+                return this.$message({
+                  type: 'error',
+                  message: data.message || '数据异常'
+                })
+              }
+            })
           } else {
-            this.indexSaveData(type)
+           this.savueData(type)
           }
         }
       })
     },
-    indexSaveData (type) {
+    savueData(type, callback) {
+      if (this.baseForm.userType === 'excel') { // excel方式
+        this.excelSaveData(callback)
+      } else if (this.baseForm.userType === 'sql') {
+        this.saveSql(callback)
+      } else {
+        this.indexSaveData(type, callback)
+      }
+    },
+    indexSaveData (type, callback) {
       let code = 0
       if (this.rejectForm.rejectGroupPackageIds.length) {
         code = 1
@@ -989,11 +925,11 @@ export default {
           })
         } else {
           this.id = data.data
-          this.saveCollision()
+          this.saveCollision(callback)
         }
       })
     },
-    excelSaveData () {
+    excelSaveData (callback) {
       let data = new FormData() // 上传文件使用new formData();可以实现表单提交;
       data.append('file', this.fileData.fileList.length ? this.fileData.fileList[0].raw : {})
       data.append('name', this.baseForm.name)
@@ -1026,7 +962,7 @@ export default {
           this.loading = false
         } else {
           this.id = res.data.data
-          this.saveCollision()
+          this.saveCollision(callback)
         }
       }).catch((e) => {
         this.$message({
@@ -1035,7 +971,7 @@ export default {
         })
       })
     },
-    saveSql () {
+    saveSql (callback) {
       let code = 0
       if (this.rejectForm.rejectGroupPackageIds.length) {
         code = 1
@@ -1075,7 +1011,7 @@ export default {
           this.loading = false
         } else {
           this.id = res.data.data
-          this.saveCollision()
+          this.saveCollision(callback)
         }
       })
     },
@@ -1209,7 +1145,7 @@ export default {
   margin-bottom: 20px;
 }
 .pane-rules-relation:before {
-  content: " ";
+  content: ' ';
   position: absolute;
   top: 0;
   left: 50%;
@@ -1237,7 +1173,8 @@ export default {
   cursor: pointer;
   user-select: none;
 }
-.insight-manage-drawer .pane-rules-title, .insight-manage-drawer .pane-reject {
+.insight-manage-drawer .pane-rules-title,
+.insight-manage-drawer .pane-reject {
   border-top: 1px dashed #ccc;
 }
 .insight-manage-drawer .user-channel {
@@ -1254,14 +1191,14 @@ export default {
   width: 50%;
 }
 .insight-manage-drawer .reject-pane-item1 {
-  width:80%
+  width: 80%;
 }
 .inputTag {
   display: inline-block;
   border-radius: 4px;
   width: 340px;
   line-height: 22px;
-  border: 1px solid #dcdfe6
+  border: 1px solid #dcdfe6;
 }
 .work-type-pane-source {
   display: flex;
