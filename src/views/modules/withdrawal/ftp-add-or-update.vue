@@ -140,6 +140,8 @@ export default {
     init () {
       this.getUsersList()
       this.dataList = []
+      this.selecttreeData.path = '/'
+      this.getFtpTableList()
       this.visible = true
       this.$nextTick(() => {
         this.treeVisible = true
