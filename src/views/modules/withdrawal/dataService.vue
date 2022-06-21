@@ -37,13 +37,7 @@
           <el-tag v-else size="small" type="danger">是</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="approveStatus" header-align="center" align="center" label="审批流状态">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.approveStatus === 'agree'" size="small">审批通过</el-tag>
-          <el-tag v-if="scope.row.approveStatus === 'running'" size="small">审批中</el-tag>
-          <el-tag v-if="scope.row.approveStatus === 'refuse'" size="small" type="danger">审批拒绝</el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column prop="approveStatus" header-align="center" align="center" label="审批流状态"></el-table-column>
       <el-table-column prop="period" header-align="center" align="center" label="周期"></el-table-column>
       <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天数"></el-table-column>
       <el-table-column prop="remainDay" header-align="center" align="center" label="距离失效日期"></el-table-column>
