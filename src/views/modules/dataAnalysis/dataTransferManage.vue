@@ -7,6 +7,13 @@
       <el-form-item label="任务名称">
         <el-input v-model="dataForm.transferName" placeholder clearable />
       </el-form-item>
+      <el-form-item label="调度频率">
+        <el-select v-model="dataForm.dispatchFrequency" placeholder="调度频率">
+          <el-option label="单次" value="ONCE_ONLY"></el-option>
+          <el-option label="定时" value="TIME"></el-option>
+          <el-option label="被动" value="1"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="任务状态">
         <el-select v-model="dataForm.enable" placeholder="任务状态">
           <el-option label="全部" value></el-option>
@@ -132,7 +139,9 @@ export default {
         transferName: '',
         enable: '',
         timeType: '',
-        dateTimeRange: ''
+        dateTimeRange: '',
+        triggerMode: '',
+        dispatchFrequency: ''
       },
       loading: false,
       dataList: [],
@@ -243,6 +252,12 @@ export default {
             'pageNum': this.pageNum,
             'pageSize': this.pageSize
           }
+          if (params.dispatchFrequency === '1') {
+            params.triggerMode = 1
+            params.dispatchFrequency = ''
+          } else if (params.dispatchFrequency === 'TIME' || params.dispatchFrequency === 'ONCE_ONLY') {
+            params.triggerMode = 0
+          }
           params.dateTimeRange.length > 0 ? params.dateTimeRange = params.dateTimeRange.join(',') : params.dateTimeRange = params.dateTimeRange
           dataTransferManageList(params).then(({ data }) => {
             if (data && data.status === '1') {
@@ -290,7 +305,9 @@ export default {
         transferName: '',
         enable: '',
         timeType: '',
-        dateTimeRange: ''
+        dateTimeRange: '',
+        dispatchFrequency: '',
+        triggerMode: ''
       }
       // this.getDataList()
     },
