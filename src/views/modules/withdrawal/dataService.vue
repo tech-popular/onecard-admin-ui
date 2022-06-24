@@ -46,12 +46,12 @@
           <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
           <el-button
             type="text"
-            v-if="scope.row.typeDesc === 'sql提数' && scope.row.enable === 1 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'"
+            v-if="scope.row.typeDesc === 'sql提数' && scope.row.enable === 1 && scope.row.exportType !== '一次性' && scope.row.approveStatus === '执行完成'"
             @click="disableHandle(scope.row)"
           >申请失效</el-button>
           <el-button
             type="text"
-            v-if="scope.row.typeDesc === 'sql提数' && scope.row.enable === 0 && scope.row.exportType !== '一次性' && scope.row.approveStatus === 'agree'"
+            v-if="scope.row.typeDesc === 'sql提数' && scope.row.enable === 0 && scope.row.exportType !== '一次性' && scope.row.approveStatus === '执行完成'"
             @click="renewalHandle(scope.row)"
           >申请续期</el-button>
           <!-- <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 1 && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
