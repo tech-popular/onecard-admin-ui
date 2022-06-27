@@ -43,8 +43,8 @@ export default {
       dataList: [],
       transferType: [],
       dataForm: {
-        percent: '',
-        metricRound: 30
+        percent: '30',
+        metricRound: 0
       }
     }
   },
@@ -60,7 +60,7 @@ export default {
       dataTransferManageTaskProgress(id).then(({ data }) => {
         if (data.status === '1') {
           this.dataList = data.data.transferHistoryCounts
-          this.dataForm.percent = data.data.percent ? data.data.percent * 100 : 30
+          this.dataForm.percent = data.data.percent ? data.data.percent * 100 : '30'
           this.dataForm.metricRound = data.data.metricRound
         } else {
           this.$message.error(data.message || '数据异常')
