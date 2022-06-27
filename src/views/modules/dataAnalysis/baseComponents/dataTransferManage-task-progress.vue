@@ -53,6 +53,8 @@ export default {
       this.transferType = row.transferType.split(',')
       this.dataList = []
       this.id = row.id
+      this.dataForm.metricRound = 0
+      this.dataForm.percen = '30'
       this.getTableData(row.id)
       this.visible = true
     },
