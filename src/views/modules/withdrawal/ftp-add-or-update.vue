@@ -6,7 +6,10 @@
     </div>
     <div class="wrap">
       <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-width="80px" ref="baseForm" class="base-form">
-        <h3>目录</h3>
+        <div style="margin-bottom:10px">
+          <span>目录</span>
+          <el-button size="small" type="success" style="margin-left:20px" @click="refreshTree">刷新目录</el-button>
+        </div>
         <div class="base-pane">
           <div style="display:flex">
             <div style="width:30%">
@@ -114,6 +117,8 @@ export default {
         children: 'children',
         label: 'fileName'
       },
+      node_had: [], // 触发 tree 的 :load=loadNode 重复触发  动态更新tree
+      resolve_had: [], // 触发 tree 的 :load=loadNode 重复触发  动态更新tree
       baseRule: {
         approveReason: [
           { required: true, message: '请输入申请原因', trigger: 'blur' }
@@ -140,8 +145,6 @@ export default {
     init () {
       this.getUsersList()
       this.dataList = []
-      this.selecttreeData.path = '/'
-      this.getFtpTableList()
       this.visible = true
       this.$nextTick(() => {
         this.treeVisible = true
@@ -149,7 +152,10 @@ export default {
       })
     },
     loadNode (node, resolve) {
+      console.log('node: ', node);
       if (node.level === 0) {
+        this.node_had = node //这里是关键！在data里面定义一个变量，将node.level == 0的node存起来
+        this.resolve_had = resolve //同上，把node.level == 0的resolve也存起来
         this.getTreeData('', resolve)
       } else {
         this.getTreeData(node, resolve)
@@ -162,6 +168,10 @@ export default {
       getFtpMenuLis(params).then(({ data }) => {
         console.log('data: ', data)
         if (data && data.code === 0) {
+          if (!node.data) {
+            this.selecttreeData.path = '/'
+            this.getFtpTableList()
+          }
           return resolve(data.menuList)
         } else {
           return resolve([])
@@ -196,15 +206,28 @@ export default {
       }
       getFtpDataList(params).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataList = data.data.dataList
-          this.totalPage = data.data.totalCount
+          if (data.data) {
+            this.dataList = data.data.dataList
+            this.totalPage = data.data.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
           this.dataListLoading = false
         } else {
           this.$message.error(data.msg)
           this.dataList = []
+          this.totalPage = 0
           this.dataListLoading = false
         }
       })
+    },
+    // 刷新目录
+    refreshTree () {
+      this.node_had.childNodes = [] //把存起来的node的子节点清空，不然会界面会出现重复树！
+      this.dataListLoading = true
+      // this.loadNode(this.node_had, this.resolve_had); //再次执行懒加载的方法
+      this.getTreeData(this.node_had, this.resolve_had)
     },
     // 多选
     handleSelectionChange (val) {
