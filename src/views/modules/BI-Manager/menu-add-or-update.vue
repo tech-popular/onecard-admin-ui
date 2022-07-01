@@ -1,6 +1,6 @@
 <template>
-  <el-dialog v-loading="loading" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+    <el-form v-loading="loading" :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
       <el-form-item label="菜单类型：" prop="type">
         <el-radio-group v-model="dataForm.type" @change="radioTypeChange" :disabled="!!dataForm.id">
           <el-radio v-for="(type, index) in dataForm.typeList" :label="index" :key="index">{{ type }}</el-radio>
@@ -28,7 +28,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" :disabled="loading" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -117,7 +117,6 @@ export default {
     getDataInfo (row) {
       lookDataInfo(row.id).then(({ data }) => {
         if (data && data.code === 0) {
-          this.loading = false
           let parentIdData = []
           if (data.data.parentId == '0') {
             this.dataForm.parentId = []
@@ -140,6 +139,7 @@ export default {
             this.dataForm.url = ''
             this.dataForm.taskIds = []
           }
+          this.loading = false
           // this.getTaskManageList(data.data.taskIds.split(';'))
         }
       })
