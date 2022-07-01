@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog v-loading="loading" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
       <el-form-item label="菜单类型：" prop="type">
         <el-radio-group v-model="dataForm.type" @change="radioTypeChange" :disabled="!!dataForm.id">
@@ -46,6 +46,7 @@ export default {
     // }
     return {
       visible: false,
+      loading: false,
       dataForm: {
         id: 0,
         type: 0,
@@ -103,6 +104,7 @@ export default {
       this.dataForm.type = 0
       this.visible = true
       if (row) {
+        this.loading = true
         this.dataForm.id = row.id
         this.getDataInfo(row)
       } else {
@@ -115,6 +117,7 @@ export default {
     getDataInfo (row) {
       lookDataInfo(row.id).then(({ data }) => {
         if (data && data.code === 0) {
+          this.loading = false
           let parentIdData = []
           if (data.data.parentId == '0') {
             this.dataForm.parentId = []
@@ -232,6 +235,7 @@ export default {
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.loading = true
           let params = {
             'parentId': this.dataForm.parentId.length ? this.menuParentList[this.menuParentList.length - 1].toString() : '0',
             'name': this.dataForm.name,
@@ -251,10 +255,12 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.loading = false
                     this.visible = false
                   }
                 })
               } else {
+                this.loading = false
                 this.$message.error(data.msg || '数据异常')
               }
             })
@@ -268,10 +274,12 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.loading = false
                     this.visible = false
                   }
                 })
               } else {
+                this.loading = false
                 this.$message.error(data.msg || '数据异常')
               }
             })
