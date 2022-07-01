@@ -152,10 +152,9 @@ export default {
       })
     },
     loadNode (node, resolve) {
-      console.log('node: ', node);
       if (node.level === 0) {
-        this.node_had = node //这里是关键！在data里面定义一个变量，将node.level == 0的node存起来
-        this.resolve_had = resolve //同上，把node.level == 0的resolve也存起来
+        this.node_had = node // 这里是关键！在data里面定义一个变量，将node.level == 0的node存起来
+        this.resolve_had = resolve // 同上，把node.level == 0的resolve也存起来
         this.getTreeData('', resolve)
       } else {
         this.getTreeData(node, resolve)
@@ -224,7 +223,7 @@ export default {
     },
     // 刷新目录
     refreshTree () {
-      this.node_had.childNodes = [] //把存起来的node的子节点清空，不然会界面会出现重复树！
+      this.node_had.childNodes = [] // 把存起来的node的子节点清空，不然会界面会出现重复树！
       this.dataListLoading = true
       // this.loadNode(this.node_had, this.resolve_had); //再次执行懒加载的方法
       this.getTreeData(this.node_had, this.resolve_had)

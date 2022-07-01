@@ -1,4 +1,4 @@
-import {httpGet, httpPost} from '@/api'
+import { httpGet, httpPost } from '@/api'
 let da = '/'
 export const getUserGroupList = params => httpGet(da + 'bi/biUserGroup/getListByPage', params) // 获取页面list
 export const savaUserGroupInfo = params => httpPost(da + 'bi/biUserGroup/save', params) // 新增保存
