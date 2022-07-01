@@ -88,7 +88,7 @@ export default {
         name: 'superset列表'
       }, {
         id: '1',
-        name: 'table简单报表'
+        name: 'BI报表'
       }, {
         id: '2',
         name: 'tableau图表'

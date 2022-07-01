@@ -9,11 +9,9 @@
       </el-form-item>
       <el-form-item label="菜单等级: ">
         <el-input v-model="dataForm.grade" @keyup.enter.native="getDataList()"></el-input>
-        <!-- <el-select v-model="dataForm.grade"></el-select> -->
       </el-form-item>
       <el-form-item label="创建人: ">
         <el-input v-model="dataForm.creator" @keyup.enter.native="getDataList()"></el-input>
-        <!-- <el-select v-model="dataForm.grade"></el-select> -->
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
@@ -31,8 +29,18 @@
           </el-tooltip>
         </template>
       </el-table-column>
+      <el-table-column prop="menuRelevance " header-align="center" align="center" width="150" label="菜单层级">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.menuRelevance )" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
+            <div class="text-to-long-cut">{{scope.row.menuRelevance }}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="menuType" header-align="center" align="center" width="150" :formatter="formatMenuType" label="菜单属性"></el-table-column>
-      <el-table-column prop="grade" header-align="center" align="center" width="120" label="菜单等级"></el-table-column>
+      <el-table-column prop="grade" header-align="center" align="center" width="120" label="菜单等级">
+        <template slot-scope="scope">{{scope.row.grade}}级菜单</template>
+      </el-table-column>
       <el-table-column prop="url" header-align="center" align="center" label="菜单链接">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
@@ -212,7 +220,7 @@ export default {
     // 格式化菜单属性显示
     formatMenuType (row, column, cellValue, index) {
       cellValue = row.menuType === 100 ? 3 : cellValue
-      const menuLists = ['superset列表', 'table简单报表', 'tableau图表', '目录']
+      const menuLists = ['superset列表', 'BI报表', 'tableau图表', '目录']
       return menuLists[cellValue]
     }
   }
