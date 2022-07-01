@@ -31,6 +31,9 @@
           </el-tooltip>
         </template>
       </el-table-column>
+      <el-table-column header-align="center" align="center" width="120" label="菜单">
+        <template slot-scope="scope">{{scope.row.url ? '报表' :'目录'}}</template>
+      </el-table-column>
       <el-table-column prop="grade" header-align="center" align="center" width="120" label="菜单等级">
         <template slot-scope="scope">{{scope.row.grade}}级菜单</template>
       </el-table-column>
