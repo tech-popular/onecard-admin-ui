@@ -1,34 +1,22 @@
 <template>
-<el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px" size="small">
-    <el-form-item label="用户组名称" prop="name">
-      <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
-    </el-form-item>
-    <el-form-item label="用户组归属部门" prop="department">
-      <el-input v-model="dataForm.department" placeholder="用户组归属部门"></el-input>
-    </el-form-item>
-    <el-form-item label="用户组申请人" prop="creater">
-      <!-- <el-input v-model="dataForm.creater" placeholder="用户组申请人"></el-input> -->
-      <el-select 
-        v-model="dataForm.creater" 
-        placeholder="请输入关键字" 
-        style="width:100%" 
-        remote
-        :remote-method="getUserSelectList"
-        :loading="loading"
-        filterable>
-        <el-option
-          v-for="item in userIdList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.name">
-        </el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item label="用户组说明" prop="remark">
-      <el-input v-model="dataForm.remark" placeholder="用户组说明"></el-input>
-    </el-form-item>
-		<!-- <el-form-item label="用户组所属租户" prop="tenantId">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px" size="small">
+      <el-form-item label="用户组名称" prop="name">
+        <el-input v-model="dataForm.name" placeholder="用户组名称"></el-input>
+      </el-form-item>
+      <el-form-item label="用户组归属部门" prop="department">
+        <el-input v-model="dataForm.department" placeholder="用户组归属部门"></el-input>
+      </el-form-item>
+      <el-form-item label="用户组申请人" prop="creater">
+        <!-- <el-input v-model="dataForm.creater" placeholder="用户组申请人"></el-input> -->
+        <el-select v-model="dataForm.creater" placeholder="请输入关键字" style="width:100%" remote :remote-method="getUserSelectList" :loading="loading" filterable>
+          <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="用户组说明" prop="remark">
+        <el-input v-model="dataForm.remark" placeholder="用户组说明"></el-input>
+      </el-form-item>
+      <!-- <el-form-item label="用户组所属租户" prop="tenantId">
       <el-select v-model="dataForm.tenantId"  placeholder="请选择" style="width:100%" filterable @change="getUserSelectList">
         <el-option
           v-for="item in tenantIdList"
@@ -38,37 +26,24 @@
           >
         </el-option>
       </el-select>
-    </el-form-item> -->
-     <el-form-item label="用户组成员" prop="userIds">
-      <el-select 
-        v-model="dataForm.userIds" 
-        multiple 
-        placeholder="请输入关键字" 
-        style="width:100%" 
-        remote
-        :remote-method="getUserSelectList"
-        :loading="loading"
-        filterable>
-        <el-option
-          v-for="item in userIdList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id">
-        </el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item label="是否失效" prop="flag">
-      <el-radio-group v-model="dataForm.flag">
-        <el-radio :label="0">否</el-radio>
-        <el-radio :label="1">是</el-radio>
-      </el-radio-group>
-    </el-form-item>
-  </el-form>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="visible = false">取消</el-button>
-    <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-  </span>
-</el-dialog>
+      </el-form-item>-->
+      <el-form-item label="用户组成员" prop="userIds">
+        <el-select v-model="dataForm.userIds" multiple placeholder="请输入关键字" style="width:100%" remote :remote-method="getUserSelectList" :loading="loading" filterable>
+          <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="是否失效" prop="flag">
+        <el-radio-group v-model="dataForm.flag">
+          <el-radio :label="0">否</el-radio>
+          <el-radio :label="1">是</el-radio>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+    </span>
+  </el-dialog>
 </template>
 
 <script>
@@ -201,42 +176,42 @@ export default {
             // 'tenantId': this.dataForm.tenantId,
             'flag': this.dataForm.flag,
             'userIds': this.dataForm.userIds.join(',')
-            }
-            console.log('params: ', params)
-            if (!this.dataForm.id) {
-              savaUserGroupInfo(params).then(({data}) => {
-                if (data && data.code === 0) {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.$emit('refreshDataList')
-                      this.visible = false
-                    }
-                  })
-                } else {
-                  this.$message.error(data.msg || '数据异常')
-                }
-              })
-            } else {
-              params.id = this.dataForm.id
-              updateUserGroupInfo(params).then(({data}) => {
-                if (data && data.code === 0) {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.$emit('refreshDataList')
-                      this.visible = false
-                    }
-                  })
-                } else {
-                  this.$message.error(data.msg || '数据异常')
-                }
-              })
-            }
+          }
+          console.log('params: ', params)
+          if (!this.dataForm.id) {
+            savaUserGroupInfo(params).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.$emit('refreshDataList')
+                    this.visible = false
+                  }
+                })
+              } else {
+                this.$message.error(data.msg || '数据异常')
+              }
+            })
+          } else {
+            params.id = this.dataForm.id
+            updateUserGroupInfo(params).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.$emit('refreshDataList')
+                    this.visible = false
+                  }
+                })
+              } else {
+                this.$message.error(data.msg || '数据异常')
+              }
+            })
+          }
         }
       })
     }
