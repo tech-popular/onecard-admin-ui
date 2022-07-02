@@ -124,6 +124,7 @@ export default {
     getDataInfo (row) {
       lookDataInfo(row.id).then(({ data }) => {
         if (data && data.code === 0) {
+          // this.loading = false
           let parentIdData = []
           if (data.data.parentId == '0') {
             this.dataForm.parentId = []
@@ -135,6 +136,7 @@ export default {
           }
           this.dataForm.name = data.data.name
           this.dataForm.menuType = data.data.menuType.toString()
+          this.dataForm.orderNum = data.data.orderNum
           if (data.data.url) {
             this.dataForm.type = 1
             this.menuList = this.filterMenuList(this.menuData)
@@ -148,6 +150,9 @@ export default {
           }
           this.loading = false
           // this.getTaskManageList(data.data.taskIds.split(';'))
+        } else {
+          this.loading = false
+          this.$message.error(data.msg)
         }
       })
     },
@@ -250,7 +255,8 @@ export default {
             'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
             'menuParentList': this.menuParentList.join(','),
             'type': 0,
-            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType)
+            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType),
+            'orderNum': this.dataForm.orderNum
           }
           console.log('params: ', params)
           if (!this.dataForm.id) {

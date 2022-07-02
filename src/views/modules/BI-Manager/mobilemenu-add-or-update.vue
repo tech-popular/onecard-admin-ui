@@ -227,7 +227,8 @@ export default {
             'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
             'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
             'menuParentList': this.menuParentList.join(','),
-            'type': 1
+            'type': 1,
+            'orderNum': this.dataForm.orderNum
           }
           console.log('params: ', params)
           this.loading = true
