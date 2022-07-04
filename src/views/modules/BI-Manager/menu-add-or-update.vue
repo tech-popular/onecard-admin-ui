@@ -25,6 +25,9 @@
           <el-option v-for="item in calculateList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="位置排序" prop="orderNum">
+        <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="位置排序"></el-input-number>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -55,7 +58,8 @@ export default {
         menuType: '',
         name: '',
         url: '',
-        taskIds: []
+        taskIds: [],
+        orderNum: 0
       },
       menuData: [],
       menuList: [],
@@ -82,6 +86,9 @@ export default {
         ],
         menuType: [
           { required: true, message: '菜单属性不能为空', trigger: 'blur' }
+        ],
+        orderNum: [
+          { required: true, message: '位置排序不能为空', trigger: 'blur' }
         ]
       },
       menuLists: [{
@@ -117,6 +124,7 @@ export default {
     getDataInfo (row) {
       lookDataInfo(row.id).then(({ data }) => {
         if (data && data.code === 0) {
+          // this.loading = false
           let parentIdData = []
           if (data.data.parentId == '0') {
             this.dataForm.parentId = []
@@ -128,6 +136,7 @@ export default {
           }
           this.dataForm.name = data.data.name
           this.dataForm.menuType = data.data.menuType.toString()
+          this.dataForm.orderNum = data.data.orderNum
           if (data.data.url) {
             this.dataForm.type = 1
             this.menuList = this.filterMenuList(this.menuData)
@@ -141,6 +150,9 @@ export default {
           }
           this.loading = false
           // this.getTaskManageList(data.data.taskIds.split(';'))
+        } else {
+          this.loading = false
+          this.$message.error(data.msg)
         }
       })
     },
@@ -243,7 +255,8 @@ export default {
             'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
             'menuParentList': this.menuParentList.join(','),
             'type': 0,
-            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType)
+            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType),
+            'orderNum': this.dataForm.orderNum
           }
           console.log('params: ', params)
           if (!this.dataForm.id) {
