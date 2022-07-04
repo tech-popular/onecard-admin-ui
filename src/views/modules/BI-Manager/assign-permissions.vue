@@ -1,17 +1,6 @@
 <template>
   <el-dialog :title="type === 0 ? 'PC端权限分配' : '移动端权限分配'" :close-on-click-modal="false" :visible.sync="visible">
-			<el-tree
-			:data="dataTree"
-      ref="tree"
-			show-checkbox
-			node-key="id"
-      :default-expand-all="true"
-			:props="defaultProps"
-      v-model="menuIds"
-      :default-checked-keys="defaultExpandedKeys"
-      @check="checkPermit"
-      >
-    </el-tree>
+    <el-tree :data="dataTree" ref="tree" show-checkbox node-key="id" :props="defaultProps" v-model="menuIds" :default-checked-keys="defaultExpandedKeys" @check="checkPermit"></el-tree>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -120,8 +109,8 @@ export default {
           }
         })
       } else {
-       this.$message.error('请选择菜单')
-     }
+        this.$message.error('请选择菜单')
+      }
     }
   }
 }
