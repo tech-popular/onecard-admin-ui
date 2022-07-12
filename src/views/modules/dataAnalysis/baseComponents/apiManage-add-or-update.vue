@@ -1,13 +1,9 @@
 <template>
-  <el-drawer
-    :append-to-body="false"
-    :visible.sync="visible"
-    :show-close="false"
-    :wrapperClosable="false"
-    size="1200px"
-    class="api-manage-drawer"
-  >
-    <div slot="title" class="drawer-title">{{drawerTitle}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+  <el-drawer :append-to-body="false" :visible.sync="visible" :show-close="false" :wrapperClosable="false" size="1200px" class="api-manage-drawer">
+    <div slot="title" class="drawer-title">
+      {{drawerTitle}}
+      <i class="el-icon-close drawer-close" @click="drawerClose"></i>
+    </div>
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <h3>基本信息</h3>
@@ -19,8 +15,7 @@
             <el-select v-model="baseForm.department" placeholder="请选择一级事业群" :disabled="!!id">
               <el-option v-for="(item, index) in departmentList" :key="index" :label="item.childrenValue" :value="item.childrenNum"></el-option>
             </el-select>
-          </el-form-item>
-          &nbsp; _
+          </el-form-item>&nbsp; _
           <el-form-item prop="apiName" class="item-inline item-code">
             <el-input v-model.trim="baseForm.apiName" placeholder="输入字母和数字的组合" clearable class="item-code-name" :disabled="!!id" />
           </el-form-item>
@@ -30,22 +25,23 @@
           </el-form-item>
           <el-form-item label="分群名称" prop="templateIds">
             <el-select v-model="baseForm.templateIds" @change="custerNamesChange" filterable multiple placeholder="请选择分群名称" class="base-pane-item">
-              <el-option
-                v-for="item in newCusterNameList"
-                :key="item.value"
-                :label="item.text"
-                :disabled="item.disabled || !!item.isUserAction"
-                :value="item.value">
-              </el-option>
+              <el-option v-for="item in newCusterNameList" :key="item.value" :label="item.text" :disabled="item.disabled || !!item.isUserAction" :value="item.value"></el-option>
             </el-select>
             <el-button type="primary" @click="previewCusterInfo" size="small">预览</el-button>
           </el-form-item>
           <el-form-item label="API入参" prop="inParam">
             <!-- <el-radio v-model="baseForm.inParam" label="cust_no" v-if="!!id && baseForm.inParam === 'cust_no'" :disabled="!!id && baseForm.inParam === 'cust_no'">客户编号（cust_no）</el-radio> -->
-            <el-radio v-model="baseForm.inParam" :label="fitem.value" :disabled="allSelectedChannelCode.includes(xiaofankaCode)" v-for="(fitem, findex) in inParamsList" :key="findex" @change="inParamChange">{{fitem.title}}</el-radio>
+            <el-radio
+              v-model="baseForm.inParam"
+              :label="fitem.value"
+              :disabled="allSelectedChannelCode.includes(xiaofankaCode)"
+              v-for="(fitem, findex) in inParamsList"
+              :key="findex"
+              @change="inParamChange"
+            >{{fitem.title}}</el-radio>
             <!-- <el-checkbox-group v-model="baseForm.inParam">
               <el-checkbox :label="fitem.value" v-for="(fitem, findex) in inParamsList" :key="findex">{{fitem.title}}</el-checkbox>
-            </el-checkbox-group> -->
+            </el-checkbox-group>-->
           </el-form-item>
           <el-form-item label="API模式" prop="outType">
             <el-radio-group v-model="baseForm.outType" @change="outTypeChange" :disabled="baseForm.type === 'static'">
@@ -72,7 +68,10 @@
           </el-form-item>
           <el-form-item label="API描述">
             <el-input type="textarea" class="base-pane-item" v-model="baseForm.desc" placeholder="最多输入100个字符" maxlength="100" :autosize="{ minRows: 3, maxRows: 5}" />
-            <p class="data-description-tips">最多输入100个字符，您还可以输入<span v-text="100 - baseForm.desc.length"></span>个字符</p>
+            <p class="data-description-tips">
+              最多输入100个字符，您还可以输入
+              <span v-text="100 - baseForm.desc.length"></span>个字符
+            </p>
           </el-form-item>
         </el-form>
       </div>
@@ -205,7 +204,7 @@ export default {
       custerInfoList: [],
       curCusterInfo: {},
       custerLoading: false,
-      filterCursterList: [], // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
+      // filterCursterList: [], // 选择一个分群后，过滤分群列表的数据，根据type加是否可选操作
       allSelectedChannelCode: [], // 选中的分群名称中所包含的所有channelCode
       subTimeSelects: [
         {
@@ -243,10 +242,11 @@ export default {
       return false
     },
     newCusterNameList () {
-      if (!this.filterCursterList.length) {
-        return this.custerNameList
-      }
-      return this.filterCursterList
+      return this.custerNameList
+      // if (!this.filterCursterList.length) {
+      //   return this.custerNameList
+      // }
+      // return this.filterCursterList
     }
   },
   methods: {
@@ -274,7 +274,7 @@ export default {
     },
     // 获取分群名称
     getCusterList (fn) {
-      dataTransferManageCuster().then(({data}) => {
+      dataTransferManageCuster().then(({ data }) => {
         if (data.status !== '1') {
           this.custerNameList = []
           return this.$message({
@@ -282,6 +282,11 @@ export default {
             message: data.message
           })
         }
+        data.data.forEach(item => {
+          if (item.type === 'static') {
+            item.disabled = true
+          }
+        })
         this.custerNameList = data.data.filter(item => item.channelCode.split(',').filter(citem => citem !== '').length === 1) // 多渠道的分群不让选择
         if (fn) {
           fn()
@@ -290,7 +295,7 @@ export default {
     },
     custerNamesChange (value) { // 选中数据变化时
       if (value.length === 0) {
-        this.filterCursterList = []
+        // this.filterCursterList = []
         this.baseForm.type = ''
       }
       // 当选中数据为1时，更新下拉数据状态
@@ -298,16 +303,16 @@ export default {
       if (value.length === 1) {
         filterFirstObj = this.custerNameList.filter(item => item.value === value[0]) // 筛选出第一条数据，要获取第一条数据的type
         this.baseForm.type = filterFirstObj[0].type
-        if (this.baseForm.type === 'static') {
-          this.baseForm.outType = 'JUDGE'
-        }
-        let newArr = this.custerNameList.map(item => {
-          if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
-            return {...item, disabled: true}
-          }
-          return item
-        })
-        this.filterCursterList = newArr
+        // if (this.baseForm.type === 'static') {
+        //   this.baseForm.outType = 'JUDGE'
+        // }
+        // let newArr = this.custerNameList.map(item => {
+        //   if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+        //     return { ...item, disabled: true }
+        //   }
+        //   return item
+        // })
+        // this.filterCursterList = newArr
       }
       this.allSelectedChannelCode = [] // 获取选中的所有的channelCode
       for (let i = 0; i < value.length; i++) {
@@ -393,7 +398,7 @@ export default {
       })
     },
     getCusterInfo (id, fn) { // 获取分群数据
-      viewDataInfo(id).then(({data}) => {
+      viewDataInfo(id).then(({ data }) => {
         if (data.status * 1 !== 1) {
           this.curCusterInfo = {
             id: id,
@@ -444,7 +449,7 @@ export default {
       })
     },
     getApiInfo (id, outParams) { // 查看及编辑时请求数据
-      viewApiInfo(id).then(({data}) => {
+      viewApiInfo(id).then(({ data }) => {
         if (data.status !== '1') {
           return this.$message({
             message: data.message,
@@ -481,23 +486,23 @@ export default {
           this.allSelectedChannelCode = Array.from(new Set(this.allSelectedChannelCode))
           // 分群包
           if (!this.baseForm.templateIds) {
-            this.filterCursterList = this.custerNameList
+            // this.filterCursterList = this.custerNameList
             this.$nextTick(() => {
               this.$refs.baseForm.clearValidate('templateIds')
             })
           } else {
-            let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
-            if (filterFirstObj.length) {
-              let newArr = this.custerNameList.map(item => {
-                if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
-                  return { ...item, disabled: true }
-                }
-                return item
-              })
-              this.filterCursterList = newArr
-            } else {
-              this.filterCursterList = this.custerNameList
-            }
+            // let filterFirstObj = this.custerNameList.filter(item => item.value === this.baseForm.templateIds[0]) // 筛选出第一条数据，要获取第一条数据的type
+            // if (filterFirstObj.length) {
+            //   let newArr = this.custerNameList.map(item => {
+            //     if (item.type !== filterFirstObj[0].type) { // 只可选与第一条数据type相同的数据，其他的置灰
+            //       return { ...item, disabled: true }
+            //     }
+            //     return item
+            //   })
+            //   this.filterCursterList = newArr
+            // } else {
+            //   this.filterCursterList = this.custerNameList
+            // }
           }
           this.getSelectAllCata((indexList) => {
             this.outParamsIndexList = this.updateOutParamsList(indexList)
@@ -573,7 +578,7 @@ export default {
           // 兼容老数据,可多输入时，为数据类型，旧数据为字符串类型，需改为数组类型，否则回显出错
           if ((item.fieldType === 'string' || item.fieldType === 'number') && (item.func === 'eq' || item.func === 'neq')) {
             if (!item.params[0].selectVal) {
-              item.params[0].selectVal = [ item.params[0].value ]
+              item.params[0].selectVal = [item.params[0].value]
             }
           }
         } else {
@@ -583,7 +588,7 @@ export default {
       return arr
     },
     getSelectAllCata (fn) { // 获取所有指标
-      selectAllCata({ channelCode: this.allSelectedChannelCode, flag: '-1' }).then(({data}) => {
+      selectAllCata({ channelCode: this.allSelectedChannelCode, flag: '-1' }).then(({ data }) => {
         if (data.status !== '1') {
           this.indexList = []
         } else {
@@ -676,7 +681,7 @@ export default {
           params.apiName = this.originApiName
           params.code = this.originDepartment + '_' + this.originApiName
         }
-        url(params).then(({data}) => {
+        url(params).then(({ data }) => {
           this.loading = false
           if (data.status !== '1') {
             return this.$message({
@@ -705,78 +710,78 @@ export default {
 }
 </script>
 <style scoped>
-  .api-manage-drawer .wrap {
-    padding: 0 20px 20px;
-    margin-top: -12px;
-    width: 100%;
-    overflow-y: auto;
-    position: absolute;
-    top: 75px;
-    bottom: 55px;
-  }
-  .drawer-title {
-    padding: 15px;
-    background: #333;
-    color: #fff;
-    font-size: 15px;
-    margin: -20px -20px 0 -20px;
-    position: relative;
-  }
-  .drawer-close {
-    position: absolute;
-    right: 20px;
-  }
-  .item-inline {
-    display: inline-block;
-  }
-  .item-code {
-    margin-left: -70px;
-  }
-  .item-code-name {
-    width: 300px;
-  }
-  .item-button {
-    margin-left: -60px;
-  }
-  .copy-code {
-    margin-left: 15px;
-  }
-  .pane-preview-title {
-    text-align: center;
-    border-top: 1px dashed #ccc;
-    padding-top: 20px;
-  }
-  .pane-rules-item {
-    border-bottom: 1px dashed #ccc;
-  }
-  .pane-rules-item:last-child{
-    border: 0
-  }
-  .footer {
-    position: absolute;
-    bottom: 0;
-    background: #fff;
-    padding: 10px 22px 10px 10px;
-    width: 100%;
-    height: 55px;
-    text-align: right;
-    box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
-    z-index: 500;
-  }
-  .cursor-pointer {
-    cursor: pointer;
-  }
-  .base-pane-item {
-    width: 80%;
-  }
-  .vue-treeselect {
-    line-height: 24px;
-  }
-  .data-description-tips {
-    color: #999;
-    margin-top: 0
-  }
-  .data-description-tips span {
-    color: red
-  }
+.api-manage-drawer .wrap {
+  padding: 0 20px 20px;
+  margin-top: -12px;
+  width: 100%;
+  overflow-y: auto;
+  position: absolute;
+  top: 75px;
+  bottom: 55px;
+}
+.drawer-title {
+  padding: 15px;
+  background: #333;
+  color: #fff;
+  font-size: 15px;
+  margin: -20px -20px 0 -20px;
+  position: relative;
+}
+.drawer-close {
+  position: absolute;
+  right: 20px;
+}
+.item-inline {
+  display: inline-block;
+}
+.item-code {
+  margin-left: -70px;
+}
+.item-code-name {
+  width: 300px;
+}
+.item-button {
+  margin-left: -60px;
+}
+.copy-code {
+  margin-left: 15px;
+}
+.pane-preview-title {
+  text-align: center;
+  border-top: 1px dashed #ccc;
+  padding-top: 20px;
+}
+.pane-rules-item {
+  border-bottom: 1px dashed #ccc;
+}
+.pane-rules-item:last-child {
+  border: 0;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  background: #fff;
+  padding: 10px 22px 10px 10px;
+  width: 100%;
+  height: 55px;
+  text-align: right;
+  box-shadow: 0 -2px 9px 0 rgba(153, 169, 191, 0.17);
+  z-index: 500;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.base-pane-item {
+  width: 80%;
+}
+.vue-treeselect {
+  line-height: 24px;
+}
+.data-description-tips {
+  color: #999;
+  margin-top: 0;
+}
+.data-description-tips span {
+  color: red;
+}
 </style>
