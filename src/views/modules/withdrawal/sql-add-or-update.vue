@@ -5,47 +5,47 @@
       <i class="el-icon-close drawer-close" @click="drawerClose"></i>
     </div>
     <div class="wrap">
-      <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-width="80px" ref="baseForm" class="base-form">
+      <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="110px" ref="baseForm" class="base-form">
         <div class="base-pane">
           <el-tabs type="border-card">
             <el-tab-pane label="自助查询">
               <div style="display:flex">
                 <div>
-                  <el-form-item prop="dataSourceId" label="服务器：">
+                  <el-form-item prop="dataSourceId" label="服务器：" label-width="80px">
                     <el-select filterable v-model="baseForm.dataSourceId" placeholder="请选择" clearable @change="selectdatabaseDataList">
                       <el-option v-for="item in datasourceList" :key="item.id" :label="item.datasourceName" :value="item.id"></el-option>
                     </el-select>
                   </el-form-item>
-                  <el-form-item prop="dataBaseId" label="数据库：">
+                  <el-form-item prop="dataBaseId" label="数据库：" label-width="80px">
                     <el-select filterable v-model="baseForm.dataBaseId" clearable placeholder="请选择">
                       <el-option v-for="item in databaseIdList" :key="item.id" :label="item.databaseName" :value="item.id"></el-option>
                     </el-select>
                   </el-form-item>
                   <el-collapse v-model="activeNames">
                     <el-collapse-item title="新增数据源信息" name="1">
-                      <el-form-item label="类型" prop="type">
+                      <el-form-item label="类型" prop="type" label-width="80px">
                         <el-radio v-model="baseForm.addingDatabase.type" @change="radioTypeChange" label="mysql">mysql</el-radio>
                         <el-radio v-model="baseForm.addingDatabase.type" @change="radioTypeChange" label="maxComputer" style="margin-left:5px;">maxComputer</el-radio>
                       </el-form-item>
-                      <el-form-item label="实例地址" prop="url" v-if="baseForm.addingDatabase.type === 'mysql'">
+                      <el-form-item label="实例地址" label-width="80px" prop="url" v-if="baseForm.addingDatabase.type === 'mysql'">
                         <el-input v-model="baseForm.addingDatabase.url" placeholder="jdbc:mysql://ip:3306/"></el-input>
                       </el-form-item>
-                      <el-form-item label="数据库" prop="database" v-if="baseForm.addingDatabase.type === 'mysql'">
+                      <el-form-item label="数据库" label-width="80px" prop="database" v-if="baseForm.addingDatabase.type === 'mysql'">
                         <el-input v-model="baseForm.addingDatabase.database" placeholder="database"></el-input>
                       </el-form-item>
-                      <el-form-item label="用户名" prop="userName" v-if="baseForm.addingDatabase.type === 'mysql'">
+                      <el-form-item label="用户名" label-width="80px" prop="userName" v-if="baseForm.addingDatabase.type === 'mysql'">
                         <el-input v-model="baseForm.addingDatabase.userName" placeholder="user"></el-input>
                       </el-form-item>
-                      <el-form-item label="密码" prop="password" v-if="baseForm.addingDatabase.type === 'mysql'">
+                      <el-form-item label="密码" label-width="80px" prop="password" v-if="baseForm.addingDatabase.type === 'mysql'">
                         <el-input v-model="baseForm.addingDatabase.password" placeholder="password"></el-input>
                       </el-form-item>
-                      <el-form-item label="空间名" prop="database" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                      <el-form-item label="空间名" label-width="80px" prop="database" v-if="baseForm.addingDatabase.type === 'maxComputer'">
                         <el-input v-model="baseForm.addingDatabase.database" placeholder="bd_src"></el-input>
                       </el-form-item>
-                      <el-form-item label="用户名" prop="userName" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                      <el-form-item label="用户名" label-width="80px" prop="userName" v-if="baseForm.addingDatabase.type === 'maxComputer'">
                         <el-input v-model="baseForm.addingDatabase.userName" placeholder="access-id"></el-input>
                       </el-form-item>
-                      <el-form-item label="密码" prop="password" v-if="baseForm.addingDatabase.type === 'maxComputer'">
+                      <el-form-item label="密码" label-width="80px" prop="password" v-if="baseForm.addingDatabase.type === 'maxComputer'">
                         <el-input v-model="baseForm.addingDatabase.password" placeholder="access-key"></el-input>
                       </el-form-item>
                       <el-button style="float: right; margin-right: 10px; margin-bottom: 20px;" type="success" plain @click="handleSaveDatasource">保存</el-button>
@@ -53,7 +53,7 @@
                   </el-collapse>
                 </div>
                 <div style="width:70%">
-                  <el-form-item prop="sql" label="SQL：" ref="serviceBeginSqlForm">
+                  <el-form-item prop="sql" label-width="70px" label="SQL：" ref="serviceBeginSqlForm">
                     <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative;">
                       <codemirror
                         ref="serviceBeginSql"
@@ -66,10 +66,10 @@
                       ></codemirror>
                     </div>
                   </el-form-item>
-                  <el-form-item style="margin-top:10px;">
+                  <el-form-item style="margin-top:10px;" label-width="70px">
                     <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
-                  <el-form-item v-if="previewing">
+                  <el-form-item v-if="previewing" label-width="70px">
                     <span>
                       {{previewText ? '正在执行中' : '执行完成' }}
                       <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>（随机展示10条数据）
@@ -88,12 +88,12 @@
                         <el-option v-for="item in sqlCycleList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'" label-width="100px">
+                    <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'">
                       <el-select v-model="baseForm.receiveDays" class="reject-pane-item" placeholder="请选择">
                         <el-option v-for="item in receiveDaysList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px">
+                    <el-form-item label="允许接收时间段" prop="receiveTime">
                       <el-time-picker
                         is-range
                         v-model="baseForm.receiveTime"
@@ -105,7 +105,7 @@
                         placeholder="选择时间范围"
                       ></el-time-picker>
                     </el-form-item>
-                    <el-form-item prop="receiver" label="数据接收人" label-width="100px">
+                    <el-form-item prop="receiver" label="数据接收人">
                       <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
                         <el-option v-for="item in userList" :value="item.userid" :key="item.id" :label="item.name || item.username "></el-option>
                       </el-select>

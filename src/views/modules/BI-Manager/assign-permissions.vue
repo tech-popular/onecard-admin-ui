@@ -11,11 +11,12 @@
       node-key="id"
       :props="defaultProps"
       v-model="menuIds"
+      :default-expand-all="isExpandAll"
       :default-checked-keys="defaultExpandedKeys"
       @check="checkPermit"
     ></el-tree>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="closed()">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
@@ -34,6 +35,7 @@ export default {
       halfCheckedDataKeys: [],
       defaultExpandedKeys: [],
       dataTree: [],
+      isExpandAll: false,
       search: '',
       defaultProps: {
         children: 'children',
@@ -48,6 +50,8 @@ export default {
   },
   methods: {
     init (id, type) {
+      this.search = ''
+      this.isExpandAll = false
       this.defaultExpandedKeys = []
       this.checkedDataKeys = []
       this.halfCheckedDataKeys = []
@@ -59,14 +63,13 @@ export default {
     },
 
     filterNode (value, data, node) {
-      console.log('node: ', node)
-      console.log('data: ', data)
-      console.log('value: ', value)
-      if (!value) return true
+      if (!value) {
+        this.toggleExpandAll(false)
+        return true
+      }
       let parentNode = node.parent
       let labels = [node.label]
       let level = 1
-      console.log('parentNode: ', parentNode)
       while (level < node.level) {
         labels = [...labels, parentNode.label]
         parentNode = parentNode.parent
@@ -74,7 +77,14 @@ export default {
       }
       return labels.some(label => label.indexOf(value) !== -1)
     },
-
+    /** 展开/折叠操作 */
+    toggleExpandAll (isExpandAll) {
+      this.isExpandAll = isExpandAll
+      const nodes = this.$refs.tree.store._getAllNodes()
+      for (let i in nodes) {
+        nodes[i].expanded = isExpandAll
+      }
+    },
     getRecursionList () {
       let params = {
         type: this.type
@@ -148,6 +158,11 @@ export default {
       } else {
         this.$message.error('请选择菜单')
       }
+    },
+    closed () {
+      this.visible = false
+      this.search = ''
+      this.toggleExpandAll(false)
     }
   }
 }
