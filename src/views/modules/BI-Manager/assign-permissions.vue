@@ -1,6 +1,19 @@
 <template>
   <el-dialog :title="type === 0 ? 'PC端权限分配' : '移动端权限分配'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-tree :data="dataTree" ref="tree" show-checkbox node-key="id" :props="defaultProps" v-model="menuIds" :default-checked-keys="defaultExpandedKeys" @check="checkPermit"></el-tree>
+    <div style="margin-bottom: 16px">
+      <el-input size="small" clearable placeholder="请输入菜单名称" v-model="search"></el-input>
+    </div>
+    <el-tree
+      :data="dataTree"
+      ref="tree"
+      :filter-node-method="filterNode"
+      show-checkbox
+      node-key="id"
+      :props="defaultProps"
+      v-model="menuIds"
+      :default-checked-keys="defaultExpandedKeys"
+      @check="checkPermit"
+    ></el-tree>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
@@ -21,10 +34,16 @@ export default {
       halfCheckedDataKeys: [],
       defaultExpandedKeys: [],
       dataTree: [],
+      search: '',
       defaultProps: {
         children: 'children',
         label: 'name'
       }
+    }
+  },
+  watch: {
+    search (val) {
+      this.$refs.tree.filter(val)
     }
   },
   methods: {
@@ -38,6 +57,24 @@ export default {
       this.getRoleMenuListData()
       this.visible = true
     },
+
+    filterNode (value, data, node) {
+      console.log('node: ', node)
+      console.log('data: ', data)
+      console.log('value: ', value)
+      if (!value) return true
+      let parentNode = node.parent
+      let labels = [node.label]
+      let level = 1
+      console.log('parentNode: ', parentNode)
+      while (level < node.level) {
+        labels = [...labels, parentNode.label]
+        parentNode = parentNode.parent
+        level++
+      }
+      return labels.some(label => label.indexOf(value) !== -1)
+    },
+
     getRecursionList () {
       let params = {
         type: this.type
