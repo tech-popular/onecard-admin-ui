@@ -114,10 +114,10 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="pane-rules-title">
+      <div class="pane-rules-title" v-if="baseForm.userType === 'indicator'">
         <h3>满足如下条件的用户</h3>
       </div>
-      <div class="pane-rules">
+      <div class="pane-rules" v-if="baseForm.userType === 'indicator'">
         <div class="pane-rules-relation" v-if="showActionRule && showAtterRule">
           <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
         </div>
@@ -193,7 +193,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
-    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @savueData = 'savueData'></taskDependencies>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @savueData="savueData"></taskDependencies>
   </el-drawer>
 </template>
 <script>
@@ -864,12 +864,12 @@ export default {
               }
             })
           } else {
-           this.savueData(type)
+            this.savueData(type)
           }
         }
       })
     },
-    savueData(type, callback) {
+    savueData (type, callback) {
       if (this.baseForm.userType === 'excel') { // excel方式
         this.excelSaveData(callback)
       } else if (this.baseForm.userType === 'sql') {
