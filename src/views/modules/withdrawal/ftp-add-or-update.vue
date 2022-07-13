@@ -5,7 +5,7 @@
       <i class="el-icon-close drawer-close" @click="drawerClose"></i>
     </div>
     <div class="wrap">
-      <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-width="80px" ref="baseForm" class="base-form">
+      <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="100px" ref="baseForm" class="base-form">
         <div style="margin-bottom:10px">
           <span>目录</span>
           <el-button size="small" type="success" style="margin-left:20px" @click="refreshTree">刷新目录</el-button>
@@ -56,11 +56,11 @@
                   <br />
                 </span>
               </div>
-              <div style="margin-left:50px;margin-top:50px;">
+              <div style="margin-left:0px;margin-top:50px;">
                 <el-form-item label="申请原因" prop="approveReason">
                   <el-input v-model="baseForm.approveReason" type="textarea"></el-input>
                 </el-form-item>
-                <el-form-item prop="receiver" label="数据接收人" label-width="100px">
+                <el-form-item prop="receiver" label="数据接收人">
                   <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
                     <el-option v-for="item in userList" :value="item.userid" :key="item.id" :label="item.name || item.username "></el-option>
                   </el-select>
