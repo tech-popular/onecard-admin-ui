@@ -20,11 +20,11 @@ const globalRoutes = [
   { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
   { path: '/resetPassword', component: _import('common/resetPass'), name: 'resetPass', meta: { title: '重置密码' } },
   { path: '', redirect: '/login' },
-  { path: '/withdrawal-reportData', component: _import('modules/withdrawal/reportData'), name: 'withdrawal-reportData', meta: { title: '数据预览' } },
-  { path: '/withdrawal-dingPreview', component: _import('modules/withdrawal/dingPreview'), name: 'withdrawal-dingPreview', meta: { title: 'SQL数据预览' } },
-  { path: '/withdrawal-dingFtpPreview', component: _import('modules/withdrawal/dingFtpPreview'), name: 'withdrawal-dingFtpPreview', meta: { title: 'FTP数据预览' } },
-  { path: '/withdrawal-dingDownLoad', component: _import('modules/withdrawal/dingDownLoad'), name: 'withdrawal-dingDownLoad', meta: { title: 'SQL数据下载' } },
-  { path: '/withdrawal-dingFtpDownLoad', component: _import('modules/withdrawal/dingFtpDownLoad'), name: 'withdrawal-dingFtpDownLoad', meta: { title: 'FTP数据下载' } }
+  { path: '/dataGovernance-reportData', component: _import('modules/dataGovernance/reportData'), name: 'dataGovernance-reportData', meta: { title: '数据预览' } },
+  { path: '/dataGovernance-dingPreview', component: _import('modules/dataGovernance/dingPreview'), name: 'dataGovernance-dingPreview', meta: { title: 'SQL数据预览' } },
+  { path: '/dataGovernance-dingFtpPreview', component: _import('modules/dataGovernance/dingFtpPreview'), name: 'dataGovernance-dingFtpPreview', meta: { title: 'FTP数据预览' } },
+  { path: '/dataGovernance-dingDownLoad', component: _import('modules/dataGovernance/dingDownLoad'), name: 'dataGovernance-dingDownLoad', meta: { title: 'SQL数据下载' } },
+  { path: '/dataGovernance-dingFtpDownLoad', component: _import('modules/dataGovernance/dingFtpDownLoad'), name: 'dataGovernance-dingFtpDownLoad', meta: { title: 'FTP数据下载' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -54,7 +54,7 @@ const mainRoutes = {
     { path: '/phoenix-spectaculars0', component: _import('modules/phoenix/spectaculars0'), name: 'phoenix-spectaculars0', meta: { title: '彩虹评级', isTab: true } },
     { path: '/dataAnalysis-workFlow', component: _import('modules/dataAnalysis/workFlow'), name: 'dataAnalysis-workFlow', meta: { title: '决策配置', isTab: false } },
     { path: '/dataAnalysis-canvasFlow', component: _import('modules/dataAnalysis/canvasFlow'), name: 'dataAnalysis-canvasFlow', meta: { title: '决策画布', isTab: false } }
-    // { path: '/withdrawal-reportData', component: _import('modules/withdrawal/reportData'), name: 'withdrawal-reportData', meta: { title: '数据预览', isTab: false } }
+    // { path: '/dataGovernance-reportData', component: _import('modules/dataGovernance/reportData'), name: 'dataGovernance-reportData', meta: { title: '数据预览', isTab: false } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

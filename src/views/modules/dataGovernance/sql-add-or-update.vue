@@ -131,7 +131,7 @@
   </el-drawer>
 </template>
 <script>
-import { datasourceDataList, databaseDataList, sqlPreview, checkDatasource, saveDatasource, getUsersList, saveDatabySql } from '@/api/withdrawal/datareport'
+import { datasourceDataList, databaseDataList, sqlPreview, checkDatasource, saveDatasource, getUsersList, saveDatabySql } from '@/api/dataGovernance/datareport'
 // import {isInnerIPFn} from '@/utils/validate'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -443,7 +443,7 @@ export default {
       })
     },
     previewSqlData () {
-      let routeUrl = this.$router.resolve({ path: '/withdrawal-reportData' })
+      let routeUrl = this.$router.resolve({ path: '/dataGovernance-reportData' })
       window.open(routeUrl.href, '_blank')
     },
     //  提数 时间间隔 数据切换

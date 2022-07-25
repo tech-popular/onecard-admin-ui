@@ -84,7 +84,7 @@
 }
 </style>
 <script>
-import { exportDataList, approveRenewal, approveDisable } from '@/api/withdrawal/datareport'
+import { exportDataList, approveRenewal, approveDisable } from '@/api/dataGovernance/datareport'
 import addOrUpdateSql from './sql-add-or-update'
 import addOrUpdateFtp from './ftp-add-or-update'
 export default {
@@ -155,7 +155,7 @@ export default {
     },
     // 新增 / 修改
     addOrUpdateSqlHandle () {
-      // let routeUrl = this.$router.resolve({        path: '/withdrawal-dingDownLoad', query: {
+      // let routeUrl = this.$router.resolve({        path: '/dataGovernance-dingDownLoad', query: {
       //     fileName: 'dingning_20220322154406300'
       //   }      })
       // window.open(routeUrl.href, '_blank')

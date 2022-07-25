@@ -79,7 +79,7 @@
   </el-drawer>
 </template>
 <script>
-import { getFtpMenuLis, getUsersList, getFtpDataList, saveDataFtp } from '@/api/withdrawal/datareport'
+import { getFtpMenuLis, getUsersList, getFtpDataList, saveDataFtp } from '@/api/dataGovernance/datareport'
 export default {
   data () {
     return {
