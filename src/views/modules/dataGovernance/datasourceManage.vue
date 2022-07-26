@@ -69,7 +69,7 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
     <!-- 授权 -->
-    <assign-permission v-if="assignPermissionVisible" :submitDataApi="submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
+    <permissionConfiguration v-if="permissionConfigurationVisible" :submitDataApi="submitDataApi" :submitDataApis="submitDataApis" ref="permissionConfiguration" @refreshDataList="getDataList"></permissionConfiguration>
     <addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></addOrUpdate>-->
   </div>
 </template>
@@ -81,7 +81,7 @@
 <script>
 import { datasourceList, updateDataSourceAuth, batchUpdateDataSourceAuth } from '@/api/dataGovernance/datasourceManage'
 import addOrUpdate from './datasourceManage-add-or-update'
-import AssignPermission from '../../components/permission/assign-permission'
+import permissionConfiguration from './permissionConfiguration'
 export default {
   data () {
     return {
@@ -90,7 +90,6 @@ export default {
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
-      addOrUpdateSqlVisible: false,
       addOrUpdateVisible: false,
       dataForm: {
         enable: '',
@@ -100,13 +99,13 @@ export default {
       dataListSelections: [],
       submitDataApi: updateDataSourceAuth,
       submitDataApis: batchUpdateDataSourceAuth,
-      assignPermissionVisible: false,
+      permissionConfigurationVisible: false,
       userid: sessionStorage.getItem('id'),
       username: sessionStorage.getItem('username'),
       isAdmin: sessionStorage.getItem('username') === 'admin'
     }
   },
-  components: { addOrUpdate, AssignPermission },
+  components: { addOrUpdate, permissionConfiguration },
   activated () {
     this.getDataList()
   },
@@ -164,19 +163,19 @@ export default {
     taskPermission (row) {
       // 打开权限分配弹框
       // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
-      this.assignPermissionVisible = true
+      this.permissionConfigurationVisible = true
       this.$nextTick(() => {
-        this.$refs.assignPermission.init(row, false)
+        this.$refs.permissionConfiguration.init(row, false)
       })
     },
     // 批量授权
     multiTaskPermission () {
-      this.assignPermissionVisible = true
+      this.permissionConfigurationVisible = true
       let ids = this.dataListSelections.map(item => {
         return item.id
       })
       this.$nextTick(() => {
-        this.$refs.assignPermission.init(ids, true)
+        this.$refs.permissionConfiguration.init(ids, true)
       })
     }
   }
