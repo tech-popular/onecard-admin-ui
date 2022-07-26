@@ -11,9 +11,10 @@
         <el-input v-model="dataForm.grade" @keyup.enter.native="getDataList()"></el-input>
         <!-- <el-select v-model="dataForm.grade"></el-select> -->
       </el-form-item>
-      <el-form-item label="报表负责人: ">
-        <el-input v-model="dataForm.responsible" @keyup.enter.native="getDataList()"></el-input>
-        <!-- <el-select v-model="dataForm.grade"></el-select> -->
+      <el-form-item label="报表负责人">
+        <el-select v-model="dataForm.principalId" placeholder="请输入关键字" style="width:100%" clearable remote :remote-method="getUserSelectList" :loading="loading" filterable>
+          <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
@@ -40,7 +41,7 @@
           <el-tag v-else-if="scope.row.flag === 0" size="small" type="primary">是</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="responsible" header-align="center" align="center" label="负责人"></el-table-column>
+      <el-table-column prop="principal" header-align="center" align="center" label="负责人"></el-table-column>
       <el-table-column prop="creator" header-align="center" align="center" label="创建人"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
@@ -69,6 +70,7 @@
 
 <script>
 import { getMenuList, updateFlagInfo } from '@/api/BI-Manager/menu'
+import { getUsersList } from '@/api/BI-Manager/userGroup'
 import AddOrUpdate from './menu-add-or-update'
 export default {
   data () {
@@ -77,12 +79,14 @@ export default {
         name: '',
         url: '',
         grade: '',
-        responsible: ''
+        principalId: ''
       },
       page: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalCount: 0,
       dataList: [],
+      loading: false,
+      userIdList: [],
       dataListLoading: false,
       addOrUpdateVisible: false
     }
@@ -92,7 +96,6 @@ export default {
   },
   mounted () {
     this.getDataList()
-    this.getSelectDown()
   },
   methods: {
     // 获取数据列表
@@ -102,7 +105,7 @@ export default {
         'name': this.dataForm.name,
         'url': this.dataForm.url,
         'grade': this.dataForm.grade,
-        'responsible': this.dataForm.responsible,
+        'principalId': this.dataForm.principalId,
         'page': this.page,
         'pageSize': this.pageSize,
         'type': 0
@@ -119,7 +122,25 @@ export default {
         }
       })
     },
-    getSelectDown () {
+    getUserSelectList (query) {
+      if (query !== '') {
+        this.loading = true
+        let params = {
+          name: query
+        }
+        getUsersList(params).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.userIdList = data.dataList
+          } else {
+            this.userIdList = []
+          }
+          this.loading = false
+        }).finally(() => {
+          this.loading = false
+        })
+      } else {
+        this.userIdList = []
+      }
     },
     // 新增 / 修改
     addOrUpdateHandle (id) {
@@ -153,7 +174,7 @@ export default {
       this.dataForm.name = ''
       this.dataForm.url = ''
       this.dataForm.grade = ''
-      this.dataForm.responsible = ''
+      this.dataForm.principalId = ''
       this.getDataList()
     },
     /** 查询 */

@@ -25,8 +25,8 @@
           <el-option v-for="item in calculateList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="报表负责人" prop="responsible" v-if="dataForm.type === 1">
-        <el-select v-model="dataForm.responsible" multiple placeholder="请输入关键字" style="width:100%" remote :remote-method="getUserSelectList" :loading="loading" filterable>
+      <el-form-item label="报表负责人" prop="principalId" v-if="dataForm.type === 1">
+        <el-select v-model="dataForm.principalId" @change="changeprincipal" multiple placeholder="请输入关键字" style="width:100%" remote :remote-method="getUserSelectList" :loading="loading" filterable>
           <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -45,6 +45,7 @@ export default {
   data () {
     return {
       visible: false,
+      loading: false,
       dataForm: {
         id: 0,
         type: 0,
@@ -53,13 +54,14 @@ export default {
         name: '',
         url: '',
         taskIds: [],
-        responsible: []
+        principalId: []
       },
       menuData: [],
       menuList: [],
       menuParentList: [], // 保留选中的级联中完整内容
       calculateList: [],
       userIdList: [],
+      principal: [],
       menuListTreeProps: {
         checkStrictly: true,
         label: 'name',
@@ -82,7 +84,7 @@ export default {
         menuType: [
           { required: true, message: '菜单属性不能为空', trigger: 'blur' }
         ],
-        responsible: [
+        principalId: [
           { required: true, message: '请选择报表负责人', trigger: 'blur' }
         ]
       },
@@ -103,6 +105,7 @@ export default {
       this.getRecursionList()
       this.getTaskManageList()
       this.menuParentList = []
+      this.principal = []
       this.dataForm.type = 0
       this.visible = true
       if (row) {
@@ -119,7 +122,7 @@ export default {
       lookDataInfo(row.id).then(({ data }) => {
         if (data && data.code === 0) {
           let parentIdData = []
-          let responsibleData = data.data.responsible.split(',')
+          let responsibleData = (data.data.principalId && data.data.principalId.split(',')) || []
           if (data.data.parentId == '0') {
             this.dataForm.parentId = []
             this.menuParentList = []
@@ -131,8 +134,9 @@ export default {
           this.dataForm.name = data.data.name
           this.dataForm.menuType = data.data.menuType + ''
           this.getUserSelectList()
-          this.dataForm.responsible = responsibleData.map(item => { return +item })
-          this.userIdList = data.data.nameList
+          this.dataForm.principalId = responsibleData.map(item => { return +item })
+          this.userIdList = data.data.principalList
+          this.principal = data.data.principalList
           if (data.data.url) {
             this.dataForm.type = 1
             this.menuList = this.filterMenuList(this.menuData)
@@ -255,10 +259,29 @@ export default {
     parentTreeChange (val) {
       this.menuParentList = val
     },
+    // 负责人选中值修改
+    changeprincipal (val) {
+      this.userIdList.forEach(item => {
+        if (this.dataForm.principalId.includes(item.id)) {
+          this.principal.push(item)
+        }
+      })
+    },
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          let hash = {}
+          this.principal = this.principal.reduce((preVal, curVal) => {
+            hash[curVal.id] ? '' : hash[curVal.id] = true && preVal.push(curVal)
+            return preVal
+          }, [])
+          let principalData = []
+          this.principal.forEach(item => {
+            if (this.dataForm.principalId.includes(item.id)) {
+              principalData.push(item.name)
+            }
+          })
           let params = {
             'parentId': this.dataForm.parentId.length ? this.menuParentList[this.menuParentList.length - 1].toString() : '0',
             'name': this.dataForm.name,
@@ -267,7 +290,8 @@ export default {
             'menuParentList': this.menuParentList.join(','),
             'type': 0,
             'menuType': this.dataForm.menuType,
-            'responsible': this.dataForm.type === 0 ? '' : this.dataForm.responsible.join(','),
+            'principalId': this.dataForm.type === 0 ? '' : this.dataForm.principalId.join(','),
+            'principal': this.dataForm.type === 0 ? '' : principalData.join(',')
           }
           console.log('params: ', params)
           if (!this.dataForm.id) {
