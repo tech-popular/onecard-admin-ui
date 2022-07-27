@@ -582,7 +582,9 @@ export default {
       this.rejectForm.rejectGroupPackageIds = []
       this.getCusterList(this.baseForm.channelId)
       this.getVestPackAvailable(this.baseForm.channelId)
-      this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
+      if (this.baseForm.userType === 'indicator') {
+        this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
+      }
       // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId) // 用户行为暂时隐藏
       this.rejectForm.rejectGroupPackageIds = []
     },
