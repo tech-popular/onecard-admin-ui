@@ -52,8 +52,8 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
-          <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button> -->
           <!-- <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 1 && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
           <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 0  && scope.row.approveStatus === 'agree'" @click="renewalHandle(scope.row)">申请续期</el-button>-->
         </template>
@@ -114,25 +114,25 @@ export default {
   methods: {
     // 获取数据列表
     getDataList () {
-      // this.dataListLoading = true
+      this.dataListLoading = true
       let params = {
-        approveReason: this.dataForm.datasourceName,
+        datasourceName: this.dataForm.datasourceName,
         enable: this.dataForm.enable ? Number(this.dataForm.enable) : '',
         type: this.dataForm.type,
-        page: this.pageIndex,
+        currPage: this.pageIndex,
         pageSize: this.pageSize
       }
-      // datasourceList(params).then(({ data }) => {
-      //   console.log('res: ', data)
-      //   if (data.code === 0 && data.data) {
-      //     this.dataList = data.data.list
-      //     this.totalPage = data.data.totalCount
-      //     this.dataListLoading = false
-      //   } else {
-      //     this.dataList = []
-      //     this.dataListLoading = false
-      //   }
-      // })
+      datasourceList(params).then(({ data }) => {
+        console.log('res: ', data)
+        if (data.code === 0 && data.data) {
+          this.dataList = data.data.list
+          this.totalPage = data.data.totalCount
+          this.dataListLoading = false
+        } else {
+          this.dataList = []
+          this.dataListLoading = false
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (val) {
@@ -150,10 +150,10 @@ export default {
       this.getDataList()
     },
     // 新增 / 修改
-    addOrUpdateHandle () {
+    addOrUpdateHandle (id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init()
+        this.$refs.addOrUpdate.init(id)
       })
     },
     // 多选

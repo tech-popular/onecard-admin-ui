@@ -19,8 +19,8 @@ export default {
       this.visible = true
     },
     filterMethod (query, item) {
-      return item.pinyin.indexOf(query) > -1;
+      return item.pinyin.indexOf(query) > -1
     }
   }
-};
+}
 </script>
