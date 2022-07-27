@@ -2,9 +2,7 @@
   <el-dialog :title="!updateId ? '新增' : '修改'" @close="datano" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="20%">
       <el-form-item label="数据源名称" prop="datasourceName">
-        <el-select filterable v-model="dataForm.datasourceName" placeholder="请选择">
-          <el-option v-for="item in datasourceNameList" :value="item.id" :key="item.id" :label="item.datasourceName" />
-        </el-select>
+        <el-input v-model="dataForm.datasourceName" placeholder="数据源名称" />
       </el-form-item>
       <el-form-item label="数据源类型" prop="datasourceType">
         <el-select filterable v-model="dataForm.datasourceType" placeholder="请选择">
@@ -38,7 +36,7 @@
 </template>
 
 <script>
-import { queryEnableList, saveDatasource, editDatasource, lookDatasource } from '@/api/dataGovernance/datasourceManage'
+import { saveDatasource, editDatasource, lookDatasource } from '@/api/dataGovernance/datasourceManage'
 import Filter from './filter'
 export default {
   data () {
@@ -54,7 +52,6 @@ export default {
         remark: '',
         datasourceType: ''
       },
-      datasourceNameList: [],
       userid: sessionStorage.getItem('id'),
       dataRule: {
         datasourceName: [
@@ -79,10 +76,6 @@ export default {
         enable: [
           { required: true, message: '请选择启用/禁用', trigger: 'blur' },
           { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
-        ],
-        remark: [
-          { required: true, message: '备注不能为空', trigger: 'blur' },
-          { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
         ]
       },
 
@@ -102,20 +95,6 @@ export default {
       console.log('id: ', id);
       this.updateId = id
       this.visible = true
-      let params = {
-        'userId': Number(this.userid)
-      }
-      queryEnableList(params).then(({ data }) => {
-        if (data.code === 0) {
-          this.datasourceNameList = data.data
-        } else {
-          this.datasourceNameList = []
-          this.$message({
-            message: data.msg || '数据异常',
-            type: 'error'
-          })
-        }
-      })
       if (id) {
         lookDatasource(id).then(({ data }) => {
           if (data && data.code === 0) {
@@ -142,7 +121,6 @@ export default {
             'enable': Number(this.dataForm.enable),
             'remark': this.dataForm.remark,
             'datasourceType': this.dataForm.datasourceType,
-
           }
           if (this.updateId) {
             params.id = this.updateId
@@ -164,9 +142,7 @@ export default {
                 })
               }
             })
-
           } else {
-
             saveDatasource(params).then(({ data }) => {
               if (data && data.message === 'success') {
                 this.$message({

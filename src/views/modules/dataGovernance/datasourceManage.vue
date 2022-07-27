@@ -20,7 +20,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="searchData()">查询</el-button>
-        <el-button type="primary" @click="addOrUpdateHandle">新增</el-button>
+        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
