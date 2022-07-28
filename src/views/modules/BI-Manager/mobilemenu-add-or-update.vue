@@ -89,6 +89,9 @@ export default {
         ],
         orderNum: [
           { required: true, message: '位置排序不能为空', trigger: 'blur' }
+        ],
+        principalId: [
+          { required: true, message: '报表负责人不能为空', trigger: 'blur' }
         ]
       }
     }
