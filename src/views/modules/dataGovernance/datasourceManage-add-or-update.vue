@@ -9,6 +9,18 @@
           <el-option v-for="item in datasourceTypeList" :value="item.value" :key="item.id" :label="item.value" />
         </el-select>
       </el-form-item>
+      <el-form-item label="数据库列表" v-if="(!updateId && dataForm.datasourceType === 'maxCompute') || updateId" prop="databaseList">
+        <input-tag
+          v-model="dataForm.databaseList"
+          :valueType="'string'"
+          :add-tag-on-blur="true"
+          :tag-tips="[]"
+          :readOnly="updateId && dataForm.datasourceType !== 'maxCompute'"
+          :allow-duplicates="true"
+          class="itemIput inputTag"
+          placeholder="可用回车输入多条"
+        ></input-tag>
+      </el-form-item>
       <el-form-item label="数据库用户名" prop="user">
         <el-input v-model="dataForm.user" placeholder="数据库用户名" />
       </el-form-item>
@@ -17,6 +29,9 @@
       </el-form-item>
       <el-form-item label="数据库URL" prop="url">
         <el-input v-model="dataForm.url" placeholder="数据库URL" />
+      </el-form-item>
+      <el-form-item label="驱动类" prop="driver">
+        <el-input v-model="dataForm.driver" placeholder="数据库用户名" />
       </el-form-item>
       <el-form-item label="启用/禁用" prop="enable">
         <el-radio-group v-model="dataForm.enable">
@@ -38,6 +53,7 @@
 <script>
 import { saveDatasource, editDatasource, lookDatasource } from '@/api/dataGovernance/datasourceManage'
 import Filter from './filter'
+import InputTag from '../dataAnalysis/components/InputTag'
 export default {
   data () {
     return {
@@ -48,9 +64,11 @@ export default {
         user: '',
         passwd: '',
         url: '',
-        enable: 0,
+        enable: '',
         remark: '',
-        datasourceType: ''
+        datasourceType: '',
+        databaseList: [],
+        driver: ''
       },
       userid: sessionStorage.getItem('id'),
       dataRule: {
@@ -75,8 +93,16 @@ export default {
         ],
         enable: [
           { required: true, message: '请选择启用/禁用', trigger: 'blur' },
+        ],
+        databaseList: [
+          { required: true, message: '数据库列表不能为空', trigger: 'blur' },
+          { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
+        ],
+        driver: [
+          { required: true, message: '驱动类不能为空', trigger: 'blur' },
           { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
         ]
+
       },
 
       datasourceTypeList: [
@@ -89,17 +115,19 @@ export default {
   mounted () {
   },
   components: {
+    InputTag
   },
   methods: {
     init (id) {
       console.log('id: ', id);
       this.updateId = id
-      this.visible = true
       if (id) {
         lookDatasource(id).then(({ data }) => {
           if (data && data.code === 0) {
             this.dataForm = data.data
             this.dataForm.enable = data.data.enable.toString()
+            this.dataForm.databaseList = data.data.databaseList.split(',')
+            console.log(' this.dataForm.databaseList: ', this.dataForm.databaseList);
           } else {
             this.$message({
               message: data.message || '数据异常',
@@ -108,6 +136,7 @@ export default {
           }
         })
       }
+      this.visible = true
     },
     // 表单提交
     dataFormSubmit () {
@@ -121,11 +150,13 @@ export default {
             'enable': Number(this.dataForm.enable),
             'remark': this.dataForm.remark,
             'datasourceType': this.dataForm.datasourceType,
+            'databaseList': this.dataForm.datasourceType === 'maxCompute' ? this.dataForm.databaseList.join(',') : '',
+            'driver': this.dataForm.driver
           }
           if (this.updateId) {
             params.id = this.updateId
             editDatasource(params).then(({ data }) => {
-              if (data && data.message === 'success') {
+              if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
                   type: 'success',
@@ -144,7 +175,7 @@ export default {
             })
           } else {
             saveDatasource(params).then(({ data }) => {
-              if (data && data.message === 'success') {
+              if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
                   type: 'success',

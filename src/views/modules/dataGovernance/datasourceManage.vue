@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.datasourceName" clearable class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item label="数据源类型: ">
-        <el-select v-model="dataForm.type" clearable>
+        <el-select v-model="dataForm.datasourceType" clearable>
           <el-option label="mysql" value="mysql"></el-option>
           <el-option label="maxComputer" value="maxComputer"></el-option>
           <el-option label="postgre" value="postgre"></el-option>
@@ -54,8 +54,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
-          <!-- <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 1 && scope.row.approveStatus === 'agree'" @click="disableHandle(scope.row)">申请失效</el-button>
-          <el-button type="text" v-if="scope.row.typeDesc === 'ftp提数' && scope.row.enable === 0  && scope.row.approveStatus === 'agree'" @click="renewalHandle(scope.row)">申请续期</el-button>-->
+          <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="userPermission(scope.row)">用户组配置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -69,7 +68,8 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
     <!-- 授权 -->
-    <permissionConfiguration v-if="permissionConfigurationVisible" :submitDataApi="submitDataApi" :submitDataApis="submitDataApis" ref="permissionConfiguration" @refreshDataList="getDataList"></permissionConfiguration>
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi="submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
+    <permissionConfiguration v-if="userPermissionConfigurationVisible" ref="userPermissionConfiguration" @refreshDataList="getDataList"></permissionConfiguration>
     <addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></addOrUpdate>-->
   </div>
 </template>
@@ -82,6 +82,7 @@
 import { datasourceList, updateDataSourceAuth, batchUpdateDataSourceAuth } from '@/api/dataGovernance/datasourceManage'
 import addOrUpdate from './datasourceManage-add-or-update'
 import permissionConfiguration from './permissionConfiguration'
+import AssignPermission from '../../components/permission/assign-permission'
 export default {
   data () {
     return {
@@ -93,19 +94,20 @@ export default {
       addOrUpdateVisible: false,
       dataForm: {
         enable: '',
-        type: '',
+        datasourceType: '',
         datasourceName: ''
       },
       dataListSelections: [],
       submitDataApi: updateDataSourceAuth,
       submitDataApis: batchUpdateDataSourceAuth,
-      permissionConfigurationVisible: false,
+      assignPermissionVisible: false,
+      userPermissionConfigurationVisible: false,
       userid: sessionStorage.getItem('id'),
       username: sessionStorage.getItem('username'),
       isAdmin: sessionStorage.getItem('username') === 'admin'
     }
   },
-  components: { addOrUpdate, permissionConfiguration },
+  components: { addOrUpdate, permissionConfiguration, AssignPermission },
   activated () {
     this.getDataList()
   },
@@ -118,7 +120,7 @@ export default {
       let params = {
         datasourceName: this.dataForm.datasourceName,
         enable: this.dataForm.enable ? Number(this.dataForm.enable) : '',
-        type: this.dataForm.type,
+        datasourceType: this.dataForm.datasourceType,
         currPage: this.pageIndex,
         pageSize: this.pageSize
       }
@@ -160,24 +162,34 @@ export default {
     selectionChangeHandle (val) {
       this.dataListSelections = val
     },
+    userPermission (row) {
+      // 打开权限分配弹框
+      // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
+      this.userPermissionConfigurationVisible = true
+      this.$nextTick(() => {
+        this.$refs.userPermissionConfiguration.init(row, false)
+      })
+    },
     taskPermission (row) {
       // 打开权限分配弹框
       // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
-      this.permissionConfigurationVisible = true
+      this.assignPermissionVisible = true
       this.$nextTick(() => {
-        this.$refs.permissionConfiguration.init(row, false)
+        this.$refs.assignPermission.init(row, false)
       })
     },
     // 批量授权
     multiTaskPermission () {
-      this.permissionConfigurationVisible = true
-      let ids = this.dataListSelections.map(item => {
-        return item.id
-      })
-      this.$nextTick(() => {
-        this.$refs.permissionConfiguration.init(ids, true)
-      })
-    }
+      if (this.dataListSelections.length) {
+        this.assignPermissionVisible = true
+        let ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$nextTick(() => {
+          this.$refs.assignPermission.init(ids, true)
+        })
+      }
+    },
   }
 }
 </script>
