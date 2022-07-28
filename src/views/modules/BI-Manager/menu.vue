@@ -11,6 +11,9 @@
         <el-input v-model="dataForm.grade" @keyup.enter.native="getDataList()"></el-input>
         <!-- <el-select v-model="dataForm.grade"></el-select> -->
       </el-form-item>
+       <el-form-item label="创建人: ">
+        <el-input v-model="dataForm.creator" @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
       <el-form-item label="报表负责人">
         <el-select v-model="dataForm.principalId" placeholder="请输入关键字" style="width:100%" clearable remote :remote-method="getUserSelectList" :loading="loading" filterable>
           <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -79,7 +82,8 @@ export default {
         name: '',
         url: '',
         grade: '',
-        principalId: ''
+        principalId: '',
+        creator: ''
       },
       page: 1, // 当前页
       pageSize: 10, // 默认每页10条
@@ -105,6 +109,7 @@ export default {
         'name': this.dataForm.name,
         'url': this.dataForm.url,
         'grade': this.dataForm.grade,
+        'creator': this.dataForm.creator,
         'principalId': this.dataForm.principalId,
         'page': this.page,
         'pageSize': this.pageSize,
@@ -174,6 +179,7 @@ export default {
       this.dataForm.name = ''
       this.dataForm.url = ''
       this.dataForm.grade = ''
+      this.dataForm.creator = ''
       this.dataForm.principalId = ''
       this.getDataList()
     },
