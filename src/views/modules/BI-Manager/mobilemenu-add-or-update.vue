@@ -129,6 +129,7 @@ export default {
             this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
           }
           this.dataForm.name = data.data.name
+          this.dataForm.orderNum = data.data.orderNum
           this.getUserSelectList()
           this.dataForm.principalId = responsibleData.map(item => { return +item })
           this.userIdList = data.data.principalList
