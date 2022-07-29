@@ -77,7 +77,7 @@ export default {
           { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
         ],
         datasourceType: [
-          { required: true, message: '请选择数据源类型', trigger: 'blur' },
+          { required: true, message: '请选择数据源类型', trigger: 'blur' }
         ],
         user: [
           { required: true, message: '用户名不能为空', trigger: 'blur' },
@@ -92,7 +92,7 @@ export default {
           { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
         ],
         enable: [
-          { required: true, message: '请选择启用/禁用', trigger: 'blur' },
+          { required: true, message: '请选择启用/禁用', trigger: 'blur' }
         ],
         databaseList: [
           { required: true, message: '数据库列表不能为空', trigger: 'blur' },
@@ -102,7 +102,6 @@ export default {
           { required: true, message: '驱动类不能为空', trigger: 'blur' },
           { required: true, validator: Filter.NullKongGeRule, trigger: 'change' }
         ]
-
       },
 
       datasourceTypeList: [
@@ -119,8 +118,8 @@ export default {
   },
   methods: {
     init (id) {
-      console.log('id: ', id);
       this.updateId = id
+      this.dataForm.databaseList = []
       if (id) {
         lookDatasource(id).then(({ data }) => {
           if (data && data.code === 0) {
@@ -142,6 +141,7 @@ export default {
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          console.log('this.dataForm.databaseList: ', this.dataForm.databaseList);
           let params = {
             'datasourceName': this.dataForm.datasourceName,
             'user': this.dataForm.user,
@@ -150,11 +150,12 @@ export default {
             'enable': Number(this.dataForm.enable),
             'remark': this.dataForm.remark,
             'datasourceType': this.dataForm.datasourceType,
-            'databaseList': this.dataForm.datasourceType === 'maxCompute' ? this.dataForm.databaseList.join(',') : '',
+            'databaseList': this.dataForm.databaseList.join(','),
             'driver': this.dataForm.driver
           }
           if (this.updateId) {
             params.id = this.updateId
+            // params.databaseList = this.dataForm.databaseList.join(',')
             editDatasource(params).then(({ data }) => {
               if (data && data.code === 0) {
                 this.$message({

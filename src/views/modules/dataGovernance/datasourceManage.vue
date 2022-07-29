@@ -52,7 +52,12 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button
+            type="text"
+            size="small"
+            v-if="isAdmin || scope.row.authOtherList.includes(userid || username) || scope.row.authOwner === userid || scope.row.authOwner === username"
+            @click="addOrUpdateHandle(scope.row.id)"
+          >修改</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="userPermission(scope.row)">用户组配置</el-button>
         </template>
@@ -70,7 +75,7 @@
     <!-- 授权 -->
     <assign-permission v-if="assignPermissionVisible" :submitDataApi="submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
     <permissionConfiguration v-if="userPermissionConfigurationVisible" ref="userPermissionConfiguration" @refreshDataList="getDataList"></permissionConfiguration>
-    <addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></addOrUpdate>-->
+    <addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></addOrUpdate>
   </div>
 </template>
 <style>
@@ -189,7 +194,7 @@ export default {
           this.$refs.assignPermission.init(ids, true)
         })
       }
-    },
+    }
   }
 }
 </script>
