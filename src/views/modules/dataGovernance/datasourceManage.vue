@@ -36,7 +36,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="datasourceType" header-align="center" align="center" label="数据源类型"></el-table-column>
-      <el-table-column prop="databaseList" header-align="center" align="center" label="数据库列表"></el-table-column>
+      <el-table-column prop="databaseList" header-align="center" show-overflow-tooltip align="center" label="数据库列表"></el-table-column>
       <el-table-column prop="user" header-align="center" align="center" label="账户"></el-table-column>
       <el-table-column prop="url" header-align="center" align="center" show-overflow-tooltip label="数据源地址"></el-table-column>
       <el-table-column prop="createUser" header-align="center" align="center" label="创建人"></el-table-column>

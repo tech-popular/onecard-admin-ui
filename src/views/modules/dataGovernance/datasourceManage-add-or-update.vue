@@ -106,7 +106,7 @@ export default {
 
       datasourceTypeList: [
         { id: 'mysql', value: 'mysql' },
-        { id: 'postgre', value: 'postgre' },
+        { id: 'postgres', value: 'postgres' },
         { id: 'maxCompute', value: 'maxCompute' }
       ]
     }
