@@ -24,12 +24,14 @@ export default {
   methods: {
     init (row) {
       this.datasourceId = row.id
-      this.userGroupId = []
+      let userGroupIdData = row.userGroupIds ? row.userGroupIds.split(',') : []
+      this.userGroupId = userGroupIdData.map(item => { return +item })
       this.transferData = []
       biUserGroupList().then(({ data }) => {
         if (data.code === 0) {
           const allData = data.data
           allData.forEach(element => {
+            // if ()
             this.transferData.push({
               key: element.id,
               label: element.name

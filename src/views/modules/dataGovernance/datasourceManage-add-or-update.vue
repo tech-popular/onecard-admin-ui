@@ -126,7 +126,6 @@ export default {
             this.dataForm = data.data
             this.dataForm.enable = data.data.enable.toString()
             this.dataForm.databaseList = data.data.databaseList.split(',')
-            console.log(' this.dataForm.databaseList: ', this.dataForm.databaseList);
           } else {
             this.$message({
               message: data.message || '数据异常',
@@ -141,7 +140,6 @@ export default {
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log('this.dataForm.databaseList: ', this.dataForm.databaseList);
           let params = {
             'datasourceName': this.dataForm.datasourceName,
             'user': this.dataForm.user,
