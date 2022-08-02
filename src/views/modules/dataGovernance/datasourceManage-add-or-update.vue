@@ -46,12 +46,13 @@
     <span slot="footer">
       <el-button @click="datano()">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="success" @click="handleTest()">连接测试</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
-import { saveDatasource, editDatasource, lookDatasource } from '@/api/dataGovernance/datasourceManage'
+import { saveDatasource, editDatasource, lookDatasource, testDatasource } from '@/api/dataGovernance/datasourceManage'
 import Filter from './filter'
 import InputTag from '../dataAnalysis/components/InputTag'
 export default {
@@ -135,6 +136,32 @@ export default {
         })
       }
       this.visible = true
+    },
+    handleTest () {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          testDatasource({
+            'url': this.dataForm.url,
+            'datasourceType': this.dataForm.datasourceType,
+            'user': this.dataForm.user,
+            'passwd': this.dataForm.passwd,
+            'driver': this.dataForm.driver,
+            'databaseList': this.dataForm.databaseList.join(',')
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: data.msg,
+                type: 'success'
+              })
+            } else {
+              this.$message({
+                message: data.msg,
+                type: 'error'
+              })
+            }
+          })
+        }
+      })
     },
     // 表单提交
     dataFormSubmit () {

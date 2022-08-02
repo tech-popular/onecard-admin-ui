@@ -7,8 +7,8 @@
       <el-form-item label="数据源类型: ">
         <el-select v-model="dataForm.datasourceType" clearable>
           <el-option label="mysql" value="mysql"></el-option>
-          <el-option label="maxComputer" value="maxComputer"></el-option>
-          <el-option label="postgre" value="postgre"></el-option>
+          <el-option label="maxCompute" value="maxCompute"></el-option>
+          <el-option label="postgres" value="postgres"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="启用状态: ">
