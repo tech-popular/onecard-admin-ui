@@ -71,7 +71,6 @@ export default {
         databaseList: [],
         driver: ''
       },
-      userid: sessionStorage.getItem('id'),
       dataRule: {
         datasourceName: [
           { required: true, message: '数据源名称不能为空', trigger: 'blur' },
@@ -180,7 +179,6 @@ export default {
           }
           if (this.updateId) {
             params.id = this.updateId
-            // params.databaseList = this.dataForm.databaseList.join(',')
             editDatasource(params).then(({ data }) => {
               if (data && data.code === 0) {
                 this.$message({
