@@ -114,10 +114,10 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="pane-rules-title">
+      <div class="pane-rules-title" v-if="baseForm.userType === 'indicator'">
         <h3>满足如下条件的用户</h3>
       </div>
-      <div class="pane-rules">
+      <div class="pane-rules" v-if="baseForm.userType === 'indicator'">
         <div class="pane-rules-relation" v-if="showActionRule && showAtterRule">
           <span @click="switchSymbol()">{{outMostExpressionTemplate === 'and' ? '且' : '或'}}</span>
         </div>
@@ -193,7 +193,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
-    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @savueData = 'savueData'></taskDependencies>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @savueData="savueData"></taskDependencies>
   </el-drawer>
 </template>
 <script>
@@ -468,10 +468,14 @@ export default {
               type: 'error'
             })
           }
-          this.$refs.userAttrRule.renderData(
-            data.data.configJson,
-            this.baseForm.channelId
-          )
+          if (data.data.userType === 'indicator') {
+            this.$refs.userAttrRule.renderData(
+              data.data.configJson,
+              this.baseForm.channelId
+            )
+          } else {
+            this.renderEnd()
+          }
           // 用户行为暂时隐藏
           // this.$refs.userActionRule.renderData( // 真实调接口时数据重现
           //   data.data.configJson,
@@ -578,7 +582,9 @@ export default {
       this.rejectForm.rejectGroupPackageIds = []
       this.getCusterList(this.baseForm.channelId)
       this.getVestPackAvailable(this.baseForm.channelId)
-      this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
+      if (this.baseForm.userType === 'indicator') {
+        this.$refs.userAttrRule.channelIdChangeUpdate(this.baseForm.channelId)
+      }
       // this.$refs.userActionRule.channelIdChangeUpdate(this.baseForm.channelId) // 用户行为暂时隐藏
       this.rejectForm.rejectGroupPackageIds = []
     },
@@ -792,84 +798,86 @@ export default {
         })
         return
       }
-      // 用户属性 用户行为 数据校验
-      this.$refs.userAttrRule.isRequired = true
-      // this.$refs.userActionRule.isRequired = true // 用户行为暂时隐藏
-      let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
-      // let actionRuleFormArr = this.$refs.userActionRule.getRuleForm() // 用户行为暂时隐藏
-      this.$nextTick(() => {
-        // 待页面中的isRequired = true后再执行校验
-        let flag = true
-        this.$refs.baseForm.validate(valid => {
-          if (!valid) {
-            flag = false
-          }
-        })
-        this.$refs.rejectForm.validate((valid) => {
-          if (!valid) {
-            flag = false
-          }
-        })
-        console.log(ruleFormArr)
-        ruleFormArr.forEach(item => {
-          item.validate(valid => {
+      if (this.baseForm.userType === 'indicator') {
+        // 用户属性 用户行为 数据校验
+        this.$refs.userAttrRule.isRequired = true
+        // this.$refs.userActionRule.isRequired = true // 用户行为暂时隐藏
+        let ruleFormArr = this.$refs.userAttrRule.getRuleForm()
+        // let actionRuleFormArr = this.$refs.userActionRule.getRuleForm() // 用户行为暂时隐藏
+        this.$nextTick(() => {
+          // 待页面中的isRequired = true后再执行校验
+          let flag = true
+          this.$refs.baseForm.validate(valid => {
             if (!valid) {
               flag = false
             }
           })
-        })
-        // actionRuleFormArr.forEach(item => { // 用户行为暂时隐藏
-        //   item.validate(valid => {
-        //     if (!valid) {
-        //       flag = false
-        //     }
-        //   })
-        // })
-        if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel' && this.baseForm.userType !== 'sql') {
-          // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
-          return this.$message({
-            message: '请配置用户规则信息',
-            type: 'error',
-            center: true
+          this.$refs.rejectForm.validate((valid) => {
+            if (!valid) {
+              flag = false
+            }
           })
-        }
-        if (!flag) {
-          this.$refs.userAttrRule.isRequired = false
-          // this.$refs.userActionRule.isRequired = false // 用户行为暂时隐藏
-        } else {
-          // 全部校验通过后，可保存数据
-          this.$refs.userAttrRule.uneffectIndexValidate()
-          // this.$refs.userActionRule.uneffectIndexValidate() // 用户行为暂时隐藏
-          if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
-            return false
-          }
-          if (this.id && type === 'save') {
-            selectTransferTask(this.id).then(({ data }) => {
-              if (data.status === '1' && data.data) {
-                this.taskDependenciesList = data.data.dataTransfers
-                if (this.taskDependenciesList.length) {
-                  this.taskDependenciesVisible = true
-                  this.$nextTick(() => {
-                    this.$refs.taskDependencies.init()
-                  })
-                } else {
-                  this.savueData(type)
-                }
-              } else {
-                this.taskDependenciesList = []
-                return this.$message({
-                  type: 'error',
-                  message: data.message || '数据异常'
-                })
+          console.log(ruleFormArr)
+          ruleFormArr.forEach(item => {
+            item.validate(valid => {
+              if (!valid) {
+                flag = false
               }
             })
-          } else {
-           this.savueData(type)
+          })
+          // actionRuleFormArr.forEach(item => { // 用户行为暂时隐藏
+          //   item.validate(valid => {
+          //     if (!valid) {
+          //       flag = false
+          //     }
+          //   })
+          // })
+          if (ruleFormArr.length === 0 && this.baseForm.userType !== 'excel' && this.baseForm.userType !== 'sql') {
+            // if (ruleFormArr.length === 0 && actionRuleFormArr.length === 0) { // 用户行为暂时隐藏
+            return this.$message({
+              message: '请配置用户规则信息',
+              type: 'error',
+              center: true
+            })
           }
-        }
-      })
+          if (!flag) {
+            this.$refs.userAttrRule.isRequired = false
+            // this.$refs.userActionRule.isRequired = false // 用户行为暂时隐藏
+          } else {
+            // 全部校验通过后，可保存数据
+            this.$refs.userAttrRule.uneffectIndexValidate()
+            // this.$refs.userActionRule.uneffectIndexValidate() // 用户行为暂时隐藏
+            if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
+              return false
+            }
+          }
+        })
+      }
+      if (this.id && type === 'save') {
+        selectTransferTask(this.id).then(({ data }) => {
+          if (data.status === '1' && data.data) {
+            this.taskDependenciesList = data.data.dataTransfers
+            if (this.taskDependenciesList.length) {
+              this.taskDependenciesVisible = true
+              this.$nextTick(() => {
+                this.$refs.taskDependencies.init()
+              })
+            } else {
+              this.savueData(type)
+            }
+          } else {
+            this.taskDependenciesList = []
+            return this.$message({
+              type: 'error',
+              message: data.message || '数据异常'
+            })
+          }
+        })
+      } else {
+        this.savueData(type)
+      }
     },
-    savueData(type, callback) {
+    savueData (type, callback) {
       if (this.baseForm.userType === 'excel') { // excel方式
         this.excelSaveData(callback)
       } else if (this.baseForm.userType === 'sql') {
@@ -937,9 +945,9 @@ export default {
       data.append('userType', this.baseForm.userType)
       data.append('desc', this.baseForm.desc)
       data.append('channelId', this.baseForm.channelId)
-      data.append('ruleConfig', JSON.stringify(this.$refs.userAttrRule.lastSubmitRuleConfig.ruleConfig))
-      data.append('expression', this.$refs.userAttrRule.lastSubmitRuleConfig.expression)
-      data.append('expressionTemplate', this.$refs.userAttrRule.lastSubmitRuleConfig.expressionTemplate)
+      // data.append('ruleConfig', JSON.stringify(this.$refs.userAttrRule.lastSubmitRuleConfig.ruleConfig))
+      // data.append('expression', this.$refs.userAttrRule.lastSubmitRuleConfig.expression)
+      // data.append('expressionTemplate', this.$refs.userAttrRule.lastSubmitRuleConfig.expressionTemplate)
       data.append('vestPackCode', this.rejectForm.vestPackCode.join(','))
       this.rejectForm.rejectGroupPackageIds.forEach(item => {
         data.append('rejectGroupPackageIds', item)
@@ -989,11 +997,11 @@ export default {
         type: this.baseForm.type,
         channelId: this.baseForm.channelId,
         desc: this.baseForm.desc,
-        ...this.$refs.userAttrRule.lastSubmitRuleConfig,
+        // ...this.$refs.userAttrRule.lastSubmitRuleConfig,
         // ...this.$refs.userActionRule.lastSubmitRuleConfig, //用户行为
         ...this.rejectForm,
         sqlImportParam: sqlImportParam,
-        outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
+        // outMostExpressionTemplate: this.showActionRule && this.showAtterRule ? this.outMostExpressionTemplate : 'and',
         rejectGroupPackCode: code
       }
       params.vestPackCode = params.vestPackCode.join(',')

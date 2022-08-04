@@ -8,14 +8,14 @@
         <el-input v-model="dataForm.transferName" placeholder clearable />
       </el-form-item>
       <el-form-item label="调度频率">
-        <el-select v-model="dataForm.dispatchFrequency" placeholder="调度频率">
+        <el-select v-model="dataForm.dispatchFrequency" clearable placeholder="调度频率">
           <el-option label="单次" value="ONCE_ONLY"></el-option>
           <el-option label="定时" value="TIME"></el-option>
           <el-option label="被动" value="1"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="任务状态">
-        <el-select v-model="dataForm.enable" placeholder="任务状态">
+        <el-select v-model="dataForm.enable" clearable placeholder="任务状态">
           <el-option label="全部" value></el-option>
           <el-option label="有效" value="1"></el-option>
           <el-option label="无效" value="0"></el-option>
