@@ -30,7 +30,10 @@ export default {
       // 禁用右键
       // document.oncontextmenu = new Function("event.returnValue=false")
       // 禁用选择
-      document.onselectstart = new Function('event.returnValue=false')
+      let setReturnValue = function() {
+        event.returnValue = false
+      }
+      document.onselectstart = setReturnValue
     })
   },
   methods: {

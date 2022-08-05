@@ -270,7 +270,10 @@ export default {
         if (valid) {
           let hash = {}
           this.principal = this.principal.reduce((preVal, curVal) => {
-            hash[curVal.id] ? '' : hash[curVal.id] = true && preVal.push(curVal)
+            // hash[curVal.id] ? '' : hash[curVal.id] = true && preVal.push(curVal)
+            if (!hash[curVal.id]) {
+              hash[curVal.id] = preVal.push(curVal)
+            }
             return preVal
           }, [])
           let principalData = []
