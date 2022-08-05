@@ -394,8 +394,7 @@ export default {
     },
     // 钉钉扫码登陆
     initDingJs () {
-      !function (window, document) {
-        function d (a) {
+        window.DDLogin = (a) => {
           let e
           let c = document.createElement('iframe')
           let d = 'https://login.dingtalk.com/login/qrcode.htm?goto=' + a.goto
@@ -411,8 +410,6 @@ export default {
           e.innerHTML = ''
           e.appendChild(c)
         }
-        window.DDLogin = d
-      }(window, document)
     },
     addDingListener () {
       let self = this
