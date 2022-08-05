@@ -316,8 +316,8 @@ export default {
             trigger: 'change'
           }
         ],
-        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }]
-        // cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
+        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
+        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
         // sqlFields: [
         //   { required: true, message: 'SQL列不能为空，且必须和SQL对应', trigger: 'blur', validator: validateNull }
         // ]

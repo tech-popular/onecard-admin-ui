@@ -1145,22 +1145,16 @@
         }
         postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
-        console.log('data.onceRunTime:111 ', data.onceRunTime);
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
-        console.log('year: ', year);
         let month = (tempTime.getMonth() + 1) < 10 ? '0' + (tempTime.getMonth() + 1) : tempTime.getMonth().toString()
-        console.log('month: ', month);
         let day = tempTime.getDate() < 10 ? '0' + tempTime.getDate() : tempTime.getDate().toString()
         let hour = tempTime.getHours() < 10 ? '0' + tempTime.getHours() : tempTime.getHours().toString()
         let minute = tempTime.getMinutes() < 10 ? '0' + tempTime.getMinutes() : tempTime.getMinutes().toString()
         let second = tempTime.getSeconds() < 10 ? '0' + tempTime.getSeconds() : tempTime.getSeconds().toString()
-          
-          console.log('data.onceRunTime: ', data.onceRunTime);
-          console.log('data.jobType: ', data.jobType);
         if (data.jobType == 1) {
           postData.taskScheduleConfig.jobType = 'ONCE_ONLY'
-          if (data.onceRunTime !== ''&& data.onceRunTime !== null) {
+          if (data.onceRunTime !== '' && data.onceRunTime !== null) {
             let obgExec = {
               year: year,
               month: month,
