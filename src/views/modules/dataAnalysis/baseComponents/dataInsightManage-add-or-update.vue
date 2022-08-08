@@ -740,16 +740,6 @@ export default {
       }).catch(() => {
         console.log('cancel')
       })
-      // .then(() => {
-      //   // 确认创建分群时的操作
-      //   this.drawerTitle = '新建'
-      //   this.baseForm.name = '复制' + this.baseForm.name
-      //   this.id = 0
-      //   this.$refs.baseTitle.scrollIntoView() // 滚动到页面最上面
-      // })
-      // .catch(() => {
-      //   console.log('cancel')
-      // })
     },
     saveCollision (callback) {
       let url = collisionSave
@@ -817,7 +807,6 @@ export default {
               flag = false
             }
           })
-          console.log(ruleFormArr)
           ruleFormArr.forEach(item => {
             item.validate(valid => {
               if (!valid) {
@@ -845,36 +834,37 @@ export default {
             // this.$refs.userActionRule.isRequired = false // 用户行为暂时隐藏
           } else {
             // 全部校验通过后，可保存数据
+            console.log('全部校验通过后: ');
             this.$refs.userAttrRule.uneffectIndexValidate()
             // this.$refs.userActionRule.uneffectIndexValidate() // 用户行为暂时隐藏
             if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
               return false
             }
           }
-        })
-      }
-      if (this.id && type === 'save') {
-        selectTransferTask(this.id).then(({ data }) => {
-          if (data.status === '1' && data.data) {
-            this.taskDependenciesList = data.data.dataTransfers
-            if (this.taskDependenciesList.length) {
-              this.taskDependenciesVisible = true
-              this.$nextTick(() => {
-                this.$refs.taskDependencies.init()
-              })
-            } else {
-              this.savueData(type)
-            }
-          } else {
-            this.taskDependenciesList = []
-            return this.$message({
-              type: 'error',
-              message: data.message || '数据异常'
+          if (this.id && type === 'save') {
+            selectTransferTask(this.id).then(({ data }) => {
+              if (data.status === '1' && data.data) {
+                this.taskDependenciesList = data.data.dataTransfers
+                if (this.taskDependenciesList.length) {
+                  this.taskDependenciesVisible = true
+                  this.$nextTick(() => {
+                    this.$refs.taskDependencies.init()
+                  })
+                } else {
+                  this.savueData(type)
+                }
+              } else {
+                this.taskDependenciesList = []
+                return this.$message({
+                  type: 'error',
+                  message: data.message || '数据异常'
+                })
+              }
             })
+          } else {
+            this.savueData(type)
           }
         })
-      } else {
-        this.savueData(type)
       }
     },
     savueData (type, callback) {
@@ -901,6 +891,7 @@ export default {
         rejectGroupPackCode: code
       }
       // params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
+      console.log('params222: ', params);
       if (type === 'preview') {
         this.isPreviewShow = true
         this.$nextTick(() => {
