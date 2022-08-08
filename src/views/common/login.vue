@@ -394,22 +394,22 @@ export default {
     },
     // 钉钉扫码登陆
     initDingJs () {
-        window.DDLogin = (a) => {
-          let e
-          let c = document.createElement('iframe')
-          let d = 'https://login.dingtalk.com/login/qrcode.htm?goto=' + a.goto
-          d += a.style ? '&style=' + encodeURIComponent(a.style) : ''
-          d += a.href ? '&href=' + a.href : ''
-          c.src = d
-          c.frameBorder = '0'
-          c.allowTransparency = 'true'
-          c.scrolling = 'no'
-          c.width = a.width ? a.width + 'px' : '365px'
-          c.height = a.height ? a.height + 'px' : '400px'
-          e = document.getElementById(a.id)
-          e.innerHTML = ''
-          e.appendChild(c)
-        }
+      window.DDLogin = (a) => {
+        let e
+        let c = document.createElement('iframe')
+        let d = 'https://login.dingtalk.com/login/qrcode.htm?goto=' + a.goto
+        d += a.style ? '&style=' + encodeURIComponent(a.style) : ''
+        d += a.href ? '&href=' + a.href : ''
+        c.src = d
+        c.frameBorder = '0'
+        c.allowTransparency = 'true'
+        c.scrolling = 'no'
+        c.width = a.width ? a.width + 'px' : '365px'
+        c.height = a.height ? a.height + 'px' : '400px'
+        e = document.getElementById(a.id)
+        e.innerHTML = ''
+        e.appendChild(c)
+      }
     },
     addDingListener () {
       let self = this
