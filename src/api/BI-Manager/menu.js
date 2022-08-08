@@ -1,4 +1,4 @@
-import {httpGet, httpPost} from '@/api'
+import { httpGet, httpPost } from '@/api'
 let da = '/'
 export const savaBiInfo = params => httpPost(da + 'bi/biSysMenu/save', params) // 新增保存
 export const updateBiInfo = params => httpPost(da + 'bi/biSysMenu/update', params) // 编辑保存

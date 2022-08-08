@@ -25,6 +25,17 @@ export default {
   mounted () {
     this.getDataList()
   },
+  created () {
+    this.$nextTick(() => {
+      // 禁用右键
+      // document.oncontextmenu = new Function("event.returnValue=false")
+      // 禁用选择
+      let setReturnValue = function() {
+        event.returnValue = false
+      }
+      document.onselectstart = setReturnValue
+    })
+  },
   methods: {
     // 获取数据列表
     getDataList () {

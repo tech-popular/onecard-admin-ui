@@ -2,27 +2,19 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" size="small">
       <el-form-item label="用户组名称: ">
-        <el-input
-          v-model="dataForm.name"
-          class="input-with-select"
-          @keyup.enter.native="getDataList()"
-        ></el-input>
+        <el-input v-model="dataForm.name" class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
+      <el-form-item label="用户成员: ">
+        <el-select v-model="dataForm.userId" clearable placeholder="请输入关键字" style="width:100%" remote :remote-method="getUserSelectList" :loading="loading" filterable>
+          <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button
-          v-if="isAuth('honeycomb:honeycombtask:save')"
-          type="primary"
-          @click="addOrUpdateHandle()"
-        >新增</el-button>
+        <el-button v-if="isAuth('honeycomb:honeycombtask:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
-    <el-table
-      :data="dataList"
-      border
-      fit
-      v-loading="dataListLoading"
-    >
+    <el-table :data="dataList" border fit v-loading="dataListLoading">
       <el-table-column prop="id" header-align="center" align="center" label="ID" width="80"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="用户组名称">
         <template slot-scope="scope">
@@ -32,62 +24,22 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="department"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="归属部门"
-      ></el-table-column>
-      <el-table-column
-        prop="creater"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="申请人"
-      ></el-table-column>
-      <el-table-column
-        prop="remark"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="说明"
-      ></el-table-column>
-      <el-table-column
-        prop="memberNum"
-        header-align="center"
-        align="center"
-        label="成员人数"
-        width="80">
-      </el-table-column>
+      <el-table-column prop="department" header-align="center" align="center" show-overflow-tooltip label="归属部门"></el-table-column>
+      <el-table-column prop="creater" header-align="center" align="center" show-overflow-tooltip label="申请人"></el-table-column>
+      <el-table-column prop="remark" header-align="center" align="center" show-overflow-tooltip label="说明"></el-table-column>
+      <el-table-column prop="memberNum" header-align="center" align="center" label="成员人数" width="80"></el-table-column>
       <el-table-column prop="flag" header-align="center" align="center" label="是否失效" width="80">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.flag === 1" size="small">是</el-tag>
           <el-tag v-else size="small" type="danger">否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center"  label="操作" width="260">
+      <el-table-column header-align="center" align="center" label="操作" width="260">
         <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="small"
-            @click="addOrUpdateHandle(scope.row)"
-          >修改</el-button>
-          <el-button
-            type="text"
-            size="small"
-            @click="deleteHandle(scope.row.id)"
-          >删除</el-button>
-					<el-button
-            type="text"
-            size="small"
-						@click="taskDependent(scope.row.id, 0)"
-          >PC端权限</el-button>
-          <el-button
-            type="text"
-            size="small"
-						@click="taskDependent(scope.row.id, 1)"
-          >移动端权限</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="taskDependent(scope.row.id, 0)">PC端权限</el-button>
+          <el-button type="text" size="small" @click="taskDependent(scope.row.id, 1)">移动端权限</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -111,14 +63,14 @@
 }
 </style>
 <script>
-import { getUserGroupList, deleteUsersById } from '@/api/BI-Manager/userGroup'
+import { getUserGroupList, deleteUsersById, getUsersList } from '@/api/BI-Manager/userGroup'
 import AddOrUpdate from './userGroup-add-or-update'
 import assignPermissions from './assign-permissions'
 export default {
   data () {
     return {
       dataForm: {
-        // user: '',
+        userId: '',
         name: ''
       },
       dataList: [],
@@ -127,6 +79,8 @@ export default {
       totalCount: 0,
       dataListLoading: false,
       dataListSelections: [],
+      userIdList: [],
+      loading: false,
       // tenantIdList: [],
       addOrUpdateVisible: false,
       assignPermissionsVisible: false,
@@ -140,7 +94,7 @@ export default {
   activated () {
     this.getDataList()
   },
-  mounted () {},
+  mounted () { },
   methods: {
     handleSelect (item) {
       this.dataForm.key = item.name
@@ -149,35 +103,45 @@ export default {
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true
-       let params = {
-          'name': this.dataForm.name,
-          'page': this.pageIndex,
-          'pageSize': this.pageSize
+      let params = {
+        'name': this.dataForm.name,
+        'userId': this.dataForm.userId,
+        'page': this.pageIndex,
+        'pageSize': this.pageSize
+      }
+      getUserGroupList(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.dataList = data.data.list
+          // this.getTenantDown()
+          this.totalCount = data.data.totalCount
+          this.dataListLoading = false
+        } else {
+          this.dataList = []
+          this.totalCount = 0
+          this.dataListLoading = false
         }
-        getUserGroupList(params).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.dataList = data.data.list
-            // this.getTenantDown()
-            this.totalCount = data.data.totalCount
-            this.dataListLoading = false
-          } else {
-            this.dataList = []
-            this.totalCount = 0
-            this.dataListLoading = false
-          }
-        })
+      })
     },
-    // getTenantDown() {
-    //   getSelectTenantDown().then(({ data }) => {
-    //     data.data.forEach(item => {
-    //       this.dataList.forEach(citem => {
-    //         if (item.id === citem.tenantId) {
-    //           citem.tenantId = item.name
-    //         }
-    //       })
-    //     })
-    //   })
-    // },
+    getUserSelectList (query) {
+      if (query !== '') {
+        this.loading = true
+        let params = {
+          name: query
+        }
+        getUsersList(params).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.userIdList = data.dataList
+          } else {
+            this.userIdList = []
+          }
+          this.loading = false
+        }).finally(() => {
+          this.loading = false
+        })
+      } else {
+        this.userIdList = []
+      }
+    },
     // 每页数
     sizeChangeHandle (val) {
       this.pageSize = val
@@ -203,27 +167,27 @@ export default {
       })
     },
     // 删除
-      deleteHandle (id) {
-        this.$confirm(`确定对[id=${id}]进行[删除]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          deleteUsersById(id).then(({ data }) => {
-            if (data.code !== 0) {
-              return this.$message({
-                type: 'error',
-                message: data.msg
-              })
-            }
-            this.$message({
-              type: 'success',
-              message: '删除成功'
+    deleteHandle (id) {
+      this.$confirm(`确定对[id=${id}]进行[删除]操作?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteUsersById(id).then(({ data }) => {
+          if (data.code !== 0) {
+            return this.$message({
+              type: 'error',
+              message: data.msg
             })
-            this.getDataList()
+          }
+          this.$message({
+            type: 'success',
+            message: '删除成功'
           })
-        }).catch(() => {})
-      }
+          this.getDataList()
+        })
+      }).catch(() => { })
+    }
   }
 }
 </script>

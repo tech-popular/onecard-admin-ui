@@ -21,7 +21,7 @@
       }
     },
     mounted () {
-      debugger
+      // debugger
       let mime = 'text/x-mariadb'
       // let theme = 'ambiance'//设置主题，不设置的会使用默认主题
       let editor = CodeMirror.fromTextArea(this.$refs.mycode, {

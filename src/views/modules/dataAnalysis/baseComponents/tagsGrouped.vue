@@ -264,7 +264,12 @@ export default {
     init (val, selected) {
       this.selectedFieldType = selected.fieldType
       // this.dataForm.id = val.id
-      this.enumsVisible = selected.enumTypeNum ? true : false
+      if (selected.enumTypeNum) {
+        this.enumsVisible = true
+      } else {
+        this.enumsVisible = false
+      }
+      // this.enumsVisible = selected.enumTypeNum ? true : false
       this.selectEnumsList = []
       this.dataForm = {
         id: val.id,

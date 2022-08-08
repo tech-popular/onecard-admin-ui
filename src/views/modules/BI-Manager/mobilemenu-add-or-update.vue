@@ -1,6 +1,6 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="100px">
+    <el-form :model="dataForm" v-loading="loading" :rules="dataRule" ref="dataForm" label-width="100px">
       <el-form-item label="菜单类型：" prop="type">
         <el-radio-group v-model="dataForm.type" @change="radioTypeChange" :disabled="!!dataForm.id">
           <el-radio v-for="(type, index) in dataForm.typeList" :label="index" :key="index">{{ type }}</el-radio>
@@ -20,16 +20,25 @@
           <el-option v-for="item in calculateList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="报表负责人" prop="principalId" v-if="dataForm.type === 1">
+        <el-select v-model="dataForm.principalId" @change="changeprincipal" multiple placeholder="请输入关键字" style="width:100%" remote :remote-method="getUserSelectList" :loading="loading" filterable>
+          <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="位置排序" prop="orderNum">
+        <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="位置排序"></el-input-number>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" :disabled="loading" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import { savaBiInfo, updateBiInfo, lookDataInfo, findAllRecursionList, taskManageList } from '@/api/BI-Manager/menu'
+import { getUsersList } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
     // var validateUrl = (rule, value, callback) => {
@@ -41,6 +50,7 @@ export default {
     // }
     return {
       visible: false,
+      loading: false,
       dataForm: {
         id: 0,
         type: 0,
@@ -48,12 +58,16 @@ export default {
         parentId: [],
         name: '',
         url: '',
-        taskIds: []
+        taskIds: [],
+        orderNum: 0,
+        principalId: []
       },
       menuData: [],
       menuList: [],
       menuParentList: [], // 保留选中的级联中完整内容
       calculateList: [],
+      userIdList: [],
+      principal: [],
       menuListTreeProps: {
         checkStrictly: true,
         label: 'name',
@@ -72,6 +86,12 @@ export default {
         ],
         taskIds: [
           { required: true, message: '计算任务不能为空', trigger: 'blur' }
+        ],
+        orderNum: [
+          { required: true, message: '位置排序不能为空', trigger: 'blur' }
+        ],
+        principalId: [
+          { required: true, message: '报表负责人不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -81,9 +101,11 @@ export default {
       this.getRecursionList()
       this.getTaskManageList()
       this.menuParentList = []
+      this.principal = []
       this.dataForm.type = 0
       this.visible = true
       if (row) {
+        this.loading = true
         this.dataForm.id = row.id
         this.getDataInfo(row)
       } else {
@@ -97,6 +119,7 @@ export default {
       lookDataInfo(row.id).then(({ data }) => {
         if (data && data.code === 0) {
           let parentIdData = []
+          let responsibleData = (data.data.principalId && data.data.principalId.split(',')) || []
           if (data.data.parentId == '0') {
             this.dataForm.parentId = []
             this.menuParentList = []
@@ -106,6 +129,11 @@ export default {
             this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
           }
           this.dataForm.name = data.data.name
+          this.dataForm.orderNum = data.data.orderNum
+          this.getUserSelectList()
+          this.dataForm.principalId = responsibleData.map(item => { return +item })
+          this.userIdList = data.data.principalList
+          this.principal = data.data.principalList
           if (data.data.url) {
             this.dataForm.type = 1
             this.menuList = this.filterMenuList(this.menuData)
@@ -117,9 +145,30 @@ export default {
             this.dataForm.url = ''
             this.dataForm.taskIds = []
           }
+          this.loading = false
           // this.getTaskManageList(data.data.taskIds.split(';'))
         }
       })
+    },
+    getUserSelectList (query) {
+      if (query !== '') {
+        this.loading = true
+        let params = {
+          name: query
+        }
+        getUsersList(params).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.userIdList = data.dataList
+          } else {
+            this.userIdList = []
+          }
+          this.loading = false
+        }).finally(() => {
+          this.loading = false
+        })
+      } else {
+        this.userIdList = []
+      }
     },
     //   菜单类型修改
     radioTypeChange (val) {
@@ -207,19 +256,45 @@ export default {
     parentTreeChange (val) {
       this.menuParentList = val
     },
+    // 负责人选中值修改
+    changeprincipal (val) {
+      this.userIdList.forEach(item => {
+        if (this.dataForm.principalId.includes(item.id)) {
+          this.principal.push(item)
+        }
+      })
+    },
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          let hash = {}
+          this.principal = this.principal.reduce((preVal, curVal) => {
+            // hash[curVal.id] ? '' : hash[curVal.id] = true && preVal.push(curVal)
+            if (!hash[curVal.id]) {
+              hash[curVal.id] = preVal.push(curVal)
+            }
+            return preVal
+          }, [])
+          let principalData = []
+          this.principal.forEach(item => {
+            if (this.dataForm.principalId.includes(item.id)) {
+              principalData.push(item.name)
+            }
+          })
           let params = {
             'parentId': this.dataForm.parentId.length ? this.menuParentList[this.menuParentList.length - 1].toString() : '0',
             'name': this.dataForm.name,
             'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
             'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
             'menuParentList': this.menuParentList.join(','),
-            'type': 1
+            'type': 1,
+            'orderNum': this.dataForm.orderNum,
+            'principalId': this.dataForm.type === 0 ? '' : this.dataForm.principalId.join(','),
+            'principal': this.dataForm.type === 0 ? '' : principalData.join(',')
           }
           console.log('params: ', params)
+          this.loading = true
           if (!this.dataForm.id) {
             savaBiInfo(params).then(({ data }) => {
               if (data && data.code === 0) {
@@ -229,10 +304,12 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.loading = false
                     this.visible = false
                   }
                 })
               } else {
+                this.loading = false
                 this.$message.error(data.msg || '数据异常')
               }
             })
@@ -246,10 +323,12 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.loading = false
                     this.visible = false
                   }
                 })
               } else {
+                this.loading = false
                 this.$message.error(data.msg || '数据异常')
               }
             })

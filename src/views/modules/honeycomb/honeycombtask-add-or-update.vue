@@ -1,60 +1,26 @@
 <template>
   <div>
-    <el-dialog
-      :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'"
-      :close-on-click-modal="false"
-      :visible.sync="visible"
-    >
-      <el-form
-        :model="dataForm"
-        :rules="dataRule"
-        :disabled="!canUpdate"
-        ref="dataForm"
-        @keyup.enter.native="dataFormSubmit()"
-        label-width="150px"
-      >
+    <el-dialog :title="canUpdate? !dataForm.id ? '新增' : '修改' :'查看'" :close-on-click-modal="false" :visible.sync="visible">
+      <el-form :model="dataForm" :rules="dataRule" :disabled="!canUpdate" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
         <el-form-item label="任务名称" prop="name">
           <el-input v-model="dataForm.name" placeholder="任务名称"></el-input>
         </el-form-item>
         <el-form-item label="输入数据源" prop="inDatasource">
           <el-select v-model="dataForm.inDatasource" placeholder="请选择">
-            <el-option
-              v-for="item in datasourceoptions"
-              :key="item.id"
-              :label="item.datasourceName"
-              :value="item.id"
-            ></el-option>
+            <el-option v-for="item in datasourceoptions" :key="item.id" :label="item.datasourceName" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="计算类型" prop="computeType">
           <el-select v-model="dataForm.computeType" placeholder="请选择">
-            <el-option
-              v-for="item in computeTypeoptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
+            <el-option v-for="item in computeTypeoptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item
-          v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys"
-          :label="'输出数据源' + index"
-          :key="outdata.key"
-        >
+        <el-form-item v-for="(outdata, index) in dataForm.honeycombOutDatasourceEntitys" :label="'输出数据源' + index" :key="outdata.key">
           <el-row :gutter="24">
             <el-col :span="7">
               <div class="grid-content bg-purple">
-                <el-select
-                  v-model="outdata.outDatasource"
-                  @change="selectOutData(index)"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    v-for="item in datasourceoptions"
-                    :key="item.id"
-                    :label="item.datasourceName"
-                    :value="item.id"
-                  ></el-option>
+                <el-select v-model="outdata.outDatasource" @change="selectOutData(index)" placeholder="请选择">
+                  <el-option v-for="item in datasourceoptions" :key="item.id" :label="item.datasourceName" :value="item.id"></el-option>
                 </el-select>
               </div>
             </el-col>
@@ -69,15 +35,10 @@
               </div>
             </el-col>
           </el-row>
-          <div v-if="redisListData[index] && redisListData[index].show" class='redis-config' style="marginLeft: -130px">
+          <div v-if="redisListData[index] && redisListData[index].show" class="redis-config" style="marginLeft: -130px">
             <el-form-item class="el-redis-item" label="redis数据格式">
               <el-select v-model="redisListData[index].name" placeholder="redis数据格式" clearable @change="val => redisNameChange(val, index)">
-                <el-option
-                  v-for="item in redisNames"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in redisNames" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item class="el-redis-item" label="redisKey">
@@ -95,19 +56,9 @@
               </el-select>
             </el-form-item>
             <el-form-item class="el-redis-item" label="key失效时间">
-              <el-input
-                v-model="redisListData[index].time"
-                placeholder="key失效时间"
-                clearable
-                @input="redisListData[index].time = redisListData[index].time.replace(/[^\d]/g,'')"
-              >
+              <el-input v-model="redisListData[index].time" placeholder="key失效时间" clearable @input="redisListData[index].time = redisListData[index].time.replace(/[^\d]/g,'')">
                 <el-select v-model="redisListData[index].unit" slot="append">
-                  <el-option
-                    v-for="item in redisUnits"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
+                  <el-option v-for="item in redisUnits" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
               </el-input>
             </el-form-item>
@@ -119,7 +70,7 @@
         </el-form-item>
         <!-- <el-form-item label="SQL列" prop="sqlFields">
           <el-input v-model="dataForm.sqlFields" placeholder="必须和SQL对应"></el-input>
-        </el-form-item> -->
+        </el-form-item>-->
         <el-form-item label="SQL" prop="sql">
           <el-input type="textarea" v-model="dataForm.sql" placeholder="SQL" :rows="10"></el-input>
         </el-form-item>
@@ -153,16 +104,11 @@
               @click="showCronBox = false"
               title="关闭图形配置"
             ></el-button>
-          </el-input> -->
+          </el-input>-->
         </el-form-item>
         <el-form-item label="数据权限" prop="tenantId">
           <el-select v-model="dataForm.tenantId" placeholder="请选择,默认为所有人查看">
-            <el-option
-              v-for="item in tenantoptions"
-              :key="item.tenantId"
-              :label="item.name"
-              :value="item.tenantId"
-            ></el-option>
+            <el-option v-for="item in tenantoptions" :key="item.tenantId" :label="item.name" :value="item.tenantId"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否启用" prop="enable">
@@ -175,32 +121,17 @@
           <el-collapse-item title="高级选项" name="1">
             <el-form-item label="id规则" prop="idRule">
               <el-select v-model="dataForm.idRule" placeholder="请选择">
-                <el-option
-                  v-for="item in idRuleoptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in idRuleoptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="增加task字段" prop="addFieldTask">
               <el-select v-model="dataForm.addFieldTask" placeholder="请选择">
-                <el-option
-                  v-for="item in tureOrFalseoptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in tureOrFalseoptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="增加timestamp字段" prop="addFieldTimestamp">
               <el-select v-model="dataForm.addFieldTimestamp" placeholder="请选择">
-                <el-option
-                  v-for="item in tureOrFalseoptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in tureOrFalseoptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="重写规则" prop="overwriteKey">
@@ -211,32 +142,17 @@
             </el-form-item>
             <el-form-item label="健康检查任务" prop="isHealthcheck">
               <el-select v-model="dataForm.isHealthcheck" placeholder="请选择">
-                <el-option
-                  v-for="item in tureOrFalseoptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in tureOrFalseoptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="是否为业务监控任务" prop="isBusinessDataCheck">
               <el-select v-model="dataForm.isBusinessDataCheck" placeholder="请选择">
-                <el-option
-                  v-for="item in tureOrFalseoptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in tureOrFalseoptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="是否是合并任务" prop="isMergeTask">
               <el-select v-model="dataForm.isMergeTask" placeholder="请选择">
-                <el-option
-                  v-for="item in tureOrFalseoptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in tureOrFalseoptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="版本号" prop="version">
@@ -252,7 +168,7 @@
       <span slot="footer" class="dialog-footer">
         <!-- <el-button style="margin-top: 12px;" v-show="dataForm.id" @click="startTask()">启动任务</el-button> -->
         <el-button @click="visible = false">取消</el-button>
-        <el-button type="primary"  v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
+        <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
       </span>
     </el-dialog>
     <!-- 测试 sql -->
@@ -271,13 +187,7 @@
             v-model="dataSql.sql"
             style="height:200px;width:100%"
           ></textarea>-->
-          <codemirror
-            ref="mycode"
-            :value="dataSql.sql"
-            :options="cmOptions"
-            @changes="changes"
-            class="code"
-          ></codemirror>
+          <codemirror ref="mycode" :value="dataSql.sql" :options="cmOptions" @changes="changes" class="code"></codemirror>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="dataSqlSubmit()">执行</el-button>
@@ -374,9 +284,9 @@ export default {
       },
       dataForm: {},
       rowData: { // 修改时数据内容
-          authOwner: '',
-          authOtherList: [],
-          authOthers: ''
+        authOwner: '',
+        authOtherList: [],
+        authOthers: ''
       },
       datasourceoptions: [],
       tenantoptions: [],
@@ -406,8 +316,8 @@ export default {
             trigger: 'change'
           }
         ],
-        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }],
-        cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
+        period: [{ required: true, message: '周期不能为空', trigger: 'blur' }]
+        // cron: [{ required: true, message: 'cron不能为空', trigger: 'blur', validator: validateNull }]
         // sqlFields: [
         //   { required: true, message: 'SQL列不能为空，且必须和SQL对应', trigger: 'blur', validator: validateNull }
         // ]
@@ -708,7 +618,7 @@ export default {
           this.$http({
             url: this.$http.adornUrl(
               `/honeycomb/honeycombtask/${
-                !this.dataForm.id ? 'save' : 'update'
+              !this.dataForm.id ? 'save' : 'update'
               }`
             ),
             method: 'post',

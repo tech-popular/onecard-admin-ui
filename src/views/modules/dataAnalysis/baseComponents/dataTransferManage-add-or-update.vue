@@ -1154,7 +1154,7 @@
         let second = tempTime.getSeconds() < 10 ? '0' + tempTime.getSeconds() : tempTime.getSeconds().toString()
         if (data.jobType == 1) {
           postData.taskScheduleConfig.jobType = 'ONCE_ONLY'
-          if (data.onceRunTime !== '') {
+          if (data.onceRunTime !== '' && data.onceRunTime !== null) {
             let obgExec = {
               year: year,
               month: month,

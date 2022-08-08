@@ -1,19 +1,22 @@
 <template>
   <el-dialog :title="type === 0 ? 'PC端权限分配' : '移动端权限分配'" :close-on-click-modal="false" :visible.sync="visible">
-			<el-tree
-			:data="dataTree"
+    <div style="margin-bottom: 16px">
+      <el-input size="small" clearable placeholder="请输入菜单名称" v-model="search"></el-input>
+    </div>
+    <el-tree
+      :data="dataTree"
       ref="tree"
-			show-checkbox
-			node-key="id"
-      :default-expand-all="true"
-			:props="defaultProps"
+      :filter-node-method="filterNode"
+      show-checkbox
+      node-key="id"
+      :props="defaultProps"
       v-model="menuIds"
+      :default-expand-all="isExpandAll"
       :default-checked-keys="defaultExpandedKeys"
       @check="checkPermit"
-      >
-    </el-tree>
+    ></el-tree>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="closed()">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
@@ -32,14 +35,23 @@ export default {
       halfCheckedDataKeys: [],
       defaultExpandedKeys: [],
       dataTree: [],
+      isExpandAll: false,
+      search: '',
       defaultProps: {
         children: 'children',
         label: 'name'
       }
     }
   },
+  watch: {
+    search (val) {
+      this.$refs.tree.filter(val)
+    }
+  },
   methods: {
     init (id, type) {
+      this.search = ''
+      this.isExpandAll = false
       this.defaultExpandedKeys = []
       this.checkedDataKeys = []
       this.halfCheckedDataKeys = []
@@ -48,6 +60,30 @@ export default {
       this.getRecursionList()
       this.getRoleMenuListData()
       this.visible = true
+    },
+
+    filterNode (value, data, node) {
+      if (!value) {
+        this.toggleExpandAll(false)
+        return true
+      }
+      let parentNode = node.parent
+      let labels = [node.label]
+      let level = 1
+      while (level < node.level) {
+        labels = [...labels, parentNode.label]
+        parentNode = parentNode.parent
+        level++
+      }
+      return labels.some(label => label.indexOf(value) !== -1)
+    },
+    /** 展开/折叠操作 */
+    toggleExpandAll (isExpandAll) {
+      this.isExpandAll = isExpandAll
+      const nodes = this.$refs.tree.store._getAllNodes()
+      for (let i in nodes) {
+        nodes[i].expanded = isExpandAll
+      }
     },
     getRecursionList () {
       let params = {
@@ -120,8 +156,13 @@ export default {
           }
         })
       } else {
-       this.$message.error('请选择菜单')
-     }
+        this.$message.error('请选择菜单')
+      }
+    },
+    closed () {
+      this.visible = false
+      this.search = ''
+      this.toggleExpandAll(false)
     }
   }
 }
