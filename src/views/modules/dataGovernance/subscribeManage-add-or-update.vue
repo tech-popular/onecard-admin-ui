@@ -536,6 +536,6 @@ export default {
   }
 }
 .el-drawer__open .el-drawer.rtl {
-  width: 100% !important;
+  width: 80% !important;
 }
 </style>

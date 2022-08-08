@@ -90,7 +90,7 @@ import { } from '@/api/dataGovernance/subscribeManage'
 import { deepClone } from '@/utils'
 export default {
   props: {
-    taskId: Number,
+    // taskId: Number,
     dispatchStatus: Object
   },
   data () {
