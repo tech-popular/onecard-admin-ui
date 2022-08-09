@@ -455,7 +455,6 @@ export default {
               .filter(item => item != '')
           }
           this.baseForm.channelId = data.data.channelId
-
           this.getVestPackAvailable(this.baseForm.channelId)
           if (data.data.userType === 'excel') {
             this.excelFile = data.data.excelFile
@@ -851,54 +850,35 @@ export default {
               return false
             }
           }
-          if (this.id && type === 'save') {
-            selectTransferTask(this.id).then(({ data }) => {
-              if (data.status === '1' && data.data) {
-                this.taskDependenciesList = data.data.dataTransfers
-                if (this.taskDependenciesList.length) {
-                  this.taskDependenciesVisible = true
-                  this.$nextTick(() => {
-                    this.$refs.taskDependencies.init()
-                  })
-                } else {
-                  this.savueData(type)
-                }
-              } else {
-                this.taskDependenciesList = []
-                return this.$message({
-                  type: 'error',
-                  message: data.message || '数据异常'
-                })
-              }
-            })
+          this.judgmentisTask(type)
+        })
+      } else {
+        this.judgmentisTask(type)
+      }
+    },
+    judgmentisTask (type) {
+      if (this.id && type === 'save') {
+        selectTransferTask(this.id).then(({ data }) => {
+          if (data.status === '1' && data.data) {
+            this.taskDependenciesList = data.data.dataTransfers
+            if (this.taskDependenciesList.length) {
+              this.taskDependenciesVisible = true
+              this.$nextTick(() => {
+                this.$refs.taskDependencies.init()
+              })
+            } else {
+              this.savueData(type)
+            }
           } else {
-            this.savueData(type)
+            this.taskDependenciesList = []
+            return this.$message({
+              type: 'error',
+              message: data.message || '数据异常'
+            })
           }
         })
       } else {
-        if (this.id && type === 'save') {
-          selectTransferTask(this.id).then(({ data }) => {
-            if (data.status === '1' && data.data) {
-              this.taskDependenciesList = data.data.dataTransfers
-              if (this.taskDependenciesList.length) {
-                this.taskDependenciesVisible = true
-                this.$nextTick(() => {
-                  this.$refs.taskDependencies.init()
-                })
-              } else {
-                this.savueData(type)
-              }
-            } else {
-              this.taskDependenciesList = []
-              return this.$message({
-                type: 'error',
-                message: data.message || '数据异常'
-              })
-            }
-          })
-        } else {
-          this.savueData(type)
-        }
+        this.savueData(type)
       }
     },
     savueData (type, callback) {
