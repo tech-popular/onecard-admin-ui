@@ -875,6 +875,30 @@ export default {
             this.savueData(type)
           }
         })
+      } else {
+        if (this.id && type === 'save') {
+          selectTransferTask(this.id).then(({ data }) => {
+            if (data.status === '1' && data.data) {
+              this.taskDependenciesList = data.data.dataTransfers
+              if (this.taskDependenciesList.length) {
+                this.taskDependenciesVisible = true
+                this.$nextTick(() => {
+                  this.$refs.taskDependencies.init()
+                })
+              } else {
+                this.savueData(type)
+              }
+            } else {
+              this.taskDependenciesList = []
+              return this.$message({
+                type: 'error',
+                message: data.message || '数据异常'
+              })
+            }
+          })
+        } else {
+          this.savueData(type)
+        }
       }
     },
     savueData (type, callback) {
