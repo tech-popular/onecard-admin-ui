@@ -430,7 +430,7 @@ export default {
             option.legend = {
               orient: 'vertical',
               left: 'right',
-              icon: "rect",
+              icon: 'rect',
               itemHeight: 10,
               itemWidth: 10,
               top: 10
