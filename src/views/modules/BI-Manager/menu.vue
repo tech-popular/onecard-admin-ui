@@ -164,6 +164,7 @@ export default {
         this.getDataList()
       })
     },
+    // 删除功能
     deleteHandle (id) {
       var ids = [id]
       this.$confirm(
