@@ -57,7 +57,7 @@
 <script>
 import echarts from 'echarts'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
-import { selectAllCata, overviewData, chartInfo, custGroupList } from '@/api/dataAnalysis/dataInsightManage'
+import { selectAllCata, overviewData, chartInfo, custGroupList, getAnalysisIndicators } from '@/api/dataAnalysis/dataInsightManage'
 import { findVueSelectItemIndex, deepClone } from '../dataAnalysisUtils/utils'
 import { pieJson, barJson } from '../dataAnalysisUtils/tableShowChartInit'
 import tagsGrouped from './tagsGrouped.vue'
@@ -80,6 +80,7 @@ export default {
       regionList: [], // 可视化筛选数据的默认值
       indexGroups: [], // 默认分组
       indexId: null, // 选中分组ID
+      channelId: '',
       ruleForm: {
         region: [],
         templateId: '',
@@ -267,16 +268,54 @@ export default {
         this.channelInfoNameList = data.data.channelInfoNameList.join('、')
         this.channelInfoNameList.slice(0, data.data.channelInfoNameList.length - 1)
         this.getSelectAllCata(channelCode, (indexList) => {
-          this.getRegionList(indexList)
-          this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : this.regionList
-          this.selectedIndex = this.ruleForm.region
-          this.outParamsIndexList = this.updateOutParamsList(indexList)
-          this.getSelectCata(indexList, this.selectedIndex)
-          this.getChartInfo(this.indexGroups, this.indexId)
-          this.$nextTick(() => {
-            this.loading = false
-          })
+          // this.getRegionList(indexList)
+          if (!data.data.lableValList) {
+            this.getIndicators(channelCode, indexList)
+          } else {
+            this.ruleForm.region = data.data.lableValList.map(item => item * 1)
+            this.handleParameters(indexList)
+          }
+          // this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : deepClone(this.regionList)
+          // this.selectedIndex = this.ruleForm.region
+          // this.outParamsIndexList = this.updateOutParamsList(indexList)
+          // this.getSelectCata(indexList, this.selectedIndex)
+          // this.getChartInfo(this.indexGroups, this.indexId)
+          // this.$nextTick(() => {
+          //   this.loading = false
+          // })
         })
+      })
+    },
+    // 处理其余参数
+    handleParameters (indexList) {
+      this.selectedIndex = this.ruleForm.region
+      this.outParamsIndexList = this.updateOutParamsList(indexList)
+      this.getSelectCata(indexList, this.selectedIndex)
+      this.getChartInfo(this.indexGroups, this.indexId)
+      this.$nextTick(() => {
+        this.loading = false
+      })
+    },
+    // 获取默认已选标签
+    getIndicators (channelCode, indexList) {
+      getAnalysisIndicators(channelCode).then(({ data }) => {
+        if (data.status * 1 !== 1) {
+          this.loading = false
+          return this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+        if (data.data.length) {
+          data.data.forEach(item => {
+            this.regionList.push(Number(item.fieldId))
+          })
+        } else {
+          this.getRegionList(indexList)
+        }
+        // this.ruleForm.region = data.data.lableValList ? data.data.lableValList.map(item => item * 1) : deepClone(this.regionList)
+        this.ruleForm.region = this.regionList
+        this.handleParameters(indexList)
       })
     },
     getRegionList (indexList) {
@@ -296,7 +335,7 @@ export default {
       }
     },
     getChartInfo (indexGroups, indexId) {
-      console.log('indexGroups: ', indexGroups)
+      console.log('this.ruleForm.region: ', this.ruleForm.region)
       this.seriesData = []
       this.chartLen = 0
       this.echartLoading = true
@@ -343,7 +382,6 @@ export default {
             option.title.text = item.indicatorsName
             option.series[0].name = item.indicatorsName
             option.series[0].data = optionSeriesData
-            option.legend.data = []
             item.valList.forEach(item => {
               option.legend.data.push(item.name)
             })
@@ -383,6 +421,20 @@ export default {
             option.id = item.id
             option.title.text = item.indicatorsName
             option.xAxis.data = item.xaxisData
+            option.tooltip = {
+              trigger: 'axis',
+              axisPointer: {
+                type: 'shadow'
+              }
+            }
+            option.legend = {
+              orient: 'vertical',
+              left: 'right',
+              icon: "rect",
+              itemHeight: 10,
+              itemWidth: 10,
+              top: 10
+            }
             item.fieldType = this.selectedData.filter(citem => citem.id === item.id)[0].fieldType
             if (this.ruleForm.comTemplateId) {
               option.series = item.series
