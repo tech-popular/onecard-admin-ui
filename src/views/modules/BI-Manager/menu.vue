@@ -11,7 +11,7 @@
         <el-input v-model="dataForm.grade" @keyup.enter.native="getDataList()"></el-input>
         <!-- <el-select v-model="dataForm.grade"></el-select> -->
       </el-form-item>
-       <el-form-item label="创建人: ">
+      <el-form-item label="创建人: ">
         <el-input v-model="dataForm.creator" @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item label="报表负责人">
@@ -51,7 +51,7 @@
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
-          <!-- <el-button  type="text" size="small" @click="deleteHandle(scope.row.id)"></el-button> -->
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
           <el-button v-if="scope.row.flag === 1 " style="color:#67C23A;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">启用</el-button>
           <el-button v-if="scope.row.flag === 0 " style="color:#F56C6C;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">禁用</el-button>
         </template>
@@ -173,6 +173,38 @@ export default {
           message: '操作成功'
         })
         this.getDataList()
+      })
+    },
+    // 删除功能
+    deleteHandle (id) {
+      var ids = [id]
+      this.$confirm(
+        `确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/bi/biSysMenu/deleteBatchIds'),
+          method: 'post',
+          data: this.$http.adornData(ids, false)
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       })
     },
     resetHandle () { // 重置
