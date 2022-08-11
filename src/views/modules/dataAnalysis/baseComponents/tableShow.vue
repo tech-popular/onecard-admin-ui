@@ -382,7 +382,6 @@ export default {
             option.title.text = item.indicatorsName
             option.series[0].name = item.indicatorsName
             option.series[0].data = optionSeriesData
-            option.legend.data = []
             item.valList.forEach(item => {
               option.legend.data.push(item.name)
             })
@@ -422,6 +421,20 @@ export default {
             option.id = item.id
             option.title.text = item.indicatorsName
             option.xAxis.data = item.xaxisData
+            option.tooltip = {
+              trigger: 'axis',
+              axisPointer: {
+                type: 'shadow'
+              }
+            }
+            option.legend = {
+              orient: 'vertical',
+              left: 'right',
+              icon: "rect",
+              itemHeight: 10,
+              itemWidth: 10,
+              top: 10
+            }
             item.fieldType = this.selectedData.filter(citem => citem.id === item.id)[0].fieldType
             if (this.ruleForm.comTemplateId) {
               option.series = item.series
