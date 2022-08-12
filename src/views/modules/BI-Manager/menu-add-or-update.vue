@@ -255,10 +255,9 @@ export default {
             'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
             'menuParentList': this.menuParentList.join(','),
             'type': 0,
-            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType),
-            'orderNum': this.dataForm.orderNum
+            'orderNum': this.dataForm.orderNum,
+            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType)
           }
-          console.log('params: ', params)
           if (!this.dataForm.id) {
             savaBiInfo(params).then(({ data }) => {
               if (data && data.code === 0) {

@@ -29,7 +29,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="menuRelevance " header-align="center" align="center" width="150" label="菜单层级">
+      <el-table-column prop="menuRelevance" header-align="center" align="center" width="150" label="菜单层级">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" placement="top">
             <div v-html="toBreak(scope.row.menuRelevance )" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
