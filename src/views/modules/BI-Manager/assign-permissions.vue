@@ -86,7 +86,8 @@ export default {
     },
     getRecursionList () {
       let params = {
-        type: this.type
+        type: this.type,
+        userGroupId: this.userGroupId
       }
       findAllRecursionList(params).then(({ data }) => {
         if (data && data.code === 0) {
