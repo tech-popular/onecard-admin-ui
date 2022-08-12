@@ -125,31 +125,27 @@ export default {
           arr.push(item.id)
         }
       })
-      if (menuIds.length) {
-        let params = {
-          'menuIds': menuIds.join(','),
-          'userGroupId': this.userGroupId,
-          'checkedDataKeys': arr.join(','),
-          'type': this.type
-        }
-        saveRoleInfo(params).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.$emit('refreshDataList')
-                this.visible = false
-              }
-            })
-          } else {
-            this.$message.error(data.msg || '数据异常')
-          }
-        })
-      } else {
-        this.$message.error('请选择菜单')
+      let params = {
+        'menuIds': menuIds.join(','),
+        'userGroupId': this.userGroupId,
+        'checkedDataKeys': arr.join(','),
+        'type': this.type
       }
+      saveRoleInfo(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.$emit('refreshDataList')
+              this.visible = false
+            }
+          })
+        } else {
+          this.$message.error(data.msg || '数据异常')
+        }
+      })
     },
     closed () {
       this.visible = false
