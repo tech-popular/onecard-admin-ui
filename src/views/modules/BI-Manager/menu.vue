@@ -27,7 +27,22 @@
     </el-form>
     <el-table :data="dataList" v-loading="dataListLoading" border style="width: 100%;">
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" width="150" label="菜单名称"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" width="150" label="菜单名称">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.name)" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
+            <div class="text-to-long-cut">{{scope.row.name}}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="menuRelevance" header-align="center" align="center" width="150" label="菜单层级">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div v-html="toBreak(scope.row.menuRelevance )" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
+            <div class="text-to-long-cut">{{scope.row.menuRelevance }}</div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="menuType" header-align="center" align="center" width="150" :formatter="formatMenuType" label="菜单属性"></el-table-column>
       <el-table-column prop="grade" header-align="center" align="center" width="120" label="菜单等级"></el-table-column>
       <el-table-column prop="url" header-align="center" align="center" label="菜单链接">

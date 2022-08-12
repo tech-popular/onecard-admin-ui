@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { findAllRecursionList, saveRoleInfo, getRoleMenuList } from '@/api/BI-Manager/userGroup'
+import { findAllRecursionList, saveRoleInfo } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
     return {
@@ -58,7 +58,6 @@ export default {
       this.userGroupId = id
       this.type = type
       this.getRecursionList()
-      this.getRoleMenuListData()
       this.visible = true
     },
 
@@ -87,36 +86,29 @@ export default {
     },
     getRecursionList () {
       let params = {
-        type: this.type
+        type: this.type,
+        userGroupId: this.userGroupId
       }
       findAllRecursionList(params).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataTree = data.data
+          this.selectAllRecursionList(data.data)
         }
       })
     },
-    getRoleMenuListData () {
-      let params = {
-        userGroupId: this.userGroupId,
-        type: this.type
-      }
-      getRoleMenuList(params).then(({ data }) => {
-        if (data && data.code === 0 && data.data.length) {
-          data.data.forEach(element => {
-            if (element.checkeState === 1) {
-              this.defaultExpandedKeys.push(element.menuId)
-              this.checkedDataKeys.push(element.menuId)
-            } else {
-              this.halfCheckedDataKeys.push(element.menuId)
-            }
-            this.$refs.tree.setCheckedKeys(this.defaultExpandedKeys)
-          })
+    selectAllRecursionList (recursionList) {
+      recursionList && recursionList.forEach((item, index) => {
+        if (!item.children.length && item.checkeState === 1) {
+          this.defaultExpandedKeys.push(item.id)
+          this.checkedDataKeys.push(item.id)
+        } else {
+          this.selectAllRecursionList(item.children)
         }
+        this.$refs.tree.setCheckedKeys(this.defaultExpandedKeys)
       })
     },
     changeType () {
       this.getRecursionList()
-      this.getRoleMenuListData()
     },
     checkPermit (checkedNodes, checkedKeys, halfCheckedNodes, halfCheckedKeys) {
       this.checkedDataKeys = checkedKeys.checkedKeys
@@ -133,31 +125,27 @@ export default {
           arr.push(item.id)
         }
       })
-      if (menuIds.length) {
-        let params = {
-          'menuIds': menuIds.join(','),
-          'userGroupId': this.userGroupId,
-          'checkedDataKeys': arr.join(','),
-          'type': this.type
-        }
-        saveRoleInfo(params).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.$emit('refreshDataList')
-                this.visible = false
-              }
-            })
-          } else {
-            this.$message.error(data.msg || '数据异常')
-          }
-        })
-      } else {
-        this.$message.error('请选择菜单')
+      let params = {
+        'menuIds': menuIds.join(','),
+        'userGroupId': this.userGroupId,
+        'checkedDataKeys': arr.join(','),
+        'type': this.type
       }
+      saveRoleInfo(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.$emit('refreshDataList')
+              this.visible = false
+            }
+          })
+        } else {
+          this.$message.error(data.msg || '数据异常')
+        }
+      })
     },
     closed () {
       this.visible = false

@@ -2,8 +2,8 @@
   <el-dialog :title=" title + '人群特征分析'" :visible.sync="dialogVisible" width="1200px" v-loading="loading" :close-on-click-modal="false" :close-on-press-escape="false" :before-close="handleClose">
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :inline="true" label-width="120px" class="demo-ruleForm">
       <el-form-item label="已选人群：">{{channelInfoNameList}}</el-form-item>
-      <el-form-item label="选择对比人群：" style="margin-left: 30px;">
-        <el-select v-model="ruleForm.comTemplateId" filterable clearable placeholder="请选择">
+      <el-form-item label="选择对比人群：" style="margin-left: 30px; ">
+        <el-select v-model="ruleForm.comTemplateId" class="subSelect1" filterable clearable placeholder="请选择">
           <el-option v-for="(item, index) in custGroupDataList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
@@ -423,6 +423,11 @@ export default {
             option.xAxis.data = item.xaxisData
             option.tooltip = {
               trigger: 'axis',
+              confine: true,
+              position: function (point, params, dom, rect, size) {
+                // 固定在顶部
+                return [point[0], '30%']
+              },
               axisPointer: {
                 type: 'shadow'
               }
@@ -513,5 +518,8 @@ export default {
   min-height: 38px;
   line-height: 24px;
   max-width: 100%;
+}
+.subSelect1 {
+  width: 500px;
 }
 </style>>
