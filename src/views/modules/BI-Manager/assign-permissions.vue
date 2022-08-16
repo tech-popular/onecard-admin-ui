@@ -98,11 +98,15 @@ export default {
     },
     selectAllRecursionList (recursionList) {
       recursionList && recursionList.forEach((item, index) => {
-        if (!item.children.length && item.checkeState === 1) {
-          this.defaultExpandedKeys.push(item.id)
-          this.checkedDataKeys.push(item.id)
-        } else {
+        if (item.children.length) {
           this.selectAllRecursionList(item.children)
+        } else {
+          if (item.menuType === 100) {
+            item.disabled = true
+          } else if (item.checkeState === 1) {
+            this.defaultExpandedKeys.push(item.id)
+            this.checkedDataKeys.push(item.id)
+          }
         }
         this.$refs.tree.setCheckedKeys(this.defaultExpandedKeys)
       })
