@@ -103,7 +103,7 @@ export default {
         } else {
           if (item.menuType === 100) {
             item.disabled = true
-          } else if (item.checkeState === 1) {
+          } else if (item.menuType !== 100 && item.checkeState === 1) {
             this.defaultExpandedKeys.push(item.id)
             this.checkedDataKeys.push(item.id)
           }
