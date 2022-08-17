@@ -834,7 +834,6 @@ export default {
             // this.$refs.userActionRule.isRequired = false // 用户行为暂时隐藏
           } else {
             // 全部校验通过后，可保存数据
-            console.log('全部校验通过后: ');
             this.$refs.userAttrRule.uneffectIndexValidate()
             // this.$refs.userActionRule.uneffectIndexValidate() // 用户行为暂时隐藏
             if (this.$refs.userAttrRule.isSelectedUneffectIndex.length > 0) { // （后续）校验需要加上用户行为
@@ -891,7 +890,6 @@ export default {
         rejectGroupPackCode: code
       }
       // params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
-      console.log('params222: ', params);
       if (type === 'preview') {
         this.isPreviewShow = true
         this.$nextTick(() => {

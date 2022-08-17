@@ -1,45 +1,54 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
-      <el-form-item label="订阅说明: ">
-        <el-input v-model="dataForm.approveReason" clearable placeholder="请输入申请原因" class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
+      <el-form-item label="主题: ">
+        <el-input v-model="dataForm.theme" clearable  class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="申请原因: ">
+        <el-input v-model="dataForm.approveReason" clearable  class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
+     <el-form-item label="类型: ">
+        <el-select v-model="dataForm.type" clearable>
+          <el-option label="提数" value="export"></el-option>
+          <el-option label="订阅" value="subscription"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="状态: ">
+        <el-select v-model="dataForm.status" clearable>
+          <el-option label="未上线" value="0"></el-option>
+          <el-option label="上线" value="1"></el-option>
+        </el-select>
+      </el-form-item>
         <el-button type="primary" @click="searchData()">查询</el-button>
         <el-button type="primary" @click="addOrUpdateHandle">订阅申请</el-button>
         <el-button type="primary" @click="dispatchConfig">配置调度</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
-      <el-table-column prop="approveReason" header-align="center" align="center" label="申请原因">
-        <template slot-scope="scope">
-          <el-tooltip effect="dark" placement="top">
-            <div v-html="toBreak(scope.row.approveReason)" slot="content"></div>
-            <div class="text-to-long-cut">{{scope.row.approveReason}}</div>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-      <el-table-column prop="typeDesc" header-align="center" align="center" label="类型"></el-table-column>
+      <el-table-column prop="id" header-align="center" align="center" label="数据源id"></el-table-column>
+      <el-table-column prop="receiveType" header-align="center" align="center" label="接收方式"></el-table-column>
+      <el-table-column prop="receiveContentType" header-align="center" align="center" label="接收方式"></el-table-column>
+      <el-table-column prop="period" header-align="center" align="center" label="提数周期"></el-table-column>
+       <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天数"></el-table-column>
+      <el-table-column prop="thene" header-align="center" align="center" label="主题"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="申请时间"></el-table-column>
       <el-table-column prop="createUser" header-align="center" align="center" label="申请人"></el-table-column>
       <el-table-column prop="expiryTime" header-align="center" align="center" label="过期时间"></el-table-column>
-      <el-table-column prop="enable" header-align="center" align="center" label="是否失效">
+      <el-table-column prop="status" header-align="center" align="center" label="上线状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.enable === 1" size="small">否</el-tag>
-          <el-tag v-else size="small" type="danger">是</el-tag>
+          <el-tag v-if="scope.row.status === 0" size="small">未上线</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small">已上线</el-tag>
+          <el-tag v-if="scope.row.status === 2" size="small" >上线中</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="approveStatus" header-align="center" align="center" label="审批流状态">
+      <el-table-column prop="approveStatus" header-align="center" align="center" label="审批状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.approveStatus === 'agree'" size="small">审批通过</el-tag>
-          <el-tag v-if="scope.row.approveStatus === 'running'" size="small">审批中</el-tag>
-          <el-tag v-if="scope.row.approveStatus === 'refuse'" size="small" type="danger">审批拒绝</el-tag>
+          <el-tag v-if="scope.row.approveStatus === 0" size="small" type="danger">审批异常</el-tag>
+          <el-tag v-if="scope.row.approveStatus === 1" size="small">敏感数据验证审批中</el-tag>
+          <el-tag v-if="scope.row.approveStatus === 2" size="small">敏感数据审批中</el-tag>
+          <el-tag v-if="scope.row.approveStatus === 3" size="small">审批完成</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="period" header-align="center" align="center" label="周期"></el-table-column>
-      <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天数"></el-table-column>
-      <el-table-column prop="remainDay" header-align="center" align="center" label="距离失效日期"></el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
@@ -52,7 +61,7 @@
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
-      :current-page="pageIndex"
+      :current-page="currPage"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
       :total="totalPage"
@@ -69,21 +78,22 @@
 }
 </style>
 <script>
-import { } from '@/api/dataGovernance/subscribeManage'
+import {getList, subscriptionUpAndDown } from '@/api/dataGovernance/subscribeManage'
 import addOrUpdate from './subscribeManage-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 export default {
   data () {
     return {
-      restaurants: [],
       dataList: [],
-      pageIndex: 1,
+      currPage: 1,
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
       dispatchConfigAddOrUpdateVisible: false,
       dataForm: {
+        status: '',
+        theme: '',
         approveReason: '',
         type: ''
       }
@@ -99,21 +109,17 @@ export default {
     // 获取数据列表
     getDataList () {
       // this.dataListLoading = true
-      // let params = {
-      //   approveReason: this.dataForm.approveReason,
-      //   type: this.dataForm.type ? Number(this.dataForm.type) : '',
-      //   pageNum: this.pageIndex,
-      //   pageSize: this.pageSize
-      // }
-      // exportDataList(params).then(({ data }) => {
+      let params = {
+        'approveReason': this.dataForm.approveReason,
+        'type': this.dataForm.type,
+        'status': this.dataForm.status ? Number(this.dataForm.status) : '',
+        'theme': this.dataForm.theme,
+        'currPage': this.currPage,
+        'pageSize': this.pageSize
+      }
+      // getList(params).then(({ data }) => {
       //   console.log('res: ', data)
       //   if (data.code === 0 && data.data) {
-      //     data.data.list.forEach(element => {
-      //       if (element.typeDesc === 'ftp提数') {
-      //         element.remainDay = ''
-      //         element.receiveDays = ''
-      //       }
-      //     })
       //     this.dataList = data.data.list
       //     this.totalPage = data.data.totalCount
       //     this.dataListLoading = false
@@ -126,16 +132,16 @@ export default {
     // 每页数
     sizeChangeHandle (val) {
       this.pageSize = val
-      this.pageIndex = 1
+      this.currPage = 1
       this.getDataList()
     },
     // 当前页
     currentChangeHandle (val) {
-      this.pageIndex = val
+      this.currPage = val
       this.getDataList()
     },
     searchData () {
-      this.pageIndex = 1
+      this.currPage = 1
       this.getDataList()
     },
     // 新增 / 修改
