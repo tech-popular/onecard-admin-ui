@@ -33,9 +33,9 @@
               </div>
             </div>
             <div style="width:70%">
-              <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;" @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="90"></el-table-column>
-                <el-table-column type="index" header-align="center" align="center" label="序号"></el-table-column>
+              <el-table :data="dataList" :row-key="getRowKeys" ref="ftpDataTable" border v-loading="dataListLoading" style="width: 100%;" @selection-change="handleSelectionChange">
+                <el-table-column type="selection" reserve-selection="true" width="90"></el-table-column>
+                <el-table-column prop="num" header-align="center" align="center" label="序号"></el-table-column>
                 <el-table-column prop="name" header-align="center" align="center" label="文件名称"></el-table-column>
                 <el-table-column prop="suffix" header-align="center" align="center" label="文件格式"></el-table-column>
                 <el-table-column prop="lastModifiedTime" header-align="center" align="center" label="修改时间"></el-table-column>
@@ -151,6 +151,9 @@ export default {
         this.$refs['baseForm'].resetFields()
       })
     },
+    getRowKeys (row) {
+      return row.num
+    },
     loadNode (node, resolve) {
       if (node.level === 0) {
         this.node_had = node // 这里是关键！在data里面定义一个变量，将node.level == 0的node存起来
@@ -231,7 +234,6 @@ export default {
     // 多选
     handleSelectionChange (val) {
       this.multipleSelection = val
-      console.log('this.multipleSelection: ', this.multipleSelection)
     },
     // 每页数
     sizeChangeHandle (val) {
@@ -276,6 +278,7 @@ export default {
                 onClose: () => {
                   this.$emit('refreshDataList')
                   this.$refs['baseForm'].resetFields()
+                  this.$refs.ftpDataTable.clearSelection()
                   this.visible = false
                   this.treeVisible = false
                 }
@@ -291,11 +294,13 @@ export default {
     drawerClose () {
       this.visible = false
       this.treeVisible = false
+      this.$refs.ftpDataTable.clearSelection()
       this.$parent.addOrUpdateVisible = false
     },
     // 关闭
     cancelHandle () {
       this.visible = false
+      this.$refs.ftpDataTable.clearSelection()
       this.treeVisible = false
       this.$parent.addOrUpdateVisible = false
     }
@@ -453,7 +458,8 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    height: 600px;
+    min-height: 600px;
+    // overflow: scroll;
     border: 1px solid #e6e6e6;
   }
   .code-select {
