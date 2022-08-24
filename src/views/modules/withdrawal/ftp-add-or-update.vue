@@ -278,7 +278,7 @@ export default {
                 onClose: () => {
                   this.$emit('refreshDataList')
                   this.$refs['baseForm'].resetFields()
-                  this.$refs.ftpDataTable.clearSelection()
+                  this.clearTableSelection()
                   this.visible = false
                   this.treeVisible = false
                 }
@@ -294,15 +294,22 @@ export default {
     drawerClose () {
       this.visible = false
       this.treeVisible = false
-      this.$refs.ftpDataTable.clearSelection()
+      this.clearTableSelection()
       this.$parent.addOrUpdateVisible = false
     },
     // 关闭
     cancelHandle () {
       this.visible = false
-      this.$refs.ftpDataTable.clearSelection()
+      this.clearTableSelection()
       this.treeVisible = false
       this.$parent.addOrUpdateVisible = false
+    },
+    clearTableSelection () {
+      this.pageIndex = 1
+      this.pageSize = 10
+      this.totalPage = 0
+      this.totalCount = 0
+      this.$refs.ftpDataTable.clearSelection()
     }
   }
 }
