@@ -6,78 +6,128 @@
     </div>
     <div class="wrap" v-loading="loading">
       <h3 id="title">基础信息</h3>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="110px">
+      <el-form :model="dataForm" ref="dataForm1" label-width="110px">
         <div class="work-type-pane">
-          <el-form-item label="任务名称：" prop="taskName">
-            <el-input v-model="dataForm.taskName" placeholder="任务名称" disabled style="width: 400px">
-              <template slot="prepend">{{preDs}}</template>
+          <el-form-item label="订阅主题：" prop="theme">
+            <el-input v-model="dataForm.theme" placeholder="任务名称" disabled style="width: 400px">
             </el-input>
           </el-form-item>
           <el-form-item label="任务ID：" prop="id">
             <el-input v-model="dataForm.id" placeholder="任务ID" disabled style="width: 300px" />
           </el-form-item>
         </div>
-        <!-- <el-form-item label="所属系统：" prop="projectSystemName">
-          <el-input v-model="dataForm.projectSystemName" placeholder="所属系统" disabled  style="width: 300px" />
-        </el-form-item>-->
-        <!-- <el-form-item label="任务描述：" prop="taskDescribe">
-          <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" disabled />
-        </el-form-item>-->
       </el-form>
       <div class="work-content-1">
         <h3 style="overflow:hidden">
-          新调度任务依赖
-          <el-button style="float:right" type="danger" @click="deleteDependenceHandle">批量删除</el-button>
-          <el-button style="float:right;margin-right:20px" type="primary" @click="addDependenceHandle">新增依赖</el-button>
+          蜂巢调度任务依赖
         </h3>
         <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
-          <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>
-          <el-table style="flex:1;" ref="multipleTable" :data="dataForm.selectedDpendeceList" border @selection-change="handleSelectDependenceChange">
+         <el-row :gutter="20">
+      <el-col :span="11">
+        <el-card class="box-card" shadow="never">
+          <div slot="header" class="clearfix" style="display:flex">
+            <span style="width: 150px">所有依赖</span>
+            <el-input v-model="honeycombTasksLeftSearchText" size="mini" placeholder="请输入搜索关键字">
+              <el-button slot="append" icon="el-icon-search" @click="honeycombTasksSearchTableHandle"></el-button>
+            </el-input>
+          </div>
+          <el-table ref="multipleLeftTable" :data="honeycombTasksLeftTableData" border @selection-change="honeycombTasksHandleLeftSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务ID"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务名称"></el-table-column>
             <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="honeycombTasksSizeChangeHandle"
+            @current-change="honeycombTasksCurrentChangeHandle"
+            :current-page="honeycombTasksPageNo"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="honeycombTasksPageSize"
+            :total="honeycombTasksTotalCount"
+            style="margin-top:20px"
+            layout="total, sizes, prev, pager, next, jumper"
+          />
+        </el-card>
+      </el-col>
+      <el-col :span="2" style="text-align:center">
+        <el-button size="mini" type="primary" style="margin-top: 100px" @click="honeycombTasksAddToRight">添加至</el-button>
+      </el-col>
+      <el-col :span="11">
+        <el-card class="box-card" shadow="never">
+          <div slot="header" class="clearfix">
+            <span>已选依赖</span>
+            <el-button style="float: right;" size="mini" type="danger" @click="honeycombTasksMultiDeleteHandle">批量删除</el-button>
+          </div>
+          <el-table ref="multipleRightTable" :data="honeycombTasksRightTableData" border @selection-change="honeycombTasksHandleRightSelectChange">
+            <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务名称"></el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
-                <a style="cursor: pointer" @click="deleteDependenceHandle(scope.row)">删除</a>
+                <a style="cursor: pointer" @click="honeycombTasksDeleteDependenceHandle(scope.$index)">删除</a>
               </template>
             </el-table-column>
           </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
         </div>
       </div>
       <div class="work-content-1">
         <h3 style="overflow:hidden">
           老调度任务依赖
-          <el-button style="float:right" type="danger" @click="deleteOldDependenceHandle">批量删除</el-button>
-          <el-button style="float:right;margin-right:20px" type="primary" @click="addOldDependenceHandle">新增依赖</el-button>
         </h3>
         <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
-          <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>
-          <el-table style="flex:1;" ref="multipleTable" :data="dataForm.selectedOldDpendeceList" border @selection-change="handleSelectOldDependenceChange">
+         <el-row :gutter="20">
+      <el-col :span="11">
+        <el-card class="box-card" shadow="never">
+          <div slot="header" class="clearfix" style="display:flex">
+            <span style="width: 150px">所有依赖</span>
+            <el-input v-model="oldDispatchTaskLeftSearchText" size="mini" placeholder="请输入搜索关键字">
+              <el-button slot="append" icon="el-icon-search" @click="oldDispatchTaskSearchTableHandle"></el-button>
+            </el-input>
+          </div>
+          <el-table ref="oldmultipleLeftTable" :data="oldDispatchTaskLeftTableData" border @selection-change="oldDispatchTaskHandleLeftSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="taskName" label="任务ID"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="oldDispatchTaskSizeChangeHandle"
+            @current-change="oldDispatchTaskCurrentChangeHandle"
+            :current-page="oldDispatchTaskPageNo"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="oldDispatchTaskPageSize"
+            :total="oldDispatchTaskTotalCount"
+            style="margin-top:20px"
+            layout="total, sizes, prev, pager, next, jumper"
+          />
+        </el-card>
+      </el-col>
+      <el-col :span="2" style="text-align:center">
+        <el-button size="mini" type="primary" style="margin-top: 100px" @click="oldDispatchTaskAddToRight">添加至</el-button>
+      </el-col>
+      <el-col :span="11">
+        <el-card class="box-card" shadow="never">
+          <div slot="header" class="clearfix">
+            <span>已选依赖</span>
+            <el-button style="float: right;" size="mini" type="danger" @click="oldDispatchTaskMultiDeleteHandle">批量删除</el-button>
+          </div>
+          <el-table ref="oldmultipleRightTable" :data="oldDispatchTaskRightTableData" border @selection-change="oldDispatchTaskHandleRightSelectChange">
+            <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="taskName" label="任务ID"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
-                <a style="cursor: pointer" @click="deleteOldDependenceHandle(scope.row)">删除</a>
+                <a style="cursor: pointer" @click="oldDispatchTaskDeleteDependenceHandle(scope.$index)">删除</a>
               </template>
             </el-table-column>
           </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
         </div>
       </div>
-      <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" @getStatus="getDispatchStatus" @refreshList="refreshListhandle"></dispatch-config-period>
-      <div class="work-content-1">
-        <h3>调度启停</h3>
-        <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus">
-          <div class="work-type-pane">
-            <el-form-item label="状态：" prop="dispatchStatus" label-width="100px">
-              <el-radio-group v-model="dispatchStatusForm.dispatchStatus">
-                <el-radio :label="0">有效</el-radio>
-                <el-radio :label="1">无效</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item label="任务责任人：" prop="dutyUser" label-width="200px">
-              <el-input v-model="dispatchStatusForm.dutyUser" placeholder="任务责任人" style="width: 300px" />
-            </el-form-item>
-          </div>
         </el-form>
       </div>
     </div>
@@ -85,90 +135,55 @@
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
-    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence"></dispatch-config-task-dependent>
-    <dispatch-config-old-task-dependent v-if="dispatchConfigOldTaskDependentVisible" ref="dispatchConfigOldTaskDependent" @refreshOldTaskDependence="getOldTaskSelectDependence"></dispatch-config-old-task-dependent>
   </el-drawer>
 </template>
 
 <script>
-import { } from '@/api/dataGovernance/subscribeManage'
-import { deepClone } from '@/utils'
-import dispatchConfigTaskDependent from './dispatch-config-dependent'
-import dispatchConfigOldTaskDependent from './dispatch-config-old-dependent'
-import dispatchConfigPeriod from './dispatch-config-period'
+import {honeycombTasks, oldDispatchTasks, configDepend, queryDenpendJob } from '@/api/dataGovernance/subscribeManage'
 export default {
-  components: {
-    dispatchConfigTaskDependent,
-    dispatchConfigPeriod,
-    dispatchConfigOldTaskDependent
-  },
+  components: {},
   data () {
     return {
       visible: false,
       loading: false,
       id: '',
-      rowData: { // 修改时数据内容
-        authOwner: '',
-        authOtherList: [],
-        authOthers: ''
-      },
-      taskType: '',
-      preDs: '',
-      updateUser: '',
-      updateTime: '',
       selectedDpendeceData: [], // 已选新调度任务
       selectedOldDpendeceData: [], // 已选老调度任务
       dataForm: {
-        taskName: '',
         id: '',
-        projectSystemName: '',
-        taskDescribe: '',
-        selectedDpendeceList: [], // 新调度任务列表
-        selectedOldDpendeceList: [] // 老调度任务列表
+        theme: ''
       },
-      dispatchStatusForm: {
-        dispatchStatus: 0,
-        dutyUser: ''
-      },
-      dataRule: {
-        dispatchStatus: [
-          { required: true, message: '请选择状态', trigger: 'change' }
-        ],
-        dutyUser: [
-          { required: true, message: '请输入任务责任人', trigger: 'blur' }
-        ]
-      },
-      dispatchConfigTaskDependentVisible: false,
-      dispatchConfigOldTaskDependentVisible: false
+      // 蜂巢
+      honeycombTasksPageNo: 1, // 当前页
+      honeycombTasksPageSize: 10, // 默认每页10条
+      honeycombTasksTotalCount: 0,
+      honeycombTasksLeftSearchText: '',
+      honeycombTasksLeftSelectedData: [],
+      honeycombTasksRightSelectedData: [],
+      honeycombTasksLeftTableData: [],
+      honeycombTasksRightTableData: [],
+      // 老调度
+      oldDispatchTaskPageNo: 1, // 当前页
+      oldDispatchTaskPageSize: 10, // 默认每页10条
+      oldDispatchTaskTotalCount: 0,
+      oldDispatchTaskLeftSearchText: '',
+      oldDispatchTaskLeftSelectedData: [],
+      oldDispatchTaskRightSelectedData: [],
+      oldDispatchTaskLeftTableData: [],
+      oldDispatchTaskRightTableData: []
     }
   },
   methods: {
-    init (id) {
-      this.id = id ? id.id : ''
-      this.rowData = {
-        authOwner: '',
-        authOtherList: [],
-        authOthers: ''
-      }
-      this.rowData = id ? deepClone(id) : this.rowData
-      this.dispatchStatusForm = {
-        dispatchStatus: 0,
-        dutyUser: ''
-      }
+    init (row) {
+      // this.id = row.id
+      // this.dataForm.theme = row.theme
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
-        if (id) {
-          this.taskType = id.taskType
-          this.loading = true
-          this.$refs.dispatchConfigPeriod.init()
-          // this.$refs.dispatchConfigAlert.init()
-          this.getTaskBaseInfo()
-          this.getTaskSelectDependence()
-          this.getOldTaskSelectDependence()
-        }
-        this.$refs['dataForm1'].resetFields()
-        this.$refs['dispatchStatus'].resetFields()
+        this.loading = true
+        this.getTaskBaseInfo()
+        this.getHoneycombTasksDependence()
+        this.getOldTaskSelectDependence()
         setTimeout(() => {
           this.loading = false
         }, 300)
@@ -176,110 +191,43 @@ export default {
     },
     // 基础信息
     getTaskBaseInfo () {
-      //   taskBaseInfo(this.id).then(({data}) => {
+      //   queryDenpendJob(this.id).then(({data}) => {
       //     if (data.code !== 0) {
       //       return this.$message.error(data.msg || '获取数据异常')
       //     }
-      //     this.dataForm.id = data.data.id
-      //     this.dataForm.projectSystemName = data.data.projectSystemName
-      //     this.dataForm.taskDescribe = data.data.taskDescribe
-      //     this.updateTime = data.data.updateTime
-      //     this.updateUser = data.data.updateUser
-      //     let name = data.data.taskName.split('_')
-      //     if (this.taskType === 'ACQUISITION') {
-      //       this.preDs = `${name[0]}_to_${name[2]}_`
-      //       this.dataForm.taskName = name.slice(3).join('_')
-      //     } else {
-      //       this.preDs = `${name[0]}_`
-      //       this.dataForm.taskName = name.slice(1).join('_')
-      //     }
+      
       //   })
     },
-    // 新调度任务依赖列表
-    getTaskSelectDependence () {
-      // taskSelectDependence(this.id).then(({data}) => {
+    // 蜂巢任务
+    getHoneycombTasksDependence () {
+      // let parsms = {
+        // jobName: this.honeycombTasksLeftSearchText,
+        // currPage: this.honeycombTasksPageNo,
+      //   pageSize: this.honeycombTasksPageSize
+      // }
+      // honeycombTasks(parsms).then(({data}) => {
       //   if (data.code !== 0) {
       //     return this.$message.error(data.msg || '获取数据异常')
       //   }
-      //   this.dataForm.selectedDpendeceList = data.data
+      //   this.honeycombTasksLeftTableData = data.data
+          //  this.honeycombTasksTotalCount = data.totalCount
       // })
     },
     // 老调度任务依赖列表
     getOldTaskSelectDependence () {
-      // taskSelectOldDependence(this.id).then(({data}) => {
+      // let parsms = {
+        // currPage: this.oldDispatchTaskPageNo,
+      //   pageSize: this.oldDispatchTaskPageSize,
+      // jobName: this.oldDispatchTaskLeftSearchText,
+      // }
+      // oldDispatchTasks(parsms).then(({data}) => {
       //   if (data.code !== 0) {
-      //     this.dataForm.selectedOldDpendeceList = []
+      //     this.oldDispatchTaskLeftTableData = []
       //     return this.$message.error(data.msg || '获取数据异常')
       //   }
-      //   this.dataForm.selectedOldDpendeceList = data.data
+      //    this.oldDispatchTaskLeftTableData = data.data
+          // this.oldDispatchTaskTotalCount = data.totalCount
       // })
-    },
-    // 获取状态数据
-    getDispatchStatus (data) {
-      this.dispatchStatusForm.dispatchStatus = data.dispatchStatus
-      this.dispatchStatusForm.dutyUser = data.dutyUser
-    },
-    // 已选新调度依赖选中操作
-    handleSelectDependenceChange (val) {
-      this.selectedDpendeceData = val
-    },
-    // 删除新调度任务所选依赖
-    deleteDependenceHandle (row) {
-      let arr = []
-      if (row.id) { // 单个删除
-        arr = [row.id]
-      } else { // 批量删除
-        if (!this.selectedDpendeceData.length) return
-        this.selectedDpendeceData.forEach(item => {
-          arr.push(item.id)
-        })
-      }
-      // taskDependenceDelete(arr).then(({data}) => {
-      //   if (data && data.code === 0) {
-      //     this.$message.success(data.msg)
-      //     this.getTaskSelectDependence()
-      //   } else {
-      //     this.$message.error(data.msg || '删除失败')
-      //   }
-      // })
-    },
-    // 已选老调度依赖选中操作
-    handleSelectOldDependenceChange (val) {
-      this.selectedOldDpendeceData = val
-    },
-    // 删除老调度任务所选依赖
-    deleteOldDependenceHandle (row) {
-      let arr = []
-      if (row.id) { // 单个删除
-        arr = [row.id]
-      } else { // 批量删除
-        if (!this.selectedOldDpendeceData.length) return
-        this.selectedOldDpendeceData.forEach(item => {
-          arr.push(item.id)
-        })
-      }
-      // oldTaskDependenceDelete(arr).then(({data}) => {
-      //   if (data && data.code === 0) {
-      //     this.$message.success(data.msg)
-      //     this.getOldTaskSelectDependence()
-      //   } else {
-      //     this.$message.error(data.msg || '删除失败')
-      //   }
-      // })
-    },
-    // 新增新调度依赖
-    addDependenceHandle () {
-      this.dispatchConfigTaskDependentVisible = true
-      this.$nextTick(() => {
-        this.$refs.dispatchConfigTaskDependent.init(this.dataForm.id)
-      })
-    },
-    // 新增老调度依赖
-    addOldDependenceHandle () {
-      this.dispatchConfigOldTaskDependentVisible = true
-      this.$nextTick(() => {
-        this.$refs.dispatchConfigOldTaskDependent.init(this.dataForm.id)
-      })
     },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
@@ -291,24 +239,121 @@ export default {
     },
     // 提交
     dataFormSubmit (form) {
-      let flag = true
-      flag = this.$refs.dispatchConfigPeriod.validateForm()
-      // flag = this.$refs.dispatchConfigAlert.validateForm()
-      this.$refs['dispatchStatus'].validate((valid) => {
-        if (!valid) {
-          flag = false
-        }
-      })
-      if (flag) {
-        // 提交周期及状态信息数据
-        let authParams = {
-          authOwner: this.rowData.authOwner,
-          authOtherList: this.rowData.authOtherList,
-          authOthers: this.rowData.authOthers,
-          tenantId: sessionStorage.getItem('tenantId')
-        }
-        this.$refs.dispatchConfigPeriod.submitData(flag, authParams)
+        // let params = {
+        //   id: this.id,
+        //   jiblist: [...this.honeycombTasksRightTableData, ...this.oldDispatchTaskRightTableData ]
+        // }
+         // configDepend(parsms).then(({data}) => {
+      //   if (data.code !== 0) {
+      //     this.oldDispatchTaskLeftTableData = []
+      //     return this.$message.error(data.msg || '获取数据异常')
+      //   }
+          // this.$message({
+          //   message: '保存成功',
+          //   type: 'success',
+          //   duration: 1500,
+          //   onClose: () => {
+          //     this.$emit('refreshDataList')
+          //     this.visible = false
+          //   }
+          // })
+      // })
+    },
+    // 蜂巢调度任务
+    // 左侧搜索功能
+    honeycombTasksSearchTableHandle () {
+      this.honeycombTasksPageNo = 1
+      this.getHoneycombTasksDependence()
+    },
+    honeycombTasksHandleLeftSelectChange (val) {
+      this.honeycombTasksLeftSelectedData = val
+    },
+    honeycombTasksHandleRightSelectChange (val) {
+      this.honeycombTasksRightSelectedData = val
+    },
+    // 单独删除
+    honeycombTasksDeleteDependenceHandle (index) {
+      this.honeycombTasksRightTableData.splice(index, 1)
+    },
+    // 批量删除
+    honeycombTasksMultiDeleteHandle () {
+      if (!this.honeycombTasksRightSelectedData.length) return
+      let arr = this.filterArr(this.honeycombTasksRightSelectedData, this.honeycombTasksRightTableData)
+      this.honeycombTasksRightTableData = arr
+    },
+    // 添加到右侧
+    honeycombTasksAddToRight () {
+      if (!this.honeycombTasksLeftSelectedData.length) return
+      if (!this.honeycombTasksRightTableData.length) {
+        this.honeycombTasksRightTableData = this.honeycombTasksLeftSelectedData
+      } else {
+        this.honeycombTasksRightTableData = this.unique(this.honeycombTasksRightTableData.concat(this.honeycombTasksLeftSelectedData))
       }
+      this.$refs.multipleLeftTable.clearSelection()
+    },
+    // 取两个对象数组的并集且去重
+    unique (arr) {
+      const res = new Map()
+      return arr.filter((arr) => !res.has(arr.etlJobId) && res.set(arr.etlJobId, 1))
+    },
+    // 从一个对象数组中过滤过另一个对象数组的内容
+    filterArr (a, b) {
+      return [...b].filter(x => [...a].every(y => y.etlJobId !== x.etlJobId))
+    },
+    // 每页数
+    honeycombTasksSizeChangeHandle (page) {
+      this.honeycombTasksPageSize = page
+      this.honeycombTasksPageNo = 1
+      this.getHoneycombTasksDependence()
+    },
+    // 当前页
+    honeycombTasksCurrentChangeHandle (page) {
+      this.honeycombTasksPageNo = page
+      this.getHoneycombTasksDependence()
+    },
+
+    // 老调度
+    // 左侧搜索功能
+    oldDispatchTaskSearchTableHandle () {
+      this.oldDispatchTaskPageNo = 1
+      this.getOldTaskSelectDependence()
+    },
+    oldDispatchTaskHandleLeftSelectChange (val) {
+      this.oldDispatchTaskLeftSelectedData = val
+    },
+    oldDispatchTaskHandleRightSelectChange (val) {
+      this.oldDispatchTaskRightSelectedData = val
+    },
+    // 单独删除
+    oldDispatchTaskDeleteDependenceHandle (index) {
+      this.oldDispatchTaskRightTableData.splice(index, 1)
+    },
+    // 批量删除
+    oldDispatchTaskMultiDeleteHandle () {
+      if (!this.oldDispatchTaskRightSelectedData.length) return
+      let arr = this.filterArr(this.oldDispatchTaskRightSelectedData, this.oldDispatchTaskRightTableData)
+      this.oldDispatchTaskRightTableData = arr
+    },
+    // 添加到右侧
+    oldDispatchTaskAddToRight () {
+      if (!this.oldDispatchTaskLeftSelectedData.length) return
+      if (!this.oldDispatchTaskRightTableData.length) {
+        this.oldDispatchTaskRightTableData = this.oldDispatchTaskLeftSelectedData
+      } else {
+        this.oldDispatchTaskRightTableData = this.unique(this.oldDispatchTaskRightTableData.concat(this.oldDispatchTaskLeftSelectedData))
+      }
+      this.$refs.oldmultipleLeftTable.clearSelection()
+    },
+    // 每页数
+    oldDispatchTaskSizeChangeHandle (page) {
+      this.oldDispatchTaskPageSize = page
+      this.oldDispatchTaskPageNo = 1
+      this.getOldTaskSelectDependence()
+    },
+    // 当前页
+    oldDispatchTaskCurrentChangeHandle (page) {
+      this.oldDispatchTaskPageNo = page
+      this.getOldTaskSelectDependence()
     }
   }
 }
