@@ -25,9 +25,9 @@
           <el-option v-for="item in calculateList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="位置排序" prop="orderNum">
+      <!-- <el-form-item label="位置排序" prop="orderNum">
         <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="位置排序"></el-input-number>
-      </el-form-item>
+      </el-form-item>-->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -58,8 +58,8 @@ export default {
         menuType: '',
         name: '',
         url: '',
-        taskIds: [],
-        orderNum: 0
+        taskIds: []
+        // orderNum: 0
       },
       menuData: [],
       menuList: [],
@@ -86,10 +86,10 @@ export default {
         ],
         menuType: [
           { required: true, message: '菜单属性不能为空', trigger: 'blur' }
-        ],
-        orderNum: [
-          { required: true, message: '位置排序不能为空', trigger: 'blur' }
         ]
+        // orderNum: [
+        //   { required: true, message: '位置排序不能为空', trigger: 'blur' }
+        // ]
       },
       menuLists: [{
         id: '0',
@@ -136,7 +136,7 @@ export default {
           }
           this.dataForm.name = data.data.name
           this.dataForm.menuType = data.data.menuType.toString()
-          this.dataForm.orderNum = data.data.orderNum
+          // this.dataForm.orderNum = data.data.orderNum
           if (data.data.url) {
             this.dataForm.type = 1
             this.menuList = this.filterMenuList(this.menuData)
@@ -255,7 +255,7 @@ export default {
             'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
             'menuParentList': this.menuParentList.join(','),
             'type': 0,
-            'orderNum': this.dataForm.orderNum,
+            // 'orderNum': this.dataForm.orderNum,
             'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType)
           }
           if (!this.dataForm.id) {

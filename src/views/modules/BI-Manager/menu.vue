@@ -2,7 +2,10 @@
   <div class="mod-menu">
     <el-form :inline="true" :model="dataForm">
       <el-form-item label="菜单名称: ">
-        <el-input v-model="dataForm.name" @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.name" clearable @keyup.enter.native="getDataList()"></el-input>
+      </el-form-item>
+      <el-form-item label="目录名称：">
+        <el-cascader clearable ref="cascaderMenu" @keyup.enter.native="getDataList()" v-model="dataForm.parentId" :options="menuList" :props="menuListTreeProps"></el-cascader>
       </el-form-item>
       <el-form-item label="菜单链接: ">
         <el-input v-model="dataForm.url" @keyup.enter.native="getDataList()"></el-input>
@@ -63,6 +66,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="sortMenuHandle(scope.row.id)">排序</el-button>
           <el-button v-if="scope.row.flag === 1 " style="color:#67C23A;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">启用</el-button>
           <el-button v-if="scope.row.flag === 0 " style="color:#F56C6C;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">禁用</el-button>
         </template>
@@ -79,12 +83,14 @@
     />
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <menu-sort v-if="menuSortVisible" ref="menuSort" @refreshDataList="getDataList"></menu-sort>
   </div>
 </template>
 
 <script>
-import { getMenuList, updateFlagInfo } from '@/api/BI-Manager/menu'
+import { getMenuList, updateFlagInfo, findAllRecursionList } from '@/api/BI-Manager/menu'
 import AddOrUpdate from './menu-add-or-update'
+import menuSort from './menu-sort'
 export default {
   data () {
     return {
@@ -99,15 +105,25 @@ export default {
       totalCount: 0,
       dataList: [],
       dataListLoading: false,
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      menuSortVisible: false,
+      menuList: [],
+      menuListTreeProps: {
+        checkStrictly: true,
+        label: 'name',
+        value: 'id',
+        children: 'children'
+      },
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    menuSort
   },
   mounted () {
     this.getDataList()
     this.getSelectDown()
+    this.getRecursionList()
   },
   methods: {
     // 获取数据列表
@@ -135,6 +151,41 @@ export default {
       })
     },
     getSelectDown () {
+    },
+    // 获取上级菜单
+    getRecursionList () {
+      let params = {
+        type: 0
+      }
+      findAllRecursionList(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.menuList = this.filterMenuList(data.data)
+        }
+      })
+    },
+    filterMenuList (tree) {
+      let arr = []
+      if (!!tree && tree.length !== 0) {
+        tree.forEach((item, index) => {
+          if (!item.url) {
+            let obj = {}
+            obj.id = item.id
+            obj.name = item.name
+            obj.grade = item.grade
+            if (item.children.length) {
+              let children = []
+              children = this.filterMenuList(item.children)
+              if (children.length) {
+                obj.children = children
+              }
+              arr.push(obj)
+            } else {
+              arr.push(obj)
+            }
+          }
+        })
+      }
+      return arr
     },
     // 新增 / 修改
     addOrUpdateHandle (id) {
@@ -224,6 +275,13 @@ export default {
       cellValue = row.menuType === 100 ? 3 : cellValue
       const menuLists = ['superset列表', 'BI报表', 'tableau图表', '目录']
       return menuLists[cellValue]
+    },
+    // 给目录下级进行手动排序
+    sortMenuHandle (id) {
+      this.menuSortVisible = true
+      this.$nextTick(() => {
+        this.$refs.menuSort.init(id)
+      })
     }
   }
 }
