@@ -17,6 +17,17 @@
           <el-option v-for="item in menuLists" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="tableau类型" prop="tableauType" v-if="dataForm.menuType == 2">
+        <el-select v-model="dataForm.tableauType" placeholder="请选择菜单属性" style="width: 100%">
+          <el-option v-for="item in tableauTypeLists" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="站点名称" prop="tableauSiteId" v-if="dataForm.tableauType == 1">
+        <el-input v-model="dataForm.tableauSiteId" placeholder="请输入站点名称"></el-input>
+      </el-form-item>
+      <el-form-item label="用户名" prop="tableauUserName" v-if="dataForm.tableauType == 1">
+        <el-input v-model="dataForm.tableauUserName" placeholder="请输入用户名"></el-input>
+      </el-form-item>
       <el-form-item label="菜单链接" prop="url" v-if="dataForm.type === 1">
         <el-input v-model="dataForm.url" placeholder="菜单链接"></el-input>
       </el-form-item>
@@ -58,7 +69,11 @@ export default {
         url: '',
         taskIds: [],
         principalId: [],
-        orderNum: 0
+        orderNum: 0,
+        menuType: '',
+        tableauType: '', // tableau类型
+        tableauSiteId: '', // timscale类型tableau图表 站点名称
+        tableauUserName: '' // timscale类型tableau图表 用户名
       },
       menuData: [],
       menuList: [],
@@ -88,6 +103,15 @@ export default {
         menuType: [
           { required: true, message: '菜单属性不能为空', trigger: 'blur' }
         ],
+        tableauType: [
+          { required: true, message: 'tableau类型不能为空', trigger: 'blur' }
+        ],
+        tableauSiteId: [
+          { required: true, message: '站点名称不能为空', trigger: 'blur' }
+        ],
+        tableauUserName: [
+          { required: true, message: '用户名不能为空', trigger: 'blur' }
+        ],
         orderNum: [
           { required: true, message: '位置排序不能为空', trigger: 'blur' }
         ],
@@ -104,6 +128,13 @@ export default {
       }, {
         id: '2',
         name: 'tableau图表'
+      }],
+      tableauTypeLists: [{
+        id: '0',
+        name: 'tableau'
+      }, {
+        id: '1',
+        name: 'timscale_tableau'
       }]
     }
   },
@@ -140,6 +171,9 @@ export default {
           }
           this.dataForm.name = data.data.name
           this.dataForm.menuType = data.data.menuType + ''
+          this.dataForm.tableauType = data.data.tableauType + ''
+          this.dataForm.tableauSiteId = data.data.tableauSiteId
+          this.dataForm.tableauUserName = data.data.tableauUserName
           this.dataForm.orderNum = data.data.orderNum
           this.getUserSelectList()
           this.dataForm.principalId = responsibleData.map(item => { return +item })
@@ -303,7 +337,10 @@ export default {
             'principalId': this.dataForm.type === 0 ? '' : this.dataForm.principalId.join(','),
             'principal': this.dataForm.type === 0 ? '' : principalData.join(','),
             'orderNum': this.dataForm.orderNum,
-            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType)
+            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType),
+            'tableauType': this.dataForm.menuType == 2 ? Number(this.dataForm.tableauType) : '',
+            'tableauUserName': this.dataForm.tableauUserName,
+            'tableauSiteId': this.dataForm.tableauSiteId
           }
           if (!this.dataForm.id) {
             savaBiInfo(params).then(({ data }) => {
