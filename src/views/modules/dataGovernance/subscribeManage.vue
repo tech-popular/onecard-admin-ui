@@ -1,38 +1,33 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm">
-      <el-form-item label="主题: ">
-        <el-input v-model="dataForm.theme" clearable  class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
-      </el-form-item>
       <el-form-item label="申请原因: ">
         <el-input v-model="dataForm.approveReason" clearable  class="input-with-select" @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
      <el-form-item label="类型: ">
         <el-select v-model="dataForm.type" clearable>
-          <el-option label="提数" value="export"></el-option>
-          <el-option label="订阅" value="subscription"></el-option>
+          <el-option label="SQL提数提数" value="0"></el-option>
+          <el-option label="订阅" value="1"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="状态: ">
         <el-select v-model="dataForm.status" clearable>
           <el-option label="未上线" value="0"></el-option>
-          <el-option label="上线" value="1"></el-option>
+          <el-option label="已上线" value="1"></el-option>
         </el-select>
       </el-form-item>
         <el-button type="primary" @click="searchData()">查询</el-button>
-        <el-button type="primary" @click="addOrUpdateHandle">订阅申请</el-button>
-        <el-button type="primary" @click="dispatchConfig">配置调度</el-button>
         <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column v-if="isAdmin" type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column prop="id" header-align="center" align="center" label="数据源id"></el-table-column>
-      <el-table-column prop="receiveType" header-align="center" align="center" label="接收方式"></el-table-column>
-      <el-table-column prop="receiveContentType" header-align="center" align="center" label="接收方式"></el-table-column>
-      <el-table-column prop="period" header-align="center" align="center" label="提数周期"></el-table-column>
-       <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天数"></el-table-column>
-      <el-table-column prop="thene" header-align="center" align="center" label="主题"></el-table-column>
+      <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
+      <el-table-column prop="approveReason" header-align="center" align="center" label="申请原因"></el-table-column>
+      <el-table-column prop="receiveTypeDesc" header-align="center" align="center" label="接收方式"></el-table-column>
+      <el-table-column prop="receiveContentTypeDesc" header-align="center" align="center" label="接收内容类型"></el-table-column>
+      <el-table-column prop="exportTypeDesc" header-align="center" align="center" label="订阅周期"></el-table-column>
+       <el-table-column prop="receiveDays" header-align="center" align="center" label="接收天设置"></el-table-column>
       <el-table-column prop="createTime" header-align="center" align="center" label="申请时间"></el-table-column>
       <el-table-column prop="createUser" header-align="center" align="center" label="申请人"></el-table-column>
       <el-table-column prop="expiryTime" header-align="center" align="center" label="过期时间"></el-table-column>
@@ -40,7 +35,6 @@
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 0" size="small">未上线</el-tag>
           <el-tag v-if="scope.row.status === 1" size="small">已上线</el-tag>
-          <el-tag v-if="scope.row.status === 2" size="small" >上线中</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="approveStatus" header-align="center" align="center" label="审批状态">
@@ -53,12 +47,10 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="dispatchConfig(scope.row.id)">配置调度</el-button>
-          <el-button type="text" @click="upOrDownHandle(scope.row)">上线</el-button>
+          <el-button type="text" size="small" v-if="scope.row.type === 0 && scope.row.exportType === 'period' " @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="dispatchConfig(scope.row)">配置调度</el-button>
+          <el-button type="text" size="small" @click="upOrDownHandle(scope.row)">{{scope.row.status === 0 ? '上线' : '下线'}}</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
-          <el-button type="text" @click="disableHandle(scope.row)">申请失效</el-button>
-          <el-button type="text" @click="renewalHandle(scope.row)">申请续期</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -71,6 +63,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi="submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
     <!--调度配置-->
     <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="getDataList" />
     <addOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></addOrUpdate>
@@ -99,7 +92,6 @@ export default {
       dispatchConfigAddOrUpdateVisible: false,
       dataForm: {
         status: '',
-        theme: '',
         approveReason: '',
         type: ''
       },
@@ -120,12 +112,11 @@ export default {
   methods: {
     // 获取数据列表
     getDataList () {
-      // this.dataListLoading = true
+      this.dataListLoading = true
       let params = {
         'approveReason': this.dataForm.approveReason,
         'type': this.dataForm.type,
         'status': this.dataForm.status ? Number(this.dataForm.status) : '',
-        'theme': this.dataForm.theme,
         'currPage': this.currPage,
         'pageSize': this.pageSize
       }
@@ -157,30 +148,19 @@ export default {
       this.getDataList()
     },
     // 新增 / 修改
-    addOrUpdateHandle () {
-      this.addOrUpdateVisible = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdate.init()
-      })
+    addOrUpdateHandle (id) {
+      this.$router.push({ name: 'dataGovernance-dataServiceSql', query: {id: id} })
     },
     // 调度配置
-    dispatchConfig () {
+    dispatchConfig (row) {
       this.dispatchConfigAddOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.dispatchConfigAddOrUpdate.init()
+        this.$refs.dispatchConfigAddOrUpdate.init(row)
       })
     },
     // 多选
     selectionChangeHandle (val) {
       this.dataListSelections = val
-    },
-    userPermission (row) {
-      // 打开权限分配弹框
-      // 根据登陆用户和数据创建人判断是否是同一用户决定权限按钮是否显示
-      this.userPermissionConfigurationVisible = true
-      this.$nextTick(() => {
-        this.$refs.userPermissionConfiguration.init(row, false)
-      })
     },
     taskPermission (row) {
       // 打开权限分配弹框
@@ -204,11 +184,7 @@ export default {
     },
     // 上下线
     upOrDownHandle (row) {
-      let params = {
-        'id': row.id,
-        'status': row.status
-      }
-      subscriptionUpAndDown(params).then(({ data }) => {
+      subscriptionUpAndDown(row.id).then(({ data }) => {
         if (data && data.code === 0) {
           this.$message({
             message: '成功',
@@ -219,46 +195,6 @@ export default {
             }
           })
         }
-      })
-    },
-    renewalHandle (row) {
-      // let params = {
-      //   'id': row.id,
-      //   'month': 3
-      // }
-      // approveRenewal(params).then(({ data }) => {
-      //   console.log('申请延期 ', data)
-      //   if (data && data.code === 0) {
-      //     this.$message({
-      //       message: '延期成功',
-      //       type: 'success',
-      //       duration: 1500,
-      //       onClose: () => {
-      //         this.getDataList()
-      //       }
-      //     })
-      //   }
-      // })
-    },
-    // 申请失效
-    disableHandle (row) {
-      this.$confirm('确认要将此申请设为失效？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        // approveDisable(row.id).then(({ data }) => {
-        //   if (data && data.code === 0) {
-        //     this.$message({
-        //       message: '申请失效成功',
-        //       type: 'success',
-        //       duration: 1500,
-        //       onClose: () => {
-        //         this.getDataList()
-        //       }
-        //     })
-        //   }
-        // })
       })
     }
   }

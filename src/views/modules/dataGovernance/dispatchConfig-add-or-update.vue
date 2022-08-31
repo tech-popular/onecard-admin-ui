@@ -1,5 +1,5 @@
 <template>
-  <el-drawer :append-to-body="false" :visible.sync="visible" :show-close="false" :wrapperClosable="false" size="1100px" class="api-manage-drawer">
+  <el-drawer :append-to-body="false" :visible.sync="visible" :show-close="false" :wrapperClosable="false" size="1300px" class="api-manage-drawer">
     <div slot="title" class="drawer-title">
       编辑调度配置
       <i class="el-icon-close drawer-close" @click="drawerClose"></i>
@@ -8,12 +8,12 @@
       <h3 id="title">基础信息</h3>
       <el-form :model="dataForm" ref="dataForm1" label-width="110px">
         <div class="work-type-pane">
-          <el-form-item label="订阅主题：" prop="theme">
+          <!-- <el-form-item label="订阅主题：" prop="theme">
             <el-input v-model="dataForm.theme" placeholder="任务名称" disabled style="width: 400px">
             </el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="任务ID：" prop="id">
-            <el-input v-model="dataForm.id" placeholder="任务ID" disabled style="width: 300px" />
+            <el-input v-model="id" placeholder="任务ID" disabled style="width: 300px" />
           </el-form-item>
         </div>
       </el-form>
@@ -33,9 +33,12 @@
           </div>
           <el-table ref="multipleLeftTable" :data="honeycombTasksLeftTableData" border @selection-change="honeycombTasksHandleLeftSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务ID"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务名称"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+             </template>
+            </el-table-column>
           </el-table>
           <el-pagination
             @size-change="honeycombTasksSizeChangeHandle"
@@ -60,7 +63,12 @@
           </div>
           <el-table ref="multipleRightTable" :data="honeycombTasksRightTableData" border @selection-change="honeycombTasksHandleRightSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="etlJobName" label="任务名称"></el-table-column>
+             <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+             </template>
+            </el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
                 <a style="cursor: pointer" @click="honeycombTasksDeleteDependenceHandle(scope.$index)">删除</a>
@@ -175,59 +183,78 @@ export default {
   },
   methods: {
     init (row) {
-      // this.id = row.id
-      // this.dataForm.theme = row.theme
+      this.id = row.id
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
         this.loading = true
         this.getTaskBaseInfo()
-        this.getHoneycombTasksDependence()
-        this.getOldTaskSelectDependence()
         setTimeout(() => {
           this.loading = false
-        }, 300)
+        }, 500)
       })
     },
     // 基础信息
     getTaskBaseInfo () {
-      //   queryDenpendJob(this.id).then(({data}) => {
-      //     if (data.code !== 0) {
-      //       return this.$message.error(data.msg || '获取数据异常')
-      //     }
-      
-      //   })
+        queryDenpendJob(this.id).then(({data}) => {
+          if (data.code !== 0) {
+            return this.$message.error(data.msg || '获取数据异常')
+          }
+          data.data.forEach(element => {
+            if (element.dispatchSystem === 1) {
+              this.honeycombTasksRightTableData.push(element)
+            } else {
+              this.oldDispatchTaskRightTableData.push(element)
+            }
+          })
+          this.getHoneycombTasksDependence()
+          this.getOldTaskSelectDependence()
+        })
     },
     // 蜂巢任务
     getHoneycombTasksDependence () {
-      // let parsms = {
-        // jobName: this.honeycombTasksLeftSearchText,
-        // currPage: this.honeycombTasksPageNo,
-      //   pageSize: this.honeycombTasksPageSize
-      // }
-      // honeycombTasks(parsms).then(({data}) => {
-      //   if (data.code !== 0) {
-      //     return this.$message.error(data.msg || '获取数据异常')
-      //   }
-      //   this.honeycombTasksLeftTableData = data.data
-          //  this.honeycombTasksTotalCount = data.totalCount
-      // })
+      let parsms = {
+        jobName: this.honeycombTasksLeftSearchText,
+        currPage: this.honeycombTasksPageNo,
+        pageSize: this.honeycombTasksPageSize
+      }
+      honeycombTasks(parsms).then(({data}) => {
+        this.honeycombTasksLeftTableData = []
+          this.honeycombTasksTotalCount = 0
+        if (data.code !== 0) {
+          return this.$message.error(data.msg || '获取数据异常')
+        }
+        data.data.list.forEach(item => {
+          this.honeycombTasksRightTableData.forEach(citem => {
+            if (citem.dispatchJobId !== item.dispatchJobId && item.dispatchSystem === 1) {
+              this.honeycombTasksLeftTableData.push(item)
+            }
+          })
+        })
+        // this.honeycombTasksLeftTableData = data.data.list
+        this.honeycombTasksTotalCount = data.data.totalCount
+      })
     },
     // 老调度任务依赖列表
     getOldTaskSelectDependence () {
-      // let parsms = {
-        // currPage: this.oldDispatchTaskPageNo,
-      //   pageSize: this.oldDispatchTaskPageSize,
-      // jobName: this.oldDispatchTaskLeftSearchText,
-      // }
-      // oldDispatchTasks(parsms).then(({data}) => {
-      //   if (data.code !== 0) {
-      //     this.oldDispatchTaskLeftTableData = []
-      //     return this.$message.error(data.msg || '获取数据异常')
-      //   }
-      //    this.oldDispatchTaskLeftTableData = data.data
-          // this.oldDispatchTaskTotalCount = data.totalCount
-      // })
+      let parsms = {
+        currPage: this.oldDispatchTaskPageNo,
+        pageSize: this.oldDispatchTaskPageSize,
+        jobName: this.oldDispatchTaskLeftSearchText
+      }
+      oldDispatchTasks(parsms).then(({data}) => {
+        this.oldDispatchTaskLeftTableData = []
+        this.oldDispatchTaskTotalCount = 0
+        if (data.code !== 0) {
+          return this.$message.error(data.msg || '获取数据异常')
+        }
+        this.oldDispatchTaskRightTableData.forEach(citem => {
+          if (citem.dispatchJobId !== item.dispatchJobId && item.dispatchSystem === 1) {
+            this.oldDispatchTaskLeftTableData.push(item)
+          }
+        })
+        this.oldDispatchTaskTotalCount = data.data.totalCount
+      })
     },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
@@ -239,25 +266,25 @@ export default {
     },
     // 提交
     dataFormSubmit (form) {
-        // let params = {
-        //   id: this.id,
-        //   jiblist: [...this.honeycombTasksRightTableData, ...this.oldDispatchTaskRightTableData ]
-        // }
-         // configDepend(parsms).then(({data}) => {
-      //   if (data.code !== 0) {
-      //     this.oldDispatchTaskLeftTableData = []
-      //     return this.$message.error(data.msg || '获取数据异常')
-      //   }
-          // this.$message({
-          //   message: '保存成功',
-          //   type: 'success',
-          //   duration: 1500,
-          //   onClose: () => {
-          //     this.$emit('refreshDataList')
-          //     this.visible = false
-          //   }
-          // })
-      // })
+        let params = {
+          id: this.id,
+          jobList: [...this.honeycombTasksRightTableData, ...this.oldDispatchTaskRightTableData]
+        }
+         configDepend(params).then(({data}) => {
+        if (data.code !== 0) {
+          this.oldDispatchTaskLeftTableData = []
+          return this.$message.error(data.msg || '获取数据异常')
+        }
+          this.$message({
+            message: '保存成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.$emit('refreshDataList')
+              this.visible = false
+            }
+          })
+      })
     },
     // 蜂巢调度任务
     // 左侧搜索功能
@@ -294,11 +321,11 @@ export default {
     // 取两个对象数组的并集且去重
     unique (arr) {
       const res = new Map()
-      return arr.filter((arr) => !res.has(arr.etlJobId) && res.set(arr.etlJobId, 1))
+      return arr.filter((arr) => !res.has(arr.dispatchJobId) && res.set(arr.dispatchJobId, 1))
     },
     // 从一个对象数组中过滤过另一个对象数组的内容
     filterArr (a, b) {
-      return [...b].filter(x => [...a].every(y => y.etlJobId !== x.etlJobId))
+      return [...b].filter(x => [...a].every(y => y.dispatchJobId !== x.dispatchJobId))
     },
     // 每页数
     honeycombTasksSizeChangeHandle (page) {
