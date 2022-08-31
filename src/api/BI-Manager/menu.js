@@ -7,3 +7,5 @@ export const getMenuList = params => httpGet(da + 'bi/biSysMenu/getListByPage', 
 export const taskManageList = () => httpGet(da + 'honeycomb/honeycombtask/getNewBiHoneycombtaskList') // 获取计算任务
 export const lookDataInfo = id => httpGet(da + `bi/biSysMenu/info/${id}`) // 根据id查询详情
 export const updateFlagInfo = params => httpPost(da + 'bi/biSysMenu/updateByFlag', params) // 编辑保存
+export const getListByParentId = params => httpGet(da + 'bi/biSysMenu/getListByParentId', params) // 根据ID获取下级目录或菜单
+export const updateOrder = params => httpGet(da + 'bi/biSysMenu/updateOrder', params) // 保存排序

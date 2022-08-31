@@ -58,12 +58,11 @@
   </el-dialog>
 </template>
 <script>
-// import { jdyAdd, jdyEdit, jdyDetail, jdyGetPro, jdyuploadWords, jdydownloadTemplate } from '@/api/jindouyun/recommendLocConfig'
+import { getListByParentId, updateOrder } from '@/api/BI-Manager/menu'
 import { deepClone } from './js/utils'
 export default {
   data () {
     return {
-      id: '',
       visible: false,
       dataForm: {
         id: '',
@@ -71,32 +70,31 @@ export default {
         menuRelevance: 0
       },
       loading: false,
-      tableData: []
+      tableData: [],
+      backupsTableData: []
     }
   },
   methods: {
-    init (id) {
-      this.id = ''
+    init (row) {
+      this.dataForm.id = row.id
+      this.dataForm.name = row.name
+      this.dataForm.menuRelevance = row.menuRelevance
       this.tableData = []
-      this.getInfo()
+      this.getInfo(row.id)
       this.visible = true
     },
-    getInfo () {
-      // jdyDetail(this.id).then(({data}) => { // 查看详情信息
-      //   if (data.status * 1 !== 1) {
-      //     return this.$message.error(data.message)
-      //   }
-      //   this.dataForm = {
-      //     id: data.data.id,
-      //     name: data.data.name
-      //   }
-      //   this.tableData = data.data.locationList || []
-      //   this.tableDataLength = data.data.locationList.length
-      //   this.visible = true
-      //   this.$nextTick(() => {
-      //     this.$refs.dataForm.clearValidate()
-      //   })
-      // })
+    getInfo (id) {
+      let params = {
+        'parentId': id
+      }
+      getListByParentId(params).then(({ data }) => { // 查看详情信息
+        console.log('data: ', data)
+        if (data.code !== 0) {
+          return this.$message.error(data.msg)
+        }
+        this.tableData = data.data || []
+        this.backupsTableData = data.data || []
+      })
     },
     // 格式化菜单属性显示
     formatMenuType (row, column, cellValue, index) {
@@ -134,26 +132,27 @@ export default {
       this.visible = false
     },
     dataSubmit () {
-      this.$refs.dataForm.validate((valid) => {
-        this.tableData.forEach((item, index) => {
-          item.productLocation = index + 1
-          if (item.styleState) {
-            delete item.styleState
+      let orderStr = []
+      this.tableData.forEach((item, index) => {
+        this.backupsTableData.forEach((citem, cindex) => {
+          if (item.id === citem.id && index !== cindex) {
+            let orderStrData = [item.id, index + 1].join(',')
+            orderStr.push(orderStrData)
           }
         })
-        // let params = {
-        //   name: this.dataForm.name,
-        //   locationList: this.tableData
-        // }
-        // url(params).then(({data}) => {
-        //   if (data && data.status * 1 === 1) {
-        //     this.$message.success(data.message)
-        //     this.visible = false
-        //     this.$emit('refreshDataList')
-        //   } else {
-        //     this.$message.error(data.message)
-        //   }
-        // })
+      })
+      console.log('orderStr: ', orderStr);
+      let params = {
+        'orderStr': orderStr.join(';')
+      }
+      updateOrder(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message.success(data.msg)
+          this.visible = false
+          this.$emit('refreshDataList')
+        } else {
+          this.$message.error(data.msg)
+        }
       })
     }
   }

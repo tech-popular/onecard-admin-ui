@@ -5,16 +5,16 @@
         <el-input v-model="dataForm.name" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item label="目录名称：">
-        <el-cascader clearable ref="cascaderMenu" @keyup.enter.native="getDataList()" v-model="dataForm.parentId" :options="menuList" :props="menuListTreeProps"></el-cascader>
+        <el-cascader clearable ref="cascaderMenu" @keyup.enter.native="getDataList()" v-model="dataForm.catalogueId" :options="menuList" :props="menuListTreeProps"></el-cascader>
       </el-form-item>
       <el-form-item label="菜单链接: ">
-        <el-input v-model="dataForm.url" @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.url" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item label="菜单等级: ">
-        <el-input v-model="dataForm.grade" @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.grade" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item label="创建人: ">
-        <el-input v-model="dataForm.creator" @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.creator" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getDataList()">查询</el-button>
@@ -66,7 +66,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="sortMenuHandle(scope.row.id)">排序</el-button>
+          <el-button type="text" size="small" @click="sortMenuHandle(scope.row)">排序</el-button>
           <el-button v-if="scope.row.flag === 1 " style="color:#67C23A;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">启用</el-button>
           <el-button v-if="scope.row.flag === 0 " style="color:#F56C6C;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">禁用</el-button>
         </template>
@@ -98,7 +98,8 @@ export default {
         name: '',
         url: '',
         grade: '',
-        creator: ''
+        creator: '',
+        catalogueId: []
       },
       page: 1, // 当前页
       pageSize: 10, // 默认每页10条
@@ -136,7 +137,8 @@ export default {
         'page': this.page,
         'pageSize': this.pageSize,
         'type': 0,
-        'creator': this.dataForm.creator
+        'creator': this.dataForm.creator,
+        'id': this.dataForm.catalogueId.length ? this.dataForm.catalogueId[this.dataForm.catalogueId.length - 1] : ''
       }
       getMenuList(params).then(({ data }) => {
         if (data && data.code === 0) {
@@ -252,6 +254,7 @@ export default {
       this.dataForm.url = ''
       this.dataForm.grade = ''
       this.dataForm.creator = ''
+      this.dataForm.catalogueId = []
       this.getDataList()
     },
     /** 查询 */
@@ -277,10 +280,10 @@ export default {
       return menuLists[cellValue]
     },
     // 给目录下级进行手动排序
-    sortMenuHandle (id) {
+    sortMenuHandle (row) {
       this.menuSortVisible = true
       this.$nextTick(() => {
-        this.$refs.menuSort.init(id)
+        this.$refs.menuSort.init(row)
       })
     }
   }
