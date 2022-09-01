@@ -48,7 +48,6 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="orderNum" header-align="center" align="center" label="当前层级排序"></el-table-column>
       <el-table-column prop="flag" header-align="center" align="center" label="是否有效">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.flag === 1" size="small" type="danger">否</el-tag>
@@ -110,7 +109,7 @@ export default {
         label: 'name',
         value: 'id',
         children: 'children'
-      },
+      }
     }
   },
   components: {

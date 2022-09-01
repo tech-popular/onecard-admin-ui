@@ -14,7 +14,7 @@
     </el-form>
     <h3 id="title" style="border-top:1px dashed #c0c0c0;padding-top:20px">下级位置顺序配置</h3>
     <div>
-      <el-table :data="tableData" border :cell-style="cellStyle" style="width: 100%">
+      <el-table :data="tableData" class="options_table" ref="dragTable" border row-key="id" style="width: 100%">
         <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
         <el-table-column label="序号" header-align="center" align="center" width="100">
           <template slot-scope="scope">{{scope.$index + 1}}</template>
@@ -60,6 +60,7 @@
 <script>
 import { getListByParentId, updateOrder } from '@/api/BI-Manager/menu'
 import { deepClone } from './js/utils'
+import Sortable from 'sortablejs'
 export default {
   data () {
     return {
@@ -74,6 +75,11 @@ export default {
       backupsTableData: []
     }
   },
+  // mounted () {
+  //   // 阻止默认行为
+
+  //   this.rowDrop()
+  // },
   methods: {
     init (row) {
       this.dataForm.id = row.id
@@ -81,6 +87,13 @@ export default {
       this.dataForm.menuRelevance = row.menuRelevance
       this.tableData = []
       this.getInfo(row.id)
+      document.body.ondrop = function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      this.$nextTick(() => {
+        this.rowDrop()
+      })
       this.visible = true
     },
     getInfo (id) {
@@ -98,19 +111,15 @@ export default {
     },
     // 格式化菜单属性显示
     formatMenuType (row, column, cellValue, index) {
-      cellValue = row.menuType === 100 ? 3 : cellValue
-      const menuLists = ['superset列表', 'BI报表', 'tableau图表', '目录']
-      return menuLists[cellValue]
-    },
-    // 设置背景色
-    cellStyle ({ row, column, rowIndex, columnIndex }) {
-      const style = {}
-      if (this.id) {
-        if (row.styleState) {
-          style.background = '#97CBFF'
-        }
-        return style
+      console.log('row: ', row);
+      if (row.menuType === 10 && row.url) {
+        return '报表'
+      } else if (row.menuType === 10 && !row.url) {
+        return '目录'
       }
+      cellValue = row.menuType === 100 ? 3 : cellValue
+      const menuLists = ['superset报表', 'BI报表', 'tableau图表', '目录']
+      return menuLists[cellValue]
     },
     // 上移 将当前数组index索引与后面一个元素互换位置，向数组后面移动一位
     moveUp (index) {
@@ -141,7 +150,7 @@ export default {
           }
         })
       })
-      console.log('orderStr: ', orderStr);
+      console.log('orderStr: ', orderStr)
       let params = {
         'orderStr': orderStr.join(';')
       }
@@ -152,6 +161,23 @@ export default {
           this.$emit('refreshDataList')
         } else {
           this.$message.error(data.msg)
+        }
+      })
+    },
+    // 具体方法
+    // 行拖拽
+    rowDrop () {
+      let tbody = document.querySelector('.options_table .el-table__body-wrapper tbody')
+      let _this = this
+      Sortable.create(tbody, {
+        draggable: '.el-table__row', // 设置可拖拽行的类名(el-table自带的类名)
+        animation: 150,
+        delay: 0,
+        onEnd ({ newIndex, oldIndex }) {
+          let data = deepClone(_this.tableData)
+          const currRow = data.splice(oldIndex, 1)[0]
+          data.splice(newIndex, 0, currRow)
+          _this.tableData = deepClone(data)
         }
       })
     }

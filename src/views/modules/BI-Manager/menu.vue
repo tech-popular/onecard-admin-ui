@@ -276,7 +276,7 @@ export default {
     // 格式化菜单属性显示
     formatMenuType (row, column, cellValue, index) {
       cellValue = row.menuType === 100 ? 3 : cellValue
-      const menuLists = ['superset列表', 'BI报表', 'tableau图表', '目录']
+      const menuLists = ['superset表报', 'BI报表', 'tableau图表', '目录']
       return menuLists[cellValue]
     },
     // 给目录下级进行手动排序
