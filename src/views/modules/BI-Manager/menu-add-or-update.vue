@@ -267,6 +267,7 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.$refs['dataForm'].resetFields()
                     this.loading = false
                     this.visible = false
                   }
@@ -286,6 +287,7 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.$refs['dataForm'].resetFields()
                     this.loading = false
                     this.visible = false
                   }
