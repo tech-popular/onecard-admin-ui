@@ -144,7 +144,7 @@ export default {
       }
       updateOrder(params).then(({ data }) => {
         if (data && data.code === 0) {
-          this.$message.success(data.msg)
+          this.$message.success('保存成功')
           this.visible = false
           this.$emit('refreshDataList')
         } else {
