@@ -2,12 +2,14 @@
   <el-dialog title="排序" :modal-append-to-body="false" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible" width="900px">
     <h3 id="title">基本信息</h3>
     <el-form :model="dataForm" ref="dataForm" label-width="100px">
-      <el-form-item label="目录ID:" prop="id">
-        <el-input v-model="dataForm.id" placeholder disabled />
-      </el-form-item>
-      <el-form-item label="目录名称:" prop="name">
-        <el-input v-model="dataForm.name" placeholder disabled />
-      </el-form-item>
+      <div style="display: flex">
+        <el-form-item label="目录ID:" prop="id">
+          <el-input v-model="dataForm.id" placeholder disabled />
+        </el-form-item>
+        <el-form-item label="目录名称:" prop="name">
+          <el-input v-model="dataForm.name" placeholder disabled />
+        </el-form-item>
+      </div>
       <el-form-item label="目录层级:" prop="menuRelevance">
         <el-input v-model="dataForm.menuRelevance" placeholder disabled />
       </el-form-item>
@@ -27,19 +29,11 @@
             </el-tooltip>
           </template>
         </el-table-column>
-        <el-table-column prop="menuRelevance" header-align="center" align="center" width="150" label="层级">
-          <template slot-scope="scope">
-            <el-tooltip class="item" effect="dark" placement="top">
-              <div v-html="toBreak(scope.row.menuRelevance )" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
-              <div class="text-to-long-cut">{{scope.row.menuRelevance }}</div>
-            </el-tooltip>
-          </template>
-        </el-table-column>
-        <el-table-column prop="menuType" header-align="center" align="center" width="150" :formatter="formatMenuType" label="属性"></el-table-column>
-        <el-table-column prop="grade" header-align="center" align="center" width="120" label="等级">
+        <el-table-column prop="menuType" header-align="center" align="center" :formatter="formatMenuType" label="属性"></el-table-column>
+        <el-table-column prop="grade" header-align="center" align="center" label="等级">
           <template slot-scope="scope">{{scope.row.grade}}级菜单</template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" width="100" label="操作">
+        <el-table-column header-align="center" align="center" label="操作">
           <template slot-scope="scope">
             <span @click="moveUp(scope.$index)" v-if="scope.$index !== 0">
               <icon-svg name="top" style="color: #2093f7"></icon-svg>
@@ -75,11 +69,6 @@ export default {
       backupsTableData: []
     }
   },
-  // mounted () {
-  //   // 阻止默认行为
-
-  //   this.rowDrop()
-  // },
   methods: {
     init (row) {
       this.dataForm.id = row.id
@@ -111,7 +100,6 @@ export default {
     },
     // 格式化菜单属性显示
     formatMenuType (row, column, cellValue, index) {
-      console.log('row: ', row);
       if (row.menuType === 10 && row.url) {
         return '报表'
       } else if (row.menuType === 10 && !row.url) {
@@ -184,3 +172,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.el-input__inner {
+  color: #000;
+}
+</style>
