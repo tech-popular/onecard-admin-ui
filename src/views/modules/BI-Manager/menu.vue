@@ -66,7 +66,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="sortMenuHandle(scope.row)">排序</el-button>
+          <el-button type="text" size="small" v-if="scope.row.menuType === 100" @click="sortMenuHandle(scope.row)">排序</el-button>
           <el-button v-if="scope.row.flag === 1 " style="color:#67C23A;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">启用</el-button>
           <el-button v-if="scope.row.flag === 0 " style="color:#F56C6C;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">禁用</el-button>
         </template>
