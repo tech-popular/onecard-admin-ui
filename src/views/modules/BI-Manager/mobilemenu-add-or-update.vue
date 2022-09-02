@@ -73,7 +73,7 @@ export default {
         ],
         taskIds: [
           { required: true, message: '计算任务不能为空', trigger: 'blur' }
-        ],
+        ]
       }
     }
   },
@@ -220,7 +220,7 @@ export default {
             'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
             'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
             'menuParentList': this.menuParentList.join(','),
-            'type': 1,
+            'type': 1
           }
           console.log('params: ', params)
           this.loading = true

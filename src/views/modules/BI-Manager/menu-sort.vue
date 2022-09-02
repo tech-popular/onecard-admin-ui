@@ -21,7 +21,7 @@
         <el-table-column label="序号" header-align="center" align="center" width="100">
           <template slot-scope="scope">{{scope.$index + 1}}</template>
         </el-table-column>
-        <el-table-column prop="name" header-align="center" align="center" width="150" label="名称">
+        <el-table-column prop="name" header-align="center" align="center" label="名称">
           <template slot-scope="scope">
             <el-tooltip class="item" effect="dark" placement="top">
               <div v-html="toBreak(scope.row.name)" slot="content" style="max-width:400px;line-height: 1.5;word-break: break-all;"></div>
@@ -33,7 +33,7 @@
         <el-table-column prop="grade" header-align="center" align="center" label="等级">
           <template slot-scope="scope">{{scope.row.grade}}级菜单</template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" label="操作">
+        <!-- <el-table-column header-align="center" align="center" label="操作">
           <template slot-scope="scope">
             <span @click="moveUp(scope.$index)" v-if="scope.$index !== 0">
               <icon-svg name="top" style="color: #2093f7"></icon-svg>
@@ -42,7 +42,7 @@
               <icon-svg name="down" style="color: green"></icon-svg>
             </span>
           </template>
-        </el-table-column>
+        </el-table-column>-->
       </el-table>
     </div>
     <div slot="footer">
@@ -80,10 +80,10 @@ export default {
         event.preventDefault()
         event.stopPropagation()
       }
+      this.visible = true
       this.$nextTick(() => {
         this.rowDrop()
       })
-      this.visible = true
     },
     getInfo (id) {
       let params = {
@@ -146,6 +146,7 @@ export default {
         if (data && data.code === 0) {
           this.$message.success('保存成功')
           this.visible = false
+          this.tableData = []
           this.$emit('refreshDataList')
         } else {
           this.$message.error(data.msg)
@@ -155,10 +156,11 @@ export default {
     // 具体方法
     // 行拖拽
     rowDrop () {
-      let tbody = document.querySelector('.options_table .el-table__body-wrapper tbody')
+      // let tbody = document.querySelector('.options_table .el-table__body-wrapper tbody')
+      let tbody = this.$refs.dragTable.$el.querySelector('.el-table__body-wrapper tbody')
       let _this = this
       Sortable.create(tbody, {
-        draggable: '.el-table__row', // 设置可拖拽行的类名(el-table自带的类名)
+        // draggable: '.el-table__row', // 设置可拖拽行的类名(el-table自带的类名)
         animation: 150,
         delay: 0,
         onEnd ({ newIndex, oldIndex }) {
