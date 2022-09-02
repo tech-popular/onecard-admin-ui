@@ -41,9 +41,9 @@
           <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="位置排序" prop="orderNum">
+      <!-- <el-form-item label="位置排序" prop="orderNum">
         <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="位置排序"></el-input-number>
-      </el-form-item>
+      </el-form-item>-->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -69,11 +69,11 @@ export default {
         url: '',
         taskIds: [],
         principalId: [],
-        orderNum: 0,
         menuType: '',
         tableauType: '', // tableau类型
         tableauSiteId: '', // timscale类型tableau图表 站点名称
         tableauUserName: '' // timscale类型tableau图表 用户名
+        // orderNum: 0
       },
       menuData: [],
       menuList: [],
@@ -112,12 +112,12 @@ export default {
         tableauUserName: [
           { required: true, message: '用户名不能为空', trigger: 'blur' }
         ],
-        orderNum: [
-          { required: true, message: '位置排序不能为空', trigger: 'blur' }
-        ],
         principalId: [
           { required: true, message: '请选择报表负责人', trigger: 'blur' }
         ]
+        // orderNum: [
+        //   { required: true, message: '位置排序不能为空', trigger: 'blur' }
+        // ]
       },
       menuLists: [{
         id: '0',
@@ -170,15 +170,15 @@ export default {
             this.menuParentList = data.data.menuParentList && data.data.menuParentList.split(',')
           }
           this.dataForm.name = data.data.name
-          this.dataForm.menuType = data.data.menuType + ''
           this.dataForm.tableauType = data.data.tableauType + ''
           this.dataForm.tableauSiteId = data.data.tableauSiteId
           this.dataForm.tableauUserName = data.data.tableauUserName
-          this.dataForm.orderNum = data.data.orderNum
           this.getUserSelectList()
           this.dataForm.principalId = responsibleData.map(item => { return +item })
           this.userIdList = data.data.principalList
           this.principal = data.data.principalList
+          this.dataForm.menuType = data.data.menuType.toString()
+          // this.dataForm.orderNum = data.data.orderNum
           if (data.data.url) {
             this.dataForm.type = 1
             this.menuList = this.filterMenuList(this.menuData)
@@ -336,11 +336,11 @@ export default {
             'type': 0,
             'principalId': this.dataForm.type === 0 ? '' : this.dataForm.principalId.join(','),
             'principal': this.dataForm.type === 0 ? '' : principalData.join(','),
-            'orderNum': this.dataForm.orderNum,
-            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType),
             'tableauType': this.dataForm.menuType == 2 ? Number(this.dataForm.tableauType) : '',
             'tableauUserName': this.dataForm.tableauUserName,
-            'tableauSiteId': this.dataForm.tableauSiteId
+            'tableauSiteId': this.dataForm.tableauSiteId,
+            // 'orderNum': this.dataForm.orderNum,
+            'menuType': this.dataForm.type === 0 ? 100 : Number(this.dataForm.menuType)
           }
           if (!this.dataForm.id) {
             savaBiInfo(params).then(({ data }) => {
@@ -351,6 +351,8 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.$refs['dataForm'].resetFields()
+                    this.loading = false
                     this.visible = false
                   }
                 })
@@ -368,6 +370,8 @@ export default {
                   duration: 1500,
                   onClose: () => {
                     this.$emit('refreshDataList')
+                    this.$refs['dataForm'].resetFields()
+                    this.loading = false
                     this.visible = false
                   }
                 })

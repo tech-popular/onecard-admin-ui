@@ -33,6 +33,10 @@
     "lodash": "4.17.21",
     "moment": "^2.29.1",
     "qs": "^6.9.0",
+<<<<<<< HEAD
+=======
+    "sortablejs": "^1.15.0",
+>>>>>>> feature/repair0726
     "svg-sprite-loader": "3.7.3",
     "vconsole": "^3.13.0",
     "vue": "2.6.10",

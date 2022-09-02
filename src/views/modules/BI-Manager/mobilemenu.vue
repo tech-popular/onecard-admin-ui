@@ -4,15 +4,18 @@
       <el-form-item label="菜单名称: ">
         <el-input v-model="dataForm.name" @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
+      <el-form-item label="目录名称：">
+        <el-cascader clearable ref="cascaderMenu" @keyup.enter.native="getDataList()" v-model="dataForm.catalogueId" :options="menuList" :props="menuListTreeProps"></el-cascader>
+      </el-form-item>
       <el-form-item label="菜单链接: ">
-        <el-input v-model="dataForm.url" @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.url" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item label="菜单等级: ">
-        <el-input v-model="dataForm.grade" @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.grade" clearable @keyup.enter.native="getDataList()"></el-input>
         <!-- <el-select v-model="dataForm.grade"></el-select> -->
       </el-form-item>
       <el-form-item label="创建人: ">
-        <el-input v-model="dataForm.creator" @keyup.enter.native="getDataList()"></el-input>
+        <el-input v-model="dataForm.creator" clearable @keyup.enter.native="getDataList()"></el-input>
       </el-form-item>
       <el-form-item label="报表负责人">
         <el-select v-model="dataForm.principalId" placeholder="请输入关键字" style="width:100%" clearable remote :remote-method="getUserSelectList" :loading="loading" filterable>
@@ -50,7 +53,6 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="orderNum" header-align="center" align="center" label="当前层级排序"></el-table-column>
       <el-table-column prop="flag" header-align="center" align="center" label="是否有效">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.flag === 1" size="small" type="danger">否</el-tag>
@@ -65,6 +67,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" v-if="!scope.row.url" @click="sortMenuHandle(scope.row)">排序</el-button>
           <el-button v-if="scope.row.flag === 1 " style="color:#67C23A;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">启用</el-button>
           <el-button v-if="scope.row.flag === 0 " style="color:#F56C6C;" type="text" size="small" @click="changeFlagHandle(scope.row.id,scope.row.flag)">禁用</el-button>
         </template>
@@ -79,15 +82,17 @@
       :total="totalCount"
       layout="total, sizes, prev, pager, next, jumper"
     />
+    <menu-sort v-if="menuSortVisible" ref="menuSort" @refreshDataList="getDataList"></menu-sort>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
 </template>
 
 <script>
-import { getMenuList, updateFlagInfo } from '@/api/BI-Manager/menu'
 import { getUsersList } from '@/api/BI-Manager/userGroup'
+import { getMenuList, updateFlagInfo, findAllRecursionList } from '@/api/BI-Manager/menu'
 import AddOrUpdate from './mobilemenu-add-or-update'
+import menuSort from './menu-sort'
 export default {
   data () {
     return {
@@ -96,7 +101,8 @@ export default {
         url: '',
         grade: '',
         creator: '',
-        principalId: ''
+        principalId: '',
+        catalogueId: []
       },
       page: 1, // 当前页
       pageSize: 10, // 默认每页10条
@@ -105,14 +111,24 @@ export default {
       dataList: [],
       dataListLoading: false,
       loading: false,
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      menuSortVisible: false,
+      menuList: [],
+      menuListTreeProps: {
+        checkStrictly: true,
+        label: 'name',
+        value: 'id',
+        children: 'children'
+      }
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    menuSort
   },
   mounted () {
     this.getDataList()
+    this.getRecursionList()
   },
   methods: {
     // 获取数据列表
@@ -126,7 +142,8 @@ export default {
         'page': this.page,
         'pageSize': this.pageSize,
         'type': 1,
-        'creator': this.dataForm.creator
+        'creator': this.dataForm.creator,
+        'id': this.dataForm.catalogueId.length ? this.dataForm.catalogueId[this.dataForm.catalogueId.length - 1] : ''
       }
       getMenuList(params).then(({ data }) => {
         if (data && data.code === 0) {
@@ -159,6 +176,41 @@ export default {
       } else {
         this.userIdList = []
       }
+    },
+    // 获取上级菜单
+    getRecursionList () {
+      let params = {
+        type: 1
+      }
+      findAllRecursionList(params).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.menuList = this.filterMenuGradeList(data.data)
+        }
+      })
+    },
+    filterMenuGradeList (tree) {
+      let arr = []
+      if (!!tree && tree.length !== 0) {
+        tree.forEach((item, index) => {
+          if (item.grade === 1) {
+            let obj = {}
+            obj.id = item.id
+            obj.name = item.name
+            obj.grade = item.grade
+            if (item.children.length) {
+              let children = []
+              children = this.filterMenuGradeList(item.children)
+              if (children.length) {
+                obj.children = children
+              }
+              arr.push(obj)
+            } else {
+              arr.push(obj)
+            }
+          }
+        })
+      }
+      return arr
     },
     // 新增 / 修改
     addOrUpdateHandle (id) {
@@ -225,6 +277,7 @@ export default {
       this.dataForm.grade = ''
       this.dataForm.creator = ''
       this.dataForm.principalId = ''
+      this.dataForm.catalogueId = []
       this.getDataList()
     },
     /** 查询 */
@@ -242,6 +295,13 @@ export default {
     currentChangeHandle (page) {
       this.page = page
       this.getDataList()
+    },
+    // 给目录下级进行手动排序
+    sortMenuHandle (row) {
+      this.menuSortVisible = true
+      this.$nextTick(() => {
+        this.$refs.menuSort.init(row)
+      })
     }
   }
 }
