@@ -24,7 +24,8 @@ const globalRoutes = [
   { path: '/dataGovernance-dingPreview', component: _import('modules/dataGovernance/dingPreview'), name: 'dataGovernance-dingPreview', meta: { title: 'SQL数据预览' } },
   { path: '/dataGovernance-dingFtpPreview', component: _import('modules/dataGovernance/dingFtpPreview'), name: 'dataGovernance-dingFtpPreview', meta: { title: 'FTP数据预览' } },
   { path: '/dataGovernance-dingDownLoad', component: _import('modules/dataGovernance/dingDownLoad'), name: 'dataGovernance-dingDownLoad', meta: { title: 'SQL数据下载' } },
-  { path: '/dataGovernance-dingFtpDownLoad', component: _import('modules/dataGovernance/dingFtpDownLoad'), name: 'dataGovernance-dingFtpDownLoad', meta: { title: 'FTP数据下载' } }
+  { path: '/dataGovernance-dingFtpDownLoad', component: _import('modules/dataGovernance/dingFtpDownLoad'), name: 'dataGovernance-dingFtpDownLoad', meta: { title: 'FTP数据下载' } },
+  { path: '/dataGovernance-imgView', component: _import('modules/dataGovernance/imgView'), name: 'dataGovernance-imgView', meta: { title: '提数数据导出图片' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)

@@ -1,5 +1,5 @@
 <template>
-  <div class="wrap">
+  <div class="dataService-ftp-wrap">
     <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="100px" ref="baseForm" class="base-form">
       <div style="margin-bottom:10px">
         <span>目录</span>
@@ -27,9 +27,9 @@
           </div>
         </div>
         <div style="width:65%">
-          <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="90"></el-table-column>
-            <el-table-column type="index" header-align="center" align="center" label="序号"></el-table-column>
+          <el-table :data="dataList" :row-key="getRowKeys" ref="ftpDataTable" border v-loading="dataListLoading" style="width: 100%;" @selection-change="handleSelectionChange">
+            <el-table-column type="selection" :reserveSelection="true" width="90"></el-table-column>
+            <el-table-column prop="num" header-align="center" align="center" label="序号"></el-table-column>
             <el-table-column prop="name" header-align="center" align="center" label="文件名称"></el-table-column>
             <el-table-column prop="suffix" header-align="center" align="center" label="文件格式"></el-table-column>
             <el-table-column prop="lastModifiedTime" header-align="center" align="center" label="修改时间"></el-table-column>
@@ -67,13 +67,14 @@
         </div>
       </div>
     </el-form>
-    <div class="footer">
+    <div class="ftp-footer">
       <el-button type="primary" @click="severDataFormSubmit" size="small">立即申请</el-button>
     </div>
   </div>
 </template>
 <script>
-import { getFtpMenuLis, getUsersList, getFtpDataList, saveDataFtp } from '@/api/dataGovernance/datareport'
+import { getFtpMenuLis, getFtpDataList } from '@/api/dataGovernance/datareport'
+import { getUsersList, saveTask } from '@/api/dataGovernance/subscribeManage'
 export default {
   data () {
     return {
@@ -104,6 +105,7 @@ export default {
       },
       userList: [],
       multipleSelection: [], // 多选数据
+      multipleSelectionData: [], // 已勾选的数据
       defaultProps: {
         children: 'children',
         label: 'fileName'
@@ -111,9 +113,9 @@ export default {
       node_had: [], // 触发 tree 的 :load=loadNode 重复触发  动态更新tree
       resolve_had: [], // 触发 tree 的 :load=loadNode 重复触发  动态更新tree
       baseRule: {
-        approveReason: [
-          { required: true, message: '请输入申请原因', trigger: 'blur' }
-        ],
+        // approveReason: [
+        //   { required: true, message: '请输入申请原因', trigger: 'blur' }
+        // ],
         receiver: [
           { type: 'array', required: true, message: '请选择接收人', trigger: 'change' }
         ],
@@ -129,11 +131,12 @@ export default {
     }
   },
   mounted () {
-    // this.treeVisible = false
     this.getUsersList()
-    // this.$refs['baseForm'].resetFields()
   },
   methods: {
+    getRowKeys (row) {
+      return row.num
+    },
     loadNode (node, resolve) {
       if (node.level === 0) {
         this.node_had = node // 这里是关键！在data里面定义一个变量，将node.level == 0的node存起来
@@ -214,7 +217,15 @@ export default {
     // 多选
     handleSelectionChange (val) {
       this.multipleSelection = val
-      console.log('this.multipleSelection: ', this.multipleSelection)
+    },
+    // 取两个对象数组的并集且去重
+    unique (arr) {
+      const res = new Map()
+      return arr.filter((arr) => !res.has(arr.fileName) && res.set(arr.fileName, 1))
+    },
+    // 从一个对象数组中过滤过另一个对象数组的内容
+    filterArr (a, b) {
+      return [...b].filter(x => [...a].every(y => y.fileName !== x.fileName))
     },
     // 每页数
     sizeChangeHandle (val) {
@@ -248,9 +259,10 @@ export default {
             'ftpFileName': ftpFileName.join(','),
             'approveReason': this.baseForm.approveReason,
             'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
-            'receiveType': Number(this.baseForm.receiveType)
+            'receiveType': Number(this.baseForm.receiveType),
+            'type': 1
           }
-          saveDataFtp(params).then(({ data }) => {
+          saveTask(params).then(({ data }) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '保存成功',
@@ -258,8 +270,8 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.$refs['baseForm'].resetFields()
-                  this.visible = false
-                  this.treeVisible = false
+                  this.$refs.ftpDataTable.clearSelection()
+                  this.refreshTree()
                 }
               })
             } else {
@@ -272,8 +284,8 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-.wrap {
+<style scoped>
+.dataService-ftp-wrap {
   padding: 0 20px 20px;
   margin-top: -12px;
   width: 100%;
@@ -281,82 +293,43 @@ export default {
   position: absolute;
   top: 75px;
   bottom: 55px;
-  .step-title {
-    height: 30px;
-    background: #e8e2e2;
-    line-height: 30px;
-    padding-left: 20px;
-  }
-  .reject-pane-item {
-    width: 50%;
-  }
-  & .footer {
-    width: 20%;
-    float: right;
-  }
-  & .vue-treeselect {
-    min-height: 38px;
-    line-height: 24px;
-    max-width: 100%;
-  }
-  & .base-pane {
-    // border-bottom: 1px dashed #ccc;
-    & .label-remove-margin {
-      & .el-form-item__content {
-        margin-left: 0px !important;
-      }
-    }
-  }
-  & .base-pane-item {
-    width: 80%;
-  }
-  & .base-select {
-    width: 40%;
-  }
-  & .radio-item {
-    margin-right: 15px;
-  }
-  & .radio-passive {
-    margin-left: 30px;
-  }
-  & .radio-incremodel {
-    margin-right: 15px;
-  }
-  & .transfer-log {
-    margin-left: 20px;
-  }
-  .aside-main {
-    box-sizing: border-box;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-  }
-  .dimension-tree {
-    width: 300px;
-    position: relative;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    height: 600px;
-    border: 1px solid #e6e6e6;
-  }
-  .code-select {
-    position: relative;
-    box-sizing: border-box;
-    display: flex;
-    flex: 0 0 46px;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 6px;
-  }
-  .el-tree__empty-block {
-    width: 290px;
-  }
-  .filter-tree {
-    width: 100%;
-  }
+}
+.ftp-footer {
+  width: 10%;
+  float: right;
+}
+.aside-main {
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+}
+.dimension-tree {
+  width: 300px;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 600px;
+  overflow-y: scroll;
+  border: 1px solid #e6e6e6;
+}
+.code-select {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 46px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 6px;
+}
+.el-tree__empty-block {
+  width: 290px;
+}
+.filter-tree {
+  width: 100%;
 }
 </style>

@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import {honeycombTasks, oldDispatchTasks, configDepend, queryDenpendJob } from '@/api/dataGovernance/subscribeManage'
+import {honeycombTasks, oldDispatchTasks, configDepend, queryDenpendJob} from '@/api/dataGovernance/subscribeManage'
 export default {
   components: {},
   data () {
@@ -189,14 +189,16 @@ export default {
         document.getElementById('title').scrollIntoView()
         this.loading = true
         this.getTaskBaseInfo()
-        setTimeout(() => {
-          this.loading = false
-        }, 500)
+        // setTimeout(() => {
+        //   this.loading = false
+        // }, 500)
       })
     },
     // 基础信息
     getTaskBaseInfo () {
         queryDenpendJob(this.id).then(({data}) => {
+          this.honeycombTasksRightTableData = []
+          this.oldDispatchTaskRightTableData = []
           if (data.code !== 0) {
             return this.$message.error(data.msg || '获取数据异常')
           }
@@ -220,19 +222,19 @@ export default {
       }
       honeycombTasks(parsms).then(({data}) => {
         this.honeycombTasksLeftTableData = []
-          this.honeycombTasksTotalCount = 0
+        this.honeycombTasksTotalCount = 0
         if (data.code !== 0) {
+          this.loading = false
           return this.$message.error(data.msg || '获取数据异常')
         }
-        data.data.list.forEach(item => {
-          this.honeycombTasksRightTableData.forEach(citem => {
-            if (citem.dispatchJobId !== item.dispatchJobId && item.dispatchSystem === 1) {
-              this.honeycombTasksLeftTableData.push(item)
-            }
-          })
-        })
-        // this.honeycombTasksLeftTableData = data.data.list
+        if (this.honeycombTasksRightTableData.length) {
+          let arr = this.filterArr(this.honeycombTasksRightTableData, data.data.list)
+          this.honeycombTasksLeftTableData = arr
+        } else {
+          this.honeycombTasksLeftTableData = data.data.list
+        }
         this.honeycombTasksTotalCount = data.data.totalCount
+        this.loading = false
       })
     },
     // 老调度任务依赖列表
@@ -248,11 +250,12 @@ export default {
         if (data.code !== 0) {
           return this.$message.error(data.msg || '获取数据异常')
         }
-        this.oldDispatchTaskRightTableData.forEach(citem => {
-          if (citem.dispatchJobId !== item.dispatchJobId && item.dispatchSystem === 1) {
-            this.oldDispatchTaskLeftTableData.push(item)
-          }
-        })
+        if (this.oldDispatchTaskRightTableData.length) {
+         let arr = this.filterArr(this.oldDispatchTaskRightTableData, data.data.list)
+          this.oldDispatchTaskTotalCount = arr
+        } else {
+          this.oldDispatchTaskTotalCount = data.data.list
+        }
         this.oldDispatchTaskTotalCount = data.data.totalCount
       })
     },

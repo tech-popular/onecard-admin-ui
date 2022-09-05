@@ -1,15 +1,27 @@
 <template>
   <div class="wrap">
-    <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="110px" ref="baseForm" class="base-form">
-      <div class="base-pane">
-        <div style="width:29%">
+    <div class="base-pane">
+      <div style="width:29%">
+        <el-collapse v-model="activeNames">
+          <el-collapse-item title="SQL列表" name="1">
+            <div v-for="(item, index) in sqlList" :key="index">
+              <span style="font-style: normal; font-size: 16px;cursor:pointer;margin-right:20px" @click="clicksqlTitle(item.sqlTitle, index)">名称：{{item.sqlTitle}}</span>
+              <span style="float: right">
+                <i class="el-icon-close cursor-pointer" @click="deletesqlTitle(item, index)"></i>
+              </span>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+      <div style="width:60%">
+        <el-form v-loading="loading" :model="sqlAddData" :rules="sqlAddDataRule" label-position="right" label-width="110px" ref="sqlAddData" class="base-form">
           <el-form-item prop="datasourceId" label="数据源：">
-            <el-select filterable v-model="baseForm.datasourceId" placeholder="请选择" clearable @change="selectdatabaseDataList">
+            <el-select filterable v-model="sqlAddData.datasourceId" placeholder="请选择" clearable @change="selectdatabaseDataList">
               <el-option v-for="item in datasourceList" :key="item.id" :label="item.datasourceName" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item prop="databaseId" label="数据库：">
-            <el-select filterable v-model="baseForm.databaseId" clearable placeholder="请选择">
+            <el-select filterable v-model="sqlAddData.databaseId" clearable placeholder="请选择">
               <el-option v-for="item in databaseIdList" :key="item.id" :label="item.databaseName" :value="item.id"></el-option>
             </el-select>
             <span style="color:red;font-size:12px;">
@@ -17,18 +29,6 @@
               <i style="font-style: normal;color:blue;cursor:pointer" @click="gotoDataSource">点击</i>）
             </span>
           </el-form-item>
-          <el-collapse v-model="activeNames">
-            <el-collapse-item title="SQL列表" name="1">
-              <div v-for="(item, index) in sqlList" :key="index">
-                <span style="font-style: normal;cursor:pointer;margin-right:20px" @click="clicksqlTitle(item.sqlTitle, index)">名称：{{item.sqlTitle}}</span>
-                <span style="float: right">
-                  <i class="el-icon-close cursor-pointer" @click="deletesqlTitle(item, index)"></i>
-                </span>
-              </div>
-            </el-collapse-item>
-          </el-collapse>
-        </div>
-        <div style="width:60%">
           <el-form-item label="SQL名称" prop="sqlTitle">
             <el-input v-model="sqlAddData.sqlTitle"></el-input>
           </el-form-item>
@@ -47,9 +47,18 @@
           </el-form-item>
           <el-form-item style="margin-top:10px;">
             <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
-            <el-button type="primary" @click="SqlAddSubmit()">保存</el-button>
+            <el-button type="primary" @click="SqlAddSubmit()">新增SQL</el-button>
           </el-form-item>
-          <div style="margin-left:50px;">
+          <el-form-item v-if="previewing" label-width="70px">
+            <span>
+              <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>
+              <span v-if="sqlPreviewDataList.length">（随机展示10条数据）</span>
+              <!-- <span v-if="sqlPreviewDataList.length === 0">无数据</span> -->
+            </span>
+          </el-form-item>
+        </el-form>
+        <div style="margin-left:50px;">
+          <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="110px" ref="baseForm" class="base-form">
             <el-form-item label="前描述" prop="describePre">
               <el-input v-model="baseForm.describePre" type="textarea"></el-input>
             </el-form-item>
@@ -94,17 +103,18 @@
               <el-radio v-model="baseForm.receiveContentType" label="1">图片</el-radio>
               <el-radio v-model="baseForm.receiveContentType" label="2" style="margin-left:5px;">Excel压缩包下载链接</el-radio>
             </el-form-item>
-          </div>
+          </el-form>
         </div>
       </div>
-    </el-form>
-    <div class="footer">
+    </div>
+    <div class="sql-footer">
       <el-button type="primary" @click="severDataFormSubmit" size="small">立即申请</el-button>
     </div>
   </div>
 </template>
 <script>
 import { getUsersList, queryEnableList, databaseList, editTask, saveTask, taskDetail } from '@/api/dataGovernance/subscribeManage'
+import { sqlPreview } from '@/api/dataGovernance/datareport'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/idea.css'
@@ -120,9 +130,15 @@ export default {
     return {
       loading: false,
       activeNames: ['1'],
+      previewText: '',
+      previewTextColor: '#303133',
+      previewing: false,
+      sqlSubmitSuccess: false,
+      dataSqlSubmiting: false,
+      dataSqlSubmitTime: 0,
+      timer: null,
       baseForm: {
-        datasourceId: '', // 数据源id
-        databaseId: '', // 数据库id
+        id: '',
         approveReason: '',
         exportType: 'once', // 提数类型
         period: '', // 提数周期
@@ -137,6 +153,8 @@ export default {
         headUser: '' // 负责人
       },
       sqlAddData: {
+        datasourceId: '', // 数据源id
+        databaseId: '', // 数据库id
         sqlTitle: '',
         sql: ''
       },
@@ -144,6 +162,7 @@ export default {
       datasourceList: [],
       databaseIdList: [],
       receiveDaysList: [], // 接收天设置list
+      sqlPreviewDataList: [], // sql预览数据
       userList: [],
       userid: sessionStorage.getItem('id'),
       sqlCycleList: [
@@ -195,12 +214,6 @@ export default {
         styleSelectedText: true
       },
       baseRule: {
-        datasourceId: [
-          { required: true, message: '请选择数据源', trigger: 'change' }
-        ],
-        databaseId: [
-          { required: true, message: '请选择数据库', trigger: 'change' }
-        ],
         approveReason: [
           { required: true, message: '请输入申请原因', trigger: 'blur' }
         ],
@@ -230,25 +243,46 @@ export default {
         ],
         receiveContentType: [
           { required: true, message: '请选择接收内容类型', trigger: 'change' }
+        ]
+      },
+      sqlAddDataRule: {
+        datasourceId: [
+          { required: true, message: '请选择数据源', trigger: 'change' }
         ],
+        databaseId: [
+          { required: true, message: '请选择数据库', trigger: 'change' }
+        ],
+        sqlTitle: [
+          { required: true, message: '请输入SQL名称', trigger: 'blur' }
+        ],
+        sql: [{ required: true, message: 'sql不能为空', trigger: 'blur' }]
       }
     }
   },
   components: { codemirror },
-  mounted () {
+  activated () {
     if (this.$route.query.id) {
       this.lookTaskDetail(this.$route.query.id)
+    } else {
+      this.sqlList = []
+      this.$refs['sqlAddData'].resetFields()
+      this.$refs['baseForm'].resetFields()
     }
     this.getSourceDataList()
     this.getUsersList()
-
+    this.sqlPreviewDataList = []
+    this.previewing = false
+    this.previewText = ''
+    this.dataSqlSubmiting = false
+    this.sqlSubmitSuccess = false
   },
   methods: {
     lookTaskDetail (id) {
       taskDetail(id).then(({ data }) => {
         if (data && data.code === 0) {
-          this.baseForm.datasourceId = data.data.datasourceId
-          this.baseForm.databaseId = data.data.databaseId
+          this.baseForm.id = data.data.id
+          // this.baseForm.datasourceId = data.data.datasourceId
+          // this.baseForm.databaseId = data.data.databaseId
           this.baseForm.approveReason = data.data.approveReason
           this.baseForm.exportType = data.data.exportType
           this.baseForm.period = data.data.period
@@ -259,10 +293,33 @@ export default {
           this.baseForm.describeAfter = data.data.describeAfter
           this.baseForm.describePre = data.data.describePre
           this.sqlList = data.data.sqlList
+          this.sqlAddData.sqlTitle = data.data.sqlList[0].sqlTitle
+          this.sqlAddData.sql = data.data.sqlList[0].sql
+          this.sqlAddData.datasourceId = data.data.sqlList[0].datasourceId
+          this.sqlAddData.databaseId = data.data.sqlList[0].databaseId
           this.baseForm.receiveTime = [data.data.receiveStartTime, data.data.receiveEndTime]
           this.baseForm.headUser = data.data.headUser
+          this.getDatabaseList()
           if (this.baseForm.exportType === 'period') {
-            this.disTimeTurnOff(this.baseForm.period)
+            let tempArry = []
+            if (this.baseForm.period === 'day') {
+              tempArry.push({ value: '1', label: '每天' })
+            } else if (this.baseForm.period === 'hours') {
+              for (let i = 1, j = 24; i < j; i++) {
+                tempArry.push({ value: i, label: '每隔' + i + '小时' })
+              }
+            } else if (this.baseForm.period === 'month') {
+              for (let i = 1, j = 32; i < j; i++) {
+                tempArry.push({ value: i, label: '每月' + i + '号' })
+              }
+              // tempArry.push({ value: '-1', label: '每月最后一天' })
+            }
+            if (this.baseForm.period === 'week') {
+              this.receiveDaysList = this.dayOfWeeksList
+            } else {
+              this.receiveDaysList = tempArry
+            }
+            // this.disTimeTurnOff(this.baseForm.period)
           }
         } else {
           this.$message({
@@ -294,34 +351,71 @@ export default {
     },
     // 获取数据库列表
     selectdatabaseDataList () {
-      databaseList(this.baseForm.datasourceId).then(({ data }) => {
+      this.baseForm.databaseId = ''
+      this.getDatabaseList()
+    },
+    getDatabaseList () {
+      databaseList(this.sqlAddData.datasourceId).then(({ data }) => {
         if (data.code === 0 && data.data) {
-          this.baseForm.databaseId = ''
           this.databaseIdList = data.data
         } else {
-          this.baseForm.databaseId = ''
           this.databaseIdList = []
         }
       })
     },
     // sql执行预览
     dataSqlSubmit () {
-      // let params = {
-      //   'databaseId': this.baseForm.databaseId,
-      //   'sql': this.baseForm.sql
-      // }
-      // sqlPreview(params).then(({ data }) => {
-      //   if (data && data.code === 0 && this.dataSqlSubmitTime < 180) {
-      //     this.$message({
-      //       message: '查询成功',
-      //       type: 'success',
-      //       duration: 1500,
-      //       onClose: () => {
-      //       }
-      //     })
-      //   } else {
-      //   }
-      // })
+      this.previewText = '执行中'
+      this.previewing = true
+      this.dataSqlSubmiting = true
+      this.previewTextColor = '#303133'
+      this.dataSqlSubmitTime = 0
+      let params = {
+        'databaseId': this.sqlAddData.databaseId,
+        'datasourceId': this.sqlAddData.datasourceId,
+        'sql': this.sqlAddData.sql
+      }
+      let that = this
+      that.timer = setInterval(function () {
+        if (that.dataSqlSubmitTime >= 180) {
+          that.previewText = '执行超时,请联系管理员'
+          that.sqlSubmitSuccess = false
+          that.dataSqlSubmiting = false
+          that.previewTextColor = 'red'
+          clearInterval(that.timer)
+        }
+        that.dataSqlSubmitTime = that.dataSqlSubmitTime + 1
+      }, 1000)
+      sqlPreview(params).then(({ data }) => {
+        clearInterval(this.timer)
+        if (data && data.code === 0 && this.dataSqlSubmitTime < 180) {
+          this.$message({
+            message: '查询成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.sqlPreviewDataList = data.data
+              sessionStorage.setItem('sqlPreviewDataList', JSON.stringify(data.data || '[]'))
+              this.previewText = '查询成功'
+              this.sqlSubmitSuccess = true
+              this.dataSqlSubmiting = false
+            }
+          })
+        } else {
+          sessionStorage.setItem('sqlPreviewDataList', [])
+          if (this.dataSqlSubmitTime < 180) {
+            this.previewTextColor = 'red'
+            this.$message.error(data.msg)
+            this.previewText = '执行失败：' + data.msg
+          }
+          this.sqlSubmitSuccess = false
+          this.dataSqlSubmiting = false
+        }
+      })
+    },
+    previewSqlData () {
+      let routeUrl = this.$router.resolve({ path: '/dataGovernance-reportData' })
+      window.open(routeUrl.href, '_blank')
     },
     //  时间间隔 数据切换
     disTimeTurnOff (disType) {
@@ -375,7 +469,9 @@ export default {
       this.sqlList.push(this.sqlAddData)
       this.sqlAddData = {
         sqlTitle: '',
-        sql: ''
+        sql: '',
+        databaseId: '',
+        datasourceId: ''
       }
     },
     deletesqlTitle (index) {
@@ -384,76 +480,96 @@ export default {
     clicksqlTitle (sqlTitle, index) {
       this.sqlAddData.sqlTitle = sqlTitle
       this.sqlAddData.sql = this.sqlList[index].sql
+      this.sqlAddData.databaseId = this.sqlList[index].databaseId
+      this.sqlAddData.datasourceId = this.sqlList[index].datasourceId
       // this.sqlAddData = {
       //   sqlTitle: '',
       //   sql: ''
       // }
     },
     severDataFormSubmit () {
+      let sqlValid = true
+      if (!this.sqlList.length) {
+        this.$refs['sqlAddData'].validate(valid => {
+          if (!valid) {
+            sqlValid = false
+          }
+        })
+      } else {
+        if (!this.sqlAddData.datasourceId && !this.sqlAddData.databaseId && !this.sqlAddData.sqlTitle && !this.sqlAddData.sql) {
+          sqlValid = true
+        } else {
+          this.$refs['sqlAddData'].validate(valid => {
+            if (!valid) {
+              sqlValid = false
+              return this.$message.warn('请补全或清空SQL信息')
+            } else {
+              this.sqlList.push(this.sqlAddData)
+            }
+          })
+        }
+      }
       this.$refs['baseForm'].validate(valid => {
-        if (valid) {
-          if (!this.sqlList.length && !this.sqlAddData.sqlTitle && !this.sqlAddData.sql) {
-            return this.$message.error('请填写SQL名称及内容后再申请！')
-          } else if (this.sqlAddData.sqlTitle && this.sqlAddData.sql) {
-            this.sqlList.push(this.sqlAddData)
-          } else if (!this.sqlAddData.sqlTitle && this.sqlAddData.sql) {
-            return this.$message.error('请填写SQL名称后再申请！')
-          } else if (this.sqlAddData.sqlTitle && !this.sqlAddData.sql) {
-            return this.$message.error('请填写SQL内容后再申请！')
-          }
-          let params = {
-            'datasourceId': this.baseForm.datasourceId,
-            'databaseId': this.baseForm.databaseId,
-            'type': 0,
-            'receiveType': Number(this.baseForm.receiveType),
-            'receiveContentType': Number(this.baseForm.receiveContentType),
-            'approveReason': this.baseForm.approveReason,
-            'exportType': this.baseForm.exportType,
-            'period': this.baseForm.period,
-            'receiveDays': this.baseForm.period === 'day' ? '' : this.baseForm.receiveDays,
-            'receiveStartTime': this.baseForm.receiveTime[0],
-            'receiveEndTime': this.baseForm.receiveTime[1],
-            'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
-            'headUser': this.baseForm.headUser,
-            'describeAfter': this.baseForm.describeAfter,
-            'describePre': this.baseForm.describePre,
-            'sqlList': this.sqlList
-          }
-          if (this.baseForm.id) {
-            params.id = this.baseForm.id
-            editTask(params).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '保存成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.sqlList = []
-                    this.$refs['baseForm'].resetFields()
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          } else {
-            saveTask(params).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '保存成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.$refs['baseForm'].resetFields()
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          }
+        if (!valid) {
+          sqlValid = false
         }
       })
+      if (sqlValid) {
+        let params = {
+          // 'datasourceId': this.baseForm.datasourceId,
+          // 'databaseId': this.baseForm.databaseId,
+          'type': 0,
+          'receiveType': Number(this.baseForm.receiveType),
+          'receiveContentType': Number(this.baseForm.receiveContentType),
+          'approveReason': this.baseForm.approveReason,
+          'exportType': this.baseForm.exportType,
+          'period': this.baseForm.period,
+          'receiveDays': this.baseForm.period === 'day' ? '' : this.baseForm.receiveDays,
+          'receiveStartTime': this.baseForm.receiveTime[0],
+          'receiveEndTime': this.baseForm.receiveTime[1],
+          'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
+          'headUser': this.baseForm.headUser,
+          'describeAfter': this.baseForm.describeAfter,
+          'describePre': this.baseForm.describePre,
+          'sqlList': this.sqlList
+        }
+        if (this.baseForm.id) {
+          params.id = this.baseForm.id
+          editTask(params).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '保存成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.sqlList = []
+                  this.$refs['sqlAddData'].resetFields()
+                  this.$refs['baseForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        } else {
+          saveTask(params).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '保存成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.sqlList = []
+                  this.$refs['sqlAddData'].resetFields()
+                  this.$refs['baseForm'].resetFields()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }
+      }
     }
   }
 }
@@ -462,7 +578,7 @@ export default {
 .reject-pane-item {
   width: 50%;
 }
-.footer {
+.sql-footer {
   width: 20%;
   float: right;
 }

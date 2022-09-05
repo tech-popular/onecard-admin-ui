@@ -17,6 +17,7 @@
         </el-select>
       </el-form-item>
         <el-button type="primary" @click="searchData()">查询</el-button>
+        <el-button type="primary" @click="searchImgData()">查看图片</el-button>
         <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
@@ -47,7 +48,7 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" v-if="scope.row.type === 0 && scope.row.exportType === 'period' " @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" v-if="scope.row.type === 0 && scope.row.exportType === 'period' && scope.row.status === 0" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="dispatchConfig(scope.row)">配置调度</el-button>
           <el-button type="text" size="small" @click="upOrDownHandle(scope.row)">{{scope.row.status === 0 ? '上线' : '下线'}}</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
@@ -75,7 +76,7 @@
 }
 </style>
 <script>
-import {getList, subscriptionUpAndDown, updateSubscriptionAuth, batchUpdateSubscriptionAuth } from '@/api/dataGovernance/subscribeManage'
+import { getList, subscriptionUpAndDown, updateSubscriptionAuth, batchUpdateSubscriptionAuth } from '@/api/dataGovernance/subscribeManage'
 import addOrUpdate from './subscribeManage-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import AssignPermission from '../../components/permission/assign-permission'
@@ -146,6 +147,10 @@ export default {
     searchData () {
       this.currPage = 1
       this.getDataList()
+    },
+    searchImgData () {
+      let routeUrl = this.$router.resolve({ path: '/dataGovernance-imgView', query: {fileName: 'user_50_0_1662016491641'} })
+      window.open(routeUrl.href, '_blank')
     },
     // 新增 / 修改
     addOrUpdateHandle (id) {
