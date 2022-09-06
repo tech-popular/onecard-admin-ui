@@ -7,42 +7,46 @@
     <div class="wrap" v-loading="loading">
       <div class="base-pane">
         <el-form label-width="180px" :model="baseForm" ref="baseForm" :rules="baseRule" class="base-form">
-          <el-form-item label="英文名称" prop="englishName">
+          <el-form-item label="英文名称" prop="englishName" key="englishName">
             <el-input v-model.trim="baseForm.englishName" placeholder="英文名称" clearable class="base-pane-item" />
           </el-form-item>
-          <el-form-item label="标签名称" prop="chineseName">
+          <el-form-item label="标签名称" prop="chineseName" key="chineseName">
             <el-input v-model.trim="baseForm.chineseName" placeholder="标签名称" clearable class="base-pane-item" />
           </el-form-item>
-          <el-form-item label="所属业务线" prop="channelCode" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
+          <el-form-item label="所属业务线" prop="channelCode" key="channelCode" :rules="{ required: true, message: '请选择用户所属业务线', trigger: 'blur' }">
             <el-select v-model="baseForm.channelCode" @change="channelIdChange" filterable style="width: 400px">
               <template v-for="(item, index) in channelList">
                 <el-option :key="index" :label="item.text" :value="item.value" :disabled="item.disabled"></el-option>
               </template>
             </el-select>
           </el-form-item>
-          <el-form-item label="标签口径" prop="processCaliber">
+          <el-form-item label="标签口径" prop="processCaliber" key="processCaliber">
             <el-input v-model.trim="baseForm.processCaliber" placeholder="标签口径" clearable class="base-pane-item" />
           </el-form-item>
-          <el-form-item prop="indexType" label="类型">
+          <el-form-item prop="indexType" label="类型" key="indexType">
             <el-radio v-model="baseForm.indexType" label="1">用户标签</el-radio>
             <el-radio v-model="baseForm.indexType" label="4">衍生标签</el-radio>
           </el-form-item>
-          <el-form-item label="计算公式" prop="formula" v-if="baseForm.indexType === '4'">
+          <el-form-item label="计算公式" prop="formula" key="formula" v-if="baseForm.indexType === '4'">
             <el-input v-model.trim="baseForm.formula" placeholder="计算公式" clearable class="base-pane-item" />
           </el-form-item>
-          <el-form-item label="选择所属分类" prop="categoryId">
+          <el-form-item label="选择所属分类" key="categoryId" prop="categoryId">
             <!-- <el-cascader clearable ref="cascaderMenu" v-model="baseForm.categoryId" :options="indexList" :props="indexListTreeProps" @change="indexTreeChange" class="base-pane-item"></el-cascader> -->
             <el-cascader style="width: 100%" clearable ref="cascaderMenu" v-model="baseForm.categoryId" :options="alldataCataLogList" :props="dataCataLogTreeProps" @change="indexTreeChange"></el-cascader>
           </el-form-item>
-          <el-form-item prop="processType" label="加工类型：" v-if="baseForm.indexType === '1'">
+          <el-form-item prop="processType" label="加工类型：" key="processType" v-if="baseForm.indexType === '1'">
             <el-radio v-model="baseForm.processType" label="1">实时更新</el-radio>
             <el-radio v-model="baseForm.processType" label="2">T+1</el-radio>
           </el-form-item>
-          <el-form-item prop="fieldType" label="数据类型：">
+          <el-form-item prop="fieldType" label="数据类型：" key="fieldType">
             <el-radio v-model="baseForm.fieldType" label="number" :disabled="!!id">数值</el-radio>
             <el-radio v-model="baseForm.fieldType" label="date" :disabled="!!id">日期</el-radio>
             <el-radio v-model="baseForm.fieldType" label="enums" :disabled="!!id">枚举</el-radio>
             <el-radio v-model="baseForm.fieldType" label="string" :disabled="!!id">字符串</el-radio>
+          </el-form-item>
+          <el-form-item prop="enumFieldType" label="枚举类型：" key="enumFieldType" v-if="baseForm.fieldType === 'enums'">
+            <el-radio v-model="baseForm.enumFieldType" label="number">数值</el-radio>
+            <el-radio v-model="baseForm.enumFieldType" label="string">字符串</el-radio>
           </el-form-item>
           <el-form-item label-width="100px" v-if="baseForm.fieldType === 'enums'">
             <el-button @click="changeHandle()">添加值</el-button>
@@ -57,16 +61,16 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-form-item prop="isSensitive" label="是否包含敏感信息：">
+          <el-form-item prop="isSensitive" label="是否包含敏感信息：" key="isSensitive">
             <el-radio v-model="baseForm.isSensitive" label="1">是</el-radio>
             <el-radio v-model="baseForm.isSensitive" label="0">否</el-radio>
           </el-form-item>
-          <el-form-item label="敏感信息显示规则：" prop="showRules" v-if="baseForm.isSensitive === '1'">
+          <el-form-item label="敏感信息显示规则：" prop="showRules" key="showRules" v-if="baseForm.isSensitive === '1'">
             <el-input v-model.trim="baseForm.showRules" clearable class="base-pane-item" />
           </el-form-item>
-          <el-form-item prop="enable" label="是否启动：">
-            <el-radio v-model="baseForm.enable" :label="true">是</el-radio>
-            <el-radio v-model="baseForm.enable" :label="false">否</el-radio>
+          <el-form-item prop="enable" label="是否启用：" key="enable">
+            <el-radio v-model="baseForm.enable" label="true">是</el-radio>
+            <el-radio v-model="baseForm.enable" label="false">否</el-radio>
           </el-form-item>
         </el-form>
       </div>
@@ -114,7 +118,8 @@ export default {
         fieldType: '',
         isSensitive: '',
         showRules: '',
-        enable: ''
+        enable: '',
+        enumFieldType: '' // 枚举值类型
       },
       indexListTreeProps: {
         checkStrictly: true,
@@ -163,10 +168,13 @@ export default {
           { required: true, message: '请选择所属分类', trigger: 'change' }
         ],
         processType: [
-          { required: true, message: '请选择加工类型', trigger: 'change' }
+          { required: true, message: '请选择加工类型', trigger: 'blur' }
         ],
         fieldType: [
           { required: true, message: '请选择数据类型', trigger: 'change' }
+        ],
+        enumFieldType: [
+          { required: true, message: '请选择枚举类型', trigger: 'change' }
         ],
         isSensitive: [
           { required: true, message: '请选择是否包含敏感信息', trigger: 'change' }
@@ -243,11 +251,12 @@ export default {
           this.baseForm.isSensitive = data.data.isSensitive
           this.baseForm.showRules = data.data.showRules
           this.baseForm.enable = data.data.enable
+          this.baseForm.enumFieldType = data.data.enumFieldType
           this.indexParentList = data.data.catagoryIdSelect
           // this.getSelectAllCata()
           getDataCataLog().then(({ data }) => {
             if (data.status === '1') {
-              this.alldataCataLogList = data.data
+              this.alldataCataLogList = data.data.length ? data.data.filter(item => item.name === '玖富新万卡') : []
             } else {
               this.alldataCataLogList = []
             }
@@ -362,7 +371,7 @@ export default {
       // this.getSelectAllCata()
       getDataCataLog().then(({ data }) => {
         if (data.status === '1') {
-          this.alldataCataLogList = data.data
+          this.alldataCataLogList = data.data.length ? data.data.filter(item => item.name === '玖富新万卡') : []
         } else {
           this.alldataCataLogList = []
         }
@@ -397,7 +406,8 @@ export default {
             'showRules': this.baseForm.showRules,
             'enable': this.baseForm.enable,
             'catagoryIdSelect': this.indexParentList,
-            'enumList': enumDataList
+            'enumList': enumDataList,
+            'enumFieldType': this.baseForm.enumFieldType,
           }
           if (!this.id) {
             addIndexManage(params).then(({ data }) => {
