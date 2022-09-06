@@ -470,7 +470,7 @@ export default {
           childrenNum: this.dataForm.childrenNum,
           childrenValue: this.dataForm.childrenValue
         }
-        if (this.dataForm.id) {
+        if (this.dataForm.id !== '') {
           this.enumList = this.enumList.map(t => {
             return t.id === params.id ? params : t
           })
