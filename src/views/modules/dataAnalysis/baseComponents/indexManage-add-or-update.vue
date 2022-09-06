@@ -237,8 +237,10 @@ export default {
               })
             })
             this.dataFormId = data.data.enumList.length
+            this.baseForm.enumFieldType = data.data.fieldType
           } else {
             this.baseForm.fieldType = data.data.fieldType
+            this.baseForm.enumFieldType = ''
           }
           this.baseForm.formula = data.data.formula
           this.baseForm.englishName = data.data.englishName
@@ -251,7 +253,7 @@ export default {
           this.baseForm.isSensitive = data.data.isSensitive
           this.baseForm.showRules = data.data.showRules
           this.baseForm.enable = data.data.enable
-          this.baseForm.enumFieldType = data.data.enumFieldType
+
           this.indexParentList = data.data.catagoryIdSelect
           // this.getSelectAllCata()
           getDataCataLog().then(({ data }) => {
