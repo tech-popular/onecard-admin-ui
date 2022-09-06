@@ -156,7 +156,8 @@ export default {
         datasourceId: '', // 数据源id
         databaseId: '', // 数据库id
         sqlTitle: '',
-        sql: ''
+        sql: '',
+        id: 1
       },
       sqlList: [],
       datasourceList: [],
@@ -292,11 +293,17 @@ export default {
           this.baseForm.receiveContentType = data.data.receiveContentType.toString()
           this.baseForm.describeAfter = data.data.describeAfter
           this.baseForm.describePre = data.data.describePre
-          this.sqlList = data.data.sqlList
-          this.sqlAddData.sqlTitle = data.data.sqlList[0].sqlTitle
-          this.sqlAddData.sql = data.data.sqlList[0].sql
-          this.sqlAddData.datasourceId = data.data.sqlList[0].datasourceId
-          this.sqlAddData.databaseId = data.data.sqlList[0].databaseId
+          this.sqlList = data.data.sqlList.map((item, index) => {
+            item.id = index + 1
+            return item
+          })
+          console.log(' this.sqlList: ', this.sqlList);
+          // this.sqlAddData.sqlTitle = this.sqlList[0].sqlTitle
+          this.sqlAddData = this.sqlList[0]
+          // this.sqlAddData.sql = this.sqlList[0].sql
+          // this.sqlAddData.datasourceId = this.sqlList[0].datasourceId
+          // this.sqlAddData.databaseId = this.sqlList[0].databaseId
+          // this.sqlAddData.id = this.sqlList[0].id
           this.baseForm.receiveTime = [data.data.receiveStartTime, data.data.receiveEndTime]
           this.baseForm.headUser = data.data.headUser
           this.getDatabaseList()
@@ -466,22 +473,40 @@ export default {
       this.$router.push({ name: 'dataGovernance-subscribeManage' })
     },
     SqlAddSubmit () {
-      this.sqlList.push(this.sqlAddData)
+      this.$refs['sqlAddData'].validate(valid => {
+        if (!valid) {
+          sqlValid = false
+          return this.$message.warn('请补全或清空SQL信息')
+        } else {
+          this.sqlList.push(this.sqlAddData)
+        }
+      })
+      // this.sqlList.push(this.sqlAddData)
       this.sqlAddData = {
         sqlTitle: '',
         sql: '',
         databaseId: '',
-        datasourceId: ''
+        datasourceId: '',
+        id: this.sqlList.length + 1
       }
+      this.$refs['sqlAddData'].clearValidate()
     },
-    deletesqlTitle (index) {
-      this.sqlList.splice(index, 1)
+    deletesqlTitle (item, index) {
+      if (item.id === this.sqlAddData.id) {
+        this.sqlList.splice(index, 1)
+        this.sqlAddData = this.sqlList[0]
+        // this.sqlAddData.sql = this.sqlList[0].sql
+        // this.sqlAddData.datasourceId = this.sqlList[0].datasourceId
+        // this.sqlAddData.databaseId = this.sqlList[0].databaseId
+      } else {
+        this.sqlList.splice(index, 1)
+      }
     },
     clicksqlTitle (sqlTitle, index) {
       this.sqlAddData.sqlTitle = sqlTitle
-      this.sqlAddData.sql = this.sqlList[index].sql
-      this.sqlAddData.databaseId = this.sqlList[index].databaseId
-      this.sqlAddData.datasourceId = this.sqlList[index].datasourceId
+      this.sqlAddData = this.sqlList[index]
+      // this.sqlAddData.databaseId = this.sqlList[index].databaseId
+      // this.sqlAddData.datasourceId = this.sqlList[index].datasourceId
       // this.sqlAddData = {
       //   sqlTitle: '',
       //   sql: ''
@@ -515,9 +540,11 @@ export default {
         }
       })
       if (sqlValid) {
+        let sqlListSaveData = this.sqlList.map(item => {
+          delete item.id
+          return item
+        })
         let params = {
-          // 'datasourceId': this.baseForm.datasourceId,
-          // 'databaseId': this.baseForm.databaseId,
           'type': 0,
           'receiveType': Number(this.baseForm.receiveType),
           'receiveContentType': Number(this.baseForm.receiveContentType),
@@ -531,7 +558,7 @@ export default {
           'headUser': this.baseForm.headUser,
           'describeAfter': this.baseForm.describeAfter,
           'describePre': this.baseForm.describePre,
-          'sqlList': this.sqlList
+          'sqlList': sqlListSaveData
         }
         if (this.baseForm.id) {
           params.id = this.baseForm.id
