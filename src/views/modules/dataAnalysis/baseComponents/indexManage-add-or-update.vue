@@ -69,8 +69,8 @@
             <el-input v-model.trim="baseForm.showRules" clearable class="base-pane-item" />
           </el-form-item>
           <el-form-item prop="enable" label="是否启用：" key="enable">
-            <el-radio v-model="baseForm.enable" label="true">是</el-radio>
-            <el-radio v-model="baseForm.enable" label="false">否</el-radio>
+            <el-radio v-model="baseForm.enable" :label="true">是</el-radio>
+            <el-radio v-model="baseForm.enable" :label="false">否</el-radio>
           </el-form-item>
         </el-form>
       </div>
