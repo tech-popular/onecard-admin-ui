@@ -248,10 +248,10 @@ export default {
       },
       sqlAddDataRule: {
         datasourceId: [
-          { required: true, message: '请选择数据源', trigger: 'change' }
+          { required: true, message: '请选择数据源', trigger: 'blur' }
         ],
         databaseId: [
-          { required: true, message: '请选择数据库', trigger: 'change' }
+          { required: true, message: '请选择数据库', trigger: 'blur' }
         ],
         sqlTitle: [
           { required: true, message: '请输入SQL名称', trigger: 'blur' }
@@ -297,7 +297,6 @@ export default {
             item.id = index + 1
             return item
           })
-          console.log(' this.sqlList: ', this.sqlList);
           // this.sqlAddData.sqlTitle = this.sqlList[0].sqlTitle
           this.sqlAddData = this.sqlList[0]
           // this.sqlAddData.sql = this.sqlList[0].sql
@@ -470,12 +469,11 @@ export default {
       }
     },
     gotoDataSource () {
-      this.$router.push({ name: 'dataGovernance-subscribeManage' })
+      this.$router.push({ name: 'dataGovernance-datasourceManage' })
     },
     SqlAddSubmit () {
       this.$refs['sqlAddData'].validate(valid => {
         if (!valid) {
-          sqlValid = false
           return this.$message.warn('请补全或清空SQL信息')
         } else {
           this.sqlList.push(this.sqlAddData)
@@ -518,6 +516,8 @@ export default {
         this.$refs['sqlAddData'].validate(valid => {
           if (!valid) {
             sqlValid = false
+          } else {
+            this.sqlList.push(this.sqlAddData)
           }
         })
       } else {
@@ -527,7 +527,7 @@ export default {
           this.$refs['sqlAddData'].validate(valid => {
             if (!valid) {
               sqlValid = false
-              return this.$message.warn('请补全或清空SQL信息')
+              return this.$message.warning('请补全或清空SQL信息')
             } else {
               this.sqlList.push(this.sqlAddData)
             }

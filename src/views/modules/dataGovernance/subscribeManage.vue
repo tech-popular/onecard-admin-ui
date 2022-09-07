@@ -17,7 +17,6 @@
         </el-select>
       </el-form-item>
         <el-button type="primary" @click="searchData()">查询</el-button>
-        <el-button type="primary" @click="searchImgData()">查看图片</el-button>
         <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
     </el-form>
@@ -148,10 +147,10 @@ export default {
       this.currPage = 1
       this.getDataList()
     },
-    searchImgData () {
-      let routeUrl = this.$router.resolve({ path: '/dataGovernance-imgView', query: {fileName: 'user_50_0_1662016491641'} })
-      window.open(routeUrl.href, '_blank')
-    },
+    // searchImgData () {
+    //   let routeUrl = this.$router.resolve({ path: '/dataGovernance-imgView', query: {fileName: 'user_50_0_1662016491641'} })
+    //   window.open(routeUrl.href, '_blank')
+    // },
     // 新增 / 修改
     addOrUpdateHandle (id) {
       this.$router.push({ name: 'dataGovernance-dataServiceSql', query: {id: id} })
