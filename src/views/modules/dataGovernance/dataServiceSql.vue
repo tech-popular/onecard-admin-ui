@@ -47,7 +47,7 @@
           </el-form-item>
           <el-form-item style="margin-top:10px;">
             <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
-            <el-button type="primary" @click="SqlAddSubmit()">新增SQL</el-button>
+            <el-button type="primary" @click="SqlAddSubmit()">保存SQL</el-button>
           </el-form-item>
           <el-form-item v-if="previewing" label-width="70px">
             <span>
