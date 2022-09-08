@@ -100,8 +100,8 @@
               <el-radio v-model="baseForm.receiveType" label="1" style="margin-left:5px;">邮件</el-radio>
             </el-form-item>
             <el-form-item label="接收内容类型" prop="receiveContentType">
-              <el-radio v-model="baseForm.receiveContentType" label="1">图片</el-radio>
-              <el-radio v-model="baseForm.receiveContentType" label="2" style="margin-left:5px;">Excel压缩包下载链接</el-radio>
+              <el-radio v-model="baseForm.receiveContentType" label="1" @change="receiveContentTypeChange">图片</el-radio>
+              <el-radio v-model="baseForm.receiveContentType" label="2" style="margin-left:5px;">Excel</el-radio>
             </el-form-item>
           </el-form>
         </div>
@@ -146,7 +146,7 @@ export default {
         receiveTime: ['08:00', '23:59'],
         // receiveEndTime: '', // 允许接收时间接收时间
         receiveType: '0', // 接收类型
-        receiveContentType: '1', // 接收内容方式
+        receiveContentType: '', // 接收内容方式
         receiver: [], // 接收人,
         describePre: '', // 前描述
         describeAfter: '', // 后描述
@@ -419,6 +419,7 @@ export default {
         }
       })
     },
+    // 点击查看预览数据
     previewSqlData () {
       let routeUrl = this.$router.resolve({ path: '/dataGovernance-reportData' })
       window.open(routeUrl.href, '_blank')
@@ -468,8 +469,15 @@ export default {
         this.$refs[ref].codemirror.showHint({ completeSingle: false })
       }
     },
+    // 配置数据源 
     gotoDataSource () {
       this.$router.push({ name: 'dataGovernance-datasourceManage' })
+    },
+    // 接受内容方式
+    receiveContentTypeChange (label) {
+      if (label === '1') {
+        return this.$message.warning('如果数据量超过1000条请使用Excel')
+      }
     },
     SqlAddSubmit () {
       this.$refs['sqlAddData'].validate(valid => {
@@ -478,7 +486,6 @@ export default {
         } else {
           if (this.sqlList.length) {
             let sqlfilterList = this.sqlList.filter(item => item.id === this.sqlAddData.id)
-            console.log('sqlfilterList: ', sqlfilterList);
             if (!sqlfilterList.length) {
               this.sqlList.push(this.sqlAddData)
             }
@@ -498,9 +505,21 @@ export default {
       this.$refs['sqlAddData'].clearValidate()
     },
     deletesqlTitle (item, index) {
+      console.log('item: ', item);
+      console.log('this.sqlAddData: ', this.sqlAddData);
       if (item.id === this.sqlAddData.id) {
         this.sqlList.splice(index, 1)
-        this.sqlAddData = this.sqlList[0]
+        if (this.sqlList.length) {
+          this.sqlAddData = this.sqlList[0]
+        } else {
+          this.sqlAddData = {
+            sqlTitle: '',
+            sql: '',
+            databaseId: '',
+            datasourceId: '',
+            id: 0
+          }
+        }
         // this.sqlAddData.sql = this.sqlList[0].sql
         // this.sqlAddData.datasourceId = this.sqlList[0].datasourceId
         // this.sqlAddData.databaseId = this.sqlList[0].databaseId
@@ -538,7 +557,6 @@ export default {
               return this.$message.warning('请补全或清空SQL信息')
             } else {
               let sqlfilterList = this.sqlList.filter(item => item.id === this.sqlAddData.id)
-              console.log('sqlfilterList: ', sqlfilterList);
               if (!sqlfilterList.length) {
                 this.sqlList.push(this.sqlAddData)
               }
