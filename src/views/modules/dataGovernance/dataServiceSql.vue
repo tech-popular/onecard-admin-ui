@@ -476,8 +476,13 @@ export default {
         if (!valid) {
           return this.$message.warn('请补全或清空SQL信息')
         } else {
-          let sqlfilterList = this.sqlList.filter(item => item.id === this.sqlAddData.id)
-          if (!sqlfilterList) {
+          if (this.sqlList.length) {
+            let sqlfilterList = this.sqlList.filter(item => item.id === this.sqlAddData.id)
+            console.log('sqlfilterList: ', sqlfilterList);
+            if (!sqlfilterList.length) {
+              this.sqlList.push(this.sqlAddData)
+            }
+          } else {
             this.sqlList.push(this.sqlAddData)
           }
         }
@@ -533,7 +538,8 @@ export default {
               return this.$message.warning('请补全或清空SQL信息')
             } else {
               let sqlfilterList = this.sqlList.filter(item => item.id === this.sqlAddData.id)
-              if (!sqlfilterList) {
+              console.log('sqlfilterList: ', sqlfilterList);
+              if (!sqlfilterList.length) {
                 this.sqlList.push(this.sqlAddData)
               }
             }
