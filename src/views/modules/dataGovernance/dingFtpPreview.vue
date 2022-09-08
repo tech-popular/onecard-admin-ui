@@ -12,7 +12,7 @@
   </div>
 </template>
 <script>
-// import { dingDingPreview } from '@/api/withdrawal/datareport'
+// import { dingDingPreview } from '@/api/dataGovernance/datareport'
 export default {
   data () {
     return {

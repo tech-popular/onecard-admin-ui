@@ -409,7 +409,7 @@ export default {
             'enable': this.baseForm.enable,
             'catagoryIdSelect': this.indexParentList,
             'enumList': enumDataList,
-            'enumFieldType': this.baseForm.enumFieldType,
+            'enumFieldType': this.baseForm.enumFieldType
           }
           if (!this.id) {
             addIndexManage(params).then(({ data }) => {
