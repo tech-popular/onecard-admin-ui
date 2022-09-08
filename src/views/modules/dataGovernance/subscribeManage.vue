@@ -23,6 +23,7 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column v-if="isAdmin" type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
+       <el-table-column prop="typeDesc" header-align="center" align="center" label="类型"></el-table-column>
       <el-table-column prop="approveReason" header-align="center" align="center" label="申请原因"></el-table-column>
       <el-table-column prop="receiveTypeDesc" header-align="center" align="center" label="接收方式"></el-table-column>
       <el-table-column prop="receiveContentTypeDesc" header-align="center" align="center" label="接收内容类型"></el-table-column>
@@ -38,18 +39,18 @@
         </template>
       </el-table-column>
       <el-table-column prop="approveStatus" header-align="center" align="center" label="审批状态">
-        <template slot-scope="scope">
+        <!-- <template slot-scope="scope">
           <el-tag v-if="scope.row.approveStatus === 0" size="small" type="danger">审批异常</el-tag>
           <el-tag v-if="scope.row.approveStatus === 1" size="small">敏感数据验证审批中</el-tag>
           <el-tag v-if="scope.row.approveStatus === 2" size="small">敏感数据审批中</el-tag>
           <el-tag v-if="scope.row.approveStatus === 3" size="small">审批完成</el-tag>
-        </template>
+        </template> -->
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" v-if="scope.row.type === 0 && scope.row.exportType === 'period' && scope.row.status === 0" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="dispatchConfig(scope.row)">配置调度</el-button>
-          <el-button type="text" size="small" @click="upOrDownHandle(scope.row)">{{scope.row.status === 0 ? '上线' : '下线'}}</el-button>
+          <el-button type="text" size="small" v-if=" authHandle(scope.row) && scope.row.type === 0 && scope.row.exportType === 'period' && scope.row.status === 0" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="dispatchConfig(scope.row)" v-if="scope.row.type === 0 && scope.row.exportType === 'period' && scope.row.status === 0">配置调度</el-button>
+          <el-button type="text" size="small" v-if="authHandle(scope.row) && scope.row.type === 0 " @click="upOrDownHandle(scope.row)">{{scope.row.status === 0 ? '上线' : '下线'}}</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
       </el-table-column>
@@ -147,6 +148,9 @@ export default {
       this.currPage = 1
       this.getDataList()
     },
+    authHandle (row) {
+      return this.isAdmin || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username
+    },
     // searchImgData () {
     //   let routeUrl = this.$router.resolve({ path: '/dataGovernance-imgView', query: {fileName: 'user_50_0_1662016491641'} })
     //   window.open(routeUrl.href, '_blank')
@@ -198,6 +202,8 @@ export default {
               this.getDataList()
             }
           })
+        } else {
+          this.$message.error(data.msg)
         }
       })
     }

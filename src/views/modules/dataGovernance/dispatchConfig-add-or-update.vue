@@ -1,7 +1,7 @@
 <template>
   <el-drawer :append-to-body="false" :visible.sync="visible" :show-close="false" :wrapperClosable="false" size="1300px" class="api-manage-drawer">
     <div slot="title" class="drawer-title">
-      编辑调度配置
+      {{canUpdate ? '编辑' : '查看' }}调度配置
       <i class="el-icon-close drawer-close" @click="drawerClose"></i>
     </div>
     <div class="wrap" v-loading="loading">
@@ -141,7 +141,7 @@
     </div>
     <div class="footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button v-if="canUpdate" type="primary" @click="dataFormSubmit()">确定</el-button>
     </div>
   </el-drawer>
 </template>
@@ -178,12 +178,18 @@ export default {
       oldDispatchTaskLeftSelectedData: [],
       oldDispatchTaskRightSelectedData: [],
       oldDispatchTaskLeftTableData: [],
-      oldDispatchTaskRightTableData: []
+      oldDispatchTaskRightTableData: [],
+      //  权限
+      userid: sessionStorage.getItem('id'),
+      username: sessionStorage.getItem('username'),
+      isAdmin: sessionStorage.getItem('username') === 'admin',
+      canUpdate: true
     }
   },
   methods: {
     init (row) {
       this.id = row.id
+      this.canUpdate = this.isAdmin || row.authOtherList.includes(this.userid || this.username) || row.authOwner === this.userid || row.authOwner === this.username
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()

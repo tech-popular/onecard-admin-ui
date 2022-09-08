@@ -58,7 +58,7 @@
           </el-form-item>
         </el-form>
         <div style="margin-left:50px;">
-          <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="110px" ref="baseForm" class="base-form">
+          <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="130px" ref="baseForm" class="base-form">
             <el-form-item label="前描述" prop="describePre">
               <el-input v-model="baseForm.describePre" type="textarea"></el-input>
             </el-form-item>
@@ -77,20 +77,20 @@
                 <el-option v-for="item in sqlCycleList" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="接受天设置" prop="receiveDays" label-width="100px" v-if="baseForm.exportType === 'period'">
+            <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'">
               <el-select v-model="baseForm.receiveDays" class="reject-pane-item" placeholder="请选择">
                 <el-option v-for="item in receiveDaysList" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="允许接收时间段" prop="receiveTime" label-width="120px">
+            <el-form-item label="允许接收时间段" prop="receiveTime">
               <el-time-picker is-range v-model="baseForm.receiveTime" format="HH:mm" value-format="HH:mm" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
             </el-form-item>
-            <el-form-item prop="receiver" label="数据接收人" label-width="100px">
+            <el-form-item prop="receiver" label="数据接收人">
               <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
                 <el-option v-for="item in userList" :value="item.userid" :key="item.id" :label="item.name || item.username "></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="headUser" label="数据负责人" label-width="100px">
+            <el-form-item prop="headUser" label="数据负责人">
               <el-select filterable v-model="baseForm.headUser" class="reject-pane-item" placeholder="请选择">
                 <el-option v-for="item in userList" :value="item.userid" :key="item.id" :label="item.name || item.username "></el-option>
               </el-select>
@@ -476,7 +476,10 @@ export default {
         if (!valid) {
           return this.$message.warn('请补全或清空SQL信息')
         } else {
-          this.sqlList.push(this.sqlAddData)
+          let sqlfilterList = this.sqlList.filter(item => item.id === this.sqlAddData.id)
+          if (!sqlfilterList) {
+            this.sqlList.push(this.sqlAddData)
+          }
         }
       })
       // this.sqlList.push(this.sqlAddData)
@@ -529,7 +532,10 @@ export default {
               sqlValid = false
               return this.$message.warning('请补全或清空SQL信息')
             } else {
-              this.sqlList.push(this.sqlAddData)
+              let sqlfilterList = this.sqlList.filter(item => item.id === this.sqlAddData.id)
+              if (!sqlfilterList) {
+                this.sqlList.push(this.sqlAddData)
+              }
             }
           })
         }
