@@ -233,12 +233,12 @@ export default {
         headUser: [
           { required: true, message: '请选择负责人', trigger: 'change' }
         ],
-        describePre: [
-          { required: true, message: '请输入前描述', trigger: 'blur' }
-        ],
-        describeAfter: [
-          { required: true, message: '请输入后描述', trigger: 'blur' }
-        ],
+        // describePre: [
+        //   { required: true, message: '请输入前描述', trigger: 'blur' }
+        // ],
+        // describeAfter: [
+        //   { required: true, message: '请输入后描述', trigger: 'blur' }
+        // ],
         exportType: [
           { required: true, message: '请选择发送频率', trigger: 'change' }
         ],

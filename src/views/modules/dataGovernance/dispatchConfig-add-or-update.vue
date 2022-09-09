@@ -258,9 +258,9 @@ export default {
         }
         if (this.oldDispatchTaskRightTableData.length) {
          let arr = this.filterArr(this.oldDispatchTaskRightTableData, data.data.list)
-          this.oldDispatchTaskTotalCount = arr
+          this.oldDispatchTaskLeftTableData = arr
         } else {
-          this.oldDispatchTaskTotalCount = data.data.list
+          this.oldDispatchTaskLeftTableData = data.data.list
         }
         this.oldDispatchTaskTotalCount = data.data.totalCount
       })
