@@ -46,10 +46,11 @@
             </div>
           </el-form-item>
           <el-form-item style="margin-top:10px;">
-            <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
+            <el-button type="primary" :disabled="dataSqlSubmiting" @click="dataSqlSubmit()">执行验证</el-button>
             <el-button type="primary" @click="SqlAddSubmit()">保存SQL</el-button>
           </el-form-item>
           <el-form-item v-if="previewing" label-width="70px">
+            <span :style="{color:previewTextColor}">{{previewText}},执行时间&nbsp;&nbsp;{{dataSqlSubmitTime}}</span>
             <span>
               <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>
               <span v-if="sqlPreviewDataList.length">（随机展示10条数据）</span>
@@ -233,12 +234,12 @@ export default {
         headUser: [
           { required: true, message: '请选择负责人', trigger: 'change' }
         ],
-        describePre: [
-          { required: true, message: '请输入前描述', trigger: 'blur' }
-        ],
-        describeAfter: [
-          { required: true, message: '请输入后描述', trigger: 'blur' }
-        ],
+        // describePre: [
+        //   { required: true, message: '请输入前描述', trigger: 'blur' }
+        // ],
+        // describeAfter: [
+        //   { required: true, message: '请输入后描述', trigger: 'blur' }
+        // ],
         exportType: [
           { required: true, message: '请选择发送频率', trigger: 'change' }
         ],
