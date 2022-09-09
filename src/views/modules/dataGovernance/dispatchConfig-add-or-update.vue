@@ -96,9 +96,12 @@
           </div>
           <el-table ref="oldmultipleLeftTable" :data="oldDispatchTaskLeftTableData" border @selection-change="oldDispatchTaskHandleLeftSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskName" label="任务ID"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
             <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+             </template>
+            </el-table-column>
           </el-table>
           <el-pagination
             @size-change="oldDispatchTaskSizeChangeHandle"
@@ -123,8 +126,12 @@
           </div>
           <el-table ref="oldmultipleRightTable" :data="oldDispatchTaskRightTableData" border @selection-change="oldDispatchTaskHandleRightSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskName" label="任务ID"></el-table-column>
+             <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
             <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+             </template>
+            </el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
                 <a style="cursor: pointer" @click="oldDispatchTaskDeleteDependenceHandle(scope.$index)">删除</a>

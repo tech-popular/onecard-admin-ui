@@ -70,6 +70,8 @@
                     <el-button type="primary" @click="dataSqlSubmit()">执行验证</el-button>
                   </el-form-item>
                   <el-form-item v-if="previewing" label-width="70px">
+                    <span v-if="dataSqlSubmiting">{{previewText}}, 执行时间{{dataSqlSubmitTime}}</span>
+                    <span v-else>{{previewText}},执行时间{{dataSqlSubmitTime}}</span>
                     <span>
                       <el-button type="text" v-if="sqlPreviewDataList.length" @click="previewSqlData">预览查询结果</el-button>
                       <span v-if="sqlPreviewDataList.length">（随机展示10条数据）</span>
