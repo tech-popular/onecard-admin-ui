@@ -15,9 +15,19 @@
       <el-form-item label="菜单链接" prop="url" v-if="dataForm.type === 1">
         <el-input v-model="dataForm.url" placeholder="菜单链接"></el-input>
       </el-form-item>
-      <el-form-item label="计算任务" prop="taskIds" v-if="dataForm.type === 1">
+      <!-- <el-form-item label="计算任务" prop="taskIds" v-if="dataForm.type === 1">
         <el-select v-model="dataForm.taskIds" clearable filterable multiple placeholder="请选择计算任务" style="width: 100%">
           <el-option v-for="item in calculateList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>-->
+      <el-form-item label="蜂巢计算任务" prop="honeycombJobTaskIds" v-if="dataForm.type === 1">
+        <el-select v-model="dataForm.honeycombJobTaskIds" clearable filterable multiple placeholder="请选择计算任务" style="width: 100%">
+          <el-option v-for="item in honeycombJobList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="调度计算任务" prop="oldJobTaskIds" v-if="dataForm.type === 1">
+        <el-select v-model="dataForm.oldJobTaskIds" clearable filterable multiple placeholder="请选择计算任务" style="width: 100%">
+          <el-option v-for="item in oldJobList" :key="item.id" :label="item.etlJobName" :value="item.etlJobId"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="报表负责人" prop="principalId" v-if="dataForm.type === 1">
@@ -37,7 +47,7 @@
 </template>
 
 <script>
-import { savaBiInfo, updateBiInfo, lookDataInfo, findAllRecursionList, taskManageList } from '@/api/BI-Manager/menu'
+import { savaBiInfo, updateBiInfo, lookDataInfo, findAllRecursionList, queryAllTypeTasks } from '@/api/BI-Manager/menu'
 import { getUsersList } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
@@ -60,7 +70,9 @@ export default {
         url: '',
         taskIds: [],
         orderNum: 0,
-        principalId: []
+        principalId: [],
+        oldJobTaskIds: [],
+        honeycombJobTaskIds: []
       },
       menuData: [],
       menuList: [],
@@ -68,6 +80,8 @@ export default {
       calculateList: [],
       userIdList: [],
       principal: [],
+      honeycombJobList: [],
+      oldJobList: [],
       menuListTreeProps: {
         checkStrictly: true,
         label: 'name',
@@ -137,9 +151,27 @@ export default {
           if (data.data.url) {
             this.dataForm.type = 1
             this.menuList = this.filterMenuList(this.menuData)
+            // this.dataForm.taskIds = taskIdsData.length ? taskIdsData.map(item => { return +item }) : []
             let taskIdsData = (data.data.taskIds && data.data.taskIds.split(';')) || []
+            console.log('taskIdsData: ', taskIdsData);
             this.dataForm.url = data.data.url
-            this.dataForm.taskIds = taskIdsData.length ? taskIdsData.map(item => { return +item }) : []
+            if (taskIdsData.length === 0) {
+              this.dataForm.honeycombJobTaskIds = []
+              this.dataForm.oldJobTaskIds = []
+            } else if (taskIdsData.length === 1) {
+              taskIdsData[0].split(':')[0] == 0 ? this.dataForm.honeycombJobTaskIds = taskIdsData[0].split(':')[1].split(',') : this.dataForm.oldJobTaskIds = taskIdsData[0].split(':')[1].split(',')
+            } else if (taskIdsData.length === 2) {
+              console.log('taskIdsD', taskIdsData[0].split(':'));
+              if (taskIdsData[0].split(':')[0] == 0) {
+                this.dataForm.honeycombJobTaskIds = taskIdsData[0].split(':')[1].split(',')
+                this.dataForm.oldJobTaskIds = taskIdsData[1].split(':')[1].split(',')
+              } else {
+                this.dataForm.oldJobTaskIds = taskIdsData[0].split(':')[1].split(',')
+                this.dataForm.honeycombJobTaskIds = taskIdsData[1].split(':')[1].split(',')
+              }
+            }
+            // this.dataForm.oldJobTaskIds = this.dataForm.oldJobTaskIds.length ? this.dataForm.oldJobTaskIds.map(item => { return +item }) : []
+            this.dataForm.honeycombJobTaskIds = this.dataForm.honeycombJobTaskIds.length ? this.dataForm.honeycombJobTaskIds.map(item => { return +item }) : []
           } else {
             this.dataForm.type = 0
             this.dataForm.url = ''
@@ -176,11 +208,14 @@ export default {
       if (val === 0) {
         this.menuList = this.filterMenuGradeList(this.menuData)
         this.dataForm.url = ''
-        this.dataForm.taskIds = []
+        this.dataForm.honeycombJobTaskIds = []
+        this.dataForm.oldJobTaskIds = []
       } else {
         this.menuList = this.filterMenuList(this.menuData)
         this.dataForm.url = ''
-        this.dataForm.taskIds = []
+        // this.dataForm.taskIds = []
+        this.dataForm.honeycombJobTaskIds = []
+        this.dataForm.oldJobTaskIds = []
       }
     },
     // 获取上级菜单
@@ -244,11 +279,14 @@ export default {
       return arr
     },
     getTaskManageList () {
-      taskManageList().then(({ data }) => {
+      queryAllTypeTasks().then(({ data }) => {
         if (data && data.code === 0) {
-          this.calculateList = data.data
+          this.honeycombJobList = data.data.honeycombJob
+          this.oldJobList = data.data.oldJob
         } else {
-          this.calculateList = []
+          this.honeycombJobList = []
+          this.oldJobList = []
+          return this.$message.error(data.msg)
         }
       })
     },
@@ -282,11 +320,18 @@ export default {
               principalData.push(item.name)
             }
           })
+          let taskIdsData = []
+          if (this.dataForm.honeycombJobTaskIds.length) {
+            taskIdsData.push(`0:${this.dataForm.honeycombJobTaskIds.join(',')}`)
+          }
+          if (this.dataForm.oldJobTaskIds.length) {
+            taskIdsData.push(`1:${this.dataForm.oldJobTaskIds.join(',')}`)
+          }
           let params = {
             'parentId': this.dataForm.parentId.length ? this.menuParentList[this.menuParentList.length - 1].toString() : '0',
             'name': this.dataForm.name,
             'url': this.dataForm.type === 0 ? '' : this.dataForm.url,
-            'taskIds': this.dataForm.type === 0 ? '' : this.dataForm.taskIds.join(';'),
+            'taskIds': this.dataForm.type === 0 ? '' : taskIdsData.join(';'),
             'menuParentList': this.menuParentList.join(','),
             'type': 1,
             'orderNum': this.dataForm.orderNum,

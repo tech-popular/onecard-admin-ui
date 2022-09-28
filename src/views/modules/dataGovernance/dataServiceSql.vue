@@ -30,7 +30,7 @@
             </span>
           </el-form-item>
           <el-form-item label="SQL名称" prop="sqlTitle">
-            <el-input v-model="sqlAddData.sqlTitle"></el-input>
+            <el-input v-model="sqlAddData.sqlTitle" type="text" maxlength="50" show-word-limit></el-input>
           </el-form-item>
           <el-form-item prop="sql" label="SQL：" ref="serviceBeginSqlForm">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative;">
@@ -61,13 +61,13 @@
         <div style="margin-left:50px;">
           <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="130px" ref="baseForm" class="base-form">
             <el-form-item label="前描述" prop="describePre">
-              <el-input v-model="baseForm.describePre" type="textarea"></el-input>
+              <el-input v-model="baseForm.describePre" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
             </el-form-item>
             <el-form-item label="后描述" prop="describeAfter">
-              <el-input v-model="baseForm.describeAfter" type="textarea"></el-input>
+              <el-input v-model="baseForm.describeAfter" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
             </el-form-item>
             <el-form-item label="申请原因" prop="approveReason">
-              <el-input v-model="baseForm.approveReason" type="textarea"></el-input>
+              <el-input v-model="baseForm.approveReason" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
             </el-form-item>
             <el-form-item label="发送频率" prop="exportType">
               <el-radio v-model="baseForm.exportType" label="once">一次性</el-radio>
