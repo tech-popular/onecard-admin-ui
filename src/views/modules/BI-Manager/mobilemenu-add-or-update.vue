@@ -153,7 +153,6 @@ export default {
             this.menuList = this.filterMenuList(this.menuData)
             // this.dataForm.taskIds = taskIdsData.length ? taskIdsData.map(item => { return +item }) : []
             let taskIdsData = (data.data.taskIds && data.data.taskIds.split(';')) || []
-            console.log('taskIdsData: ', taskIdsData);
             this.dataForm.url = data.data.url
             if (taskIdsData.length === 0) {
               this.dataForm.honeycombJobTaskIds = []
@@ -161,7 +160,6 @@ export default {
             } else if (taskIdsData.length === 1) {
               taskIdsData[0].split(':')[0] == 0 ? this.dataForm.honeycombJobTaskIds = taskIdsData[0].split(':')[1].split(',') : this.dataForm.oldJobTaskIds = taskIdsData[0].split(':')[1].split(',')
             } else if (taskIdsData.length === 2) {
-              console.log('taskIdsD', taskIdsData[0].split(':'));
               if (taskIdsData[0].split(':')[0] == 0) {
                 this.dataForm.honeycombJobTaskIds = taskIdsData[0].split(':')[1].split(',')
                 this.dataForm.oldJobTaskIds = taskIdsData[1].split(':')[1].split(',')
