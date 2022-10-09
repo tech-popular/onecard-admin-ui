@@ -1147,7 +1147,7 @@
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
-        let month = (tempTime.getMonth() + 1) < 10 ? '0' + (tempTime.getMonth() + 1) : tempTime.getMonth().toString()
+        let month = (tempTime.getMonth() + 1) < 10 ? '0' + (tempTime.getMonth() + 1) : (tempTime.getMonth() + 1).toString()
         let day = tempTime.getDate() < 10 ? '0' + tempTime.getDate() : tempTime.getDate().toString()
         let hour = tempTime.getHours() < 10 ? '0' + tempTime.getHours() : tempTime.getHours().toString()
         let minute = tempTime.getMinutes() < 10 ? '0' + tempTime.getMinutes() : tempTime.getMinutes().toString()
