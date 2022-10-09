@@ -49,8 +49,8 @@
               <el-input v-model="sqlAddData.sqlTitle" type="text" maxlength="50" style="width:500px"></el-input>
             </el-form-item>
             <el-form-item>
+              <el-button :disabled="dataSqlSubmiting" type="primary" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
               <el-button @click="SqlAddSubmit()" size="medium">保存</el-button>
-              <el-button :disabled="dataSqlSubmiting" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
             </el-form-item>
           </div>
           <el-form-item v-if="previewing" label-width="70px">
