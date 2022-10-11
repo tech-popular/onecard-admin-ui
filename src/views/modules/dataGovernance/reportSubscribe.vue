@@ -13,8 +13,8 @@
           <el-option label="禁用" value="1"></el-option>
         </el-select>
       </el-form-item>
-        <el-button type="primary" @click="searchData()">查询</el-button>
-				<el-button  @click="addOrUpdateHandle()">新增</el-button>
+        <el-button @click="searchData()">查询</el-button>
+				<el-button  type="primary"  @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">

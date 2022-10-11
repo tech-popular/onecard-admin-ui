@@ -7,14 +7,23 @@
             <div v-for="(item, index) in sqlList" :key="index">
               <span style="font-style: normal; font-size: 16px;cursor:pointer;margin-right:20px" @click="clicksqlTitle(item.sqlTitle, index)">名称：{{item.sqlTitle}}</span>
               <span style="float: right">
-                <i class="el-icon-close cursor-pointer" @click="deletesqlTitle(item, index)"></i>
+                <i class="el-icon-close cursor-pointer" v-if="!baseForm.id || (baseForm.id && baseForm.exportType !== 'once')" @click="deletesqlTitle(item, index)"></i>
               </span>
             </div>
           </el-collapse-item>
         </el-collapse>
       </div>
       <div style="width:70%">
-        <el-form v-loading="loading" :model="sqlAddData" :rules="sqlAddDataRule" label-position="right" label-width="110px" ref="sqlAddData" class="base-form">
+        <el-form
+          v-loading="loading"
+          :disabled="baseForm.id && baseForm.exportType === 'once'"
+          :model="sqlAddData"
+          :rules="sqlAddDataRule"
+          label-position="right"
+          label-width="110px"
+          ref="sqlAddData"
+          class="base-form"
+        >
           <div style="display:flex">
             <el-form-item prop="datasourceId" label="数据源：">
               <el-select filterable v-model="sqlAddData.datasourceId" placeholder="请选择" clearable @change="selectdatabaseDataList">
@@ -45,12 +54,12 @@
             </div>
           </el-form-item>
           <div style="display:flex">
-            <el-form-item label="SQL名称" prop="sqlTitle">
+            <el-form-item label="SQL名称：" prop="sqlTitle">
               <el-input v-model="sqlAddData.sqlTitle" type="text" maxlength="50" style="width:500px"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button :disabled="dataSqlSubmiting" type="primary" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
-              <el-button @click="SqlAddSubmit()" size="medium">保存</el-button>
+              <el-button :disabled="dataSqlSubmiting" type="success" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
+              <el-button @click="SqlAddSubmit()" v-if="!baseForm.id || (baseForm.id && baseForm.exportType !== 'once')" type="primary" size="medium">保存</el-button>
             </el-form-item>
           </div>
           <el-form-item v-if="previewing" label-width="70px">
@@ -63,50 +72,59 @@
           </el-form-item>
         </el-form>
         <div>
-          <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="130px" ref="baseForm" class="base-form">
-            <el-form-item label="接收方式" prop="receiveType">
+          <el-form
+            v-loading="loading"
+            :disabled="baseForm.id && baseForm.exportType === 'once'"
+            :model="baseForm"
+            :rules="baseRule"
+            label-position="right"
+            label-width="130px"
+            ref="baseForm"
+            class="base-form"
+          >
+            <el-form-item label="接收方式；" prop="receiveType">
               <el-radio v-model="baseForm.receiveType" label="0">钉钉</el-radio>
               <el-radio v-model="baseForm.receiveType" label="1" style="margin-left:5px;">邮件</el-radio>
             </el-form-item>
-            <el-form-item label="接收内容类型" prop="receiveContentType">
+            <el-form-item label="接收内容类型：" prop="receiveContentType">
               <el-radio v-model="baseForm.receiveContentType" label="1" @change="receiveContentTypeChange">图片</el-radio>
               <el-radio v-model="baseForm.receiveContentType" label="2" style="margin-left:5px;">Excel</el-radio>
-              <el-radio v-model="baseForm.receiveContentType" v-if="checkUserHaveHtmlVisible" label="3" style="margin-left:5px;">HTML</el-radio>
+              <el-radio v-model="baseForm.receiveContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveType === '0'" @change="receiveContentTypeChange" label="3" style="margin-left:5px;">HTML</el-radio>
             </el-form-item>
-            <el-form-item label="发送频率" prop="exportType">
+            <el-form-item label="发送频率：" prop="exportType">
               <el-radio v-model="baseForm.exportType" label="once">一次性</el-radio>
               <el-radio v-model="baseForm.exportType" label="period" style="margin-left:5px;">周期性</el-radio>
             </el-form-item>
-            <el-form-item label="提数周期" prop="period" v-if="baseForm.exportType === 'period'">
+            <el-form-item label="提数周期：" prop="period" v-if="baseForm.exportType === 'period'">
               <el-select v-model="baseForm.period" placeholder="请选择" class="reject-pane-item" @change="disTimeTurnOff (baseForm.period)">
                 <el-option v-for="item in sqlCycleList" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="接受天设置" prop="receiveDays" v-if="baseForm.exportType === 'period'">
+            <el-form-item label="接受天设置：" prop="receiveDays" v-if="baseForm.exportType === 'period'">
               <el-select v-model="baseForm.receiveDays" class="reject-pane-item" placeholder="请选择">
                 <el-option v-for="item in receiveDaysList" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="允许接收时间段" prop="receiveTime">
+            <el-form-item label="允许接收时间段：" prop="receiveTime">
               <el-time-picker is-range v-model="baseForm.receiveTime" format="HH:mm" value-format="HH:mm" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间" placeholder="选择时间范围"></el-time-picker>
             </el-form-item>
-            <el-form-item prop="receiver" label="数据接收人">
+            <el-form-item prop="receiver" label="数据接收人：">
               <el-select filterable multiple v-model="baseForm.receiver" class="reject-pane-item" placeholder="请选择">
                 <el-option v-for="item in userList" :value="item.userid" :key="item.id" :label="item.name || item.username "></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="headUser" label="数据负责人">
+            <el-form-item prop="headUser" label="数据负责人：">
               <el-select filterable v-model="baseForm.headUser" class="reject-pane-item" placeholder="请选择">
                 <el-option v-for="item in userList" :value="item.userid" :key="item.id" :label="item.name || item.username "></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="申请原因" prop="approveReason">
+            <el-form-item label="申请原因：" prop="approveReason">
               <el-input v-model="baseForm.approveReason" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
             </el-form-item>
-            <el-form-item label="前描述" prop="describePre">
+            <el-form-item label="前描述：" prop="describePre">
               <el-input v-model="baseForm.describePre" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
             </el-form-item>
-            <el-form-item label="后描述" prop="describeAfter">
+            <el-form-item label="后描述：" prop="describeAfter">
               <el-input v-model="baseForm.describeAfter" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
             </el-form-item>
           </el-form>
@@ -114,7 +132,7 @@
       </div>
     </div>
     <div class="sql-footer">
-      <el-button type="primary" @click="severDataFormSubmit" size="small">立即申请</el-button>
+      <el-button type="primary" v-if="!baseForm.id || (baseForm.id && baseForm.exportType !== 'once')" @click="severDataFormSubmit" size="small">立即申请</el-button>
     </div>
   </div>
 </template>
@@ -545,14 +563,7 @@ export default {
       }
     },
     clicksqlTitle (sqlTitle, index) {
-      this.sqlAddData.sqlTitle = sqlTitle
       this.sqlAddData = this.sqlList[index]
-      // this.sqlAddData.databaseId = this.sqlList[index].databaseId
-      // this.sqlAddData.datasourceId = this.sqlList[index].datasourceId
-      // this.sqlAddData = {
-      //   sqlTitle: '',
-      //   sql: ''
-      // }
     },
     severDataFormSubmit () {
       let sqlValid = true
