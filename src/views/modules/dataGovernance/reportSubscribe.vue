@@ -24,6 +24,7 @@
          {{scope.row.systemId === 8 ? '新BI_PC端' : '新BI_移动端'}}
         </template>
       </el-table-column>
+      <el-table-column prop="menuList" header-align="center" align="center" label="系统模块"></el-table-column>
       <el-table-column prop="receiveTypeDesc" header-align="center" align="center" label="接收方式">
         <template slot-scope="scope">
          {{scope.row.notifyType === '1' ? '钉钉消息' : '邮件'}}

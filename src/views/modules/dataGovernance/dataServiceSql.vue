@@ -290,6 +290,7 @@ export default {
     if (this.$route.query.id) {
       this.lookTaskDetail(this.$route.query.id)
     } else {
+      this.baseForm.id = 0
       this.sqlList = []
       this.$refs['sqlAddData'].resetFields()
       this.$refs['baseForm'].resetFields()

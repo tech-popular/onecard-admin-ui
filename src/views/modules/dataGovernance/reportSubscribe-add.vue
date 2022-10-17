@@ -31,10 +31,8 @@
       </el-form-item>
 
       <el-form-item label="通知方式：" prop="notifyType">
-        <el-checkbox-group v-model="subscriptionForm.notifyType">
-          <el-checkbox label="2">邮件</el-checkbox>
-          <el-checkbox label="1">钉钉消息</el-checkbox>
-        </el-checkbox-group>
+        <el-radio v-model="subscriptionForm.notifyType" label="1">钉钉消息</el-radio>
+        <el-radio v-model="subscriptionForm.notifyType" label="2" style="margin-left:5px;">邮件</el-radio>
       </el-form-item>
     </el-form>
 
@@ -58,7 +56,7 @@ export default {
         system: '',
         userGroupId: [],
         systemmodel: '',
-        notifyType: [],
+        notifyType: '',
         receiveTime: ['10:00', '18:00']
       },
       subscriptionRules: {
@@ -111,7 +109,7 @@ export default {
         system: '',
         userGroupId: [],
         systemmodel: '',
-        notifyType: [],
+        notifyType: '',
         receiveTime: ['10:00', '18:00']
       }
       this.$refs['subscriptionForm'].resetFields()
@@ -130,7 +128,7 @@ export default {
           let params = {
             userGroupIds: userGroupId.join(','),
             menuList: menuList.join(','),
-            notifyType: this.subscriptionForm.notifyType.join(','),
+            notifyType: this.subscriptionForm.notifyType,
             receiveTimeStart: this.subscriptionForm.receiveTime[0] + ':00',
             receiveTimeEnd: this.subscriptionForm.receiveTime[1] + ':00',
             systemId: selectedSystem[0].value
