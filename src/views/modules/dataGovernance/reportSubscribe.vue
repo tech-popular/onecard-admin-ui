@@ -40,6 +40,7 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
+          <el-button type="text" size="small"  @click="addOrUpdateHandle(scope.row.id)">查看</el-button>
 					<el-button type="text" size="small"  @click="upOrDownHandle(scope.row.id)">{{scope.row.status === 0 ? '启用' :'禁用' }}</el-button>
         </template>
       </el-table-column>
@@ -126,10 +127,10 @@ export default {
       this.getDataList()
     },
     // 新增 / 修改
-    addOrUpdateHandle () {
+    addOrUpdateHandle (id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init()
+        this.$refs.addOrUpdate.init(id)
       })
     },
     // 启用禁用

@@ -1,20 +1,23 @@
 <template>
   <el-dialog title="报表订阅申请" :visible.sync="dialogVisible" width="1000px" :before-close="handleClose">
-    <el-form :model="subscriptionForm" :rules="subscriptionRules" ref="subscriptionForm" label-width="150px">
+    <el-form :disabled="editDisabled" :model="subscriptionForm" :rules="subscriptionRules" ref="subscriptionForm" label-width="150px">
       <el-form-item label="申请系统：" prop="system">
         <el-radio-group v-model="subscriptionForm.system" @change="changeSystem">
           <el-radio :label="item.value" :key="item.value" v-for="item in systemList" style="margin-left:0">{{item.label}}</el-radio>
         </el-radio-group>
       </el-form-item>
-
       <el-form-item label="用户组：" prop="userGroupId">
         <el-select v-model="subscriptionForm.userGroupId" multiple placeholder="请选择用户组" style="width:100%">
           <el-option v-for="item in userGroupList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
 
-      <el-form-item label="申请系统模块：" prop="systemmodel">
+      <el-form-item label="申请系统模块：" prop="systemmodel" v-if="!editDisabled">
         <el-cascader style="width: 100%" :props="props" v-model="subscriptionForm.systemmodel" clearable :options="systemmodelListFilter"></el-cascader>
+      </el-form-item>
+
+      <el-form-item label="申请系统模块：" prop="systemmodel" v-if="editDisabled">
+        <el-input style="width: 100%" type="textare" :props="props" v-model="subscriptionForm.systemmodel"></el-input>
       </el-form-item>
 
       <el-form-item label="允许接收时间段：" prop="receiveTime">
@@ -47,7 +50,8 @@
 import {
   applyScriptions,
   getUserGroupList,
-  getSystemModulesById
+  getSystemModulesById,
+  infoData
 } from '@/api/dataGovernance/reportSubscribe'
 export default {
   data () {
@@ -68,6 +72,7 @@ export default {
       },
       userGroupList: [],
       systemmodelListFilter: [],
+      editDisabled: false,
       props: {
         multiple: true
       },
@@ -83,8 +88,24 @@ export default {
     }
   },
   methods: {
-    init () {
+    init (id) {
       this.dialogVisible = true
+      if (id) {
+        this.editDisabled = true
+        infoData(id).then(({ data }) => {
+          if (data.code === 0) {
+            let userGroupIds = data.data.userGroupIds.split(',')
+            this.subscriptionForm.userGroupId = userGroupIds.map(item => { return +item })
+            this.subscriptionForm.systemmodel = data.data.menuList
+            this.subscriptionForm.notifyType = data.data.notifyType
+            this.subscriptionForm.receiveTime = [data.data.receiveTimeStart, data.data.receiveTimeEnd]
+            this.subscriptionForm.system = data.data.systemId
+            this.changeSystem(data.data.systemId)
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      }
     },
     // 系统选择
     changeSystem (value) {
@@ -133,7 +154,6 @@ export default {
             receiveTimeEnd: this.subscriptionForm.receiveTime[1] + ':00',
             systemId: selectedSystem[0].value
           }
-          console.log('params: ', params)
           applyScriptions(params).then(({ data }) => {
             if (data && data.code === 0) {
               this.$message({
