@@ -32,10 +32,10 @@
           <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="是否失效" prop="flag">
+      <el-form-item label="是否有效" prop="flag">
         <el-radio-group v-model="dataForm.flag">
-          <el-radio :label="0">否</el-radio>
-          <el-radio :label="1">是</el-radio>
+          <el-radio :label="0">是</el-radio>
+          <el-radio :label="1">否</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -59,7 +59,7 @@ export default {
         department: '',
         creater: '',
         remark: '',
-        flag: 1,
+        flag: '0',
         // tenantId: '',
         userIds: []
       },
