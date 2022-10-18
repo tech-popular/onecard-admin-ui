@@ -108,19 +108,19 @@ export default {
     handleChange (file) {
       // 上传文件之前的事件
       let extension = file.name.substring(file.name.lastIndexOf('.') + 1)
-      let size = file.size / 1024 / 1024
+      // let size = file.size / 1024 / 1024
       if (extension !== 'xlsx') {
         this.$message.warning({
           title: '警告',
           message: `只能上传Excel2017（即后缀是.xlsx）的文件`
         })
       }
-      if (size > 10) {
-        this.$message.warning({
-          title: '警告',
-          message: `文件大小不得超过10M`
-        })
-      }
+      // if (size > 10) {
+      //   this.$message.warning({
+      //     title: '警告',
+      //     message: `文件大小不得超过10M`
+      //   })
+      // }
       const form = new FormData()
       // form.append('type', this.dataForm.type)
       form.append('file', file.raw, file.name)

@@ -16,7 +16,7 @@
         <el-cascader style="width: 100%" :props="props" v-model="subscriptionForm.systemmodel" clearable :options="systemmodelListFilter"></el-cascader>
       </el-form-item>
 
-      <el-form-item label="申请系统模块：" prop="systemmodel" v-if="editDisabled">
+      <el-form-item label="系统模块" prop="systemmodel" v-if="editDisabled">
         <el-input style="width: 100%" type="textare" :props="props" v-model="subscriptionForm.systemmodel"></el-input>
       </el-form-item>
 
