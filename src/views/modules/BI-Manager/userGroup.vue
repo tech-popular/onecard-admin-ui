@@ -28,10 +28,10 @@
       <el-table-column prop="creater" header-align="center" align="center" show-overflow-tooltip label="申请人"></el-table-column>
       <el-table-column prop="remark" header-align="center" align="center" show-overflow-tooltip label="说明"></el-table-column>
       <el-table-column prop="memberNum" header-align="center" align="center" label="成员人数" width="80"></el-table-column>
-      <el-table-column prop="flag" header-align="center" align="center" label="是否失效" width="80">
+      <el-table-column prop="flag" header-align="center" align="center" label="是否有效" width="80">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.flag === 1" size="small">是</el-tag>
-          <el-tag v-else size="small" type="danger">否</el-tag>
+          <el-tag v-if="scope.row.flag === 1" size="small">否</el-tag>
+          <el-tag v-else size="small" type="danger">是</el-tag>
         </template>
       </el-table-column>
       <el-table-column header-align="center" align="center" label="操作" width="260">

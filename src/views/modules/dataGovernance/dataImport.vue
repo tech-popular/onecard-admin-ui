@@ -8,11 +8,21 @@
         <el-date-picker v-model="dataForm.createTime" type="datetimerange" range-separator="至" format="yyyy-MM-dd HH:mm:ss" start-placeholder="开始时间" end-placeholder="结束时间"></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="getDataList()">查询</el-button>
         <el-button @click="resetHandle">重置</el-button>
-        <el-upload class="upload-excel" ref="upload" action="aaa" accept=".xlsx, .xls" :on-change="handleChange" :show-file-list="false" :auto-upload="false">
-          <el-button type="primary">点击上传</el-button>
-        </el-upload>
+        <el-button type="primary" @click="getDataList()">查询</el-button>
+        <el-popover placement="top" width="300" v-model="visible">
+          <el-form-item label="上传模式: ">
+            <el-radio v-model="dataForm.type" label="0">全量</el-radio>
+            <el-radio v-model="dataForm.type" label="1" style="margin-left:5px;">增量</el-radio>
+          </el-form-item>
+          <div style="text-align: right; margin: 0">
+            <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+            <el-upload class="upload-excel" ref="upload" action="aaa" accept=".xlsx, .xls" :on-change="handleChange" :show-file-list="false" :auto-upload="false">
+              <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
+            </el-upload>
+          </div>
+          <el-button slot="reference" type="success">点击上传</el-button>
+        </el-popover>
         <el-button type="primary" class="btn-download" icon="el-icon-download">
           <a :href="templateUrl">下载模板</a>
         </el-button>
@@ -57,8 +67,10 @@ export default {
     return {
       dataForm: {
         creator: '',
-        createTime: ''
+        createTime: '',
+        type: ''
       },
+      visible: false,
       dataList: [],
       pageIndex: 1,
       pageSize: 10,
@@ -96,22 +108,23 @@ export default {
     handleChange (file) {
       // 上传文件之前的事件
       let extension = file.name.substring(file.name.lastIndexOf('.') + 1)
-      let size = file.size / 1024 / 1024
+      // let size = file.size / 1024 / 1024
       if (extension !== 'xlsx') {
         this.$message.warning({
           title: '警告',
           message: `只能上传Excel2017（即后缀是.xlsx）的文件`
         })
       }
-      if (size > 10) {
-        this.$message.warning({
-          title: '警告',
-          message: `文件大小不得超过10M`
-        })
-      }
+      // if (size > 10) {
+      //   this.$message.warning({
+      //     title: '警告',
+      //     message: `文件大小不得超过10M`
+      //   })
+      // }
       const form = new FormData()
+      // form.append('type', this.dataForm.type)
       form.append('file', file.raw, file.name)
-      biExcelUpload(form).then(({ data }) => {
+      biExcelUpload(this.dataForm.type, form).then(({ data }) => {
         if (data.code === 0) {
           this.$message({
             message: '上传成功',
@@ -119,9 +132,11 @@ export default {
             duration: 1500,
             onClose: () => {
               this.getDataList()
+              this.dataForm.type = ''
             }
           })
         } else {
+          this.dataForm.type = ''
           this.$message.error(data.msg)
         }
       })
@@ -130,6 +145,7 @@ export default {
     resetHandle () {
       this.dataForm.creator = ''
       this.dataForm.createTime = ''
+      this.dataForm.type = ''
     },
     // 每页数
     sizeChangeHandle (val) {
