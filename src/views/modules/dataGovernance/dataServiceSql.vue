@@ -7,23 +7,14 @@
             <div v-for="(item, index) in sqlList" :key="index">
               <span style="font-style: normal; font-size: 16px;cursor:pointer;margin-right:20px" @click="clicksqlTitle(item.sqlTitle, index)">名称：{{item.sqlTitle}}</span>
               <span style="float: right">
-                <i class="el-icon-close cursor-pointer" v-if="!baseForm.id || (baseForm.id && baseForm.exportType !== 'once')" @click="deletesqlTitle(item, index)"></i>
+                <i class="el-icon-close cursor-pointer" v-if="!editAble" @click="deletesqlTitle(item, index)"></i>
               </span>
             </div>
           </el-collapse-item>
         </el-collapse>
       </div>
       <div style="width:70%">
-        <el-form
-          v-loading="loading"
-          :disabled="!!baseForm.id && baseForm.exportType === 'once'"
-          :model="sqlAddData"
-          :rules="sqlAddDataRule"
-          label-position="right"
-          label-width="110px"
-          ref="sqlAddData"
-          class="base-form"
-        >
+        <el-form v-loading="loading" :disabled="editAble" :model="sqlAddData" :rules="sqlAddDataRule" label-position="right" label-width="110px" ref="sqlAddData" class="base-form">
           <div style="display:flex">
             <el-form-item prop="datasourceId" label="数据源：">
               <el-select filterable v-model="sqlAddData.datasourceId" placeholder="请选择" clearable @change="selectdatabaseDataList">
@@ -59,7 +50,7 @@
             </el-form-item>
             <el-form-item label-width="20px">
               <el-button :disabled="dataSqlSubmiting" type="success" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
-              <el-button @click="SqlAddSubmit()" v-if="!baseForm.id || (!!baseForm.id && baseForm.exportType !== 'once')" type="primary" size="medium">保存</el-button>
+              <el-button @click="SqlAddSubmit()" v-if="!editAble" type="primary" size="medium">保存</el-button>
             </el-form-item>
           </div>
           <el-form-item v-if="previewing" label-width="70px">
@@ -72,16 +63,7 @@
           </el-form-item>
         </el-form>
         <div>
-          <el-form
-            v-loading="loading"
-            :disabled="!!baseForm.id && baseForm.exportType === 'once'"
-            :model="baseForm"
-            :rules="baseRule"
-            label-position="right"
-            label-width="130px"
-            ref="baseForm"
-            class="base-form"
-          >
+          <el-form v-loading="loading" :disabled="editAble" :model="baseForm" :rules="baseRule" label-position="right" label-width="130px" ref="baseForm" class="base-form">
             <el-form-item label="接收方式；" prop="receiveType">
               <el-radio v-model="baseForm.receiveType" label="0">钉钉</el-radio>
               <el-radio v-model="baseForm.receiveType" label="1" style="margin-left:5px;">邮件</el-radio>
@@ -132,7 +114,7 @@
       </div>
     </div>
     <div class="sql-footer">
-      <el-button type="primary" v-if="!baseForm.id || (!!baseForm.id && baseForm.exportType !== 'once')" @click="severDataFormSubmit" size="small">立即申请</el-button>
+      <el-button type="primary" v-if="!editAble" @click="severDataFormSubmit" size="small">立即申请</el-button>
     </div>
   </div>
 </template>
@@ -161,6 +143,7 @@ export default {
       dataSqlSubmiting: false,
       dataSqlSubmitTime: 0,
       checkUserHaveHtmlVisible: false,
+      editAble: false,
       timer: null,
       baseForm: {
         id: '',
@@ -287,24 +270,30 @@ export default {
   },
   components: { codemirror },
   activated () {
-    if (this.$route.query.id) {
-      this.lookTaskDetail(this.$route.query.id)
-    } else {
-      this.baseForm.id = 0
-      this.sqlList = []
-      this.$refs['sqlAddData'].resetFields()
-      this.$refs['baseForm'].resetFields()
-    }
-    this.getSourceDataList()
-    this.getUsersList()
-    this.checkUserHaveHtmlHandle()
-    this.sqlPreviewDataList = []
-    this.previewing = false
-    this.previewText = ''
-    this.dataSqlSubmiting = false
-    this.sqlSubmitSuccess = false
+    this.reload()
   },
   methods: {
+    reload () {
+      this.editAble = false
+      this.$refs['sqlAddData'].resetFields()
+      this.$refs['baseForm'].resetFields()
+      if (this.$route.query.id) {
+        this.lookTaskDetail(this.$route.query.id)
+      } else {
+        this.baseForm.id = 0
+        this.sqlList = []
+        this.baseForm.period = ''
+        this.baseForm.receiveDays = ''
+      }
+      this.getSourceDataList()
+      this.getUsersList()
+      this.checkUserHaveHtmlHandle()
+      this.sqlPreviewDataList = []
+      this.previewing = false
+      this.previewText = ''
+      this.dataSqlSubmiting = false
+      this.sqlSubmitSuccess = false
+    },
     lookTaskDetail (id) {
       taskDetail(id).then(({ data }) => {
         if (data && data.code === 0) {
@@ -314,7 +303,7 @@ export default {
           this.baseForm.approveReason = data.data.approveReason
           this.baseForm.exportType = data.data.exportType
           this.baseForm.period = data.data.period
-          this.baseForm.receiveDays = data.data.receiveDays
+          this.baseForm.receiveDays = data.data.period === 'month' || data.data.period === 'hours' ? Number(data.data.receiveDays) : data.data.receiveDays
           this.baseForm.receiver = data.data.receiver.split(',')
           this.baseForm.receiveType = data.data.receiveType.toString()
           this.baseForm.receiveContentType = data.data.receiveContentType.toString()
@@ -337,6 +326,7 @@ export default {
             let tempArry = []
             if (this.baseForm.period === 'day') {
               tempArry.push({ value: '1', label: '每天' })
+              this.baseForm.receiveDays = '1'
             } else if (this.baseForm.period === 'hours') {
               for (let i = 1, j = 24; i < j; i++) {
                 tempArry.push({ value: i, label: '每隔' + i + '小时' })
@@ -353,6 +343,8 @@ export default {
               this.receiveDaysList = tempArry
             }
             // this.disTimeTurnOff(this.baseForm.period)
+          } else {
+            this.editAble = true
           }
         } else {
           this.$message({
@@ -609,8 +601,8 @@ export default {
           'receiveContentType': Number(this.baseForm.receiveContentType),
           'approveReason': this.baseForm.approveReason,
           'exportType': this.baseForm.exportType,
-          'period': this.baseForm.period,
-          'receiveDays': this.baseForm.period === 'day' ? '' : this.baseForm.receiveDays,
+          'period': this.baseForm.exportType === 'once' ? '' : this.baseForm.period,
+          'receiveDays': this.baseForm.exportType === 'once' ? '' : (this.baseForm.period === 'day' ? '' : this.baseForm.receiveDays),
           'receiveStartTime': this.baseForm.receiveTime[0],
           'receiveEndTime': this.baseForm.receiveTime[1],
           'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
@@ -628,9 +620,9 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.sqlList = []
-                  this.$refs['sqlAddData'].resetFields()
-                  this.$refs['baseForm'].resetFields()
+                  const path = this.$route.path // 先获取路由路径
+                  this.$router.push(path) // 再跳转路由路径，query参数没带，被清除掉
+                  this.reload()
                 }
               })
             } else {
@@ -645,9 +637,7 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.sqlList = []
-                  this.$refs['sqlAddData'].resetFields()
-                  this.$refs['baseForm'].resetFields()
+                  this.reload()
                 }
               })
             } else {
