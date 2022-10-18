@@ -16,7 +16,7 @@
       <div style="width:70%">
         <el-form
           v-loading="loading"
-          :disabled="baseForm.id && baseForm.exportType === 'once'"
+          :disabled="!!baseForm.id && baseForm.exportType === 'once'"
           :model="sqlAddData"
           :rules="sqlAddDataRule"
           label-position="right"
@@ -59,7 +59,7 @@
             </el-form-item>
             <el-form-item label-width="20px">
               <el-button :disabled="dataSqlSubmiting" type="success" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
-              <el-button @click="SqlAddSubmit()" v-if="!baseForm.id || (baseForm.id && baseForm.exportType !== 'once')" type="primary" size="medium">保存</el-button>
+              <el-button @click="SqlAddSubmit()" v-if="!baseForm.id || (!!baseForm.id && baseForm.exportType !== 'once')" type="primary" size="medium">保存</el-button>
             </el-form-item>
           </div>
           <el-form-item v-if="previewing" label-width="70px">
@@ -74,7 +74,7 @@
         <div>
           <el-form
             v-loading="loading"
-            :disabled="baseForm.id && baseForm.exportType === 'once'"
+            :disabled="!!baseForm.id && baseForm.exportType === 'once'"
             :model="baseForm"
             :rules="baseRule"
             label-position="right"
@@ -132,7 +132,7 @@
       </div>
     </div>
     <div class="sql-footer">
-      <el-button type="primary" v-if="!baseForm.id || (baseForm.id && baseForm.exportType !== 'once')" @click="severDataFormSubmit" size="small">立即申请</el-button>
+      <el-button type="primary" v-if="!baseForm.id || (!!baseForm.id && baseForm.exportType !== 'once')" @click="severDataFormSubmit" size="small">立即申请</el-button>
     </div>
   </div>
 </template>
