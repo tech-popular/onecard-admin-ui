@@ -57,7 +57,7 @@
             <el-form-item label="SQL名称：" prop="sqlTitle">
               <el-input v-model="sqlAddData.sqlTitle" type="text" maxlength="50" style="width:500px"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item label-width="20px">
               <el-button :disabled="dataSqlSubmiting" type="success" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
               <el-button @click="SqlAddSubmit()" v-if="!baseForm.id || (baseForm.id && baseForm.exportType !== 'once')" type="primary" size="medium">保存</el-button>
             </el-form-item>

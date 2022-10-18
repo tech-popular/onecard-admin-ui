@@ -21,7 +21,7 @@
               <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
             </el-upload>
           </div>
-          <el-button slot="reference">点击上传</el-button>
+          <el-button slot="reference" type="success">点击上传</el-button>
         </el-popover>
         <el-button type="primary" class="btn-download" icon="el-icon-download">
           <a :href="templateUrl">下载模板</a>
