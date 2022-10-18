@@ -89,7 +89,7 @@
             <el-form-item label="接收内容类型：" prop="receiveContentType">
               <el-radio v-model="baseForm.receiveContentType" label="1" @change="receiveContentTypeChange">图片</el-radio>
               <el-radio v-model="baseForm.receiveContentType" label="2" style="margin-left:5px;">Excel</el-radio>
-              <el-radio v-model="baseForm.receiveContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveType === '0'" @change="receiveContentTypeChange" label="3" style="margin-left:5px;">HTML</el-radio>
+              <el-radio v-model="baseForm.receiveContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveType === '1'" @change="receiveContentTypeChange" label="3" style="margin-left:5px;">HTML</el-radio>
             </el-form-item>
             <el-form-item label="发送频率：" prop="exportType">
               <el-radio v-model="baseForm.exportType" label="once">一次性</el-radio>
@@ -513,7 +513,7 @@ export default {
     },
     // 接受内容方式
     receiveContentTypeChange (label) {
-      if (label === '1') {
+      if (label === '1' || label === '3') {
         return this.$message.warning('如果数据量超过1000条请使用Excel')
       }
     },
