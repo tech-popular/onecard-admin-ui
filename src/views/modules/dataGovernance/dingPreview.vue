@@ -39,15 +39,16 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           let reportData = data.data
-          let columnsData = Object.keys(reportData[0])
-          columnsData.forEach(item => {
+          let columnsData = Object.keys(reportData[0][0])
+          console.log(reportData[0])
+          columnsData.forEach((item, index) => {
             this.columns.push({
               label: item,
               prop: item,
               align: 'center'
             })
           })
-          this.dataList = reportData
+          this.dataList = reportData[0]
           this.dataListLoading = false
         } else {
           this.dataList = []

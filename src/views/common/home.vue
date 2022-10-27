@@ -170,7 +170,7 @@ export default {
         {
           name: '新BI系统',
           img: require('../../assets/img/newBI.png'),
-          url: originHost + '/bi/#/'
+          url: '/proxyApi/sys/redirect?token=' + this.$cookie.get('token')
           // url: 'https://tech.9f.cn/bi/#/'
           // url: 'http://10.3.0.50:3088/#/'
         }
