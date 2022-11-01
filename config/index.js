@@ -15,7 +15,6 @@ module.exports = {
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
       '/proxyApi': {
         target: 'http://test02.bigdata.9f.cn/canary-admin',
-        // target: 'http://task.sk.9f.cn/canary-admin',
         changeOrigin: true,
         pathRewrite: {
           '^/proxyApi': '/'
