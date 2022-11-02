@@ -34,7 +34,7 @@
       <el-col :span="12" v-for="(item, index) in seriesData" :key="index" class="order-echarts-col">
         <el-card shadow="never" class="order-echarts-card" v-if="isShowData(item)">
           <div style="width: 100%; display:flex; justify-content: end;height:30px;">
-            <el-buttonv-if="item.indicatorsType === 'bar' && ((item.fieldType !== 'string' && item.fieldType !== '') || !item.enumTypeNum)"  type="text" @click="tagsGroupHandle(item)" size="small">编辑分组</el-button>
+            <el-button v-if="item.indicatorsType === 'bar' && ((item.fieldType !== 'string' && item.fieldType !== '') || !item.enumTypeNum)"  type="text" @click="tagsGroupHandle(item)" size="small">编辑分组</el-button>
           </div>
           <div :id="'echart-' + item.id" class="echart"></div>
         </el-card>
