@@ -48,8 +48,8 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" v-if=" authHandle(scope.row) && scope.row.type === 0 && scope.row.exportType === 'once' && scope.row.status === 0" @click="addOrUpdateHandle(scope.row.id)">查看</el-button>
-          <el-button type="text" size="small" v-if=" authHandle(scope.row) && scope.row.type === 0 && scope.row.exportType === 'period' && scope.row.status === 0" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" v-if=" authHandle(scope.row) && scope.row.type === 0" @click="addOrUpdateHandle(scope.row.id)">查看</el-button>
+          <el-button type="text" size="small" v-if=" authHandle(scope.row) && scope.row.type === 0 && scope.row.status === 0" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="dispatchConfig(scope.row)" v-if="scope.row.type === 0 && scope.row.exportType === 'period' && scope.row.status === 0">配置调度</el-button>
           <el-button type="text" size="small" v-if="authHandle(scope.row) && scope.row.type === 0 " @click="upOrDownHandle(scope.row)">{{scope.row.status === 0 ? '上线' : '下线'}}</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
