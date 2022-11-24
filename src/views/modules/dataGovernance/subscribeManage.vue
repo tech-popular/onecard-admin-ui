@@ -16,6 +16,7 @@
           <el-option label="已上线" value="1"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item>
         <el-button type="primary" @click="searchData()">查询</el-button>
         <el-button type="primary" v-if="isAdmin" @click="multiTaskPermission()">批量授权</el-button>
       </el-form-item>
