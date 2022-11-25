@@ -50,7 +50,7 @@
             </el-form-item>
             <el-form-item label-width="20px">
               <el-button :disabled="dataSqlSubmiting" type="success" size="medium" @click="dataSqlSubmit()">执行验证</el-button>
-              <el-button @click="SqlAddSubmit()" v-if="!editAble" type="primary" size="medium">保存</el-button>
+              <el-button @click="SqlAddSubmit()" v-if="!editAble" type="primary" size="medium">添加</el-button>
             </el-form-item>
           </div>
           <el-form-item v-if="previewing" label-width="70px">
@@ -114,7 +114,7 @@
       </div>
     </div>
     <div class="sql-footer">
-      <el-button type="primary" v-if="!editAble" @click="severDataFormSubmit" size="small">立即申请</el-button>
+      <el-button type="primary" v-if="!editAble" @click="severDataFormSubmit" size="small">保存</el-button>
     </div>
   </div>
 </template>
@@ -298,6 +298,7 @@ export default {
       taskDetail(id).then(({ data }) => {
         if (data && data.code === 0) {
           this.baseForm.id = data.data.id
+          this.baseForm.status = data.data.status
           // this.baseForm.datasourceId = data.data.datasourceId
           // this.baseForm.databaseId = data.data.databaseId
           this.baseForm.approveReason = data.data.approveReason
@@ -322,7 +323,7 @@ export default {
           this.baseForm.receiveTime = [data.data.receiveStartTime, data.data.receiveEndTime]
           this.baseForm.headUser = data.data.headUser
           this.getDatabaseList()
-          if (this.baseForm.exportType === 'period') {
+          if (this.baseForm.status === 0) {
             let tempArry = []
             if (this.baseForm.period === 'day') {
               tempArry.push({ value: '1', label: '每天' })
@@ -342,7 +343,7 @@ export default {
             } else {
               this.receiveDaysList = tempArry
             }
-            // this.disTimeTurnOff(this.baseForm.period)
+            this.disTimeTurnOff(this.baseForm.period)
           } else {
             this.editAble = true
           }
