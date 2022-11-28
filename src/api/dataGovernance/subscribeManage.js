@@ -17,3 +17,5 @@ export const queryDenpendJob = id => httpGet(da + `data/governance/queryDependJo
 export const honeycombTasks = params => httpGet(da + 'data/governance/dispatchDepend/honeycombTasks', params) // 查看蜂巢调度任务
 export const oldDispatchTasks = params => httpGet(da + 'data/governance/dispatchDepend/oldDispatchTasks', params) // 查看老调度任务
 export const checkUserHaveHtml = () => httpGet(da + 'data/governance/checkUserHaveHtmlButton') // 订阅列表
+
+export const watchHistorySql = id => httpGet(da + `export/data/sql/sqlHistoryList/${id}`) // 订阅列表
