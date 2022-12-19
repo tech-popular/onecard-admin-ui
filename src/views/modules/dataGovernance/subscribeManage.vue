@@ -191,6 +191,9 @@
           <el-button type="text" size="small" @click="historySql(scope.row)"
             >历史SQL</el-button
           >
+          <el-button type="text" size="small" @click="takeEffect(scope.row)"
+            >立即触发</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -225,13 +228,35 @@
     <!-- Table -->
     <el-dialog title="历史sql列表" :visible.sync="dialogTableVisible">
       <el-table :data="historySqlList">
-        <el-table-column property="id" label="ID"  width="60"></el-table-column>
-        <el-table-column property="sqlTitle" label="sql标题" width="120"></el-table-column>
-        <el-table-column property="sql" label="sql语句" width="300"></el-table-column>
-        <el-table-column property="dataJobId" label="订阅任务ID"  width="120"></el-table-column>
-        <el-table-column property="sqlBatchId" label="sql批次ID" width="120"></el-table-column>
-        <el-table-column property="datasourceId" label="数据源ID"></el-table-column>
-        <el-table-column property="databaseId" label="数据库ID"></el-table-column>
+        <el-table-column property="id" label="ID" width="60"></el-table-column>
+        <el-table-column
+          property="sqlTitle"
+          label="sql标题"
+          width="120"
+        ></el-table-column>
+        <el-table-column
+          property="sql"
+          label="sql语句"
+          width="300"
+        ></el-table-column>
+        <el-table-column
+          property="dataJobId"
+          label="订阅任务ID"
+          width="120"
+        ></el-table-column>
+        <el-table-column
+          property="sqlBatchId"
+          label="sql批次ID"
+          width="120"
+        ></el-table-column>
+        <el-table-column
+          property="datasourceId"
+          label="数据源ID"
+        ></el-table-column>
+        <el-table-column
+          property="databaseId"
+          label="数据库ID"
+        ></el-table-column>
       </el-table>
     </el-dialog>
   </div>
@@ -242,7 +267,7 @@
 }
 </style>
 <script>
-import { getList, subscriptionUpAndDown, watchHistorySql, updateSubscriptionAuth, batchUpdateSubscriptionAuth } from '@/api/dataGovernance/subscribeManage'
+import { getList, subscriptionUpAndDown, watchHistorySql, periodImmediateStartAPI, updateSubscriptionAuth, batchUpdateSubscriptionAuth } from '@/api/dataGovernance/subscribeManage'
 import addOrUpdate from './subscribeManage-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import AssignPermission from '../../components/permission/assign-permission'
@@ -280,6 +305,32 @@ export default {
   mounted() {
   },
   methods: {
+    takeEffect(item) {
+      if (item.status !== 0) {
+        this.$message({
+          message: '请下线后立即触发！',
+          type: 'error'
+        })
+        return
+      }
+      console.log(item)
+      periodImmediateStartAPI({
+        id: item.id,
+        periodImmediateStatus: item.status
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '立即触发成功！',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: data.msg || '数据异常',
+            type: 'error'
+          })
+        }
+      })
+    },
     historySql(item) {
       watchHistorySql(item.id).then(({ data }) => {
         if (data && data.code === 0) {
@@ -287,7 +338,7 @@ export default {
           this.dialogTableVisible = true
         } else {
           this.$message({
-            message: data.message || '数据异常',
+            message: data.msg || '数据异常',
             type: 'error'
           })
         }
@@ -305,7 +356,6 @@ export default {
         'pageSize': this.pageSize
       }
       getList(params).then(({ data }) => {
-        console.log('res: ', data)
         if (data.code === 0 && data.data) {
           this.dataList = data.data.list
           this.totalPage = data.data.totalCount
