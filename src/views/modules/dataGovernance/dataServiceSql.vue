@@ -104,10 +104,10 @@
               <el-input v-model="baseForm.approveReason" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
             </el-form-item>
             <el-form-item label="前描述：" prop="describePre">
-              <el-input v-model="baseForm.describePre" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
+              <el-input v-model="baseForm.describePre" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="1000"></el-input>
             </el-form-item>
             <el-form-item label="后描述：" prop="describeAfter">
-              <el-input v-model="baseForm.describeAfter" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="200"></el-input>
+              <el-input v-model="baseForm.describeAfter" type="textarea" show-word-limit :autosize="{ minRows: 2}" maxlength="1000"></el-input>
             </el-form-item>
           </el-form>
         </div>
