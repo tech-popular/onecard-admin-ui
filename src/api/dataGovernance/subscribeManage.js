@@ -18,4 +18,6 @@ export const honeycombTasks = params => httpGet(da + 'data/governance/dispatchDe
 export const oldDispatchTasks = params => httpGet(da + 'data/governance/dispatchDepend/oldDispatchTasks', params) // 查看老调度任务
 export const checkUserHaveHtml = () => httpGet(da + 'data/governance/checkUserHaveHtmlButton') // 订阅列表
 
-export const watchHistorySql = id => httpGet(da + `export/data/sql/sqlHistoryList/${id}`) // 订阅列表
+export const watchHistorySql = id => httpGet(da + `export/data/sql/sqlHistoryList/${id}`) // 查看历史sql
+
+export const periodImmediateStartAPI = params => httpPost(da + `/data/governance/periodImmediateStart`, params) // 立即处罚
