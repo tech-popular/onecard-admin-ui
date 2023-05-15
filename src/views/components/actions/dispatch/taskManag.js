@@ -12,11 +12,11 @@ export const models = {
       label: '全部',
       value: -1
     }, {
-      label: '同步任务',
-      value: 'ACQUISITION'
+      label: 'Trino任务',
+      value: 'TRINO'
     }, {
-      label: '计算任务',
-      value: 'CALCULATE'
+      label: 'DBT任务',
+      value: 'DBT'
     }]
     let typeProps = {
       label: 'label',
@@ -220,6 +220,12 @@ export const models = {
           }
         },
         {
+          prop: 'tag',
+          label: 'Tag',
+          width: '120px',
+          align: 'center'
+        },
+        {
           prop: 'createTime',
           label: '任务创建时间',
           width: '120px',
@@ -301,6 +307,13 @@ export const models = {
         },
         {
           type: 'Input',
+          label: 'Tag',
+          prop: 'tag',
+          width: '300px',
+          placeholder: 'Tag'
+        },
+        {
+          type: 'Input',
           label: '创建人',
           prop: 'user',
           width: '300px',
@@ -332,15 +345,15 @@ export const models = {
           }
         },
         // {label: '新增采集任务', type: 'primary', handle: () => { this.addOrUpdateHandle() }},
+        // {
+        //   label: '新增同步任务',
+        //   type: 'warning',
+        //   handle: () => {
+        //     this.addOrUpdateHandle()
+        //   }
+        // },
         {
-          label: '新增同步任务',
-          type: 'warning',
-          handle: () => {
-            this.addOrUpdateHandle()
-          }
-        },
-        {
-          label: '新增计算任务',
+          label: '新增Trino任务',
           type: 'success',
           handle: () => {
             this.computAddOrUpdateHandle()
@@ -369,6 +382,7 @@ export const models = {
         'pageSize': this.pageSize,
         'id': this.searchData.id,
         'name': this.searchData.name,
+        'tag': this.searchData.tag,
         'type': this.searchData.type === -1 ? '' : this.searchData.type,
         'user': this.searchData.user,
         'status': this.searchData.status === -1 ? '' : this.searchData.status,

@@ -7,9 +7,9 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑计算任务' : '新增计算任务' : '查看计算任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑Trino任务' : '新增Trino任务' : '查看Trino任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
-      <h3 id="title">作业信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
+      <h3 id="title">任务信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
@@ -26,6 +26,11 @@
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="Tag" prop="tag">
+          <el-select v-model="dataForm.projectId" placeholder="Tag" style="width: 400px" filterable>
+            <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in tagList" :key="index"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="任务描述" prop="taskDescribe">
           <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" />
         </el-form-item>
@@ -38,7 +43,7 @@
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
-          <div class="work-type-pane">
+          <!-- <div class="work-type-pane">
             <el-form-item label="作业类型" prop="jobType" label-width="120px">
               <el-select v-model="item.jobType" placeholder="请选择数据源类型" @change="val => dataSourceTypeChange(index, val)" filterable>
                 <el-option :label="citem.name" :value="citem.name" v-for="(citem, cindex) in allDatasourceList" :key="cindex"></el-option>
@@ -64,7 +69,7 @@
                 （如需配置账户，请<i style="font-style: normal;color:blue;cursor:pointer" @click="gotoDataSource">点击</i>）
               </span>
             </el-form-item>
-          </div>
+          </div> -->
           <el-form-item label="作业描述" prop="jobDescribe" label-width="120px">
             <el-input type="textarea" v-model="item.jobDescribe" placeholder="作业描述" />
           </el-form-item>
@@ -107,9 +112,9 @@
               <el-radio :label="1">无效</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="任务需求人：" prop="requestedUser" label-width="200px">
+          <!-- <el-form-item label="任务需求人：" prop="requestedUser" label-width="200px">
             <el-input v-model="dataForm.requestedUser" placeholder="任务需求人" />
-          </el-form-item>
+          </el-form-item> -->
         </div>
       </el-form>
     </div>
@@ -148,7 +153,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, projectAll, dataSourceAll, accountAll } from '@/api/dispatch/taskManag'
+import { info, save, update, projectAll } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
 import diff from '@/assets/js/diff.min.js'
 import 'codemirror/lib/codemirror.css'
@@ -175,7 +180,7 @@ export default {
         authOtherList: [],
         authOthers: ''
       },
-      formDs: 'mc',
+      formDs: 'trino',
       updateUser: '',
       updateTime: '',
       dataForm: {},
@@ -183,9 +188,10 @@ export default {
         taskName: '',
         id: '',
         projectId: '',
+        tag: '',
         taskDescribe: '',
         taskDisable: 0,
-        requestedUser: '',
+        // requestedUser: '',
         failRepeatTrigger: 3,
         isRunAgain: 0
       },
@@ -193,13 +199,13 @@ export default {
       tempCalculateTasks: [
         {
           jobNo: 1,
-          jobType: '',
-          datasourceId: '',
-          accountId: '',
+          // jobType: '',
+          // datasourceId: '',
+          // accountId: '',
           jobDescribe: '',
           jobSql: '',
-          allDatasourceNameList: [],
-          allAccountList: [],
+          // allDatasourceNameList: [],
+          // allAccountList: [],
           placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
         }
       ],
@@ -210,24 +216,27 @@ export default {
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
         ],
+        tag: [
+          { required: true, message: '请选择Tag', trigger: 'change' }
+        ],
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
-        jobType: [
-          { required: true, message: '请输入作业类型', trigger: 'change' }
-        ],
-        datasourceId: [
-          { required: true, message: '请选择数据源', trigger: 'change' }
-        ],
-        accountId: [
-          { required: true, message: '请选择帐户', trigger: 'change' }
-        ],
+        // jobType: [
+        //   { required: true, message: '请输入作业类型', trigger: 'change' }
+        // ],
+        // datasourceId: [
+        //   { required: true, message: '请选择数据源', trigger: 'change' }
+        // ],
+        // accountId: [
+        //   { required: true, message: '请选择帐户', trigger: 'change' }
+        // ],
         jobSql: [
           { required: true, message: '请输入任务语句', trigger: 'change' }
         ],
-        requestedUser: [
-          { required: true, message: '请输入任务需求人', trigger: 'blur' }
-        ],
+        // requestedUser: [
+        //   { required: true, message: '请输入任务需求人', trigger: 'blur' }
+        // ],
         taskDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ],
@@ -239,7 +248,9 @@ export default {
         ]
       },
       allSystemList: [],
-      allDatasourceList: [],
+      tagList: [],
+
+      // allDatasourceList: [],
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
@@ -298,7 +309,7 @@ export default {
       this.dataForm = deepClone(this.tempDataForm)
       this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
-      this.getAllDatasource()
+      // this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
@@ -317,8 +328,9 @@ export default {
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
+            this.dataForm.tag = data.data.tag
             this.dataForm.taskDisable = data.data.taskDisable
-            this.dataForm.requestedUser = data.data.requestedUser
+            // this.dataForm.requestedUser = data.data.requestedUser
             // 是否重跑判断
             if (data.data.failRepeatTrigger !== 0) {
               this.dataForm.isRunAgain = 0
@@ -328,16 +340,22 @@ export default {
               this.dataForm.failRepeatTrigger = 3
             }
             this.calculateTasks = data.data.calculateTasks
-            this.calculateTasks.forEach((item, index) => {
-              let filterArr = this.allDatasourceList.filter(citem => citem.name === item.jobType)[0]
-              item.allDatasourceNameList = filterArr.source
-              this.getAllAccount(index, data.data.calculateTasks.datasourceId)
-            })
-            let filterInArr = this.allDatasourceList.filter(item => item.name === this.calculateTasks[0].jobType)[0]
-            this.formDs = filterInArr.alias
-            this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
+            // this.calculateTasks.forEach((item, index) => {
+            //   let filterArr = this.allDatasourceList.filter(citem => citem.name === item.jobType)[0]
+            //   item.allDatasourceNameList = filterArr.source
+            //   this.getAllAccount(index, data.data.calculateTasks.datasourceId)
+            // })
+            // let filterInArr = this.allDatasourceList.filter(item => item.name === this.calculateTasks[0].jobType)[0]
+            // this.formDs = filterInArr.alias
+            // this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
           })
         }
+      })
+    },
+    // TODO:
+    getTag () {
+      projectAll().then(({data}) => {
+        this.tagList = data.data
       })
     },
     getAllSystem () {
@@ -345,35 +363,35 @@ export default {
         this.allSystemList = data.data
       })
     },
-    getAllDatasource () {
-      dataSourceAll('CALCULATE', 'IN').then(({data}) => {
-        this.allDatasourceList = data.data
-      })
-    },
-    dataSourceTypeChange (index, val) {
-      this.calculateTasks.datasourceId = ''
-      let filterArr = this.allDatasourceList.filter(item => item.name === val)[0]
-      this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], datasourceId: '', allDatasourceNameList: filterArr.source })
-      if (index === 0) {
-        this.formDs = filterArr.alias
-      }
-    },
-    dataSourceNameChange (index, val) {
-      this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], accountId: '' })
-      this.getAllAccount(index, val)
-    },
-    getAllAccount (index, id) {
-      accountAll({
-        id: id
-      }).then(({data}) => {
-        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], allAccountList: data.data })
-      })
-    },
-    gotoDataSource () {
-      this.visible = false
-      this.$parent.computAddOrUpdateVisible = false
-      this.$router.push({ name: 'dispatch-dataSource' })
-    },
+    // getAllDatasource () {
+    //   dataSourceAll('CALCULATE', 'IN').then(({data}) => {
+    //     this.allDatasourceList = data.data
+    //   })
+    // },
+    // dataSourceTypeChange (index, val) {
+    //   this.calculateTasks.datasourceId = ''
+    //   let filterArr = this.allDatasourceList.filter(item => item.name === val)[0]
+    //   this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], datasourceId: '', allDatasourceNameList: filterArr.source })
+    //   if (index === 0) {
+    //     this.formDs = filterArr.alias
+    //   }
+    // },
+    // dataSourceNameChange (index, val) {
+    //   this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], accountId: '' })
+    //   this.getAllAccount(index, val)
+    // },
+    // getAllAccount (index, id) {
+    //   accountAll({
+    //     id: id
+    //   }).then(({data}) => {
+    //     this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], allAccountList: data.data })
+    //   })
+    // },
+    // gotoDataSource () {
+    //   this.visible = false
+    //   this.$parent.computAddOrUpdateVisible = false
+    //   this.$router.push({ name: 'dispatch-dataSource' })
+    // },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
       this.$parent.computAddOrUpdateVisible = false
@@ -400,7 +418,7 @@ export default {
         return a.jobNo * 1 - b.jobNo * 1
       })
       newWorkForm.forEach((item, index) => {
-        let sqlLineTitle = '<作业序号:' + item.jobNo + ';作业类型:' + item.jobType + '>'
+        let sqlLineTitle = '<作业序号:' + item.jobNo + '>'
         this.sqlLineDist.push(sqlLineTitle)
         this.sqlLineWorkIndex.push(item.jobNo)
         let sqlJob = sqlLineTitle + '\n' + item.jobSql + '\n'
@@ -520,9 +538,9 @@ export default {
     addWork () { // 增加一条作业内容
       this.calculateTasks.push({
         jobNo: '',
-        jobType: '',
-        datasourceId: '',
-        accountId: '',
+        // jobType: '',
+        // datasourceId: '',
+        // accountId: '',
         jobDescribe: '',
         jobSql: '',
         placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
@@ -569,10 +587,10 @@ export default {
           return this.$message.error('作业序号不可重复，请重新填写后再操作')
         }
         console.log(this.dataForm, this.calculateTasks)
-        this.calculateTasks.forEach(item => {
-          item.allDatasourceNameList = []
-          item.allAccountList = []
-        })
+        // this.calculateTasks.forEach(item => {
+        //   item.allDatasourceNameList = []
+        //   item.allAccountList = []
+        // })
         let url = save
         if (this.dataForm.id) {
           url = update
