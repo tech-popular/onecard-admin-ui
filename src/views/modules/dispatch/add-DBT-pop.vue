@@ -7,7 +7,7 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑Trino任务' : '新增Trino任务' : '查看Trino任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑DBT任务' : '新增DBT任务' : '查看DBT任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3 id="title">任务信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
@@ -27,18 +27,38 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Tag" prop="tag">
-          <el-select v-model="dataForm.projectId" placeholder="Tag" style="width: 400px" filterable>
-            <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in tagList" :key="index"></el-option>
+          <el-select v-model="dataForm.tag" placeholder="Tag" style="width: 400px" filterable>
+            <el-option :label="item" :value="item" v-for="(item, index) in tagList" :key="index"></el-option>
           </el-select>
         </el-form-item>
+  
         <el-form-item label="任务描述" prop="taskDescribe">
           <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" />
         </el-form-item>
+        <el-form-item label="目录" prop="gitlabProjectId">
+          <el-select v-model="dataForm.gitlabProjectId" @change="getGitLabDetail"  style="width: 400px" filterable>
+            <el-option :label="item.projectName" :value="item.projectId" v-for="(item, index) in gitLabList" :key="index"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="目录层级" prop="gitlabFileCode">
+          <el-cascader style="width: 100%" clearable ref="gitLabList" v-model="dataForm.gitlabFileCode" :options="gitLabDetialList" :props="menuListTreeProps" @change="parentTreeChange"></el-cascader>
+        </el-form-item>
+        <!-- <el-form-item label="目录层级" prop="gitlabFileCode">
+          <el-select v-model="dataForm.gitlabFileCode" style="width: 400px" filterable>
+            <el-option :label="item.name" :value="item.id" v-for="(item, index) in gitLabDetialList" :key="index"></el-option>
+          </el-select>
+        </el-form-item> -->
+        <el-form-item prop="script">
+          <codemirror
+            ref="mycode"
+            :value="script"
+            :options="cmOptions"
+            @changes="changes"
+            class="code"
+          ></codemirror>
+        </el-form-item>
       </el-form>
-      <div class="btn-code-continue">
-        <el-button type="success" @click="mergeSql">代码连贯模式</el-button>
-      </div>
-      <div class="work-content" v-for="(item, index) in calculateTasks" :key="index">
+      <!-- <div class="work-content" v-for="(item, index) in calculateTasks" :key="index">
         <el-form :model="item" :rules="dataRule" ref="calculateTasks" :disabled="!canUpdate"> 
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
@@ -65,7 +85,7 @@
             <el-button type="danger" @click="deleteWork(index)">删除</el-button>
           </div>
         </el-form>
-      </div>
+      </div> -->
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
@@ -92,40 +112,13 @@
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
-    <el-dialog
-      title="代码连贯模式"
-      :visible.sync="mergeCodeVisible"
-      :modal-append-to-body="true"
-      :close-on-click-modal="false"
-      :append-to-body="true"
-      width="50%"
-    >
-      <div style="position:relative;">
-        <codemirror
-          ref="previewSql"
-          v-model="previewSql"
-          :options="cmOptions"
-          @changes="sqlPreviewChange"
-          @click.native="sqlPreviewFocus"
-          @keydown.native="sqlPreviewKeyDown"
-          class="code"
-          style="border:1px solid #dcdfe6; border-radius: 4px;"
-        ></codemirror>
-        <span style="position:absolute;right: 20px;bottom:-30px;">变动行数: <b style="color:red;">{{updateRowNum}}</b>行</span>
-      </div>
-      <div slot="footer">
-        <el-button @click="mergeCodeVisible = false">取消</el-button>
-        <el-button type="primary" v-if="canUpdate" @click="previewSqlSubmit()">提交</el-button>
-      </div>
-    </el-dialog>
   </el-drawer>
 </template>
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, projectAll } from '@/api/dispatch/taskManag'
+import { info, save, update, getGitLabCatalog, getGitLabProjects, getRawBlobContent, getTagsAPI, projectAll } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
-import diff from '@/assets/js/diff.min.js'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/idea.css'
 import 'codemirror/addon/hint/show-hint.css'
@@ -142,6 +135,7 @@ export default {
   },
   data () {
     return {
+      script: '',
       visible: false,
       mergeCodeVisible: false,
       id: '',
@@ -150,7 +144,12 @@ export default {
         authOtherList: [],
         authOthers: ''
       },
-      formDs: 'trino',
+      menuListTreeProps: {
+        label: 'name',
+        value: 'id',
+        children: 'gitLabDirectoryList'
+      },
+      formDs: 'DBT',
       updateUser: '',
       updateTime: '',
       dataForm: {},
@@ -161,7 +160,6 @@ export default {
         tag: '',
         taskDescribe: '',
         taskDisable: 0,
-        // requestedUser: '',
         failRepeatTrigger: 3,
         isRunAgain: 0
       },
@@ -169,13 +167,8 @@ export default {
       tempCalculateTasks: [
         {
           jobNo: 1,
-          // jobType: '',
-          // datasourceId: '',
-          // accountId: '',
           jobDescribe: '',
           jobSql: '',
-          // allDatasourceNameList: [],
-          // allAccountList: [],
           placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
         }
       ],
@@ -192,21 +185,9 @@ export default {
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
-        // jobType: [
-        //   { required: true, message: '请输入作业类型', trigger: 'change' }
-        // ],
-        // datasourceId: [
-        //   { required: true, message: '请选择数据源', trigger: 'change' }
-        // ],
-        // accountId: [
-        //   { required: true, message: '请选择帐户', trigger: 'change' }
-        // ],
         jobSql: [
           { required: true, message: '请输入任务语句', trigger: 'change' }
         ],
-        // requestedUser: [
-        //   { required: true, message: '请输入任务需求人', trigger: 'blur' }
-        // ],
         taskDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ],
@@ -219,6 +200,8 @@ export default {
       },
       allSystemList: [],
       tagList: [],
+      gitLabList: [],
+      gitLabDetialList: [],
 
       // allDatasourceList: [],
       cmOptions: {
@@ -263,7 +246,7 @@ export default {
   },
   computed: {
     previreCodemirror () {
-      return this.$refs.previewSql.codemirror
+      return this.$refs.mycode.codemirror
     }
   },
   methods: {
@@ -279,6 +262,8 @@ export default {
       this.dataForm = deepClone(this.tempDataForm)
       this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
+      this.getGitLabList()
+      this.getTags()
       // this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
@@ -314,8 +299,29 @@ export default {
         }
       })
     },
-    getTag () {
-      projectAll().then(({data}) => {
+    changes (value) {
+      this.script = this.previreCodemirror.getValue()
+    },
+    getGitLabDetail (item) {
+      console.log(item)
+      getGitLabCatalog(item).then(({data}) => {
+        this.gitLabDetialList = data.data
+      })
+    },
+    getGitLabList () {
+      getGitLabProjects().then(({data}) => {
+        this.gitLabList = data.data
+      })
+    },
+    parentTreeChange (item) {
+      const blobHashCode = item.at(-1)
+      getRawBlobContent({blobHashCode, projectId: this.dataForm.gitlabProjectId}).then(({data}) => {
+        console.log(data)
+        this.script = data.data
+      })
+    },
+    getTags () {
+      getTagsAPI().then(({data}) => {
         this.tagList = data.data
       })
     },
@@ -330,94 +336,6 @@ export default {
     },
     handleChange (val) {
       console.log(val)
-    },
-    mergeSql () { // 代码连贯操作
-      // 判断作业序号是否重复，若重复就报错，不然连贯后再渲染会有问题
-      let indexArr = []
-      this.calculateTasks.forEach(item => {
-        indexArr.push(item.jobNo * 1)
-      })
-      let uniqueIndexArr = Array.from(new Set(indexArr))
-      if (uniqueIndexArr.length < indexArr.length) {
-        return this.$message.error('作业序号不可重复，请重新填写后再操作')
-      }
-      this.previewSql = ''
-      this.sqlLineDist = []
-      this.sqlLineWorkIndex = []
-      this.updateRowNum = 0
-      let newWorkForm = deepClone(this.calculateTasks) // 对数组进行排序
-      newWorkForm.sort((a, b) => {
-        return a.jobNo * 1 - b.jobNo * 1
-      })
-      newWorkForm.forEach((item, index) => {
-        let sqlLineTitle = '<作业序号:' + item.jobNo + '>'
-        this.sqlLineDist.push(sqlLineTitle)
-        this.sqlLineWorkIndex.push(item.jobNo)
-        let sqlJob = sqlLineTitle + '\n' + item.jobSql + '\n'
-        this.previewSql += sqlJob
-      })
-      this.originpreviewSql = this.previewSql
-      this.mergeCodeVisible = true
-    },
-    sqlPreviewChange (line) { // 连贯代码改变时
-      let originArr = this.originpreviewSql.split('\n')
-      let curArr = this.previewSql.split('\n')
-      let changeArry = []
-      let changeNum = 0
-      changeArry = diff.compare(originArr, curArr)
-      let changeArryLen = changeArry.length
-      if (changeArryLen > 0) {
-        changeNum = changeArryLen
-        for (let i = 0, j = changeArryLen; i < j; i++) {
-          let tempnum = changeArry[i][2].length
-          if (tempnum > 1) {
-            changeNum = changeNum + tempnum - 1
-          }
-        }
-      }
-      this.updateRowNum = changeNum
-      // 输入提示
-      if (!this.previewSql) {
-        this.$nextTick(() => {
-          this.$refs.previewSql.codemirror.setOption('lint', false)
-        })
-        return
-      }
-      this.$refs.previewSql.codemirror.setOption('lint', false)
-      this.$nextTick(() => {
-        this.$refs.previewSql.codemirror.setOption('lint', true)
-      })
-    },
-    sqlPreviewKeyDown (event) {
-      const keyCode = event.keyCode || event.which || event.charCode
-      const keyCombination = event.ctrlKey || event.altKey || event.metaKey
-      if (!keyCombination && keyCode > 64 && keyCode < 123) {
-        this.$refs.previewSql.codemirror.showHint({ completeSingle: false })
-      }
-    },
-    sqlPreviewFocus () {
-      this.previewSqlDefaultRow()
-    },
-    previewSqlSubmit () { // 连贯代码提交
-      let sqlValue = this.previewSql
-      let tempValStartIndex = 0
-      let tempValEndIndex = 0
-      let tempValue = null
-      let titleLength = 0
-      for (let i = 0, j = this.sqlLineDist.length; i < j; i++) {
-        titleLength = this.sqlLineDist[i].length + 1 // +1去掉回车
-        tempValStartIndex = sqlValue.indexOf(this.sqlLineDist[i])
-        if (this.sqlLineDist[i + 1] != undefined) {
-          tempValEndIndex = sqlValue.indexOf(this.sqlLineDist[i + 1])
-        } else {
-          tempValEndIndex = sqlValue.length
-        }
-        tempValue = sqlValue.substring(tempValStartIndex + titleLength, tempValEndIndex)
-        let index = this.findIndex(this.sqlLineWorkIndex[i])
-        let tempArr = tempValue.split('\n').filter(item => item !== '') // 把多余的回车去掉
-        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], jobSql: tempArr.join('\n') })
-      }
-      this.mergeCodeVisible = false
     },
     findIndex (n) {
       let i = 0
@@ -455,24 +373,10 @@ export default {
         this.$refs['code-' + index][0].codemirror.showHint({ completeSingle: false })
       }
     },
-    previewSqlDefaultRow () { // 设置每个作业的title不可修改
-      let lineNum = 0
-      let sqlPreFormatArry = []
-      this.previreCodemirror.eachLine(line => {
-        if (line.text.indexOf('<作业序号') > -1) {
-          let strNum = line.text.length
-          this.previreCodemirror.markText({line: lineNum, ch: 0}, {line: lineNum, ch: strNum}, {className: 'styled-background', readOnly: true})
-        }
-        sqlPreFormatArry.push(line.text) // 记录最开始每一行
-        lineNum++
-      })
-    },
+
     addWork () { // 增加一条作业内容
       this.calculateTasks.push({
         jobNo: '',
-        // jobType: '',
-        // datasourceId: '',
-        // accountId: '',
         jobDescribe: '',
         jobSql: '',
         placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
@@ -598,9 +502,7 @@ export default {
     font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono,
       DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   }
-  .btn-code-continue {
-    text-align: right;
-  }
+ 
   .work-content {
     border: 1px #cccccc dashed;
     padding: 20px 20px 10px 0;

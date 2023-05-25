@@ -54,6 +54,7 @@ export const models = {
       addOrUpdateVisible: false,
       dispatchConfigAddOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
+      addDBTVisible: false,
       submitDataApi: updateDispatchTaskAuth,
       submitDataApis: updateDispatchTaskAuths,
       assignPermissionVisible: false,
@@ -344,14 +345,13 @@ export const models = {
             this.resetHandle()
           }
         },
-        // {label: '新增采集任务', type: 'primary', handle: () => { this.addOrUpdateHandle() }},
-        // {
-        //   label: '新增同步任务',
-        //   type: 'warning',
-        //   handle: () => {
-        //     this.addOrUpdateHandle()
-        //   }
-        // },
+        {
+          label: '新增DBT任务',
+          type: 'warning',
+          handle: () => {
+            this.addDBTHandle()
+          }
+        },
         {
           label: '新增Trino任务',
           type: 'success',
@@ -449,6 +449,17 @@ export const models = {
           canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
         }
         this.$refs.computAddOrUpdate.init(id, canUpdate)
+      })
+    },
+    // 新增 / 修改计算任务
+    addDBTHandle(id) {
+      this.addDBTVisible = true
+      this.$nextTick(() => {
+        let canUpdate = true
+        if (!this.isAdmin) {
+          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+        }
+        this.$refs.addDBTRef.init(id, canUpdate)
       })
     },
     // 点击名称跳转到批次

@@ -17,7 +17,7 @@ module.exports = {
         target: 'http://test02.bigdata.9f.cn/canary-admin',
         changeOrigin: true,
         pathRewrite: {
-          '^/proxyApi': '/'
+          '^/proxyApi': ''
         },
       },
       '/gongFeng': {

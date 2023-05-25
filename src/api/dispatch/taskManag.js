@@ -14,6 +14,10 @@ export const save = (params) => httpPost(base + 'dispatch/task/save', params) //
 export const dataSourceAll = (type, flow) => httpGet(base + `dispatch/datasource/supports?taskType=${type}&dataFlow=${flow}`) // 同步及计算任务中的殴打让你源类型下选
 export const accountAll = params => httpPost(base + 'dispatch/account/selectall', params)
 export const projectAll = () => httpPost(base + 'dispatch/project/selectall')
+export const getGitLabProjects = () => httpGet(base + 'gitlab/getGitLabProjects')
+export const getTagsAPI = () => httpGet(base + 'dispatch/task/tag/list')
+export const getGitLabCatalog = (projectId) => httpGet(base + `gitlab/getGitLabCatalog/${projectId}`)
+export const getRawBlobContent = (params) => httpPost(base + `gitlab/getRawBlobContent`, params)
 export const sqlParse = params => httpPostFile(base + 'dispatch/task/sql/parse', params)
 export const taskBatchList = params => httpGet(base + 'dispatch/task/instance/listOnPage', params)
 export const taskExecute = id => httpPut(base + `dispatch/task/${id}/execute`) // 任务执行

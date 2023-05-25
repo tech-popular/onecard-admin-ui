@@ -25,6 +25,12 @@
       ref="computAddOrUpdate"
       @refreshDataList="init"
     />
+        <!-- 弹窗, 新增 / 修改计算任务 -->
+    <AddDBTPop
+      v-if="addDBTVisible"
+      ref="addDBTRef"
+      @refreshDataList="init"
+    />
     <!--调度配置-->
     <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
     <!-- 授权 -->
@@ -37,6 +43,7 @@
 <script>
 import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
+import AddDBTPop from './add-DBT-pop'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import AssignPermission from '../../components/permission/assign-permission'
 import taskManagSnapShot from './taskManag-snap-shot'
@@ -44,6 +51,7 @@ import { models } from '../../components/actions/dispatch/taskManag'
 export default {
   mixins: [models],
   components: {
+    AddDBTPop,
     AddOrUpdate,
     ComputAddOrUpdate,
     dispatchConfigAddOrUpdate,
