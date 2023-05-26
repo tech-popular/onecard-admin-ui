@@ -43,11 +43,7 @@
         <el-form-item label="目录层级" prop="gitlabFileCode">
           <el-cascader style="width: 100%" clearable ref="gitLabList" v-model="dataForm.gitlabFileCode" :options="gitLabDetialList" :props="menuListTreeProps" @change="parentTreeChange"></el-cascader>
         </el-form-item>
-        <!-- <el-form-item label="目录层级" prop="gitlabFileCode">
-          <el-select v-model="dataForm.gitlabFileCode" style="width: 400px" filterable>
-            <el-option :label="item.name" :value="item.id" v-for="(item, index) in gitLabDetialList" :key="index"></el-option>
-          </el-select>
-        </el-form-item> -->
+
         <el-form-item prop="script">
           <codemirror
             ref="mycode"
@@ -58,34 +54,6 @@
           ></codemirror>
         </el-form-item>
       </el-form>
-      <!-- <div class="work-content" v-for="(item, index) in calculateTasks" :key="index">
-        <el-form :model="item" :rules="dataRule" ref="calculateTasks" :disabled="!canUpdate"> 
-          <el-form-item label="作业序号" prop="jobNo" label-width="120px">
-            <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
-          </el-form-item>
-          <el-form-item label="作业描述" prop="jobDescribe" label-width="120px">
-            <el-input type="textarea" v-model="item.jobDescribe" placeholder="作业描述" />
-          </el-form-item>
-          <el-form-item prop="jobSql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
-            <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
-              <codemirror
-                :ref="'code-' + index"
-                v-model="item.jobSql"
-                :options="cmOptions"
-                @changes="cm => workItemChanges(cm, item, 'mycode-' + index, index)"
-                @keydown.native="e => workItemKeyDown(e, index)"
-                class="code"
-                style="padding-bottom: 0px"
-              ></codemirror>
-              <span style="color:#6da7ff; position:absolute;left: 40px;top:4px;">{{item.placeholder}}</span>
-            </div>
-          </el-form-item>
-          <div style="margin-bottom: 10px; text-align: right;">
-            <el-button type="primary" @click="addWork">新增</el-button>
-            <el-button type="danger" @click="deleteWork(index)">删除</el-button>
-          </div>
-        </el-form>
-      </div> -->
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
@@ -129,7 +97,7 @@ require('codemirror/mode/sql/sql.js')
 require('codemirror/addon/hint/show-hint.js')
 require('codemirror/addon/hint/sql-hint.js')
 export default {
-  name: 'codeMirror',
+  name: 'addDBT',
   components: {
     codemirror
   },
@@ -137,14 +105,13 @@ export default {
     return {
       script: '',
       visible: false,
-      mergeCodeVisible: false,
       id: '',
       rowData: { // 修改时数据内容
         authOwner: '',
         authOtherList: [],
         authOthers: ''
       },
-      menuListTreeProps: {
+      menuListTreeProps: { // 目录层级的树形结构配置
         label: 'name',
         value: 'id',
         children: 'gitLabDirectoryList'
@@ -163,15 +130,6 @@ export default {
         failRepeatTrigger: 3,
         isRunAgain: 0
       },
-      calculateTasks: [],
-      tempCalculateTasks: [
-        {
-          jobNo: 1,
-          jobDescribe: '',
-          jobSql: '',
-          placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
-        }
-      ],
       dataRule: {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
@@ -202,8 +160,6 @@ export default {
       tagList: [],
       gitLabList: [],
       gitLabDetialList: [],
-
-      // allDatasourceList: [],
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
@@ -260,11 +216,9 @@ export default {
       this.rowData = id ? deepClone(id) : this.rowData
       this.canUpdate = canUpdate
       this.dataForm = deepClone(this.tempDataForm)
-      this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
       this.getGitLabList()
       this.getTags()
-      // this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
@@ -274,9 +228,6 @@ export default {
           info(this.id).then(({data}) => {
             if (data.code !== 0) {
               return this.$message.error(data.msg || '获取数据异常')
-            }
-            if (!data.data.calculateTasks.length) {
-              return this.$message.error('获取数据异常')
             }
             this.updateUser = data.data.updateUser
             this.updateTime = data.data.updateTime
@@ -294,7 +245,6 @@ export default {
               this.dataForm.isRunAgain = 1
               this.dataForm.failRepeatTrigger = 3
             }
-            this.calculateTasks = data.data.calculateTasks
           })
         }
       })
@@ -334,64 +284,7 @@ export default {
       this.visible = false
       this.$parent.computAddOrUpdateVisible = false
     },
-    handleChange (val) {
-      console.log(val)
-    },
-    findIndex (n) {
-      let i = 0
-      this.calculateTasks.forEach((item, index) => {
-        if (item.jobNo * 1 === n * 1) {
-          i = index
-        }
-      })
-      return i
-    },
-    workItemChanges (cm, item, ref, index) { // 内容更新时，不为空时将报错信息去除
-      let curSql = item.jobSql
-      if (curSql !== '') {
-        this.$refs[ref][0].clearValidate()
-        this.calculateTasks.splice(index, 1, { ...item, placeholder: '' })
-      } else {
-        this.calculateTasks.splice(index, 1, { ...item, placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！' })
-      }
-      if (!curSql) {
-        this.$nextTick(() => {
-          this.$refs['code-' + index][0].codemirror.setOption('lint', false)
-        })
-      } else {
-        this.$refs['code-' + index][0].codemirror.setOption('lint', false)
-        this.$nextTick(() => {
-          this.$refs['code-' + index][0].codemirror.setOption('lint', true)
-        })
-      }
-    },
-    // 按下键盘事件处理函数
-    workItemKeyDown (event, index) {
-      const keyCode = event.keyCode || event.which || event.charCode
-      const keyCombination = event.ctrlKey || event.altKey || event.metaKey
-      if (!keyCombination && keyCode > 64 && keyCode < 123) {
-        this.$refs['code-' + index][0].codemirror.showHint({ completeSingle: false })
-      }
-    },
 
-    addWork () { // 增加一条作业内容
-      this.calculateTasks.push({
-        jobNo: '',
-        jobDescribe: '',
-        jobSql: '',
-        placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
-      })
-      this.updateWorkIndex()
-    },
-    deleteWork (index) { // 删除作业内容
-      this.calculateTasks.splice(index, 1)
-      this.updateWorkIndex()
-    },
-    updateWorkIndex () { // 增加或删除时重新排序
-      this.calculateTasks.forEach((item, index) => {
-        item.jobNo = index + 1
-      })
-    },
     // 提交
     dataFormSubmit (form) {
       let flag = true
@@ -405,28 +298,12 @@ export default {
           flag = false
         }
       })
-      this.$refs['calculateTasks'].forEach(item => {
-        item.validate((valid) => {
-          if (!valid) {
-            flag = false
-          }
-        })
-      })
-      console.log(1, this.dataForm, this.calculateTasks)
       if (flag) {
         let indexArr = []
-        this.calculateTasks.forEach(item => {
-          indexArr.push(item.jobNo * 1)
-        })
         let uniqueIndexArr = Array.from(new Set(indexArr))
         if (uniqueIndexArr.length < indexArr.length) {
           return this.$message.error('作业序号不可重复，请重新填写后再操作')
         }
-        console.log(this.dataForm, this.calculateTasks)
-        // this.calculateTasks.forEach(item => {
-        //   item.allDatasourceNameList = []
-        //   item.allAccountList = []
-        // })
         let url = save
         if (this.dataForm.id) {
           url = update
@@ -438,8 +315,7 @@ export default {
           authOthers: this.rowData.authOthers,
           tenantId: sessionStorage.getItem('tenantId'),
           taskName: `${this.formDs}_${this.dataForm.taskName}`,
-          taskType: 'CALCULATE',
-          calculateTasks: this.calculateTasks
+          taskType: 'CALCULATE'
         }
         if (params.isRunAgain === 0) {
           params.failRepeatTrigger = params.failRepeatTrigger
