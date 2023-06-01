@@ -5,7 +5,7 @@
   window.SITE_CONFIG = {}
 
   // api接口请求地址
-  window.SITE_CONFIG['baseUrl'] = '//localhost:8000/canary-admin' // 测试环境
+  window.SITE_CONFIG['baseUrl'] = '//test02.bigdata.9f.cn/canary-admin' // 测试环境
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain'] = './' // 域名
