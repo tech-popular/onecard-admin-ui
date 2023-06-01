@@ -27,8 +27,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Tag" prop="tag">
-          <el-select v-model="dataForm.projectId" placeholder="Tag" style="width: 400px" filterable>
-            <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in tagList" :key="index"></el-option>
+          <el-select v-model="dataForm.tag" placeholder="Tag" style="width: 400px" filterable allow-create>
+            <el-option :label="item" :value="item" v-for="(item, index) in tagList" :key="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="任务描述" prop="taskDescribe">
@@ -43,8 +43,8 @@
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
-          <el-form-item label="作业描述" prop="jobDescribe" label-width="120px">
-            <el-input type="textarea" v-model="item.jobDescribe" placeholder="作业描述" />
+          <el-form-item label="作业名称" prop="jobName" label-width="120px">
+            <el-input type="textarea" v-model="item.jobName" placeholder="作业名称" />
           </el-form-item>
           <el-form-item prop="jobSql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
@@ -70,19 +70,19 @@
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
-              <el-radio :label="0">是</el-radio>
-              <el-radio :label="1">否</el-radio>
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item prop="failRepeatTrigger" label-width="120px" v-if="dataForm.isRunAgain === 0">
+          <el-form-item prop="failRepeatTrigger" label-width="120px" v-if="dataForm.isRunAgain === 1">
             重跑：<el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
           </el-form-item>
         </div>
         <div class="work-type-pane">
           <el-form-item label="状态：" prop="taskDisable" label-width="120px">
             <el-radio-group v-model="dataForm.taskDisable">
-              <el-radio :label="0">有效</el-radio>
-              <el-radio :label="1">无效</el-radio>
+              <el-radio :label="1">上线</el-radio>
+              <el-radio :label="0">下线</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -123,7 +123,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, projectAll } from '@/api/dispatch/taskManag'
+import { info, save, update, projectAll, tagAll } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
 import diff from '@/assets/js/diff.min.js'
 import 'codemirror/lib/codemirror.css'
@@ -160,10 +160,10 @@ export default {
         projectId: '',
         tag: '',
         taskDescribe: '',
-        taskDisable: 0,
+        taskDisable: 1,
         // requestedUser: '',
         failRepeatTrigger: 3,
-        isRunAgain: 0
+        isRunAgain: 1
       },
       calculateTasks: [],
       tempCalculateTasks: [
@@ -172,11 +172,11 @@ export default {
           // jobType: '',
           // datasourceId: '',
           // accountId: '',
-          jobDescribe: '',
+          jobName: '',
           jobSql: '',
           // allDatasourceNameList: [],
           // allAccountList: [],
-          placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
+          placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
         }
       ],
       dataRule: {
@@ -186,11 +186,14 @@ export default {
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
         ],
-        tag: [
-          { required: true, message: '请选择Tag', trigger: 'change' }
-        ],
+        // tag: [
+        //   { required: true, message: '请选择Tag', trigger: 'change' }
+        // ],
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
+        ],
+        jobName: [
+          { required: true, message: '请输入作业名称', trigger: 'blur' }
         ],
         // jobType: [
         //   { required: true, message: '请输入作业类型', trigger: 'change' }
@@ -279,6 +282,7 @@ export default {
       this.dataForm = deepClone(this.tempDataForm)
       this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
+      this.getTag()
       // this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
@@ -302,20 +306,21 @@ export default {
             this.dataForm.taskDisable = data.data.taskDisable
             // this.dataForm.requestedUser = data.data.requestedUser
             // 是否重跑判断
-            if (data.data.failRepeatTrigger !== 0) {
-              this.dataForm.isRunAgain = 0
-              this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
+            if (data.data.failRepeatTrigger !== 1) {
+                this.dataForm.isRunAgain = 1
+                this.dataForm.failRepeatTrigger = 3
             } else {
-              this.dataForm.isRunAgain = 1
-              this.dataForm.failRepeatTrigger = 3
+                this.dataForm.isRunAgain = 0
+                this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
             }
-            this.calculateTasks = data.data.calculateTasks
+              this.calculateTasks = data.data.calculateTasks
+              this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
           })
         }
       })
     },
     getTag () {
-      projectAll().then(({data}) => {
+        tagAll().then(({data}) => {
         this.tagList = data.data
       })
     },
@@ -434,7 +439,7 @@ export default {
         this.$refs[ref][0].clearValidate()
         this.calculateTasks.splice(index, 1, { ...item, placeholder: '' })
       } else {
-        this.calculateTasks.splice(index, 1, { ...item, placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！' })
+        this.calculateTasks.splice(index, 1, { ...item, placeholder: '请勿在第一行添加注释，否则脚本运行有误！' })
       }
       if (!curSql) {
         this.$nextTick(() => {
@@ -473,9 +478,9 @@ export default {
         // jobType: '',
         // datasourceId: '',
         // accountId: '',
-        jobDescribe: '',
+        jobName: '',
         jobSql: '',
-        placeholder: '请勿在第一行添加注释，否则脚本运行有误！MaxComputer脚本只能有一个SQL语句，且以分号分割！'
+        placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
       })
       this.updateWorkIndex()
     },
@@ -534,7 +539,7 @@ export default {
           authOthers: this.rowData.authOthers,
           tenantId: sessionStorage.getItem('tenantId'),
           taskName: `${this.formDs}_${this.dataForm.taskName}`,
-          taskType: 'CALCULATE',
+          taskType: 'Trino',
           calculateTasks: this.calculateTasks
         }
         if (params.isRunAgain === 0) {

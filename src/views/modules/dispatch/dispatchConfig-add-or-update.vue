@@ -29,7 +29,7 @@
         </el-form-item>
       </el-form>
       <div class="work-content-1">
-        <h3 style="overflow:hidden">新调度任务依赖
+        <h3 style="overflow:hidden">调度任务依赖
           <el-button style="float:right" type="danger" v-if="canUpdate" @click="deleteDependenceHandle">批量删除</el-button>
           <el-button style="float:right;margin-right:20px" v-if="canUpdate" type="primary" @click="addDependenceHandle">新增依赖</el-button>
         </h3>
@@ -52,30 +52,30 @@
           </el-table>
         </div>
       </div>
-            <div class="work-content-1">
-        <h3 style="overflow:hidden">老调度任务依赖
-          <el-button style="float:right" type="danger" v-if="canUpdate" @click="deleteOldDependenceHandle">批量删除</el-button>
-          <el-button style="float:right;margin-right:20px" type="primary" v-if="canUpdate"  @click="addOldDependenceHandle">新增依赖</el-button>
-        </h3>
-        <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
-          <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>
-          <el-table
-            style="flex:1;"
-            ref="multipleTable"
-            :data="dataForm.selectedOldDpendeceList"
-            border
-            @selection-change="handleSelectOldDependenceChange">
-            <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
-            <!-- <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column> -->
-            <el-table-column label="操作" header-align="center" align="center">
-              <template slot-scope="scope">
-                <a style="cursor: pointer" v-if="canUpdate" @click="deleteOldDependenceHandle(scope.row)">删除</a>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-      </div>
+<!--            <div class="work-content-1">-->
+<!--        <h3 style="overflow:hidden">老调度任务依赖-->
+<!--          <el-button style="float:right" type="danger" v-if="canUpdate" @click="deleteOldDependenceHandle">批量删除</el-button>-->
+<!--          <el-button style="float:right;margin-right:20px" type="primary" v-if="canUpdate"  @click="addOldDependenceHandle">新增依赖</el-button>-->
+<!--        </h3>-->
+<!--        <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">-->
+<!--          <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>-->
+<!--          <el-table-->
+<!--            style="flex:1;"-->
+<!--            ref="multipleTable"-->
+<!--            :data="dataForm.selectedOldDpendeceList"-->
+<!--            border-->
+<!--            @selection-change="handleSelectOldDependenceChange">-->
+<!--            <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>-->
+<!--            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>-->
+<!--            &lt;!&ndash; <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column> &ndash;&gt;-->
+<!--            <el-table-column label="操作" header-align="center" align="center">-->
+<!--              <template slot-scope="scope">-->
+<!--                <a style="cursor: pointer" v-if="canUpdate" @click="deleteOldDependenceHandle(scope.row)">删除</a>-->
+<!--              </template>-->
+<!--            </el-table-column>-->
+<!--          </el-table>-->
+<!--        </div>-->
+<!--      </div>-->
       <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" :can-update = "canUpdate" @getStatus="getDispatchStatus" @refreshList="refreshListhandle"></dispatch-config-period>
       <!-- <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id" @refreshList="refreshListhandle"></dispatch-config-alert> -->
       <div class="work-content-1">
@@ -84,13 +84,13 @@
           <div class="work-type-pane">
             <el-form-item label="状态：" prop="dispatchStatus" label-width="100px">
               <el-radio-group v-model="dispatchStatusForm.dispatchStatus">
-                <el-radio :label="0">有效</el-radio>
-                <el-radio :label="1">无效</el-radio>
+                <el-radio :label="1">有效</el-radio>
+                <el-radio :label="0">无效</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="任务责任人：" prop="dutyUser" label-width="200px">
-              <el-input v-model="dispatchStatusForm.dutyUser" placeholder="任务责任人" style="width: 300px" />
-            </el-form-item>
+<!--            <el-form-item label="任务责任人：" prop="dutyUser" label-width="200px">-->
+<!--              <el-input v-model="dispatchStatusForm.dutyUser" placeholder="任务责任人" style="width: 300px" />-->
+<!--            </el-form-item>-->
           </div>
         </el-form>
       </div>
@@ -150,16 +150,18 @@ export default {
         selectedOldDpendeceList: [] // 老调度任务列表
       },
       dispatchStatusForm: {
-        dispatchStatus: 0,
-        dutyUser: ''
+        dispatchStatus: 1
+          // ,
+        // dutyUser: ''
       },
       dataRule: {
         dispatchStatus: [
           { required: true, message: '请选择状态', trigger: 'change' }
-        ],
-        dutyUser: [
-          { required: true, message: '请输入任务责任人', trigger: 'blur' }
         ]
+          // ,
+        // dutyUser: [
+        //   { required: true, message: '请输入任务责任人', trigger: 'blur' }
+        // ]
       },
       dispatchConfigTaskDependentVisible: false,
       dispatchConfigOldTaskDependentVisible: false
@@ -175,7 +177,7 @@ export default {
       }
       this.rowData = id ? deepClone(id) : this.rowData
       this.dispatchStatusForm = {
-        dispatchStatus: 0,
+        dispatchStatus: 1,
         dutyUser: ''
       }
       this.canUpdate = canUpdate
@@ -189,7 +191,7 @@ export default {
           // this.$refs.dispatchConfigAlert.init()
           this.getTaskBaseInfo()
           this.getTaskSelectDependence()
-          this.getOldTaskSelectDependence()
+          // this.getOldTaskSelectDependence()
         }
         this.$refs['dataForm1'].resetFields()
         this.$refs['dispatchStatus'].resetFields()
@@ -210,13 +212,13 @@ export default {
         this.updateTime = data.data.updateTime
         this.updateUser = data.data.updateUser
         let name = data.data.taskName.split('_')
-        if (this.taskType === 'ACQUISITION') {
-          this.preDs = `${name[0]}_to_${name[2]}_`
-          this.dataForm.taskName = name.slice(3).join('_')
-        } else {
+        // if (this.taskType === 'ACQUISITION') {
+        //   this.preDs = `${name[0]}_to_${name[2]}_`
+        //   this.dataForm.taskName = name.slice(3).join('_')
+        // } else {
           this.preDs = `${name[0]}_`
           this.dataForm.taskName = name.slice(1).join('_')
-        }
+        // }
       })
     },
     // 新调度任务依赖列表

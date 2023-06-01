@@ -27,11 +27,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Tag" prop="tag">
-          <el-select v-model="dataForm.tag" placeholder="Tag" style="width: 400px" filterable>
+          <el-select v-model="dataForm.tag" placeholder="Tag" style="width: 400px" filterable allow-create>
             <el-option :label="item" :value="item" v-for="(item, index) in tagList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-  
+
         <el-form-item label="任务描述" prop="taskDescribe">
           <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" />
         </el-form-item>
@@ -40,10 +40,9 @@
             <el-option :label="item.projectName" :value="item.projectId" v-for="(item, index) in gitLabList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="目录层级" prop="gitlabFileCode">
-          <el-cascader style="width: 100%" clearable ref="gitLabList" v-model="dataForm.gitlabFileCode" :options="gitLabDetialList" :props="menuListTreeProps" @change="parentTreeChange"></el-cascader>
+        <el-form-item label="目录层级" prop="gitlabFilePaths">
+          <el-cascader style="width: 100%" clearable ref="gitLabList" v-model="dataForm.gitlabFilePaths" :options="gitLabDetialList" :props="menuListTreeProps" @change="parentTreeChange"></el-cascader>
         </el-form-item>
-
         <el-form-item prop="script">
           <codemirror
             ref="mycode"
@@ -58,19 +57,19 @@
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
-              <el-radio :label="0">是</el-radio>
-              <el-radio :label="1">否</el-radio>
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item prop="failRepeatTrigger" label-width="120px" v-if="dataForm.isRunAgain === 0">
+          <el-form-item prop="failRepeatTrigger" label-width="120px" v-if="dataForm.isRunAgain === 1">
             重跑：<el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
           </el-form-item>
         </div>
         <div class="work-type-pane">
           <el-form-item label="状态：" prop="taskDisable" label-width="120px">
             <el-radio-group v-model="dataForm.taskDisable">
-              <el-radio :label="0">有效</el-radio>
-              <el-radio :label="1">无效</el-radio>
+              <el-radio :label="1">上线</el-radio>
+              <el-radio :label="0">下线</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -113,7 +112,7 @@ export default {
       },
       menuListTreeProps: { // 目录层级的树形结构配置
         label: 'name',
-        value: 'id',
+        value: 'path',
         children: 'gitLabDirectoryList'
       },
       formDs: 'DBT',
@@ -126,9 +125,9 @@ export default {
         projectId: '',
         tag: '',
         taskDescribe: '',
-        taskDisable: 0,
+        taskDisable: 1,
         failRepeatTrigger: 3,
-        isRunAgain: 0
+        isRunAgain: 1
       },
       dataRule: {
         taskName: [
@@ -137,9 +136,9 @@ export default {
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
         ],
-        tag: [
-          { required: true, message: '请选择Tag', trigger: 'change' }
-        ],
+        // tag: [
+        //   { required: true, message: '请选择Tag', trigger: 'change' }
+        // ],
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
@@ -163,6 +162,7 @@ export default {
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
+        readOnly: 'nocursor',
         lineWrapping: true,
         lineNumbers: true,
         autofocus: false,
@@ -216,6 +216,7 @@ export default {
       this.rowData = id ? deepClone(id) : this.rowData
       this.canUpdate = canUpdate
       this.dataForm = deepClone(this.tempDataForm)
+      this.script = ''
       this.getAllSystem()
       this.getGitLabList()
       this.getTags()
@@ -236,15 +237,20 @@ export default {
             this.dataForm.projectId = data.data.projectId
             this.dataForm.tag = data.data.tag
             this.dataForm.taskDisable = data.data.taskDisable
+            this.dataForm.gitlabProjectId = data.data.gitlabProjectId
+            this.getGitLabDetail(this.dataForm.gitlabProjectId)
+            this.dataForm.gitlabFilePaths = data.data.gitlabFilePaths
+            this.parentTreeChange(this.dataForm.gitlabFilePaths)
             // this.dataForm.requestedUser = data.data.requestedUser
             // 是否重跑判断
             if (data.data.failRepeatTrigger !== 0) {
-              this.dataForm.isRunAgain = 0
-              this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
+                this.dataForm.isRunAgain = 1
+                this.dataForm.failRepeatTrigger = 3
             } else {
-              this.dataForm.isRunAgain = 1
-              this.dataForm.failRepeatTrigger = 3
+                this.dataForm.isRunAgain = 0
+                this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
             }
+              this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
           })
         }
       })
@@ -264,8 +270,8 @@ export default {
       })
     },
     parentTreeChange (item) {
-      const blobHashCode = item.at(-1)
-      getRawBlobContent({blobHashCode, projectId: this.dataForm.gitlabProjectId}).then(({data}) => {
+      const filePath = item.at(-1)
+      getRawBlobContent({filePath, projectId: this.dataForm.gitlabProjectId}).then(({data}) => {
         console.log(data)
         this.script = data.data
       })
@@ -315,9 +321,9 @@ export default {
           authOthers: this.rowData.authOthers,
           tenantId: sessionStorage.getItem('tenantId'),
           taskName: `${this.formDs}_${this.dataForm.taskName}`,
-          taskType: 'CALCULATE'
+          taskType: 'DBT'
         }
-        if (params.isRunAgain === 0) {
+        if (params.isRunAgain === 1) {
           params.failRepeatTrigger = params.failRepeatTrigger
         } else {
           params.failRepeatTrigger = 0
@@ -378,7 +384,7 @@ export default {
     font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono,
       DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   }
- 
+
   .work-content {
     border: 1px #cccccc dashed;
     padding: 20px 20px 10px 0;

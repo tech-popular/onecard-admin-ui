@@ -1,10 +1,11 @@
-import { taskBatchList, projectAll } from '@/api/dispatch/taskManag'
+import { taskBatchList, projectAll, taskBatchStatus } from '@/api/dispatch/taskManag'
 export const models = {
   data () {
-    let type = [{label: '全部', value: '-1'}, {label: '计算任务', value: 'CALCULATE'}, {label: '同步任务', value: 'ACQUISITION'}]
-    let status = [{label: '全部', value: '-1'}, {label: '执行中', value: 'RUNNING'}, {label: '执行完成', value: 'COMPLETED'}, {label: '执行失败', value: 'FAILURE'}]
+    let type = [{label: '全部', value: '-1'}, {label: 'Trino', value: 'Trino'}, {label: 'DBT', value: 'DBT'}]
+    // let status = [{label: '全部', value: '-1'}, {label: '执行中', value: 'RUNNING'}, {label: '执行完成', value: 'COMPLETED'}, {label: '执行失败', value: 'FAILURE'}]
     let defaultProps = { label: 'label', value: 'value' }
-    let projectProps = { label: 'projectSystemName', value: 'id' }
+    // let projectProps = { label: 'projectSystemName', value: 'id' }
+    let statusProps = { label: 'desc', value: 'code' }
     return {
       props: {
         multiple: false,
@@ -14,6 +15,7 @@ export const models = {
         children: ''
       },
       allSystemList: [],
+      allStatusList: [],
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalPage: 0,
@@ -75,6 +77,11 @@ export const models = {
       ],
       columns: [
         {
+          prop: 'dolphinInstanceId',
+          label: '任务批次',
+          align: 'center'
+        },
+        {
           prop: 'taskId',
           label: '任务ID',
           width: '80px',
@@ -92,14 +99,14 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.taskType === 'CALCULATE' ? '' : 'warning'
+                type: params.row.taskType === 'Trino' ? '' : 'warning'
               } // 组件的props
-            }, params.row.taskType === 'CALCULATE' ? '计算任务' : '同步任务')
+            }, params.row.taskType === 'Trino' ? 'Trino' : 'DBT')
           }
         },
         {
-          prop: 'dolphinInstanceId',
-          label: '任务批次',
+          prop: 'runningTime',
+          label: '运行时长',
           align: 'center'
         },
         {
@@ -115,7 +122,14 @@ export const models = {
         {
           prop: 'runStatus',
           label: '任务状态',
-          align: 'center'
+          align: 'center',
+          render: (h, params) => {
+            return h('el-tag', {
+              props: {
+                type: params.row.runStatus === '执行失败' ? 'danger' : ''
+              } // 组件的props
+            }, params.row.runStatus)
+          }
         },
         // {
         //   prop: 'dispatchLeader',
@@ -123,8 +137,8 @@ export const models = {
         //   align: 'center'
         // },
         {
-          prop: 'dispatcherIp',
-          label: '触发机器',
+          prop: 'workerIp',
+          label: '执行机器',
           align: 'center'
         }
       ],
@@ -134,7 +148,7 @@ export const models = {
         taskId: '',
         taskType: '-1',
         // dispatchLeader: '',
-        projectId: '-1',
+        // projectId: '-1',
         runStatus: '-1'
       },
       searchForm: [
@@ -142,18 +156,19 @@ export const models = {
         {type: 'Input', label: '任务名称', prop: 'taskName', width: '300px', placeholder: '请输入名称'},
         {type: 'Select', label: '任务类型', prop: 'taskType', width: '300px', options: type, props: defaultProps, change: row => '', placeholder: '请选择任务类型'},
         // {type: 'Input', label: '调度负责人', prop: 'dispatchLeader', width: '300px', placeholder: '创建人'},
-        {type: 'Select', label: '所属项目/平台', prop: 'projectId', width: '300px', options: projectProps, props: projectProps, change: row => '', placeholder: '请选择起停状态'},
-        {type: 'Select', label: '任务状态', prop: 'runStatus', width: '300px', options: status, props: defaultProps, change: row => '', placeholder: '请选择起停状态'}
+        // {type: 'Select', label: '所属项目/平台', prop: 'projectId', width: '300px', options: projectProps, props: projectProps, change: row => '', placeholder: '请选择起停状态'},
+        {type: 'Select', label: '任务状态', prop: 'runStatus', width: '300px', options: statusProps, props: statusProps, change: row => '', placeholder: '请选择起停状态'}
       ],
       searchHandle: [
         {label: '查询', type: 'primary', handle: () => { this.handleSearch() }},
-        {label: 'Yarn日志查询', type: 'primary', handle: () => { this.handleLogSearch() }},
+        // {label: 'Yarn日志查询', type: 'primary', handle: () => { this.handleLogSearch() }},
         {label: '重置', type: '', handle: () => { this.resetHandle() }}
       ]
     }
   },
   created() {
-    this.getAllSystem()
+    // this.getAllSystem()
+    this.getAllStatus()
   },
   mounted () {
     if (this.$route.query.name) {
@@ -176,7 +191,7 @@ export const models = {
         'taskName': this.searchData.taskName,
         'taskType': this.searchData.taskType === '-1' ? '' : this.searchData.taskType,
         // 'dispatchLeader': this.searchData.dispatchLeader,
-        'projectId': this.searchData.projectId === '-1' ? '' : this.searchData.projectId,
+        // 'projectId': this.searchData.projectId === '-1' ? '' : this.searchData.projectId,
         'runStatus': this.searchData.runStatus === '-1' ? '' : this.searchData.runStatus
       }
       this.getList(dataBody)
@@ -187,6 +202,13 @@ export const models = {
         let curIndex = this.searchForm.findIndex(item => item.prop === 'projectId')
         this.searchForm.splice(curIndex, 1, { ...this.searchForm[curIndex], options: this.allSystemList })
         // console.log(this.searchForm, this.allSystemList)
+      })
+    },
+    getAllStatus () {
+      taskBatchStatus().then(({data}) => {
+        this.allStatusList = [ { desc: '全部', code: '-1' }, ...data.data ]
+        let curIndex = this.searchForm.findIndex(item => item.prop === 'runStatus')
+        this.searchForm.splice(curIndex, 1, { ...this.searchForm[curIndex], options: this.allStatusList })
       })
     },
     // 查询
@@ -202,7 +224,7 @@ export const models = {
         taskName: '',
         taskType: '-1',
         // dispatchLeader: '',
-        projectId: '-1',
+        // projectId: '-1',
         runStatus: '-1'
       }
       this.init()

@@ -13,7 +13,7 @@ export const models = {
       value: -1
     }, {
       label: 'Trino任务',
-      value: 'TRINO'
+      value: 'Trino'
     }, {
       label: 'DBT任务',
       value: 'DBT'
@@ -27,10 +27,10 @@ export const models = {
       value: -1
     }, {
       label: '启用',
-      value: 0
+      value: 1
     }, {
       label: '停用',
-      value: 1
+      value: 0
     }]
     let statusProps = {
       label: 'label',
@@ -73,10 +73,10 @@ export const models = {
             return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
           },
           method: (id) => {
-            if (id.taskType === 'CALCULATE') {
+            if (id.taskType === 'Trino') {
               this.computAddOrUpdateHandle(id)
             } else {
-              this.addOrUpdateHandle(id)
+              this.addDBTHandle(id)
             }
           }
         },
@@ -89,10 +89,10 @@ export const models = {
             return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
           },
           method: (id) => {
-            if (id.taskType === 'CALCULATE') {
+            if (id.taskType === 'Trino') {
               this.computAddOrUpdateHandle(id)
             } else {
-              this.addOrUpdateHandle(id)
+              this.addDBTHandle(id)
             }
           }
         },
@@ -215,9 +215,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.taskType === 'CALCULATE' ? '' : 'warning'
+                type: params.row.taskType === 'Trino' ? '' : 'warning'
               } // 组件的props
-            }, params.row.taskType === 'CALCULATE' ? '计算任务' : '同步任务')
+            }, params.row.taskType === 'Trino' ? 'Trino' : 'DBT')
           }
         },
         {
@@ -246,9 +246,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.taskDisable === 0 ? '' : 'warning'
+                type: params.row.taskDisable === 1 ? '' : 'warning'
               } // 组件的props
-            }, params.row.taskDisable === 0 ? '有效' : '无效')
+            }, params.row.taskDisable === 1 ? '上线' : '下线')
           }
         },
         {
@@ -259,9 +259,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.dispatchStatus === 0 ? '' : 'warning'
+                type: params.row.dispatchStatus === 1 ? '' : 'warning'
               } // 组件的props
-            }, params.row.dispatchStatus === 0 ? '启用' : '停用')
+            }, params.row.dispatchStatus === 1 ? '启用' : '停用')
           }
         },
         {
@@ -270,7 +270,7 @@ export const models = {
           width: '120px',
           align: 'center',
           render: (h, params) => {
-            return h('span', params.row.dependence === 0 ? '有' : '无')
+            return h('span', params.row.dependence === 1 ? '有' : '无')
           }
         }
       ],
@@ -440,7 +440,7 @@ export const models = {
         this.$refs.addOrUpdate.init(id, canUpdate)
       })
     },
-    // 新增 / 修改计算任务
+    // 新增 / 修改Trino任务
     computAddOrUpdateHandle(id) {
       this.computAddOrUpdateVisible = true
       this.$nextTick(() => {
@@ -451,7 +451,7 @@ export const models = {
         this.$refs.computAddOrUpdate.init(id, canUpdate)
       })
     },
-    // 新增 / 修改计算任务
+    // 新增 / 修改DBT任务
     addDBTHandle(id) {
       this.addDBTVisible = true
       this.$nextTick(() => {
