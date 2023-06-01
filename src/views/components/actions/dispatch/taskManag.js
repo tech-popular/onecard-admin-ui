@@ -151,7 +151,8 @@ export const models = {
           method: (id) => {
             this.snapshotHandle(id)
           }
-        },
+        }
+        // ,
         // {
         //   id: 5,
         //   label: '编辑依赖',
@@ -168,18 +169,18 @@ export const models = {
         //     this.taskExecuteHandle(id)
         //   }
         // }
-        {
-          id: 8,
-          label: '授权',
-          type: 'warning',
-          size: 'mini',
-          isShow: (id) => {
-            return this.isAdmin || id.authOwner === this.userid
-          },
-          method: (id) => {
-            this.taskPermission(id)
-          }
-        }
+        // {
+        //   id: 8,
+        //   label: '授权',
+        //   type: 'warning',
+        //   size: 'mini',
+        //   isShow: (id) => {
+        //     return this.isAdmin || id.authOwner === this.userid
+        //   },
+        //   method: (id) => {
+        //     this.taskPermission(id)
+        //   }
+        // }
       ],
       columns: [{
           prop: 'id',
@@ -358,17 +359,18 @@ export const models = {
           handle: () => {
             this.computAddOrUpdateHandle()
           }
-        },
-        {
-          label: '批量授权',
-          type: 'primary',
-          isShow: () => {
-            return this.isAdmin
-          },
-          handle: () => {
-            this.multiTaskPermission()
-          }
         }
+        // ,
+        // {
+        //   label: '批量授权',
+        //   type: 'primary',
+        //   isShow: () => {
+        //     return this.isAdmin
+        //   },
+        //   handle: () => {
+        //     this.multiTaskPermission()
+        //   }
+        // }
       ]
     }
   },

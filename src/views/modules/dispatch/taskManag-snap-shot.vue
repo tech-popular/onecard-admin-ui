@@ -14,16 +14,16 @@
   >
 	<el-tabs v-model="item.content.activeName"  @tab-click="tabhandleClick">
     <el-tab-pane label="上游任务" name="first">
-			<h3>新调度任务依赖</h3>
+			<h3>任务依赖</h3>
 			<taskManageSnapShotTable :dataApi ="taskSnapshotNewDepends" :taskId="taskId" taskType="up" type="new" @addTab = "addTab" ref="taskSnapshotUpNewDepends"></taskManageSnapShotTable>
-			<h3>老调度任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotOldDepends" :taskId="taskId" taskType="up" type="old" ref="taskSnapshotUpOldDepends"></taskManageSnapShotTable>
+<!--			<h3>老调度任务依赖</h3>-->
+<!--			<taskManageSnapShotTable :dataApi ="taskSnapshotOldDepends" :taskId="taskId" taskType="up" type="old" ref="taskSnapshotUpOldDepends"></taskManageSnapShotTable>-->
 		</el-tab-pane>
     <el-tab-pane label="下游任务" name="second">
-			<h3>新调度任务依赖</h3>
+			<h3>任务依赖</h3>
 			<taskManageSnapShotTable :dataApi ="taskSnapshotNewDepends" :taskId="taskId" taskType="down" type="new" @addTab = "addTab" ref="taskSnapshotDownNewDepends"></taskManageSnapShotTable>
-			<h3>老调度任务依赖</h3>
-			<taskManageSnapShotTable :dataApi ="taskSnapshotOldDepends" :taskId="taskId" taskType="down"  type="old" ref="taskSnapshotDownOldDepends"></taskManageSnapShotTable>
+<!--			<h3>老调度任务依赖</h3>-->
+<!--			<taskManageSnapShotTable :dataApi ="taskSnapshotOldDepends" :taskId="taskId" taskType="down"  type="old" ref="taskSnapshotDownOldDepends"></taskManageSnapShotTable>-->
 		</el-tab-pane>
   </el-tabs>
   </el-tab-pane>

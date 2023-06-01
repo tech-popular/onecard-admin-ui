@@ -5,14 +5,14 @@
 			 <el-table-column  prop="taskName"  header-align="center" align="center" label="任务名称"></el-table-column>
 			 <el-table-column  prop="taskType"  header-align="center"  align="center"  label="任务类型">
          <template slot-scope="scope">
-           <span v-if="type === 'new'">{{scope.row.taskType === 'CALCULATE' ? '计算任务' : '同步任务'}}</span>
+           <span v-if="type === 'new'">{{scope.row.taskType === 'Trino' ? 'Trino' : 'DBT'}}</span>
            <span v-else> {{scope.row.taskType}}</span>
          </template>
        </el-table-column>
        <el-table-column  prop="requestedUser"  header-align="center" align="center"  label="负责人"></el-table-column>
 			<el-table-column  prop="dependence"  header-align="center"  align="center"  label="有无依赖">
         <template slot-scope="scope">
-          {{scope.row.dependence === 0 ? '有': '无'}}
+          {{scope.row.dependence === 1 ? '有': '无'}}
         </template>
       </el-table-column>
 			<el-table-column
