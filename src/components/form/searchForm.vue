@@ -7,7 +7,7 @@
               <!-- 输入框 -->
               <el-input v-if="item.type==='Input'" v-model="searchData[item.prop]" size="mini" ></el-input>
               <!-- 下拉框 -->
-              <el-select v-if="item.type==='Select'" v-model="searchData[item.prop]" size="mini" @change="item.change(searchData[item.prop])">
+              <el-select v-if="item.type==='Select'" clearable v-model="searchData[item.prop]" size="mini" @change="item.change(searchData[item.prop])">
                   <el-option v-for="op in item.options" :label="op[item.props.label]" :value="op[item.props.value]" :key="op[item.props.value]"></el-option>
               </el-select>
               <!-- 单选 -->

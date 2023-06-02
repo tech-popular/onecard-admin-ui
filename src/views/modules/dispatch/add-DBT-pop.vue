@@ -26,8 +26,8 @@
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="Tag" prop="tag">
-          <el-select v-model="dataForm.tag" placeholder="Tag" style="width: 400px" filterable allow-create>
+        <el-form-item label="Tag标记" prop="tags">
+          <el-select v-model="dataForm.tags" placeholder="Tag标记" style="width: 400px" filterable allow-create multiple>
             <el-option :label="item" :value="item" v-for="(item, index) in tagList" :key="index"></el-option>
           </el-select>
         </el-form-item>
@@ -123,7 +123,7 @@ export default {
         taskName: '',
         id: '',
         projectId: '',
-        tag: '',
+        tags: '',
         taskDescribe: '',
         taskDisable: 1,
         failRepeatTrigger: 3,
@@ -235,7 +235,7 @@ export default {
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
-            this.dataForm.tag = data.data.tag
+            this.dataForm.tags = data.data.tags
             this.dataForm.taskDisable = data.data.taskDisable
             this.dataForm.gitlabProjectId = data.data.gitlabProjectId
             this.getGitLabDetail(this.dataForm.gitlabProjectId)

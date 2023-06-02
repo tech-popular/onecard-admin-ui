@@ -1,6 +1,7 @@
 import {
   list,
-  taskExecute
+  taskExecute,
+  tagAll
 } from '@/api/dispatch/taskManag'
 import {
   updateDispatchTaskAuth,
@@ -26,13 +27,17 @@ export const models = {
       label: '全部',
       value: -1
     }, {
-      label: '启用',
+      label: '上线',
       value: 1
     }, {
-      label: '停用',
+      label: '下线',
       value: 0
     }]
     let statusProps = {
+      label: 'label',
+      value: 'value'
+    }
+    let tagProps = {
       label: 'label',
       value: 'value'
     }
@@ -47,6 +52,7 @@ export const models = {
       pageNum: 1, // 当前页
       pageSize: 10, // 默认每页10条
       totalPage: 0,
+      tagDownList: [],
       dataListSelections: [],
       userid: sessionStorage.getItem('id'),
       isAdmin: sessionStorage.getItem('username') === 'admin',
@@ -63,7 +69,7 @@ export const models = {
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
       // 操作按钮
-      operatesWidth: '350px',
+      operatesWidth: '250px',
       operates: [{
           id: 1,
           label: '编辑任务',
@@ -221,16 +227,45 @@ export const models = {
             }, params.row.taskType === 'Trino' ? 'Trino' : 'DBT')
           }
         },
+        // {
+        //   prop: 'tag',
+        //   label: 'Tag标记',
+        //   width: '150px',
+        //   align: 'center',
+        //   render: (h, params) => {
+        //     let tagTags = ''
+        //     params.row.tag.split(',').forEach((item, index) => {
+        //       tagTags += h('el-tag', {
+        //         props: {
+        //           type: ''
+        //         } // 组件的props
+        //       }, item)
+        //     })
+        //     console.log('tagTags：' + tagTags)
+        //     return tagTags
+        //   }
+        // },
         {
           prop: 'tag',
-          label: 'Tag',
-          width: '120px',
-          align: 'center'
+          label: 'Tag标记',
+          width: '150px',
+          align: 'center',
+          render: (h, context) => {
+            const vnodeArr = []
+            context.row.tag.split(',').forEach((item, index) => {
+              vnodeArr.push(h('el-tag', {
+                props: {
+                  type: 'success'
+                }
+              }, item))
+            })
+            return vnodeArr
+          }
         },
         {
           prop: 'createTime',
           label: '任务创建时间',
-          width: '120px',
+          width: '160px',
           align: 'center'
         },
         {
@@ -247,7 +282,7 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.taskDisable === 1 ? '' : 'warning'
+                type: params.row.taskDisable === 1 ? '' : 'danger'
               } // 组件的props
             }, params.row.taskDisable === 1 ? '上线' : '下线')
           }
@@ -260,7 +295,7 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.dispatchStatus === 1 ? '' : 'warning'
+                type: params.row.dispatchStatus === 1 ? '' : 'danger'
               } // 组件的props
             }, params.row.dispatchStatus === 1 ? '启用' : '停用')
           }
@@ -308,11 +343,14 @@ export const models = {
           placeholder: '请选择任务类型'
         },
         {
-          type: 'Input',
-          label: 'Tag',
+          type: 'Select',
+          label: 'Tag标签',
           prop: 'tag',
           width: '300px',
-          placeholder: 'Tag'
+          options: tagProps,
+          props: tagProps,
+          change: row => '',
+          placeholder: '请选择Tag标签'
         },
         {
           type: 'Input',
@@ -323,7 +361,7 @@ export const models = {
         },
         {
           type: 'Select',
-          label: '起停状态',
+          label: '上线状态',
           prop: 'status',
           width: '300px',
           options: status,
@@ -391,6 +429,7 @@ export const models = {
         'tenantId': sessionStorage.getItem('tenantId')
       }
       this.getList(dataBody)
+      this.buildTagDownList()
     },
     // 查询
     handleSearch() {
@@ -463,6 +502,16 @@ export const models = {
         }
         this.$refs.addDBTRef.init(id, canUpdate)
       })
+    },
+    buildTagDownList () {
+      tagAll().then(({data}) => {
+        this.tagDownList = data.data.map(item => {
+          return { label: item, value: item }
+        })
+        let curIndex = this.searchForm.findIndex(item => item.prop === 'tag')
+        this.searchForm.splice(curIndex, 1, { ...this.searchForm[curIndex], options: this.tagDownList })
+      })
+      console.log(this.tagDownList)
     },
     // 点击名称跳转到批次
     gotoTaskBatchHandle (params) {
