@@ -150,7 +150,7 @@ export default {
         authOtherList: [],
         authOthers: ''
       },
-      formDs: 'trino',
+      formDs: 'Trino',
       updateUser: '',
       updateTime: '',
       dataForm: {},
