@@ -459,6 +459,7 @@
             <el-form-item label="下发模式" prop="increModel">
               <el-radio v-model="baseForm.increModel" :label="0">全量</el-radio>
               <el-radio v-model="baseForm.increModel" :label="1" v-bind:disabled="isStatic" class="radio-incremodel">增量</el-radio>
+              <el-radio v-model="baseForm.increModel" :label="2" v-bind:disabled="isStatic" class="radio-incremodel">增量（当日）</el-radio>
               <el-tooltip placement="top" v-if="isStatic">
                 <div slot="content">静态分群不支持增量</div>
                 <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>

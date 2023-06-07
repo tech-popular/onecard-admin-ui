@@ -143,6 +143,14 @@ export default {
       ],
       otherSys: [
         {
+            name: '新BI系统',
+            img: require('../../assets/img/newBI.png')
+            // http://test02.bigdata.9f.cn/bi/#/home
+            // url: '/bi/#/home?token=' + this.$cookie.get('token')
+            // url: 'https://tech.9f.cn/bi/#/'
+            // url: 'http://10.3.0.50:3088/#/'
+        },
+        {
           name: 'BI系统',
           img: require('../../assets/img/bi.jpg'),
           url: 'http://data.9f.cn/login.jsp'
@@ -166,14 +174,6 @@ export default {
           name: 'Zeppelin',
           img: require('../../assets/img/zepplin.png'),
           url: 'http://zeppelin.9f.cn'
-        },
-        {
-          name: '新BI系统',
-          img: require('../../assets/img/newBI.png')
-          // http://test02.bigdata.9f.cn/bi/#/home
-          // url: '/bi/#/home?token=' + this.$cookie.get('token')
-          // url: 'https://tech.9f.cn/bi/#/'
-          // url: 'http://10.3.0.50:3088/#/'
         }
       ]
     }
