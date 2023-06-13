@@ -73,6 +73,14 @@
               <el-radio v-model="baseForm.receiveContentType" label="2" style="margin-left:5px;">Excel</el-radio>
               <el-radio v-model="baseForm.receiveContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveType === '1'" @change="receiveContentTypeChange" label="3" style="margin-left:5px;">HTML</el-radio>
             </el-form-item>
+            <el-form-item label="Excel数据分布：" prop="receiveContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveContentType === '2'">
+              <el-tooltip class="item" effect="dark" content="多条sql数据分布于多个excel文件" placement="top">
+                <el-radio v-model="baseForm.excelContentType" label="1" style="margin-left:5px;">文件</el-radio>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="多条sql数据分布于一个excel不同sheet页" placement="top">
+                <el-radio v-model="baseForm.excelContentType" label="2" style="margin-left:5px;">sheet</el-radio>
+              </el-tooltip>
+            </el-form-item>
             <el-form-item label="发送频率：" prop="exportType">
               <el-radio v-model="baseForm.exportType" label="once">一次性</el-radio>
               <el-radio v-model="baseForm.exportType" label="period" style="margin-left:5px;">周期性</el-radio>
@@ -155,6 +163,7 @@ export default {
         // receiveEndTime: '', // 允许接收时间接收时间
         receiveType: '', // 接收类型
         receiveContentType: '', // 接收内容方式
+        excelContentType: '1',
         receiver: [], // 接收人,
         describePre: '', // 前描述
         describeAfter: '', // 后描述
@@ -308,6 +317,7 @@ export default {
           this.baseForm.receiver = data.data.receiver.split(',')
           this.baseForm.receiveType = data.data.receiveType.toString()
           this.baseForm.receiveContentType = data.data.receiveContentType.toString()
+          this.baseForm.excelContentType = data.data.excelContentType.toString()
           this.baseForm.describeAfter = data.data.describeAfter
           this.baseForm.describePre = data.data.describePre
           this.sqlList = data.data.sqlList.map((item, index) => {
