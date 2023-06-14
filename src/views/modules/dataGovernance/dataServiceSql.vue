@@ -73,7 +73,7 @@
               <el-radio v-model="baseForm.receiveContentType" label="2" style="margin-left:5px;">Excel</el-radio>
               <el-radio v-model="baseForm.receiveContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveType === '1'" @change="receiveContentTypeChange" label="3" style="margin-left:5px;">HTML</el-radio>
             </el-form-item>
-            <el-form-item label="Excel数据分布：" prop="receiveContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveContentType === '2'">
+            <el-form-item label="Excel数据分布：" prop="excelContentType" v-if="checkUserHaveHtmlVisible && baseForm.receiveContentType === '2'">
               <el-tooltip class="item" effect="dark" content="多条sql数据分布于多个excel文件" placement="top">
                 <el-radio v-model="baseForm.excelContentType" label="1" style="margin-left:5px;">文件</el-radio>
               </el-tooltip>
@@ -334,25 +334,25 @@ export default {
           this.baseForm.headUser = data.data.headUser
           this.getDatabaseList()
           if (this.baseForm.status === 0) {
-            let tempArry = []
-            if (this.baseForm.period === 'day') {
-              tempArry.push({ value: '1', label: '每天' })
-              this.baseForm.receiveDays = '1'
-            } else if (this.baseForm.period === 'hours') {
-              for (let i = 1, j = 24; i < j; i++) {
-                tempArry.push({ value: i, label: '每隔' + i + '小时' })
-              }
-            } else if (this.baseForm.period === 'month') {
-              for (let i = 1, j = 32; i < j; i++) {
-                tempArry.push({ value: i, label: '每月' + i + '号' })
-              }
-              // tempArry.push({ value: '-1', label: '每月最后一天' })
-            }
-            if (this.baseForm.period === 'week') {
-              this.receiveDaysList = this.dayOfWeeksList
-            } else {
-              this.receiveDaysList = tempArry
-            }
+            // let tempArry = []
+            // if (this.baseForm.period === 'day') {
+            //     this.baseForm.receiveDays = 1
+            //     tempArry.push({ value: 1, label: '每天' })
+            // } else if (this.baseForm.period === 'hours') {
+            //   for (let i = 1, j = 24; i < j; i++) {
+            //     tempArry.push({ value: i, label: '每隔' + i + '小时' })
+            //   }
+            // } else if (this.baseForm.period === 'month') {
+            //   for (let i = 1, j = 32; i < j; i++) {
+            //     tempArry.push({ value: i, label: '每月' + i + '号' })
+            //   }
+            //   // tempArry.push({ value: '-1', label: '每月最后一天' })
+            // }
+            // if (this.baseForm.period === 'week') {
+            //   this.receiveDaysList = this.dayOfWeeksList
+            // } else {
+            //   this.receiveDaysList = tempArry
+            // }
             this.disTimeTurnOff(this.baseForm.period)
           } else {
             this.editAble = true
@@ -480,7 +480,6 @@ export default {
         }
         // tempArry.push({ value: '-1', label: '每月最后一天' })
       }
-      this.baseForm.receiveDays = ''
       if (disType === 'week') {
         this.receiveDaysList = this.dayOfWeeksList
       } else {
@@ -610,10 +609,11 @@ export default {
           'type': 0,
           'receiveType': Number(this.baseForm.receiveType),
           'receiveContentType': Number(this.baseForm.receiveContentType),
+          'excelContentType': Number(this.baseForm.excelContentType),
           'approveReason': this.baseForm.approveReason,
           'exportType': this.baseForm.exportType,
           'period': this.baseForm.exportType === 'once' ? '' : this.baseForm.period,
-          'receiveDays': this.baseForm.exportType === 'once' ? '' : (this.baseForm.period === 'day' ? '' : this.baseForm.receiveDays),
+          'receiveDays': this.baseForm.exportType === 'once' ? '' : (this.baseForm.period === 'day' ? '1' : this.baseForm.receiveDays),
           'receiveStartTime': this.baseForm.receiveTime[0],
           'receiveEndTime': this.baseForm.receiveTime[1],
           'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
