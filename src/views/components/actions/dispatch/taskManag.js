@@ -18,6 +18,12 @@ export const models = {
     }, {
       label: 'DBT任务',
       value: 'DBT'
+    }, {
+      label: 'python任务',
+      value: 'PYTHON'
+    }, {
+      label: 'shell任务',
+      value: 'SHELL'
     }]
     let typeProps = {
       label: 'label',
@@ -60,6 +66,7 @@ export const models = {
       addOrUpdateVisible: false,
       dispatchConfigAddOrUpdateVisible: false,
       computAddOrUpdateVisible: false,
+      scriptAddOrUpdateVisible: false,
       addDBTVisible: false,
       submitDataApi: updateDispatchTaskAuth,
       submitDataApis: updateDispatchTaskAuths,
@@ -76,13 +83,16 @@ export const models = {
           type: 'primary',
           size: 'mini',
           isShow: (id) => {
-            return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            // return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            return true
           },
           method: (id) => {
             if (id.taskType === 'Trino') {
               this.computAddOrUpdateHandle(id)
-            } else {
+            } else if (id.taskType === 'DBT') {
               this.addDBTHandle(id)
+            } else {
+              this.scriptAddOrUpdateHandle(id)
             }
           }
         },
@@ -92,13 +102,16 @@ export const models = {
           type: 'primary',
           size: 'mini',
           isShow: (id) => {
-            return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+            // return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+            return true
           },
           method: (id) => {
             if (id.taskType === 'Trino') {
               this.computAddOrUpdateHandle(id)
-            } else {
+            } else if (id.taskType === 'DBT') {
               this.addDBTHandle(id)
+            } else {
+              this.scriptAddOrUpdateHandle(id)
             }
           }
         },
@@ -108,10 +121,12 @@ export const models = {
           type: 'success',
           size: 'mini',
           isShow: (id) => {
-            return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            // return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            return true
           },
           method: (id) => {
-            let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            // let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            let canUpdate = true
             this.addOrUpdateDispatchConfig(id, canUpdate)
           }
         },
@@ -121,10 +136,12 @@ export const models = {
           type: 'success',
           size: 'mini',
           isShow: (id) => {
-            return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+            // return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+            return true
           },
           method: (id) => {
-            let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            // let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+            let canUpdate = true
             this.addOrUpdateDispatchConfig(id, canUpdate)
           }
         },
@@ -137,14 +154,15 @@ export const models = {
           //   return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
           // },
           disabled: (id) => {
-            if (this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid) {
-              if (id.dispatchStatus === 1) {
-                return true
-              }
-              return false
-            } else {
-              return true
-            }
+            // if (this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid) {
+            //   if (id.dispatchStatus === 1) {
+            //     return true
+            //   }
+            //   return false
+            // } else {
+            //   return true
+            // }
+            return false
           },
           method: (id) => {
             this.taskExecuteHandle(id)
@@ -222,9 +240,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.taskType === 'Trino' ? '' : 'warning'
+                type: params.row.taskType === ''
               } // 组件的props
-            }, params.row.taskType === 'Trino' ? 'Trino' : 'DBT')
+            }, params.row.taskType)
           }
         },
         // {
@@ -252,13 +270,15 @@ export const models = {
           align: 'center',
           render: (h, context) => {
             const vnodeArr = []
-            context.row.tag.split(',').forEach((item, index) => {
-              vnodeArr.push(h('el-tag', {
-                props: {
-                  type: 'success'
-                }
-              }, item))
-            })
+            if (context.row.tag != null) {
+              context.row.tag.split(',').forEach((item, index) => {
+                vnodeArr.push(h('el-tag', {
+                  props: {
+                    type: 'success'
+                  }
+                }, item))
+              })
+            }
             return vnodeArr
           }
         },
@@ -397,6 +417,13 @@ export const models = {
           handle: () => {
             this.computAddOrUpdateHandle()
           }
+        },
+        {
+          label: '新增脚本任务',
+          type: 'success',
+          handle: () => {
+            this.scriptAddOrUpdateHandle()
+          }
         }
         // ,
         // {
@@ -454,7 +481,8 @@ export const models = {
       this.$nextTick(() => {
         let canUpdate = true
         if (!this.isAdmin) {
-          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          canUpdate = true
         }
         this.$refs.dispatchConfigAddOrUpdate.init(id, canUpdate)
       })
@@ -476,7 +504,8 @@ export const models = {
       this.$nextTick(() => {
         let canUpdate = true
         if (!this.isAdmin) {
-          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          canUpdate = true
         }
         this.$refs.addOrUpdate.init(id, canUpdate)
       })
@@ -487,9 +516,22 @@ export const models = {
       this.$nextTick(() => {
         let canUpdate = true
         if (!this.isAdmin) {
-          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          canUpdate = true
         }
         this.$refs.computAddOrUpdate.init(id, canUpdate)
+      })
+    },
+    // 新增 / 修改脚本任务
+    scriptAddOrUpdateHandle(id) {
+      this.scriptAddOrUpdateVisible = true
+      this.$nextTick(() => {
+        let canUpdate = true
+        if (!this.isAdmin) {
+          // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          canUpdate = true
+        }
+        this.$refs.scriptAddOrUpdate.init(id, canUpdate)
       })
     },
     // 新增 / 修改DBT任务
@@ -498,7 +540,8 @@ export const models = {
       this.$nextTick(() => {
         let canUpdate = true
         if (!this.isAdmin) {
-          canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+          canUpdate = true
         }
         this.$refs.addDBTRef.init(id, canUpdate)
       })

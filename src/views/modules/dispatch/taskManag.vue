@@ -19,18 +19,24 @@
     />
     <!-- 弹窗, 新增 / 修改同步任务 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init" />
-    <!-- 弹窗, 新增 / 修改计算任务 -->
+    <!-- 弹窗, 新增 / 修改Trino任务 -->
     <comput-add-or-update
       v-if="computAddOrUpdateVisible"
       ref="computAddOrUpdate"
       @refreshDataList="init"
     />
-        <!-- 弹窗, 新增 / 修改计算任务 -->
+        <!-- 弹窗, 新增 / 修改DBT任务 -->
     <AddDBTPop
       v-if="addDBTVisible"
       ref="addDBTRef"
       @refreshDataList="init"
     />
+      <!-- 弹窗, 新增 / 修改脚本任务 -->
+      <script-add-or-update
+              v-if="scriptAddOrUpdateVisible"
+              ref="scriptAddOrUpdate"
+              @refreshDataList="init"
+      />
     <!--调度配置-->
     <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
     <!-- 授权 -->
@@ -44,6 +50,7 @@
 import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
 import AddDBTPop from './add-DBT-pop'
+import ScriptAddOrUpdate from './script-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import AssignPermission from '../../components/permission/assign-permission'
 import taskManagSnapShot from './taskManag-snap-shot'
@@ -54,6 +61,7 @@ export default {
     AddDBTPop,
     AddOrUpdate,
     ComputAddOrUpdate,
+    ScriptAddOrUpdate,
     dispatchConfigAddOrUpdate,
     AssignPermission,
     taskManagSnapShot

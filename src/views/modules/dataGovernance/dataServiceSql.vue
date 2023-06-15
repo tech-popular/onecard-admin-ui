@@ -64,7 +64,7 @@
         </el-form>
         <div>
           <el-form v-loading="loading" :disabled="editAble" :model="baseForm" :rules="baseRule" label-position="right" label-width="130px" ref="baseForm" class="base-form">
-            <el-form-item label="接收方式；" prop="receiveType">
+            <el-form-item label="接收方式" prop="receiveType">
               <el-radio v-model="baseForm.receiveType" label="0">钉钉</el-radio>
               <el-radio v-model="baseForm.receiveType" label="1" style="margin-left:5px;">邮件</el-radio>
             </el-form-item>
