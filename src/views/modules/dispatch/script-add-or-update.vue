@@ -182,7 +182,7 @@ export default {
       })
     },
     changeTaskType (item) {
-        this.formDs = item
+        this.dataForm.formDs = item
     },
     getTags () {
       getTagsAPI().then(({data}) => {
