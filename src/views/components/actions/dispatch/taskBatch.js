@@ -99,9 +99,9 @@ export const models = {
           render: (h, params) => {
             return h('el-tag', {
               props: {
-                type: params.row.taskType === 'Trino' ? '' : 'warning'
+                type: params.row.taskType === ''
               } // 组件的props
-            }, params.row.taskType === 'Trino' ? 'Trino' : 'DBT')
+            }, params.row.taskType)
           }
         },
         {
