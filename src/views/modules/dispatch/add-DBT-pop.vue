@@ -13,9 +13,9 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
-            <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px">
-              <template slot="prepend">{{formDs}}_</template>
-            </el-input>
+            <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px" />
+<!--              <template slot="prepend">{{formDs}}_</template>-->
+<!--            </el-input>-->
           </el-form-item>
           <el-form-item label="任务ID" prop="id">
             <el-input v-model="dataForm.id" placeholder="任务ID" disabled  style="width: 300px" />
@@ -250,7 +250,8 @@ export default {
                 this.dataForm.isRunAgain = 0
                 this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
             }
-              this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
+              this.dataForm.taskName = data.data.taskName
+              // this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
           })
         }
       })
@@ -320,7 +321,8 @@ export default {
           authOtherList: this.rowData.authOtherList,
           authOthers: this.rowData.authOthers,
           tenantId: sessionStorage.getItem('tenantId'),
-          taskName: `${this.formDs}_${this.dataForm.taskName}`,
+          // taskName: `${this.formDs}_${this.dataForm.taskName}`,
+          taskName: `${this.dataForm.taskName}`,
           taskType: 'DBT'
         }
         if (params.isRunAgain === 1) {

@@ -96,25 +96,25 @@ export const models = {
             }
           }
         },
-        {
-          id: 2,
-          label: '查看任务',
-          type: 'primary',
-          size: 'mini',
-          isShow: (id) => {
-            // return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
-            return true
-          },
-          method: (id) => {
-            if (id.taskType === 'Trino') {
-              this.computAddOrUpdateHandle(id)
-            } else if (id.taskType === 'DBT') {
-              this.addDBTHandle(id)
-            } else {
-              this.scriptAddOrUpdateHandle(id)
-            }
-          }
-        },
+        // {
+        //   id: 2,
+        //   label: '查看任务',
+        //   type: 'primary',
+        //   size: 'mini',
+        //   isShow: (id) => {
+        //     // return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+        //     return true
+        //   },
+        //   method: (id) => {
+        //     if (id.taskType === 'Trino') {
+        //       this.computAddOrUpdateHandle(id)
+        //     } else if (id.taskType === 'DBT') {
+        //       this.addDBTHandle(id)
+        //     } else {
+        //       this.scriptAddOrUpdateHandle(id)
+        //     }
+        //   }
+        // },
         {
           id: 3,
           label: '调度配置',
@@ -130,21 +130,21 @@ export const models = {
             this.addOrUpdateDispatchConfig(id, canUpdate)
           }
         },
-        {
-          id: 9,
-          label: '查看配置',
-          type: 'success',
-          size: 'mini',
-          isShow: (id) => {
-            // return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
-            return true
-          },
-          method: (id) => {
-            // let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
-            let canUpdate = true
-            this.addOrUpdateDispatchConfig(id, canUpdate)
-          }
-        },
+        // {
+        //   id: 9,
+        //   label: '查看配置',
+        //   type: 'success',
+        //   size: 'mini',
+        //   isShow: (id) => {
+        //     // return !(this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid)
+        //     return true
+        //   },
+        //   method: (id) => {
+        //     // let canUpdate = this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
+        //     let canUpdate = true
+        //     this.addOrUpdateDispatchConfig(id, canUpdate)
+        //   }
+        // },
         {
           id: 4,
           label: '执行任务',

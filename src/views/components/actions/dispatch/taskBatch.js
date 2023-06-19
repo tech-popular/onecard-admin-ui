@@ -1,7 +1,7 @@
 import { taskBatchList, projectAll, taskBatchStatus } from '@/api/dispatch/taskManag'
 export const models = {
   data () {
-    let type = [{label: '全部', value: '-1'}, {label: 'Trino', value: 'Trino'}, {label: 'DBT', value: 'DBT'}]
+    let type = [{label: '全部', value: '-1'}, {label: 'Trino', value: 'Trino'}, {label: 'DBT', value: 'DBT'}, {label: 'python', value: 'python'}, {label: 'shell', value: 'shell'}]
     // let status = [{label: '全部', value: '-1'}, {label: '执行中', value: 'RUNNING'}, {label: '执行完成', value: 'COMPLETED'}, {label: '执行失败', value: 'FAILURE'}]
     let defaultProps = { label: 'label', value: 'value' }
     // let projectProps = { label: 'projectSystemName', value: 'id' }
