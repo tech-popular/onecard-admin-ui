@@ -81,12 +81,12 @@ export const models = {
           label: '任务批次',
           align: 'center'
         },
-        {
-          prop: 'taskId',
-          label: '任务ID',
-          width: '80px',
-          align: 'center'
-        },
+        // {
+        //   prop: 'taskId',
+        //   label: '任务ID',
+        //   width: '80px',
+        //   align: 'center'
+        // },
         {
           prop: 'taskName',
           label: '任务名称',
@@ -152,7 +152,7 @@ export const models = {
         runStatus: '-1'
       },
       searchForm: [
-        {type: 'Input', label: '任务ID', prop: 'taskId', width: '300px', placeholder: '任务ID'},
+        // {type: 'Input', label: '任务ID', prop: 'taskId', width: '300px', placeholder: '任务ID'},
         {type: 'Input', label: '任务名称', prop: 'taskName', width: '300px', placeholder: '请输入名称'},
         {type: 'Select', label: '任务类型', prop: 'taskType', width: '300px', options: type, props: defaultProps, change: row => '', placeholder: '请选择任务类型'},
         // {type: 'Input', label: '调度负责人', prop: 'dispatchLeader', width: '300px', placeholder: '创建人'},
