@@ -13,9 +13,9 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="110px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="任务名称：" prop="taskName">
-            <el-input v-model="dataForm.taskName" placeholder="任务名称" disabled style="width: 400px">
-              <template slot="prepend">{{preDs}}</template>
-            </el-input>
+            <el-input v-model="dataForm.taskName" placeholder="任务名称" disabled style="width: 400px" />
+<!--              <template slot="prepend">{{preDs}}</template>-->
+<!--            </el-input>-->
           </el-form-item>
           <el-form-item label="任务ID：" prop="id">
             <el-input v-model="dataForm.id" placeholder="任务ID" disabled  style="width: 300px" />
@@ -211,13 +211,14 @@ export default {
         this.dataForm.taskDescribe = data.data.taskDescribe
         this.updateTime = data.data.updateTime
         this.updateUser = data.data.updateUser
-        let name = data.data.taskName.split('_')
+        // let name = data.data.taskName.split('_')
         // if (this.taskType === 'ACQUISITION') {
         //   this.preDs = `${name[0]}_to_${name[2]}_`
         //   this.dataForm.taskName = name.slice(3).join('_')
         // } else {
-          this.preDs = `${name[0]}_`
-          this.dataForm.taskName = name.slice(1).join('_')
+        //   this.preDs = `${name[0]}_`
+        //   this.dataForm.taskName = name.slice(1).join('_')
+          this.dataForm.taskName = data.data.taskName
         // }
       })
     },
