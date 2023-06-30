@@ -31,16 +31,16 @@
       <el-form-item label="菜单链接" prop="url" v-if="dataForm.type === 1">
         <el-input v-model="dataForm.url" placeholder="菜单链接"></el-input>
       </el-form-item>
-      <el-form-item label="蜂巢计算任务" prop="honeycombJobTaskIds" v-if="dataForm.type === 1">
-        <el-select v-model="dataForm.honeycombJobTaskIds" clearable filterable multiple placeholder="请选择计算任务" style="width: 100%">
-          <el-option v-for="item in honeycombJobList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="调度计算任务" prop="oldJobTaskIds" v-if="dataForm.type === 1">
-        <el-select v-model="dataForm.oldJobTaskIds" clearable filterable multiple placeholder="请选择计算任务" style="width: 100%">
-          <el-option v-for="item in oldJobList" :key="item.id" :label="item.etlJobName" :value="item.etlJobId"></el-option>
-        </el-select>
-      </el-form-item>
+<!--      <el-form-item label="蜂巢计算任务" prop="honeycombJobTaskIds" v-if="dataForm.type === 1">-->
+<!--        <el-select v-model="dataForm.honeycombJobTaskIds" clearable filterable multiple placeholder="请选择计算任务" style="width: 100%">-->
+<!--          <el-option v-for="item in honeycombJobList" :key="item.id" :label="item.name" :value="item.id"></el-option>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="调度计算任务" prop="oldJobTaskIds" v-if="dataForm.type === 1">-->
+<!--        <el-select v-model="dataForm.oldJobTaskIds" clearable filterable multiple placeholder="请选择计算任务" style="width: 100%">-->
+<!--          <el-option v-for="item in oldJobList" :key="item.id" :label="item.etlJobName" :value="item.etlJobId"></el-option>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
       <el-form-item label="报表负责人" prop="principalId" v-if="dataForm.type === 1">
         <el-select v-model="dataForm.principalId" @change="changeprincipal" multiple placeholder="请输入关键字" style="width:100%" remote :remote-method="getUserSelectList" :loading="loading" filterable>
           <el-option v-for="item in userIdList" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -58,7 +58,8 @@
 </template>
 
 <script>
-import { savaBiInfo, updateBiInfo, lookDataInfo, findAllRecursionList, queryAllTypeTasks } from '@/api/BI-Manager/menu'
+// import { savaBiInfo, updateBiInfo, lookDataInfo, findAllRecursionList, queryAllTypeTasks } from '@/api/BI-Manager/menu'
+import { savaBiInfo, updateBiInfo, lookDataInfo, findAllRecursionList } from '@/api/BI-Manager/menu'
 import { getUsersList } from '@/api/BI-Manager/userGroup'
 export default {
   data () {
@@ -313,16 +314,16 @@ export default {
       return arr
     },
     getTaskManageList () {
-      queryAllTypeTasks().then(({ data }) => {
-        if (data && data.code === 0) {
-          this.honeycombJobList = data.data.honeycombJob
-          this.oldJobList = data.data.oldJob
-        } else {
-          this.honeycombJobList = []
-          this.oldJobList = []
-          return this.$message.error(data.msg)
-        }
-      })
+      // queryAllTypeTasks().then(({ data }) => {
+      //   if (data && data.code === 0) {
+      //     this.honeycombJobList = data.data.honeycombJob
+      //     this.oldJobList = data.data.oldJob
+      //   } else {
+      //     this.honeycombJobList = []
+      //     this.oldJobList = []
+      //     return this.$message.error(data.msg)
+      //   }
+      // })
     },
     // 所属父级
     parentTreeChange (val) {
