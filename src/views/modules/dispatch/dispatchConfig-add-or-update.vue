@@ -41,9 +41,10 @@
             :data="dataForm.selectedDpendeceList"
             border
             @selection-change="handleSelectDependenceChange">
-            <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+            <el-table-column header-align="center" align="center" type="selection"></el-table-column>
             <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
             <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
+            <el-table-column header-align="center" align="center" prop="lastExecutionTime" label="上次执行结束时间"></el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
                 <a style="cursor: pointer" v-if="canUpdate" @click="deleteDependenceHandle(scope.row)">删除</a>
@@ -52,55 +53,12 @@
           </el-table>
         </div>
       </div>
-<!--            <div class="work-content-1">-->
-<!--        <h3 style="overflow:hidden">老调度任务依赖-->
-<!--          <el-button style="float:right" type="danger" v-if="canUpdate" @click="deleteOldDependenceHandle">批量删除</el-button>-->
-<!--          <el-button style="float:right;margin-right:20px" type="primary" v-if="canUpdate"  @click="addOldDependenceHandle">新增依赖</el-button>-->
-<!--        </h3>-->
-<!--        <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">-->
-<!--          <div style="width: 110px;text-align:right;padding-right: 10px;">已选依赖：</div>-->
-<!--          <el-table-->
-<!--            style="flex:1;"-->
-<!--            ref="multipleTable"-->
-<!--            :data="dataForm.selectedOldDpendeceList"-->
-<!--            border-->
-<!--            @selection-change="handleSelectOldDependenceChange">-->
-<!--            <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>-->
-<!--            <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>-->
-<!--            &lt;!&ndash; <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column> &ndash;&gt;-->
-<!--            <el-table-column label="操作" header-align="center" align="center">-->
-<!--              <template slot-scope="scope">-->
-<!--                <a style="cursor: pointer" v-if="canUpdate" @click="deleteOldDependenceHandle(scope.row)">删除</a>-->
-<!--              </template>-->
-<!--            </el-table-column>-->
-<!--          </el-table>-->
-<!--        </div>-->
-<!--      </div>-->
-      <dispatch-config-period ref="dispatchConfigPeriod" :task-id="id" :dispatch-status="dispatchStatusForm" :can-update = "canUpdate" @getStatus="getDispatchStatus" @refreshList="refreshListhandle"></dispatch-config-period>
-      <!-- <dispatch-config-alert ref="dispatchConfigAlert" :task-id="id" @refreshList="refreshListhandle"></dispatch-config-alert> -->
-      <div class="work-content-1">
-        <h3>调度启停</h3>
-        <el-form label-width="110px" :model="dispatchStatusForm" :rules="dataRule" ref="dispatchStatus" :disabled="!canUpdate">
-          <div class="work-type-pane">
-            <el-form-item label="状态：" prop="dispatchStatus" label-width="100px">
-              <el-radio-group v-model="dispatchStatusForm.dispatchStatus">
-                <el-radio :label="1">有效</el-radio>
-                <el-radio :label="0">无效</el-radio>
-              </el-radio-group>
-            </el-form-item>
-<!--            <el-form-item label="任务责任人：" prop="dutyUser" label-width="200px">-->
-<!--              <el-input v-model="dispatchStatusForm.dutyUser" placeholder="任务责任人" style="width: 300px" />-->
-<!--            </el-form-item>-->
-          </div>
-        </el-form>
-      </div>
     </div>
     <div class="footer">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
+      <el-button @click="visible = false">关闭</el-button>
+<!--      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>-->
     </div>
     <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence"></dispatch-config-task-dependent>
-    <dispatch-config-old-task-dependent v-if="dispatchConfigOldTaskDependentVisible" ref="dispatchConfigOldTaskDependent" @refreshOldTaskDependence="getOldTaskSelectDependence"></dispatch-config-old-task-dependent>
   </el-drawer>
 </template>
 
@@ -108,20 +66,20 @@
 import {
   taskBaseInfo,
   taskDependenceDelete,
-  taskSelectDependence,
-  taskSelectOldDependence,
-  oldTaskDependenceDelete
+  taskSelectDependence
+  // taskSelectOldDependence,
+  // oldTaskDependenceDelete
 } from '@/api/dispatch/taskManag'
 import { deepClone } from '@/utils'
 import dispatchConfigTaskDependent from './dispatch-config-dependent'
-import dispatchConfigOldTaskDependent from './dispatch-config-old-dependent'
-import dispatchConfigPeriod from './dispatch-config-period'
+// import dispatchConfigOldTaskDependent from './dispatch-config-old-dependent'
+// import dispatchConfigPeriod from './dispatch-config-period'
 // import dispatchConfigAlert from './dispatch-config-alert'
 export default {
   components: {
-    dispatchConfigTaskDependent,
-    dispatchConfigPeriod,
-    dispatchConfigOldTaskDependent
+    dispatchConfigTaskDependent
+    // dispatchConfigPeriod,
+    // dispatchConfigOldTaskDependent
     // dispatchConfigAlert
   },
   data () {
@@ -176,10 +134,10 @@ export default {
         authOthers: ''
       }
       this.rowData = id ? deepClone(id) : this.rowData
-      this.dispatchStatusForm = {
-        dispatchStatus: 1,
-        dutyUser: ''
-      }
+      // this.dispatchStatusForm = {
+      //   dispatchStatus: 1,
+      //   dutyUser: ''
+      // }
       this.canUpdate = canUpdate
       this.visible = true
       this.$nextTick(() => {
@@ -187,14 +145,14 @@ export default {
         if (id) {
           this.taskType = id.taskType
           this.loading = true
-          this.$refs.dispatchConfigPeriod.init()
+          // this.$refs.dispatchConfigPeriod.init()
           // this.$refs.dispatchConfigAlert.init()
           this.getTaskBaseInfo()
           this.getTaskSelectDependence()
           // this.getOldTaskSelectDependence()
         }
         this.$refs['dataForm1'].resetFields()
-        this.$refs['dispatchStatus'].resetFields()
+        // this.$refs['dispatchStatus'].resetFields()
         setTimeout(() => {
           this.loading = false
         }, 300)
@@ -231,16 +189,6 @@ export default {
         this.dataForm.selectedDpendeceList = data.data
       })
     },
-    // 老调度任务依赖列表
-    getOldTaskSelectDependence () {
-      taskSelectOldDependence(this.id).then(({data}) => {
-        if (data.code !== 0) {
-          this.dataForm.selectedOldDpendeceList = []
-          return this.$message.error(data.msg || '获取数据异常')
-        }
-        this.dataForm.selectedOldDpendeceList = data.data
-      })
-    },
     // 获取状态数据
     getDispatchStatus (data) {
       this.dispatchStatusForm.dispatchStatus = data.dispatchStatus
@@ -270,30 +218,7 @@ export default {
         }
       })
     },
-    // 已选老调度依赖选中操作
-    handleSelectOldDependenceChange (val) {
-      this.selectedOldDpendeceData = val
-    },
-    // 删除老调度任务所选依赖
-    deleteOldDependenceHandle (row) {
-      let arr = []
-      if (row.id) { // 单个删除
-        arr = [row.id]
-      } else { // 批量删除
-        if (!this.selectedOldDpendeceData.length) return
-        this.selectedOldDpendeceData.forEach(item => {
-          arr.push(item.id)
-        })
-      }
-      oldTaskDependenceDelete(arr).then(({data}) => {
-        if (data && data.code === 0) {
-          this.$message.success(data.msg)
-          this.getOldTaskSelectDependence()
-        } else {
-          this.$message.error(data.msg || '删除失败')
-        }
-      })
-    },
+
     // 新增新调度依赖
     addDependenceHandle () {
       this.dispatchConfigTaskDependentVisible = true

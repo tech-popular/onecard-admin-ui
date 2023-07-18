@@ -22,8 +22,13 @@
           </el-form-item>
         </div>
         <el-form-item label="所属系统" prop="projectId">
-          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px" filterable>
+          <el-select v-model="dataForm.projectId" @change="getDolphinFlowList" placeholder="所属系统" style="width: 400px" filterable>
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属工作流" prop="dolphinProcessName">
+          <el-select v-model="dataForm.dolphinProcessName" placeholder="所属工作流" style="width: 400px" filterable allow-create>
+            <el-option :label="item" :value="item" v-for="(item, index) in dolphinProcessList" :key="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Tag标记" prop="tags">
@@ -31,7 +36,6 @@
             <el-option :label="item" :value="item" v-for="(item, index) in tagList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-
         <el-form-item label="任务描述" prop="taskDescribe">
           <el-input type="textarea" v-model="dataForm.taskDescribe" placeholder="任务描述" />
         </el-form-item>
@@ -84,7 +88,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, getGitLabCatalog, getGitLabProjects, getRawBlobContent, getTagsAPI, projectAll } from '@/api/dispatch/taskManag'
+import { info, save, update, getGitLabCatalog, getGitLabProjects, getRawBlobContent, getTagsAPI, projectAll, getDolphinFlowList } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/idea.css'
@@ -123,6 +127,7 @@ export default {
         taskName: '',
         id: '',
         projectId: '',
+        dolphinProcessName: '',
         tags: '',
         taskDescribe: '',
         taskDisable: 1,
@@ -136,9 +141,9 @@ export default {
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
         ],
-        // tag: [
-        //   { required: true, message: '请选择Tag', trigger: 'change' }
-        // ],
+        dolphinProcessName: [
+          { required: true, message: '请选择所属工作流', trigger: 'change' }
+        ],
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
@@ -156,6 +161,7 @@ export default {
         ]
       },
       allSystemList: [],
+      dolphinProcessList: [],
       tagList: [],
       gitLabList: [],
       gitLabDetialList: [],
@@ -238,6 +244,7 @@ export default {
             this.dataForm.tags = data.data.tags
             this.dataForm.taskDisable = data.data.taskDisable
             this.dataForm.gitlabProjectId = data.data.gitlabProjectId
+            this.dataForm.dolphinProcessName = data.data.dolphinProcessName
             this.getGitLabDetail(this.dataForm.gitlabProjectId)
             this.dataForm.gitlabFilePaths = data.data.gitlabFilePaths
             this.parentTreeChange(this.dataForm.gitlabFilePaths)
@@ -263,6 +270,12 @@ export default {
       console.log(item)
       getGitLabCatalog(item).then(({data}) => {
         this.gitLabDetialList = data.data
+      })
+    },
+    getDolphinFlowList (item) {
+      console.log(item)
+      getDolphinFlowList(Number(item)).then(({data}) => {
+        this.dolphinProcessList = data.data
       })
     },
     getGitLabList () {

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<script src="../plugins/go.js"></script>
+<div id="allSampleContent" class="p-4 w-full">
+    <script src="../plugins/RadialLayout.js"></script>
+    <script id="code">
+        var nodeDataArray = [];
+        var linkDataArray = [];
+        function init() {
+            const $ = go.GraphObject.make;  // for conciseness in defining templates
+            myDiagram =
+                new go.Diagram("myDiagramDiv", // must be the ID or reference to div
+                    {
+                        initialAutoScale: go.Diagram.Uniform,
+                        padding: 10,
+                        isReadOnly: true,
+                        layout: $(RadialLayout, {
+                            maxLayers: 2,
+                            rotateNode: function (node, angle, sweep, radius) {  // method override must be function, not =>
+                                // rotate the nodes and make sure the text is not upside-down
+                                node.angle = angle;
+                                var label = node.findObject("TEXTBLOCK");
+                                if (label !== null) {
+                                    label.angle = ((angle > 90 && angle < 270 || angle < -90) ? 180 : 0);
+                                }
+                            },
+                            commitLayers: function () {  // method override must be function, not =>
+                                // optional: add circles in the background
+                                // need to remove any old ones first
+                                const diagram = this.diagram;
+                                var gridlayer = diagram.findLayer("Grid");
+                                var circles = new go.Set(/*go.Part*/);
+                                gridlayer.parts.each(circle => {
+                                    if (circle.name === "CIRCLE") circles.add(circle);
+                                });
+                                circles.each(circle => diagram.remove(circle));
+                                // add circles centered at the root
+                                for (var lay = 1; lay <= this.maxLayers; lay++) {
+                                    var radius = lay * this.layerThickness;
+                                    var circle =
+                                        $(go.Part,
+                                            {name: "CIRCLE", layerName: "Grid"},
+                                            {locationSpot: go.Spot.Center, location: this.root.location},
+                                            $(go.Shape, "Circle",
+                                                {width: radius * 2, height: radius * 2},
+                                                {fill: "rgba(200,200,200,0.2)", stroke: null}));
+                                    diagram.add(circle);
+                                }
+                            }
+                        }),
+                        "animationManager.isEnabled": false
+                    });
+
+            // shows when hovering over a node
+            var commonToolTip =
+                $("ToolTip",
+                    $(go.Panel, "Vertical",
+                        {margin: 3},
+                        $(go.TextBlock,  // bound to node data
+                            {margin: 4, font: "bold 12pt sans-serif"},
+                            new go.Binding("text")),
+                        $(go.TextBlock,  // bound to node data
+                            new go.Binding("text", "color", c => "Color: " + c)),
+                        $(go.TextBlock,  // bound to Adornment because of call to Binding.ofObject
+                            new go.Binding("text", "", ad => "Connections: " + ad.adornedPart.linksConnected.count).ofObject())
+                    )  // end Vertical Panel
+                );  // end Adornment
+
+            // define the Node template
+            myDiagram.nodeTemplate =
+                $(go.Node, "Spot",
+                    {
+                        locationSpot: go.Spot.Center,
+                        locationObjectName: "SHAPE",  // Node.location is the center of the Shape
+                        selectionAdorned: false,
+                        click: nodeClicked,
+                        toolTip: commonToolTip
+                    },
+                    $(go.Shape, "Circle",
+                        {
+                            name: "SHAPE",
+                            fill: "lightgray",  // default value, but also data-bound
+                            stroke: "transparent",
+                            strokeWidth: 2,
+                            desiredSize: new go.Size(20, 20),
+                            portId: ""  // so links will go to the shape, not the whole node
+                        },
+                        new go.Binding("fill", "color")),
+                    $(go.TextBlock,
+                        {
+                            name: "TEXTBLOCK",
+                            alignment: go.Spot.Right,
+                            alignmentFocus: go.Spot.Left
+                        },
+                        new go.Binding("text"))
+                );
+
+            // this is the root node, at the center of the circular layers
+            myDiagram.nodeTemplateMap.add("Root",
+                $(go.Node, "Auto",
+                    {
+                        locationSpot: go.Spot.Center,
+                        selectionAdorned: false,
+                        toolTip: commonToolTip
+                    },
+                    $(go.Shape, "Circle",
+                        {fill: "white"}),
+                    $(go.TextBlock,
+                        {font: "bold 12pt sans-serif", margin: 5},
+                        new go.Binding("text"))
+                ));
+
+            // define the Link template
+            myDiagram.linkTemplate =
+                $(go.Link,
+                    {
+                        routing: go.Link.Normal,
+                        curve: go.Link.Bezier,
+                        selectionAdorned: false,
+                        layerName: "Background"
+                    },
+                    $(go.Shape,
+                        {
+                            stroke: "black",  // default value, but is data-bound
+                            strokeWidth: 1
+                        },
+                        new go.Binding("stroke", "color"))
+                );
+            generateGraph();
+        }
+        window.addEventListener('message', (e) => {
+            var data = e.data;
+            this.nodeDataArray = data.params.nodeDataArray;
+            this.linkDataArray = data.params.linkDataArray;
+        });
+        function generateGraph() {
+            var nodeDataArray = [
+                {key: '0', text: '工作流预览', color: '#1F4963'},
+                {key: '1', text: 'http', color: '#1F4963'},
+                {key: '2', text: 'jdbk', color: '#1F4963'},
+                {key: '3', text: 'json', color: '#1F4963'},
+                {key: '4', text: '数据4', color: '#1F4963'},
+                {key: '5', text: '条件5', color: '#1F4963'},
+                {key: '6', text: '数据5', color: '#1F4963'},
+                {key: '7', text: '数据6', color: '#1F4963'}
+            ]
+            var linkDataArray = [
+                {from: '0', to: '1', color: '#1F4963'},
+                {from: '1', to: '2', color: '#1F4963'},
+                {from: '2', to: '3', color: '#1F4963'},
+                {from: '3', to: '4', color: '#1F4963'},
+                {from: '4', to: '5', color: '#1F4963'},
+                {from: '5', to: '6', color: '#1F4963'},
+                {from: '6', to: '7', color: '#1F4963'}
+            ]
+            myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+            var someone = nodeDataArray[Math.floor(Math.random() * nodeDataArray.length)];
+            nodeClicked(null, myDiagram.findNodeForData(someone));
+        }
+
+        function nodeClicked(e, root) {
+            var diagram = root.diagram;
+            if (diagram === null) return;
+            // all other nodes should be visible and use the default category
+            diagram.nodes.each(n => {
+                n.visible = true;
+                if (n !== root) n.category = "";
+            });
+            // make this Node the root
+            root.category = "Root";
+            // tell the RadialLayout what the root node should be
+            diagram.layout.root = root;
+            diagram.layoutDiagram(true);
+        }
+
+        // called when "Set Max Layers" button is clicked
+        function adjustMaxLayers() {
+            var newMaxLayers = parseInt(document.getElementById('maxLayersChanger').value);
+
+            function isInteger(val) {
+                return typeof val === 'number' &&
+                    isFinite(val) &&
+                    Math.floor(val) === val;
+            }
+
+            if (!isInteger(newMaxLayers) || newMaxLayers < 1 || newMaxLayers > 10) {
+                alert("Please enter an integer larger than zero and less than or equal to 10.");
+            } else {
+                myDiagram.layout.maxLayers = Math.max(1, Math.min(newMaxLayers, 10));
+                nodeClicked(null, myDiagram.layout.root);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+
+    <div id="sample">
+        <div id="myDiagramDiv"
+             style="border: 1px solid black; background: white; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0);">
+            <canvas tabindex="0" width="1054" height="598"
+                    style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 1054px; height: 598px;">
+                This text is displayed if your browser does not support the Canvas HTML element.
+            </canvas>
+            <div style="position: absolute; overflow: auto; width: 1054px; height: 598px; z-index: 1;">
+                <div style="position: absolute; width: 1px; height: 1px;"></div>
+            </div>
+        </div>
+        <label for="maxLayersChanger">Max Layers: </label><input type="text" id="maxLayersChanger" name="maxLayers"
+        <button onclick="adjustMaxLayers()">Set Max Layers</button>
+    </div>
+</body>
+</html>

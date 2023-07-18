@@ -24,7 +24,7 @@
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
             <el-table-column header-align="center" align="center" prop="taskName" label="任务名称"></el-table-column>
             <el-table-column header-align="center" align="center" prop="projectSystemName" label="所属系统"></el-table-column>
-            <el-table-column header-align="center" align="center" prop="lastExecutionTime" label="上次执行结束时间" width="100"></el-table-column>
+<!--            <el-table-column header-align="center" align="center" prop="lastExecutionTime" label="上次执行结束时间" width="100"></el-table-column>-->
           </el-table>
           <el-pagination
             @size-change="sizeChangeHandle"
@@ -166,17 +166,17 @@ export default {
           depProjectId: item.projectId
         })
       })
-        taskDependenceAdd({
-          list: params
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.$message.success(data.msg || '提交成功')
-            this.$emit('refreshTaskDependence')
-            this.closed()
-          } else {
-            this.$message.error(data.msg || '提交异常')
-          }
-        })
+      taskDependenceAdd({
+        list: params
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success(data.msg || '提交成功')
+          this.$emit('refreshTaskDependence')
+          this.closed()
+        } else {
+          this.$message.error(data.msg || '提交异常')
+        }
+      })
     },
     // 每页数
     sizeChangeHandle (page) {

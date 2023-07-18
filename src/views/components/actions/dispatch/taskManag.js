@@ -117,7 +117,7 @@ export const models = {
         // },
         {
           id: 3,
-          label: '调度配置',
+          label: '依赖配置',
           type: 'success',
           size: 'mini',
           isShow: (id) => {
@@ -170,10 +170,10 @@ export const models = {
         },
         {
           id: 4,
-          label: '依赖快照',
+          label: '工作流快照',
           type: 'danger',
-          method: (id) => {
-            this.snapshotHandle(id)
+          method: (dolphinProcessId) => {
+            this.snapshotHandle(dolphinProcessId)
           }
         }
         // ,
@@ -231,6 +231,19 @@ export const models = {
               }
             }, params.row.taskName)
           }
+        },
+        {
+          prop: 'dolphinProcessId',
+          label: '所属工作流',
+          align: 'center',
+          width: '100px',
+          isShow: false
+        },
+        {
+          prop: 'dolphinProcessName',
+          label: '所属工作流',
+          align: 'center',
+          width: '100px'
         },
         {
           prop: 'taskType',
@@ -562,10 +575,11 @@ export const models = {
       this.$router.push({ name: 'dispatch-taskBatch', query: { name: params.row.taskName } })
     },
     // 依赖快照
-    snapshotHandle(id) {
+    snapshotHandle(data) {
       this.taskManagSnapShotVisible = true
       this.$nextTick(() => {
-        this.$refs.taskManagSnapShot.init(id)
+        console.log(data.dolphinProcessId)
+        this.$refs.taskManagSnapShot.init(data.dolphinProcessId)
       })
       // window.open(url, '_blank')
     },
