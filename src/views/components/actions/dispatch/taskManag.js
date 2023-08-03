@@ -170,7 +170,7 @@ export const models = {
         },
         {
           id: 4,
-          label: '工作流快照',
+          label: '调度管理',
           type: 'danger',
           method: (dolphinProcessId) => {
             this.snapshotHandle(dolphinProcessId)
@@ -233,17 +233,22 @@ export const models = {
           }
         },
         {
-          prop: 'dolphinProcessId',
-          label: '所属工作流',
-          align: 'center',
-          width: '100px',
-          isShow: false
-        },
-        {
           prop: 'dolphinProcessName',
           label: '所属工作流',
           align: 'center',
-          width: '100px'
+          width: '100px',
+          render: (h, params) => {
+            return h('a', {
+              style: {
+                cursor: 'pointer'
+              },
+              on: {
+                click: () => {
+                  this.gotoTaskProcessManag(params)
+                }
+              }
+            }, params.row.dolphinProcessName)
+          }
         },
         {
           prop: 'taskType',
@@ -425,7 +430,7 @@ export const models = {
           }
         },
         {
-          label: '新增Trino任务',
+          label: '新增SQL任务',
           type: 'success',
           handle: () => {
             this.computAddOrUpdateHandle()
@@ -573,6 +578,11 @@ export const models = {
     gotoTaskBatchHandle (params) {
       console.log(params)
       this.$router.push({ name: 'dispatch-taskBatch', query: { name: params.row.taskName } })
+    },
+    // 点击名称跳转到流程图
+    gotoTaskProcessManag (params) {
+      console.log(params)
+      this.$router.push({ name: 'dispatch-processManag', query: { name: params.row.id } })
     },
     // 依赖快照
     snapshotHandle(data) {

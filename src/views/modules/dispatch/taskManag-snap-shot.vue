@@ -16,10 +16,10 @@
                     <div>
                         <el-form-item label="运行时间：" prop="onceRunTime">
                             <el-date-picker
-                                v-model="dispatchTimeForm.onceRunTime"
-                                type="datetime"
-                                value-format="yyyy-MM-dd HH:mm:ss"
-                                placeholder="选择日期时间">
+                                    v-model="dispatchTimeForm.onceRunTime"
+                                    type="datetime"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    placeholder="选择日期时间">
                             </el-date-picker>
                             <!-- （未指定运行时间，默认立即下发） -->
                         </el-form-item>
@@ -32,48 +32,48 @@
                     <el-select v-model="dispatchTimeForm.runCycle" placeholder="请选择" style="width:220px;"
                                @change="disTimeTurnOff(dispatchTimeForm.runCycle)">
                         <el-option
-                            v-for="item in dispatchCycleList"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
+                                v-for="item in dispatchCycleList"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="具体时间：" prop="dayOfWeeks" v-if="dispatchTimeForm.runCycle === 'WEEK'">
                     <el-select
-                        v-model="dispatchTimeForm.dayOfWeeks"
-                        multiple
-                        collapse-tags
-                        placeholder="请选择">
+                            v-model="dispatchTimeForm.dayOfWeeks"
+                            multiple
+                            collapse-tags
+                            placeholder="请选择">
                         <el-option
-                            v-for="item in dayOfWeeksList"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
+                                v-for="item in dayOfWeeksList"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="具体时间：" prop="dayOfMonths" v-if="dispatchTimeForm.runCycle === 'MONTH'">
                     <el-select
-                        v-model="dispatchTimeForm.dayOfMonths"
-                        multiple
-                        collapse-tags
-                        placeholder="请选择">
+                            v-model="dispatchTimeForm.dayOfMonths"
+                            multiple
+                            collapse-tags
+                            placeholder="请选择">
                         <el-option
-                            v-for="item in dayOfMonthsList"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
+                                v-for="item in dayOfMonthsList"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item class="label-remove-margin" prop="execTime" label-width="30px"
                               v-if="dispatchTimeForm.runCycle === 'MONTH' || dispatchTimeForm.runCycle === 'WEEK' || dispatchTimeForm.runCycle === 'DAY'">
                     <el-time-picker
-                        v-model="dispatchTimeForm.execTime"
-                        format="HH:mm:ss"
-                        value-format="HH:mm:ss"
-                        placeholder="时:分:秒">
+                            v-model="dispatchTimeForm.execTime"
+                            format="HH:mm:ss"
+                            value-format="HH:mm:ss"
+                            placeholder="时:分:秒">
                     </el-time-picker>
                 </el-form-item>
                 <el-form-item class="label-remove-margin" prop="cron" label-width="30px"
@@ -85,52 +85,56 @@
                  v-if="dispatchTimeForm.jobType === 2 && (dispatchTimeForm.runCycle === 'MINUTE' || dispatchTimeForm.runCycle === 'HOUR')">
                 <el-form-item label="开始时间：" prop="startTime">
                     <el-time-picker
-                        v-model="dispatchTimeForm.startTime"
-                        :clearable=false
-                        format="HH:mm"
-                        value-format="HH:mm"
-                        placeholder="时:分">
+                            v-model="dispatchTimeForm.startTime"
+                            :clearable=false
+                            format="HH:mm"
+                            value-format="HH:mm"
+                            placeholder="时:分">
                     </el-time-picker>
                 </el-form-item>
                 <el-form-item label="时间间隔：" prop="interval">
                     <el-select v-model="dispatchTimeForm.interval" placeholder="请选择">
                         <el-option
-                            v-for="item in timeIntervalList"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
+                                v-for="item in timeIntervalList"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
                         </el-option>
                     </el-select>
                     <span>{{ disIntervalMess }}</span>
                 </el-form-item>
                 <el-form-item label="结束时间：" prop="endTime">
                     <el-time-picker
-                        v-model="dispatchTimeForm.endTime"
-                        :clearable=false
-                        format="HH:mm"
-                        value-format="HH:mm"
-                        placeholder="时:分">
+                            v-model="dispatchTimeForm.endTime"
+                            :clearable=false
+                            format="HH:mm"
+                            value-format="HH:mm"
+                            placeholder="时:分">
                     </el-time-picker>
                 </el-form-item>
             </div>
             <el-form-item label="最晚完成时间：" prop="latestTime"
                           v-if="dispatchTimeForm.jobType === 2 && dispatchTimeForm.runCycle !== 'MINUTE' && dispatchTimeForm.runCycle !== 'HOUR' && dispatchTimeForm.runCycle !== 'CRON'">
                 <el-time-picker
-                    v-model="dispatchTimeForm.latestTime"
-                    :clearable=false
-                    format="HH:mm:ss"
-                    value-format="HH:mm:ss"
-                    placeholder="时:分:秒">
+                        v-model="dispatchTimeForm.latestTime"
+                        :clearable=false
+                        format="HH:mm:ss"
+                        value-format="HH:mm:ss"
+                        placeholder="时:分:秒">
                 </el-time-picker>
             </el-form-item>
+            <el-form-item label="状态：" prop="dispatchStatus" label-width="100px">
+                <el-radio-group v-model="dispatchTimeForm.dispatchStatus">
+                    <el-radio :label="1">有效</el-radio>
+                    <el-radio :label="0">无效</el-radio>
+                </el-radio-group>
+            </el-form-item>
         </el-form>
+        <div id="mind"></div>
         <div class="footer">
             <el-button @click="visible = false">关闭</el-button>
             <el-button type="primary" @click="submitData()">确定</el-button>
         </div>
-<!--        <div style="height: 500px">-->
-<!--            <iframe :src='src' id="iframe" frameborder="0" style="width: 100%;height: 100%"></iframe>-->
-<!--        </div>-->
     </el-dialog>
 </template>
 <script>
@@ -141,10 +145,24 @@ import {
 import {deepClone} from '@/utils'
 
 export default {
+    name: 'Mind',
     props: {
         dolphinProcessId: Number,
         dispatchStatus: Object,
-        canUpdate: Boolean
+        canUpdate: Boolean,
+        // 数据
+        data: {
+            type: Object,
+            default () {
+                return {}
+            }
+        },
+        height: {
+            type: Number,
+            default () {
+                return 0
+            }
+        }
     },
     data() {
         let validateTime = (rule, value, callback) => {
@@ -165,8 +183,8 @@ export default {
         }
         return {
             visible: false,
-            showSessionId: '',
-            src: '',
+            // showSessionId: '',
+            // src: '',
             dispatchTimeForm: {},
             tempForm: {
                 jobType: 1, // 周期
@@ -179,9 +197,8 @@ export default {
                 latestTime: '',
                 cron: '',
                 dayOfWeeks: [], // 周
-                dayOfMonths: [] // 月
-                // failRepeatTrigger: 3,
-                // isRunAgain: 1
+                dayOfMonths: [], // 月
+                dispatchStatus: 1
             },
             disIntervalMess: '分钟',
             timeIntervalList: [],
@@ -203,27 +220,7 @@ export default {
                 {value: '7', label: '周六'}
             ],
             dayOfMonthsList: [],
-            // nodeDataArray: [
-            //   {key: '0', text: '工作流预览', category: 'Start', color: ''},
-            //   {key: '1', text: 'http', category: 'THTTP', dital: '这是详情'},
-            //   {key: '2', text: 'jdbk', category: 'JDBC', dital: '这是详情2'},
-            //   {key: '3', text: 'json', category: 'Condition', dital: '这是详情3'},
-            //   {key: '4', text: '数据4', category: 'Condition', dital: '这是详情4'},
-            //   {key: '5', text: '条件500000000000000', category: 'Judge'},
-            //   {key: '6', text: '数据5', category: 'Condition', dital: '这是详情5'},
-            //   {key: '7', text: '数据6', category: 'Condition', dital: '这是详情6'}
-            // ],
-            // linkDataArray: [
-            //   {from: '0', to: '1', answer: null},
-            //   {from: '1', to: '2', answer: '是'},
-            //   {from: '1', to: '3', answer: null},
-            //   {from: '2', to: '4', answer: null},
-            //   {from: '3', to: '4', answer: null},
-            //   {from: '5', to: '6', answer: null},
-            //   {from: '5', to: '7', answer: null},
-            //   {from: '4', to: '5', answer: null}
-            // ],
-            // iframeWin: {},
+            dolphinProcessId: '',
             dataRule: {
                 jobType: [
                     {required: true, message: '请选择周期', trigger: 'change'}
@@ -277,17 +274,9 @@ export default {
             this.dataAssembly()
             this.disTimeTurnOff('MINUTE')
             this.getTaskPeriodInfo(dolphinProcessId)
-            // this.sendIframeWinpMessage()
+            this.dolphinProcessId = dolphinProcessId
+            // buildAntvContainer(this.treeList)
         },
-        // sendIframeWinpMessage() {
-        //     document.getElementById('iframe').contentWindow.postMessage({
-        //         params: {
-        //             nodeDataArray: this.nodeDataArray,
-        //             linkDataArray: this.linkDataArray
-        //         }
-        //     }, '*')
-        // },
-        // 获取周期信息 & 状态信息
         getTaskPeriodInfo(dolphinProcessId) {
             taskPeriodInfo(dolphinProcessId).then(({data}) => {
                 if (data && data.code === 0) {
@@ -467,9 +456,9 @@ export default {
             console.log('fn: ', fn)
             console.log('authParams: ', authParams)
             let params = {
-                ...this.dispatchStatus,
                 ...this.formatDispatchTime(this.dispatchTimeForm),
                 dolphinProcessId: this.dolphinProcessId,
+                dispatchStatus: this.dispatchTimeForm.dispatchStatus,
                 ...authParams
 
             }
@@ -496,16 +485,19 @@ export default {
     top: 75px;
     bottom: 55px;
 }
-.wrap h3 span  {
+
+.wrap h3 span {
     float: right;
     font-size: 12px;
     font-weight: normal;
 }
+
 .wrap h3 span i {
     font-style: normal;
     padding-right: 10px;
     color: #000;
 }
+
 .drawer-title {
     padding: 15px;
     background: #333;
@@ -514,40 +506,48 @@ export default {
     margin: -20px -20px 0 -20px;
     position: relative;
 }
+
 .drawer-close {
     position: absolute;
     right: 20px;
 }
+
 .codesql {
     font-size: 11pt;
     font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono,
     DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
 }
+
 .btn-code-continue {
     text-align: right;
 }
+
 .work-content-1 {
     border-top: 1px #cccccc dashed;
     padding: 20px 20px 10px 0;
     margin-top: 20px;
 }
+
 .footer {
     position: absolute;
     bottom: 0;
     background: #fff;
     padding: 10px 22px 10px 10px;
-    width: 100%;
+    width: 90%;
     height: 55px;
     text-align: right;
-    box-shadow: 0 -2px 9px 0 rgba(153,169,191,.17);
+    box-shadow: 0 -2px 9px 0 rgba(153, 169, 191, .17);
     z-index: 500;
 }
+
 .CodeMirror {
     height: 260px
 }
+
 .styled-background {
     color: red
 }
+
 .work-type-pane {
     display: flex;
     flex-direction: row;
@@ -555,15 +555,23 @@ export default {
     justify-content: flex-start;
     align-items: center;
 }
+
 .CodeMirror-hints.xq-light, .CodeMirror-hints.idea {
     position: absolute;
     z-index: 9999;
     display: block;
 }
+
 .inputTag {
     border-radius: 4px;
     width: 600px;
     line-height: 22px;
     border: 1px solid #dcdfe6
+}
+</style>
+<style lang="scss" scoped>
+#mind{
+    width: 100%;
+    height: 100%;
 }
 </style>

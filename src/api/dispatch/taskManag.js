@@ -14,7 +14,12 @@ export const save = (params) => httpPost(base + 'dispatch/task/save', params) //
 export const dataSourceAll = (type, flow) => httpGet(base + `dispatch/datasource/supports?taskType=${type}&dataFlow=${flow}`) // 同步及计算任务中的殴打让你源类型下选
 export const accountAll = params => httpPost(base + 'dispatch/account/selectall', params)
 export const tagAll = () => httpGet(base + 'dispatch/task/tag/list')
+export const getExtraParam = (taskType) => httpGet(base + `dispatch/task/extraParam/list/${taskType}`)
 export const getDolphinFlowList = (projectId) => httpGet(base + `dispatch/task/getDolphinFlowList/${projectId}`)
+export const getTaskList = (type) => httpGet(base + `dispatch/task/getTaskList/${type}`)
+export const getDolphinProcessList = () => httpGet(base + `dispatch/task/getDolphinProcessList`)
+export const getDolphinProcessById = (processId) => httpGet(base + `dispatch/task/getDolphinProcessById/${processId}`)
+export const getDolphinTaskById = (taskId) => httpGet(base + `dispatch/task/getDolphinTaskById/${taskId}`)
 export const projectAll = () => httpPost(base + 'dispatch/project/selectall')
 export const getGitLabProjects = () => httpGet(base + 'gitlab/getGitLabProjects')
 export const getTagsAPI = () => httpGet(base + 'dispatch/task/tag/list')

@@ -22,9 +22,14 @@
           </el-form-item>
         </div>
         <el-form-item label="所属系统" prop="projectId">
-          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 300px" filterable>
+          <el-select v-model="dataForm.projectId" placeholder="所属系统" @change="getDolphinFlowList" style="width: 300px" filterable>
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="所属工作流" prop="dolphinProcessName">
+            <el-select v-model="dataForm.dolphinProcessName" placeholder="所属工作流" style="width: 400px" filterable allow-create>
+                <el-option :label="item" :value="item" v-for="(item, index) in dolphinProcessList" :key="index"></el-option>
+            </el-select>
         </el-form-item>
         <el-form-item label="脚本类型" prop="taskType">
             <el-select v-model="dataForm.taskType" @change="changeTaskType" style="width: 300px" clearable placeholder="脚本类型">
@@ -76,7 +81,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, getTagsAPI, projectAll } from '@/api/dispatch/taskManag'
+import { info, save, update, getTagsAPI, projectAll, getDolphinFlowList } from '@/api/dispatch/taskManag'
 export default {
   name: 'addScript',
   data () {
@@ -93,10 +98,12 @@ export default {
       updateUser: '',
       updateTime: '',
       dataForm: {},
+      dolphinProcessList: [],
       tempDataForm: {
         taskName: '',
         id: '',
         projectId: '',
+        dolphinProcessName: '',
         taskType: '',
         script: '',
         tags: '',
@@ -111,6 +118,9 @@ export default {
         ],
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
+        ],
+        dolphinProcessName: [
+            { required: true, message: '请选择所属工作流', trigger: 'change' }
         ],
         taskType: [
           { required: true, message: '请选择脚本类型', trigger: 'change' }
@@ -162,6 +172,7 @@ export default {
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
+            this.dataForm.dolphinProcessName = data.data.dolphinProcessName
             this.dataForm.tags = data.data.tags
             this.dataForm.taskDisable = data.data.taskDisable
             this.dataForm.taskType = data.data.taskType
@@ -194,6 +205,12 @@ export default {
       projectAll().then(({data}) => {
         this.allSystemList = data.data
       })
+    },
+    getDolphinFlowList (item) {
+        console.log(item)
+        getDolphinFlowList(Number(item)).then(({data}) => {
+            this.dolphinProcessList = data.data
+        })
     },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false

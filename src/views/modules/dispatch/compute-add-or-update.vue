@@ -7,7 +7,7 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑Trino任务' : '新增Trino任务' : '查看Trino任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑SQL任务' : '新增SQL任务' : '查看SQL任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3 id="title">任务信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
@@ -22,9 +22,21 @@
           </el-form-item>
         </div>
         <el-form-item label="所属系统" prop="projectId">
-          <el-select v-model="dataForm.projectId" placeholder="所属系统" style="width: 400px" filterable>
+          <el-select v-model="dataForm.projectId" placeholder="所属系统" @change="getDolphinFlowList" style="width: 400px" filterable>
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="所属工作流" prop="dolphinProcessName">
+            <el-select v-model="dataForm.dolphinProcessName" placeholder="所属工作流" style="width: 400px" filterable allow-create>
+                <el-option :label="item" :value="item" v-for="(item, index) in dolphinProcessList" :key="index"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="任务类型" prop="taskType">
+            <el-select v-model="dataForm.taskType" style="width: 400px" @change="changeTaskType" clearable placeholder="任务类型">
+                <el-option label="trino" value="TRINO"></el-option>
+                <el-option label="sparkSql" value="SPARKSQL"></el-option>
+                <el-option label="kyuubi" value="KYUUBI"></el-option>
+            </el-select>
         </el-form-item>
         <el-form-item label="Tag标记" prop="tags">
           <el-select v-model="dataForm.tags" placeholder="Tag标记" style="width: 400px" filterable allow-create multiple>
@@ -42,9 +54,6 @@
         <el-form :model="item" :rules="dataRule" ref="calculateTasks" :disabled="!canUpdate"> 
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
-          </el-form-item>
-          <el-form-item label="作业名称" prop="jobName" label-width="120px">
-            <el-input type="textarea" v-model="item.jobName" placeholder="作业名称" />
           </el-form-item>
           <el-form-item prop="jobSql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
@@ -67,6 +76,13 @@
         </el-form>
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
+        <div class="work-type-pane">
+          <el-form-item label="额外参数" prop="extraParam">
+              <el-select v-model="dataForm.extraParam" placeholder="额外参数" style="width: 400px" filterable allow-create>
+                  <el-option :label="item" :value="item" v-for="(item, index) in extraParamList" :key="index"></el-option>
+              </el-select>
+          </el-form-item>
+        </div>
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
@@ -123,7 +139,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, projectAll, tagAll } from '@/api/dispatch/taskManag'
+import { info, save, update, projectAll, tagAll, getDolphinFlowList, getExtraParam } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
 import diff from '@/assets/js/diff.min.js'
 import 'codemirror/lib/codemirror.css'
@@ -150,15 +166,18 @@ export default {
         authOtherList: [],
         authOthers: ''
       },
-      formDs: 'Trino',
       updateUser: '',
       updateTime: '',
       dataForm: {},
+      dolphinProcessList: [],
       tempDataForm: {
         taskName: '',
         id: '',
         projectId: '',
+        dolphinProcessName: '',
+        taskType: '',
         tags: '',
+        extraParam: '',
         taskDescribe: '',
         taskDisable: 1,
         // requestedUser: '',
@@ -172,7 +191,7 @@ export default {
           // jobType: '',
           // datasourceId: '',
           // accountId: '',
-          jobName: '',
+          // jobName: '',
           jobSql: '',
           // allDatasourceNameList: [],
           // allAccountList: [],
@@ -186,15 +205,21 @@ export default {
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
         ],
+        dolphinProcessName: [
+            { required: true, message: '请选择所属工作流', trigger: 'change' }
+        ],
+        taskType: [
+            { required: true, message: '请选择任务类型', trigger: 'change' }
+        ],
         // tag: [
         //   { required: true, message: '请选择Tag', trigger: 'change' }
         // ],
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
-        jobName: [
-          { required: true, message: '请输入作业名称', trigger: 'blur' }
-        ],
+        // jobName: [
+        //   { required: true, message: '请输入作业名称', trigger: 'blur' }
+        // ],
         // jobType: [
         //   { required: true, message: '请输入作业类型', trigger: 'change' }
         // ],
@@ -222,7 +247,7 @@ export default {
       },
       allSystemList: [],
       tagList: [],
-
+      extraParamList: [],
       // allDatasourceList: [],
       cmOptions: {
         theme: 'idea',
@@ -302,7 +327,10 @@ export default {
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
+            this.dataForm.dolphinProcessName = data.data.dolphinProcessName
+            this.dataForm.taskType = data.data.taskType
             this.dataForm.tags = data.data.tags
+            this.dataForm.extraParam = data.data.extraParam
             this.dataForm.taskDisable = data.data.taskDisable
             // this.dataForm.requestedUser = data.data.requestedUser
             // 是否重跑判断
@@ -325,10 +353,21 @@ export default {
         this.tagList = data.data
       })
     },
+    changeTaskType (item) {
+        getExtraParam(item).then(({data}) => {
+            this.extraParamList = data.data
+        })
+    },
     getAllSystem () {
       projectAll().then(({data}) => {
         this.allSystemList = data.data
       })
+    },
+    getDolphinFlowList (item) {
+        console.log(item)
+        getDolphinFlowList(Number(item)).then(({data}) => {
+            this.dolphinProcessList = data.data
+        })
     },
     drawerClose () { // 关闭抽屉弹窗
       this.visible = false
@@ -541,7 +580,7 @@ export default {
           tenantId: sessionStorage.getItem('tenantId'),
           // taskName: `${this.formDs}_${this.dataForm.taskName}`,
           taskName: `${this.dataForm.taskName}`,
-          taskType: 'Trino',
+          taskType: this.dataForm.taskType,
           calculateTasks: this.calculateTasks
         }
         if (params.isRunAgain === 0) {

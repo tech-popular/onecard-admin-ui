@@ -1,0 +1,455 @@
+<template>
+    <div>
+        <el-form :model="baseForm" ref="baseForm" inline>
+            <el-row class="base-form">
+                <el-form-item prop="key">
+                    <el-select
+                            v-model="baseForm.key"
+                            placeholder="请选择"
+                            class="data-select"
+                            @change="getTaskList"
+                            filterable
+                    >
+                        <el-option
+                                v-for="item in typeList"
+                                :key="item.key"
+                                :label="item.value"
+                                :value="item.key">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item  prop="id">
+                    <el-select
+                            v-model="baseForm.id"
+                            placeholder="请选择"
+                            class="data-select"
+                            filterable
+                    >
+                        <el-option
+                                v-for="item in taskList"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-button type="primary" v-if="true" @click="handleSearch">查询</el-button>
+            </el-row>
+        </el-form>
+        <div id='g6-kaimo'></div>
+    </div>
+</template>
+
+<script>
+import G6 from '@antv/g6'
+import {getTaskList, getDolphinProcessById} from '@/api/dispatch/taskManag'
+
+export default {
+    data() {
+        return {
+            baseForm: {
+                key: '',
+                id: ''
+            },
+            taskList: {
+                id: ''
+            },
+            typeList: [
+                {
+                    key: 1,
+                    value: '任务筛选'
+                },
+                {
+                    key: 2,
+                    value: '工作流筛选'
+                }
+            ],
+            treeData: {},
+            graph: null
+        }
+    },
+    name: 'G6Demo',
+    mounted() {
+        this.getTaskList()
+        this.getDolphinProcessList()
+    },
+    // watch: {
+    //     '$route.query.name' (val) {
+    //         this.getTaskList()
+    //         this.baseForm.id = val
+    //         this.autoSearch(val)
+    //     }
+    // },
+    methods: {
+        getTaskList(item) {
+            getTaskList(item).then(({data}) => {
+                this.taskList = data.data
+            })
+        },
+        handleSearch() {
+            let params = { type: this.baseForm.key, id: this.baseForm.id }
+            console.log('handleSearch' + this.baseForm.id)
+            getDolphinProcessById(params).then(({data}) => {
+                this.initTree(data.data)
+            })
+            // this.initTree(TREELIST)
+        },
+        initTree(data) {
+            if (this.graph) {
+                this.graph.destroy()
+            }
+            console.log('initTre' + JSON.stringify(data))
+            // 文本超出隐藏 (字段, 最大长度, 字体大小)
+            const fittingString = (str, maxWidth, fontSize) => {
+                const ellipsis = '...'
+                const ellipsisLength = G6.Util.getTextSize(ellipsis, fontSize)[0]
+                let currentWidth = 0
+                let res = str
+                const pattern = new RegExp('[\u4E00-\u9FA5]+') // distinguish the Chinese charactors and letters
+                str.split('').forEach((letter, i) => {
+                    if (currentWidth > maxWidth - ellipsisLength) return
+                    if (pattern.test(letter)) {
+                        // Chinese charactors
+                        currentWidth += fontSize
+                    } else {
+                        // get the width of single letter according to the fontSize
+                        currentWidth += G6.Util.getLetterWidth(letter, fontSize)
+                    }
+                    if (currentWidth > maxWidth - ellipsisLength) {
+                        res = `${str.substr(0, i)}${ellipsis}`
+                    }
+                })
+                return res
+            }
+            // 获取文本的长度
+            const getTextSize = (str, maxWidth, fontSize) => {
+                let width = G6.Util.getTextSize(str, fontSize)[0]
+                return width > maxWidth ? maxWidth : width
+            }
+            // 自定义节点
+            G6.registerNode(
+                'tree-node',
+                {
+                    draw(cfg, group) {
+                        let rect
+                        if (cfg.state === 'left') {
+                            rect = group.addShape('rect', {
+                                attrs: {
+                                    x: 210 - getTextSize(cfg.name, 210, 16), // x 轴移动距离
+                                    y: 0, // y 轴移动距离
+                                    width: getTextSize(cfg.name, 210, 16) + 20, // 宽
+                                    height: 40, // 高
+                                    fill: '#C6E5FF',
+                                    stroke: '#5B8FF9', // 边框色
+                                    fontSize: 16,
+                                    fontWeight: 500,
+                                    radius: 4
+                                },
+                                name: 'big-rect-shape'
+                            })
+                            // 左文本点
+                            group.addShape('text', {
+                                attrs: {
+                                    text: fittingString(cfg.name, 210, 16),
+                                    x: 210 - getTextSize(cfg.name, 210, 16) + 10,
+                                    y: 20,
+                                    fontSize: 16,
+                                    textAlign: 'left',
+                                    textBaseline: 'middle',
+                                    fill: '#00287E'
+                                },
+                                name: 'text-shape'
+                            })
+                        }
+                        if (cfg.state !== 'left') {
+                            rect = group.addShape('rect', {
+                                attrs: {
+                                    x: 0, // x 轴移动距离
+                                    y: 0, // y 轴移动距离
+                                    width: getTextSize(cfg.name, 210, 16) + 20, // 宽
+                                    height: 40, // 高
+                                    fill: '#C6E5FF',
+                                    stroke: '#5B8FF9', // 边框色
+                                    fontSize: 16,
+                                    fontWeight: 500,
+                                    radius: 4
+                                },
+                                name: 'big-rect-shape'
+                            })
+                            group.addShape('text', {
+                                attrs: {
+                                    text: fittingString(cfg.name, 210, 16),
+                                    x: 10,
+                                    y: 20,
+                                    fontSize: 16,
+                                    textAlign: 'left',
+                                    textBaseline: 'middle',
+                                    fill: '#00287E'
+                                },
+                                name: 'text-shape'
+                            })
+                            if (cfg.depth === 0) {
+                                rect = group.addShape('rect', {
+                                    attrs: {
+                                        x: 0, // x 轴移动距离
+                                        y: 0, // y 轴移动距离
+                                        width: getTextSize(cfg.name, 210, 16) + 20, // 宽
+                                        height: 40, // 高
+                                        fill: '#5B8FF9',
+                                        stroke: '#5B8FF9', // 边框色
+                                        fontSize: 16,
+                                        fontWeight: 500,
+                                        radius: 4
+                                    },
+                                    name: 'big-rect-shape'
+                                })
+                                group.addShape('text', {
+                                    attrs: {
+                                        text: fittingString(cfg.name, 210, 16),
+                                        x: 10,
+                                        y: 20,
+                                        fontSize: 16,
+                                        textAlign: 'left',
+                                        textBaseline: 'middle',
+                                        fill: '#00287E'
+                                    },
+                                    name: 'text-shape'
+                                })
+                            }
+                        }
+                        // 是否有子节点
+                        if (cfg.children && cfg.children.length > 0) {
+                            if (cfg.state === 'left') {
+                                group.addShape('marker', {
+                                    attrs: {
+                                        x: 210 - getTextSize(cfg.name, 210, 16),
+                                        y: 20,
+                                        r: 6,
+                                        symbol: cfg.collapsed ? G6.Marker.expand : G6.Marker.collapse,
+                                        fill: '#C6E5FF',
+                                        stroke: '#5B8FF9', // 边框色
+                                        lineWidth: 1,
+                                        cursor: 'pointer' // 鼠标变手
+                                    },
+                                    name: 'collapse-icon'
+                                })
+                            } else {
+                                group.addShape('marker', {
+                                    attrs: {
+                                        x: getTextSize(cfg.name, 210, 16) + 20,
+                                        y: 20,
+                                        r: 6,
+                                        symbol: cfg.collapsed ? G6.Marker.expand : G6.Marker.collapse,
+                                        fill: '#C6E5FF',
+                                        stroke: '#5B8FF9', // 边框色
+                                        lineWidth: 1,
+                                        cursor: 'pointer' // 鼠标变手
+                                    },
+                                    name: 'collapse-icon'
+                                })
+                                if (cfg.depth === 0) {
+                                    console.log('cfg---->', cfg)
+                                    group.addShape('marker', {
+                                        attrs: {
+                                            x: 0,
+                                            y: 20,
+                                            r: 6,
+                                            symbol: cfg.collapsed ? G6.Marker.expand : G6.Marker.collapse,
+                                            fill: '#C6E5FF',
+                                            stroke: '#5B8FF9', // 边框色
+                                            lineWidth: 1,
+                                            cursor: 'pointer' // 鼠标变手
+                                        },
+                                        name: 'collapse-icon'
+                                    })
+                                }
+                            }
+                        }
+                        return rect
+                    },
+                    setState: (name, value, item) => {
+                        console.log('自定义节点--->setState：', name, value, item)
+                        if (name === 'collapsed') {
+                            console.log('item-group', item.get('group'))
+                            const marker = item.get('group').findAll(ele => ele.get('name') === 'collapse-icon')
+                            console.log('marker--->', marker)
+                            marker[0] && marker[0].attr('symbol', value ? G6.Marker.collapse : G6.Marker.expand)
+                            // 如果是根节点需要处理两个marker
+                            if (item._cfg.model.depth === 0) {
+                                marker[1] && marker[1].attr('symbol', value ? G6.Marker.collapse : G6.Marker.expand)
+                            }
+                        }
+                    }
+                }
+            )
+            // 自定义边
+            G6.registerEdge(
+                'kaimo-line',
+                {
+                    /**
+                     * 绘制边，包含文本
+                     * @param  {Object} cfg 边的配置项
+                     * @param  {G.Group} group 图形分组，边中的图形对象的容器
+                     * @return {G.Shape} 绘制的图形，通过 node.get('keyShape') 可以获取到
+                     */
+                    draw(cfg, group) {
+                        const startPoint = cfg.startPoint
+                        const endPoint = cfg.endPoint
+                        let shape
+                        if (cfg.state === 'left') {
+                            shape = group.addShape('path', {
+                                attrs: {
+                                    stroke: '#C2C8D5',
+                                    path: [
+                                        ['M', startPoint.x, startPoint.y],
+                                        ['L', endPoint.x / 3 + 2 / 3 * startPoint.x, startPoint.y],
+                                        ['L', endPoint.x / 3 + 2 / 3 * startPoint.x, endPoint.y],
+                                        ['L', endPoint.x, endPoint.y]
+                                    ],
+                                    endArrow: {
+                                        path: G6.Arrow.triangle(5, 5, 0), // 使用内置箭头路径函数，参数为箭头的 宽度、长度、偏移量（默认为 0，与 d 对应）
+                                        d: 0,
+                                        fill: '#C2C8D5',
+                                        opacity: 0.5,
+                                        lineWidth: 1
+                                    }
+                                },
+                                // must be assigned in G6 3.3 and later versions. it can be any value you want
+                                name: 'path-shape'
+                            })
+                        } else {
+                            shape = group.addShape('path', {
+                                attrs: {
+                                    stroke: '#C2C8D5',
+                                    path: [
+                                        ['M', startPoint.x, startPoint.y],
+                                        ['L', endPoint.x / 3 + 2 / 3 * startPoint.x, startPoint.y],
+                                        ['L', endPoint.x / 3 + 2 / 3 * startPoint.x, endPoint.y],
+                                        ['L', endPoint.x, endPoint.y]
+                                    ],
+                                    endArrow: {
+                                        path: G6.Arrow.triangle(5, 5, 0), // 使用内置箭头路径函数，参数为箭头的 宽度、长度、偏移量（默认为 0，与 d 对应）
+                                        d: 0,
+                                        fill: '#C2C8D5',
+                                        opacity: 0.5,
+                                        lineWidth: 1
+                                    }
+                                },
+                                // must be assigned in G6 3.3 and later versions. it can be any value you want
+                                name: 'path-shape'
+                            })
+                        }
+                        return shape
+                    }
+                }
+            )
+            // 自定义事件
+            G6.registerBehavior('kaimo-behavior', {
+                getEvents() {
+                    return {
+                        'node:click': 'onNodeClick'
+                    }
+                },
+                // 自定义单击事件
+                onNodeClick: (evt) => {
+                    // 单击展开/收起
+                    console.log('自定义单击事件--->', evt, this.graph)
+                    evt.item._cfg.model.collapsed = !evt.item._cfg.model.collapsed
+                    // 更改 item 的状态，触发自定义节点：setState
+                    this.graph.setItemState(evt.item, 'collapsed', !evt.item.getModel().collapsed)
+                    this.graph.layout()
+                }
+            })
+
+            // 定义画布的宽高
+            const width = document.getElementById('g6-kaimo').scrollWidth || 1600
+            const height = document.getElementById('g6-kaimo').scrollHeight || 960
+            // 实例化G6
+            // 因为我们用的是树图，所以这里是G6.TreeGraph(),还有其他，像是普通图的配置G6.Graph(),一般y用的比较多的就像是树图这种，还有组织架构图一类的。
+            this.graph = new G6.TreeGraph({
+                // 图的  DOM 容器，对应上面我们定义的id
+                container: 'g6-kaimo',
+                width,
+                height,
+                // 设置画布的交互模式
+                modes: {
+                    default: [
+                        // 自定义事件
+                        'kaimo-behavior',
+                        // 拖拽画布
+                        'drag-canvas',
+                        // 缩放画布
+                        'zoom-canvas'
+                    ]
+                },
+                // 配置节点的属性
+                defaultNode: {
+                    // 节点类型，cicle:圆形，rect:矩形，ellipse:椭圆，diamond:菱形，triangle：三角形，star：五角星，image：图片，modelRect：卡片
+                    type: 'tree-node',
+                    // 节点样式
+                    style: {
+                        // 鼠标经过是的形状，跟css是一样的。
+                        cursor: 'pointer',
+                        // 圆角
+                        radius: 4
+                    }
+                },
+                // 配置边的属性
+                defaultEdge: {
+                    // 指定边的类型，可以是内置边的类型名称，也可以是自定义边的名称。
+                    // line:直线，polyline：折线，arc：圆弧线，quadratic：二阶贝塞尔曲线，cubic：三阶贝塞尔曲线，cubic-vertica：垂直方向的三阶贝塞尔曲线，不考虑用户从外部传入的控制点。cubic-horizontal：水平方向的三阶贝塞尔曲线，不考虑用户从外部传入的控制点。loop：自环
+                    type: 'kaimo-line'
+                },
+                // 布局配置项
+                layout: {
+                    // 布局名称,这个可就太多了，这个只是树图结构中的一种。比如还有compactBox：紧凑树布局，dendrogram：生态树布局，indented：缩紧树布局。
+                    type: 'compactBox', // 脑图树布局
+                    direction: 'H', // H / V / LR / RL / TB / BT 这些是控制节点分布位置，从左往右、从右往左、从中间往上下延伸、从中间往左右延伸...具体可以看官网
+                    // 节点 id 的回调函数
+                    getId: function getId(d) {
+                        return d.id
+                    },
+                    // 下面都是一些控制节点与节点间距离的回调函数，具体可以试着修改一下值。
+                    // 节点高度的回调函数
+                    getHeight: function getHeight() {
+                        return 16
+                    },
+                    // 节点宽度的回调函数
+                    getWidth: function getWidth(cfg) {
+                        return 60
+                    },
+                    // 节点纵向间距的回调函数
+                    getVGap: function getVGap() {
+                        return 20
+                    },
+                    // 节点横向间距的回调函数
+                    getHGap: function getHGap(val) {
+                        return 100
+                    },
+                    // 这个getSide就是控制节点位置的属性了，通过数据结构中定义的值做判断，来控制左右，
+                    // 注意的是这个官方写的只能return 'left'和'right'，当我们的树结构是竖着的呢？难道是用top和bottom？这里我也试过了，用top和bottom是不好使的，因为人家官方确确实实的只有left和right，通过尝试，其实left就对应top，right对应bottom，所以要控制节点在上面就写left,在下面就写right。
+                    getSide: (node) => {
+                        if (node.data.state === 'left') {
+                            return 'left'
+                        }
+                        return 'right'
+                    }
+                },
+                // 动画属性
+                animate: true
+            })
+            // 默认全部展开
+            G6.Util.traverseTree(data, function (item) {
+                item.collapsed = false
+            })
+            // 初始化的图数据
+            this.graph.data(data)
+            // 根据提供的数据渲染视图。
+            this.graph.render()
+            // 让画布内容适应视口
+            this.graph.fitView()
+        }
+    }
+}
+</script>
