@@ -87,7 +87,7 @@ export const models = {
             return true
           },
           method: (id) => {
-            if (id.taskType === 'Trino') {
+            if (id.taskType === 'KYUUBI' || id.taskType === 'SPARKSQL' || id.taskType === 'TRINO') {
               this.computAddOrUpdateHandle(id)
             } else if (id.taskType === 'DBT') {
               this.addDBTHandle(id)

@@ -241,6 +241,7 @@ export default {
             this.dataForm.id = data.data.id
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
+            this.getDolphinFlowList(data.data.projectId)
             this.dataForm.tags = data.data.tags
             this.dataForm.taskDisable = data.data.taskDisable
             this.dataForm.gitlabProjectId = data.data.gitlabProjectId
