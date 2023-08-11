@@ -71,10 +71,11 @@ export default {
     },
     name: 'G6Demo',
     mounted() {
-        this.getTaskList()
+        // this.getTaskList()
     },
     methods: {
         getTaskList(item) {
+            console.log('item' + item)
             getTaskList(item).then(({data}) => {
                 this.taskList = data.data
                 this.typeList.key = item
@@ -88,100 +89,15 @@ export default {
             console.log('this.typeList.key' + this.typeList.key)
             if (this.typeList.key === 1) {
                 getDolphinTaskById(this.baseForm.id).then(({data}) => {
-                    this.initTaskTree(data.data)
+                    this.initTree(data.data)
                 })
             } else {
                 getDolphinProcessById(this.baseForm.id).then(({data}) => {
-                    this.initProcessTree(data.data)
+                    this.initTree(data.data)
                 })
             }
         },
-        initTaskTree(data) {
-            const container = document.getElementById('container')
-            const width = container.scrollWidth
-            const height = container.scrollHeight
-            this.graph = new G6.TreeGraph({
-                container: 'container',
-                width,
-                height,
-                modes: {
-                    default: [
-                        {
-                            type: 'collapse-expand',
-                            onChange: function onChange(item, collapsed) {
-                                const data = item.get('model')
-                                data.collapsed = collapsed
-                                return true
-                            }
-                        },
-                        'drag-canvas',
-                        'zoom-canvas'
-                    ]
-                },
-                defaultNode: {
-                    type: 'rect',
-                    style: {
-                        stroke: '#5B8FF9',
-                        fill: '#C6E5FF',
-                        lineWidth: 1,
-                        radius: 10
-                    },
-                    anchorPoints: [
-                        [0, 0.5],
-                        [1, 0.5]
-                    ]
-                },
-                defaultEdge: {
-                    type: 'cubic-horizontal'
-                },
-                layout: {
-                    type: 'mindmap',
-                    direction: 'H',
-                    getHeight: () => {
-                        return 16
-                    },
-                    getWidth: () => {
-                        return 16
-                    },
-                    getVGap: () => {
-                        return 10
-                    },
-                    getHGap: () => {
-                        return 50
-                    },
-                    getSide: (node) => {
-                        return node.data.state
-                    }
-                }
-            })
-
-            this.graph.node(function (node) {
-                console.log('node:' + JSON.stringify(node))
-                if (node.state === 'center') {
-                    return {
-                        label: node.id,
-                        style: {
-                            stroke: '#50C878',
-                            fill: '#9FE2BF',
-                            lineWidth: 1,
-                            radius: 10
-                        }
-                    }
-                }
-                return {
-                    label: node.id
-                }
-            })
-
-            // 默认全部展开
-            G6.Util.traverseTree(data, function (item) {
-                item.collapsed = false
-            })
-            this.graph.data(data)
-            this.graph.render()
-            this.graph.fitView()
-        },
-        initProcessTree(data) {
+        initTree(data) {
             G6.registerNode(
                 'sql',
                 {
@@ -229,14 +145,14 @@ export default {
                 height,
                 layout: {
                     type: 'dagre',
-                    rankdir: 'LR',
+                    rankdir: 'TB',
                     nodesepFunc: (d) => {
                         // if (d.id === '3') {
                         //     return 500
                         // }
                         return 50
                     },
-                    ranksep: 70,
+                    ranksep: 30,
                     controlPoints: true
                 },
                 defaultNode: {
@@ -262,22 +178,39 @@ export default {
                     default: [
                         'drag-canvas',
                         'zoom-canvas',
-                        'click-select',
-                        {
-                            type: 'tooltip',
-                            formatText(model) {
-                                const cfg = model.conf
-                                const text = []
-                                cfg.forEach((row) => {
-                                    text.push(row.label + ':' + row.value + '<br>')
-                                })
-                                return text.join('\n')
-                            },
-                            offset: 30
-                        }
+                        'click-select'
+                        // {
+                        //     type: 'tooltip',
+                        //     formatText(model) {
+                        //         const cfg = model.conf
+                        //         const text = []
+                        //         cfg.forEach((row) => {
+                        //             text.push(row.label + ':' + row.value + '<br>')
+                        //         })
+                        //         return text.join('\n')
+                        //     },
+                        //     offset: 30
+                        // }
                     ]
                 },
                 fitView: true
+            })
+            this.graph.node(function (node) {
+                console.log('node:' + JSON.stringify(node))
+                if (node.id === 'center') {
+                    return {
+                        label: node.name,
+                        style: {
+                            stroke: '#50C878',
+                            fill: '#9FE2BF',
+                            lineWidth: 1,
+                            radius: 10
+                        }
+                    }
+                }
+                return {
+                    label: node.id
+                }
             })
             this.graph.data(data)
             this.graph.render()

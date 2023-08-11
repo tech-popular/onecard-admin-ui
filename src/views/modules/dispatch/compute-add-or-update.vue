@@ -56,7 +56,10 @@
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
           <el-form-item label="作业名称" prop="jobName" label-width="120px">
-              <el-input type="textarea" v-model="item.jobName" placeholder="作业名称" />
+              <el-input v-model="item.jobName" placeholder="作业名称" />
+          </el-form-item>
+          <el-form-item label="作业描述" prop="jobDesc" label-width="120px">
+              <el-input type="textarea" v-model="item.jobDesc" placeholder="作业名称" />
           </el-form-item>
           <el-form-item prop="jobSql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
@@ -194,7 +197,8 @@ export default {
           // jobType: '',
           // datasourceId: '',
           // accountId: '',
-          // jobName: '',
+          jobName: '',
+          jobDesc: '',
           jobSql: '',
           // allDatasourceNameList: [],
           // allAccountList: [],
