@@ -72,6 +72,7 @@ export const models = {
       submitDataApis: updateDispatchTaskAuths,
       assignPermissionVisible: false,
       taskManagSnapShotVisible: false,
+      taskManagParamsVisible: false,
       operatesFixed: 'right',
       snapshot: 'http://dss.9fbank.com:8091/task/depency?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlJobStatus=Done&isUser=true',
       editSnapshot: 'http://dss.9fbank.com:8091/depend/list?etlJobId=01165352627912917264&etlJobName=me_dlv_db_clearingExt_t_deduct_discint_trade_info&etlSystemCode=12&serverGroupId=e85ee394c572477cab12ecdf8ee5629b',
@@ -174,6 +175,14 @@ export const models = {
           type: 'danger',
           method: (dolphinProcessId) => {
             this.snapshotHandle(dolphinProcessId)
+          }
+        },
+        {
+          id: 4,
+          label: '参数配置',
+          type: 'success',
+          method: (id) => {
+            this.paramsHandle(id)
           }
         }
         // ,
@@ -584,7 +593,6 @@ export const models = {
       console.log(params)
       this.$router.push({ name: 'dispatch-processManag', query: { name: params.row.id } })
     },
-    // 依赖快照
     snapshotHandle(data) {
       this.taskManagSnapShotVisible = true
       this.$nextTick(() => {
@@ -592,6 +600,14 @@ export const models = {
         this.$refs.taskManagSnapShot.init(data.dolphinProcessId)
       })
       // window.open(url, '_blank')
+    },
+    // 参数配置
+    paramsHandle(data) {
+      this.taskManagParamsVisible = true
+      this.$nextTick(() => {
+        console.log(data.id)
+        this.$refs.taskManagParams.init(data.id)
+      })
     },
     // 编辑依赖
     editSnapshotHandle(url) {

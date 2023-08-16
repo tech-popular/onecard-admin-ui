@@ -43,6 +43,8 @@
     <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="init"></assign-permission>
     <!-- 依赖快照 -->
     <taskManag-snap-shot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"></taskManag-snap-shot>
+    <!-- 参数管理 -->
+    <taskManagParams v-if="taskManagParamsVisible" ref="taskManagParams" @refreshDataList="init" ></taskManagParams>
   </div>
 </template>
 
@@ -54,6 +56,7 @@ import ScriptAddOrUpdate from './script-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import AssignPermission from '../../components/permission/assign-permission'
 import taskManagSnapShot from './taskManag-snap-shot'
+import taskManagParams from './taskManag-params.vue'
 import { models } from '../../components/actions/dispatch/taskManag'
 export default {
   mixins: [models],
@@ -64,7 +67,8 @@ export default {
     ScriptAddOrUpdate,
     dispatchConfigAddOrUpdate,
     AssignPermission,
-    taskManagSnapShot
+    taskManagSnapShot,
+    taskManagParams
   }
 }
 </script>

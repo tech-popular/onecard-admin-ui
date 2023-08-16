@@ -1,0 +1,184 @@
+<template>
+    <el-dialog title="参数配置" :close-on-click-modal="false" :visible.sync="visible">
+<!--        <el-form-item v-for="(dispatchTaskParams, index) in dataForm.dispatchTaskParamsList"-->
+<!--                      :label="'全局参数' + index" :key="dispatchTaskParams.key">-->
+<!--            <el-row :gutter="24">-->
+<!--                <el-col :span="10">-->
+<!--                    <div class="grid-content bg-purple">-->
+<!--                        <el-select v-model="dispatchTaskParams.prop" placeholder="参数名"-->
+<!--                                   @change="changeParamsKey(item)" style="width: 400px"-->
+<!--                                   filterable allow-create multiple>-->
+<!--                            <el-option :label="item.prop" :value="item.prop" v-for="(item, index) in paramsList"-->
+<!--                                       :key="index"></el-option>-->
+<!--                        </el-select>-->
+<!--                    </div>-->
+<!--                </el-col>-->
+<!--                <el-col :span="10">-->
+<!--                    <div class="grid-content bg-purple">-->
+<!--                        <el-input v-model="dispatchTaskParams.prop"></el-input>-->
+<!--                    </div>-->
+<!--                </el-col>-->
+<!--                <el-col :span="10">-->
+<!--                    <div class="grid-content bg-purple">-->
+<!--                        <el-input v-model="dispatchTaskParams.value"></el-input>-->
+<!--                    </div>-->
+<!--                </el-col>-->
+<!--                <el-col :span="4">-->
+<!--                    <div class="grid-content bg-purple">-->
+<!--                        <el-button @click.prevent="removeDomain(dispatchTaskParams, index)">删除</el-button>-->
+<!--                    </div>-->
+<!--                    <div class="grid-content bg-purple">-->
+<!--                        <el-button @click="addDomain">新增全局参数</el-button>-->
+<!--                    </div>-->
+<!--                </el-col>-->
+<!--            </el-row>-->
+<!--        </el-form-item>-->
+        <el-form-item label="新增sql"></el-form-item>
+        <el-form-item
+                v-for="(dispatchTaskParams, index) in dataForm.dispatchTaskParamsList"
+                :label="'sql数据源'+index"
+                :key="dispatchTaskParams.key"
+                :rules="{
+      required: true, message: '表名不能为空', trigger: 'blur'}">
+            <el-row :gutter="24">
+                <el-col :span="5">
+                    <div class="grid-content bg-purple">
+                        <el-select v-model="dispatchTaskParams.prop" placeholder="请选择">
+                            <el-option
+                                    v-for="item in paramsList"
+                                    :key="item.prop"
+                                    :label="item.prop"
+                                    :value="item.prop">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </el-col>
+                <el-col :span="10">
+                    <div class="grid-content bg-purple">
+                        <el-input type="textarea" v-model="dispatchTaskParams.value"></el-input>
+                    </div>
+                </el-col>
+                <el-col :span="2">
+                    <div class="grid-content bg-purple">
+                        <el-button @click.prevent="removeDomain(dispatchTaskParams)">删除</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item>
+            <el-button @click="addDomain">新增sql数据源</el-button>
+        </el-form-item>
+
+
+
+
+
+
+        <div slot="footer">
+            <el-button @click="visible = false">关闭</el-button>
+            <el-button type="primary" @click="dataFormSubmit()">提交</el-button>
+        </div>
+<!--        <el-form-item-->
+<!--                prop="email"-->
+<!--                label="邮箱"-->
+<!--                :rules="[-->
+<!--      { required: true, message: '请输入邮箱地址', trigger: 'blur' },-->
+<!--      { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }-->
+<!--    ]"-->
+<!--        >-->
+<!--            <el-input v-model="dynamicValidateForm.email"></el-input>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item-->
+<!--                v-for="(domain, index) in dynamicValidateForm.domains"-->
+<!--                :label="'域名' + index"-->
+<!--                :key="domain.key"-->
+<!--                :prop="'domains.' + index + '.value'"-->
+<!--                :rules="{-->
+<!--      required: true, message: '域名不能为空', trigger: 'blur'-->
+<!--    }"-->
+<!--        >-->
+<!--            <el-input v-model="domain.value"></el-input><el-button @click.prevent="removeDomain(domain)">删除</el-button>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item>-->
+<!--            <el-button type="primary" @click="submitForm('dynamicValidateForm')">提交</el-button>-->
+<!--            <el-button @click="addDomain">新增域名</el-button>-->
+<!--            <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>-->
+<!--        </el-form-item>-->
+    </el-dialog>
+</template>
+<script>
+import {
+    getParamsList,
+    getParamsListByTaskId,
+    saveParams
+} from '@/api/dispatch/taskManag'
+
+export default {
+    data() {
+        return {
+            visible: false,
+            taskId: '',
+            dataForm: {
+                dispatchTaskParamsList: [{
+                    prop: '',
+                    value: ''
+                }
+                ]
+            },
+            paramsList: []
+        }
+    },
+    mounted() {
+        this.init()
+    },
+    methods: {
+        init(id) {
+            this.taskId = id
+            console.log('this.taskId:' + id)
+            this.visible = true
+            this.selectParamsList()
+            this.$nextTick(() => {
+                if (id) {
+                    getParamsListByTaskId(id).then(({data}) => {
+                        this.dataForm.dispatchTaskParamsList = data.data
+                    })
+                }
+            })
+        },
+        selectParamsList() {
+            getParamsList().then(({data}) => {
+                this.paramsList = data.data
+            })
+        },
+        changeParamsKey(item) {
+            this.dataForm.dispatchTaskParamsList.paramsValue = item.paramsValue
+        },
+        addDomain() {
+            this.dataForm.dispatchTaskParamsList.push({
+                value: '',
+                key: Date.now()
+            })
+        },
+        removeDomain(item) {
+            var index = this.dataForm.dispatchTaskParamsList.indexOf(item)
+            if (index !== -1) {
+                this.dataForm.dispatchTaskParamsList.splice(index, 1)
+            }
+        },
+        dataFormSubmit() {
+            saveParams({
+                dispatchTaskParamsList: this.dataForm.dispatchTaskParamsList,
+                taskId: this.taskId
+            }).then(({data}) => {
+                if (data && data.code === 0) {
+                    this.$message.success(data.msg || '保存成功')
+                    this.$emit('refreshTaskDependence')
+                    this.closed()
+                } else {
+                    this.$message.error(data.msg || '提交异常')
+                }
+            })
+        }
+    }
+}
+</script>

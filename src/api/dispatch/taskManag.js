@@ -34,6 +34,11 @@ export const taskDependenceAdd = params => httpPost(base + 'dispatch/task/depend
 export const taskBaseList = params => httpPost(base + 'dispatch/task/listOnPage', params) // 基础任务分页列表
 export const taskDependenceDelete = params => httpPostFile(base + 'dispatch/task/dependence/delete', params) // 依赖任务批量删除
 export const taskSelectDependence = id => httpGet(base + `dispatch/task/dependence/selectDependence/${id}`) // 已选依赖列表
+// 参数管理
+export const getParamsList = () => httpGet(base + '/dispatch/task/params/globalParamList')
+export const getParamsListByTaskId = id => httpGet(base + `/dispatch/task/params/getParamsListByTaskId/${id}`)
+export const getParamsByProp = prop => httpGet(base + `/dispatch/task/params/getParamsByProp/${prop}`)
+export const saveParams = params => httpPost(base + '/dispatch/task/params/save', params) // 保存
 // 调度周期
 export const taskPeriodInfo = id => httpGet(base + `dispatch/task/period/info/${id}`) // 调度周期信息回显接口
 export const taskPeriodSaveOrUpdate = params => httpPost(base + 'dispatch/task/period/saveOrUpdate', params) // 周期保存接口
