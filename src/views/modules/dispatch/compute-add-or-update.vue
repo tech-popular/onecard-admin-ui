@@ -55,9 +55,9 @@
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
-          <el-form-item label="作业名称" prop="jobName" label-width="120px">
-              <el-input v-model="item.jobName" placeholder="作业名称" />
-          </el-form-item>
+<!--          <el-form-item label="作业名称" prop="jobName" label-width="120px">-->
+<!--              <el-input v-model="item.jobName" placeholder="作业名称" />-->
+<!--          </el-form-item>-->
           <el-form-item label="作业描述" prop="jobDesc" label-width="120px">
               <el-input type="textarea" v-model="item.jobDesc" placeholder="作业名称" />
           </el-form-item>
@@ -197,7 +197,7 @@ export default {
           // jobType: '',
           // datasourceId: '',
           // accountId: '',
-          jobName: '',
+          // jobName: '',
           jobDesc: '',
           jobSql: '',
           // allDatasourceNameList: [],
@@ -224,9 +224,9 @@ export default {
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
-        jobName: [
-          { required: true, message: '请输入作业名称', trigger: 'blur' }
-        ],
+        // jobName: [
+        //   { required: true, message: '请输入作业名称', trigger: 'blur' }
+        // ],
         // jobType: [
         //   { required: true, message: '请输入作业类型', trigger: 'change' }
         // ],
