@@ -464,9 +464,14 @@ export default {
             }
             taskPeriodSaveOrUpdate(params).then(({data}) => {
                 if (data && data.code === 0) {
-                    // fn()
-                    this.$message.success(data.msg)
-                    this.$emit('refreshList')
+                    this.$message({
+                        message: data.msg || '操作成功"',
+                        type: 'success',
+                        onClose: () => {
+                            this.visible = false
+                            this.$emit('refreshDataList')
+                        }
+                    })
                 } else {
                     this.$message.error(data.msg)
                 }
