@@ -1,0 +1,74 @@
+<template>
+  <div>
+    <searchForm
+      size="mini"
+      labelWidth="100px"
+      :searchData="searchData"
+      :searchForm="searchForm"
+      :searchHandle="searchHandle"
+    ></searchForm>
+    <tab :list="list" :columns="columns" :operates="operates" :fixed="operatesFixed" :operates-width="operatesWidth" :is-selection="isAdmin" @selection-change="handleSelectionChange"/>
+    <el-pagination
+      @size-change="sizeChangeHandle"
+      @current-change="currentChangeHandle"
+      :current-page="pageNum"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"
+    />
+    <!-- 弹窗, 新增 / 修改同步任务 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="init" />
+    <!-- 弹窗, 新增 / 修改Trino任务 -->
+    <comput-add-or-update
+      v-if="computAddOrUpdateVisible"
+      ref="computAddOrUpdate"
+      @refreshDataList="init"
+    />
+        <!-- 弹窗, 新增 / 修改DBT任务 -->
+    <AddDBTPop
+      v-if="addDBTVisible"
+      ref="addDBTRef"
+      @refreshDataList="init"
+    />
+      <!-- 弹窗, 新增 / 修改脚本任务 -->
+      <script-add-or-update
+              v-if="scriptAddOrUpdateVisible"
+              ref="scriptAddOrUpdate"
+              @refreshDataList="init"
+      />
+    <!--调度配置-->
+    <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate" @refreshDataList="init" />
+    <!-- 授权 -->
+    <assign-permission v-if="assignPermissionVisible" :submitDataApi= "submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="init"></assign-permission>
+    <!-- 依赖快照 -->
+    <taskManag-snap-shot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"></taskManag-snap-shot>
+    <!-- 参数管理 -->
+    <taskManagParams v-if="taskManagParamsVisible" ref="taskManagParams" @refreshDataList="init" ></taskManagParams>
+  </div>
+</template>
+
+<script>
+import AddOrUpdate from './taskManag-add-or-update'
+import ComputAddOrUpdate from './compute-add-or-update'
+import AddDBTPop from './add-DBT-pop'
+import ScriptAddOrUpdate from './script-add-or-update'
+import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
+import AssignPermission from '../../components/permission/assign-permission'
+import taskManagSnapShot from './taskManag-snap-shot'
+import taskManagParams from './taskManag-params.vue'
+import { models } from '../../components/actions/dispatch/taskManag'
+export default {
+  mixins: [models],
+  components: {
+    AddDBTPop,
+    AddOrUpdate,
+    ComputAddOrUpdate,
+    ScriptAddOrUpdate,
+    dispatchConfigAddOrUpdate,
+    AssignPermission,
+    taskManagSnapShot,
+    taskManagParams
+  }
+}
+</script>

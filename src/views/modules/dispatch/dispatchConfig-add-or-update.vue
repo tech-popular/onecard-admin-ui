@@ -127,7 +127,7 @@ export default {
   },
   methods: {
     init (id, canUpdate) {
-      this.id = id ? id.id : ''
+      console.log('dispatchConfig->id=', id)
       this.rowData = {
         authOwner: '',
         authOtherList: [],
@@ -147,8 +147,8 @@ export default {
           this.loading = true
           // this.$refs.dispatchConfigPeriod.init()
           // this.$refs.dispatchConfigAlert.init()
-          this.getTaskBaseInfo()
-          this.getTaskSelectDependence()
+          this.getTaskBaseInfo(id)
+          this.getTaskSelectDependence(id)
           // this.getOldTaskSelectDependence()
         }
         this.$refs['dataForm1'].resetFields()
@@ -159,8 +159,8 @@ export default {
       })
     },
     // 基础信息
-    getTaskBaseInfo () {
-      taskBaseInfo(this.id).then(({data}) => {
+    getTaskBaseInfo (id) {
+      taskBaseInfo(id).then(({data}) => {
         if (data.code !== 0) {
           return this.$message.error(data.msg || '获取数据异常')
         }
@@ -181,8 +181,8 @@ export default {
       })
     },
     // 新调度任务依赖列表
-    getTaskSelectDependence () {
-      taskSelectDependence(this.id).then(({data}) => {
+    getTaskSelectDependence (id) {
+      taskSelectDependence(id).then(({data}) => {
         if (data.code !== 0) {
           return this.$message.error(data.msg || '获取数据异常')
         }

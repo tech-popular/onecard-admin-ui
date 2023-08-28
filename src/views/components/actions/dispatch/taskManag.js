@@ -80,9 +80,10 @@ export const models = {
       operatesWidth: '250px',
       operates: [{
           id: 1,
-          label: '编辑任务',
+          // label: '编辑任务',
           type: 'primary',
-          size: 'mini',
+          // size: 'mini',
+          icon: 'el-icon-edit',
           isShow: (id) => {
             // return this.isAdmin || id.authOtherList.includes(this.userid) || id.authOwner === this.userid
             return true
@@ -431,13 +432,13 @@ export const models = {
             this.resetHandle()
           }
         },
-        {
-          label: '新增DBT任务',
-          type: 'warning',
-          handle: () => {
-            this.addDBTHandle()
-          }
-        },
+        // {
+        //   label: '新增DBT任务',
+        //   type: 'warning',
+        //   handle: () => {
+        //     this.addDBTHandle()
+        //   }
+        // },
         {
           label: '新增SQL任务',
           type: 'success',
@@ -447,7 +448,7 @@ export const models = {
         },
         {
           label: '新增脚本任务',
-          type: 'success',
+          type: 'warning',
           handle: () => {
             this.scriptAddOrUpdateHandle()
           }
