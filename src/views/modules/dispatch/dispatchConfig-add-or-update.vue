@@ -58,7 +58,7 @@
       <el-button @click="visible = false">关闭</el-button>
 <!--      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>-->
     </div>
-    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence"></dispatch-config-task-dependent>
+    <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence()"></dispatch-config-task-dependent>
   </el-drawer>
 </template>
 
@@ -127,6 +127,7 @@ export default {
   },
   methods: {
     init (id, canUpdate) {
+      this.id = id
       console.log('dispatchConfig->id=', id)
       this.rowData = {
         authOwner: '',
@@ -181,8 +182,9 @@ export default {
       })
     },
     // 新调度任务依赖列表
-    getTaskSelectDependence (id) {
-      taskSelectDependence(id).then(({data}) => {
+    getTaskSelectDependence () {
+      console.log('getTaskSelectDependence.id:' + this.id)
+      taskSelectDependence(this.id).then(({data}) => {
         if (data.code !== 0) {
           return this.$message.error(data.msg || '获取数据异常')
         }
