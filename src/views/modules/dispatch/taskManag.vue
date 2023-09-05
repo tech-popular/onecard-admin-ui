@@ -45,7 +45,11 @@
                     width="50">
             </el-table-column>
             <el-table-column prop="id" header-align="center" align="center" label="任务ID"/>
-            <el-table-column prop="taskName" header-align="center" align="center" label="任务名称"/>
+            <el-table-column prop="taskName" header-align="center" align="center" label="任务名称">
+                <template slot-scope="scope">
+                    <el-tag @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</el-tag>
+                </template>
+            </el-table-column>
             <el-table-column prop="dolphinProcessName" header-align="center" align="center" label="所属工作流"/>
             <el-table-column prop="taskType" header-align="center" align="center" label="任务类型"/>
             <el-table-column prop="tag" header-align="center" align="center" label="Tag标记"/>
@@ -261,13 +265,7 @@ export default {
         },
         // 新增 / 修改同步任务
         addOrUpdateHandle(id) {
-            if (id.taskType === 'KYUUBI' || id.taskType === 'SPARKSQL' || id.taskType === 'TRINO') {
-                this.computAddOrUpdateHandle(id)
-            } else if (id.taskType === 'DBT') {
-                this.addDBTHandle(id)
-            } else {
-                this.scriptAddOrUpdateHandle(id)
-            }
+            this.computAddOrUpdateHandle(id)
         },
         // 新增 / 修改Trino任务
         computAddOrUpdateHandle(id) {
@@ -313,7 +311,7 @@ export default {
         // 点击名称跳转到批次
         gotoTaskBatchHandle(params) {
             console.log(params)
-            this.$router.push({name: 'dispatch-taskBatch', query: {name: params.row.taskName}})
+            this.$router.push({name: 'dispatch-taskBatch', query: {name: params}})
         },
         // 点击名称跳转到流程图
         gotoTaskProcessManag(params) {

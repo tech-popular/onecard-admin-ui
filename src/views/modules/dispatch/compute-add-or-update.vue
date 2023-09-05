@@ -14,8 +14,6 @@
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px" />
-<!--              <template slot="prepend">{{formDs}}_</template>-->
-<!--            </el-input>-->
           </el-form-item>
           <el-form-item label="任务ID" prop="id">
             <el-input v-model="dataForm.id" placeholder="任务ID" disabled  style="width: 300px" />
@@ -36,6 +34,8 @@
                 <el-option label="trino" value="TRINO"></el-option>
                 <el-option label="sparkSql" value="SPARKSQL"></el-option>
                 <el-option label="kyuubi" value="KYUUBI"></el-option>
+                <el-option label="shell" value="SHELL"></el-option>
+                <el-option label="python" value="PYTHON"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="Tag标记" prop="tags">
@@ -61,11 +61,11 @@
           <el-form-item label="作业描述" prop="jobDesc" label-width="120px">
               <el-input type="textarea" v-model="item.jobDesc" placeholder="作业描述" />
           </el-form-item>
-          <el-form-item prop="jobSql" label="作业语句" :ref="'mycode-' + index" label-width="120px">
+          <el-form-item prop="jobScript" label="作业语句" :ref="'mycode-' + index" label-width="120px">
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative">
               <codemirror
                 :ref="'code-' + index"
-                v-model="item.jobSql"
+                v-model="item.jobScript"
                 :options="cmOptions"
                 @changes="cm => workItemChanges(cm, item, 'mycode-' + index, index)"
                 @keydown.native="e => workItemKeyDown(e, index)"
@@ -199,7 +199,7 @@ export default {
           // accountId: '',
           // jobName: '',
           jobDesc: '',
-          jobSql: '',
+          jobScript: '',
           // allDatasourceNameList: [],
           // allAccountList: [],
           placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
@@ -236,7 +236,7 @@ export default {
         // accountId: [
         //   { required: true, message: '请选择帐户', trigger: 'change' }
         // ],
-        jobSql: [
+        jobScript: [
           { required: true, message: '请输入任务语句', trigger: 'change' }
         ],
         // requestedUser: [
@@ -406,7 +406,7 @@ export default {
         let sqlLineTitle = '<作业序号:' + item.jobNo + '>'
         this.sqlLineDist.push(sqlLineTitle)
         this.sqlLineWorkIndex.push(item.jobNo)
-        let sqlJob = sqlLineTitle + '\n' + item.jobSql + '\n'
+        let sqlJob = sqlLineTitle + '\n' + item.jobScript + '\n'
         this.previewSql += sqlJob
       })
       this.originpreviewSql = this.previewSql
@@ -468,7 +468,7 @@ export default {
         tempValue = sqlValue.substring(tempValStartIndex + titleLength, tempValEndIndex)
         let index = this.findIndex(this.sqlLineWorkIndex[i])
         let tempArr = tempValue.split('\n').filter(item => item !== '') // 把多余的回车去掉
-        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], jobSql: tempArr.join('\n') })
+        this.calculateTasks.splice(index, 1, { ...this.calculateTasks[index], jobScript: tempArr.join('\n') })
       }
       this.mergeCodeVisible = false
     },
@@ -482,7 +482,7 @@ export default {
       return i
     },
     workItemChanges (cm, item, ref, index) { // 内容更新时，不为空时将报错信息去除
-      let curSql = item.jobSql
+      let curSql = item.jobScript
       if (curSql !== '') {
         this.$refs[ref][0].clearValidate()
         this.calculateTasks.splice(index, 1, { ...item, placeholder: '' })
@@ -527,7 +527,7 @@ export default {
         // datasourceId: '',
         // accountId: '',
         jobName: '',
-        jobSql: '',
+        jobScript: '',
         placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
       })
       this.updateWorkIndex()
