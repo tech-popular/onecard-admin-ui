@@ -39,7 +39,7 @@
                   v-loading="dataListLoading"
                   style="width: 100%;">
             <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>
-            <el-table-column prop="taskName" fixed header-align="center" :width="150" align="center" label="任务名称">
+            <el-table-column prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start">
                         <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</p>
@@ -47,7 +47,7 @@
                     </el-tooltip>
                 </template>
             </el-table-column>
-            <el-table-column prop="dolphinProcessName" fixed header-align="center" :width="150" align="center" label="所属工作流">
+            <el-table-column prop="dolphinProcessName" fixed header-align="center" :width="170" align="center" label="所属工作流">
             <template slot-scope="scope">
                 <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName" placement="top-start">
                     <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName }}</p>
