@@ -43,7 +43,7 @@
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start">
                         <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</p>
-                        <p v-else @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName.slice(0, 5) }}...</p>
+                        <p v-else @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName.slice(0, 20) }}...</p>
                     </el-tooltip>
                 </template>
             </el-table-column>
@@ -51,7 +51,7 @@
             <template slot-scope="scope">
                 <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName" placement="top-start">
                     <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName }}</p>
-                    <p v-else @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName.slice(0, 5) }}...</p>
+                    <p v-else @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName.slice(0, 20) }}...</p>
                 </el-tooltip>
             </template>
             </el-table-column>
