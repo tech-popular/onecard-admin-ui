@@ -42,7 +42,7 @@
             <el-table-column prop="taskName" fixed header-align="center" :width="150" align="center" label="任务名称">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start">
-                        <p v-if="scope.row.taskName.length <= 7" @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</p>
+                        <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</p>
                         <p v-else @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName.slice(0, 5) }}...</p>
                     </el-tooltip>
                 </template>
@@ -50,7 +50,7 @@
             <el-table-column prop="dolphinProcessName" fixed header-align="center" :width="150" align="center" label="所属工作流">
             <template slot-scope="scope">
                 <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName" placement="top-start">
-                    <p v-if="scope.row.taskName.length <= 7" @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName }}</p>
+                    <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName }}</p>
                     <p v-else @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName.slice(0, 5) }}...</p>
                 </el-tooltip>
             </template>
