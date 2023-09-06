@@ -22,8 +22,8 @@
             <el-form-item label="创建人" prop="createUser">
                 <el-input v-model.trim="dataForm.createUser" placeholder="创建人" clearable/>
             </el-form-item>
-            <el-form-item label="任务类型" prop="taskDisable">
-                <el-select v-model="dataForm.taskDisable" placeholder="任务类型" filterable>
+            <el-form-item label="任务状态" prop="taskDisable">
+                <el-select v-model="dataForm.taskDisable" placeholder="任务状态" filterable>
                     <el-option :label="item.label" :value="item.value" v-for="(item, index) in statusList"
                                :key="index"></el-option>
                 </el-select>
@@ -31,50 +31,70 @@
             <el-form-item>
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
                 <el-button @click="resetHandle()">重置</el-button>
-                <el-button type="primary" @click="computAddOrUpdateHandle()">新增SQL任务</el-button>
-                <el-button type="primary" @click="scriptAddOrUpdateHandle()">新增脚本任务</el-button>
+                <el-button type="primary" @click="computAddOrUpdateHandle()">新增任务</el-button>
+<!--                <el-button type="primary" @click="scriptAddOrUpdateHandle()">新增脚本任务</el-button>-->
             </el-form-item>
         </el-form>
         <el-table :data="dataList" border
                   v-loading="dataListLoading"
                   style="width: 100%;">
-            <el-table-column
-                    type="selection"
-                    header-align="center"
-                    align="center"
-                    width="50">
-            </el-table-column>
-            <el-table-column prop="id" header-align="center" align="center" label="任务ID"/>
-            <el-table-column prop="taskName" header-align="center" align="center" label="任务名称">
+            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>
+            <el-table-column prop="taskName" fixed header-align="center" :width="150" align="center" label="任务名称">
                 <template slot-scope="scope">
-                    <el-tag @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</el-tag>
+                    <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start">
+                        <p v-if="scope.row.taskName.length <= 7" @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</p>
+                        <p v-else @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName.slice(0, 5) }}...</p>
+                    </el-tooltip>
                 </template>
             </el-table-column>
-            <el-table-column prop="dolphinProcessName" header-align="center" align="center" label="所属工作流"/>
-            <el-table-column prop="taskType" header-align="center" align="center" label="任务类型"/>
+            <el-table-column prop="dolphinProcessName" fixed header-align="center" :width="150" align="center" label="所属工作流">
+            <template slot-scope="scope">
+                <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName" placement="top-start">
+                    <p v-if="scope.row.taskName.length <= 7" @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName }}</p>
+                    <p v-else @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName.slice(0, 5) }}...</p>
+                </el-tooltip>
+            </template>
+            </el-table-column>
+            <el-table-column prop="taskType" header-align="center" fixed align="center" label="任务类型"/>
             <el-table-column prop="tag" header-align="center" align="center" label="Tag标记"/>
-            <el-table-column prop="createTime" header-align="center" align="center" label="任务创建时间"/>
             <el-table-column prop="createUser" header-align="center" align="center" label="创建人"/>
-            <el-table-column prop="taskDisable" header-align="center" align="center" label="任务状态"/>
-            <el-table-column prop="dispatchStatus" header-align="center" align="center" label="调度起停状态"/>
-            <el-table-column prop="dependence" header-align="center" align="center" label="有无依赖"/>
-            <el-table-column header-align="center" align="center" width="200" label="操作" class="but">
+            <el-table-column prop="createTime" header-align="center" align="center" :width="180" sortable label="创建时间"/>
+            <el-table-column prop="updateTime" header-align="center"  align="center" :width="180" sortable label="修改时间"/>
+            <el-table-column prop="taskDisable" header-align="center" align="center" label="任务状态">
+            <template slot-scope="scope" >
+                <el-tag v-if="scope.row.taskDisable === 1" type="success"  @click="changeTaskDisable(scope.row)">上线</el-tag>
+                <el-tag v-else  type="danger" @click="changeTaskDisable(scope.row)">下线</el-tag>
+            </template>
+            </el-table-column>
+            <el-table-column prop="dispatchStatus" header-align="center" align="center" label="定时状态">
+            <template slot-scope="scope">
+                <el-tag v-if="scope.row.dispatchStatus === 1" type="success" @click="changeDispatchStatus(scope.row)">上线</el-tag>
+                <el-tag v-else type="danger" @click="changeDispatchStatus(scope.row)">下线</el-tag>
+            </template>
+            </el-table-column>
+            <el-table-column prop="topDependence" header-align="center" align="center" label="上游依赖"/>
+            <el-table-column prop="downDependence" header-align="center" align="center" label="下游依赖"/>
+            <el-table-column header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="'编辑任务'" placement="top">
                         <el-button type="primary" size="mini" circle :icon="'el-icon-edit'"
-                                   @click="addOrUpdateHandle(scope.row)"></el-button>
+                                   @click="computAddOrUpdateHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="依赖配置" placement="top">
                         <el-button type="success" size="mini" icon="el-icon-sort" circle
                                    @click="addOrUpdateDispatchConfig(scope.row.id,scope.row)"></el-button>
                     </el-tooltip>
+                    <el-tooltip class="item" effect="dark" content="依赖快照" placement="top">
+                        <el-button type="primary" size="mini" icon="el-icon-camera-solid" circle
+                                   @click="snapshotHandle(scope.row)"></el-button>
+                    </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="执行任务" placement="top">
                         <el-button type="warning" size="mini" icon="el-icon-view" circle
                                    @click="taskExecuteHandle(scope.row)"></el-button>
                     </el-tooltip>
-                    <el-tooltip class="item" effect="dark" content="调度管理" placement="top">
+                    <el-tooltip class="item" effect="dark" content="调度配置" placement="top">
                         <el-button type="success" size="mini" icon="el-icon-alarm-clock" circle
-                                   @click="snapshotHandle(scope.row)"></el-button>
+                                   @click="periodConfigHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="参数配置" placement="top">
                         <el-button type="warning" size="mini" icon="el-icon-connection" circle
@@ -118,8 +138,10 @@
         <assign-permission v-if="assignPermissionVisible" :submitDataApi="submitDataApi"
                            :submitDataApis="submitDataApis" ref="assignPermission"
                            @refreshDataList="init"></assign-permission>
-        <!-- 依赖快照 -->
+        <!-- 调度管理 -->
         <taskManag-snap-shot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"></taskManag-snap-shot>
+        <!-- 依赖快照 -->
+        <taskManagPeriod v-if="taskManagPeriodVisible" ref="taskManagPeriod"></taskManagPeriod>
         <!-- 参数管理 -->
         <taskManagParams v-if="taskManagParamsVisible" ref="taskManagParams" @refreshDataList="init"></taskManagParams>
     </div>
@@ -129,7 +151,9 @@
 import {
     list,
     taskExecute,
-    tagAll
+    tagAll,
+    changeTaskDisable,
+    changeDispatchStatus
 } from '@/api/dispatch/taskManag'
 import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
@@ -138,6 +162,7 @@ import ScriptAddOrUpdate from './script-add-or-update'
 import dispatchConfigAddOrUpdate from './dispatchConfig-add-or-update'
 import AssignPermission from '../../components/permission/assign-permission'
 import taskManagSnapShot from './taskManag-snap-shot'
+import taskManagPeriod from './dispatch-config-period'
 import taskManagParams from './taskManag-params.vue'
 
 export default {
@@ -154,9 +179,11 @@ export default {
             scriptAddOrUpdateVisible: false,
             assignPermissionVisible: false,
             taskManagSnapShotVisible: false,
+            taskManagPeriodVisible: false,
             taskManagParamsVisible: false,
             addDBTVisible: false,
             tagDownList: [],
+            localDolphinProcessId: '',
             dataForm: {
                 id: '',
                 taskName: '',
@@ -202,6 +229,7 @@ export default {
         dispatchConfigAddOrUpdate,
         AssignPermission,
         taskManagSnapShot,
+        taskManagPeriod,
         taskManagParams
     },
     mounted() {
@@ -240,6 +268,48 @@ export default {
             }
             this.init()
         },
+        changeTaskDisable(data) {
+            this.$confirm(data.taskDisable === 1 ? '是否确认要下线' + data.taskName : '是否确认要上线' + data.taskName, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                changeTaskDisable(data.id).then(({data}) => {
+                    if (data && data.code === 0) {
+                        this.$message.success(data.msg || '执行成功')
+                    } else {
+                        this.$message.error(data.msg || '执行失败')
+                    }
+                    this.init()
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消'
+                })
+            })
+        },
+        changeDispatchStatus(data) {
+            this.$confirm(data.dispatchStatus === 1 ? '是否确认要下线' + data.taskName + '的调度周期' : '是否确认要上线' + data.taskName + '的调度周期', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                changeDispatchStatus(data.id).then(({data}) => {
+                    if (data && data.code === 0) {
+                        this.$message.success(data.msg || '执行成功')
+                    } else {
+                        this.$message.error(data.msg || '执行失败')
+                    }
+                    this.init()
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消'
+                })
+            })
+        },
         // 调度配置
         addOrUpdateDispatchConfig(id) {
             console.log('addOrUpdateDispatchConfig->id=', id)
@@ -263,20 +333,21 @@ export default {
                 }
             })
         },
-        // 新增 / 修改同步任务
-        addOrUpdateHandle(id) {
-            this.computAddOrUpdateHandle(id)
-        },
-        // 新增 / 修改Trino任务
-        computAddOrUpdateHandle(id) {
+        // 新增 / 修改任务
+        computAddOrUpdateHandle(data) {
+            let canUpdate = true
+            if (data && data.taskDisable && data.taskDisable === 1) {
+                canUpdate = false
+            }
             this.computAddOrUpdateVisible = true
             this.$nextTick(() => {
-                let canUpdate = true
-                if (!this.isAdmin) {
-                    // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
-                    canUpdate = true
-                }
-                this.$refs.computAddOrUpdate.init(id, canUpdate)
+                // let canUpdate = true
+                // if (!this.isAdmin) {
+                //     // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+                //     canUpdate = true
+                // }
+                console.log('computAddOrUpdateHandle->canUpdate:' + canUpdate)
+                this.$refs.computAddOrUpdate.init(data, canUpdate)
             })
         },
         // 新增 / 修改脚本任务
@@ -321,8 +392,22 @@ export default {
         snapshotHandle(data) {
             this.taskManagSnapShotVisible = true
             this.$nextTick(() => {
+                console.log(data)
+                this.$refs.taskManagSnapShot.init(data)
+            })
+            // window.open(url, '_blank')
+        },
+        periodConfigHandle(data) {
+            let canUpdate = true
+            if (data && data.dispatchStatus && data.dispatchStatus === 1) {
+                canUpdate = false
+            }
+            console.log('periodConfigHandle->data.dispatchStatus' + data.dispatchStatus + ',canUpdate->' + canUpdate)
+            this.taskManagPeriodVisible = true
+            this.$nextTick(() => {
+                this.localDolphinProcessId = data.dolphinProcessId
                 console.log(data.dolphinProcessId)
-                this.$refs.taskManagSnapShot.init(data.dolphinProcessId)
+                this.$refs.taskManagPeriod.init(this.localDolphinProcessId, canUpdate)
             })
             // window.open(url, '_blank')
         },

@@ -7,7 +7,7 @@
     size="1100px"
     class="api-manage-drawer"
   >
-    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑SQL任务' : '新增SQL任务' : '查看SQL任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
+    <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑任务' : '新增任务' : '查看任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3 id="title">任务信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
@@ -51,7 +51,7 @@
         <el-button type="success" @click="mergeSql">代码连贯模式</el-button>
       </div>
       <div class="work-content" v-for="(item, index) in calculateTasks" :key="index">
-        <el-form :model="item" :rules="dataRule" ref="calculateTasks" :disabled="!canUpdate"> 
+        <el-form :model="item" :rules="dataRule" ref="calculateTasks" :disabled="!canUpdate">
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
@@ -84,7 +84,7 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
           <el-form-item label="额外参数" prop="extraParam">
-              <el-select v-model="dataForm.extraParam" placeholder="额外参数" style="width: 400px" filterable allow-create>
+              <el-select v-model="dataForm.extraParam" placeholder="额外参数" style="width: 400px" clearable filterable allow-create>
                   <el-option :label="item" :value="item" v-for="(item, index) in extraParamList" :key="index"></el-option>
               </el-select>
           </el-form-item>
@@ -100,14 +100,14 @@
             重跑：<el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
           </el-form-item>
         </div>
-        <div class="work-type-pane">
-          <el-form-item label="状态：" prop="taskDisable" label-width="120px">
-            <el-radio-group v-model="dataForm.taskDisable">
-              <el-radio :label="1">上线</el-radio>
-              <el-radio :label="0">下线</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </div>
+<!--        <div class="work-type-pane">-->
+<!--          <el-form-item label="状态：" prop="taskDisable" label-width="120px">-->
+<!--            <el-radio-group v-model="dataForm.taskDisable">-->
+<!--              <el-radio :label="1">上线</el-radio>-->
+<!--              <el-radio :label="0">下线</el-radio>-->
+<!--            </el-radio-group>-->
+<!--          </el-form-item>-->
+<!--        </div>-->
       </el-form>
     </div>
     <div class="footer">
