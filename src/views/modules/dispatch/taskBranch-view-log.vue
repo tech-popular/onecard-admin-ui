@@ -7,7 +7,7 @@
       <el-button size="small" @click="visible = false">关闭</el-button>
     </div>
   </div>
-  <div style="width:100%; height:600px; overflow:auto; padding-left:15px; word-wrap:break-word; word-break: normal; background:black;color:#fff;" v-html="logText">
+  <div style="width:100%; height:600px; overflow:auto; padding-left:15px; word-wrap:break-word; word-break: normal; background:white;color:black;" v-html="logText">
   </div>
     <!-- <div slot="footer" class="foot">
       <el-button @click="visible = false">取消</el-button>

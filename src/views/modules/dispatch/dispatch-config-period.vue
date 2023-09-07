@@ -186,7 +186,7 @@ export default {
                 jobType: 2, // 周期
                 onceRunTime: '', // 运行一次运行时间
                 execTime: '', // 周期运行具体时间
-                runCycle: 'HOUR', // 调度周期
+                runCycle: 'DAY', // 调度周期
                 interval: '',
                 startTime: '',
                 endTime: '',

@@ -30,7 +30,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
-                <el-button @click="resetHandle()">重置</el-button>
+<!--                <el-button @click="resetHandle()">重置</el-button>-->
                 <el-button type="primary" @click="computAddOrUpdateHandle()">新增任务</el-button>
 <!--                <el-button type="primary" @click="scriptAddOrUpdateHandle()">新增脚本任务</el-button>-->
             </el-form-item>
@@ -256,26 +256,13 @@ export default {
             this.pageNum = 1
             this.init()
         },
-        // 重置
-        resetHandle() {
-            this.pageNum = 1
-            this.searchData = {
-                id: '',
-                taskName: '',
-                type: '',
-                tag: '',
-                createUser: '',
-                taskDisable: ''
-            }
-            this.init()
-        },
         changeTaskDisable(data) {
             this.$confirm(data.taskDisable === 1 ? '是否确认要下线' + data.taskName : '是否确认要上线' + data.taskName, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                changeTaskDisable(data.id).then(({data}) => {
+                changeTaskDisable(Number(data.id)).then(({data}) => {
                     if (data && data.code === 0) {
                         this.$message.success(data.msg || '执行成功')
                     } else {
@@ -296,7 +283,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                changeDispatchStatus(data.id).then(({data}) => {
+                changeDispatchStatus(Number(data.id)).then(({data}) => {
                     if (data && data.code === 0) {
                         this.$message.success(data.msg || '执行成功')
                     } else {
