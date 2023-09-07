@@ -5,7 +5,7 @@
 			 <el-table-column  prop="taskName"  header-align="center" align="center" label="任务名称"></el-table-column>
 			 <el-table-column  prop="taskType"  header-align="center"  align="center"  label="任务类型">
          <template slot-scope="scope">
-           <span v-if="type === 'new'">{{scope.row.taskType === 'Trino' ? 'Trino' : 'DBT'}}</span>
+           <span v-if="type === 'new'">{{scope.row.taskType}}</span>
            <span v-else> {{scope.row.taskType}}</span>
          </template>
        </el-table-column>
