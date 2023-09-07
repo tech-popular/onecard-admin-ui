@@ -261,10 +261,11 @@ export default {
             this.pageNum = 1
             this.searchData = {
                 id: '',
-                name: '',
-                type: -1,
-                user: '',
-                status: -1
+                taskName: '',
+                type: '',
+                tag: '',
+                createUser: '',
+                taskDisable: ''
             }
             this.init()
         },
@@ -324,13 +325,25 @@ export default {
             })
         },
         // 执行任务
-        taskExecuteHandle(id) {
-            taskExecute(id.id).then(({data}) => {
-                if (data && data.code === 0) {
-                    this.$message.success(data.msg || '执行成功')
-                } else {
-                    this.$message.error(data.msg || '执行失败')
-                }
+        taskExecuteHandle(data) {
+            this.$confirm('是否确认执行' + data.taskName, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                taskExecute(data.id).then(({data}) => {
+                    if (data && data.code === 0) {
+                        this.$message.success(data.msg || '执行成功')
+                    } else {
+                        this.$message.error(data.msg || '执行失败')
+                    }
+                    this.init()
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消'
+                })
             })
         },
         // 新增 / 修改任务
