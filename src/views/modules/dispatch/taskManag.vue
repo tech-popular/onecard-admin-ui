@@ -69,7 +69,7 @@
             <el-table-column prop="dispatchStatus" header-align="center" align="center" label="定时状态">
             <template slot-scope="scope">
                 <el-tag v-if="scope.row.dispatchStatus === 1" type="success" @click="changeDispatchStatus(scope.row)">上线</el-tag>
-                <el-tag v-if="scope.row.dispatchStatus === 0" type="danger" @click="changeDispatchStatus(scope.row)">下线</el-tag>
+                <el-tag v-else-if="scope.row.dispatchStatus === 0" type="danger" @click="changeDispatchStatus(scope.row)">下线</el-tag>
                 <el-tag v-else type="danger">-</el-tag>
             </template>
             </el-table-column>
