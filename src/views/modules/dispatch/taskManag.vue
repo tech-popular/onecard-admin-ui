@@ -30,9 +30,9 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
-<!--                <el-button @click="resetHandle()">重置</el-button>-->
+                <!--                <el-button @click="resetHandle()">重置</el-button>-->
                 <el-button type="primary" @click="computAddOrUpdateHandle()">新增任务</el-button>
-<!--                <el-button type="primary" @click="scriptAddOrUpdateHandle()">新增脚本任务</el-button>-->
+                <!--                <el-button type="primary" @click="scriptAddOrUpdateHandle()">新增脚本任务</el-button>-->
             </el-form-item>
         </el-form>
         <el-table :data="dataList" border
@@ -41,37 +41,50 @@
             <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>
             <el-table-column prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
                 <template slot-scope="scope">
-                    <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start">
-                        <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</p>
-                        <p v-else @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName.slice(0, 20) }}...</p>
+                    <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start"
+                    >
+                        <a @click="gotoTaskBatchHandle(scope.row.taskName)">{{
+                            scope.row.taskName
+                            }}</a>
                     </el-tooltip>
                 </template>
             </el-table-column>
-            <el-table-column prop="dolphinProcessName" fixed header-align="center" :width="170" align="center" label="所属工作流">
-            <template slot-scope="scope">
-                <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName" placement="top-start">
-                    <p v-if="scope.row.taskName.length <= 20" @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName }}</p>
-                    <p v-else @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{ scope.row.dolphinProcessName.slice(0, 20) }}...</p>
-                </el-tooltip>
-            </template>
+            <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"
+                             label="所属工作流" >
+                <template slot-scope="scope">
+                    <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName"
+                                placement="top-start">
+                        <p @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{
+                            scope.row.dolphinProcessName
+                            }}</p>
+                    </el-tooltip>
+                </template>
             </el-table-column>
-            <el-table-column prop="taskType" header-align="center" fixed align="center" label="任务类型"/>
+            <el-table-column prop="taskType" header-align="center" align="center" label="任务类型"/>
             <el-table-column prop="tag" header-align="center" align="center" label="Tag标记"/>
             <el-table-column prop="createUser" header-align="center" align="center" label="创建人"/>
-            <el-table-column prop="createTime" header-align="center" align="center" :width="180" sortable label="创建时间"/>
-            <el-table-column prop="updateTime" header-align="center"  align="center" :width="180" sortable label="修改时间"/>
+            <el-table-column prop="createTime" header-align="center" align="center" :width="180" sortable
+                             label="创建时间"/>
+            <el-table-column prop="updateTime" header-align="center" align="center" :width="180" sortable
+                             label="修改时间"/>
             <el-table-column prop="taskDisable" header-align="center" align="center" label="任务状态">
-            <template slot-scope="scope" >
-                <el-tag v-if="scope.row.taskDisable === 1" type="success"  @click="changeTaskDisable(scope.row)">上线</el-tag>
-                <el-tag v-else  type="danger" @click="changeTaskDisable(scope.row)">下线</el-tag>
-            </template>
+                <template slot-scope="scope">
+                    <el-tag v-if="scope.row.taskDisable === 1" type="success" @click="changeTaskDisable(scope.row)">
+                        上线
+                    </el-tag>
+                    <el-tag v-else type="danger" @click="changeTaskDisable(scope.row)">下线</el-tag>
+                </template>
             </el-table-column>
             <el-table-column prop="dispatchStatus" header-align="center" align="center" label="定时状态">
-            <template slot-scope="scope">
-                <el-tag v-if="scope.row.dispatchStatus === 1" type="success" @click="changeDispatchStatus(scope.row)">上线</el-tag>
-                <el-tag v-else-if="scope.row.dispatchStatus === 0" type="danger" @click="changeDispatchStatus(scope.row)">下线</el-tag>
-                <el-tag v-else-if="scope.row.dispatchStatus === -1" type="danger">-</el-tag>
-            </template>
+                <template slot-scope="scope">
+                    <el-tag v-if="scope.row.dispatchStatus === 1" type="success"
+                            @click="changeDispatchStatus(scope.row)">上线
+                    </el-tag>
+                    <el-tag v-else-if="scope.row.dispatchStatus === 0" type="danger"
+                            @click="changeDispatchStatus(scope.row)">下线
+                    </el-tag>
+                    <el-tag v-else-if="scope.row.dispatchStatus === -1" type="danger">-</el-tag>
+                </template>
             </el-table-column>
             <el-table-column prop="topDependence" header-align="center" align="center" label="上游依赖"/>
             <el-table-column prop="downDependence" header-align="center" align="center" label="下游依赖"/>
@@ -490,4 +503,5 @@ export default {
     font-size: 18px;
     cursor: pointer;
 }
+
 </style>

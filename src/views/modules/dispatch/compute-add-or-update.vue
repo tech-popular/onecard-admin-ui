@@ -83,11 +83,18 @@
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
-          <el-form-item label="额外参数" prop="extraParam">
-              <el-select v-model="dataForm.extraParam" placeholder="额外参数" style="width: 400px" clearable filterable allow-create>
-                  <el-option :label="item" :value="item" v-for="(item, index) in extraParamList" :key="index"></el-option>
+          <el-form-item label="资源" prop="">
+              <el-select v-model="dataForm.resourceList" placeholder="资源" style="width: 400px" clearable filterable allow-create multiple>
+                  <el-option :label="item.fileName" :value="item.id" v-for="(item, index) in resourceInfoList" :key="index"></el-option>
               </el-select>
           </el-form-item>
+        </div>
+        <div class="work-type-pane">
+            <el-form-item label="额外参数" prop="extraParam">
+                <el-select v-model="dataForm.extraParam" placeholder="额外参数" style="width: 400px" clearable filterable allow-create>
+                    <el-option :label="item" :value="item" v-for="(item, index) in extraParamList" :key="index"></el-option>
+                </el-select>
+            </el-form-item>
         </div>
         <div class="work-type-pane">
           <el-form-item label="失败重跑：" prop="isRunAgain">
@@ -145,7 +152,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, projectAll, tagAll, getDolphinFlowList, getExtraParam } from '@/api/dispatch/taskManag'
+import { info, save, update, projectAll, tagAll, getDolphinFlowList, getExtraParam, getResourceList } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
 import diff from '@/assets/js/diff.min.js'
 import 'codemirror/lib/codemirror.css'
@@ -183,6 +190,7 @@ export default {
         dolphinProcessName: '',
         taskType: '',
         tags: '',
+        resourceList: '',
         extraParam: '',
         taskDescribe: '',
         taskDisable: 1,
@@ -255,6 +263,7 @@ export default {
       allSystemList: [],
       tagList: [],
       extraParamList: [],
+      resourceInfoList: [],
       // allDatasourceList: [],
       cmOptions: {
         theme: 'idea',
@@ -315,6 +324,7 @@ export default {
       this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
       this.getTag()
+      this.getResourceList()
       // this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
@@ -338,6 +348,7 @@ export default {
             this.dataForm.dolphinProcessName = data.data.dolphinProcessName
             this.dataForm.taskType = data.data.taskType
             this.dataForm.tags = data.data.tags
+            this.dataForm.resourceList = data.data.resourceList
             this.dataForm.extraParam = data.data.extraParam
             this.dataForm.taskDisable = data.data.taskDisable
             // this.dataForm.requestedUser = data.data.requestedUser
@@ -359,6 +370,11 @@ export default {
     getTag () {
         tagAll().then(({data}) => {
         this.tagList = data.data
+      })
+    },
+    getResourceList () {
+        getResourceList().then(({data}) => {
+        this.resourceInfoList = data.data
       })
     },
     changeTaskType (item) {
