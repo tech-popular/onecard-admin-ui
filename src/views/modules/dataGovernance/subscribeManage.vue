@@ -191,7 +191,7 @@
           <el-button type="text" size="small" @click="historySql(scope.row)"
             >历史SQL</el-button
           >
-          <el-button type="text" v-if="scope.row.exportType === 'period' " size="small" @click="takeEffect(scope.row)"
+          <el-button type="text" v-if="scope.row.exportType === 'period' &&  scope.row.status === 0" size="small" @click="takeEffect(scope.row)"
             >立即触发</el-button
           >
         </template>
