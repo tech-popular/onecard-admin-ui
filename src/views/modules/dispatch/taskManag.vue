@@ -1,9 +1,9 @@
 <template>
     <div>
         <el-form :inline="true" :model="dataForm" ref="dataForm">
-            <el-form-item label="任务ID">
-                <el-input v-model.trim="dataForm.id" placeholder="任务ID" clearable/>
-            </el-form-item>
+<!--            <el-form-item label="任务ID">-->
+<!--                <el-input v-model.trim="dataForm.id" placeholder="任务ID" clearable/>-->
+<!--            </el-form-item>-->
             <el-form-item label="任务名称" prop="taskName">
                 <el-input v-model.trim="dataForm.taskName" placeholder="任务名称" clearable/>
             </el-form-item>
@@ -38,7 +38,7 @@
         <el-table :data="dataList" border
                   v-loading="dataListLoading"
                   style="width: 100%;">
-            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>
+<!--            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>-->
             <el-table-column prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start"
