@@ -51,9 +51,9 @@
             </span>
           </div>
           <div style="margin-left:0px;margin-top:50px;">
-            <el-form-item>
-                <el-tag type="danger">注：暂不支持中文文件名称提取，请修改为英文文件名称后操作</el-tag>
-            </el-form-item>
+<!--            <el-form-item>-->
+<!--                <el-tag type="danger">注：暂不支持中文文件名称提取，请修改为英文文件名称后操作</el-tag>-->
+<!--            </el-form-item>-->
             <el-form-item label="申请原因" prop="approveReason">
               <el-input v-model="baseForm.approveReason" type="textarea"></el-input>
             </el-form-item>
