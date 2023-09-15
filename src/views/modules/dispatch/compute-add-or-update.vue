@@ -190,7 +190,7 @@ export default {
         dolphinProcessName: '',
         taskType: '',
         tags: '',
-        resourceList: '',
+        resourceList: [],
         extraParam: '',
         taskDescribe: '',
         taskDisable: 1,

@@ -1,9 +1,9 @@
 <template>
     <div>
         <el-form :inline="true" :model="dataForm" ref="dataForm">
-<!--            <el-form-item label="任务ID">-->
-<!--                <el-input v-model.trim="dataForm.id" placeholder="任务ID" clearable/>-->
-<!--            </el-form-item>-->
+            <!--            <el-form-item label="任务ID">-->
+            <!--                <el-input v-model.trim="dataForm.id" placeholder="任务ID" clearable/>-->
+            <!--            </el-form-item>-->
             <el-form-item label="任务名称" prop="taskName">
                 <el-input v-model.trim="dataForm.taskName" placeholder="任务名称" clearable/>
             </el-form-item>
@@ -38,7 +38,7 @@
         <el-table :data="dataList" border
                   v-loading="dataListLoading"
                   style="width: 100%;">
-<!--            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>-->
+            <!--            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>-->
             <el-table-column prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start"
@@ -50,11 +50,11 @@
                 </template>
             </el-table-column>
             <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"
-                             label="所属工作流" >
+                             label="所属工作流">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName"
                                 placement="top-start">
-                        <p @click="gotoTaskBatchHandle(scope.row.dolphinProcessName)">{{
+                        <p>{{
                             scope.row.dolphinProcessName
                             }}</p>
                     </el-tooltip>
@@ -96,7 +96,7 @@
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="依赖配置" placement="top">
                         <el-button type="success" size="mini" icon="el-icon-sort" circle
-                                   @click="addOrUpdateDispatchConfig(scope.row.id,scope.row)"></el-button>
+                                   @click="addOrUpdateDispatchConfig(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="依赖快照" placement="top">
                         <el-button type="primary" size="mini" icon="el-icon-camera-solid" circle
@@ -145,17 +145,18 @@
                 ref="scriptAddOrUpdate"
                 @refreshDataList="init"
         />
-        <!--调度配置-->
+        <!--依赖配置-->
         <dispatch-config-add-or-update v-if="dispatchConfigAddOrUpdateVisible" ref="dispatchConfigAddOrUpdate"
                                        @refreshDataList="init"/>
         <!-- 授权 -->
         <assign-permission v-if="assignPermissionVisible" :submitDataApi="submitDataApi"
                            :submitDataApis="submitDataApis" ref="assignPermission"
                            @refreshDataList="init"></assign-permission>
-        <!-- 调度管理 -->
-        <taskManag-snap-shot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"></taskManag-snap-shot>
         <!-- 依赖快照 -->
-        <taskManagPeriod v-if="taskManagPeriodVisible" ref="taskManagPeriod"></taskManagPeriod>
+        <taskManag-snap-shot v-if="taskManagSnapShotVisible" ref="taskManagSnapShot"
+                             @refreshDataList="init"></taskManag-snap-shot>
+        <!-- 调度快照 -->
+        <taskManagPeriod v-if="taskManagPeriodVisible" ref="taskManagPeriod" @refreshDataList="init"></taskManagPeriod>
         <!-- 参数管理 -->
         <taskManagParams v-if="taskManagParamsVisible" ref="taskManagParams" @refreshDataList="init"></taskManagParams>
     </div>
@@ -313,39 +314,53 @@ export default {
             })
         },
         // 调度配置
-        addOrUpdateDispatchConfig(id) {
-            console.log('addOrUpdateDispatchConfig->id=', id)
-            this.dispatchConfigAddOrUpdateVisible = true
-            this.$nextTick(() => {
-                let canUpdate = true
-                if (!this.isAdmin) {
-                    // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
-                    canUpdate = true
-                }
-                this.$refs.dispatchConfigAddOrUpdate.init(id, canUpdate)
-            })
+        addOrUpdateDispatchConfig(data) {
+            if (data.taskDisable === 1) {
+                this.$message({
+                    message: '请调整任务状态为下线时，配置依赖！',
+                    type: 'warning'
+                })
+            } else {
+                console.log('addOrUpdateDispatchConfig->id=', data.id)
+                this.dispatchConfigAddOrUpdateVisible = true
+                this.$nextTick(() => {
+                    let canUpdate = true
+                    if (!this.isAdmin) {
+                        // canUpdate = id ? id.authOtherList.includes(this.userid) || id.authOwner === this.userid : true
+                        canUpdate = true
+                    }
+                    this.$refs.dispatchConfigAddOrUpdate.init(data.id, canUpdate)
+                })
+            }
         },
         // 执行任务
         taskExecuteHandle(data) {
-            this.$confirm('是否确认执行' + data.taskName, '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                taskExecute(data.id).then(({data}) => {
-                    if (data && data.code === 0) {
-                        this.$message.success(data.msg || '执行成功')
-                    } else {
-                        this.$message.error(data.msg || '执行失败')
-                    }
-                    this.init()
-                })
-            }).catch(() => {
+            if (data.taskDisable === 0) {
                 this.$message({
-                    type: 'info',
-                    message: '已取消'
+                    message: '请调整任务状态为上线时，执行任务！',
+                    type: 'warning'
                 })
-            })
+            } else {
+                this.$confirm('是否确认执行' + data.taskName, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    taskExecute(data.id).then(({data}) => {
+                        if (data && data.code === 0) {
+                            this.$message.success(data.msg || '执行成功')
+                        } else {
+                            this.$message.error(data.msg || '执行失败')
+                        }
+                        this.init()
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消'
+                    })
+                })
+            }
         },
         // 新增 / 修改任务
         computAddOrUpdateHandle(data) {
@@ -412,18 +427,24 @@ export default {
             // window.open(url, '_blank')
         },
         periodConfigHandle(data) {
-            let canUpdate = true
-            if (data && data.dispatchStatus && data.dispatchStatus === 1) {
-                canUpdate = false
+            if (data.taskDisable === 0) {
+                this.$message({
+                    message: '请调整任务状态为上线时，进行调度配置！',
+                    type: 'warning'
+                })
+            } else {
+                let canUpdate = true
+                if (data && data.dispatchStatus && data.dispatchStatus === 1) {
+                    canUpdate = false
+                }
+                console.log('periodConfigHandle->data.dispatchStatus' + data.dispatchStatus + ',canUpdate->' + canUpdate)
+                this.taskManagPeriodVisible = true
+                this.$nextTick(() => {
+                    this.localDolphinProcessId = data.dolphinProcessId
+                    console.log(data.dolphinProcessId)
+                    this.$refs.taskManagPeriod.init(this.localDolphinProcessId, canUpdate)
+                })
             }
-            console.log('periodConfigHandle->data.dispatchStatus' + data.dispatchStatus + ',canUpdate->' + canUpdate)
-            this.taskManagPeriodVisible = true
-            this.$nextTick(() => {
-                this.localDolphinProcessId = data.dolphinProcessId
-                console.log(data.dolphinProcessId)
-                this.$refs.taskManagPeriod.init(this.localDolphinProcessId, canUpdate)
-            })
-            // window.open(url, '_blank')
         },
         // 参数配置
         paramsHandle(data) {
