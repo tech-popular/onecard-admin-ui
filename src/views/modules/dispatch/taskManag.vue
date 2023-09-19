@@ -39,7 +39,7 @@
                   v-loading="dataListLoading"
                   style="width: 100%;">
             <!--            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>-->
-            <el-table-column prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
+            <el-table-column show-overflow-tooltip="true" prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.taskName" placement="top-start"
                     >
@@ -60,14 +60,14 @@
 <!--                    </el-tooltip>-->
 <!--                </template>-->
 <!--            </el-table-column>-->
-            <el-table-column prop="taskType" header-align="center" align="center" label="任务类型"/>
-            <el-table-column prop="tag" header-align="center" align="center" label="Tag标记"/>
-            <el-table-column prop="createUser" header-align="center" align="center" label="创建人"/>
-            <el-table-column prop="createTime" header-align="center" align="center" :width="180" sortable
+            <el-table-column show-overflow-tooltip="true" prop="taskType" header-align="center" align="center" label="任务类型"/>
+            <el-table-column show-overflow-tooltip="true" prop="tag" header-align="center" align="center" label="Tag标记"/>
+            <el-table-column show-overflow-tooltip="true" prop="createUser" header-align="center" align="center" label="创建人"/>
+            <el-table-column show-overflow-tooltip="true" prop="createTime" header-align="center" align="center" :width="180" sortable
                              label="创建时间"/>
-            <el-table-column prop="updateTime" header-align="center" align="center" :width="180" sortable
+            <el-table-column show-overflow-tooltip="true" prop="updateTime" header-align="center" align="center" :width="180" sortable
                              label="修改时间"/>
-            <el-table-column prop="taskDisable" header-align="center" align="center" label="任务状态">
+            <el-table-column show-overflow-tooltip="true" prop="taskDisable" header-align="center" align="center" label="任务状态">
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.taskDisable === 1" type="success" @click="changeTaskDisable(scope.row)">
                         上线
@@ -75,7 +75,7 @@
                     <el-tag v-else type="danger" @click="changeTaskDisable(scope.row)">下线</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="dispatchStatus" header-align="center" align="center" label="定时状态">
+            <el-table-column show-overflow-tooltip="true" prop="dispatchStatus" header-align="center" align="center" label="定时状态">
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.dispatchStatus === 1" type="success"
                             @click="changeDispatchStatus(scope.row)">上线
@@ -86,9 +86,9 @@
                     <el-tag v-else-if="scope.row.dispatchStatus === -1" type="danger">-</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="topDependence" header-align="center" align="center" label="上游依赖"/>
-            <el-table-column prop="downDependence" header-align="center" align="center" label="下游依赖"/>
-            <el-table-column header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
+            <el-table-column show-overflow-tooltip="true" prop="topDependence" header-align="center" align="center" label="上游依赖"/>
+            <el-table-column show-overflow-tooltip="true" prop="downDependence" header-align="center" align="center" label="下游依赖"/>
+            <el-table-column  header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="'编辑任务'" placement="top">
                         <el-button type="primary" size="mini" circle :icon="'el-icon-edit'"
