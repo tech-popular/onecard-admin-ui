@@ -24,11 +24,11 @@
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="所属工作流" prop="dolphinProcessName">
-            <el-select v-model="dataForm.dolphinProcessName" placeholder="所属工作流" style="width: 400px" filterable allow-create>
-                <el-option :label="item" :value="item" v-for="(item, index) in dolphinProcessList" :key="index"></el-option>
-            </el-select>
-        </el-form-item>
+<!--        <el-form-item label="所属工作流" prop="dolphinProcessName">-->
+<!--            <el-select v-model="dataForm.dolphinProcessName" placeholder="所属工作流" style="width: 400px" filterable allow-create>-->
+<!--                <el-option :label="item" :value="item" v-for="(item, index) in dolphinProcessList" :key="index"></el-option>-->
+<!--            </el-select>-->
+<!--        </el-form-item>-->
         <el-form-item label="任务类型" prop="taskType">
             <el-select v-model="dataForm.taskType" style="width: 400px" @change="changeTaskType" clearable placeholder="任务类型">
                 <el-option label="trino" value="TRINO"></el-option>
@@ -187,7 +187,7 @@ export default {
         taskName: '',
         id: '',
         projectId: '',
-        dolphinProcessName: '',
+        // dolphinProcessName: '',
         taskType: '',
         tags: '',
         resourceList: [],
@@ -345,7 +345,7 @@ export default {
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
             this.getDolphinFlowList(data.data.projectId)
-            this.dataForm.dolphinProcessName = data.data.dolphinProcessName
+            // this.dataForm.dolphinProcessName = data.data.dolphinProcessName
             this.dataForm.taskType = data.data.taskType
             this.dataForm.tags = data.data.tags
             this.dataForm.resourceList = data.data.resourceList

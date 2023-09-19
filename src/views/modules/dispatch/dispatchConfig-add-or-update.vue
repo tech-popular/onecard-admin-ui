@@ -55,7 +55,7 @@
       </div>
     </div>
     <div class="footer">
-      <el-button @click="visible = false">关闭</el-button>
+      <el-button @click="refreshListhandle()">关闭</el-button>
 <!--      <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>-->
     </div>
     <dispatch-config-task-dependent v-if="dispatchConfigTaskDependentVisible" ref="dispatchConfigTaskDependent" @refreshTaskDependence="getTaskSelectDependence()"></dispatch-config-task-dependent>

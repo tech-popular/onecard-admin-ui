@@ -49,17 +49,17 @@
                     </el-tooltip>
                 </template>
             </el-table-column>
-            <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"
-                             label="所属工作流">
-                <template slot-scope="scope">
-                    <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName"
-                                placement="top-start">
-                        <p>{{
-                            scope.row.dolphinProcessName
-                            }}</p>
-                    </el-tooltip>
-                </template>
-            </el-table-column>
+<!--            <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"-->
+<!--                             label="所属工作流">-->
+<!--                <template slot-scope="scope">-->
+<!--                    <el-tooltip class="item" effect="dark" :content="scope.row.dolphinProcessName"-->
+<!--                                placement="top-start">-->
+<!--                        <p>{{-->
+<!--                            scope.row.dolphinProcessName-->
+<!--                            }}</p>-->
+<!--                    </el-tooltip>-->
+<!--                </template>-->
+<!--            </el-table-column>-->
             <el-table-column prop="taskType" header-align="center" align="center" label="任务类型"/>
             <el-table-column prop="tag" header-align="center" align="center" label="Tag标记"/>
             <el-table-column prop="createUser" header-align="center" align="center" label="创建人"/>
@@ -315,12 +315,12 @@ export default {
         },
         // 调度配置
         addOrUpdateDispatchConfig(data) {
-            if (data.taskDisable === 1) {
-                this.$message({
-                    message: '请调整任务状态为下线时，配置依赖！',
-                    type: 'warning'
-                })
-            } else {
+            // if (data.taskDisable === 1) {
+            //     this.$message({
+            //         message: '请调整任务状态为下线时，配置依赖！',
+            //         type: 'warning'
+            //     })
+            // } else {
                 console.log('addOrUpdateDispatchConfig->id=', data.id)
                 this.dispatchConfigAddOrUpdateVisible = true
                 this.$nextTick(() => {
@@ -331,7 +331,7 @@ export default {
                     }
                     this.$refs.dispatchConfigAddOrUpdate.init(data.id, canUpdate)
                 })
-            }
+            // }
         },
         // 执行任务
         taskExecuteHandle(data) {
@@ -365,9 +365,9 @@ export default {
         // 新增 / 修改任务
         computAddOrUpdateHandle(data) {
             let canUpdate = true
-            if (data && data.taskDisable && data.taskDisable === 1) {
-                canUpdate = false
-            }
+            // if (data && data.taskDisable && data.taskDisable === 1) {
+            //     canUpdate = false
+            // }
             this.computAddOrUpdateVisible = true
             this.$nextTick(() => {
                 // let canUpdate = true
@@ -427,16 +427,16 @@ export default {
             // window.open(url, '_blank')
         },
         periodConfigHandle(data) {
-            if (data.taskDisable === 0) {
-                this.$message({
-                    message: '请调整任务状态为上线时，进行调度配置！',
-                    type: 'warning'
-                })
-            } else {
+            // if (data.taskDisable === 0) {
+            //     this.$message({
+            //         message: '请调整任务状态为上线时，进行调度配置！',
+            //         type: 'warning'
+            //     })
+            // } else {
                 let canUpdate = true
-                if (data && data.dispatchStatus && data.dispatchStatus === 1) {
-                    canUpdate = false
-                }
+                // if (data && data.dispatchStatus && data.dispatchStatus === 1) {
+                //     canUpdate = false
+                // }
                 console.log('periodConfigHandle->data.dispatchStatus' + data.dispatchStatus + ',canUpdate->' + canUpdate)
                 this.taskManagPeriodVisible = true
                 this.$nextTick(() => {
@@ -444,7 +444,7 @@ export default {
                     console.log(data.dolphinProcessId)
                     this.$refs.taskManagPeriod.init(this.localDolphinProcessId, canUpdate)
                 })
-            }
+            // }
         },
         // 参数配置
         paramsHandle(data) {
