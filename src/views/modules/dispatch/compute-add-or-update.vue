@@ -325,6 +325,7 @@ export default {
       this.getAllSystem()
       this.getTag()
       this.getResourceList()
+      this.changeTaskType(this.dataForm.taskType)
       // this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {

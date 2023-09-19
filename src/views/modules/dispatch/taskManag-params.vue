@@ -96,11 +96,16 @@ export default {
                 taskId: this.dataForm.taskId
             }).then(({data}) => {
                 if (data && data.code === 0) {
-                    this.$message.success(data.msg || '保存成功')
-                    this.$emit('refreshTaskDependence')
-                    this.closed()
+                    this.$message({
+                        message: data.msg || '操作成功"',
+                        type: 'success',
+                        onClose: () => {
+                            this.visible = false
+                            this.$emit('refreshDataList')
+                        }
+                    })
                 } else {
-                    this.$message.error(data.msg || '提交异常')
+                    this.$message.error(data.msg)
                 }
             })
         }
