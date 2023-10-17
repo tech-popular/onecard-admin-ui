@@ -8,13 +8,13 @@
                 <el-input v-model.trim="dataForm.taskName" placeholder="任务名称" clearable/>
             </el-form-item>
             <el-form-item label="任务类型" prop="type">
-                <el-select v-model="dataForm.type" placeholder="任务类型" filterable>
+                <el-select v-model="dataForm.type" placeholder="任务类型" filterable clearable>
                     <el-option :label="item.label" :value="item.value" v-for="(item, index) in typeList"
                                :key="index"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="Tag标签" prop="tag">
-                <el-select v-model="dataForm.tag" placeholder="Tag标签" filterable>
+                <el-select v-model="dataForm.tag" placeholder="Tag标签" filterable clearable>
                     <el-option :label="item" :value="item" v-for="(item, index) in tagDownList"
                                :key="index"></el-option>
                 </el-select>
@@ -23,8 +23,14 @@
                 <el-input v-model.trim="dataForm.createUser" placeholder="创建人" clearable/>
             </el-form-item>
             <el-form-item label="任务状态" prop="taskDisable">
-                <el-select v-model="dataForm.taskDisable" placeholder="任务状态" filterable>
-                    <el-option :label="item.label" :value="item.value" v-for="(item, index) in statusList"
+                <el-select v-model="dataForm.taskDisable" placeholder="任务状态" clearable>
+                    <el-option :label="item.label" :value="item.label" v-for="(item, index) in statusList"
+                               :key="index"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="任务执行状态" prop="executeStatus">
+                <el-select v-model="dataForm.executeStatus" placeholder="任务执行状态" clearable>
+                    <el-option :label="item.desc" :value="item.code" v-for="(item, index) in allStatusList"
                                :key="index"></el-option>
                 </el-select>
             </el-form-item>
@@ -60,9 +66,32 @@
 <!--                    </el-tooltip>-->
 <!--                </template>-->
 <!--            </el-table-column>-->
-            <el-table-column :show-overflow-tooltip="true" prop="taskType" header-align="center" align="center" label="任务类型"/>
-            <el-table-column :show-overflow-tooltip="true" prop="tag" header-align="center" align="center" label="Tag标记"/>
-            <el-table-column :show-overflow-tooltip="true" prop="createUser" header-align="center" align="center" label="创建人"/>
+            <el-table-column :show-overflow-tooltip="true" prop="taskType" header-align="center" align="center" label="任务类型">
+                <template slot-scope="scope">
+                        <el-tag type="warning">{{ scope.row.taskType }}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" prop="tag" header-align="center" align="center" label="Tag标记">
+                <template slot-scope="scope">
+                  <div  v-if="scope.row.tag !== null && scope.row.tag !== ''">
+                      <span v-for="tag in scope.row.tag.split(',')" :key="tag">
+                        <el-tag type="primary">{{ tag }}</el-tag>
+                      </span>
+                  </div>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" prop="executeStatus" header-align="center" align="center" label="执行状态">
+                <template slot-scope="scope">
+                    <template slot-scope="scope">
+                        <el-tag v-if="scope.row.executeStatus === '执行失败'" type="danger">
+                            {{ scope.row.executeStatus }}
+                        </el-tag>
+                        <el-tag v-else type="success">{{ scope.row.executeStatus }}</el-tag>
+                    </template>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" prop="nextExecuteTime" header-align="center" align="center" :width="180" sortable
+                             label="下次执行时间"/>
             <el-table-column :show-overflow-tooltip="true" prop="createTime" header-align="center" align="center" :width="180" sortable
                              label="创建时间"/>
             <el-table-column :show-overflow-tooltip="true" prop="updateTime" header-align="center" align="center" :width="180" sortable
@@ -86,6 +115,7 @@
                     <el-tag v-else-if="scope.row.dispatchStatus === -1" type="danger">-</el-tag>
                 </template>
             </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" prop="createUser" header-align="center" align="center" label="创建人"/>
             <el-table-column :show-overflow-tooltip="true" prop="topDependence" header-align="center" align="center" label="上游依赖"/>
             <el-table-column :show-overflow-tooltip="true" prop="downDependence" header-align="center" align="center" label="下游依赖"/>
             <el-table-column  header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
@@ -168,7 +198,8 @@ import {
     taskExecute,
     tagAll,
     changeTaskDisable,
-    changeDispatchStatus
+    changeDispatchStatus,
+    taskBatchStatus
 } from '@/api/dispatch/taskManag'
 import AddOrUpdate from './taskManag-add-or-update'
 import ComputAddOrUpdate from './compute-add-or-update'
@@ -198,6 +229,7 @@ export default {
             taskManagParamsVisible: false,
             addDBTVisible: false,
             tagDownList: [],
+            allStatusList: [],
             localDolphinProcessId: '',
             dataForm: {
                 id: '',
@@ -205,7 +237,8 @@ export default {
                 type: '',
                 tag: '',
                 createUser: '',
-                taskDisable: ''
+                taskDisable: '',
+                executeStatus: ''
             },
             typeList: [{
                 label: '全部',
@@ -249,6 +282,7 @@ export default {
     },
     mounted() {
         this.init()
+        this.getAllStatus()
     },
     methods: {
         init() {
@@ -261,6 +295,7 @@ export default {
                 'type': this.dataForm.type === -1 ? '' : this.dataForm.type,
                 'user': this.dataForm.createUser,
                 'status': this.dataForm.taskDisable === -1 ? '' : this.dataForm.taskDisable,
+                'executeStatus': this.dataForm.executeStatus,
                 'tenantId': sessionStorage.getItem('tenantId')
             }
             this.getList(dataBody)
@@ -270,6 +305,11 @@ export default {
         handleSearch() {
             this.pageNum = 1
             this.init()
+        },
+        getAllStatus () {
+            taskBatchStatus().then(({data}) => {
+                this.allStatusList = data.data
+            })
         },
         changeTaskDisable(data) {
             this.$confirm(data.taskDisable === 1 ? '是否确认要下线' + data.taskName : '是否确认要上线' + data.taskName, '提示', {
