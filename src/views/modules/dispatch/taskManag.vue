@@ -82,12 +82,10 @@
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" prop="executeStatus" header-align="center" align="center" label="执行状态">
                 <template slot-scope="scope">
-                    <template slot-scope="scope">
-                        <el-tag v-if="scope.row.executeStatus === '执行失败'" type="danger">
-                            {{ scope.row.executeStatus }}
-                        </el-tag>
-                        <el-tag v-else type="success">{{ scope.row.executeStatus }}</el-tag>
-                    </template>
+                    <el-tag v-if="scope.row.executeStatus === '执行失败'" type="danger">
+                        {{ scope.row.executeStatus }}
+                    </el-tag>
+                    <el-tag v-else type="success">{{ scope.row.executeStatus }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" prop="nextExecuteTime" header-align="center" align="center" :width="180" sortable
