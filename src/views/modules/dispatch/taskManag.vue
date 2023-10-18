@@ -30,7 +30,7 @@
             </el-form-item>
             <el-form-item label="任务执行状态" prop="executeStatus">
                 <el-select v-model="dataForm.executeStatus" placeholder="任务执行状态" clearable>
-                    <el-option :label="item.desc" :value="item.code" v-for="(item, index) in allStatusList"
+                    <el-option :label="item.desc" :value="item.desc" v-for="(item, index) in allStatusList"
                                :key="index"></el-option>
                 </el-select>
             </el-form-item>
