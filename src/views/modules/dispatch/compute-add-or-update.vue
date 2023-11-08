@@ -85,7 +85,7 @@
         <div class="work-type-pane">
           <el-form-item label="资源" prop="">
               <el-select v-model="dataForm.resourceList" placeholder="资源" style="width: 400px" clearable filterable allow-create multiple>
-                  <el-option :label="item.fileName" :value="item.id" v-for="(item, index) in resourceInfoList" :key="index"></el-option>
+                  <el-option :label="item" :value="item" v-for="(item, index) in resourceInfoList" :key="index"></el-option>
               </el-select>
           </el-form-item>
         </div>
