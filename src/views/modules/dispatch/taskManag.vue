@@ -24,7 +24,7 @@
             </el-form-item>
             <el-form-item label="任务状态" prop="taskDisable">
                 <el-select v-model="dataForm.taskDisable" placeholder="任务状态" clearable>
-                    <el-option :label="item.label" :value="item.label" v-for="(item, index) in statusList"
+                    <el-option :label="item.label" :value="item.value" v-for="(item, index) in statusList"
                                :key="index"></el-option>
                 </el-select>
             </el-form-item>
@@ -255,9 +255,6 @@ export default {
                 value: 'SHELL'
             }],
             statusList: [{
-                label: '全部',
-                value: -1
-            }, {
                 label: '上线',
                 value: 1
             }, {
