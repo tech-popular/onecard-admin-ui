@@ -4,6 +4,7 @@
     <div>查看日志</div>
     <div>
       <el-button size="small" @click="isFullscreen = !isFullscreen"> {{isFullscreen ? '缩小' : '放大'}}</el-button>
+      <el-button size="small" @click="init(this.dolphinInstanceId)">刷新</el-button>
       <el-button size="small" @click="visible = false">关闭</el-button>
     </div>
   </div>
@@ -21,11 +22,13 @@ export default{
     return {
       visible: false,
       isFullscreen: false,
-      logText: ''
+      logText: '',
+      dolphinInstanceId: ''
     }
   },
   methods: {
     init (dolphinInstanceId) {
+      this.dolphinInstanceId = dolphinInstanceId
       this.isFullscreen = false
       this.visible = true
       this.logText = ''

@@ -340,6 +340,7 @@ export default {
             if (!data.data.calculateTasks.length) {
               return this.$message.error('获取数据异常')
             }
+            this.createUser = data.data.createUser
             this.updateUser = data.data.updateUser
             this.updateTime = data.data.updateTime
             this.dataForm.id = data.data.id
@@ -606,7 +607,8 @@ export default {
           // taskName: `${this.formDs}_${this.dataForm.taskName}`,
           taskName: `${this.dataForm.taskName}`,
           taskType: this.dataForm.taskType,
-          calculateTasks: this.calculateTasks
+          calculateTasks: this.calculateTasks,
+          createUser: this.createUser
         }
         if (params.isRunAgain === 0) {
           params.failRepeatTrigger = params.failRepeatTrigger
