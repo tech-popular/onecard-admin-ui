@@ -97,14 +97,20 @@
             </el-form-item>
         </div>
         <div class="work-type-pane">
-          <el-form-item label="失败重跑：" prop="isRunAgain">
+          <el-form-item label="失败重跑"  prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item prop="failRepeatTrigger" label-width="120px" v-if="dataForm.isRunAgain === 1">
-            重跑：<el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
+          <el-form-item prop="failRepeatTrigger" label="重跑"  v-if="dataForm.isRunAgain === 1">
+            <el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
+          </el-form-item>
+          <el-form-item label="失败预警" prop="alarmTypes">
+              <el-select v-model="dataForm.alarmTypes" multiple  placeholder="失败预警">
+                  <el-option label="钉钉通知" value="ding"></el-option>
+                  <el-option label="短信通知" value="msg"></el-option>
+              </el-select>
           </el-form-item>
         </div>
 <!--        <div class="work-type-pane">-->
@@ -196,7 +202,8 @@ export default {
         taskDisable: 1,
         // requestedUser: '',
         failRepeatTrigger: 3,
-        isRunAgain: 1
+        isRunAgain: 1,
+        alarmTypes: ['ding']
       },
       calculateTasks: [],
       tempCalculateTasks: [
@@ -258,6 +265,9 @@ export default {
         ],
         failRepeatTrigger: [
           {required: true, message: '请输入重跑次数', trigger: 'change'}
+        ],
+        alarmTypes: [
+          {required: true, message: '请选择失败预警方式(可多选)', trigger: 'change'}
         ]
       },
       allSystemList: [],
@@ -349,6 +359,7 @@ export default {
             this.getDolphinFlowList(data.data.projectId)
             // this.dataForm.dolphinProcessName = data.data.dolphinProcessName
             this.dataForm.taskType = data.data.taskType
+            this.dataForm.alarmTypes = data.data.alarmTypes
             this.dataForm.tags = data.data.tags
             this.dataForm.resourceList = data.data.resourceList
             this.dataForm.extraParam = data.data.extraParam
