@@ -47,12 +47,12 @@
             <!--            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>-->
             <el-table-column :show-overflow-tooltip="true" prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
                 <template slot-scope="scope">
-                    <el-tooltip class="item" :content="scope.row.taskName" placement="top-start"
-                    >
+<!--                    <el-tooltip class="item" :content="scope.row.taskName" placement="top-start"-->
+<!--                    >-->
                         <a @click="gotoTaskBatchHandle(scope.row.taskName)">{{
                             scope.row.taskName
                             }}</a>
-                    </el-tooltip>
+<!--                    </el-tooltip>-->
                 </template>
             </el-table-column>
 <!--            <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"-->
