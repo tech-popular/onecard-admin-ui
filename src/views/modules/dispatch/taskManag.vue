@@ -55,6 +55,11 @@
 <!--                    </el-tooltip>-->
                 </template>
             </el-table-column>
+            <el-table-column>
+                <template slot-scope="scope">
+                  <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain circle class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>
+                </template>
+            </el-table-column>
 <!--            <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"-->
 <!--                             label="所属工作流">-->
 <!--                <template slot-scope="scope">-->
@@ -124,7 +129,7 @@
                                    @click="computAddOrUpdateHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="依赖配置" placement="top">
-                        <el-button type="success" size="mini" icon="el-icon-sort" circle
+                        <el-button type="warning" size="mini" icon="el-icon-sort" circle
                                    @click="addOrUpdateDispatchConfig(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="依赖快照" placement="top">
@@ -132,11 +137,11 @@
                                    @click="snapshotHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="执行任务" placement="top">
-                        <el-button type="warning" size="mini" icon="el-icon-view" circle
+                        <el-button type="success" size="mini" icon="el-icon-video-play" circle
                                    @click="taskExecuteHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="调度配置" placement="top">
-                        <el-button type="success" size="mini" icon="el-icon-alarm-clock" circle
+                        <el-button type="primary" size="mini" icon="el-icon-alarm-clock" circle
                                    @click="periodConfigHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="参数配置" placement="top">
@@ -209,7 +214,7 @@ import AssignPermission from '../../components/permission/assign-permission'
 import taskManagSnapShot from './taskManag-snap-shot'
 import taskManagPeriod from './dispatch-config-period'
 import taskManagParams from './taskManag-params.vue'
-
+import Clipboard from 'clipboard'
 export default {
     data() {
         return {
@@ -301,6 +306,18 @@ export default {
         handleSearch() {
             this.pageNum = 1
             this.init()
+        },
+        copyToClipboard(textToCopy) {
+            const clipboard = new Clipboard('.custom-button')
+            clipboard.on('success', e => {
+                this.$message.success('任务名称已复制到剪切板')
+                e.clearSelection()
+                clipboard.destroy()
+            })
+            clipboard.on('error', e => {
+                this.$message.error('复制失败，请手动复制')
+                clipboard.destroy()
+            })
         },
         getAllStatus () {
             taskBatchStatus().then(({data}) => {
@@ -560,5 +577,7 @@ export default {
     font-size: 18px;
     cursor: pointer;
 }
-
+.custom-button {
+    border: none !important;
+}
 </style>
