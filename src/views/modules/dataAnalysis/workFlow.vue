@@ -1065,7 +1065,7 @@ export default {
       }
     },
     doubleClickNodeEvent (e, node, visibleParams, nodeEl) { // 双击节点时的事件
-      if (e.event.path[1].id == 'myPaletteDiv') return
+      // if (e.event.path[1].id == 'myPaletteDiv') return
       // 获取节点出来的线
       let nodeLink = mySelf.myDiagram.findNodeForKey(node.key)  // 获取节点对象
       let category = node.part.data.category
