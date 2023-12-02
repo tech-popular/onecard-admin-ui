@@ -65,3 +65,5 @@ export const taskBatchYarnLog = dolphinInstanceId => httpGet(base + `dispatch/ta
 // 依赖快照
 export const taskSnapshotNewDepends = params => httpPost(base + 'dispatch/snapshot/newDepends', params) // 任务新调度
 export const taskSnapshotOldDepends = params => httpPost(base + 'dispatch/snapshot/oldDepends', params) // 任务老调度
+export const mcSyncPage = (params) => httpGet(base + 'dispatch/mc/sync/listOnPage', params) // 初始化列表
+export const mcSyncSave = (params) => httpPost(base + 'dispatch/mc/sync/save', params)
