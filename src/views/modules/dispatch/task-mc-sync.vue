@@ -29,6 +29,7 @@
             <el-table-column :show-overflow-tooltip="true" prop="result" header-align="center" align="center" label="执行结果"/>
             <el-table-column :show-overflow-tooltip="true" prop="createTime" header-align="center" align="center" label="开始时间"/>
             <el-table-column :show-overflow-tooltip="true" prop="completeTime" header-align="center" align="center" label="完成时间"/>
+            <el-table-column :show-overflow-tooltip="true" prop="createUser" header-align="center" align="center" label="创建人"/>
         </el-table>
         <el-pagination
                 @size-change="sizeChangeHandle"
