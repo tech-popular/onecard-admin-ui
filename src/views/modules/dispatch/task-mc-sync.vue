@@ -15,7 +15,7 @@
         <el-table :data="dataList" border
                   v-loading="dataListLoading"
                   style="width: 100%;">
-            <el-table-column prop="id" fixed header-align="center" align="center" label="id"/>
+<!--            <el-table-column prop="id" fixed header-align="center" align="center" label="id"/>-->
             <el-table-column :show-overflow-tooltip="true" prop="project" header-align="center" align="center" label="空间名"/>
             <el-table-column :show-overflow-tooltip="true" prop="tableName" header-align="center" align="center" label="表名"/>
             <el-table-column :show-overflow-tooltip="true" prop="history" header-align="center" align="center" label="是否同步历史数据">
