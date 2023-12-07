@@ -2,16 +2,16 @@
     <el-dialog title="参数展示" :close-on-click-modal="false" :visible.sync="visible">
         <el-form :model="dataForm"  ref="dataForm" class="base-form" inline>
             <el-form-item label="参数名" prop="paramName">
-                <el-input v-model.trim="dataForm.paramName" placeholder="参数名" style="width: 150px" clearable/>
+                <el-input v-model.trim="dataForm.paramName" placeholder="参数名" style="width: 200px" clearable/>
             </el-form-item>
             <el-form-item label="参数值" prop="paramValue">
-                <el-input v-model.trim="dataForm.paramValue" placeholder="参数值" style="width: 150px" clearable/>
+                <el-input v-model.trim="dataForm.paramValue" placeholder="参数值" style="width: 200px" clearable/>
             </el-form-item>
-            <el-form-item label="所属系统" prop="projectCode">
+<!--            <el-form-item label="所属系统" prop="projectCode">
                 <el-select v-model="dataForm.projectId" placeholder="所属系统" filterable>
                     <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
                 </el-select>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item>
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
             </el-form-item>
@@ -21,7 +21,7 @@
                   style="width: 100%;">
             <el-table-column :show-overflow-tooltip="true" prop="paramName" header-align="center" align="center" label="参数名"/>
             <el-table-column :show-overflow-tooltip="true" prop="paramValue" header-align="center" align="center" label="参数值"/>
-            <el-table-column :show-overflow-tooltip="true" prop="projectCode" header-align="center" align="center" label="项目名"/>
+<!--            <el-table-column :show-overflow-tooltip="true" prop="projectCode" header-align="center" align="center" label="项目名"/>-->
         </el-table>
         <el-pagination
             @size-change="sizeChangeHandle"
