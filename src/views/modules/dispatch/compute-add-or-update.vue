@@ -10,13 +10,16 @@
     <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑任务' : '新增任务' : '查看任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
     <div class="wrap">
       <h3 id="title">任务信息<span v-if="!!dataForm.id">最近修改人：<i>{{updateUser}}</i> 最近修改时间：<i>{{updateTime}}</i></span></h3>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px" :disabled="!canUpdate">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm1" label-width="120px">
         <div class="work-type-pane">
           <el-form-item label="任务名称" prop="taskName">
             <el-input v-model="dataForm.taskName" placeholder="任务名称" style="width: 400px" />
           </el-form-item>
-          <el-form-item label="任务ID" prop="id">
-            <el-input v-model="dataForm.id" placeholder="任务ID" disabled  style="width: 300px" />
+          <el-form-item v-if="!!dataForm.id" label="负责人" prop="createUser">
+            <el-input v-model="dataForm.createUser" placeholder="负责人" style="width: 150px" />
+          </el-form-item>
+          <el-form-item label="任务id" prop="id" :disabled="!canUpdate">
+            <el-input v-model="dataForm.id" placeholder="id" disabled  style="width: 100px" />
           </el-form-item>
         </div>
         <el-form-item label="所属系统" prop="projectId">
@@ -191,6 +194,7 @@ export default {
       dolphinProcessList: [],
       tempDataForm: {
         taskName: '',
+        createUser: '',
         id: '',
         projectId: '',
         // dolphinProcessName: '',
@@ -223,6 +227,9 @@ export default {
       dataRule: {
         taskName: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
+        ],
+        createUser: [
+          { required: true, message: '请输入负责人', trigger: 'blur' }
         ],
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
@@ -375,6 +382,7 @@ export default {
             }
               this.calculateTasks = data.data.calculateTasks
               this.dataForm.taskName = data.data.taskName
+              this.dataForm.createUser = data.data.createUser
               // this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
           })
         }
@@ -617,11 +625,11 @@ export default {
           tenantId: sessionStorage.getItem('tenantId'),
           // taskName: `${this.formDs}_${this.dataForm.taskName}`,
           taskName: `${this.dataForm.taskName}`,
+          createUser: `${this.dataForm.createUser}`,
           taskType: this.dataForm.taskType,
-          calculateTasks: this.calculateTasks,
-          createUser: this.createUser
+          calculateTasks: this.calculateTasks
         }
-        if (params.isRunAgain === 0) {
+        if (params.isRunAgain === 1) {
           params.failRepeatTrigger = params.failRepeatTrigger
         } else {
           params.failRepeatTrigger = 0
