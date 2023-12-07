@@ -38,6 +38,7 @@
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
                 <!--                <el-button @click="resetHandle()">重置</el-button>-->
                 <el-button type="primary" @click="computAddOrUpdateHandle()">新增任务</el-button>
+                <el-button type="warning" @click="paramsView()">可用参数</el-button>
                 <!--                <el-button type="primary" @click="scriptAddOrUpdateHandle()">新增脚本任务</el-button>-->
             </el-form-item>
         </el-form>
@@ -144,10 +145,10 @@
                         <el-button type="primary" size="mini" icon="el-icon-alarm-clock" circle
                                    @click="periodConfigHandle(scope.row)"></el-button>
                     </el-tooltip>
-                    <el-tooltip class="item" effect="dark" content="参数配置" placement="top">
+<!--                    <el-tooltip class="item" effect="dark" content="参数配置" placement="top">
                         <el-button type="warning" size="mini" icon="el-icon-connection" circle
                                    @click="paramsHandle(scope.row)"></el-button>
-                    </el-tooltip>
+                    </el-tooltip>-->
                 </template>
             </el-table-column>
         </el-table>
@@ -193,6 +194,7 @@
         <taskManagPeriod v-if="taskManagPeriodVisible" ref="taskManagPeriod" @refreshDataList="init"></taskManagPeriod>
         <!-- 参数管理 -->
         <taskManagParams v-if="taskManagParamsVisible" ref="taskManagParams" @refreshDataList="init"></taskManagParams>
+        <paramsView v-if="paramsViewVisible" ref="paramsView" @refreshDataList="init"></paramsView>
     </div>
 </template>
 
@@ -214,6 +216,7 @@ import AssignPermission from '../../components/permission/assign-permission'
 import taskManagSnapShot from './taskManag-snap-shot'
 import taskManagPeriod from './dispatch-config-period'
 import taskManagParams from './taskManag-params.vue'
+import paramsView from './params-view.vue'
 import Clipboard from 'clipboard'
 export default {
     data() {
@@ -231,6 +234,7 @@ export default {
             taskManagSnapShotVisible: false,
             taskManagPeriodVisible: false,
             taskManagParamsVisible: false,
+            paramsViewVisible: false,
             addDBTVisible: false,
             tagDownList: [],
             allStatusList: [],
@@ -279,7 +283,8 @@ export default {
         AssignPermission,
         taskManagSnapShot,
         taskManagPeriod,
-        taskManagParams
+        taskManagParams,
+        paramsView
     },
     mounted() {
         this.init()
@@ -498,6 +503,13 @@ export default {
                     this.$refs.taskManagPeriod.init(this.localDolphinProcessId, canUpdate)
                 })
             // }
+        },
+        // 全局参数
+        paramsView() {
+            this.paramsViewVisible = true
+            this.$nextTick(() => {
+                this.$refs.paramsView.init()
+            })
         },
         // 参数配置
         paramsHandle(data) {

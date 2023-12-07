@@ -67,3 +67,4 @@ export const taskSnapshotNewDepends = params => httpPost(base + 'dispatch/snapsh
 export const taskSnapshotOldDepends = params => httpPost(base + 'dispatch/snapshot/oldDepends', params) // 任务老调度
 export const mcSyncPage = (params) => httpGet(base + 'dispatch/mc/sync/listOnPage', params) // 初始化列表
 export const mcSyncSave = (params) => httpPost(base + 'dispatch/mc/sync/save', params)
+export const paramsViewPage = (params) => httpGet(base + 'dispatch/task/params/listOnPage', params)
