@@ -27,20 +27,6 @@
             <el-option :label="item.projectSystemName" :value="item.id" v-for="(item, index) in allSystemList" :key="index"></el-option>
           </el-select>
         </el-form-item>
-<!--        <el-form-item label="所属工作流" prop="dolphinProcessName">-->
-<!--            <el-select v-model="dataForm.dolphinProcessName" placeholder="所属工作流" style="width: 400px" filterable allow-create>-->
-<!--                <el-option :label="item" :value="item" v-for="(item, index) in dolphinProcessList" :key="index"></el-option>-->
-<!--            </el-select>-->
-<!--        </el-form-item>-->
-        <el-form-item label="任务类型" prop="taskType">
-            <el-select v-model="dataForm.taskType" style="width: 400px" @change="changeTaskType" clearable placeholder="任务类型">
-                <el-option label="trino" value="TRINO"></el-option>
-                <el-option label="sparkSql" value="SPARKSQL"></el-option>
-                <el-option label="kyuubi" value="KYUUBI"></el-option>
-                <el-option label="shell" value="SHELL"></el-option>
-                <el-option label="python" value="PYTHON"></el-option>
-            </el-select>
-        </el-form-item>
         <el-form-item label="Tag标记" prop="tags">
           <el-select v-model="dataForm.tags" placeholder="Tag标记" style="width: 400px" filterable allow-create multiple>
             <el-option :label="item" :value="item" v-for="(item, index) in tagList" :key="index"></el-option>
@@ -58,9 +44,28 @@
           <el-form-item label="作业序号" prop="jobNo" label-width="120px">
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
-<!--          <el-form-item label="作业名称" prop="jobName" label-width="120px">-->
-<!--              <el-input v-model="item.jobName" placeholder="作业名称" />-->
-<!--          </el-form-item>-->
+          <div class="work-type-pane">
+            <el-form-item label="任务类型" prop="jobType" label-width="120px" >
+                <el-select v-model="item.jobType"  clearable placeholder="任务类型">
+                    <el-option label="trino" value="TRINO"></el-option>
+                    <el-option label="sparkSql" value="SPARKSQL"></el-option>
+                    <el-option label="kyuubi" value="KYUUBI"></el-option>
+                    <el-option label="shell" value="SHELL"></el-option>
+                    <el-option label="python" value="PYTHON"></el-option>
+                    <el-option label="db" value="DB"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="item.jobType === 'DB'"  label="数据源" prop="dataSourceId" label-width="120px" >
+                <el-select v-model="item.dataSourceId"  clearable placeholder="任务类型">
+                    <el-option :label="item.name" :value="item.id" v-for="(item, index) in dataSourceList" :key="index"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="item.jobType === 'PYTHON' || item.jobType === 'SHELL'" label="资源" prop="resourceList" label-width="120px" >
+                <el-select v-model="item.resourceList" placeholder="资源" style="width: 300px" clearable filterable allow-create multiple>
+                    <el-option :label="data" :value="data" v-for="(data, index) in resourceInfoList" :key="index"></el-option>
+                </el-select>
+            </el-form-item>
+           </div>
           <el-form-item label="作业描述" prop="jobDesc" label-width="120px">
               <el-input type="textarea" v-model="item.jobDesc" placeholder="作业描述" />
           </el-form-item>
@@ -78,6 +83,9 @@
               <span style="color:#6da7ff; position:absolute;left: 40px;top:4px;">{{item.placeholder}}</span>
             </div>
           </el-form-item>
+          <el-form-item v-show="false" label="dolphin任务id" prop="dolphinTaskId" label-width="120px">
+              <el-input type="textarea" v-model="item.dolphinTaskId" placeholder="dolphin任务id" />
+          </el-form-item>
           <div style="margin-bottom: 10px; text-align: right;">
             <el-button type="primary" @click="addWork">新增</el-button>
             <el-button type="danger" @click="deleteWork(index)">删除</el-button>
@@ -85,20 +93,6 @@
         </el-form>
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
-        <div class="work-type-pane">
-          <el-form-item label="资源" prop="">
-              <el-select v-model="dataForm.resourceList" placeholder="资源" style="width: 400px" clearable filterable allow-create multiple>
-                  <el-option :label="item" :value="item" v-for="(item, index) in resourceInfoList" :key="index"></el-option>
-              </el-select>
-          </el-form-item>
-        </div>
-        <div class="work-type-pane">
-            <el-form-item label="额外参数" prop="extraParam">
-                <el-select v-model="dataForm.extraParam" placeholder="额外参数" style="width: 400px" clearable filterable allow-create>
-                    <el-option :label="item" :value="item" v-for="(item, index) in extraParamList" :key="index"></el-option>
-                </el-select>
-            </el-form-item>
-        </div>
         <div class="work-type-pane">
           <el-form-item label="失败重跑"  prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
@@ -115,15 +109,7 @@
                   <el-option label="短信通知" value="msg"></el-option>
               </el-select>
           </el-form-item>
-        </div>
-<!--        <div class="work-type-pane">-->
-<!--          <el-form-item label="状态：" prop="taskDisable" label-width="120px">-->
-<!--            <el-radio-group v-model="dataForm.taskDisable">-->
-<!--              <el-radio :label="1">上线</el-radio>-->
-<!--              <el-radio :label="0">下线</el-radio>-->
-<!--            </el-radio-group>-->
-<!--          </el-form-item>-->
-<!--        </div>-->
+        </div>>
       </el-form>
     </div>
     <div class="footer">
@@ -161,7 +147,7 @@
 
 <script>
 import { deepClone } from '@/utils'
-import { info, save, update, projectAll, tagAll, getDolphinFlowList, getExtraParam, getResourceList } from '@/api/dispatch/taskManag'
+import { info, save, update, projectAll, tagAll, getDolphinFlowList, getResourceList, getAllDataSourceList, getDolphinTaskId } from '@/api/dispatch/taskManag'
 import { codemirror } from 'vue-codemirror'
 import diff from '@/assets/js/diff.min.js'
 import 'codemirror/lib/codemirror.css'
@@ -192,19 +178,16 @@ export default {
       updateTime: '',
       dataForm: {},
       dolphinProcessList: [],
+      dataSourceList: [],
       tempDataForm: {
         taskName: '',
         createUser: '',
         id: '',
         projectId: '',
-        // dolphinProcessName: '',
         taskType: '',
         tags: '',
-        resourceList: [],
-        extraParam: '',
         taskDescribe: '',
         taskDisable: 1,
-        // requestedUser: '',
         failRepeatTrigger: 3,
         isRunAgain: 1,
         alarmTypes: ['ding']
@@ -213,14 +196,12 @@ export default {
       tempCalculateTasks: [
         {
           jobNo: 1,
-          // jobType: '',
-          // datasourceId: '',
-          // accountId: '',
-          // jobName: '',
+          jobType: '',
           jobDesc: '',
           jobScript: '',
-          // allDatasourceNameList: [],
-          // allAccountList: [],
+          resourceList: [],
+          dataSourceId: '',
+          dolphinTaskId: '',
           placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
         }
       ],
@@ -237,33 +218,15 @@ export default {
         dolphinProcessName: [
             { required: true, message: '请选择所属工作流', trigger: 'change' }
         ],
-        taskType: [
+        jobType: [
             { required: true, message: '请选择任务类型', trigger: 'change' }
         ],
-        // tag: [
-        //   { required: true, message: '请选择Tag', trigger: 'change' }
-        // ],
         jobNo: [
           { required: true, message: '请输入作业序号', trigger: 'blur' }
         ],
-        // jobName: [
-        //   { required: true, message: '请输入作业名称', trigger: 'blur' }
-        // ],
-        // jobType: [
-        //   { required: true, message: '请输入作业类型', trigger: 'change' }
-        // ],
-        // datasourceId: [
-        //   { required: true, message: '请选择数据源', trigger: 'change' }
-        // ],
-        // accountId: [
-        //   { required: true, message: '请选择帐户', trigger: 'change' }
-        // ],
         jobScript: [
           { required: true, message: '请输入任务语句', trigger: 'change' }
         ],
-        // requestedUser: [
-        //   { required: true, message: '请输入任务需求人', trigger: 'blur' }
-        // ],
         taskDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ],
@@ -281,7 +244,6 @@ export default {
       tagList: [],
       extraParamList: [],
       resourceInfoList: [],
-      // allDatasourceList: [],
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
@@ -340,10 +302,9 @@ export default {
       this.dataForm = deepClone(this.tempDataForm)
       this.calculateTasks = deepClone(this.tempCalculateTasks)
       this.getAllSystem()
+      this.getAllDataSourceList()
       this.getTag()
       this.getResourceList()
-      this.changeTaskType(this.dataForm.taskType)
-      // this.getAllDatasource()
       this.visible = true
       this.$nextTick(() => {
         document.getElementById('title').scrollIntoView()
@@ -364,14 +325,10 @@ export default {
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
             this.getDolphinFlowList(data.data.projectId)
-            // this.dataForm.dolphinProcessName = data.data.dolphinProcessName
             this.dataForm.taskType = data.data.taskType
             this.dataForm.alarmTypes = data.data.alarmTypes
             this.dataForm.tags = data.data.tags
-            this.dataForm.resourceList = data.data.resourceList
-            this.dataForm.extraParam = data.data.extraParam
             this.dataForm.taskDisable = data.data.taskDisable
-            // this.dataForm.requestedUser = data.data.requestedUser
             // 是否重跑判断
             if (data.data.failRepeatTrigger !== 1) {
                 this.dataForm.isRunAgain = 1
@@ -383,7 +340,6 @@ export default {
               this.calculateTasks = data.data.calculateTasks
               this.dataForm.taskName = data.data.taskName
               this.dataForm.createUser = data.data.createUser
-              // this.dataForm.taskName = data.data.taskName.substr(this.formDs.length + 1)
           })
         }
       })
@@ -398,15 +354,22 @@ export default {
         this.resourceInfoList = data.data
       })
     },
-    changeTaskType (item) {
-        getExtraParam(item).then(({data}) => {
-            this.extraParamList = data.data
-        })
-    },
     getAllSystem () {
       projectAll().then(({data}) => {
         this.allSystemList = data.data
       })
+    },
+    getAllDataSourceList () {
+        getAllDataSourceList().then(({data}) => {
+        this.dataSourceList = data.data
+      })
+    },
+    getDolphinTaskId() {
+        // 使用 return 将 Promise 对象返回
+        return getDolphinTaskId().then(({ data }) => {
+            // 返回 data.data
+            return data.data
+        })
     },
     getDolphinFlowList (item) {
         console.log(item)
@@ -560,11 +523,12 @@ export default {
     addWork () { // 增加一条作业内容
       this.calculateTasks.push({
         jobNo: '',
-        // jobType: '',
-        // datasourceId: '',
-        // accountId: '',
-        jobName: '',
+        jobType: '',
+        jobDesc: '',
         jobScript: '',
+        resourceList: [],
+        dataSourceId: '',
+        dolphinTaskId: '',
         placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
       })
       this.updateWorkIndex()
@@ -609,10 +573,6 @@ export default {
           return this.$message.error('作业序号不可重复，请重新填写后再操作')
         }
         console.log(this.dataForm, this.calculateTasks)
-        // this.calculateTasks.forEach(item => {
-        //   item.allDatasourceNameList = []
-        //   item.allAccountList = []
-        // })
         let url = save
         if (this.dataForm.id) {
           url = update
@@ -623,7 +583,6 @@ export default {
           authOtherList: this.rowData.authOtherList,
           authOthers: this.rowData.authOthers,
           tenantId: sessionStorage.getItem('tenantId'),
-          // taskName: `${this.formDs}_${this.dataForm.taskName}`,
           taskName: `${this.dataForm.taskName}`,
           createUser: `${this.dataForm.createUser}`,
           taskType: this.dataForm.taskType,

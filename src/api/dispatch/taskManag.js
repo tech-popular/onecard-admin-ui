@@ -39,6 +39,7 @@ export const taskDependenceDelete = params => httpPostFile(base + 'dispatch/task
 export const taskSelectDependence = id => httpGet(base + `dispatch/task/dependence/selectDependence/${id}`) // 已选依赖列表
 // 参数管理
 export const getParamsList = () => httpGet(base + '/dispatch/task/params/globalParamList')
+
 export const getParamsListByTaskId = id => httpGet(base + `/dispatch/task/params/getParamsListByTaskId/${id}`)
 export const getParamsByProp = prop => httpGet(base + `/dispatch/task/params/getParamsByProp/${prop}`)
 export const saveParams = params => httpPost(base + '/dispatch/task/params/save', params) // 保存
@@ -68,3 +69,5 @@ export const taskSnapshotOldDepends = params => httpPost(base + 'dispatch/snapsh
 export const mcSyncPage = (params) => httpGet(base + 'dispatch/mc/sync/listOnPage', params) // 初始化列表
 export const mcSyncSave = (params) => httpPost(base + 'dispatch/mc/sync/save', params)
 export const paramsViewPage = (params) => httpGet(base + 'dispatch/task/params/listOnPage', params)
+export const getAllDataSourceList = () => httpGet(base + 'dispatch/account/getAllDataSourceList')
+export const getDolphinTaskId = () => httpGet(base + 'dispatch/task/getDolphinTaskId')

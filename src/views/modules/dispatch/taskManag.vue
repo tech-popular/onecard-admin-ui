@@ -7,12 +7,12 @@
             <el-form-item label="任务名称" prop="taskName">
                 <el-input v-model.trim="dataForm.taskName" placeholder="任务名称" clearable/>
             </el-form-item>
-            <el-form-item label="任务类型" prop="type">
-                <el-select v-model="dataForm.type" placeholder="任务类型" filterable clearable>
-                    <el-option :label="item.label" :value="item.value" v-for="(item, index) in typeList"
-                               :key="index"></el-option>
-                </el-select>
-            </el-form-item>
+<!--            <el-form-item label="任务类型" prop="type">-->
+<!--                <el-select v-model="dataForm.type" placeholder="任务类型" filterable clearable>-->
+<!--                    <el-option :label="item.label" :value="item.value" v-for="(item, index) in typeList"-->
+<!--                               :key="index"></el-option>-->
+<!--                </el-select>-->
+<!--            </el-form-item>-->
             <el-form-item label="Tag标签" prop="tag">
                 <el-select v-model="dataForm.tag" placeholder="Tag标签" filterable clearable>
                     <el-option :label="item" :value="item" v-for="(item, index) in tagDownList"
@@ -72,11 +72,11 @@
 <!--                    </el-tooltip>-->
 <!--                </template>-->
 <!--            </el-table-column>-->
-            <el-table-column :show-overflow-tooltip="true" prop="taskType" header-align="center" align="center" label="任务类型">
-                <template slot-scope="scope">
-                        <el-tag type="warning">{{ scope.row.taskType }}</el-tag>
-                </template>
-            </el-table-column>
+<!--            <el-table-column :show-overflow-tooltip="true" prop="taskType" header-align="center" align="center" label="任务类型">-->
+<!--                <template slot-scope="scope">-->
+<!--                        <el-tag type="warning">{{ scope.row.taskType }}</el-tag>-->
+<!--                </template>-->
+<!--            </el-table-column>-->
             <el-table-column :show-overflow-tooltip="true" prop="tag" header-align="center" align="center" label="Tag标记">
                 <template slot-scope="scope">
                   <div  v-if="scope.row.tag !== null && scope.row.tag !== ''">
