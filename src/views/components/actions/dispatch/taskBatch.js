@@ -93,6 +93,11 @@ export const models = {
           align: 'center'
         },
         {
+          prop: 'taskInstanceName',
+          label: '子任务名称',
+          align: 'center'
+        },
+        {
           prop: 'taskType',
           label: '任务类型',
           align: 'center',
