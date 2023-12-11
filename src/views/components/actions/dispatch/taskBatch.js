@@ -218,6 +218,12 @@ export const models = {
     },
     // 查询
     handleSearch () {
+      if (this.searchData.taskName === '' || this.searchData.taskName === null || this.searchData.taskName === undefined) {
+        this.$message({
+          message: '任务批次较多，任务名称为必输项',
+          type: 'warning'
+        })
+      }
       this.pageNum = 1
       this.init()
     },
