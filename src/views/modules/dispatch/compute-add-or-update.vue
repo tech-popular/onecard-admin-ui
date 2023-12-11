@@ -227,6 +227,9 @@ export default {
         jobScript: [
           { required: true, message: '请输入任务语句', trigger: 'change' }
         ],
+        dataSourceId: [
+            { required: true, message: '请选择数据源', trigger: 'change' }
+        ],
         taskDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
         ],
