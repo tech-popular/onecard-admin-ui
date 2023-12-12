@@ -97,18 +97,18 @@ export const models = {
           label: '子任务名称',
           align: 'center'
         },
-        {
-          prop: 'taskType',
-          label: '任务类型',
-          align: 'center',
-          render: (h, params) => {
-            return h('el-tag', {
-              props: {
-                type: params.row.taskType === ''
-              } // 组件的props
-            }, params.row.taskType)
-          }
-        },
+        // {
+        //   prop: 'taskType',
+        //   label: '任务类型',
+        //   align: 'center',
+        //   render: (h, params) => {
+        //     return h('el-tag', {
+        //       props: {
+        //         type: params.row.taskType === ''
+        //       } // 组件的props
+        //     }, params.row.taskType)
+        //   }
+        // },
         {
           prop: 'runningTime',
           label: '运行时长',
@@ -159,7 +159,7 @@ export const models = {
       searchForm: [
         // {type: 'Input', label: '任务ID', prop: 'taskId', width: '300px', placeholder: '任务ID'},
         {type: 'Input', label: '任务名称', prop: 'taskName', width: '300px', placeholder: '请输入名称'},
-        {type: 'Select', label: '任务类型', prop: 'taskType', width: '300px', options: type, props: defaultProps, change: row => '', placeholder: '请选择任务类型'},
+        // {type: 'Select', label: '任务类型', prop: 'taskType', width: '300px', options: type, props: defaultProps, change: row => '', placeholder: '请选择任务类型'},
         // {type: 'Input', label: '调度负责人', prop: 'dispatchLeader', width: '300px', placeholder: '创建人'},
         // {type: 'Select', label: '所属项目/平台', prop: 'projectId', width: '300px', options: projectProps, props: projectProps, change: row => '', placeholder: '请选择起停状态'},
         {type: 'Select', label: '任务状态', prop: 'runStatus', width: '300px', options: statusProps, props: statusProps, change: row => '', placeholder: '请选择起停状态'}

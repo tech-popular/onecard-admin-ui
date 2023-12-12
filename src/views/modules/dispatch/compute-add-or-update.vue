@@ -210,7 +210,8 @@ export default {
           { required: true, message: '请输入任务名称', trigger: 'blur' }
         ],
         createUser: [
-          { required: true, message: '请输入负责人', trigger: 'blur' }
+          { required: true, message: '请输入负责人', trigger: 'blur' },
+          { validator: this.validateCreateUser, trigger: 'blur' }
         ],
         projectId: [
           { required: true, message: '请选择所属系统', trigger: 'change' }
@@ -346,6 +347,14 @@ export default {
           })
         }
       })
+    },
+    validateCreateUser(rule, value, callback) {
+        const pattern = /^[a-zA-Z0-9]+$/
+        if (!pattern.test(value)) {
+            callback(new Error('请调整为系统登录用户名'))
+        } else {
+            callback()
+        }
     },
     getTag () {
         tagAll().then(({data}) => {
