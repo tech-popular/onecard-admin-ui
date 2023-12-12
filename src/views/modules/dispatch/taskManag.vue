@@ -56,9 +56,9 @@
 <!--                    </el-tooltip>-->
                 </template>
             </el-table-column>
-            <el-table-column>
+            <el-table-column :width="50">
                 <template slot-scope="scope">
-                  <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain circle class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>
+                  <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>
                 </template>
             </el-table-column>
 <!--            <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"-->
@@ -591,5 +591,7 @@ export default {
 }
 .custom-button {
     border: none !important;
+    float: left;  /* 将按钮浮动到左侧 */
+    margin-right: 1px;  /* 可以根据需要调整按钮与左框之间的间距 */
 }
 </style>
