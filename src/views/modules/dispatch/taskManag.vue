@@ -138,7 +138,7 @@
                                    @click="snapshotHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="执行任务" placement="top">
-                        <el-button type="success" size="mini" icon="el-icon-video-play" circle
+                        <el-button :disabled="scope.row.executeStatus === '提交成功' || scope.row.executeStatus === '运行中'" type="success" size="mini" icon="el-icon-video-play" circle
                                    @click="taskExecuteHandle(scope.row)"></el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="调度配置" placement="top">
