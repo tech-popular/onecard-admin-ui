@@ -71,6 +71,7 @@
             <el-form-item prop="datasourceType" label="数据来源">
               <el-select v-model="baseForm.datasourceType" style="width:300px;">
                 <el-option label="maxComputer" value="maxComputer"></el-option>
+                <el-option label="Trino" value="Trino"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item prop="tableSpace" label="表空间">

@@ -70,41 +70,78 @@ export default {
       postData.taskScheduleConfig = data.taskScheduleConfig
       return postData
     },
-    saveHandle () {
-      this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
-        if (val.status === '1') {
-          this.dataList.forEach((item, index) => {
-            // let tableData = this.dataList
-            infoDataTransferManage(item.id).then(({ data }) => {
-              if (data.status === '1' && data.data) {
-                let params = this.formatPostData(data.data)
-                updateDataTransferManage(params).then(({ data }) => {
-                  console.log('res3333: ', data)
-                  if (data.status === '1') {
-                    item.comUpdate = true
-                    this.$set(this.dataList, index, item)
-                    if (index === this.dataList.length - 1) {
-                      this.$message({
-                        message: '更新成功',
-                        type: 'success',
-                        duration: 1500,
-                        onClose: () => {
-                          this.visible = false
-                          this.$emit('updateClosed')
-                        }
-                      })
+    async saveHandle() {
+        for (let index = 0; index < this.dataList.length; index++) {
+            const item = this.dataList[index]
+            try {
+                const { data } = await infoDataTransferManage(item.id)
+                if (data.status === '1' && data.data) {
+                    const params = this.formatPostData(data.data)
+                    const response = await updateDataTransferManage(params)
+                    console.log('res3333: ', response.data)
+                    if (response.data.status === '1') {
+                        this.$set(this.dataList, index, { ...item, comUpdate: true })
+                        // 使用 this.$nextTick 确保在下一个 DOM 更新周期中执行
+                        this.$nextTick(() => {
+                            if (index === this.dataList.length - 1) {
+                                this.$message({
+                                    message: '更新成功',
+                                    type: 'success',
+                                    duration: 1500,
+                                    onClose: () => {
+                                        this.visible = false
+                                        this.$emit('updateClosed')
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+                        this.$message.error(response.data.message || '数据异常')
+                        this.visible = false
                     }
-                  } else {
-                    this.$message.error(data.message || '数据异常')
-                    this.visible = false
-                  }
-                })
-              }
-            })
-          })
+                }
+            } catch (error) {
+                console.error('An error occurred:', error)
+            }
+            // 等待5秒钟
+            await new Promise(resolve => setTimeout(resolve, 5000))
         }
-      })
     },
+    // saveHandle () {
+    //   this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
+    //     if (val.status === '1') {
+    //       this.dataList.forEach((item, index) => {
+    //         // let tableData = this.dataList
+    //         infoDataTransferManage(item.id).then(({ data }) => {
+    //           if (data.status === '1' && data.data) {
+    //             let params = this.formatPostData(data.data)
+    //             updateDataTransferManage(params).then(({ data }) => {
+    //               console.log('res3333: ', data)
+    //               if (data.status === '1') {
+    //                 item.comUpdate = true
+    //                 this.$set(this.dataList, index, item)
+    //                 if (index === this.dataList.length - 1) {
+    //                   this.$message({
+    //                     message: '更新成功',
+    //                     type: 'success',
+    //                     duration: 1500,
+    //                     onClose: () => {
+    //                       this.visible = false
+    //                       this.$emit('updateClosed')
+    //                     }
+    //                   })
+    //                 }
+    //               } else {
+    //                 this.$message.error(data.message || '数据异常')
+    //                 this.visible = false
+    //               }
+    //             })
+    //           }
+    //         })
+    //       })
+    //     }
+    //   })
+    // },
     cancelHandle () {
       this.visible = false
     }
