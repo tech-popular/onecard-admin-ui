@@ -274,7 +274,7 @@ export default {
         sql: '',
         datasourceType: '',
         tableSpace: '',
-        sqlPeriod: '',
+        sqlPeriod: 0,
         outParam: ''
       },
       rejectForm: {
@@ -445,7 +445,7 @@ export default {
             datasourceType: data.data.userType === 'sql' ? data.data.sqlImportParam.datasourceType : '',
             tableSpace: data.data.userType === 'sql' ? data.data.sqlImportParam.tableSpace : '',
             outParam: data.data.userType === 'sql' ? data.data.sqlImportParam.outParam : '',
-            sqlPeriod: data.data.userType === 'sql' ? data.data.sqlImportParam.sqlPeriod : ''
+            sqlPeriod: data.data.userType === 'sql' ? data.data.sqlImportParam.sqlPeriod.toString() : ''
             // sql: data.data.sqlImportParam.sql,
             // datasourceType: data.data.sqlImportParam.datasourceType,
             // tableSpace: data.data.sqlImportParam.tableSpace,
