@@ -858,6 +858,7 @@ export default {
       }
     },
     judgmentisTask (type) {
+      this.savueData(type)
       if (this.id && type === 'save') {
         selectTransferTask(this.id).then(({ data }) => {
           if (data.status === '1' && data.data) {
@@ -867,8 +868,6 @@ export default {
               this.$nextTick(() => {
                 this.$refs.taskDependencies.init()
               })
-            } else {
-              this.savueData(type)
             }
           } else {
             this.taskDependenciesList = []
@@ -878,8 +877,6 @@ export default {
             })
           }
         })
-      } else {
-        this.savueData(type)
       }
     },
     savueData (type, callback) {
