@@ -858,7 +858,6 @@ export default {
       }
     },
     judgmentisTask (type) {
-      this.savueData(type)
       if (this.id && type === 'save') {
         selectTransferTask(this.id).then(({ data }) => {
           if (data.status === '1' && data.data) {
@@ -878,6 +877,7 @@ export default {
           }
         })
       }
+      this.savueData(type)
     },
     savueData (type, callback) {
       if (this.baseForm.userType === 'excel') { // excel方式
