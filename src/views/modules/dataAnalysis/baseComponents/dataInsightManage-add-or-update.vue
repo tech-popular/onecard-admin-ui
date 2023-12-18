@@ -74,10 +74,16 @@
                 <el-option label="Trino" value="Trino"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="tableSpace" label="表空间">
+            <el-form-item v-if="baseForm.datasourceType === 'maxComputer'" prop="tableSpace" label="表空间">
               <el-select v-model="baseForm.tableSpace" style="width:300px;">
                 <el-option v-for="(item,index) in tableSpaceList" :key="index" :label="item.value" :value="item.value"></el-option>
               </el-select>
+            </el-form-item>
+            <el-form-item prop="sqlPeriod" label="动态撞库">
+                <el-select v-model="baseForm.sqlPeriod" style="width:100px;">
+                    <el-option label="否" value="0"></el-option>
+                    <el-option label="是" value="1"></el-option>
+                </el-select>
             </el-form-item>
           </div>
           <el-form-item class="user-channel" v-if="baseForm.userType === 'sql'" prop="sql" label="SQL：" label-width="70px" ref="workBeginSqlForm">
@@ -95,7 +101,7 @@
             <p class="data-description-tips">默认选中sql语句中输出的第一个字段作为映射字段</p>
           </el-form-item>
           <el-form-item v-if="baseForm.userType === 'sql'" prop="outParam" label="输出数据" style="margin-left:80px;">
-            <el-radio v-model="baseForm.outParam" label="uuid">uuid</el-radio>
+<!--            <el-radio v-model="baseForm.outParam" label="uuid">uuid</el-radio>-->
             <el-radio v-model="baseForm.outParam" label="user_id">user_id</el-radio>
             <el-radio v-model="baseForm.outParam" label="cert_id">cert_id</el-radio>
             <el-radio v-model="baseForm.outParam" label="mobile">mobile</el-radio>
@@ -268,6 +274,7 @@ export default {
         sql: '',
         datasourceType: '',
         tableSpace: '',
+        sqlPeriod: '',
         outParam: ''
       },
       rejectForm: {
@@ -296,6 +303,9 @@ export default {
         ],
         datasourceType: [
           { required: true, message: '请选择数据来源', trigger: 'change' }
+        ],
+       sqlPeriod: [
+          { required: true, message: '请选择', trigger: 'change' }
         ],
         // tableSpace: [
         //   { required: true, message: '请选择数据来源', trigger: 'change' }
@@ -434,7 +444,8 @@ export default {
             sql: data.data.userType === 'sql' ? data.data.sqlImportParam.sql : '',
             datasourceType: data.data.userType === 'sql' ? data.data.sqlImportParam.datasourceType : '',
             tableSpace: data.data.userType === 'sql' ? data.data.sqlImportParam.tableSpace : '',
-            outParam: data.data.userType === 'sql' ? data.data.sqlImportParam.outParam : ''
+            outParam: data.data.userType === 'sql' ? data.data.sqlImportParam.outParam : '',
+            sqlPeriod: data.data.userType === 'sql' ? data.data.sqlImportParam.sqlPeriod : ''
             // sql: data.data.sqlImportParam.sql,
             // datasourceType: data.data.sqlImportParam.datasourceType,
             // tableSpace: data.data.sqlImportParam.tableSpace,
@@ -982,7 +993,8 @@ export default {
         'datasourceType': this.baseForm.datasourceType,
         'tableSpace': this.baseForm.tableSpace,
         'sql': this.baseForm.sql,
-        'outParam': this.baseForm.outParam
+        'outParam': this.baseForm.outParam,
+        'sqlPeriod': this.baseForm.sqlPeriod
       }
       let params = {
         ...this.rowData,
