@@ -5,6 +5,7 @@
             <div>
                 <el-button size="small" @click="toggleFullscreen">{{ isFullscreen ? '缩小' : '放大' }}</el-button>
                 <el-button size="small" @click="refresh">刷新</el-button>
+                <el-button size="small" @click="downloadLog">下载</el-button>
                 <el-button size="small" @click="closeDialog">关闭</el-button>
             </div>
         </div>
@@ -14,7 +15,7 @@
 </template>
 
 <script>
-import { taskBatchLog } from '@/api/dispatch/taskManag'
+import { taskBatchLog, downloadLog } from '@/api/dispatch/taskManag'
 
 export default {
     data() {
@@ -27,6 +28,24 @@ export default {
     },
     methods: {
         toggleFullscreen() {
+            this.isFullscreen = !this.isFullscreen
+        },
+        downloadLog () {
+            let params = {
+                dolphinInstanceId: this.dolphinInstanceId
+            }
+            downloadLog(params).then(({ data }) => {
+                if (data && data.status === '1') {
+                    this.$message({
+                        message: '操作成功',
+                        type: 'success'
+                    })
+                } else {
+                    this.$message.error(data.message)
+                }
+            })
+        },
+        download() {
             this.isFullscreen = !this.isFullscreen
         },
         refresh() {
