@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { taskBatchLog, downloadLog } from '@/api/dispatch/taskManag'
+import { taskBatchLog } from '@/api/dispatch/taskManag'
 
 export default {
     data() {
@@ -31,19 +31,9 @@ export default {
             this.isFullscreen = !this.isFullscreen
         },
         downloadLog () {
-            let params = {
-                dolphinInstanceId: this.dolphinInstanceId
-            }
-            downloadLog(params).then(({ data }) => {
-                if (data && data.status === '1') {
-                    this.$message({
-                        message: '操作成功',
-                        type: 'success'
-                    })
-                } else {
-                    this.$message.error(data.message)
-                }
-            })
+            let dolphinInstanceId = this.dolphinInstanceId
+            let downloadUrl = this.$http.adornUrl(`dispatch/task/instance/log/download/${dolphinInstanceId}`)
+            window.open(downloadUrl, '_blank')
         },
         download() {
             this.isFullscreen = !this.isFullscreen
