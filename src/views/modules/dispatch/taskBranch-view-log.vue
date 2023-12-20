@@ -32,7 +32,7 @@ export default {
         },
         downloadLog () {
             let dolphinInstanceId = this.dolphinInstanceId
-            let downloadUrl = this.$http.adornUrl(`dispatch/task/instance/log/download/${dolphinInstanceId}`)
+            let downloadUrl = this.$http.adornUrl(`/dispatch/task/instance/log/download/${dolphinInstanceId}`)
             window.open(downloadUrl, '_blank')
         },
         download() {
