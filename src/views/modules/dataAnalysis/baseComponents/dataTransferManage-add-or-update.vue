@@ -233,10 +233,10 @@
               <el-form-item  prop="transferType">
                 <el-checkbox label="sms" name="transferType" v-model="baseForm.transferType" 
                 @change="checked=>changeDistribution(checked, 'sms')"
-                style="margin-left: 8px;">短信</el-checkbox>
+                             style="margin-left: 8px;">短信</el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="10" style="display:flex;">
+            <el-col :span="5" style="display:flex;">
               <el-form-item prop="smsId">
                 <el-select
                   v-model= "baseForm.smsId"
@@ -261,6 +261,33 @@
                 <div v-if="this.baseForm.transferType.indexOf('sms') > -1 " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('sms')">{{canUpdate? '配置' : '查看' }}</div>
               </div>
             </el-col>
+              <el-col style="width: 8.33333%;">
+                  <el-form-item>
+                      <el-form-item  prop="compensationType">
+                          <el-checkbox label="ai" name="compensationType" v-model="baseForm.compensationType"
+                                       @change="checked=>changeDistribution(checked, 'ai')"
+                                       style="margin-left: 90px;">补偿下发IVR</el-checkbox>
+                      </el-form-item>
+                  </el-form-item>
+              </el-col>
+              <el-col :span="5" style="display:flex;">
+                  <el-form-item prop="aiCompensationCode">
+                      <el-select
+                              v-model= "baseForm.aiCompensationCode"
+                              clearable
+                              filterable
+                              @change="aiSelectChange"
+                              style="margin-left:120px; width:270px;"
+                              placeholder="请选择">
+                          <el-option
+                                  v-for="item in aiIdList"
+                                  :key="item.id"
+                                  :label="item.resourceName"
+                                  :value="item.id">
+                          </el-option>
+                      </el-select>
+                  </el-form-item>
+              </el-col>
           </el-row>
           <el-row :gutter="20" v-if="baseForm.decisionType === '0' && baseForm.transferCategory === '1'">
              <el-col style="width: 8.33333%;">
@@ -301,7 +328,7 @@
               <el-form-item  prop="transferType">
                 <el-checkbox label="ai" name="transferType" v-model="baseForm.transferType" 
                 @change="checked=>changeDistribution(checked, 'ai')"
-                style="margin-left: 8px;">AI</el-checkbox>
+                style="margin-left: 8px;">IVR</el-checkbox>
               </el-form-item>
             </el-col>
             <el-col :span="10" style="display:flex;">
@@ -594,6 +621,7 @@
         isStatic: false,
         setSmsTemplteVisible: false,
         channelCode: '',
+        isAiCompensationChecked: false,
         // originOutParamsList: [],
         baseForm: {
           id: '',
@@ -615,6 +643,7 @@
           dayOfWeeks: [], // 周
           dayOfMonths: [], // 月
           transferType: [], // 下发数据源
+          compensationType: [], // 补偿类型
           // intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
           kafkaServer: '', // 已绑定的kafka
@@ -627,6 +656,7 @@
           telId: '',
           telParams: '',
           aiId: '',
+          aiCompensationCode: '', // 失败补偿
           aiParams: '',
           pushId: '',
           pushParams: '',
@@ -866,14 +896,17 @@
         })
       },
       // 获取分群出参 指标列表
-      getOutParamsList (sourceBindingIds) {
+      getOutParamsList (sourceBindingIds, compensationCodes) {
         let code = this.channelCode.split(',').filter(item => item !== '')
         dataTransferManageOutParams({ channelCode: code, flag: this.baseForm.id ? '-1' : '1' }).then(({data}) => {
           if (data && data.status === '1') {
             this.outParamsList = this.filterAllCata(data.data)
             if (sourceBindingIds) {
               this.baseForm.transferType.forEach(item => {
-                this.dataTransferDisplay(item, sourceBindingIds)
+                this.dataTransferDisplay(item, sourceBindingIds, 0)
+            })
+              this.baseForm.compensationType.forEach(item => {
+                this.dataTransferDisplay(item, compensationCodes, 1)
             })
             }
           } else {
@@ -1109,6 +1142,7 @@
       // 提交数据格式化
       formatPostData (data, outParams) {
         let postData = {}
+
         postData.id = data.id ? data.id : ''
         postData.beeFlowId = data.beeFlowId ? data.beeFlowId : ''
         postData.decisionType = data.decisionType
@@ -1119,6 +1153,8 @@
         postData.transferName = data.transferName
         postData.templateId = data.templateId
         postData.transferType = data.transferType.join(',')
+          console.log('data.compensationType' + data.compensationType)
+        postData.compensationType = data.compensationType.join(',')
         postData.taskDescribtion = data.taskDescribtion
         // postData.outParams = outParams
         postData.authOwner = this.rowData.authOwner
@@ -1126,6 +1162,7 @@
         postData.authOthers = this.rowData.authOthers
         // postData.datasourceParams = []
         postData.sourceBindingIds = []
+        postData.compensationCodes = []
         if (data.kafkaServer != '' && data.transferType.includes('kafka')) {
           postData.sourceBindingIds.push(data.kafkaServer)
         }
@@ -1143,6 +1180,10 @@
         }
         if (data.cardId != '' && data.transferType.includes('card')) {
           postData.sourceBindingIds.push(data.cardId)
+        }
+        postData.compensationCodes = []
+        if (data.aiCompensationCode != '' && data.compensationType.includes('ai')) {
+            postData.compensationCodes.push(data.aiCompensationCode)
         }
         postData.increModel = data.increModel
         postData.taskScheduleConfig = {}
@@ -1221,6 +1262,7 @@
               this.$store.commit('canvasFlow/setEditData', disData)
             } else {
               this.baseForm.transferType = (disData.transferType || '').split(',')
+              this.baseForm.compensationType = (disData.compensationType || '').split(',')
             }
             // 要先拿到this.templateIdList
             this.channelCode = this.templateIdList.filter(item => item.value === disData.templateId)[0].channelCode
@@ -1231,8 +1273,8 @@
             //   this.templateIdList = this.templateIdList
             // }
             this.templateIdList = this.templateIdList
-            // 要先拿到this.channelCode,才能去获取对应的出参列表
-            this.getOutParamsList(disData.sourceBindingIds)
+            // 要先拿到this.channelCode,才能去获取对应的出参列表aiCompensationCode
+            this.getOutParamsList(disData.sourceBindingIds, disData.compensationCodes)
             if (custerType === 'static') {
               this.isStatic = true
             } else {
@@ -1287,7 +1329,7 @@
         })
       },
       // 下发方式回显
-      dataTransferDisplay (type, sourceBindingIds) {
+      dataTransferDisplay (type, sourceBindingIds, num) {
         let params = {
           type: type,
           channelCode: this.channelCode
@@ -1322,7 +1364,11 @@
               this.aiIdList = data.data
               data.data.filter(item => {
                 if (sourceBindingIds.indexOf(item.id) > -1) {
-                  this.baseForm.aiId = item.id
+                  if (num === 0) {
+                      this.baseForm.aiId = item.id
+                  } else {
+                      this.baseForm.aiCompensationCode = item.id
+                  }
                   this.aiSelectChange()
                 }
               })
@@ -1371,6 +1417,7 @@
         this.baseForm.dayOfMonths = []
         // this.baseForm.transferType = ['kafka']
         this.baseForm.transferType = []
+        this.baseForm.compensationType = []
         this.isStatic = false
         this.baseForm.increModel = 0
         this.baseForm.kafkaServer = ''
@@ -1390,6 +1437,7 @@
         this.baseForm.cardId = ''
         this.baseForm.cardIdParams = ''
         this.baseForm.templateId = ''
+        this.baseForm.aiCompensationCode = ''
         this.rowData.authOwner = ''
         this.rowData.authOtherList = []
         this.rowData.authOthers = ''

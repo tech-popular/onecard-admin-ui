@@ -46,7 +46,7 @@
                   v-loading="dataListLoading"
                   style="width: 100%;">
             <!--            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>-->
-            <el-table-column :show-overflow-tooltip="true" prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
+            <el-table-column :show-overflow-tooltip="true" prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称" sortable>
                 <template slot-scope="scope">
 <!--                    <el-tooltip class="item" :content="scope.row.taskName" placement="top-start"-->
 <!--                    >-->
@@ -77,7 +77,7 @@
 <!--                        <el-tag type="warning">{{ scope.row.taskType }}</el-tag>-->
 <!--                </template>-->
 <!--            </el-table-column>-->
-            <el-table-column :show-overflow-tooltip="true" prop="tag" header-align="center" align="center" label="Tag标记">
+            <el-table-column :show-overflow-tooltip="true" prop="tag" header-align="center" align="center" label="Tag标记" sortable>
                 <template slot-scope="scope">
                   <div  v-if="scope.row.tag !== null && scope.row.tag !== ''">
                       <span v-for="tag in scope.row.tag.split(',')" :key="tag">
@@ -86,7 +86,7 @@
                   </div>
                 </template>
             </el-table-column>
-            <el-table-column :show-overflow-tooltip="true" prop="executeStatus" header-align="center" align="center" label="执行状态">
+            <el-table-column :show-overflow-tooltip="true" prop="executeStatus" header-align="center" align="center" label="执行状态" sortable>
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.executeStatus === '执行失败'" type="danger">
                         {{ scope.row.executeStatus }}
@@ -101,7 +101,7 @@
                              label="创建时间"/>
             <el-table-column :show-overflow-tooltip="true" prop="updateTime" header-align="center" align="center" :width="180" sortable
                              label="修改时间"/>
-            <el-table-column :show-overflow-tooltip="true" prop="taskDisable" header-align="center" align="center" label="任务状态">
+            <el-table-column :show-overflow-tooltip="true" prop="taskDisable" header-align="center" align="center" label="任务状态" sortable>
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.taskDisable === 1" type="success" @click="changeTaskDisable(scope.row)">
                         上线
@@ -109,7 +109,7 @@
                     <el-tag v-else type="danger" @click="changeTaskDisable(scope.row)">下线</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :show-overflow-tooltip="true" prop="dispatchStatus" header-align="center" align="center" label="定时状态">
+            <el-table-column :show-overflow-tooltip="true" prop="dispatchStatus" header-align="center" align="center" label="定时状态" sortable>
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.dispatchStatus === 1" type="success"
                             @click="changeDispatchStatus(scope.row)">上线
@@ -121,8 +121,8 @@
                 </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" prop="createUser" header-align="center" align="center" label="负责人"/>
-            <el-table-column :show-overflow-tooltip="true" prop="topDependence" header-align="center" align="center" label="上游依赖"/>
-            <el-table-column :show-overflow-tooltip="true" prop="downDependence" header-align="center" align="center" label="下游依赖"/>
+            <el-table-column :show-overflow-tooltip="true" prop="topDependence" header-align="center" align="center" label="上游依赖" sortable/>
+            <el-table-column :show-overflow-tooltip="true" prop="downDependence" header-align="center" align="center" label="下游依赖" sortable/>
             <el-table-column  header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
                 <template slot-scope="scope">
                     <el-tooltip class="item" effect="dark" :content="'编辑任务'" placement="top">
