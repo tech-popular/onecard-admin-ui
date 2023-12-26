@@ -445,7 +445,7 @@ export default {
             datasourceType: data.data.userType === 'sql' ? data.data.sqlImportParam.datasourceType : '',
             tableSpace: data.data.userType === 'sql' ? data.data.sqlImportParam.tableSpace : '',
             outParam: data.data.userType === 'sql' ? data.data.sqlImportParam.outParam : '',
-            sqlPeriod: data.data.userType === 'sql' ? data.data.sqlImportParam.sqlPeriod.toString() : ''
+            sqlPeriod: data.data.userType === 'sql' ? data.data.sqlImportParam.sqlPeriod === null ? '0' : data.data.sqlImportParam.sqlPeriod.toString() : ''
             // sql: data.data.sqlImportParam.sql,
             // datasourceType: data.data.sqlImportParam.datasourceType,
             // tableSpace: data.data.sqlImportParam.tableSpace,
