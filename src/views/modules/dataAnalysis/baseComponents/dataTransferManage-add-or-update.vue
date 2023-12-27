@@ -236,7 +236,7 @@
                              style="margin-left: 8px;">短信</el-checkbox>
               </el-form-item>
             </el-col>
-            <el-col :span="5" style="display:flex;">
+            <el-col :span="7" style="display:flex;">
               <el-form-item prop="smsId">
                 <el-select
                   v-model= "baseForm.smsId"
@@ -266,7 +266,7 @@
                       <el-form-item  prop="compensationType">
                           <el-checkbox label="ai" name="compensationType" v-model="baseForm.compensationType"
                                        @change="checked=>changeDistribution(checked, 'ai')"
-                                       style="margin-left: 90px;">补偿下发IVR</el-checkbox>
+                                       style="margin-left: 10px;">补偿下发IVR</el-checkbox>
                       </el-form-item>
                   </el-form-item>
               </el-col>
@@ -277,7 +277,7 @@
                               clearable
                               filterable
                               @change="aiSelectChange"
-                              style="margin-left:120px; width:270px;"
+                              style="margin-left:40px; width:270px;"
                               placeholder="请选择">
                           <el-option
                                   v-for="item in aiIdList"
