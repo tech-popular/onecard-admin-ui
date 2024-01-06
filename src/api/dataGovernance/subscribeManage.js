@@ -15,6 +15,7 @@ export const configDepend = params => httpPost(da + 'data/governance/configDepen
 export const queryDenpendJob = id => httpGet(da + `data/governance/queryDependJob/${id}`) // 根据订阅任务Id查看依赖任务进度
 
 export const honeycombTasks = params => httpGet(da + 'data/governance/dispatchDepend/honeycombTasks', params) // 查看蜂巢调度任务
+export const dolphinTasks = params => httpGet(da + 'data/governance/dispatchDepend/dolphinTasks', params) // 查看新调度任务
 export const oldDispatchTasks = params => httpGet(da + 'data/governance/dispatchDepend/oldDispatchTasks', params) // 查看老调度任务
 export const checkUserHaveHtml = () => httpGet(da + 'data/governance/checkUserHaveHtmlButton') // 订阅列表
 

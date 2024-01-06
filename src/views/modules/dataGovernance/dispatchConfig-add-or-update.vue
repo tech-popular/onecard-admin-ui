@@ -19,7 +19,7 @@
       </el-form>
       <div class="work-content-1">
         <h3 style="overflow:hidden">
-          蜂巢调度任务依赖
+          新调度任务依赖
         </h3>
         <div class="work-type-pane" style="align-items: flex-start;margin-top:10px">
          <el-row :gutter="20">
@@ -27,51 +27,51 @@
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix" style="display:flex">
             <span style="width: 150px">所有依赖</span>
-            <el-input v-model="honeycombTasksLeftSearchText" size="mini" placeholder="请输入搜索关键字">
-              <el-button slot="append" icon="el-icon-search" @click="honeycombTasksSearchTableHandle"></el-button>
+            <el-input v-model="dolphinTasksLeftSearchText" size="mini" placeholder="请输入搜索关键字">
+              <el-button slot="append" icon="el-icon-search" @click="dolphinTasksSearchTableHandle"></el-button>
             </el-input>
           </div>
-          <el-table ref="multipleLeftTable" :data="honeycombTasksLeftTableData" border @selection-change="honeycombTasksHandleLeftSelectChange">
+          <el-table ref="multipleLeftTable" :data="dolphinTasksLeftTableData" border @selection-change="dolphinTasksHandleLeftSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
             <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
             <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
             <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
-              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '新调度': '老调度'}}
              </template>
             </el-table-column>
           </el-table>
           <el-pagination
-            @size-change="honeycombTasksSizeChangeHandle"
-            @current-change="honeycombTasksCurrentChangeHandle"
-            :current-page="honeycombTasksPageNo"
+            @size-change="dolphinTasksSizeChangeHandle"
+            @current-change="dolphinTasksCurrentChangeHandle"
+            :current-page="dolphinTasksPageNo"
             :page-sizes="[10, 20, 50, 100]"
-            :page-size="honeycombTasksPageSize"
-            :total="honeycombTasksTotalCount"
+            :page-size="dolphinTasksPageSize"
+            :total="dolphinTasksTotalCount"
             style="margin-top:20px"
             layout="total, sizes, prev, pager, next, jumper"
           />
         </el-card>
       </el-col>
       <el-col :span="2" style="text-align:center">
-        <el-button size="mini" type="primary" style="margin-top: 100px" @click="honeycombTasksAddToRight">添加至</el-button>
+        <el-button size="mini" type="primary" style="margin-top: 100px" @click="dolphinTasksAddToRight">添加至</el-button>
       </el-col>
       <el-col :span="11">
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix">
             <span>已选依赖</span>
-            <el-button style="float: right;" size="mini" type="danger" @click="honeycombTasksMultiDeleteHandle">批量删除</el-button>
+            <el-button style="float: right;" size="mini" type="danger" @click="dolphinTasksMultiDeleteHandle">批量删除</el-button>
           </div>
-          <el-table ref="multipleRightTable" :data="honeycombTasksRightTableData" border @selection-change="honeycombTasksHandleRightSelectChange">
+          <el-table ref="multipleRightTable" :data="dolphinTasksRightTableData" border @selection-change="dolphinTasksHandleRightSelectChange">
             <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
              <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
             <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
             <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
-              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '新调度': '老调度'}}
              </template>
             </el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
               <template slot-scope="scope">
-                <a style="cursor: pointer" @click="honeycombTasksDeleteDependenceHandle(scope.$index)">删除</a>
+                <a style="cursor: pointer" @click="dolphinTasksDeleteDependenceHandle(scope.$index)">删除</a>
               </template>
             </el-table-column>
           </el-table>
@@ -99,7 +99,7 @@
             <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
             <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
             <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
-              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '新调度': '老调度'}}
              </template>
             </el-table-column>
           </el-table>
@@ -129,7 +129,7 @@
              <el-table-column header-align="center" align="center" prop="dispatchJobId" label="任务ID"></el-table-column>
             <el-table-column header-align="center" align="center" prop="jobName" label="任务名称"></el-table-column>
             <el-table-column header-align="center" align="center" prop="dispatchSystem" label="所属系统">
-              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '蜂巢': '老调度'}}
+              <template slot-scope="scope">{{scope.row.dispatchSystem === 1 ? '新调度': '老调度'}}
              </template>
             </el-table-column>
             <el-table-column label="操作" header-align="center" align="center">
@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import {honeycombTasks, oldDispatchTasks, configDepend, queryDenpendJob} from '@/api/dataGovernance/subscribeManage'
+import {dolphinTasks, oldDispatchTasks, configDepend, queryDenpendJob} from '@/api/dataGovernance/subscribeManage'
 export default {
   components: {},
   data () {
@@ -168,15 +168,15 @@ export default {
         id: '',
         theme: ''
       },
-      // 蜂巢
-      honeycombTasksPageNo: 1, // 当前页
-      honeycombTasksPageSize: 10, // 默认每页10条
-      honeycombTasksTotalCount: 0,
-      honeycombTasksLeftSearchText: '',
-      honeycombTasksLeftSelectedData: [],
-      honeycombTasksRightSelectedData: [],
-      honeycombTasksLeftTableData: [],
-      honeycombTasksRightTableData: [],
+      // 新调度
+      dolphinTasksPageNo: 1, // 当前页
+      dolphinTasksPageSize: 10, // 默认每页10条
+      dolphinTasksTotalCount: 0,
+      dolphinTasksLeftSearchText: '',
+      dolphinTasksLeftSelectedData: [],
+      dolphinTasksRightSelectedData: [],
+      dolphinTasksLeftTableData: [],
+      dolphinTasksRightTableData: [],
       // 老调度
       oldDispatchTaskPageNo: 1, // 当前页
       oldDispatchTaskPageSize: 10, // 默认每页10条
@@ -210,43 +210,43 @@ export default {
     // 基础信息
     getTaskBaseInfo () {
         queryDenpendJob(this.id).then(({data}) => {
-          this.honeycombTasksRightTableData = []
+          this.dolphinTasksRightTableData = []
           this.oldDispatchTaskRightTableData = []
           if (data.code !== 0) {
             return this.$message.error(data.msg || '获取数据异常')
           }
           data.data.forEach(element => {
             if (element.dispatchSystem === 1) {
-              this.honeycombTasksRightTableData.push(element)
+              this.dolphinTasksRightTableData.push(element)
             } else {
               this.oldDispatchTaskRightTableData.push(element)
             }
           })
-          this.getHoneycombTasksDependence()
+          this.getDolphinTasksDependence()
           this.getOldTaskSelectDependence()
         })
     },
-    // 蜂巢任务
-    getHoneycombTasksDependence () {
+    // 新调度任务
+    getDolphinTasksDependence () {
       let parsms = {
-        jobName: this.honeycombTasksLeftSearchText,
-        currPage: this.honeycombTasksPageNo,
-        pageSize: this.honeycombTasksPageSize
+        jobName: this.dolphinTasksLeftSearchText,
+        currPage: this.dolphinTasksPageNo,
+        pageSize: this.dolphinTasksPageSize
       }
-      honeycombTasks(parsms).then(({data}) => {
-        this.honeycombTasksLeftTableData = []
-        this.honeycombTasksTotalCount = 0
+      dolphinTasks(parsms).then(({data}) => {
+        this.dolphinTasksLeftTableData = []
+        this.dolphinTasksTotalCount = 0
         if (data.code !== 0) {
           this.loading = false
           return this.$message.error(data.msg || '获取数据异常')
         }
-        if (this.honeycombTasksRightTableData.length) {
-          let arr = this.filterArr(this.honeycombTasksRightTableData, data.data.list)
-          this.honeycombTasksLeftTableData = arr
+        if (this.dolphinTasksRightTableData.length) {
+          let arr = this.filterArr(this.dolphinTasksRightTableData, data.data.list)
+          this.dolphinTasksLeftTableData = arr
         } else {
-          this.honeycombTasksLeftTableData = data.data.list
+          this.dolphinTasksLeftTableData = data.data.list
         }
-        this.honeycombTasksTotalCount = data.data.totalCount
+        this.dolphinTasksTotalCount = data.data.totalCount
         this.loading = false
       })
     },
@@ -284,7 +284,7 @@ export default {
     dataFormSubmit (form) {
         let params = {
           id: this.id,
-          jobList: [...this.honeycombTasksRightTableData, ...this.oldDispatchTaskRightTableData]
+          jobList: [...this.dolphinTasksRightTableData, ...this.oldDispatchTaskRightTableData]
         }
          configDepend(params).then(({data}) => {
         if (data.code !== 0) {
@@ -302,35 +302,35 @@ export default {
           })
       })
     },
-    // 蜂巢调度任务
+    // 新调度调度任务
     // 左侧搜索功能
-    honeycombTasksSearchTableHandle () {
-      this.honeycombTasksPageNo = 1
-      this.getHoneycombTasksDependence()
+    dolphinTasksSearchTableHandle () {
+      this.dolphinTasksPageNo = 1
+      this.getDolphinTasksDependence()
     },
-    honeycombTasksHandleLeftSelectChange (val) {
-      this.honeycombTasksLeftSelectedData = val
+    dolphinTasksHandleLeftSelectChange (val) {
+      this.dolphinTasksLeftSelectedData = val
     },
-    honeycombTasksHandleRightSelectChange (val) {
-      this.honeycombTasksRightSelectedData = val
+    dolphinTasksHandleRightSelectChange (val) {
+      this.dolphinTasksRightSelectedData = val
     },
     // 单独删除
-    honeycombTasksDeleteDependenceHandle (index) {
-      this.honeycombTasksRightTableData.splice(index, 1)
+    dolphinTasksDeleteDependenceHandle (index) {
+      this.dolphinTasksRightTableData.splice(index, 1)
     },
     // 批量删除
-    honeycombTasksMultiDeleteHandle () {
-      if (!this.honeycombTasksRightSelectedData.length) return
-      let arr = this.filterArr(this.honeycombTasksRightSelectedData, this.honeycombTasksRightTableData)
-      this.honeycombTasksRightTableData = arr
+    dolphinTasksMultiDeleteHandle () {
+      if (!this.dolphinTasksRightSelectedData.length) return
+      let arr = this.filterArr(this.dolphinTasksRightSelectedData, this.dolphinTasksRightTableData)
+      this.dolphinTasksRightTableData = arr
     },
     // 添加到右侧
-    honeycombTasksAddToRight () {
-      if (!this.honeycombTasksLeftSelectedData.length) return
-      if (!this.honeycombTasksRightTableData.length) {
-        this.honeycombTasksRightTableData = this.honeycombTasksLeftSelectedData
+    dolphinTasksAddToRight () {
+      if (!this.dolphinTasksLeftSelectedData.length) return
+      if (!this.dolphinTasksRightTableData.length) {
+        this.dolphinTasksRightTableData = this.dolphinTasksLeftSelectedData
       } else {
-        this.honeycombTasksRightTableData = this.unique(this.honeycombTasksRightTableData.concat(this.honeycombTasksLeftSelectedData))
+        this.dolphinTasksRightTableData = this.unique(this.dolphinTasksRightTableData.concat(this.dolphinTasksLeftSelectedData))
       }
       this.$refs.multipleLeftTable.clearSelection()
     },
@@ -344,15 +344,15 @@ export default {
       return [...b].filter(x => [...a].every(y => y.dispatchJobId !== x.dispatchJobId))
     },
     // 每页数
-    honeycombTasksSizeChangeHandle (page) {
-      this.honeycombTasksPageSize = page
-      this.honeycombTasksPageNo = 1
-      this.getHoneycombTasksDependence()
+    dolphinTasksSizeChangeHandle (page) {
+      this.dolphinTasksPageSize = page
+      this.dolphinTasksPageNo = 1
+      this.getDolphinTasksDependence()
     },
     // 当前页
-    honeycombTasksCurrentChangeHandle (page) {
-      this.honeycombTasksPageNo = page
-      this.getHoneycombTasksDependence()
+    dolphinTasksCurrentChangeHandle (page) {
+      this.dolphinTasksPageNo = page
+      this.getDolphinTasksDependence()
     },
 
     // 老调度
