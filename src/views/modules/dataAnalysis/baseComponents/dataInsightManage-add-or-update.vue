@@ -870,6 +870,7 @@ export default {
                             this.$refs.taskDependencies.init()
                         })
                     }
+                    this.savueData()
                 } else {
                     this.taskDependenciesList = []
                     return this.$message({
