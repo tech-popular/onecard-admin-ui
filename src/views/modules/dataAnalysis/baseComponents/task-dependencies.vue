@@ -43,6 +43,9 @@ export default {
       dataListLoading: false
     }
   },
+  components: {
+      dataInsightManageAddOrUpdate
+  },
   methods: {
     init () {
       this.dataList.forEach((item, index) => {
