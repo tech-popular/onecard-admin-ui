@@ -96,10 +96,7 @@ export default {
                                     onClose: () => {
                                         this.visible = false
                                         this.$emit('updateClosed')
-                                        // 将 $nextTick 移动到 onClose 回调内
-                                        this.$nextTick(() => {
-                                            this.$refs.dataInsightManageAddOrUpdate.savueData()
-                                        })
+                                        this.$refs.dataInsightManageAddOrUpdate.savueData()
                                     }
                                 })
                             }
