@@ -76,8 +76,7 @@ export default {
       return postData
     },
     async saveHandle() {
-        for (let index = 0; index < this.dataList.length; index++) {
-            const item = this.dataList[index]
+        const promises = this.dataList.map(async (item, index) => {
             try {
                 const { data } = await infoDataTransferManage(item.id)
                 if (data.status === '1' && data.data) {
@@ -110,9 +109,10 @@ export default {
             }
             // 等待5秒钟
             await new Promise(resolve => setTimeout(resolve, 5000))
-        }
+        })
+        await Promise.all(promises)
         this.$nextTick(() => {
-            this.$parent.savueData()
+            this.$refs.dataInsightManageAddOrUpdate.savueData()
         })
     },
     // saveHandle () {
