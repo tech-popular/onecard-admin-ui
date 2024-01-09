@@ -76,7 +76,8 @@ export default {
       return postData
     },
     async saveHandle() {
-        const promises = this.dataList.map(async (item, index) => {
+        for (let index = 0; index < this.dataList.length; index++) {
+            const item = this.dataList[index]
             try {
                 const { data } = await infoDataTransferManage(item.id)
                 if (data.status === '1' && data.data) {
@@ -95,6 +96,10 @@ export default {
                                     onClose: () => {
                                         this.visible = false
                                         this.$emit('updateClosed')
+                                        // 将 $nextTick 移动到 onClose 回调内
+                                        this.$nextTick(() => {
+                                            this.$refs.dataInsightManageAddOrUpdate.savueData()
+                                        })
                                     }
                                 })
                             }
@@ -109,11 +114,7 @@ export default {
             }
             // 等待5秒钟
             await new Promise(resolve => setTimeout(resolve, 5000))
-        })
-        await Promise.all(promises)
-        this.$nextTick(() => {
-            this.$refs.dataInsightManageAddOrUpdate.savueData()
-        })
+        }
     },
     // saveHandle () {
     //   this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
