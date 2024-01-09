@@ -23,9 +23,11 @@
       <el-button type="primary" @click="saveHandle" size="small">更新</el-button>
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
+      <dataInsightManageAddOrUpdate ref="dataInsightManageAddOrUpdate"></dataInsightManageAddOrUpdate>
   </el-dialog>
 </template>
 <script>
+import dataInsightManageAddOrUpdate from './dataInsightManage-add-or-update'
 import { updateDataTransferManage, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
 export default {
   props: {
@@ -106,6 +108,7 @@ export default {
             // 等待5秒钟
             await new Promise(resolve => setTimeout(resolve, 5000))
         }
+        this.$refs.dataInsightManageAddOrUpdate.savueData()
     },
     // saveHandle () {
     //   this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据

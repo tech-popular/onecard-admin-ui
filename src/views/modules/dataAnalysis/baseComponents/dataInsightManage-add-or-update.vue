@@ -254,6 +254,7 @@ export default {
       tag: '',
       drawerTitle: '',
       visible: false,
+      transmitType: '',
       fileData: {
         fileList: []
       },
@@ -858,6 +859,7 @@ export default {
       }
     },
     judgmentisTask (type) {
+        this.transmitType = type
         if (this.id && type === 'save' && this.baseForm.userType !== 'sql') {
             selectTransferTask(this.id).then(({ data }) => {
                 if (data.status === '1' && data.data) {
@@ -868,7 +870,6 @@ export default {
                             this.$refs.taskDependencies.init()
                         })
                     }
-                    this.savueData(type)
                 } else {
                     this.taskDependenciesList = []
                     return this.$message({
@@ -878,19 +879,19 @@ export default {
                 }
             })
         } else {
-            this.savueData(type)
+            this.savueData()
         }
     },
-    savueData (type, callback) {
+    savueData (callback) {
       if (this.baseForm.userType === 'excel') { // excel方式
         this.excelSaveData(callback)
       } else if (this.baseForm.userType === 'sql') {
         this.saveSql(callback)
       } else {
-        this.indexSaveData(type, callback)
+        this.indexSaveData(callback)
       }
     },
-    indexSaveData (type, callback) {
+    indexSaveData (callback) {
       let code = 0
       if (this.rejectForm.rejectGroupPackageIds.length) {
         code = 1
@@ -905,7 +906,8 @@ export default {
         rejectGroupPackCode: code
       }
       // params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
-      if (type === 'preview') {
+      console.log('this.transmitType' + this.transmitType)
+      if (this.transmitType === 'preview') {
         this.isPreviewShow = true
         this.$nextTick(() => {
           this.$refs.dataPreviewInfo.init(params)
