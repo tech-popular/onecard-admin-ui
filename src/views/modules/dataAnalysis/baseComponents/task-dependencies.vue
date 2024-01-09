@@ -112,7 +112,7 @@ export default {
             await new Promise(resolve => setTimeout(resolve, 5000))
         }
         this.$nextTick(() => {
-            this.$refs.dataInsightManageAddOrUpdate.savueData()
+            this.$parent.savueData()
         })
     },
     // saveHandle () {
