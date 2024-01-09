@@ -108,7 +108,9 @@ export default {
             // 等待5秒钟
             await new Promise(resolve => setTimeout(resolve, 5000))
         }
-        this.$refs.dataInsightManageAddOrUpdate.savueData()
+        this.$nextTick(() => {
+            this.$refs.dataInsightManageAddOrUpdate.savueData()
+        })
     },
     // saveHandle () {
     //   this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
