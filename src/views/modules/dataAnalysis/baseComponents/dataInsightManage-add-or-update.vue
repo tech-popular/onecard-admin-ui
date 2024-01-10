@@ -869,8 +869,9 @@ export default {
                         this.$nextTick(() => {
                             this.$refs.taskDependencies.init()
                         })
+                    }else{
+                        this.savueData()
                     }
-                    this.savueData()
                 } else {
                     this.taskDependenciesList = []
                     return this.$message({
