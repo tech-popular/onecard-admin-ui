@@ -254,7 +254,6 @@ export default {
       tag: '',
       drawerTitle: '',
       visible: false,
-      transmitType: '',
       fileData: {
         fileList: []
       },
@@ -859,18 +858,18 @@ export default {
       }
     },
     judgmentisTask (type) {
-        this.transmitType = type
         if (this.id && type === 'save' && this.baseForm.userType !== 'sql') {
             selectTransferTask(this.id).then(({ data }) => {
                 if (data.status === '1' && data.data) {
                     this.taskDependenciesList = data.data.dataTransfers
                     if (this.taskDependenciesList.length) {
                         this.taskDependenciesVisible = true
+                        // this.savueData()
                         this.$nextTick(() => {
                             this.$refs.taskDependencies.init()
                         })
-                    }else{
-                        this.savueData()
+                    } else {
+                        this.savueData(type)
                     }
                 } else {
                     this.taskDependenciesList = []
@@ -881,19 +880,19 @@ export default {
                 }
             })
         } else {
-            this.savueData()
+            this.savueData(type)
         }
     },
-    savueData (callback) {
+    savueData (type, callback) {
       if (this.baseForm.userType === 'excel') { // excel方式
         this.excelSaveData(callback)
       } else if (this.baseForm.userType === 'sql') {
         this.saveSql(callback)
       } else {
-        this.indexSaveData(callback)
+        this.indexSaveData(type, callback)
       }
     },
-    indexSaveData (callback) {
+    indexSaveData (type, callback) {
       let code = 0
       if (this.rejectForm.rejectGroupPackageIds.length) {
         code = 1
@@ -909,7 +908,7 @@ export default {
       }
       // params.channelId = params.channelId.length > 1 ? params.channelId.join(',') : params.channelId[0]
       console.log('this.transmitType' + this.transmitType)
-      if (this.transmitType === 'preview') {
+      if (type === 'preview') {
         this.isPreviewShow = true
         this.$nextTick(() => {
           this.$refs.dataPreviewInfo.init(params)

@@ -75,6 +75,40 @@ export default {
       postData.taskScheduleConfig = data.taskScheduleConfig
       return postData
     },
+      // saveHandle() {
+      //     this.$emit('savueData', 'save', async (val) => { // val是父组件请求接口返回的数据
+      //         if (val.status === '1') {
+      //             for (let i = 0; i < this.dataList.length; i++) {
+      //                 await new Promise(resolve => setTimeout(resolve, 5000 * i))
+      //                 const item = this.dataList[i]
+      //                 const data = await infoDataTransferManage(item.id)
+      //                 if (data.status === '1' && data.data) {
+      //                     const params = this.formatPostData(data.data)
+      //                     const resData = await updateDataTransferManage(params)
+      //                     console.log('res3333: ', resData)
+      //                     if (resData.status === '1') {
+      //                         item.comUpdate = true
+      //                         this.$set(this.dataList, i, item)
+      //                         if (i === this.dataList.length - 1) {
+      //                             this.$message({
+      //                                 message: '更新成功',
+      //                                 type: 'success',
+      //                                 duration: 1500,
+      //                                 onClose: () => {
+      //                                     this.visible = false
+      //                                     this.$emit('updateClosed')
+      //                                 }
+      //                             })
+      //                         }
+      //                     } else {
+      //                         this.$message.error(resData.message || '数据异常')
+      //                         this.visible = false
+      //                     }
+      //                 }
+      //             }
+      //         }
+      //     })
+      // },
       saveHandle() {
           this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
               if (val.status === '1') {
@@ -127,8 +161,8 @@ export default {
               }
               })
       },
-
-      // async saveHandle() {
+    //
+    //   async saveHandle() {
     //     for (let index = 0; index < this.dataList.length; index++) {
     //         const item = this.dataList[index]
     //         try {
