@@ -76,52 +76,56 @@ export default {
       return postData
     },
       saveHandle() {
-          let index = 0
-          const processItem = () => {
-              if (index < this.dataList.length) {
-                  const item = this.dataList[index]
-                  infoDataTransferManage(item.id)
-                      .then(({ data }) => {
-                          if (data.status === '1' && data.data) {
-                              const params = this.formatPostData(data.data)
-                              return updateDataTransferManage(params)
-                          } else {
-                              throw new Error('Invalid data status or no data')
-                          }
-                      })
-                      .then(response => {
-                          console.log('res3333: ', response.data)
-                          if (response.data.status === '1') {
-                              this.$set(this.dataList, index, { ...item, comUpdate: true })
-
-                              this.$nextTick(() => {
-                                  if (index === this.dataList.length - 1) {
-                                      this.$message({
-                                          message: '更新成功',
-                                          type: 'success',
-                                          duration: 1500,
-                                          onClose: () => {
-                                              this.visible = false
-                                              this.$emit('updateClosed')
-                                          }
-                                      })
+          this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
+              if (val.status === '1') {
+                  let index = 0
+                  const processItem = () => {
+                      if (index < this.dataList.length) {
+                          const item = this.dataList[index]
+                          infoDataTransferManage(item.id)
+                              .then(({data}) => {
+                                  if (data.status === '1' && data.data) {
+                                      const params = this.formatPostData(data.data)
+                                      return updateDataTransferManage(params)
+                                  } else {
+                                      throw new Error('Invalid data status or no data')
                                   }
                               })
-                          } else {
-                              this.$message.error(response.data.message || '数据异常')
-                              this.visible = false
-                          }
-                      })
-                      .catch(error => {
-                          console.error('An error occurred:', error)
-                      })
-                      .finally(() => {
-                          index++
-                          setTimeout(processItem, 5000)
-                      })
+                              .then(response => {
+                                  console.log('res3333: ', response.data)
+                                  if (response.data.status === '1') {
+                                      this.$set(this.dataList, index, {...item, comUpdate: true})
+
+                                      this.$nextTick(() => {
+                                          if (index === this.dataList.length - 1) {
+                                              this.$message({
+                                                  message: '更新成功',
+                                                  type: 'success',
+                                                  duration: 1500,
+                                                  onClose: () => {
+                                                      this.visible = false
+                                                      this.$emit('updateClosed')
+                                                  }
+                                              })
+                                          }
+                                      })
+                                  } else {
+                                      this.$message.error(response.data.message || '数据异常')
+                                      this.visible = false
+                                  }
+                              })
+                              .catch(error => {
+                                  console.error('An error occurred:', error)
+                              })
+                              .finally(() => {
+                                  index++
+                                  setTimeout(processItem, 5000)
+                              })
+                      }
+                  }
+                  processItem()
               }
-          }
-          processItem()
+              })
       },
 
       // async saveHandle() {
