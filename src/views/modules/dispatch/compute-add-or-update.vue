@@ -94,22 +94,27 @@
       </div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm2" label-width="120px" :disabled="!canUpdate">
         <div class="work-type-pane">
-          <el-form-item label="失败重跑"  prop="isRunAgain">
+          <el-form-item label="失败重试"  prop="isRunAgain">
             <el-radio-group v-model="dataForm.isRunAgain">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item prop="failRepeatTrigger" label="重跑"  v-if="dataForm.isRunAgain === 1">
+          <el-form-item prop="failRepeatTrigger" label="重试次数"  v-if="dataForm.isRunAgain === 1">
             <el-input-number v-model="dataForm.failRepeatTrigger" style="width:160px;margin: 0 10px" :min="1" />次
           </el-form-item>
-          <el-form-item label="失败预警" prop="alarmTypes">
-              <el-select v-model="dataForm.alarmTypes" multiple  placeholder="失败预警">
-                  <el-option label="钉钉通知" value="ding"></el-option>
-                  <el-option label="短信通知" value="msg"></el-option>
-              </el-select>
-          </el-form-item>
-        </div>>
+            <el-form-item prop="failRepeatInterval" label="重试间隔"  v-if="dataForm.isRunAgain === 1">
+                <el-input-number v-model="dataForm.failRepeatInterval" style="width:160px;margin: 0 10px" :min="1" />分钟
+            </el-form-item>
+        </div>
+          <div class="work-type-pane">
+              <el-form-item label="失败预警" prop="alarmTypes">
+                  <el-select v-model="dataForm.alarmTypes" multiple  placeholder="失败预警">
+                      <el-option label="钉钉通知" value="ding"></el-option>
+                      <el-option label="短信通知" value="msg"></el-option>
+                  </el-select>
+              </el-form-item>
+          </div>
       </el-form>
     </div>
     <div class="footer">
@@ -189,6 +194,7 @@ export default {
         taskDescribe: '',
         taskDisable: 1,
         failRepeatTrigger: 3,
+        failRepeatInterval: 10,
         isRunAgain: 1,
         alarmTypes: ['ding']
       },
@@ -238,7 +244,10 @@ export default {
           {required: true, message: '请选择', trigger: 'change'}
         ],
         failRepeatTrigger: [
-          {required: true, message: '请输入重跑次数', trigger: 'change'}
+          {required: true, message: '请输入失败重试次数', trigger: 'change'}
+        ],
+        failRepeatInterval: [
+          {required: true, message: '请输入失败重试间隔', trigger: 'change'}
         ],
         alarmTypes: [
           {required: true, message: '请选择失败预警方式(可多选)', trigger: 'change'}
@@ -334,12 +343,14 @@ export default {
             this.dataForm.tags = data.data.tags
             this.dataForm.taskDisable = data.data.taskDisable
             // 是否重跑判断
-            if (data.data.failRepeatTrigger !== 1) {
-                this.dataForm.isRunAgain = 1
-                this.dataForm.failRepeatTrigger = 3
-            } else {
+            if (data.data.isRunAgain !== 1) {
                 this.dataForm.isRunAgain = 0
+                this.dataForm.failRepeatTrigger = 3
+                this.dataForm.failRepeatInterval = 10
+            } else {
+                this.dataForm.isRunAgain = 1
                 this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
+                this.dataForm.failRepeatInterval = data.data.failRepeatInterval
             }
               this.calculateTasks = data.data.calculateTasks
               this.dataForm.taskName = data.data.taskName
@@ -602,8 +613,10 @@ export default {
         }
         if (params.isRunAgain === 1) {
           params.failRepeatTrigger = params.failRepeatTrigger
+          params.failRepeatInterval = params.failRepeatInterval
         } else {
           params.failRepeatTrigger = 0
+          params.failRepeatInterval = 1
         }
         url(params).then(({data}) => {
           if (data && data.code === 0) {
