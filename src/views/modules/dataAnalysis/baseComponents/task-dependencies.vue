@@ -73,6 +73,8 @@ export default {
       postData.sourceBindingIds = data.sourceBindingIds
       postData.increModel = data.increModel
       postData.taskScheduleConfig = data.taskScheduleConfig
+      postData.compensationType = data.compensationType
+      postData.compensationCodes = data.compensationCodes
       return postData
     },
       // saveHandle() {
