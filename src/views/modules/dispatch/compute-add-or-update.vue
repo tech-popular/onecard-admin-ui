@@ -194,7 +194,7 @@ export default {
         taskDescribe: '',
         taskDisable: 1,
         failRepeatTrigger: 3,
-        failRepeatInterval: 10,
+        failRepeatInterval: 5,
         isRunAgain: 1,
         alarmTypes: ['ding']
       },
@@ -346,7 +346,7 @@ export default {
             if (data.data.isRunAgain !== 1) {
                 this.dataForm.isRunAgain = 0
                 this.dataForm.failRepeatTrigger = 3
-                this.dataForm.failRepeatInterval = 10
+                this.dataForm.failRepeatInterval = 5
             } else {
                 this.dataForm.isRunAgain = 1
                 this.dataForm.failRepeatTrigger = data.data.failRepeatTrigger
