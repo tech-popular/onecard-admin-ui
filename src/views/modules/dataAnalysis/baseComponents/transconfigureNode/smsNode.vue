@@ -238,14 +238,14 @@ export default {
           if (res.data.data.bindingConfig.content) {
             this.dataForm.editType = '1'
             this.extraParamsVisible = false
-            this.dataForm.resourceName = res.data.data.bindingConfig.resourceName.split('自定义短信_')[1]
+            this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
             let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             this.dataForm.cusSmsType = bindingContent.cusSmsType
             this.dataForm.productNo = bindingContent.productNo
             this.dataForm.smsContent = bindingContent.content
           } else {
             this.dataForm.editType = '0'
-            this.dataForm.resourceName = res.data.data.bindingConfig.resourceName.split('标准短信_')[1]
+            this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
             this.dataForm.resourceCode = res.data.data.bindingConfig.resourceCode
             this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
             this.dataForm.channelId = res.data.data.resourceData.channelId
@@ -479,7 +479,7 @@ export default {
           let params = {
             id: this.dataForm.id,
             type: this.dataForm.type,
-            resourceName: this.dataForm.editType === '0' ? '标准短信_' + this.dataForm.resourceName : '自定义短信_' + this.dataForm.resourceName,
+            resourceName: this.dataForm.resourceName,
             channelId: this.dataForm.channelId,
             resourceCode: this.dataForm.resourceCode,
             channelCode: this.dataForm.channelCode,

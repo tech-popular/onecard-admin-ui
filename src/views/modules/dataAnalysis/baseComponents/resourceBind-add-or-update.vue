@@ -97,6 +97,12 @@
           <el-option v-for="(item, index) in telOrAiList" :key="index" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="通道：" v-if="dataForm.type === 'ai' " prop="aiType" :rules="{ required: true, message: '请选择Ivr通道', trigger: 'blur' }">
+          <el-select v-model="dataForm.aiType">
+              <el-option value="zq" label="智清"></el-option>
+              <el-option value="js" label="九四"></el-option>
+          </el-select>
+      </el-form-item>
       <!-- 电销 -->
       <el-form-item prop="telTemplateValue" v-if="dataForm.type === 'tel'" label="电销模板">
         <el-autocomplete
@@ -536,7 +542,8 @@ export default {
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
         switchTemplate: '', // switch判断项集合
-        cardType: ''
+        cardType: '',
+        aiType: ''
       }
       this.target = ''
       this.createTime = ''
@@ -562,7 +569,7 @@ export default {
           this.dataForm.channelCode = res.data.data.bindingConfig.channelCode
           this.dataForm.resourceName = res.data.data.bindingConfig.resourceName
           this.dataForm.type = res.data.data.bindingConfig.type
-          if (res.data.data.bindingConfig.content) {
+          if (res.data.data.bindingConfig.content && row.type !== 'ai' && row.type !== 'card') {
             let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             if (row.type === 'sms') {
               this.getSmsSignInfo()
@@ -570,7 +577,7 @@ export default {
               this.getAllSmsChannels()
               this.dataForm.editType = '1'
               this.extraParamsVisible = false
-              this.dataForm.resourceName = this.dataForm.resourceName.split('自定义短信_')[1]
+              this.dataForm.resourceName = this.dataForm.resourceName
               this.dataForm.cusSmsType = bindingContent.cusSmsType
               this.dataForm.productNo = bindingContent.productNo
               this.dataForm.smsContent = bindingContent.content
@@ -611,7 +618,7 @@ export default {
               this.getSmsSignInfo()
               this.getSmsStyleInfo()
               this.getAllSmsChannels()
-              this.dataForm.resourceName = this.dataForm.resourceName.split('标准短信_')[1]
+              this.dataForm.resourceName = this.dataForm.resourceName
               this.dataForm.channelId = res.data.data.resourceData.channelId
               this.dataForm.smsTemplate = res.data.data.resourceData.smsTemplate
               this.paramsNum = res.data.data.resourceData.smsTemplate.split('%s').length - 1
@@ -632,6 +639,10 @@ export default {
                   this.telOrAiList = data.data
                 }
               })
+              if (res.data.data.bindingConfig.type === 'ai') {
+                  console.log('res.data.data.bindingConfig.content' + res.data.data.bindingConfig.content)
+                  this.dataForm.aiType = res.data.data.bindingConfig.content ? res.data.data.bindingConfig.content : 'zq'
+              }
             }
             if (res.data.data.bindingConfig.type === 'kafka') {
               this.getKafkaServerList(res.data.data.bindingConfig.resourceId)
@@ -891,7 +902,8 @@ export default {
         responseType: '', // 两个选项map和list 默认是map
         expression: '', // 判断表达式
         switchTemplate: '',  // switch判断项集合
-        cardType: ''
+        cardType: '',
+        aiType: ''
       }
       this.target = ''
       this.extraParams = []
@@ -1151,7 +1163,7 @@ export default {
           }
           if (this.dataForm.type === 'sms') {
             params.content = this.dataForm.editType === '0' ? '' : JSON.stringify(smsContent)
-            params.resourceName = this.dataForm.editType === '0' ? '标准短信_' + this.dataForm.resourceName : '自定义短信_' + this.dataForm.resourceName
+            params.resourceName = this.dataForm.resourceName
             // params.resourceId = this.dataForm.editType === '0' ? params.resourceId : null
           }
           if (this.dataForm.type === 'push') {
@@ -1163,7 +1175,10 @@ export default {
             // params.resourceId = null
           }
           if (this.dataForm.type === 'card') {
-            params.conten = this.dataForm.cardType.toString()
+            params.content = this.dataForm.cardType.toString()
+          }
+          if (this.dataForm.type === 'ai') {
+            params.content = this.dataForm.aiType.toString()
           }
           if (!this.dataForm.id) {
             addDataInfo(params).then(({ data }) => {
