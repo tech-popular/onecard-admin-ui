@@ -9,6 +9,12 @@
             <el-option v-for="(item, index) in aiDataList" :key="index" :value="item.id" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
+			<el-form-item label="通道：" v-if="dataForm.type === 'ai' " prop="aiType" :rules="{ required: true, message: '请选择Ivr通道', trigger: 'blur' }">
+				<el-select v-model="dataForm.aiType">
+					<el-option value="zq" label="智清"></el-option>
+					<el-option value="js" label="九四"></el-option>
+				</el-select>
+			</el-form-item>
       <el-form-item  prop="fixedParams"  label="固定出参" v-if="fixedParamsvisible">
 				  <Treeselect
 						:options="outParamsList"
@@ -52,7 +58,8 @@ export default {
         resourceName: '',
         resourceCode: '',
         fixedParams: [], // 固定出参
-        channelCode: '' // 用户渠道
+        channelCode: '', // 用户渠道
+				aiType: ''
         // outParams: [] // 绑定的出参
       },
       paramsNum: 0,
@@ -78,7 +85,8 @@ export default {
         resourceId: '',
         resourceName: '',
         resourceCode: '',
-        fixedParams: []
+        fixedParams: [],
+				aiType: ''
       }
       this.canUpdate = canUpdate
       this.outParamsList = []
@@ -112,6 +120,7 @@ export default {
           })
           this.getOutParamsList(res.data.data.fixedParams)
         }
+				this.dataForm.aiType = res.data.data.bindingConfig.content ? res.data.data.bindingConfig.content : 'zq'
         // this.$nextTick(() => {
         //   this.target = this.aiDataList.filter(item => item.id == this.dataForm.resourceId)[0].target
         // })
@@ -259,6 +268,7 @@ export default {
             channelCode: this.dataForm.channelCode,
             resourceId: this.dataForm.resourceId.toString(),
             fixedParams: this.fixedParams.join(','),
+						content: this.dataForm.aiType.toString(),
             extraParams: ''
           }
           if (!this.dataForm.id) {
