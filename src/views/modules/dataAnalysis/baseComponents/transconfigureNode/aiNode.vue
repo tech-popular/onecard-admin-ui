@@ -57,9 +57,9 @@ export default {
         resourceId: '',
         resourceName: '',
         resourceCode: '',
-        fixedParams: [], // 固定出参
-        channelCode: '', // 用户渠道
-				aiType: ''
+        fixedParams: [],
+        channelCode: '',
+aiType: ''
         // outParams: [] // 绑定的出参
       },
       paramsNum: 0,
@@ -86,7 +86,7 @@ export default {
         resourceName: '',
         resourceCode: '',
         fixedParams: [],
-				aiType: ''
+aiType: ''
       }
       this.canUpdate = canUpdate
       this.outParamsList = []
@@ -120,7 +120,7 @@ export default {
           })
           this.getOutParamsList(res.data.data.fixedParams)
         }
-				this.dataForm.aiType = res.data.data.bindingConfig.content ? res.data.data.bindingConfig.content : 'zq'
+this.dataForm.aiType = res.data.data.bindingConfig.content ? res.data.data.bindingConfig.content : 'zq'
         // this.$nextTick(() => {
         //   this.target = this.aiDataList.filter(item => item.id == this.dataForm.resourceId)[0].target
         // })
@@ -268,7 +268,7 @@ export default {
             channelCode: this.dataForm.channelCode,
             resourceId: this.dataForm.resourceId.toString(),
             fixedParams: this.fixedParams.join(','),
-						content: this.dataForm.aiType.toString(),
+content: this.dataForm.aiType.toString(),
             extraParams: ''
           }
           if (!this.dataForm.id) {

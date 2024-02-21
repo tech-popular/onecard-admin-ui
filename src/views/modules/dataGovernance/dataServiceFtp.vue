@@ -116,9 +116,9 @@ export default {
       node_had: [], // 触发 tree 的 :load=loadNode 重复触发  动态更新tree
       resolve_had: [], // 触发 tree 的 :load=loadNode 重复触发  动态更新tree
       baseRule: {
-        // approveReason: [
-        //   { required: true, message: '请输入申请原因', trigger: 'blur' }
-        // ],
+        approveReason: [
+          { required: true, message: '请输入申请原因', trigger: 'blur' }
+        ],
         receiver: [
           { type: 'array', required: true, message: '请选择接收人', trigger: 'change' }
         ],
