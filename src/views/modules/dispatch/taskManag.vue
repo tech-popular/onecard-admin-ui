@@ -56,7 +56,7 @@
 <!--                    </el-tooltip>-->
                 </template>
             </el-table-column>
-            <el-table-column :width="50">
+            <el-table-column :width="50" fixed>
                 <template slot-scope="scope">
                   <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>
                 </template>
