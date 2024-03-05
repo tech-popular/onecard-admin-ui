@@ -79,6 +79,9 @@
           <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username">
             <el-button type="warning" size="mini" icon="el-icon-connection" circle @click="taskPermission(scope.row)"></el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="清理缓存" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username" @click="exitCache(scope.row.id)">
+            <el-button type="info" size="mini" icon="el-icon-document-delete" circle @click="taskPermission(scope.row)"></el-button>
+          </el-tooltip>
           <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
         </template>
       </el-table-column>
@@ -136,7 +139,7 @@
   import taskFlow from './taskFlow'
   import flowTaskFlow from './marketingDecision'
   import AddOrUpdate from './workFlow-add-or-update'
-  import { workFlowList, deleteWorkFlow, workFlowShow } from '@/api/workerBee/workFlow'
+  import { workFlowList, deleteWorkFlow, workFlowShow, updateBeeWorkFlowDefEhcache } from '@/api/workerBee/workFlow'
   import { updateWorkflowAuth, updateWorkflowAuths } from '@/api/commom/assignPermission'
   import AssignPermission from '../../components/permission/assign-permission'
   export default {
@@ -262,6 +265,27 @@
             this.deleteVisible = false
             this.getDataList()
           }
+        })
+      },
+      exitCache (id) {
+        this.$confirm('确认要清理' + id + '的缓存吗', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+            updateBeeWorkFlowDefEhcache(id).then(({data}) => {
+                if (data && data.code === 0) {
+                    this.$message.success(data.msg || '执行成功')
+                } else {
+                    this.$message.error(data.msg || '执行失败')
+                }
+                this.getDataList()
+            })
+        }).catch(() => {
+            this.$message({
+                type: 'info',
+                message: '已取消'
+            })
         })
       },
       /** 查看示意图 */

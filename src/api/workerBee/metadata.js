@@ -4,6 +4,7 @@ let gf = '/gongFeng'
 export const beeTaskList = (params) => httpGet(gf + '/beeTask/list', params) // 初始化列表
 export const getBeeTaskTypeList = () => httpGet(gf + '/beeTask/getBeeTaskTypeList') // 任务类型
 export const deleteBeeTask = (params) => httpGet(gf + '/beeTask/deleteBeeTask', params) // 删除
+export const updateBeeTaskDefEhcache = (params) => httpGet(gf + `/beeCache/ehcache/updateBeeTaskDefEhcache/${params}`)// 删除元数据任务缓存
 export const updateStatus = (params) => httpPost(gf + `/beeTask/changeStatus/${params.id}/${params.status}`, params) // 启用禁用
 export const getAllDataSourceByType = (params) => httpPost(gf + `/beeDataSource/getAllDataSourceByType/${params.type}`, params) // 启用禁用
 export const infoBeeTask = (params) => httpGet(gf + '/beeTask/info', params) // 修改回显
