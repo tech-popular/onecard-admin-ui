@@ -79,8 +79,8 @@
           <el-tooltip class="item" effect="dark" content="授权" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username">
             <el-button type="warning" size="mini" icon="el-icon-connection" circle @click="taskPermission(scope.row)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="清理缓存" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username" @click="exitCache(scope.row.id)">
-            <el-button type="info" size="mini" icon="el-icon-document-delete" circle @click="taskPermission(scope.row)"></el-button>
+          <el-tooltip class="item" effect="dark" content="清理缓存" placement="top"  v-if="!scope.row.authOwner || isAdmin || scope.row.authOwner === userid || scope.row.authOwner ===username">
+            <el-button type="info" size="mini" icon="el-icon-document-delete" circle  @click="exitCache(scope.row.id)"></el-button>
           </el-tooltip>
           <!-- <el-button type="text" @click="clickFlowShow(scope.row.id)">2.0工作流</el-button> -->
         </template>
