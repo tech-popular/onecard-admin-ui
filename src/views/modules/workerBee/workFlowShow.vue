@@ -274,7 +274,7 @@
             type: 'warning'
         }).then(() => {
             updateBeeWorkFlowDefEhcache(id).then(({data}) => {
-                if (data && data.code === 0) {
+                if (data && data.status === 0) {
                     this.$message.success(data.msg || '执行成功')
                 } else {
                     this.$message.error(data.msg || '执行失败')
