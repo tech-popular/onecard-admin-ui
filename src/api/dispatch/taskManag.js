@@ -40,6 +40,8 @@ export const taskSelectDependence = id => httpGet(base + `dispatch/task/dependen
 // 参数管理
 export const getParamsList = () => httpGet(base + '/dispatch/task/params/globalParamList')
 
+export const executeRetryFailedTask = projectCode => httpGet(base + `/dispatch/task/executeRetryFailedTask/${projectCode}`)
+
 export const getParamsListByTaskId = id => httpGet(base + `/dispatch/task/params/getParamsListByTaskId/${id}`)
 export const getParamsByProp = prop => httpGet(base + `/dispatch/task/params/getParamsByProp/${prop}`)
 export const saveParams = params => httpPost(base + '/dispatch/task/params/save', params) // 保存
