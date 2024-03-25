@@ -8,7 +8,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
-                <el-button type="primary" @click="executeRetryFailedTask()">重试当日失败任务</el-button>
+                <el-button type="primary" :disabled="isButtonDisabled" @click="executeRetryFailedTask()">重试当日失败任务</el-button>
             </el-form-item>
         </el-form>
         <el-table :data="dataList" border
