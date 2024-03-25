@@ -94,6 +94,12 @@ export default {
                 this.$message({
                     message: '请选择重试哪个项目的失败任务',
                     type: 'warning'
+                })
+            } else {
+                this.$confirm('是否确认重试失败任务', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
                 }).then(() => {
                     // 禁用按钮
                     this.isButtonDisabled = true
