@@ -30,6 +30,8 @@ export const getGitLabCatalog = (projectId) => httpGet(base + `gitlab/getGitLabC
 export const getRawBlobContent = (params) => httpPost(base + `gitlab/getRawBlobContent`, params)
 export const sqlParse = params => httpPostFile(base + 'dispatch/task/sql/parse', params)
 export const taskBatchList = params => httpGet(base + 'dispatch/task/instance/listOnPage', params)
+
+export const flowInstanceList = params => httpGet(base + 'dispatch/flow/instance/listOnPage', params)
 export const taskBatchStatus = () => httpGet(base + 'dispatch/task/instance/task/status')
 export const taskExecute = id => httpPut(base + `dispatch/task/${id}/execute`) // 任务执行
 export const taskBaseInfo = id => httpGet(base + `dispatch/task/infoTask/${id}`) // 基础任务回显
