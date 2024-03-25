@@ -45,7 +45,9 @@ export default {
             pageSize: 10, // 默认每页10条
             totalPage: 0,
             dataListLoading: false,
-            dataForm: {},
+            dataForm: {
+                projectId: ''
+            },
             isButtonDisabled: false,
             allSystemList: [],
             dataList: []
@@ -62,7 +64,7 @@ export default {
             const dataBody = {
                 'pageNum': this.pageNum,
                 'pageSize': this.pageSize,
-                'projectCode': this.dataForm.projectCode
+                'projectCode': this.dataForm.projectId
             }
             this.getList(dataBody)
             this.getAllSystem()
@@ -88,7 +90,7 @@ export default {
             this.init()
         },
         executeRetryFailedTask() {
-            if (!this.dataForm.projectCode) {
+            if (!this.dataForm.projectId) {
                 this.$message({
                     message: '请选择重试哪个项目的失败任务',
                     type: 'warning'
