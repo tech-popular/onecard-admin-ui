@@ -4,15 +4,21 @@
         <el-form :model="baseForm"  ref="baseForm">
             <el-form-item  prop="body">
                 <el-input v-model="baseForm.body" type="textarea" :rows="20"></el-input>
+                <div style="text-align: right;">
+                    <el-button type="primary" @click="save" size="small">保存</el-button>
+                    <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
+                </div>
             </el-form-item>
             <!-- 遍历 attributesList 来映射每个对象的属性 -->
             <el-table :data="baseForm.subTaskList" style="width: 100%">
                 <el-table-column prop="id" label="id" width="180"></el-table-column>
                 <el-table-column prop="state" label="state">
                     <template slot-scope="scope">
-                        <el-tag :type="getTagType(scope.row.state)">
+                        <el-tag v-if="scope.row.state === 'RUNNING'" type="success">
                             {{ scope.row.state }}
                         </el-tag>
+                        <el-tag v-else-if="scope.row.state === 'FAILED'" type="danger">{{ scope.row.state }}</el-tag>
+                        <el-tag v-else type="warning">{{ scope.row.state }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="worker_id" label="worker_id"></el-table-column>
@@ -24,10 +30,10 @@
                 </el-table-column>
             </el-table>
         </el-form>
-        <span slot="footer">
-            <el-button type="primary" @click="save" size="small">保存</el-button>
-            <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
-        </span>
+<!--        <span slot="footer">-->
+<!--            <el-button type="primary" @click="save" size="small">保存</el-button>-->
+<!--            <el-button type="default" @click="cancelHandle" size="small">取消</el-button>-->
+<!--        </span>-->
     </el-dialog>
     <el-dialog :visible.sync="traceDialogVisible" width="50%">
         <span>Trace Information</span>
