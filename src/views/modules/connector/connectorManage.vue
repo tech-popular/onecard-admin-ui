@@ -46,6 +46,7 @@
                     header-align="center"
                     align="center"
                     label="状态"
+                    sortable
             >
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.state === 'RUNNING'" type="success">
@@ -62,6 +63,7 @@
                 header-align="center"
                 align="center"
                 label="子任务状态"
+                sortable
             >
                 <template slot-scope="scope">
                     <el-tag :type="getTagType(scope.row.subState)" @click="addOrUpdateHandle(scope.row)">
@@ -76,6 +78,7 @@
                     header-align="center"
                     align="center"
                     label="类型"
+                    sortable
             >
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.type === 'sink'" type="success">
