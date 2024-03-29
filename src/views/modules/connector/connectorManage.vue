@@ -57,14 +57,14 @@
             </el-table-column>
             <el-table-column
                 :show-overflow-tooltip="true"
-                    width="200"
-                    prop="subState"
-                    header-align="center"
-                    align="center"
-                    label="子任务状态"
+                width="200"
+                prop="subState"
+                header-align="center"
+                align="center"
+                label="子任务状态"
             >
                 <template slot-scope="scope">
-                    <el-tag :type="getTagType(scope.row.subState)">
+                    <el-tag :type="getTagType(scope.row.subState)" @click="addOrUpdateHandle(scope.row)">
                         {{ scope.row.subState }}
                     </el-tag>
                 </template>
@@ -158,8 +158,12 @@ export default {
             } else {
                 console.log('addOrUpdateHandle,row:' + JSON.stringify(row))
                 this.addOrUpdateVisible = true
+                let connectorName = null
+                if (row) {
+                    connectorName = row.name
+                }
                 this.$nextTick(() => {
-                    this.$refs.addOrUpdate.init(row.name, this.dataForm.connectorSource)
+                    this.$refs.addOrUpdate.init(connectorName, this.dataForm.connectorSource)
                 })
             }
         },
