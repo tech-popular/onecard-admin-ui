@@ -61,7 +61,7 @@
 <!--                  <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>-->
 <!--                </template>-->
 <!--            </el-table-column>-->
-            <el-table-column :show-overflow-tooltip="true" prop="taskName" header-align="center" align="center" :width="170" label="任务名称" fixed>
+            <el-table-column :show-overflow-tooltip="true" prop="taskName" header-align="center" align="center" :width="200" label="任务名称" fixed>
                 <template slot-scope="scope">
                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <div style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
