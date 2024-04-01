@@ -46,21 +46,33 @@
                   v-loading="dataListLoading"
                   style="width: 100%;">
             <!--            <el-table-column prop="id" fixed header-align="center" align="center" label="任务ID"/>-->
-            <el-table-column :show-overflow-tooltip="true" prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">
+<!--            <el-table-column :show-overflow-tooltip="true" prop="taskName" fixed header-align="center" :width="170" align="center" label="任务名称">-->
+<!--                <template slot-scope="scope">-->
+<!--&lt;!&ndash;                    <el-tooltip class="item" :content="scope.row.taskName" placement="top-start"&ndash;&gt;-->
+<!--&lt;!&ndash;                    >&ndash;&gt;-->
+<!--                        <a @click="gotoTaskBatchHandle(scope.row.taskName)">{{-->
+<!--                            scope.row.taskName-->
+<!--                            }}</a>-->
+<!--&lt;!&ndash;                    </el-tooltip>&ndash;&gt;-->
+<!--                </template>-->
+<!--            </el-table-column>-->
+<!--            <el-table-column :width="50" fixed>-->
+<!--                <template slot-scope="scope">-->
+<!--                  <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>-->
+<!--                </template>-->
+<!--            </el-table-column>-->
+            <el-table-column :show-overflow-tooltip="true" prop="taskName" header-align="center" align="center" :width="170" label="任务名称" fixed>
                 <template slot-scope="scope">
-<!--                    <el-tooltip class="item" :content="scope.row.taskName" placement="top-start"-->
-<!--                    >-->
-                        <a @click="gotoTaskBatchHandle(scope.row.taskName)">{{
-                            scope.row.taskName
-                            }}</a>
-<!--                    </el-tooltip>-->
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <a @click="gotoTaskBatchHandle(scope.row.taskName)">{{ scope.row.taskName }}</a>
+                        </div>
+                        <el-button size="mini" :data-clipboard-text="scope.row.taskName" plain class="no-border" icon="el-icon-copy-document" @click.stop="copyToClipboard(scope.row.taskName)"></el-button>
+                    </div>
                 </template>
             </el-table-column>
-            <el-table-column :width="50" fixed>
-                <template slot-scope="scope">
-                  <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>
-                </template>
-            </el-table-column>
+
+
 <!--            <el-table-column prop="dolphinProcessName" header-align="center" :width=170 align="center"-->
 <!--                             label="所属工作流">-->
 <!--                <template slot-scope="scope">-->
@@ -217,7 +229,6 @@ import taskManagSnapShot from './taskManag-snap-shot'
 import taskManagPeriod from './dispatch-config-period'
 import taskManagParams from './taskManag-params.vue'
 import paramsView from './params-view.vue'
-import Clipboard from 'clipboard'
 export default {
     data() {
         return {
@@ -311,18 +322,6 @@ export default {
         handleSearch() {
             this.pageNum = 1
             this.init()
-        },
-        copyToClipboard(textToCopy) {
-            const clipboard = new Clipboard('.custom-button')
-            clipboard.on('success', e => {
-                this.$message.success('任务名称已复制到剪切板')
-                e.clearSelection()
-                clipboard.destroy()
-            })
-            clipboard.on('error', e => {
-                this.$message.error('复制失败，请手动复制')
-                clipboard.destroy()
-            })
         },
         getAllStatus () {
             taskBatchStatus().then(({data}) => {
@@ -568,6 +567,19 @@ export default {
             this.$nextTick(() => {
                 this.$refs.assignPermission.init(ids, true)
             })
+        },
+        copyToClipboard(textToCopy) {
+            const textArea = document.createElement('textarea')
+            textArea.value = textToCopy
+            document.body.appendChild(textArea)
+            textArea.select()
+            const successful = document.execCommand('copy')
+            textArea.remove()
+            if (successful) {
+                this.$message.success('任务名称已复制到剪切板')
+            } else {
+                this.$message.error('复制失败，请手动复制')
+            }
         }
     }
 }
@@ -576,22 +588,8 @@ export default {
 .el-button + .el-button {
     margin: 0 !important;
 }
-
-.toZhi {
-    line-height: 36px;
-    margin-right: 8px;
-}
-
-.goback {
-    position: absolute;
-    right: 50px;
-    top: 20px;
-    font-size: 18px;
-    cursor: pointer;
-}
-.custom-button {
-    border: none !important;
-    float: left;  /* 将按钮浮动到左侧 */
-    margin-right: 1px;  /* 可以根据需要调整按钮与左框之间的间距 */
+.no-border {
+    border: none !important; /* 移除边框 */
+    background-color: transparent !important; /* 设置背景透明 */
 }
 </style>

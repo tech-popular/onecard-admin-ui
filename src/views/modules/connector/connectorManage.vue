@@ -32,12 +32,15 @@
             </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%">
-            <el-table-column :show-overflow-tooltip="true" prop="name" header-align="center" align="center" label="名称">
+            <el-table-column :show-overflow-tooltip="true" prop="name" header-align="center" align="center" label="名称" fixed>
                 <template slot-scope="scope">
-                <a @click="addOrUpdateHandle(scope.row)">{{
-                        scope.row.name
-                    }}</a>
-            </template>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <a @click="addOrUpdateHandle(scope.row)">{{ scope.row.name }}</a>
+                        </div>
+                        <el-button size="mini" :data-clipboard-text="scope.row.name" plain class="no-border" icon="el-icon-copy-document" @click.stop="copyToClipboard(scope.row.name)"></el-button>
+                    </div>
+                </template>
             </el-table-column>
             <el-table-column
                 :show-overflow-tooltip="true"
@@ -212,6 +215,19 @@ export default {
                 })
             }
         },
+        copyToClipboard(textToCopy) {
+            const textArea = document.createElement('textarea')
+            textArea.value = textToCopy
+            document.body.appendChild(textArea)
+            textArea.select()
+            const successful = document.execCommand('copy')
+            textArea.remove()
+            if (successful) {
+                this.$message.success('任务名称已复制到剪切板')
+            } else {
+                this.$message.error('复制失败，请手动复制')
+            }
+        },
         resume(row) {
             let params = {
                 'connectorSource': this.dataForm.connectorSource,
@@ -298,3 +314,9 @@ export default {
     }
 }
 </script>
+<style scoped>
+.no-border {
+    border: none !important; /* 移除边框 */
+    background-color: transparent !important; /* 设置背景透明 */
+}
+</style>
