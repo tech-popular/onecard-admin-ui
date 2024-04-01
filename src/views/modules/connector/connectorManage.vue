@@ -41,6 +41,16 @@
             </el-table-column>
             <el-table-column
                 :show-overflow-tooltip="true"
+                width="200"
+                prop="worker_id"
+                header-align="center"
+                align="center"
+                label="主节点"
+                sortable
+            >
+            </el-table-column>
+            <el-table-column
+                :show-overflow-tooltip="true"
                     width="200"
                     prop="state"
                     header-align="center"
