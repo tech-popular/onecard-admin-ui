@@ -19,7 +19,7 @@
       </el-form-item>
       <el-form-item label="类型: ">
         <el-select v-model="dataForm.type" clearable>
-          <el-option label="SQL提数提数" value="0"></el-option>
+          <el-option label="提数" value="0"></el-option>
           <el-option label="订阅" value="1"></el-option>
         </el-select>
       </el-form-item>
