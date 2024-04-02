@@ -104,7 +104,8 @@
                         {{ scope.row.executeStatus }}
                     </el-tag>
                     <el-tag v-else-if="scope.row.executeStatus === '执行成功'" type="success">{{ scope.row.executeStatus }}</el-tag>
-                    <el-tag v-else type="primary">{{ scope.row.executeStatus }}</el-tag>
+                    <el-tag v-else-if="scope.row.executeStatus === '运行中'" type="primary">{{ scope.row.executeStatus }}</el-tag>
+                    <el-tag v-else type="info">{{ scope.row.executeStatus }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" prop="nextExecuteTime" header-align="center" align="center" :width="180" sortable
