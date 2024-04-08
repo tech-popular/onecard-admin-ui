@@ -32,7 +32,7 @@
             </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%">
-            <el-table-column :show-overflow-tooltip="true" prop="name" header-align="center" align="center" label="名称" fixed>
+            <el-table-column :show-overflow-tooltip="true" prop="name" header-align="center" align="left" label="名称" fixed>
                 <template slot-scope="scope">
                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <div style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">

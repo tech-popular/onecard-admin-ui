@@ -61,7 +61,7 @@
 <!--                  <el-button  size="mini" :data-clipboard-text="scope.row.taskName"  plain class="custom-button" icon="el-icon-copy-document" @click="copyToClipboard()"></el-button>-->
 <!--                </template>-->
 <!--            </el-table-column>-->
-            <el-table-column :show-overflow-tooltip="true" prop="taskName" header-align="center" align="center" :width="200" label="任务名称" fixed>
+            <el-table-column :show-overflow-tooltip="true" prop="taskName" header-align="center" align="left" :width="200" label="任务名称" fixed>
                 <template slot-scope="scope">
                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <div style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -133,7 +133,7 @@
                     <el-tag v-else-if="scope.row.dispatchStatus === -1" type="danger">-</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :show-overflow-tooltip="true" prop="createUser" header-align="center" align="center" label="负责人"/>
+            <el-table-column :show-overflow-tooltip="true" prop="createUser" header-align="center" align="left" label="负责人"/>
             <el-table-column :show-overflow-tooltip="true" prop="topDependence" header-align="center" align="center" label="上游依赖" />
             <el-table-column :show-overflow-tooltip="true" prop="downDependence" header-align="center" align="center" label="下游依赖" />
             <el-table-column  header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
