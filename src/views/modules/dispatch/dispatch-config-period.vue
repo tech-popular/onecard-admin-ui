@@ -326,7 +326,7 @@ export default {
             for (let i = 1, j = 32; i < j; i++) {
                 tempArry.push({value: i.toString(), label: '每月' + i + '号'})
             }
-            tempArry.push({value: '-1', label: '每月最后一天'})
+            tempArry.push({value: 'L', label: '每月最后一天'})
             this.dayOfMonthsList = tempArry
         },
         drawerClose () { // 关闭抽屉弹窗
