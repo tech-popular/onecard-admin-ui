@@ -32,7 +32,7 @@
             <el-table-column prop="num" header-align="center" align="center" label="序号"></el-table-column>
             <el-table-column prop="name" header-align="center" align="center" label="文件名称"></el-table-column>
             <el-table-column prop="suffix" header-align="center" align="center" label="文件格式"></el-table-column>
-            <el-table-column prop="lastModifiedTime" header-align="center" align="center" label="修改时间"></el-table-column>
+<!--            <el-table-column prop="lastModifiedTime" header-align="center" align="center" label="修改时间"></el-table-column>-->
           </el-table>
           <el-pagination
             @size-change="sizeChangeHandle"
