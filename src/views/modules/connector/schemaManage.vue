@@ -22,7 +22,7 @@
                 <template slot-scope="scope">
                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <div style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            <a @click="addOrUpdateHandle(scope.row)">{{ scope.row.subjectName }}</a>
+                            <a @click="viewSchemaHandle(scope.row)">{{ scope.row.subjectName }}</a>
                         </div>
                         <el-button size="mini" :data-clipboard-text="scope.row.subjectName" plain class="no-border" icon="el-icon-copy-document" @click.stop="copyToClipboard(scope.row.subjectName)"></el-button>
                     </div>
@@ -35,9 +35,7 @@
                     label="操作"
             >
                 <template slot-scope="scope">
-                    <el-button type="text" size="small" @click="pause(scope.row)">暂停</el-button>
-                    <el-button type="text" size="small" @click="resume(scope.row)">恢复暂停</el-button>
-                    <el-button type="text" size="small" @click="deleteConnector(scope.row)">删除</el-button>
+                    <el-button type="text" size="small" @click="deleteSchema(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -50,11 +48,11 @@
                 :total="totalPage"
                 layout="total, sizes, prev, pager, next, jumper"
         ></el-pagination>
-        <addOrUpdate
-                v-if="addOrUpdateVisible"
-                ref="addOrUpdate"
+        <schemaManageAddOrUpdate
+                v-if="viewSchemaVisible"
+                ref="schemaManageAddOrUpdate"
                 @refreshDataList="getDataList"
-        ></addOrUpdate>
+        ></schemaManageAddOrUpdate>
     </div>
 </template>
 <style>
@@ -63,8 +61,8 @@
 }
 </style>
 <script>
-import {pageList, pause, resume, deleteConnector, getHost} from '@/api/connector/connectorManage'
-import addOrUpdate from './connectorManage-add-or-update'
+import {schemaPageList, deleteSchema, getHost} from '@/api/connector/connectorManage'
+import schemaManageAddOrUpdate from './schemaManage-add-or-update'
 
 export default {
     data() {
@@ -77,40 +75,35 @@ export default {
             pageSize: 10,
             totalPage: 0,
             dataListLoading: false,
-            addOrUpdateVisible: false,
+            viewSchemaVisible: false,
             dataForm: {
               subjectName: ''
             },
             connectorSourceList: []
         }
     },
-    components: {addOrUpdate},
+    components: {schemaManageAddOrUpdate},
     mounted() {
         this.getHost()
     },
     methods: {
-        // 新增 / 修改
-        addOrUpdateHandle (row) {
+        viewSchemaHandle (row) {
             if (!this.dataForm.connectorSource) {
                 this.$message({
                     message: '请选择集群信息！',
                     type: 'warning'
                 })
             } else {
-                console.log('addOrUpdateHandle,row:' + JSON.stringify(row))
-                this.addOrUpdateVisible = true
-                let connectorName = null
+                console.log('viewSchemaHandle,row:' + JSON.stringify(row))
+                this.viewSchemaVisible = true
+                let subjectName = null
                 if (row) {
-                    connectorName = row.name
+                  subjectName = row.subjectName
                 }
                 this.$nextTick(() => {
-                    this.$refs.addOrUpdate.init(connectorName, this.dataForm.connectorSource)
+                    this.$refs.schemaManageAddOrUpdate.init(subjectName, this.dataForm.connectorSource)
                 })
             }
-        },
-        getTagType(subState) {
-            const [left, right] = subState.split('/').map(Number)
-            return left === right ? 'success' : 'danger'
         },
         getDataList() {
             if (!this.dataForm.connectorSource) {
@@ -122,13 +115,11 @@ export default {
                 console.log('this.dataForm.connectorSource:' + this.dataForm.connectorSource)
                 let params = {
                     'connectorSource': this.dataForm.connectorSource,
-                    'connectorName': this.dataForm.connectorName,
-                    'state': this.dataForm.state,
-                    'connectorType': this.dataForm.connectorType,
+                    'subjectName': this.dataForm.subjectName,
                     'currPage': this.currPage,
                     'pageSize': this.pageSize
                 }
-                pageList(params).then(({data}) => {
+                schemaPageList(params).then(({data}) => {
                     if (data.code === 0 && data.data) {
                         this.dataList = data.data.list
                         this.totalPage = data.data.totalCount
@@ -153,54 +144,12 @@ export default {
                 this.$message.error('复制失败，请手动复制')
             }
         },
-        resume(row) {
+        deleteSchema(row) {
             let params = {
                 'connectorSource': this.dataForm.connectorSource,
-                'name': row.name
+                'subjectName': row.subjectName
             }
-            resume(params).then(({data}) => {
-                if (data && data.code === 0) {
-                    this.$message({
-                        message: '成功',
-                        type: 'success',
-                        duration: 1500,
-                        onClose: () => {
-                            this.searchData()
-                        }
-                    })
-                } else {
-                    this.$message.error(data.msg)
-                }
-            })
-        },
-        deleteConnector(row) {
-            let params = {
-                'connectorSource': this.dataForm.connectorSource,
-                'name': row.name
-            }
-            deleteConnector(params).then(({data}) => {
-                if (data && data.code === 0) {
-                    this.$message({
-                        message: '成功',
-                        type: 'success',
-                        duration: 1500,
-                        onClose: () => {
-                            this.searchData()
-                        }
-                    })
-                } else {
-                    this.$message.error(data.msg)
-                }
-            })
-        },
-        // 获取数据列表
-        pause(row) {
-            console.log('pause,row:' + JSON.stringify(row))
-            let params = {
-                'connectorSource': this.dataForm.connectorSource,
-                'name': row.name
-            }
-            pause(params).then(({data}) => {
+            deleteSchema(params).then(({data}) => {
                 if (data && data.code === 0) {
                     this.$message({
                         message: '成功',
