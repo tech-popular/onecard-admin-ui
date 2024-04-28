@@ -22,7 +22,7 @@ export default {
       // this.dataListLoading = true
       let fileName = this.$route.query.fileName
       let a = document.createElement('a')
-      a.href = this.$http.adornUrl(`/export/data/excel/ftp/download/${fileName}`)
+      a.href = this.$http.adornUrl(`/export/data/excel/file/download/${fileName}`)
       a.click()
     }
   }

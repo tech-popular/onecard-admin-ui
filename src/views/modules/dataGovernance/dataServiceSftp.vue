@@ -1,5 +1,5 @@
 <template>
-  <div class="dataService-ftp-wrap">
+  <div class="dataService-sftp-wrap">
     <el-form v-loading="loading" :model="baseForm" :rules="baseRule" label-position="right" label-width="100px" ref="baseForm" class="base-form">
       <div style="margin-bottom:10px">
         <span>目录</span>
@@ -76,7 +76,7 @@
   </div>
 </template>
 <script>
-import { getFtpMenuLis, getFtpDataList } from '@/api/dataGovernance/datareport'
+import { getSftpMenuLis, getSftpDataList } from '@/api/dataGovernance/datareport'
 import { getUsersList, saveTask } from '@/api/dataGovernance/subscribeManage'
 export default {
   data () {
@@ -153,7 +153,7 @@ export default {
       let params = {
         path: node.data ? node.data.path : ''
       }
-      getFtpMenuLis(params).then(({ data }) => {
+      getSftpMenuLis(params).then(({ data }) => {
         console.log('data: ', data)
         if (data && data.code === 0) {
           if (!node.data) {
@@ -192,10 +192,10 @@ export default {
         'pageSize': this.pageSize,
         'path': this.selecttreeData.path
       }
-      getFtpDataList(params).then(({ data }) => {
+      getSftpDataList(params).then(({ data }) => {
         if (data && data.code === 0) {
           if (data.data) {
-            this.dataList = data.data.dataList
+            this.dataList = data.data.list
             this.totalPage = data.data.totalCount
           } else {
             this.dataList = []
@@ -251,19 +251,19 @@ export default {
               center: true
             })
           }
-          let ftpFileUrlData = []
-          let ftpFileName = []
+          let sftpFileUrlData = []
+          let sftpFileName = []
           this.multipleSelection.forEach(item => {
-            ftpFileUrlData.push(item.path)
-            ftpFileName.push(item.fileName)
+            sftpFileUrlData.push(item.path)
+            sftpFileName.push(item.fileName)
           })
           let params = {
-            'fileUrl': ftpFileUrlData.join(','),
-            'fileName': ftpFileName.join(','),
+            'fileUrl': sftpFileUrlData.join(','),
+            'fileName': sftpFileName.join(','),
             'approveReason': this.baseForm.approveReason,
             'receiver': this.baseForm.receiver.length === 1 ? this.baseForm.receiver[0] : this.baseForm.receiver.join(','),
             'receiveType': Number(this.baseForm.receiveType),
-            'type': 1
+            'type': 2
           }
           saveTask(params).then(({ data }) => {
             if (data && data.code === 0) {
@@ -288,7 +288,7 @@ export default {
 }
 </script>
 <style scoped>
-.dataService-ftp-wrap {
+.dataService-sftp-wrap {
   padding: 0 20px 20px;
   margin-top: -12px;
   width: 100%;

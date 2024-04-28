@@ -21,3 +21,6 @@ export const approveDisable = id => httpGet(da + `export/data/disable/${id}`) //
 export const getFtpMenuLis = params => httpGet(da + 'export/data/getFtpMenuList', params)
 export const getFtpDataList = params => httpGet(da + 'export/data/getFtpDataList', params)
 export const saveDataFtp = params => httpPost(da + 'export/data/byFtp', params)
+// sftp
+export const getSftpMenuLis = params => httpGet(da + 'export/data/getSftpMenuList', params)
+export const getSftpDataList = params => httpGet(da + 'export/data/getSftpDataList', params)
