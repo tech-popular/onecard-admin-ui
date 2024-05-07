@@ -67,6 +67,7 @@ export default {
     methods: {
         // 打开抽屉弹窗
         init(name, connectorSource) {
+          this.$refs['baseForm'].resetFields()
             this.connectorSource = connectorSource
             console.log('init,name:' + JSON.stringify(name))
             if (name) {
