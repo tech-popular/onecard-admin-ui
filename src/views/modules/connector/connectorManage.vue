@@ -20,6 +20,13 @@
                     <el-option label="PAUSED" value="PAUSED"></el-option>
                 </el-select>
             </el-form-item>
+          <el-form-item label="子任务状态">
+                <el-select v-model="dataForm.subState" clearable>
+                    <el-option label="RUNNING" value="RUNNING"></el-option>
+                    <el-option label="FAILED" value="FAILED"></el-option>
+                    <el-option label="PAUSED" value="PAUSED"></el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item label="类型">
                 <el-select v-model="dataForm.connectorType" clearable>
                     <el-option label="source" value="source"></el-option>
@@ -199,6 +206,7 @@ export default {
                     'connectorSource': this.dataForm.connectorSource,
                     'connectorName': this.dataForm.connectorName,
                     'state': this.dataForm.state,
+                    'subState': this.dataForm.subState,
                     'connectorType': this.dataForm.connectorType,
                     'currPage': this.currPage,
                     'pageSize': this.pageSize
