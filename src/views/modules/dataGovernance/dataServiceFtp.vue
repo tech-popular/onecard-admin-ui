@@ -117,7 +117,18 @@ export default {
       resolve_had: [], // 触发 tree 的 :load=loadNode 重复触发  动态更新tree
       baseRule: {
         approveReason: [
-          { required: true, message: '请输入申请原因', trigger: 'blur' }
+          { required: true, message: '请输入申请原因', trigger: 'blur' },
+          {
+            validator: (rule, value, callback) => {
+              // 检查是否为空字符串、仅包含空格、仅包含数字或仅包含字母
+              if (value === '' || /^ *$/.test(value) || /^\d+$/.test(value) || /^[a-zA-Z]+$/.test(value)) {
+                callback(new Error('请输入有效的申请原因，不能是空串、空格、单独的数字或字母。'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
         ],
         receiver: [
           { type: 'array', required: true, message: '请选择接收人', trigger: 'change' }
