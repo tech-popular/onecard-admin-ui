@@ -53,6 +53,7 @@
                     <el-option label="shell" value="SHELL"></el-option>
                     <el-option label="python" value="PYTHON"></el-option>
                     <el-option label="db" value="DB"></el-option>
+                    <el-option label="undefined" value="UNDEFINED"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item v-if="item.jobType === 'DB'"  label="数据源" prop="dataSourceId" label-width="120px" >
