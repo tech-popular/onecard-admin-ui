@@ -31,7 +31,7 @@
               </span>
             </el-form-item>
           </div>
-          <el-form-item prop="sql" label="SQL：" ref="serviceBeginSqlForm">
+          <el-form-item prop="sql" label="SQL：" ref="serviceBeginSqlForm" >
             <div style="border:1px solid #dcdfe6; border-radius: 4px; position:relative;">
               <codemirror
                 ref="serviceBeginSql"
@@ -42,6 +42,7 @@
                 class="code"
                 style="padding-bottom: 0px;"
               ></codemirror>
+              <span style="color:#6da7ff; position:absolute;left: 40px;top:4px;">{{sqlAddData.placeholder}}</span>
             </div>
           </el-form-item>
           <div style="display:flex">
@@ -174,7 +175,8 @@ export default {
         databaseId: '', // 数据库id
         sqlTitle: '',
         sql: '',
-        id: 1
+        id: 1,
+        placeholder: '请输入sql语句，查询数量超过5万条，请将sql自行排序，程序将自动分页查询!'
       },
       sqlList: [],
       datasourceList: [],
@@ -202,7 +204,6 @@ export default {
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
-        placeholder: '请输入您的SQL语句，如查询数量超过5万条，请将sql自行排序，程序自动分页查询',
         lineWrapping: true,
         lineNumbers: true,
         autofocus: false,
@@ -499,8 +500,12 @@ export default {
       }
     },
     workItemChanges (cm, sql, refForm, selfRef) { // 内容更新时，不为空时将报错信息去除
+      console.log('sql:' + sql)
       if (sql !== '') {
         this.$refs[refForm].clearValidate()
+        this.sqlAddData.placeholder = ''
+      } else {
+        this.sqlAddData.placeholder = '请输入sql语句，查询数量超过5万条，请将sql自行排序，程序将自动分页查询!'
       }
       if (!sql) {
         this.$nextTick(() => {
