@@ -202,6 +202,7 @@ export default {
       cmOptions: {
         theme: 'idea',
         mode: 'text/x-sparksql',
+        placeholder: '请输入您的SQL语句，如查询数量超过5万条，请将sql自行排序，程序自动分页查询',
         lineWrapping: true,
         lineNumbers: true,
         autofocus: false,
