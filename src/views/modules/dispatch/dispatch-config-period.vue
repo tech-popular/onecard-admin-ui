@@ -288,10 +288,10 @@ export default {
                             this.dispatchTimeForm.runCycle = jobType
                             this.dispatchTimeForm.cron = data.data.cron
                             if (jobType === 'MINUTE' || jobType === 'HOUR') {
-                                this.dispatchTimeForm.startTime = data.data.startTime
-                                this.dispatchTimeForm.endTime = data.data.endTime
-                                this.dispatchTimeForm.interval = data.data.interval
-                                this.disTimeTurnOff(jobType)
+                              this.disTimeTurnOff(jobType)
+                              this.dispatchTimeForm.startTime = data.data.startTime
+                              this.dispatchTimeForm.endTime = data.data.endTime
+                              this.dispatchTimeForm.interval = data.data.interval
                             } else if (jobType === 'DAY') {
                                 this.dispatchTimeForm.execTime = data.data.execTime
                                 this.dispatchTimeForm.latestTime = data.data.latestTime
