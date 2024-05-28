@@ -291,6 +291,7 @@ export default {
                                 this.dispatchTimeForm.startTime = data.data.startTime
                                 this.dispatchTimeForm.endTime = data.data.endTime
                                 this.dispatchTimeForm.interval = data.data.interval
+                                this.disTimeTurnOff(jobType)
                             } else if (jobType === 'DAY') {
                                 this.dispatchTimeForm.execTime = data.data.execTime
                                 this.dispatchTimeForm.latestTime = data.data.latestTime
