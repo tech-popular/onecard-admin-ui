@@ -67,6 +67,12 @@
             <el-option v-for="(item, index) in productNoList" :key="index" :value="item.code" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="绑定短链" v-if="dataForm.editType === '1' && dataForm.type === 'sms'" prop="shortLinkId">
+          <el-select v-model="dataForm.shortLinkId" filterable placeholder="请选择" style="width: 220px; margin-right: 15px;" @change="handleSelectChange">
+            <el-option v-for="(item, index) in shortLinkList" :key="index" :value="item.id" :label="item.shortLinkName"></el-option>
+          </el-select>
+          <el-input v-model="dataForm.shortLinkCode"  style="width: 160px" :disabled="true"></el-input>
+        </el-form-item>
         <el-form-item label="短信内容" prop="smsContent" v-if="dataForm.editType === '1' && dataForm.type === 'sms'">
           <el-input type="textarea" class="base-pane-item" @input="changesmsContent" v-model="dataForm.smsContent" maxlength="300" :autosize="{ minRows: 3, maxRows: 5}" show-word-limit />
         </el-form-item>
@@ -275,6 +281,7 @@
 <script>
 import { dataTransferManageOutParams, dataTransferManageKafka, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
 import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo, getCardInfo } from '@/api/dataAnalysis/sourceBinding'
+import { getShortLinkList } from '@/api/dataAnalysis/bindingShortLink'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -325,6 +332,7 @@ export default {
         smsTemplate: '',
         editType: '0', // 编辑类型
         productNo: '', // 签名
+        shortLinkId: '',
         cusSmsType: '', // 短信类型
         smsContent: '', // 短信内容
         fixedParams: [], // 固定出参
@@ -367,6 +375,7 @@ export default {
       mysqlServerList: [],
       cusSmsTypeList: [], // 短信类型list
       productNoList: [], // 短信签名list
+      shortLinkList: [], // 短信签名list
       cardNameList: [], // 红包卡券name的list
       cardDataList: [],
       httpResponseTypeOptions: [{
@@ -573,6 +582,7 @@ export default {
             let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             if (row.type === 'sms') {
               this.getSmsSignInfo()
+              this.getShortLinkList()
               this.getSmsStyleInfo()
               this.getAllSmsChannels()
               this.dataForm.editType = '1'
@@ -616,6 +626,7 @@ export default {
             this.dataForm.resourceId = parseInt(res.data.data.bindingConfig.resourceId)
             if (row.type === 'sms') {
               this.getSmsSignInfo()
+              this.getShortLinkList()
               this.getSmsStyleInfo()
               this.getAllSmsChannels()
               this.dataForm.resourceName = this.dataForm.resourceName
@@ -700,6 +711,15 @@ export default {
           this.productNoList = data.data
         } else {
           this.productNoList = []
+        }
+      })
+    },
+    getShortLinkList () {
+      getShortLinkList().then(({ data }) => {
+        if (data && data.status === '1') {
+          this.shortLinkList = data.data
+        } else {
+          this.shortLinkList = []
         }
       })
     },
@@ -910,6 +930,7 @@ export default {
       this.getFixedParams()
       if (value === 'sms') {
         this.getSmsSignInfo()
+        this.getShortLinkList()
         this.getSmsStyleInfo()
         this.getAllSmsChannels()
       }
@@ -947,6 +968,9 @@ export default {
           this.paramsNum = 0
         }
       }
+    },
+    handleSelectChange(value) {
+      this.dataForm.shortLinkCode = '${shortLink_' + value + '}'
     },
     // 短信自定义
     changecusSmsType (val) {
@@ -1119,6 +1143,7 @@ export default {
           let smsContent = {
             'cusSmsType': this.dataForm.cusSmsType,
             'productNo': this.dataForm.productNo,
+            'shortLinkId': this.dataForm.cusSmsType,
             'content': this.dataForm.smsContent
           }
           let httpContent = {
