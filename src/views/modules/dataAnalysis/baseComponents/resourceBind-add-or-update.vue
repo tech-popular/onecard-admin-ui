@@ -582,15 +582,17 @@ export default {
             let bindingContent = JSON.parse(res.data.data.bindingConfig.content)
             if (row.type === 'sms') {
               this.getSmsSignInfo()
-              this.getShortLinkList()
               this.getSmsStyleInfo()
               this.getAllSmsChannels()
               this.dataForm.editType = '1'
               this.extraParamsVisible = false
               this.dataForm.resourceName = this.dataForm.resourceName
               this.dataForm.cusSmsType = bindingContent.cusSmsType
+              this.dataForm.shortLinkId = bindingContent.shortLinkId
+              this.dataForm.shortLinkCode = '${shortLink_' + bindingContent.shortLinkId + '}'
               this.dataForm.productNo = bindingContent.productNo
               this.dataForm.smsContent = bindingContent.content
+              this.getShortLinkList()
             }
             if (row.type === 'push') {
               let pushExtraKeys = JSON.parse(bindingContent.pushExtraKeys)
@@ -1143,7 +1145,7 @@ export default {
           let smsContent = {
             'cusSmsType': this.dataForm.cusSmsType,
             'productNo': this.dataForm.productNo,
-            'shortLinkId': this.dataForm.cusSmsType,
+            'shortLinkId': this.dataForm.shortLinkId,
             'content': this.dataForm.smsContent
           }
           let httpContent = {
