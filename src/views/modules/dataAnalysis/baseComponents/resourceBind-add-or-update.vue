@@ -526,6 +526,7 @@ export default {
         smsTemplate: '',
         editType: '0', // 编辑类型
         productNo: '', // 签名
+        shortLinkId: '',
         cusSmsType: '', // 短信类型
         smsContent: '', // 短信内容
         extraParams: [],
@@ -899,6 +900,7 @@ export default {
         smsTemplate: '',
         editType: '0', // 编辑类型
         productNo: '', // 签名
+        shortLinkId: '',
         cusSmsType: '', // 短信类型
         smsContent: '', // 短信内容
         extraParams: [],
@@ -957,6 +959,7 @@ export default {
       if (this.dataForm.type === 'sms') {
         if (this.dataForm.editType === '0') {
           this.dataForm.productNo = ''
+          this.dataForm.shortLinkId = ''
           this.dataForm.cusSmsType = ''
           this.dataForm.smsContent = ''
         } else {
