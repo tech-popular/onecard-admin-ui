@@ -11,6 +11,7 @@ export const list = (params) => httpPost(base + 'dispatch/task/select', params) 
 export const info = (params) => httpGet(base + `dispatch/task/info/${params}`) // 详情
 export const update = (params) => httpPost(base + 'dispatch/task/update', params) // 修改
 export const save = (params) => httpPost(base + 'dispatch/task/save', params) // 新增
+export const getTaskNameList = () => httpGet(base + '/dispatch/task/getTaskNameList')
 export const dataSourceAll = (type, flow) => httpGet(base + `dispatch/datasource/supports?taskType=${type}&dataFlow=${flow}`) // 同步及计算任务中的殴打让你源类型下选
 export const accountAll = params => httpPost(base + 'dispatch/account/selectall', params)
 export const tagAll = () => httpGet(base + 'dispatch/task/tag/list')
@@ -76,3 +77,10 @@ export const mcSyncSave = (params) => httpPost(base + 'dispatch/mc/sync/save', p
 export const paramsViewPage = (params) => httpGet(base + 'dispatch/task/params/listOnPage', params)
 export const getAllDataSourceList = () => httpGet(base + 'dispatch/account/getAllDataSourceList')
 export const getDolphinTaskId = () => httpGet(base + 'dispatch/task/getDolphinTaskId')
+export const getTrinoQueueNameList = () => httpGet(base + 'dispatch/trino/queue/getTrinoQueueNameList')
+export const queryTrinoQueuePage = (params) => httpGet(base + 'dispatch/trino/queue/queryTrinoQueuePage', params)
+export const queryTaskQueueAllotPage = (params) => httpGet(base + 'dispatch/trino/queue/queryTaskQueueAllotPage', params)
+export const getTrinoQueueInfo = id => httpGet(base + `dispatch/trino/queue/getTrinoQueueInfo/${id}`)
+export const getTaskQueueAllotInfo = id => httpGet(base + `dispatch/trino/queue/getTaskQueueAllotInfo/${id}`)
+export const saveOrUpdateTrinoQueue = params => httpPost(base + 'dispatch/trino/queue/saveOrUpdateTrinoQueue', params)
+export const saveOrUpdateTaskQueueAllot = params => httpPost(base + 'dispatch/trino/queue/saveOrUpdateTaskQueueAllot', params)
