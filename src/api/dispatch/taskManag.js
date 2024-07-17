@@ -84,3 +84,4 @@ export const getTrinoQueueInfo = id => httpGet(base + `dispatch/trino/queue/getT
 export const getTaskQueueAllotInfo = id => httpGet(base + `dispatch/trino/queue/getTaskQueueAllotInfo/${id}`)
 export const saveOrUpdateTrinoQueue = params => httpPost(base + 'dispatch/trino/queue/saveOrUpdateTrinoQueue', params)
 export const saveOrUpdateTaskQueueAllot = params => httpPost(base + 'dispatch/trino/queue/saveOrUpdateTaskQueueAllot', params)
+export const deleteTaskQueueAllot = id => httpGet(base + `dispatch/trino/queue/deleteTaskQueueAllot/${id}`)

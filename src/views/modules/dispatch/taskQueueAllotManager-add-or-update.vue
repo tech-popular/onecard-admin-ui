@@ -1,14 +1,14 @@
 <template>
     <el-dialog title="同步任务配置" :close-on-click-modal="false" :visible.sync="visible">
-      <el-form :model="dataForm" ref="dataForm" label-width="120px" :disabled="!canUpdate">
+      <el-form :model="dataForm" ref="dataForm" label-width="100px" :disabled="!canUpdate">
         <el-form-item label="任务名称" prop="taskId">
           <el-select v-model="dataForm.taskId" placeholder="任务名称" filterable>
-            <el-option :label="item.id" :value="item.taskName" v-for="(item, index) in taskNameList" :key="index"></el-option>
+            <el-option :label="item.taskName" :value="item.id" v-for="(item, index) in taskNameList" :key="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="队列名称" prop="queueId">
           <el-select v-model="dataForm.queueId" placeholder="队列名称" filterable>
-            <el-option :label="item.id" :value="item.queueName" v-for="(item, index) in queueNameList" :key="index"></el-option>
+            <el-option :label="item.queueName" :value="item.id" v-for="(item, index) in queueNameList" :key="index"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -46,6 +46,7 @@ export default {
             queueNameList: [],
             taskNameList: [],
             dataForm: {
+                id: '',
                 taskId: '',
                 queueId: ''
             }
@@ -62,6 +63,7 @@ export default {
                 if (data.code !== 0) {
                   return this.$message.error(data.msg || '获取数据异常')
                 }
+                this.dataForm.id = data.data.id
                 this.dataForm.taskId = data.data.taskId
                 this.dataForm.queueId = data.data.queueId
               })

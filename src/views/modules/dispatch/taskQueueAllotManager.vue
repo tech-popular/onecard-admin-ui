@@ -2,13 +2,13 @@
     <div>
         <el-form :inline="true" :model="dataForm" ref="dataForm">
             <el-form-item label="任务名称" prop="taskId">
-                <el-select v-model="dataForm.taskId" placeholder="任务名称" filterable>
-                    <el-option :label="item.id" :value="item.taskName" v-for="(item, index) in taskNameList" :key="index"></el-option>
+                <el-select v-model="dataForm.taskId" placeholder="任务名称" filterable clearable>
+                    <el-option :label="item.taskName" :value="item.id" v-for="(item, index) in taskNameList" :key="index"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="队列名称" prop="queueId">
-                <el-select v-model="dataForm.queueId" placeholder="队列名称" filterable>
-                    <el-option :label="item.id" :value="item.queueName" v-for="(item, index) in queueNameList" :key="index"></el-option>
+                <el-select v-model="dataForm.queueId" placeholder="队列名称" filterable clearable>
+                    <el-option :label="item.queueName" :value="item.id" v-for="(item, index) in queueNameList" :key="index"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
@@ -19,8 +19,8 @@
         <el-table :data="dataList" border
                   v-loading="dataListLoading">
             <el-table-column :show-overflow-tooltip="true" prop="id" header-align="center" align="center" label="id"/>
-            <el-table-column :show-overflow-tooltip="true" prop="queueName" header-align="center" align="center" label="队列名称" />
-            <el-table-column :show-overflow-tooltip="true" prop="description" header-align="center" align="center" label="队列描述" />
+          <el-table-column :show-overflow-tooltip="true" prop="taskName" header-align="center" align="center" label="任务名称" />
+          <el-table-column :show-overflow-tooltip="true" prop="queueName" header-align="center" align="center" label="队列名称" />
             <el-table-column  header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
               <template slot-scope="scope">
                 <el-tooltip class="item" effect="dark" :content="'编辑'" placement="top">
@@ -28,8 +28,8 @@
                              @click="addOrUpdateHandle(scope.row.id)"></el-button>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" :content="'删除'" placement="top">
-                  <el-button type="primary" size="mini" circle :icon="'el-icon-edit'"
-                             @click="addOrUpdateHandle(scope.row.id)"></el-button>
+                  <el-button type="primary" size="mini" circle :icon="'el-icon-delete'"
+                             @click="deleteHandle(scope.row.id)"></el-button>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -42,15 +42,15 @@
             :page-size="pageSize"
             :total="totalPage"
             layout="total, sizes, prev, pager, next, jumper"/>
-      <trinoQueueManagerAddOrUpdate v-if="addOrUpdateVisible" ref="trinoQueueManagerAddOrUpdate" @refreshDataList="init"></trinoQueueManagerAddOrUpdate>
+      <taskQueueAllotManagerAddOrUpdate v-if="addOrUpdateVisible" ref="taskQueueAllotManagerAddOrUpdate" @refreshDataList="init"></taskQueueAllotManagerAddOrUpdate>
     </div>
 </template>
 
 <script>
 import {
-    getTrinoQueueNameList, queryTaskQueueAllotPage, getTaskNameList
+    getTrinoQueueNameList, queryTaskQueueAllotPage, getTaskNameList, deleteTaskQueueAllot
 } from '@/api/dispatch/taskManag'
-import trinoQueueManagerAddOrUpdate from './trinoQueueManager-add-or-update.vue'
+import taskQueueAllotManagerAddOrUpdate from './taskQueueAllotManager-add-or-update.vue'
 
 export default {
     data() {
@@ -72,7 +72,7 @@ export default {
         }
     },
     components: {
-      trinoQueueManagerAddOrUpdate
+      taskQueueAllotManagerAddOrUpdate
     },
     mounted() {
         this.init()
@@ -132,7 +132,31 @@ export default {
         addOrUpdateHandle(data) {
           this.addOrUpdateVisible = true
           this.$nextTick(() => {
-            this.$refs.trinoQueueManagerAddOrUpdate.init(data)
+            this.$refs.taskQueueAllotManagerAddOrUpdate.init(data)
+          })
+        },
+        // 删除
+        deleteHandle (id) {
+          this.$confirm(`确定删除操作?`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            const dataBody = id
+            deleteTaskQueueAllot(dataBody).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.handleSearch()
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
           })
         }
     }
