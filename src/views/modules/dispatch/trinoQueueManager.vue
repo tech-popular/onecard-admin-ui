@@ -25,7 +25,7 @@
                 <el-tag v-else-if="scope.row.status === -1" type="danger">-</el-tag>
               </template>
             </el-table-column>
-            <el-table-column  header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
+            <el-table-column  header-align="center" align="center" width="200" fixed="right" label="操作" class="but">
               <template slot-scope="scope">
                 <el-tooltip class="item" effect="dark" :content="'编辑任务'" placement="top">
                   <el-button type="primary" size="mini" circle :icon="'el-icon-edit'"
