@@ -28,7 +28,7 @@
                              @click="addOrUpdateHandle(scope.row.id)"></el-button>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" :content="'删除'" placement="top">
-                  <el-button type="primary" size="mini" circle :icon="'el-icon-delete'"
+                  <el-button type="danger" size="mini" circle :icon="'el-icon-delete'"
                              @click="deleteHandle(scope.row.id)"></el-button>
                 </el-tooltip>
               </template>
