@@ -18,10 +18,10 @@
         </el-form>
         <el-table :data="dataList" border
                   v-loading="dataListLoading">
-            <el-table-column :show-overflow-tooltip="true" prop="id" header-align="center" align="center" label="id"/>
+            <el-table-column :show-overflow-tooltip="true" v-if="false"  prop="id" header-align="center" align="center" label="id"/>
           <el-table-column :show-overflow-tooltip="true" prop="taskName" header-align="center" align="center" label="任务名称" />
           <el-table-column :show-overflow-tooltip="true" prop="queueName" header-align="center" align="center" label="队列名称" />
-            <el-table-column  header-align="center" align="center" width="300" fixed="right" label="操作" class="but">
+            <el-table-column  header-align="center" align="center" width="200" fixed="right" label="操作" class="but">
               <template slot-scope="scope">
                 <el-tooltip class="item" effect="dark" :content="'编辑'" placement="top">
                   <el-button type="primary" size="mini" circle :icon="'el-icon-edit'"

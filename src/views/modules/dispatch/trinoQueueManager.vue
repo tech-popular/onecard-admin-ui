@@ -13,7 +13,7 @@
         </el-form>
         <el-table :data="dataList" border
                   v-loading="dataListLoading">
-            <el-table-column :show-overflow-tooltip="true" prop="id" header-align="center" align="center" label="id"/>
+            <el-table-column :show-overflow-tooltip="true" prop="id" v-if="false" header-align="center" align="center" label="id"/>
             <el-table-column :show-overflow-tooltip="true" prop="queueName" header-align="center" align="center" label="队列名称" />
             <el-table-column :show-overflow-tooltip="true" prop="description" header-align="center" align="center" label="队列描述" />
             <el-table-column :show-overflow-tooltip="true" prop="status" header-align="center" align="center" label="队列状态" >
