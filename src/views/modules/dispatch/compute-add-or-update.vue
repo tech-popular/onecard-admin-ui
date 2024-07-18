@@ -120,6 +120,7 @@
     </div>
     <div class="footer">
       <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" @click="copyHandle(dataForm.id)" v-if="!!dataForm.id">复制任务</el-button>
       <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
     <el-dialog
@@ -291,6 +292,7 @@ export default {
         styleSelectedText: true
       },
       canUpdate: true,
+      isCopy: false,
       updateRowNum: 0,
       originpreviewSql: '', // 保留一份原始的连贯数据，用于做对比
       previewSql: '',
@@ -304,14 +306,13 @@ export default {
     }
   },
   methods: {
-    init (id, canUpdate) {
-      this.id = id ? id.id : ''
+    init (id, canUpdate, isCopy) {
       this.rowData = {
         authOwner: '',
         authOtherList: [],
         authOthers: ''
       }
-      this.rowData = id ? deepClone(id) : this.rowData
+      // this.rowData = id ? deepClone(id) : this.rowData
       this.canUpdate = canUpdate
       this.dataForm = deepClone(this.tempDataForm)
       this.calculateTasks = deepClone(this.tempCalculateTasks)
@@ -325,7 +326,7 @@ export default {
         this.$refs['dataForm1'].resetFields()
         this.$refs['dataForm2'].resetFields()
         if (id) {
-          info(this.id).then(({data}) => {
+          info(id).then(({data}) => {
             if (data.code !== 0) {
               return this.$message.error(data.msg || '获取数据异常')
             }
@@ -335,7 +336,9 @@ export default {
             this.createUser = data.data.createUser
             this.updateUser = data.data.updateUser
             this.updateTime = data.data.updateTime
-            this.dataForm.id = data.data.id
+            if (!isCopy) {
+              this.dataForm.id = data.data.id
+            }
             this.dataForm.taskDescribe = data.data.taskDescribe
             this.dataForm.projectId = data.data.projectId
             this.getDolphinFlowList(data.data.projectId)
@@ -354,7 +357,11 @@ export default {
                 this.dataForm.failRepeatInterval = data.data.failRepeatInterval
             }
               this.calculateTasks = data.data.calculateTasks
-              this.dataForm.taskName = data.data.taskName
+              if (isCopy) {
+                this.dataForm.taskName = data.data.taskName + '复制任务'
+              } else {
+                this.dataForm.taskName = data.data.taskName
+              }
               this.dataForm.createUser = data.data.createUser
           })
         }
@@ -474,6 +481,22 @@ export default {
     },
     sqlPreviewFocus () {
       this.previewSqlDefaultRow()
+    },
+    copyHandle (id) { // 复制功能
+      this.$confirm('任务已复制，点击“确定”开始编辑新任务', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        console.log('id' + id)
+        this.init(id, true, true)
+        document.getElementById('title').scrollIntoView() // 滚动到页面最上面
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
     },
     previewSqlSubmit () { // 连贯代码提交
       let sqlValue = this.previewSql

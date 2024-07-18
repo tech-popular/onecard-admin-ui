@@ -434,7 +434,7 @@ export default {
                 //     canUpdate = true
                 // }
                 console.log('computAddOrUpdateHandle->canUpdate:' + canUpdate)
-                this.$refs.computAddOrUpdate.init(data, canUpdate)
+                this.$refs.computAddOrUpdate.init(data.id, canUpdate, false)
             })
         },
         // 新增 / 修改脚本任务
