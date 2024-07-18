@@ -120,7 +120,7 @@
     </div>
     <div class="footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="copyHandle(dataForm.id)" v-if="!!dataForm.id">复制任务</el-button>
+      <el-button type="warning" @click="copyHandle(dataForm.id)" v-if="!!dataForm.id">复制任务</el-button>
       <el-button type="primary" v-if="canUpdate" @click="dataFormSubmit()">确定</el-button>
     </div>
     <el-dialog
