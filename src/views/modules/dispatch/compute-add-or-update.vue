@@ -307,12 +307,12 @@ export default {
   },
   methods: {
     init (id, canUpdate, isCopy) {
+      this.id = id || ''
       this.rowData = {
         authOwner: '',
         authOtherList: [],
         authOthers: ''
       }
-      // this.rowData = id ? deepClone(id) : this.rowData
       this.canUpdate = canUpdate
       this.dataForm = deepClone(this.tempDataForm)
       this.calculateTasks = deepClone(this.tempCalculateTasks)
@@ -325,8 +325,8 @@ export default {
         document.getElementById('title').scrollIntoView()
         this.$refs['dataForm1'].resetFields()
         this.$refs['dataForm2'].resetFields()
-        if (id) {
-          info(id).then(({data}) => {
+        if (this.id) {
+          info(this.id).then(({data}) => {
             if (data.code !== 0) {
               return this.$message.error(data.msg || '获取数据异常')
             }
