@@ -444,6 +444,7 @@ export default {
       if (this.id) {
         params.id = this.id
         params.beeFlowId = this.$store.state.canvasFlow.editData.beeFlowId
+        params.taskUniqueFlag = this.$store.state.canvasFlow.editData.taskUniqueFlag
       }
       addCanvasInfo(params).then(({data}) => {
         if (data.status !== '1') {
