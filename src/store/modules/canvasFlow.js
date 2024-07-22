@@ -14,6 +14,7 @@ export default {
       beeFlowName: '',
       beeFlowCode: '',
       beeFlowId: '',
+      taskUniqueFlag: '',
       configJson: {}
     },
     outParams: []
@@ -36,6 +37,7 @@ export default {
       state.editData.beeFlowName = params.beeFlowName
       state.editData.beeFlowCode = params.beeFlowCode
       state.editData.beeFlowId = params.beeFlowId
+      state.editData.taskUniqueFlag = params.taskUniqueFlag
       state.editData.configJson = params.configJson
     },
     setChannelCode (state, params) {
