@@ -30,8 +30,8 @@
       </div>
       <!-- 短信 -->
       <el-form-item label="配置方式" v-if="dataForm.type === 'sms'" prop="editType">
-        <el-radio v-model="dataForm.editType" @change="changeEditType" label="0">标准模板</el-radio>
         <el-radio v-model="dataForm.editType" @change="changeEditType" label="1">自定义模板</el-radio>
+        <el-radio v-model="dataForm.editType" @change="changeEditType" label="0" :disabled="true">标准模板</el-radio>
       </el-form-item>
       <el-form-item prop="channelId" v-if="dataForm.editType === '0' && dataForm.type === 'sms'" label="短信渠道" :rules="{ required: true, message: '请选择短信渠道', trigger: 'blur' }">
         <el-select v-model="dataForm.channelId" filterable @change="getDate(dataForm.channelId,true)" placeholder="请选择渠道" style="width: 400px">
@@ -330,7 +330,7 @@ export default {
         resourceCode: '',
         channelId: '',
         smsTemplate: '',
-        editType: '0', // 编辑类型
+        editType: '1', // 编辑类型
         productNo: '', // 签名
         shortLinkId: '',
         cusSmsType: '', // 短信类型
@@ -524,7 +524,7 @@ export default {
         resourceCode: '',
         channelId: '',
         smsTemplate: '',
-        editType: '0', // 编辑类型
+        editType: '1', // 编辑类型
         productNo: '', // 签名
         shortLinkId: '',
         cusSmsType: '', // 短信类型
@@ -884,10 +884,10 @@ export default {
     },
     // 类型改变
     changeType (value) {
-      if (value === 'tel' || value === 'ai' || value === 'push' || value === 'http' || value === 'card') {
-        this.extraParamsVisible = false
-      } else {
+      if (value === 'kafka') {
         this.extraParamsVisible = true
+      } else {
+        this.extraParamsVisible = false
       }
       this.dataForm = {
         id: this.dataForm.id,
@@ -898,7 +898,7 @@ export default {
         resourceCode: '',
         channelId: '',
         smsTemplate: '',
-        editType: '0', // 编辑类型
+        editType: '1', // 编辑类型
         productNo: '', // 签名
         shortLinkId: '',
         cusSmsType: '', // 短信类型
@@ -1144,6 +1144,12 @@ export default {
           }
           if ((this.dataForm.type === 'sms' && this.dataForm.editType === '0') && this.extraParams.length !== this.paramsNum) {
             return this.$message.error(`请选择${this.paramsNum}个参数`)
+          }
+          if (this.dataForm.type === 'sms' && /\s$/.test(this.dataForm.smsContent)) {
+            return this.$message.error(`结尾存在空行或换行，请调整后保存！`)
+          }
+          if (this.dataForm.type === 'push' && /\s$/.test(this.dataForm.pushContent)) {
+            return this.$message.error(`结尾存在空行或换行，请调整后保存！`)
           }
           let smsContent = {
             'cusSmsType': this.dataForm.cusSmsType,
