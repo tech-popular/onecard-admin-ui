@@ -45,7 +45,7 @@
             <el-input-number v-model="item.jobNo" placeholder="作业序号" :min="1"></el-input-number>
           </el-form-item>
           <div class="work-type-pane">
-            <el-form-item label="任务类型" prop="jobType" label-width="120px" >
+            <el-form-item label="作业类型" prop="jobType" label-width="120px" >
                 <el-select v-model="item.jobType"  clearable placeholder="任务类型">
                     <el-option label="trino" value="TRINO"></el-option>
                     <el-option label="sparkSql" value="SPARKSQL"></el-option>
@@ -87,8 +87,14 @@
           <el-form-item v-show="false" label="dolphin任务id" prop="dolphinTaskId" label-width="120px">
               <el-input type="textarea" v-model="item.dolphinTaskId" placeholder="dolphin任务id" />
           </el-form-item>
+          <el-form-item label="作业状态"  prop="enable" label-width="120px">
+            <el-radio-group v-model="item.enable">
+              <el-radio :label="1">有效</el-radio>
+              <el-radio :label="0">无效</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <div style="margin-bottom: 10px; text-align: right;">
-            <el-button type="primary" @click="addWork">新增</el-button>
+            <el-button type="primary" @click="addWork(index)">新增</el-button>
             <el-button type="danger" @click="deleteWork(index)">删除</el-button>
           </div>
         </el-form>
@@ -210,6 +216,7 @@ export default {
           resourceList: [],
           dataSourceId: '',
           dolphinTaskId: '',
+          enable: 1,
           placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
         }
       ],
@@ -238,6 +245,9 @@ export default {
         ],
         dataSourceId: [
             { required: true, message: '请选择数据源', trigger: 'change' }
+        ],
+        enable: [
+            { required: true, message: '请选择作业状态', trigger: 'change' }
         ],
         taskDisable: [
           { required: true, message: '请选择状态', trigger: 'change' }
@@ -567,17 +577,20 @@ export default {
         lineNum++
       })
     },
-    addWork () { // 增加一条作业内容
-      this.calculateTasks.push({
-        jobNo: '',
+    addWork (index) { // 增加一条作业内容
+      const newTask = {
+        jobNo: index + 1,
         jobType: '',
         jobDesc: '',
         jobScript: '',
         resourceList: [],
         dataSourceId: '',
         dolphinTaskId: '',
+        enable: 1,
         placeholder: '请勿在第一行添加注释，否则脚本运行有误！'
-      })
+      }
+      // 在索引为1的位置插入新的任务
+      this.calculateTasks.splice(index + 1, 0, newTask)
       this.updateWorkIndex()
     },
     deleteWork (index) { // 删除作业内容
