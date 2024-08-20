@@ -975,7 +975,7 @@ export default {
       }
     },
     handleSelectChange(value) {
-      this.dataForm.shortLinkCode = '${shortLink_' + value + '}'
+      this.dataForm.shortLinkCode = '#short_link#'
     },
     // 短信自定义
     changecusSmsType (val) {
