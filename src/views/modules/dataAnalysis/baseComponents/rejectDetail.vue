@@ -25,21 +25,22 @@
           <template slot-scope="scope">
             <div>
               <template v-if="scope.row.condition.split('-').length === 1">
-                <el-tag>{{ scope.row.condition.split('-')[0] }}</el-tag>
+                <el-input>{{ scope.row.condition.split('-')[0] }}</el-input>
               </template>
               <template v-else-if="scope.row.condition.split('-').length === 2">
                 <el-input v-model="scope.row.condition.split('-')[0]" disabled></el-input>
                 <el-input v-model="scope.row.condition.split('-')[1]" disabled></el-input>
               </template>
               <template v-else>
-                <el-tag>{{ scope.row.condition.split('-')[0] }}</el-tag>
-                <el-tag type="info">{{ scope.row.condition.split('-')[1] }}</el-tag>
-                <el-tag type="success">{{ scope.row.condition.split('-')[2] }}</el-tag>
+                <el-input>{{ scope.row.condition.split('-')[0] }}</el-input>
+                <el-input type="info">{{ scope.row.condition.split('-')[1] }}</el-input>
+                <el-input type="success">{{ scope.row.condition.split('-')[2] }}</el-input>
               </template>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="count" header-align="center" align="center" width="210" label="剩余人数"/>
+        <el-table-column prop="count" header-align="center" align="center" width="100" label="剩余人数"/>
+        <el-table-column prop="hitCount" header-align="center" align="center" width="100" label="命中人数"/>
       </el-table>
     </el-dialog>
   </div>
