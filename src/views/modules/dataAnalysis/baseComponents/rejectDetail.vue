@@ -25,16 +25,16 @@
           <template slot-scope="scope">
             <div>
               <template v-if="scope.row.condition.split('-').length === 1">
-                <el-input>{{ scope.row.condition.split('-')[0] }}</el-input>
+                <el-tag>{{ scope.row.condition.split('-')[0] }}</el-tag>
               </template>
               <template v-else-if="scope.row.condition.split('-').length === 2">
-                <el-input v-model="scope.row.condition.split('-')[0]" disabled></el-input>
-                <el-input v-model="scope.row.condition.split('-')[1]" disabled></el-input>
+                <el-tag v-model="scope.row.condition.split('-')[0]" disabled></el-tag>
+                <el-tag v-model="scope.row.condition.split('-')[1]" disabled></el-tag>
               </template>
               <template v-else>
-                <el-input>{{ scope.row.condition.split('-')[0] }}</el-input>
-                <el-input type="info">{{ scope.row.condition.split('-')[1] }}</el-input>
-                <el-input type="success">{{ scope.row.condition.split('-')[2] }}</el-input>
+                <el-tag>{{ scope.row.condition.split('-')[0] }}</el-tag>
+                <el-tag type="info">{{ scope.row.condition.split('-')[1] }}</el-tag>
+                <el-tag type="success">{{ scope.row.condition.split('-')[2] }}</el-tag>
               </template>
             </div>
           </template>
