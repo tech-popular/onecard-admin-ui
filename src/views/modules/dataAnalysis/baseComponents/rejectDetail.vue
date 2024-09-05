@@ -39,8 +39,8 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="count" header-align="center" align="center" width="100" label="剩余人数"/>
         <el-table-column prop="hitCount" header-align="center" align="center" width="100" label="命中人数"/>
+        <el-table-column prop="count" header-align="center" align="center" width="100" label="剩余人数"/>
       </el-table>
     </el-dialog>
   </div>
