@@ -66,9 +66,10 @@ export default {
       this.visible = true
       this.dataForm.templateId = id
       console.log('templateId: ' + id)
-      this.queryRejectGroupList(id)
       this.dataList = []
       this.dataForm.expression = ''
+      this.rejectGroupList = []
+      this.queryRejectGroupList(id)
       // this.queryData()
     },
     queryData () {
