@@ -71,6 +71,7 @@
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="tableShowHandle(scope.row)">特征分析</el-button>
           <!-- <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="table1ShowHandle(scope.row)">分群概览</el-button> -->
           <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="detailPreviewHandle(scope.row)">明细预览</el-button>
+          <el-button type="text" size="small" :disabled="!!scope.row.actionExpressionTemplate" @click="rejectDetailHandle(scope.row.id)">剔除明细</el-button>
           <el-button type="text" size="small" @click="detailRefreshHandle(scope.row)">刷新</el-button>
           <el-button type="text" size="small" v-if="isAdmin || scope.row.authOwner === userid || scope.row.authOwner === username" @click="taskPermission(scope.row)">授权</el-button>
         </template>
@@ -89,6 +90,7 @@
     <tableShow v-if="tableShowVisible" ref="tableShow" />
     <TableShow1 v-if="tableShow1Visible" ref="tableShow1"></TableShow1>
     <detailPreview v-if="detailPreviewVisible" ref="detailPreview" />
+    <rejectDetail v-if="rejectDetailVisible" ref="rejectDetail" />
     <!-- 授权 -->
     <assign-permission v-if="assignPermissionVisible" :submitDataApi="submitDataApi" :submitDataApis="submitDataApis" ref="assignPermission" @refreshDataList="getDataList"></assign-permission>
   </div>
@@ -102,6 +104,7 @@ import TableShow1 from './baseComponents/tableShow1'
 import { updateGroupAuth, updateGroupAuths } from '@/api/commom/assignPermission'
 import AssignPermission from '../../components/permission/assign-permission'
 import detailPreview from './baseComponents/detailPreview'
+import rejectDetail from './baseComponents/rejectDetail'
 export default {
   data () {
     return {
@@ -119,6 +122,7 @@ export default {
       addOrUpdateVisible: false,
       tableShowVisible: false,
       detailPreviewVisible: false,
+      rejectDetailVisible: false,
       tableShow1Visible: false,
       dataListSelections: [],
       submitDataApi: updateGroupAuth,
@@ -134,7 +138,8 @@ export default {
     TableShow,
     AssignPermission,
     detailPreview,
-    TableShow1
+    TableShow1,
+    rejectDetail
   },
   mounted () {
     this.getDataList()
@@ -169,6 +174,17 @@ export default {
           canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
         }
         this.$refs.detailPreview.init(value, canUpdate)
+      })
+    },
+    // 剔除明细
+    rejectDetailHandle (value) {
+      this.rejectDetailVisible = true
+      this.$nextTick(() => {
+        let canUpdate = true
+        if (!this.isAdmin) {
+          canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
+        }
+        this.$refs.rejectDetail.init(value, canUpdate)
       })
     },
     // 分群概览

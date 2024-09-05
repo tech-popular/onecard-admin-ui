@@ -43,3 +43,7 @@ export const selectDataGroupInfos = params => httpGet(da + 'dataCatalog/selectDa
 export const updateUserNum = id => httpGet(da + `data/group/updateUserNum/${id}`) // 刷新
 export const selectTransferTask = id => httpGet(da + `data/group/selectTransferTaskByTemplateId/${id}`) // 流转下发依赖任务
 export const getAnalysisIndicators = channelCode => httpGet(da + `data/group/getAnalysisIndicators/${channelCode}`) // 特征分析获取默认指标
+
+export const getRejectGroupList = (templateId) => httpGet(da + `data/group/getRejectGroupList?templateId=${templateId}`)
+export const queryExpression = (templateId) => httpGet(da + `data/group/queryExpression?templateId=${templateId}`)
+export const pickConditionCount = (templateId, rejectTemplateId) => httpGet(da + `data/group/pick/condition/count?templateId=${templateId}&rejectTemplateId=${rejectTemplateId}`)
