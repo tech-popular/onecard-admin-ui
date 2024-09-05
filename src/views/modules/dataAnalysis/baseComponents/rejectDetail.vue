@@ -16,7 +16,7 @@
           <el-button type="primary" @click="searchHandle()">查询</el-button>
         </el-form-item>
         <el-form-item prop="expression">
-          <el-input v-model="dataForm.expression" placeholder="请输入名称" style="width: 400px" disabled></el-input>
+          <el-input v-model="dataForm.expression" placeholder="请输入名称" style="width: 500px" disabled></el-input>
         </el-form-item>
       </el-form>
       <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -104,17 +104,6 @@ export default {
     },
     searchHandle () {
       this.queryData()
-    },
-    // 每页数
-    sizeChangeHandle (val) {
-      this.pageSize = val
-      this.pageNum = 1
-      this.init()
-    },
-    // 下一页
-    currentChangeHandle (val) {
-      this.pageNum = val
-      this.init()
     }
   }
 }
