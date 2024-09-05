@@ -181,9 +181,6 @@ export default {
       this.rejectDetailVisible = true
       this.$nextTick(() => {
         let canUpdate = true
-        if (!this.isAdmin) {
-          canUpdate = value.authOtherList.includes(this.userid || this.username) || value.authOwner === this.userid || value.authOwner === this.username
-        }
         this.$refs.rejectDetail.init(value, canUpdate)
       })
     },
