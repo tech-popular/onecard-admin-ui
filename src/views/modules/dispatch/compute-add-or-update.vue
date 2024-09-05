@@ -4,7 +4,7 @@
     :visible.sync="visible"
     :show-close="false"
     :wrapperClosable="false"
-    size="1100px"
+    size="1500px"
     class="api-manage-drawer"
   >
     <div slot="title" class="drawer-title">{{canUpdate ? dataForm.id ? '编辑任务' : '新增任务' : '查看任务'}}<i class="el-icon-close drawer-close" @click="drawerClose"></i></div>
