@@ -3,7 +3,7 @@
     <el-dialog title="剔除明细查询" :close-on-click-modal="false" :visible.sync="visible" width="50%">
       <el-form :inline="true" :model="dataForm" ref="dataForm">
         <el-form-item label="剔除分群筛选" prop="rejectTemplateId">
-          <el-select  v-model="dataForm.rejectTemplateId" clearable @change="handleChange">
+          <el-select  v-model="dataForm.rejectTemplateId" clearable>
             <el-option
                 v-for="(item, index) in rejectGroupList"
                 :label="item.label"
@@ -67,10 +67,13 @@ export default {
       this.dataForm.templateId = id
       console.log('templateId: ' + id)
       this.queryRejectGroupList(id)
-      this.queryData()
+      this.dataList = []
+      this.dataForm.expression = ''
+      // this.queryData()
     },
     queryData () {
       if (this.dataForm.rejectTemplateId) {
+        this.handleChange(this.dataForm.rejectTemplateId)
         this.dataListLoading = true
         console.log('templateId: ' + this.dataForm.templateId)
         console.log('rejectTemplateId: ' + this.dataForm.rejectTemplateId)
