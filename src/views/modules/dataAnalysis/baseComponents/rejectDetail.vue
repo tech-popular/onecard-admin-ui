@@ -73,6 +73,7 @@ export default {
       console.log('templateId: ' + id)
       this.dataList = []
       this.dataForm.expression = ''
+      this.dataForm.rejectTemplateId = ''
       this.rejectGroupList = []
       this.queryRejectGroupList(id)
       // this.queryData()
