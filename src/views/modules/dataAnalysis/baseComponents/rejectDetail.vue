@@ -24,9 +24,14 @@
         <el-table-column prop="condition" header-align="center" align="center" width="600" label="逻辑条件">
           <template slot-scope="scope">
             <div>
-              <el-tag>{{ scope.row.condition.split('-')[0] }}</el-tag>
-              <el-tag type="info">{{ scope.row.condition.split('-')[1] }}</el-tag>
-              <el-tag type="success">{{ scope.row.condition.split('-')[2] }}</el-tag>
+              <template v-if="scope.row.condition.split('-').length === 1">
+                <el-tag>{{ scope.row.condition.split('-')[0] }}</el-tag>
+              </template>
+              <template v-else>
+                <el-tag>{{ scope.row.condition.split('-')[0] }}</el-tag>
+                <el-tag type="info">{{ scope.row.condition.split('-')[1] }}</el-tag>
+                <el-tag type="success">{{ scope.row.condition.split('-')[2] }}</el-tag>
+              </template>
             </div>
           </template>
         </el-table-column>
@@ -66,6 +71,7 @@ export default {
     },
     queryData () {
       if (this.dataForm.rejectTemplateId) {
+        this.dataListLoading = true
         console.log('templateId: ' + this.dataForm.templateId)
         console.log('rejectTemplateId: ' + this.dataForm.rejectTemplateId)
         pickConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({ data }) => {
