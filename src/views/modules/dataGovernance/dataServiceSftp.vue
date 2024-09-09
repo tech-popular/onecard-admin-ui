@@ -146,6 +146,7 @@ export default {
   },
   mounted () {
     this.getUsersList()
+    this.pushReceiver()
   },
   methods: {
     getRowKeys (row) {
@@ -186,6 +187,15 @@ export default {
           this.userList = []
         }
       })
+    },
+    // 获取用户同一租户下的列表
+    pushReceiver () {
+      let userInfoString = sessionStorage.getItem('userInfo')
+      if (userInfoString) {
+        // 将 JSON 字符串解析为对象
+        let userInfo = JSON.parse(userInfoString)
+        this.baseForm.receiver.push(userInfo.userid)
+      }
     },
     // 选择文件
     treeNodeClick (data, node) {

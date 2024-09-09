@@ -168,7 +168,7 @@ export default {
         receiver: [], // 接收人,
         describePre: '', // 前描述
         describeAfter: '', // 后描述
-        headUser: '' // 负责人
+        headUser: ''// 负责人
       },
       sqlAddData: {
         datasourceId: '', // 数据源id
@@ -306,6 +306,15 @@ export default {
         this.sqlList = []
         this.baseForm.period = ''
         this.baseForm.receiveDays = ''
+        let userInfoString = sessionStorage.getItem('userInfo')
+        if (userInfoString) {
+          // 将 JSON 字符串解析为对象
+          let userInfo = JSON.parse(userInfoString)
+          console.log('userid' + userInfo.userid)
+          console.log('[userid]' + userInfo.userid)
+          this.baseForm.headUser = userInfo.userid
+          this.baseForm.receiver.push(userInfo.userid)
+        }
       }
       this.getSourceDataList()
       this.getUsersList()
