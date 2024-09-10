@@ -2,8 +2,8 @@
   <div>
     <el-dialog title="剔除明细查询" :close-on-click-modal="false" :visible.sync="visible" width="50%">
       <el-form :inline="true" :model="dataForm" ref="dataForm">
-        <el-form-item label="剔除分群筛选" prop="rejectTemplateId">
-          <el-select  v-model="dataForm.rejectTemplateId" clearable>
+        <el-form-item label="剔除分群" prop="rejectTemplateId">
+          <el-select  v-model="dataForm.rejectTemplateId" clearable @change="queryConditionCountGenerationTime">
             <el-option
                 v-for="(item, index) in rejectGroupList"
                 :label="item.label"
@@ -15,8 +15,16 @@
         <el-form-item>
           <el-button type="primary" @click="searchHandle()">查询</el-button>
         </el-form-item>
-        <el-form-item prop="expression">
-          <el-input v-model="dataForm.expression" placeholder="请输入名称" style="width: 500px" disabled></el-input>
+        <el-form-item>
+          <el-button type="success" @click="executeHandle()">执行</el-button>
+        </el-form-item>
+        <el-form-item prop="executeTime" label="上次执行时间">
+          <el-input v-model="dataForm.executeTime" style="width: 200px" disabled></el-input>
+        </el-form-item>
+      </el-form>
+      <el-form :inline="true" :model="dataForm1" ref="dataForm">
+        <el-form-item prop="expression" label="表达式">
+          <el-input v-model="dataForm.expression" style="width: 700px" disabled></el-input>
         </el-form-item>
       </el-form>
       <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -47,7 +55,7 @@
 </template>
 
 <script>
-import { pickConditionCount, getRejectGroupList, queryExpression } from '@/api/dataAnalysis/dataInsightManage'
+import { queryConditionCount, getRejectGroupList, queryExpression, queryConditionCountGenerationTime, executeSqlConditionCount } from '@/api/dataAnalysis/dataInsightManage'
 
 export default {
   data () {
@@ -58,6 +66,9 @@ export default {
       dataForm: {
         rejectTemplateId: '',
         templateId: '',
+        executeTime: ''
+      },
+      dataForm1: {
         expression: ''
       },
       dataListLoading: false,
@@ -72,7 +83,8 @@ export default {
       this.dataForm.templateId = id
       console.log('templateId: ' + id)
       this.dataList = []
-      this.dataForm.expression = ''
+      this.dataForm1.expression = ''
+      this.dataForm.executeTime = ''
       this.dataForm.rejectTemplateId = ''
       this.rejectGroupList = []
       this.queryRejectGroupList(id)
@@ -84,7 +96,7 @@ export default {
         this.dataListLoading = true
         console.log('templateId: ' + this.dataForm.templateId)
         console.log('rejectTemplateId: ' + this.dataForm.rejectTemplateId)
-        pickConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({ data }) => {
+        queryConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({ data }) => {
           if (!data || (data && (data.status !== '1' || !data.data))) {
             this.dataList = []
             this.dataListLoading = false
@@ -104,12 +116,37 @@ export default {
     },
     queryExpression (id) {
       queryExpression(id).then(({data}) => {
-        this.dataForm.expression = data.data
+        this.dataForm1.expression = data.data
+      })
+    },
+    queryConditionCountGenerationTime (value) {
+      queryConditionCountGenerationTime(this.dataForm.templateId, value).then(({data}) => {
+        this.dataForm.executeTime = data.data
       })
     },
     queryRejectGroupList (id) {
       getRejectGroupList(id).then(({data}) => {
         this.rejectGroupList = data.data
+      })
+    },
+    executeHandle() {
+      this.$confirm('是否确认生成剔除明细数据', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        executeSqlConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({data}) => {
+          if (data && data.status === 1) {
+            this.$message.success(data.msg || '执行成功')
+          } else {
+            this.$message.error(data.msg || '执行失败')
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
       })
     },
     searchHandle () {

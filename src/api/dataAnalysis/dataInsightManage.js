@@ -46,4 +46,6 @@ export const getAnalysisIndicators = channelCode => httpGet(da + `data/group/get
 
 export const getRejectGroupList = (templateId) => httpGet(da + `data/group/getRejectGroupList?templateId=${templateId}`)
 export const queryExpression = (templateId) => httpGet(da + `data/group/queryExpression?templateId=${templateId}`)
-export const pickConditionCount = (templateId, rejectTemplateId) => httpGet(da + `data/group/pick/condition/count?templateId=${templateId}&rejectTemplateId=${rejectTemplateId}`)
+export const queryConditionCount = (templateId, rejectTemplateId) => httpGet(da + `data/group/query/condition/count?templateId=${templateId}&rejectTemplateId=${rejectTemplateId}`)
+export const executeSqlConditionCount = (templateId, rejectTemplateId) => httpGet(da + `data/group/execute/condition/count?templateId=${templateId}&rejectTemplateId=${rejectTemplateId}`)
+export const queryConditionCountGenerationTime = (templateId, rejectTemplateId) => httpGet(da + `data/group/query/condition/count/generation/time?templateId=${templateId}&rejectTemplateId=${rejectTemplateId}`)
