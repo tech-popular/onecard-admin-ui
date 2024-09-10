@@ -27,7 +27,7 @@
       </el-form>
       <el-form :inline="true" :model="dataForm1" ref="dataForm1">
         <el-form-item prop="expression" label="表达式">
-          <el-input v-model="dataForm.expression" style="width: 700px" disabled></el-input>
+          <el-input v-model="dataForm1.expression" style="width: 700px" disabled></el-input>
         </el-form-item>
       </el-form>
       <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
@@ -109,15 +109,13 @@ export default {
             })
           } else {
             this.dataList = data.data
+            this.refreshHandle()
           }
           this.dataListLoading = false
         })
       }
     },
-    handleChange(value) {
-      this.queryExpression(value)
-    },
-    queryExpression (id) {
+    handleChange(id) {
       queryExpression(id).then(({data}) => {
         this.dataForm1.expression = data.data
       })
@@ -149,13 +147,17 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          executeSqlConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({data}) => {
-            console.log('执行生成剔除明细数据返回结果data:' + data)
-            if (!data || (data && (data.status !== '1' || !data.data))) {
-              this.$message.error(data.msg || '执行失败')
+          executeSqlConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({ data }) => {
+            console.log('执行生成剔除明细数据返回结果 data:', JSON.stringify(data))
+            // 这里的逻辑调整为根据接口返回的 message 和 status 来判断
+            if (data && data.status === '1') {
+              this.$message.success(data.message || '执行成功')
             } else {
-              this.$message.success(data.msg || '执行成功')
+              this.$message.error(data ? data.message : '执行失败')
             }
+          }).catch(err => {
+            console.error('执行过程中出现错误', err)
+            this.$message.error('执行失败')
           })
         }).catch(() => {
           this.$message({
