@@ -25,7 +25,7 @@
           <el-button type="success" @click="refreshHandle()">刷新</el-button>
         </el-form-item>
       </el-form>
-      <el-form :inline="true" :model="dataForm1" ref="dataForm">
+      <el-form :inline="true" :model="dataForm1" ref="dataForm1">
         <el-form-item prop="expression" label="表达式">
           <el-input v-model="dataForm.expression" style="width: 700px" disabled></el-input>
         </el-form-item>
