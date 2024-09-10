@@ -22,7 +22,7 @@
           <el-button type="primary" @click="executeHandle()">执行</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="success" @click="refreshHandle()">刷新</el-button>
+          <el-button type="success" @click="refreshHandle()">刷新执行时间</el-button>
         </el-form-item>
       </el-form>
       <el-form :inline="true" :model="dataForm1" ref="dataForm1">
