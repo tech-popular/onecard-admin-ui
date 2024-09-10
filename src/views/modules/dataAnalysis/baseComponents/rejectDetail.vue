@@ -136,10 +136,10 @@ export default {
         type: 'warning'
       }).then(() => {
         executeSqlConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({data}) => {
-          if (data && data.status === 1) {
-            this.$message.success(data.msg || '执行成功')
-          } else {
+          if (!data || (data && (data.status !== '1' || !data.data))) {
             this.$message.error(data.msg || '执行失败')
+          } else {
+            this.$message.success(data.msg || '执行成功')
           }
         })
       }).catch(() => {
