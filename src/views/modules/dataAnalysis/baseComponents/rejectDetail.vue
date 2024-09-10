@@ -19,7 +19,7 @@
           <el-input v-model="dataForm.executeTime" style="width: 200px" disabled></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="success" @click="executeHandle()">执行</el-button>
+          <el-button type="primary" @click="executeHandle()">执行</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="success" @click="refreshHandle()">刷新</el-button>
@@ -138,24 +138,32 @@ export default {
       })
     },
     executeHandle() {
-      this.$confirm('是否确认生成剔除明细数据', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        executeSqlConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({data}) => {
-          if (!data || (data && (data.status !== '1' || !data.data))) {
-            this.$message.error(data.msg || '执行失败')
-          } else {
-            this.$message.success(data.msg || '执行成功')
-          }
-        })
-      }).catch(() => {
+      if (!this.dataForm.rejectTemplateId) {
         this.$message({
-          type: 'info',
-          message: '已取消'
+          message: '请选择剔除分群后进行执行操作！',
+          type: 'warning'
         })
-      })
+      } else {
+        this.$confirm('是否确认生成剔除明细数据', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          executeSqlConditionCount(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({data}) => {
+            console.log('执行生成剔除明细数据返回结果data:' + data)
+            if (!data || (data && (data.status !== '1' || !data.data))) {
+              this.$message.error(data.msg || '执行失败')
+            } else {
+              this.$message.success(data.msg || '执行成功')
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+      }
     },
     searchHandle () {
       this.queryData()
