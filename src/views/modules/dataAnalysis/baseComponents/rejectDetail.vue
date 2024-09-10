@@ -15,11 +15,14 @@
         <el-form-item>
           <el-button type="primary" @click="searchHandle()">查询</el-button>
         </el-form-item>
+        <el-form-item prop="executeTime" label="上次执行时间">
+          <el-input v-model="dataForm.executeTime" style="width: 200px" disabled></el-input>
+        </el-form-item>
         <el-form-item>
           <el-button type="success" @click="executeHandle()">执行</el-button>
         </el-form-item>
-        <el-form-item prop="executeTime" label="上次执行时间">
-          <el-input v-model="dataForm.executeTime" style="width: 200px" disabled></el-input>
+        <el-form-item>
+          <el-button type="success" @click="refreshHandle()">刷新</el-button>
         </el-form-item>
       </el-form>
       <el-form :inline="true" :model="dataForm1" ref="dataForm">
@@ -121,6 +124,11 @@ export default {
     },
     queryConditionCountGenerationTime (value) {
       queryConditionCountGenerationTime(this.dataForm.templateId, value).then(({data}) => {
+        this.dataForm.executeTime = data.data
+      })
+    },
+    refreshHandle () {
+      queryConditionCountGenerationTime(this.dataForm.templateId, this.dataForm.rejectTemplateId).then(({data}) => {
         this.dataForm.executeTime = data.data
       })
     },
