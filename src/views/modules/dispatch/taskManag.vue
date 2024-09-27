@@ -28,12 +28,12 @@
                                :key="index"></el-option>
                 </el-select>
             </el-form-item>
-<!--            <el-form-item label="任务执行状态" prop="executeStatus">-->
-<!--                <el-select v-model="dataForm.executeStatus" placeholder="任务执行状态" clearable>-->
-<!--                    <el-option :label="item.desc" :value="item.desc" v-for="(item, index) in allStatusList"-->
-<!--                               :key="index"></el-option>-->
-<!--                </el-select>-->
-<!--            </el-form-item>-->
+            <el-form-item label="任务执行状态" prop="executeStatus">
+                <el-select v-model="dataForm.executeStatus" placeholder="任务执行状态" clearable>
+                    <el-option :label="item.desc" :value="item.desc" v-for="(item, index) in allStatusList"
+                               :key="index"></el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
                 <!--                <el-button @click="resetHandle()">重置</el-button>-->
