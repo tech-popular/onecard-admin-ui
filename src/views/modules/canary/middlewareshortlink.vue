@@ -48,6 +48,12 @@
         label="短链url">
       </el-table-column>
       <el-table-column
+        prop="shortLinkUrlNew"
+        header-align="center"
+        align="center"
+        label="简化短链url">
+      </el-table-column>
+      <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
