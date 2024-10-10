@@ -15,7 +15,8 @@ export default {
       beeFlowCode: '',
       beeFlowId: '',
       taskUniqueFlag: '',
-      configJson: {}
+      configJson: {},
+      enable: ''
     },
     outParams: []
   },

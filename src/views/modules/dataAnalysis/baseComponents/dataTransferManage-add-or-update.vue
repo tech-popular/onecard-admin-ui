@@ -663,7 +663,8 @@
           cardId: '',
           cardIdParams: '',
           triggerMode: '0', // 下发类型，默认0主动型 1被动
-          decisionType: '0'
+          decisionType: '0',
+          enable: ''
         },
         tag: '新建', // 说明是否是“查看”
         readonly: false, // 不可编辑
@@ -1152,6 +1153,7 @@
         postData.dolphinProcessId = data.dolphinProcessId
         postData.transferName = data.transferName
         postData.templateId = data.templateId
+        postData.enable = data.enable
         postData.transferType = data.transferType.join(',')
           console.log('data.compensationType' + data.compensationType)
         postData.compensationType = data.compensationType.join(',')
@@ -1256,6 +1258,7 @@
             this.baseForm.dolphinProcessId = disData.dolphinProcessId
             this.baseForm.templateId = disData.templateId
             this.baseForm.transferName = disData.transferName
+            this.baseForm.enable = disData.enable
             this.baseForm.triggerMode = disData.triggerMode ? disData.triggerMode + '' : '0'
             this.baseForm.taskDescribtion = disData.taskDescribtion === null ? '' : disData.taskDescribtion
             if (disData.decisionType === '1') {
