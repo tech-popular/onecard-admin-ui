@@ -224,7 +224,7 @@
                   <div slot="content">{{baseForm.kafkaParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('kafka') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('kafka')">{{canUpdate? '配置' : '查看' }}</div>
+                <div v-if="this.baseForm.transferType.indexOf('kafka') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('kafka')">{{ '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -258,7 +258,7 @@
                 <div slot="content">{{baseForm.smsParams}}</div>
                 <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
               </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('sms') > -1 " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('sms')">{{canUpdate? '配置' : '查看' }}</div>
+                <div v-if="this.baseForm.transferType.indexOf('sms') > -1 " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('sms')">{{ '查看' }}</div>
               </div>
             </el-col>
               <el-col style="width: 8.33333%;">
@@ -319,7 +319,7 @@
                   <div slot="content">{{baseForm.telParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('tel') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('tel')">{{canUpdate? '配置' : '查看' }}</div>
+                <div v-if="this.baseForm.transferType.indexOf('tel') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('tel')">{{ '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -353,7 +353,7 @@
                   <div slot="content">{{baseForm.aiParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('ai') > -1 " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('ai')">{{canUpdate? '配置' : '查看' }}</div>
+                <div v-if="this.baseForm.transferType.indexOf('ai') > -1 " style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('ai')">{{ '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -387,7 +387,7 @@
                   <div slot="content">{{baseForm.pushParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('push') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('push')">{{canUpdate? '配置' : '查看' }}</div>
+                <div v-if="this.baseForm.transferType.indexOf('push') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('push')">{{ '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -421,7 +421,7 @@
                   <div slot="content">{{baseForm.cardIdParams}}</div>
                   <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
                 </el-tooltip>
-                <div v-if="this.baseForm.transferType.indexOf('card') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('card')">{{canUpdate? '配置' : '查看' }}</div>
+                <div v-if="this.baseForm.transferType.indexOf('card') > -1" style="margin-top:5px;cursor:pointer;font-size:12px;color:#8c8c94;" @click="editConfigure('card')">{{ '查看' }}</div>
               </div>
             </el-col>
           </el-row>
@@ -1801,32 +1801,32 @@
           if (val === 'kafka') {
             this.kafkaNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.kafkaNode.init(this.channelCode, this.baseForm.kafkaServer, this.canUpdate)
+              this.$refs.kafkaNode.init(this.channelCode, this.baseForm.kafkaServer, false)
             })
           } else if (val === 'sms') {
             this.smsNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.smsNode.init(this.channelCode, this.baseForm.smsId, this.canUpdate)
+              this.$refs.smsNode.init(this.channelCode, this.baseForm.smsId, false)
             })
           } else if (val === 'tel') {
             this.telNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.telNode.init(this.channelCode, this.baseForm.telId, this.canUpdate)
+              this.$refs.telNode.init(this.channelCode, this.baseForm.telId, false)
             })
           } else if (val === 'ai') {
             this.aiNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.aiNode.init(this.channelCode, this.baseForm.aiId, this.canUpdate)
+              this.$refs.aiNode.init(this.channelCode, this.baseForm.aiId, false)
             })
           } else if (val === 'push') {
             this.pushNodeVisible = true
             this.$nextTick(() => {
-              this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId, this.canUpdate)
+              this.$refs.pushNode.init(this.channelCode, this.baseForm.pushId, false)
             })
           } else if (val === 'card') {
             this.cardVoucherVisible = true
             this.$nextTick(() => {
-              this.$refs.cardVoucherNode.init(this.channelCode, this.baseForm.cardId, this.canUpdate)
+              this.$refs.cardVoucherNode.init(this.channelCode, this.baseForm.cardId, false)
             })
           }
         } else {

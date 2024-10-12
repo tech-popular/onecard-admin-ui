@@ -24,10 +24,12 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
       <dataInsightManageAddOrUpdate ref="dataInsightManageAddOrUpdate"></dataInsightManageAddOrUpdate>
+      <resourceBindAddOrUpdate ref="resourceBindAddOrUpdate"></resourceBindAddOrUpdate>
   </el-dialog>
 </template>
 <script>
 import dataInsightManageAddOrUpdate from './dataInsightManage-add-or-update'
+import resourceBindAddOrUpdate from './resourceBind-add-or-update'
 import { updateDataTransferManage, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
 export default {
   props: {
@@ -44,7 +46,8 @@ export default {
     }
   },
   components: {
-      dataInsightManageAddOrUpdate
+    dataInsightManageAddOrUpdate,
+    resourceBindAddOrUpdate
   },
   methods: {
     init () {
@@ -78,7 +81,7 @@ export default {
       return postData
     },
       // saveHandle() {
-      //     this.$emit('savueData', 'save', async (val) => { // val是父组件请求接口返回的数据
+      //     this.$emit('saveData', 'save', async (val) => { // val是父组件请求接口返回的数据
       //         if (val.status === '1') {
       //             for (let i = 0; i < this.dataList.length; i++) {
       //                 await new Promise(resolve => setTimeout(resolve, 5000 * i))
@@ -112,11 +115,14 @@ export default {
       //     })
       // },
       saveHandle() {
-          this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
+          this.$emit('saveData', 'update', val => { // val是父组件请求接口返回的数据
+            console.log('val' + val)
               if (val.status === '1') {
+                console.log('1')
                   let index = 0
                   const processItem = () => {
                       if (index < this.dataList.length) {
+                        console.log('2')
                           const item = this.dataList[index]
                           infoDataTransferManage(item.id)
                               .then(({data}) => {
@@ -185,7 +191,7 @@ export default {
     //                                 onClose: () => {
     //                                     this.visible = false
     //                                     this.$emit('updateClosed')
-    //                                     // this.$refs.dataInsightManageAddOrUpdate.savueData()
+    //                                     // this.$refs.dataInsightManageAddOrUpdate.saveData()
     //                                 }
     //                             })
     //                         }
@@ -203,7 +209,7 @@ export default {
     //     }
     // },
     // saveHandle () {
-    //   this.$emit('savueData', 'save', val => { // val是父组件请求接口返回的数据
+    //   this.$emit('saveData', 'save', val => { // val是父组件请求接口返回的数据
     //     if (val.status === '1') {
     //       this.dataList.forEach((item, index) => {
     //         // let tableData = this.dataList

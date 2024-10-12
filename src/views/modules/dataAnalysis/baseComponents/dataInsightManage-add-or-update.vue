@@ -200,7 +200,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
-    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @savueData="savueData"></taskDependencies>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @saveData="saveData"></taskDependencies>
   </el-drawer>
 </template>
 <script>
@@ -851,25 +851,25 @@ export default {
               return false
             }
           }
-          this.judgmentisTask(type)
+          this.judgmentTask(type)
         })
       } else {
-        this.judgmentisTask(type)
+        this.judgmentTask(type)
       }
     },
-    judgmentisTask (type) {
+    judgmentTask (type) {
         if (this.id && type === 'save' && this.baseForm.userType !== 'sql') {
             selectTransferTask(this.id).then(({ data }) => {
                 if (data.status === '1' && data.data) {
                     this.taskDependenciesList = data.data.dataTransfers
                     if (this.taskDependenciesList.length) {
                         this.taskDependenciesVisible = true
-                        // this.savueData()
+                        // this.saveData()
                         this.$nextTick(() => {
                             this.$refs.taskDependencies.init()
                         })
                     } else {
-                        this.savueData(type)
+                        this.saveData(type)
                     }
                 } else {
                     this.taskDependenciesList = []
@@ -880,10 +880,10 @@ export default {
                 }
             })
         } else {
-            this.savueData(type)
+            this.saveData(type)
         }
     },
-    savueData (type, callback) {
+    saveData (type, callback) {
       if (this.baseForm.userType === 'excel') { // excel方式
         this.excelSaveData(callback)
       } else if (this.baseForm.userType === 'sql') {

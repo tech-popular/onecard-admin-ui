@@ -276,15 +276,17 @@
       <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
+    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @saveData="saveData"></taskDependencies>
   </el-dialog>
 </template>
 <script>
 import { dataTransferManageOutParams, dataTransferManageKafka, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
-import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo, getCardInfo } from '@/api/dataAnalysis/sourceBinding'
+import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo, getCardInfo, selectTransferTaskByResourceId } from '@/api/dataAnalysis/sourceBinding'
 import { getShortLinkList } from '@/api/dataAnalysis/bindingShortLink'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import taskDependencies from './task-dependencies'
 export default {
   data () {
     /**
@@ -378,6 +380,8 @@ export default {
       shortLinkList: [], // 短信签名list
       cardNameList: [], // 红包卡券name的list
       cardDataList: [],
+      taskDependenciesList: [],
+      taskDependenciesVisible: false,
       httpResponseTypeOptions: [{
         value: 'map',
         label: 'map'
@@ -496,7 +500,10 @@ export default {
       }
     }
   },
-  components: { Treeselect },
+  components: {
+    taskDependencies,
+    Treeselect
+  },
   methods: {
     // 树加载
     async loadOptions ({ action, parentNode, callback }) {
@@ -1137,6 +1144,14 @@ export default {
       if (!this.dataForm.channelCode) return this.$message.error('请先选择所属渠道')
     },
     submitData () {
+      // 同步更新流转任务
+      if (this.dataForm.id) {
+        this.meanwhileUpdateTransfer(this.dataForm.id)
+      } else {
+        this.saveData()
+      }
+    },
+    saveData (action, callback) {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           if (this.dataForm.type !== 'kafka' && this.dataForm.type !== 'http' && this.fixedParams.length === 0) {
@@ -1246,6 +1261,9 @@ export default {
                     this.visible = false
                     this.$emit('refreshDataList')
                     this.$refs['dataForm'].resetFields()
+                    if (callback) {
+                      callback(data)
+                    }
                   }
                 })
               } else {
@@ -1253,6 +1271,26 @@ export default {
               }
             })
           }
+        }
+      })
+    },
+    updateClosed () {
+      this.visible = false
+      this.$parent.addOrUpdateVisible = false
+      this.$nextTick(() => {
+        this.$parent.getDataList()
+      })
+    },
+    meanwhileUpdateTransfer (id) {
+      selectTransferTaskByResourceId(id).then(({ data }) => {
+        this.taskDependenciesList = data.data.dataTransfers
+        if (this.taskDependenciesList.length) {
+          this.taskDependenciesVisible = true
+          this.$nextTick(() => {
+            this.$refs.taskDependencies.init()
+          })
+        } else {
+          this.saveData()
         }
       })
     }
