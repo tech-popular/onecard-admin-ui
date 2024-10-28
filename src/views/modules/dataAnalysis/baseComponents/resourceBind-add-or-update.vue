@@ -1283,7 +1283,7 @@ export default {
     },
     meanwhileUpdateTransfer (id) {
       selectTransferTaskByResourceId(id).then(({ data }) => {
-        this.taskDependenciesList = data.data.dataTransfers
+        this.taskDependenciesList = data.data === null ? [] : data.data.dataTransfers
         if (this.taskDependenciesList.length) {
           this.taskDependenciesVisible = true
           this.$nextTick(() => {
