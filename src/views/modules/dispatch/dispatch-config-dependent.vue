@@ -85,6 +85,7 @@ export default {
       leftSelectedData: [],
       rightSelectedData: [],
       leftTableData: [],
+      isSubmitting: false,
       rightTableData: []
     }
   },
@@ -155,6 +156,11 @@ export default {
       return [...b].filter(x => [...a].every(y => y.id !== x.id))
     },
     dataFormSubmit () {
+      // 如果正在提交，直接返回
+      if (this.isSubmitting) {
+        this.$message.warning('正在保存中，请勿重复提交')
+        return
+      }
       if (!this.rightTableData.length) {
         return this.$message.error('没有选择任何依赖！')
       }
@@ -166,6 +172,8 @@ export default {
           depProjectId: item.projectId
         })
       })
+      // 设置标志位为正在提交
+      this.isSubmitting = true
       taskDependenceAdd({
         list: params
       }).then(({data}) => {
@@ -177,6 +185,8 @@ export default {
           this.$message.error(data.msg || '提交异常')
         }
       })
+      // 请求完成后，无论成功或失败，都重置标志位
+      this.isSubmitting = false
     },
     // 每页数
     sizeChangeHandle (page) {

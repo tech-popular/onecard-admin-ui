@@ -187,6 +187,7 @@ export default {
         authOtherList: [],
         authOthers: ''
       },
+      isSubmitting: false,
       updateUser: '',
       updateTime: '',
       dataForm: {},
@@ -604,6 +605,11 @@ export default {
     },
     // 提交
     dataFormSubmit (form) {
+      // 如果正在提交，直接返回
+      if (this.isSubmitting) {
+        this.$message.warning('正在保存中，请勿重复提交')
+        return
+      }
       let flag = true
       this.$refs['dataForm1'].validate((valid) => {
         if (!valid) {
@@ -655,6 +661,10 @@ export default {
           params.failRepeatTrigger = 0
           params.failRepeatInterval = 1
         }
+
+        // 设置标志位为正在提交
+        this.isSubmitting = true
+
         url(params).then(({data}) => {
           if (data && data.code === 0) {
             this.$message({
@@ -668,6 +678,8 @@ export default {
           } else {
             this.$message.error(data.msg)
           }
+          // 请求完成后，无论成功或失败，都重置标志位
+          this.isSubmitting = false
         })
       }
     }
