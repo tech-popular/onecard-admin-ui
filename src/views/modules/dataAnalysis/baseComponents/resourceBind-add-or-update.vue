@@ -276,7 +276,7 @@
       <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
       <el-button @click="visible = false">取消</el-button>
     </div>
-    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @saveData="saveData"></taskDependencies>
+    <taskDependencies  ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @saveData="saveData"></taskDependencies>
   </el-dialog>
 </template>
 <script>
@@ -1286,7 +1286,7 @@ export default {
         console.log('selectTransferTaskByResourceId:' + data)
         this.taskDependenciesList = data.data === null ? [] : data.data.dataTransfers
         if (this.taskDependenciesList != null && this.taskDependenciesList.length) {
-          this.taskDependenciesVisible = true
+          // this.taskDependenciesVisible = true
           this.$nextTick(() => {
             this.$refs.taskDependencies.init()
           })
