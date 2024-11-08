@@ -30,7 +30,7 @@
 <script>
 import dataInsightManageAddOrUpdate from './dataInsightManage-add-or-update'
 import resourceBindAddOrUpdate from './resourceBind-add-or-update'
-import { updateDataTransferManage, infoDataTransferManage } from '@/api/dataAnalysis/dataTransferManage'
+import { updateDataTransferManage, infoDataTransferManage, addCanvasInfo } from '@/api/dataAnalysis/dataTransferManage'
 export default {
   props: {
     // 父组件传来的值需定义一下
@@ -78,6 +78,7 @@ export default {
       postData.taskScheduleConfig = data.taskScheduleConfig
       postData.compensationType = data.compensationType
       postData.compensationCodes = data.compensationCodes
+      postData.configJson = data.configJson
       return postData
     },
       // saveHandle() {
@@ -128,7 +129,11 @@ export default {
                               .then(({data}) => {
                                   if (data.status === '1' && data.data) {
                                       const params = this.formatPostData(data.data)
-                                      return updateDataTransferManage(params)
+                                      if (data.data.decisionType === '1') {
+                                        return addCanvasInfo(params)
+                                      } else {
+                                        return updateDataTransferManage(params)
+                                      }
                                   } else {
                                       throw new Error('Invalid data status or no data')
                                   }
