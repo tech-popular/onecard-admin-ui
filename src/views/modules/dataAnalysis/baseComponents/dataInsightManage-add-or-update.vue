@@ -200,7 +200,7 @@
       <el-button type="default" @click="cancelHandle" size="small">取消</el-button>
     </div>
     <data-preview-info v-if="isPreviewShow" ref="dataPreviewInfo" :vestPackCode="rejectForm.vestPackCode"></data-preview-info>
-    <taskDependencies v-if="taskDependenciesVisible" ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @saveData="saveData"></taskDependencies>
+    <taskDependencies ref="taskDependencies" :dataList="taskDependenciesList" @updateClosed="updateClosed" @saveData="saveData"></taskDependencies>
   </el-drawer>
 </template>
 <script>
@@ -863,7 +863,6 @@ export default {
                 if (data.status === '1' && data.data) {
                     this.taskDependenciesList = data.data.dataTransfers
                     if (this.taskDependenciesList.length) {
-                        this.taskDependenciesVisible = true
                         // this.saveData()
                         this.$nextTick(() => {
                             this.$refs.taskDependencies.init()

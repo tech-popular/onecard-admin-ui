@@ -1286,7 +1286,6 @@ export default {
         console.log('selectTransferTaskByResourceId:' + data)
         this.taskDependenciesList = data.data === null ? [] : data.data.dataTransfers
         if (this.taskDependenciesList != null && this.taskDependenciesList.length) {
-          // this.taskDependenciesVisible = true
           this.$nextTick(() => {
             this.$refs.taskDependencies.init()
           })
