@@ -399,6 +399,9 @@ export default {
     getAllSystem () {
       projectAll().then(({data}) => {
         this.allSystemList = data.data
+        if (this.allSystemList && this.allSystemList.length > 0) {
+          this.dataForm.projectId = this.allSystemList[0].id
+        }
       })
     },
     getAllDataSourceList () {
