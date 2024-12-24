@@ -215,7 +215,7 @@
 import {
     list,
     taskExecute,
-    tagAll,
+    tagCountAll,
     changeTaskDisable,
     changeDispatchStatus,
     taskBatchStatus
@@ -304,12 +304,13 @@ export default {
     },
     methods: {
         init() {
+          console.log('this.dataForm.tag:' + this.dataForm.tag)
             const dataBody = {
                 'pageNum': this.pageNum,
                 'pageSize': this.pageSize,
                 'id': this.dataForm.id,
                 'name': this.dataForm.taskName,
-                'tag': this.dataForm.tag,
+                'tag': this.processTag(this.dataForm.tag),
                 'type': this.dataForm.type === -1 ? '' : this.dataForm.type,
                 'user': this.dataForm.createUser,
                 'status': this.dataForm.taskDisable === -1 ? '' : this.dataForm.taskDisable,
@@ -318,6 +319,12 @@ export default {
             }
             this.getList(dataBody)
             this.buildTagDownList()
+        },
+        processTag(tag) {
+          if (tag === null || tag === '') {
+            return ''
+          }
+          return tag.replace(/\(\d+\)/g, '')
         },
         // 查询
         handleSearch() {
@@ -462,7 +469,7 @@ export default {
             })
         },
         buildTagDownList() {
-            tagAll().then(({data}) => {
+          tagCountAll().then(({data}) => {
                 this.tagDownList = data.data
             })
         },

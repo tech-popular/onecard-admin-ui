@@ -15,6 +15,7 @@ export const getTaskNameList = () => httpGet(base + '/dispatch/task/getTaskNameL
 export const dataSourceAll = (type, flow) => httpGet(base + `dispatch/datasource/supports?taskType=${type}&dataFlow=${flow}`) // 同步及计算任务中的殴打让你源类型下选
 export const accountAll = params => httpPost(base + 'dispatch/account/selectall', params)
 export const tagAll = () => httpGet(base + 'dispatch/task/tag/list')
+export const tagCountAll = () => httpGet(base + 'dispatch/task/tagCount/list')
 export const getResourceList = () => httpGet(base + 'dispatch/task/getResourceList')
 export const changeTaskDisable = (id) => httpGet(base + `dispatch/task/changeTaskDisable/${id}`)
 export const changeDispatchStatus = (id) => httpGet(base + `dispatch/task/changeDispatchStatus/${id}`)
