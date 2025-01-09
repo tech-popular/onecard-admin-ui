@@ -9,6 +9,7 @@
             <el-form-item>
                 <el-button type="primary" @click="handleSearch()">查询</el-button>
                 <el-button type="primary" :disabled="isButtonDisabled" @click="executeRetryFailedTask()">重试当日失败任务</el-button>
+                <el-button type="primary" :disabled="isButtonDisabled" @click="startFlowInstanceDownward()">一键向下执行</el-button>
             </el-form-item>
         </el-form>
         <el-table :data="dataList" border
@@ -29,6 +30,7 @@
             :page-size="pageSize"
             :total="totalPage"
             layout="total, sizes, prev, pager, next, jumper"/>
+      <flowInstanceDownward v-if="flowInstanceDownwardVisible" ref="flowInstanceDownward" @refreshDataList="init"></flowInstanceDownward>
     </div>
 </template>
 
@@ -36,6 +38,7 @@
 import {
     executeRetryFailedTask, projectAll, flowInstanceList
 } from '@/api/dispatch/taskManag'
+import flowInstanceDownward from './task-flow-downward.vue'
 
 export default {
     data() {
@@ -45,6 +48,7 @@ export default {
             pageSize: 10, // 默认每页10条
             totalPage: 0,
             dataListLoading: false,
+            flowInstanceDownwardVisible: false,
             dataForm: {
                 projectId: ''
             },
@@ -54,6 +58,7 @@ export default {
         }
     },
     components: {
+      flowInstanceDownward
 
     },
     mounted() {
@@ -88,6 +93,13 @@ export default {
         handleSearch() {
             this.pageNum = 1
             this.init()
+        },
+        startFlowInstanceDownward() {
+          this.flowInstanceDownwardVisible = true
+          this.$nextTick(() => {
+            this.$refs.flowInstanceDownward.init()
+          })
+          // }
         },
         executeRetryFailedTask() {
             if (!this.dataForm.projectId) {
