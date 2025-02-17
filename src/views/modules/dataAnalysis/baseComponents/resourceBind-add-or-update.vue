@@ -1287,7 +1287,9 @@ export default {
         this.taskDependenciesList = data.data === null ? [] : data.data.dataTransfers
         if (this.taskDependenciesList != null && this.taskDependenciesList.length) {
           this.$nextTick(() => {
-            this.$refs.taskDependencies.init()
+            if (this.$refs.taskDependencies) {
+              this.$refs.taskDependencies.init()
+            }
           })
         } else {
           this.saveData()
