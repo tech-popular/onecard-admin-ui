@@ -1,5 +1,5 @@
 <template>
-  <el-dialog width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog class="custom-dialog" width="800px" :title="tag === 'view' ? '查看' : dataForm.id ? '修改' : '新增'" :append-to-body="true" :close-on-click-modal="false" :visible.sync="visible">
     <el-form v-loading="dataLoading" label-width="160px" :model="dataForm" :rules="baseRule" ref="dataForm" :disabled="viewVisible">
       <el-form-item label="名称" prop="resourceName" :rules="{ required: true, message: '请输入名称', trigger: 'blur' }">
         <el-input v-model="dataForm.resourceName" placeholder="请输入名称" style="width: 400px"></el-input>
@@ -1299,3 +1299,9 @@ export default {
   }
 }
 </script>
+<style scoped>
+/* 自定义样式 */
+.custom-dialog {
+  z-index: 1; /* 设置较小的 z-index 值 */
+}
+</style>
