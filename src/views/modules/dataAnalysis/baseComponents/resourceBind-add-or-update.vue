@@ -597,7 +597,7 @@ export default {
               this.dataForm.resourceName = this.dataForm.resourceName
               this.dataForm.cusSmsType = bindingContent.cusSmsType
               this.dataForm.shortLinkId = bindingContent.shortLinkId
-              this.dataForm.shortLinkCode = '${shortLink_' + bindingContent.shortLinkId + '}'
+              this.dataForm.shortLinkCode = '#short_link#'
               this.dataForm.productNo = bindingContent.productNo
               this.dataForm.smsContent = bindingContent.content
               this.getShortLinkList()
