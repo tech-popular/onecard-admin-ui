@@ -8,7 +8,8 @@ export const pause = params => httpPost(da + 'connect/pause', params) // 暂停
 export const resume = params => httpPost(da + 'connect/resume', params) // 恢复暂停
 export const restart = params => httpPost(da + 'connect/restart', params) // 重启
 export const deleteConnector = params => httpPost(da + 'connect/delete', params) // 重启
-export const getHost = id => httpGet(da + `connect/getHost`) // 获取host
+export const getConnectorHost = id => httpGet(da + `connect/getConnectorHost`) // 获取host
+export const getSchemaHost = id => httpGet(da + `schema/getSchemaHost`) // 获取host
 
 export const get = params => httpPost(da + `connect/get`, params) // 获取
 

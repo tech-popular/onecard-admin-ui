@@ -61,7 +61,7 @@
 }
 </style>
 <script>
-import {schemaPageList, deleteSchema, getHost} from '@/api/connector/connectorManage'
+import {schemaPageList, deleteSchema, getSchemaHost} from '@/api/connector/connectorManage'
 import schemaManageAddOrUpdate from './schemaManage-add-or-update'
 
 export default {
@@ -165,7 +165,7 @@ export default {
             })
         },
         getHost() {
-            getHost().then(({data}) => {
+          getSchemaHost().then(({data}) => {
                 if (data.code === 0 && data.data) {
                     this.connectorSourceList = data.data
                 }

@@ -142,7 +142,7 @@
 }
 </style>
 <script>
-import {pageList, pause, resume, deleteConnector, getHost} from '@/api/connector/connectorManage'
+import {pageList, pause, resume, deleteConnector, getConnectorHost} from '@/api/connector/connectorManage'
 import addOrUpdate from './connectorManage-add-or-update'
 
 export default {
@@ -299,7 +299,7 @@ export default {
             })
         },
         getHost() {
-            getHost().then(({data}) => {
+          getConnectorHost().then(({data}) => {
                 if (data.code === 0 && data.data) {
                     this.connectorSourceList = data.data
                 }
