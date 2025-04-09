@@ -277,16 +277,7 @@ export default {
           })
         } else { // 外链系统，进行页面跳转
           if (item.name === '新BI系统') {
-            let baseHref = window.SITE_CONFIG.BIGDATA_HREFLINK
-            const urlObj = new URL(baseHref)
-            // 强制设置协议为 http:
-            urlObj.protocol = 'http:'
-
-            // 组装 path 和查询参数
-            urlObj.pathname = '/bi/#/home'   // 如果你的 hash 路径要保留，也可以后面再拼
-            urlObj.search = `?token=${this.$cookie.get('token')}`
-
-            const url = urlObj.toString()
+            let url = window.SITE_CONFIG.BIGDATA_HREFLINK + '/bi/#/home?token=' + this.$cookie.get('token')
             //  url = item.url + '?token=' + this.$cookie.get('token') + '&userId=' + sessionStorage.getItem('id')
           // url: '/bi/#/home?token=' + this.$cookie.get('token')
             window.open(url, '_blank')
