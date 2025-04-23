@@ -44,6 +44,7 @@
     "vue-ele-form": "^0.8.25",
     "vue-ele-form-codemirror": "^0.1.3",
     "vue-ele-form-json-editor": "^0.1.3",
+    "vue-pdf": "^4.3.0",
     "vue-router": "3.0.1",
     "vuex": "3.0.1",
     "xlsx": "^0.16.2"
