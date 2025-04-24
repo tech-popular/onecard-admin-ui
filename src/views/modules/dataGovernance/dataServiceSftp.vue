@@ -27,6 +27,9 @@
           </div>
         </div>
         <div style="width:65%">
+          <p style="color:#C94F4F">注：SFTP增加提取文件敏感性校验，暂不支持压缩包提取以及大于20M文件提取</p>
+          <p style="color:#C94F4F">   如遇特殊情况，可联系大数据同事提取</p>
+          <span></span>
           <el-table :data="dataList" :row-key="getRowKeys" ref="ftpDataTable" border v-loading="dataListLoading" style="width: 100%;" @selection-change="handleSelectionChange">
             <el-table-column type="selection" :reserveSelection="true" width="90"></el-table-column>
             <el-table-column prop="num" header-align="center" align="center" label="序号"></el-table-column>
@@ -51,9 +54,6 @@
             </span>
           </div>
           <div style="margin-left:0px;margin-top:50px;">
-<!--            <el-form-item>-->
-<!--                <el-tag type="danger">注：暂不支持中文文件名称提取，请修改为英文文件名称后操作</el-tag>-->
-<!--            </el-form-item>-->
             <el-form-item label="申请原因" prop="approveReason">
               <el-input v-model="baseForm.approveReason" type="textarea"></el-input>
             </el-form-item>
