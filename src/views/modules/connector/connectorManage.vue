@@ -237,65 +237,95 @@ export default {
             }
         },
         resume(row) {
+          this.$confirm(
+            `确定对${row.name}操作?`,
+            '提示',
+            {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }
+          ).then(() => {
             let params = {
-                'connectorSource': this.dataForm.connectorSource,
-                'name': row.name
+              'connectorSource': this.dataForm.connectorSource,
+              'name': row.name
             }
             resume(params).then(({data}) => {
-                if (data && data.code === 0) {
-                    this.$message({
-                        message: '成功',
-                        type: 'success',
-                        duration: 1500,
-                        onClose: () => {
-                            this.searchData()
-                        }
-                    })
-                } else {
-                    this.$message.error(data.msg)
-                }
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.searchData()
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
             })
+          })
         },
         deleteConnector(row) {
+          this.$confirm(
+            `确定对${row.name}操作?`,
+            '提示',
+            {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }
+          ).then(() => {
             let params = {
-                'connectorSource': this.dataForm.connectorSource,
-                'name': row.name
+              'connectorSource': this.dataForm.connectorSource,
+              'name': row.name
             }
             deleteConnector(params).then(({data}) => {
-                if (data && data.code === 0) {
-                    this.$message({
-                        message: '成功',
-                        type: 'success',
-                        duration: 1500,
-                        onClose: () => {
-                            this.searchData()
-                        }
-                    })
-                } else {
-                    this.$message.error(data.msg)
-                }
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.searchData()
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
             })
+          })
         },
         // 获取数据列表
         pause(row) {
-            console.log('pause,row:' + JSON.stringify(row))
-            let params = {
+            this.$confirm(
+              `确定对${row.name}操作?`,
+              '提示',
+              {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }
+            ).then(() => {
+              console.log('pause,row:' + JSON.stringify(row))
+              let params = {
                 'connectorSource': this.dataForm.connectorSource,
                 'name': row.name
-            }
-            pause(params).then(({data}) => {
+              }
+              pause(params).then(({data}) => {
                 if (data && data.code === 0) {
-                    this.$message({
-                        message: '成功',
-                        type: 'success',
-                        duration: 1500,
-                        onClose: () => {
-                            this.searchData()
-                        }
-                    })
+                  this.$message({
+                    message: '成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.searchData()
+                    }
+                  })
                 } else {
-                    this.$message.error(data.msg)
+                  this.$message.error(data.msg)
                 }
+              })
             })
         },
         getHost() {
