@@ -23,12 +23,20 @@ export default {
   methods: {
     // 直接跳转到后端接口返回的页面
     redirectToResult() {
-      let id = this.$route.query.id  // 从路由中获取 id
-      let baseUrl = window.SITE_CONFIG.baseUrl  // 获取配置中的 baseUrl
-      // 动态构建后端接口地址，进行跳转
-      window.location.href = `${baseUrl}/export/data/ftp/preview/${id}` // 替换为实际的后端接口路径
+      let id = this.$route.query.id
+      const url = this.$http.adornUrl(`/export/data/ftp/preview/${id}`)
+
+      // 创建一个隐藏表单
+      const form = document.createElement('form')
+      form.action = url
+      form.method = 'get'
+      form.target = '_blank' // 新窗口打开，如果不想新窗口可以去掉
+
+      document.body.appendChild(form)
+      form.submit()
+      document.body.removeChild(form)
     }
-  }
+
 }
 </script>
 <style scoped>
