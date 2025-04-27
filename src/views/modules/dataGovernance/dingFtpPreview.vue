@@ -36,7 +36,7 @@ export default {
       form.submit()
       document.body.removeChild(form)
     }
-
+  }
 }
 </script>
 <style scoped>
