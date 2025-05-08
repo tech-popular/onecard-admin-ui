@@ -27,7 +27,7 @@
           </div>
         </div>
         <div style="width:65%">
-          <p style="color:#e83c3c">注：SFTP增加提取文件敏感性校验，暂不支持压缩包提取以及大于20M文件提取</p>
+          <p style="color:#e83c3c">注：SFTP增加提取文件敏感性校验，暂不支持压缩包提取以及大于50M文件提取</p>
           <p style="color:#e83c3c">如遇特殊情况，可联系大数据同事提取</p>
           <span></span>
           <el-table :data="dataList" :row-key="getRowKeys" ref="ftpDataTable" border v-loading="dataListLoading" style="width: 100%;" @selection-change="handleSelectionChange">
