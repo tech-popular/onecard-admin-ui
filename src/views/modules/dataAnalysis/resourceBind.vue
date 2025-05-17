@@ -14,7 +14,7 @@
       <el-form-item label="名称">
         <el-input v-model="dataForm.resourceName" placeholder="" clearable />
       </el-form-item>
-      <el-form-item label="所属业务线">
+<!--      <el-form-item label="所属业务线">
         <el-select
 					v-model="dataForm.channelCode"
 					filterable
@@ -29,7 +29,7 @@
 						></el-option>
 					</template>
 				</el-select>
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" @click="searchHandle()">查询</el-button>
         <el-button @click="resetHandle()">重置</el-button>
