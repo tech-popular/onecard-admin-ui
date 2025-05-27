@@ -258,7 +258,7 @@ export default {
           // this.getSelectAllCata()
           getDataCataLog().then(({ data }) => {
             if (data.status === '1') {
-              this.alldataCataLogList = data.data.length ? data.data.filter(item => item.name === '玖富新万卡') : []
+              this.alldataCataLogList = data.data
             } else {
               this.alldataCataLogList = []
             }
@@ -373,7 +373,7 @@ export default {
       // this.getSelectAllCata()
       getDataCataLog().then(({ data }) => {
         if (data.status === '1') {
-          this.alldataCataLogList = data.data.length ? data.data.filter(item => item.name === '玖富新万卡') : []
+          this.alldataCataLogList = data.data
         } else {
           this.alldataCataLogList = []
         }
