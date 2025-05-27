@@ -54,6 +54,7 @@
       <el-table-column prop="params" header-align="center" align="left" label="出参"/>
       <el-table-column prop="datasourceType" header-align="center" align="center" width="150" label="通道"/>
       <el-table-column prop="target" header-align="center" align="center" width="150" label="目标"/>
+      <el-table-column prop="customParams" header-align="center" align="center" width="150" label="自定义参数"/>
       <el-table-column header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -86,7 +87,7 @@
 </template>
 
 <script>
-  import { getProgressConfigList, getChannelist, deleteSmartFlow } from '@/api/dataAnalysis/sourceBinding'
+  import { getProgressConfigList, getChannel, deleteSmartFlow } from '@/api/dataAnalysis/sourceBinding'
   import { dataTransferManageKafka } from '@/api/dataAnalysis/dataTransferManage'
   import AddOrUpdate from './processConfig-add-or-update'
   // import Look from './taskFlow-look'
@@ -172,7 +173,7 @@
       })
     },
       getChannelsList () {
-        getChannelist().then(res => {
+        getChannel().then(res => {
           if (res.data.status * 1 !== 1) {
             this.channelList = []
             return

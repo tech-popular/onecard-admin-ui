@@ -64,6 +64,14 @@
 					</el-select>
 				</el-form-item>
 			</div>
+      <el-form-item  prop="customParams"  label="自定义参数">
+        <el-input
+          type="textarea"
+          :autosize="{ minRows: 2, maxRows: 4}"
+          placeholder="请输入内容"
+          v-model="dataForm.customParams">
+        </el-input>
+      </el-form-item>
 		</el-form>
 		<div slot="footer" class="foot">
       <el-button type="primary" @click="submitData" v-if="!viewVisible">提交</el-button>
@@ -73,7 +81,7 @@
 </template>
 <script>
 import { dataTransferManageOutParams, dataTransferManageKafka } from '@/api/dataAnalysis/dataTransferManage'
-import { getChannelist, addFlowInfo, editFlowInfo, lookFlowList } from '@/api/dataAnalysis/sourceBinding'
+import { getChannel, addFlowInfo, editFlowInfo, lookFlowList } from '@/api/dataAnalysis/sourceBinding'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -93,7 +101,8 @@ export default {
         channelCode: '', // 用户渠道
         params: [], // 绑定的出参
         datasourceType: '', // 通道
-        datasourceId: ''
+        datasourceId: '',
+        customParams: '' // 自定义参数
       },
       datasourceList: [],
       outParamsList: [],
@@ -138,7 +147,8 @@ export default {
         type: '',
         params: [],
         datasourceType: '',
-        datasourceId: ''
+        datasourceId: '',
+        customParams: ''
       }
       this.params = []
       this.datasourceList = []
@@ -157,13 +167,14 @@ export default {
           this.dataForm.type = res.data.data.type
           this.dataForm.datasourceType = res.data.data.datasourceType
           this.dataForm.datasourceId = res.data.data.datasourceId
+          this.dataForm.customParams = res.data.data.customParams
           this.changeType()
           this.getOutParamsList(row, res.data.data.params.split(','))
         }
       })
     },
     getChannelsList () {
-      getChannelist().then(res => {
+      getChannel().then(res => {
         if (res.data.status * 1 !== 1) {
           this.channelList = []
           return
@@ -313,7 +324,8 @@ export default {
             channelCode: this.dataForm.channelCode,
             params: this.params.join(','),
             datasourceType: this.dataForm.datasourceType,
-            datasourceId: this.dataForm.datasourceId
+            datasourceId: this.dataForm.datasourceId,
+            customParams: this.dataForm.customParams
           }
           if (!this.dataForm.id) {
               addFlowInfo(params).then(({data}) => {

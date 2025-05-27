@@ -281,7 +281,7 @@
 </template>
 <script>
 import { dataTransferManageOutParams, dataTransferManageKafka, getAllSmsChannels, getSmsCodeInfo } from '@/api/dataAnalysis/dataTransferManage'
-import { getChannelist, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo, getCardInfo, selectTransferTaskByResourceId } from '@/api/dataAnalysis/sourceBinding'
+import { getChannel, addDataInfo, editDataInfo, lookDataList, getFixedParams, getResourceInfoFromType, getSmsStyleInfo, getSmsSignInfo, getCardInfo, selectTransferTaskByResourceId } from '@/api/dataAnalysis/sourceBinding'
 import { getShortLinkList } from '@/api/dataAnalysis/bindingShortLink'
 import { deepClone, findVueSelectItemIndex } from '../dataAnalysisUtils/utils'
 import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
@@ -679,7 +679,7 @@ export default {
       })
     },
     getChannelsList () {
-      getChannelist().then(res => {
+      getChannel().then(res => {
         if (res.data.status * 1 !== 1) {
           this.channelList = []
           return

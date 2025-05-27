@@ -65,7 +65,7 @@
         <template slot-scope="scope">
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'edit')">编辑</el-button>
           <el-button type="text" @click="addOrUpdateHandle(scope.row, 'view')">查看</el-button>
-          <el-button type="text" @click="deletedateHandle(scope.row)" v-if="isAdmin" >删除</el-button>
+          <el-button type="text" @click="deleteDateHandle(scope.row)" v-if="isAdmin" >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,7 +86,7 @@
 <script>
   import AddOrUpdate from './baseComponents/resourceBind-add-or-update'
   import ProcessConfig from './baseComponents/resoureBind-process-config'
-  import { getDataList, deleteDataInfo, getChannelist } from '@/api/dataAnalysis/sourceBinding'
+  import { getDataList, deleteDataInfo, getChannel } from '@/api/dataAnalysis/sourceBinding'
   export default {
     data () {
       return {
@@ -151,7 +151,7 @@
         })
       },
     getChannelsList () {
-      getChannelist().then(res => {
+      getChannel().then(res => {
         if (res.data.status * 1 !== 1) {
           this.channelList = []
           return
@@ -183,7 +183,7 @@
         })
       },
       // 删除数据
-      deletedateHandle (row) {
+      deleteDateHandle (row) {
         this.$confirm(`确认删除名称为【${row.resourceName}】的数据?`, '提示', {
           confirmButtonText: '删除',
           cancelButtonText: '取消',
