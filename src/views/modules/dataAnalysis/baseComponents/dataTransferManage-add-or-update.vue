@@ -492,6 +492,10 @@
                 <i class="el-icon-info cursor-pointer" style="color:#409eff"></i>
               </el-tooltip>
             </el-form-item>
+              <el-form-item label="触达去重" prop="repeatModel">
+                <el-radio v-model="baseForm.repeatModel" :label="1">开启去重</el-radio>
+                <el-radio v-model="baseForm.repeatModel" :label="0">关闭去重</el-radio>
+            </el-form-item>
         </div>
       </el-form>
     </div>
@@ -646,6 +650,7 @@
           compensationType: [], // 补偿类型
           // intelligentDistribution: [], // 业务下发
           increModel: 0, // 下发模式
+          repeatModel: 1, // 默认开启去重
           kafkaServer: '', // 已绑定的kafka
           kafkaParams: '', // kafka出参
           topic: '',
@@ -1072,6 +1077,7 @@
             this.isStatic = false
           }
           this.baseForm.increModel = 0
+          this.baseForm.repeatModel = 1
           return item.value === selVal
         })
         this.baseForm.transferName = obj.text + (this.baseForm.decisionType === '0' ? '下发任务' : '智能运营任务')
@@ -1188,6 +1194,7 @@
             postData.compensationCodes.push(data.aiCompensationCode)
         }
         postData.increModel = data.increModel
+        postData.repeatModel = data.repeatModel
         postData.taskScheduleConfig = {}
         let tempTime = new Date(data.jobType == 1 ? data.onceRunTime : data.runTime)
         let year = tempTime.getFullYear().toString()
@@ -1284,6 +1291,7 @@
               this.isStatic = false
             }
             this.baseForm.increModel = disData.increModel == -1 ? 0 : disData.increModel
+            this.baseForm.repeatModel = disData.repeatModel
             let tempTime = disData.taskScheduleConfig
             switch (disData.taskScheduleConfig.jobType) {
               case 'ONCE_ONLY':
@@ -1423,6 +1431,7 @@
         this.baseForm.compensationType = []
         this.isStatic = false
         this.baseForm.increModel = 0
+        this.baseForm.repeatModel = 1
         this.baseForm.kafkaServer = ''
         // this.baseForm.topic = ''
         // this.baseForm.mysqlServer = ''
@@ -1916,6 +1925,9 @@
       margin-left: 30px
     }
     & .radio-incremodel {
+      margin-right: 15px;
+    }
+    & .radio-repeatModel {
       margin-right: 15px;
     }
     & .transfer-log {
