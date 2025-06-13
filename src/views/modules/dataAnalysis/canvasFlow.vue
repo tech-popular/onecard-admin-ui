@@ -428,6 +428,7 @@ export default {
         templateId: this.$store.state.canvasFlow.saveDate.templateId,
         taskScheduleConfig: this.$store.state.canvasFlow.saveDate.taskScheduleConfig,
         increModel: this.$store.state.canvasFlow.saveDate.increModel,
+        repeatModel: this.$store.state.canvasFlow.saveDate.repeatModel,
         enable: this.$store.state.canvasFlow.saveDate.enable,
         // id: this.$store.state.canvasFlow.saveDate.id,
         decisionType: this.$store.state.canvasFlow.saveDate.decisionType,
