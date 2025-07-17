@@ -12,10 +12,10 @@
     window.SITE_CONFIG['baseUrl'] = '//inner-tech.9f.cn/canary-admin'
   } else {
     // api接口请求地址
-    window.SITE_CONFIG['baseUrl'] = '//tech.9f.cn/canary-admin' // 测试环境
+    window.SITE_CONFIG['baseUrl'] = '/canary-admin'
   }
   // cdn地址 = 域名 + 版本号
-  window.SITE_CONFIG['BIGDATA_HREFLINK'] = 'http://tech.9f.cn' // 域名
+  window.SITE_CONFIG['BIGDATA_HREFLINK'] = 'http://unify-manager.datacenter-standard' // 域名
 
   window.SITE_CONFIG['domain'] = './' // 域名
   window.SITE_CONFIG['version'] = ''   // 版本号(年月日时分)
